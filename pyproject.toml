@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "atomic-flow"
+version = "0.0.1"
+description = "Self-hosted AI gateway with hierarchical code understanding"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "atomic", email = "you@example.com" }]
+
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "pyyaml>=6.0",
+    "pathspec>=0.12",
+]
+
+[project.optional-dependencies]
+encoder = [
+    "torch>=2.2",
+    "transformers>=4.42",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+atomic = "atomic_flow.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/atomic_flow"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
