@@ -1,0 +1,34 @@
+[
+  {
+    "id": "invoice-subtotal",
+    "query": "How does Invoice.subtotal calculate the invoice subtotal?",
+    "path": "invoice_service.py",
+    "symbol": "Invoice.subtotal",
+    "must_mention": ["price", "quantity"],
+    "mode": "medium"
+  },
+  {
+    "id": "discount-rounding",
+    "query": "Where is the discount applied and how is the result rounded?",
+    "path": "invoice_service.py",
+    "symbol": "Invoice.total",
+    "must_mention": ["discount", "cent"],
+    "mode": "medium"
+  },
+  {
+    "id": "refund-window",
+    "query": "What exact rule makes an order refundable?",
+    "path": "invoice_service.py",
+    "symbol": "is_refundable",
+    "must_mention": ["paid", "30"],
+    "mode": "medium"
+  },
+  {
+    "id": "refund-call-chain",
+    "query": "How does refund_message decide whether to approve a refund?",
+    "path": "refund_policy.py",
+    "symbol": "refund_message",
+    "must_mention": ["is_refundable", "approved", "denied"],
+    "mode": "medium"
+  }
+]
