@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from atomic_flow.backends.openai_compatible import ChatResult, OpenAICompatibleBackend
+from atomic_flow.backends.base import ChatResult
+from atomic_flow.backends.openai_compatible import OpenAICompatibleBackend
 from atomic_flow.config import BackendConfig
 from atomic_flow.errors import ConfigurationError
 from atomic_flow.kaggle.credentials import KaggleCredentials, load_credentials
@@ -20,14 +21,28 @@ class KaggleBackend(OpenAICompatibleBackend):
         chosen_model = model or self.credentials.default_model
         if not chosen_model:
             raise ConfigurationError("No Kaggle model selected. Run `atomic kaggle models` and set LLM_DEFAULT or pass --model.")
-        if self.credentials.allowed_models and normalize_model(chosen_model) not in {normalize_model(item) for item in self.credentials.allowed_models}:
+        allowed = {normalize_model(item) for item in self.credentials.allowed_models}
+        if allowed and normalize_model(chosen_model) not in allowed:
             raise ConfigurationError(f"Model {chosen_model!r} is not allowed by the current Kaggle proxy token. Run `atomic kaggle models` or refresh credentials.")
-        self.credentials = self.credentials
-        super().__init__(BackendConfig(name="kaggle", base_url=self.credentials.url,
-                                       api_key=self.credentials.api_key, model=chosen_model,
-                                       timeout_seconds=timeout_seconds), backend_name="kaggle")
+
+        # Kaggle Model Proxy serves OpenAI Chat Completions at
+        #   ${MODEL_PROXY_URL}/openapi/chat/completions
+        base = self.credentials.url.rstrip("/")
+        if not base.endswith("/openapi"):
+            base = base + "/openapi"
+
+        super().__init__(
+            BackendConfig(type="kaggle", name="kaggle", base_url=base,
+                          api_key=self.credentials.api_key, model=chosen_model,
+                          timeout_seconds=timeout_seconds,
+                          max_output_tokens=4096),   # Gemini 3 Flash тратит часть на reasoning
+            backend_name="kaggle",
+        )
 
     def chat(self, messages: list[dict[str, str]], *, json_mode: bool = False, model: str | None = None) -> ChatResult:
         if self.credentials.expired:
             raise ConfigurationError("Kaggle Model Proxy key expired during this process. Run `atomic kaggle auth`.")
-        return super().chat(messages, json_mode=json_mode, model=model)
+        # Kaggle Model Proxy rejects `response_format={"type":"json_object"}` for many models
+        # (returns HTTP 400 "failed to convert config"). The role prompts already ask for a
+        # single JSON object, and parse_json tolerates prose/code fences, so we skip it here.
+        return super().chat(messages, json_mode=False, model=model)

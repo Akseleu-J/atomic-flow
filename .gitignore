@@ -4,6 +4,7 @@
 !.env.example
 *.key
 *.pem
+kaggle.env
 
 # Python environments and generated files
 .venv/
@@ -15,6 +16,13 @@ build/
 dist/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# atomic_flow generated state (prompts/ and config.yaml may be shared; tree.json embeds local layout)
+.atomic_flow/tree.json
+.atomic_flow/tree.json.tmp
 
 # Local benchmark outputs
 benchmark-results/

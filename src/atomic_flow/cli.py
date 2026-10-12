@@ -1,4 +1,4 @@
-"""Command line interface for the local daemon, project tree, and queries."""
+"""Command line interface. One small handler per command instead of a 300-line `main`."""
 
 from __future__ import annotations
 
@@ -8,53 +8,64 @@ import os
 import shlex
 import subprocess
 import sys
+import traceback
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 from atomic_flow import __version__
-from atomic_flow.activation.activate import activate, materialize
-from atomic_flow.backends.router import make_backend
-from atomic_flow.config import AtomicConfig, load_config, project_dir, user_dir, write_config
-from atomic_flow.errors import AtomicFlowError, ConfigurationError
-from atomic_flow.llm.orchestrator import Orchestrator, choose_mode
+from atomic_flow.activation.activate import ActivationIndex, materialize
+from atomic_flow.activation.text import has_non_latin_letters
+from atomic_flow.backends.router import make_backend, resolve_backend_name
+from atomic_flow.budget import SpendLedger, prune_runs
+from atomic_flow.config import AtomicConfig, load_config, mask_secrets, project_dir, trust_project, user_dir, write_config
+from atomic_flow.errors import AtomicFlowError, ConfigurationError, ConfirmationRequired
+from atomic_flow.kaggle.credentials import (
+    credential_status,
+    load_credentials,
+    prepare_secret_file,
+    protect_secret_file,
+    sanitize_cli_output,
+    secret_file,
+)
+from atomic_flow.llm.orchestrator import Orchestrator, _Run, choose_mode, scope_ids
 from atomic_flow.llm.prompts import PromptRegistry
-from atomic_flow.tree.builder import build_tree, load_tree, save_tree
+from atomic_flow.llm.schemas import QueryIntent
+from atomic_flow.tree.builder import build_tree, diff_trees, load_tree, refresh_tree, save_tree
 from atomic_flow.tree.node import TreeNode
-from atomic_flow.kaggle.credentials import (SECRET_FILE, credential_status, load_credentials,
-                                            protect_secret_file, sanitize_cli_output)
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="atomic", description="Project-aware local LLM gateway")
-    parser.add_argument("--version", action="version", version=f"atomic_flow {__version__}")
-    commands = parser.add_subparsers(dest="command", required=True)
+    p = argparse.ArgumentParser(prog="atomic", description="Project-aware local LLM gateway")
+    p.add_argument("--version", action="version", version=f"atomic_flow {__version__}")
+    p.add_argument("--debug", action="store_true", help="Show tracebacks")
+    cmd = p.add_subparsers(dest="command", required=True)
 
-    init = commands.add_parser("init", help="Initialize user or project configuration")
+    init = cmd.add_parser("init", help="Initialize user or project configuration")
     init.add_argument("--project", action="store_true")
     init.add_argument("--path", default=".")
 
-    tree = commands.add_parser("tree", help="Build and inspect the project tree")
-    tree_sub = tree.add_subparsers(dest="tree_action", required=True)
-    for action in ("build", "refresh"):
-        sub = tree_sub.add_parser(action)
-        sub.add_argument("--path", default=".")
-    status = tree_sub.add_parser("status")
-    status.add_argument("--path", default=".")
-    explain = tree_sub.add_parser("explain")
+    trust = cmd.add_parser("trust", help="Allow a project's .atomic_flow/config.yaml to set backends")
+    trust.add_argument("path", nargs="?", default=".")
+
+    tree = cmd.add_parser("tree", help="Build and inspect the project tree")
+    ts = tree.add_subparsers(dest="tree_action", required=True)
+    for action in ("build", "refresh", "status"):
+        ts.add_parser(action).add_argument("--path", default=".")
+    explain = ts.add_parser("explain")
     explain.add_argument("path", nargs="?")
     explain.add_argument("--project", default=".")
-    diff = tree_sub.add_parser("diff")
+    diff = ts.add_parser("diff", help="Files changed since a git commit")
     diff.add_argument("commit")
     diff.add_argument("--path", default=".")
 
-    ask = commands.add_parser("ask", help="Ask a question about a project")
+    ask = cmd.add_parser("ask", help="Ask a question about a project")
     ask.add_argument("query")
     ask.add_argument("--project", default=".")
     ask.add_argument("--mode", choices=["simple", "medium", "hard"])
     ask.add_argument("--no-auto-mode", action="store_true")
-    ask.add_argument("--file")
+    ask.add_argument("--file", help="Restrict retrieval to a file or directory")
     ask.add_argument("--budget", type=int)
     ask.add_argument("--model")
     ask.add_argument("--backend", default="auto")
@@ -65,79 +76,81 @@ def _parser() -> argparse.ArgumentParser:
     ask.add_argument("--explain", action="store_true")
     ask.add_argument("--json", action="store_true")
 
-    doctor = commands.add_parser("doctor", help="Check local configuration and project readiness")
+    doctor = cmd.add_parser("doctor", help="Check local configuration and project readiness")
     doctor.add_argument("--project", default=".")
     doctor.add_argument("--check-backend", action="store_true", help="Send a small live request to the configured model")
 
-    config = commands.add_parser("config", help="Read or update configuration")
-    config_sub = config.add_subparsers(dest="config_action", required=True)
-    for action in ("get", "set"):
-        sub = config_sub.add_parser(action)
-        sub.add_argument("key")
-        if action == "set":
-            sub.add_argument("value")
-        sub.add_argument("--project", action="store_true")
-    config_sub.add_parser("validate")
-    config_sub.add_parser("edit")
+    config = cmd.add_parser("config", help="Read or update configuration")
+    cs = config.add_subparsers(dest="config_action", required=True)
+    get = cs.add_parser("get")
+    get.add_argument("key", nargs="?")
+    get.add_argument("--project", default=None, help="Project directory (merged view)")
+    setter = cs.add_parser("set")
+    setter.add_argument("key")
+    setter.add_argument("value")
+    setter.add_argument("--project", action="store_true")
+    cs.add_parser("validate")
+    cs.add_parser("edit")
 
-    up = commands.add_parser("up", help="Run the HTTP API in the foreground")
+    up = cmd.add_parser("up", help="Run the HTTP API in the foreground")
     up.add_argument("--host", default="127.0.0.1")
     up.add_argument("--port", type=int, default=8000)
 
-    status = commands.add_parser("status", help="Show local service and project status")
+    status = cmd.add_parser("status", help="Show local service and project status")
     status.add_argument("--project", default=".")
 
-    runs = commands.add_parser("runs", help="Inspect saved request artifacts")
-    runs_sub = runs.add_subparsers(dest="runs_action", required=True)
-    runs_sub.add_parser("list")
-    show = runs_sub.add_parser("show")
-    show.add_argument("request_id")
+    runs = cmd.add_parser("runs", help="Inspect saved request artifacts")
+    rs = runs.add_subparsers(dest="runs_action", required=True)
+    rs.add_parser("list")
+    rs.add_parser("show").add_argument("request_id")
+    rs.add_parser("prune", help="Delete artifacts older than artifacts.keep_days")
 
-    kaggle = commands.add_parser("kaggle", help="Manage Kaggle Model Proxy credentials and quota")
-    kaggle_sub = kaggle.add_subparsers(dest="kaggle_action", required=True)
-    kaggle_init = kaggle_sub.add_parser("init", help="Initialize a local Kaggle benchmark environment and fetch credentials")
-    kaggle_init.add_argument("--env-file", type=Path, default=SECRET_FILE)
-    kaggle_init.add_argument("--yes", action="store_true")
-    auth = kaggle_sub.add_parser("auth", help="Fetch short-lived Kaggle Model Proxy credentials")
-    auth.add_argument("--env-file", type=Path, default=SECRET_FILE)
-    auth.add_argument("--yes", action="store_true")
-    kaggle_sub.add_parser("status", help="Show credential expiry and model access without revealing secrets")
-    kaggle_sub.add_parser("quota", help="Show Kaggle Model Proxy inference quota")
-    kaggle_sub.add_parser("models", help="List models supported by Kaggle Benchmarks")
+    kaggle = cmd.add_parser("kaggle", help="Manage Kaggle Model Proxy credentials and quota")
+    ks = kaggle.add_subparsers(dest="kaggle_action", required=True)
+    for name in ("init", "auth"):
+        sub = ks.add_parser(name)
+        sub.add_argument("--env-file", type=Path, default=None)
+        sub.add_argument("--yes", action="store_true")
+    for name in ("status", "quota", "models"):
+        ks.add_parser(name)
 
-    benchmark = commands.add_parser("benchmark", help="Run local evaluations or manage Kaggle benchmark tasks")
-    benchmark_sub = benchmark.add_subparsers(dest="benchmark_action", required=True)
-    benchmark_sub.add_parser("list", help="List the built-in local evaluation cases")
-    benchmark_sub.add_parser("kaggle-list", help="List benchmark tasks uploaded to Kaggle")
-    run_bench = benchmark_sub.add_parser("run", help="Run the local end-to-end suite through the configured LLM backend")
-    run_bench.add_argument("--model")
-    run_bench.add_argument("--backend", default="auto")
-    run_bench.add_argument("--mode", choices=["simple", "medium", "hard"], default="medium")
-    run_bench.add_argument("--budget", type=int, default=5000)
-    run_bench.add_argument("--limit", type=int)
-    run_bench.add_argument("--output", type=Path)
-    run_bench.add_argument("--yes", action="store_true", help="Acknowledge model calls and possible inference cost")
-    run_bench.add_argument("--dry-run", action="store_true")
-    push = benchmark_sub.add_parser("push", help="Upload a local Kaggle Benchmarks task")
+    bench = cmd.add_parser("benchmark", help="Run local evaluations or manage Kaggle benchmark tasks")
+    bs = bench.add_subparsers(dest="benchmark_action", required=True)
+    bs.add_parser("list")
+    bs.add_parser("kaggle-list")
+    retrieval = bs.add_parser("retrieval", help="Free: ranking quality only, no model calls")
+    retrieval.add_argument("-k", type=int, default=5)
+    run = bs.add_parser("run", help="Run the end-to-end suite through the configured LLM backend")
+    run.add_argument("--model")
+    run.add_argument("--backend", default="auto")
+    run.add_argument("--mode", choices=["simple", "medium", "hard"], default="medium")
+    run.add_argument("--budget", type=int, default=5000)
+    run.add_argument("--limit", type=int)
+    run.add_argument("--repeats", type=int, default=1, help="Repeat each case to expose LLM variance")
+    run.add_argument("--output", type=Path)
+    run.add_argument("--yes", action="store_true")
+    run.add_argument("--dry-run", action="store_true")
+    push = bs.add_parser("push")
     push.add_argument("task")
-    push.add_argument("--file", type=Path, help="Task source file; defaults to benchmarks/kaggle_tasks/<task-slug>.py")
+    push.add_argument("--file", type=Path)
     push.add_argument("--wait", action="store_true")
-    remote_run = benchmark_sub.add_parser("run-kaggle", help="Schedule a Kaggle-hosted benchmark run")
-    remote_run.add_argument("task")
-    remote_run.add_argument("--model", action="append", default=[])
-    remote_run.add_argument("--wait", action="store_true")
-    remote_run.add_argument("--yes", action="store_true", help="Acknowledge that Kaggle will run model evaluations")
-    for action in ("status", "log"):
-        sub = benchmark_sub.add_parser(action)
+    remote = bs.add_parser("run-kaggle")
+    remote.add_argument("task")
+    remote.add_argument("--model", action="append", default=[])
+    remote.add_argument("--wait", action="store_true")
+    remote.add_argument("--yes", action="store_true")
+    for name in ("status", "log"):
+        sub = bs.add_parser(name)
         sub.add_argument("task")
         sub.add_argument("--model", action="append", default=[])
-    download = benchmark_sub.add_parser("download")
-    download.add_argument("task")
-    download.add_argument("--model", action="append", default=[])
-    download.add_argument("--output", type=Path, default=Path("benchmark-results"))
+    dl = bs.add_parser("download")
+    dl.add_argument("task")
+    dl.add_argument("--model", action="append", default=[])
+    dl.add_argument("--output", type=Path, default=Path("benchmark-results"))
+    return p
 
-    return parser
 
+# --------------------------------------------------------------------------- helpers
 
 def _set_nested(data: dict[str, Any], key: str, value: Any) -> None:
     pieces = key.split(".")
@@ -150,9 +163,13 @@ def _get_nested(data: dict[str, Any], key: str) -> Any:
     value: Any = data
     for part in key.split("."):
         if not isinstance(value, dict) or part not in value:
-            raise KeyError(key)
+            raise KeyError(f"No such configuration key: {key}")
         value = value[part]
     return value
+
+
+def _editor() -> list[str]:
+    return shlex.split(os.getenv("EDITOR") or os.getenv("VISUAL") or ("notepad" if os.name == "nt" else "vi"))
 
 
 def _prompts(args, project: Path, mode: str) -> dict[str, str]:
@@ -161,30 +178,23 @@ def _prompts(args, project: Path, mode: str) -> dict[str, str]:
         role, sep, value = item.partition("=")
         if not sep or not role or not value:
             raise ValueError(f"Invalid --role-prompt {item!r}; expected ROLE=TEXT or ROLE=@FILE")
-        if value.startswith("@"):
-            values[role] = Path(value[1:]).expanduser().read_text(encoding="utf-8")
-        else:
-            values[role] = value
-    if args.edit_prompts:
-        role_list = PromptRegistry.roles_for_mode(mode)
-        prompt_dir = project_dir(project) / "prompts"
-        prompt_dir.mkdir(parents=True, exist_ok=True)
-        registry = PromptRegistry(project)
-        paths = []
-        for role in role_list:
-            path = prompt_dir / f"{role}.md"
-            if not path.exists():
-                path.write_text(registry.get(role), encoding="utf-8")
-            paths.append(path)
-        editor = os.getenv("EDITOR") or os.getenv("VISUAL") or ("notepad" if os.name == "nt" else "vi")
-        if os.name == "nt" and Path(shlex.split(editor)[0]).name.lower() == "notepad":
-            for path in paths:
-                subprocess.run(shlex.split(editor) + [str(path)], check=False)
-        else:
-            subprocess.run(shlex.split(editor) + [str(path) for path in paths], check=False)
-        for path in paths:
-            values.setdefault(path.stem, path.read_text(encoding="utf-8"))
+        values[role] = Path(value[1:]).expanduser().read_text(encoding="utf-8") if value.startswith("@") else value
     return values
+
+
+def _edit_prompts(project: Path, mode: str) -> int:
+    registry = PromptRegistry(project)
+    prompt_dir = project_dir(project) / "prompts"
+    prompt_dir.mkdir(parents=True, exist_ok=True)
+    paths = []
+    for role in registry.roles_for_mode(mode):
+        path = prompt_dir / f"{role}.md"
+        if not path.exists():
+            path.write_text(registry.get(role), encoding="utf-8")
+        paths.append(path)
+    subprocess.run([*_editor(), *map(str, paths)], check=False)
+    print("Prompts saved under", prompt_dir, "- rerun your query.")           # matches the docs: edit, then exit
+    return 0
 
 
 def _run_kaggle_cli(command: list[str], *, timeout: int = 86_400, secret_path: Path | None = None) -> int:
@@ -198,343 +208,350 @@ def _run_kaggle_cli(command: list[str], *, timeout: int = 86_400, secret_path: P
         return 2
     credentials = load_credentials(secret_path, required=False)
     secret = credentials.api_key if credentials else ""
-    out = sanitize_cli_output(proc.stdout or "", secret)
-    err = sanitize_cli_output(proc.stderr or "", secret)
-    if out.strip():
-        print(out.rstrip())
-    if err.strip():
-        print(err.rstrip(), file=sys.stderr)
+    for stream, text in ((sys.stdout, proc.stdout), (sys.stderr, proc.stderr)):
+        clean = sanitize_cli_output(text or "", secret)
+        if clean.strip():
+            print(clean.rstrip(), file=stream)
     return proc.returncode
 
 
-def _run_kaggle_command(args) -> int:
-    if args.kaggle_action == "status":
+# --------------------------------------------------------------------------- command handlers
+
+def cmd_init(args) -> int:
+    if args.project:
+        root = Path(args.path).expanduser().resolve()
+        target = project_dir(root)
+        target.mkdir(parents=True, exist_ok=True)
+        (target / "focus.yaml").write_text("focus: []\n", encoding="utf-8")
+        gitignore = target / ".gitignore"                       # keep generated state out of git, share prompts/config
+        if not gitignore.exists():
+            gitignore.write_text("tree.json\ntree.json.tmp\n", encoding="utf-8")
+        print(f"Initialized project config at {target}\nRun `atomic tree build` to index this project.")
+    else:
+        target = user_dir()
+        target.mkdir(parents=True, exist_ok=True)
+        config_path = target / "config.yaml"
+        if not config_path.exists():
+            write_config(config_path, AtomicConfig().model_dump(mode="json"), merge=False)
+        print(f"Initialized user config at {target}")
+    return 0
+
+
+def cmd_trust(args) -> int:
+    trust_project(args.path)
+    print(f"Trusted: {Path(args.path).expanduser().resolve()} (its .atomic_flow/config.yaml may now set backends).")
+    return 0
+
+
+def cmd_tree(args) -> int:
+    root = Path(args.project if args.tree_action == "explain" else args.path).expanduser().resolve()
+    config = load_config(root)
+    if args.tree_action == "build":
+        tree = build_tree(root, config.tree.ignore, respect_gitignore=config.tree.respect_gitignore)
+        print(f"Indexed {tree['files']} files, {len(tree['nodes'])} nodes -> {save_tree(root, tree)}")
+    elif args.tree_action == "refresh":
+        tree, changed = refresh_tree(root, config.tree.ignore, respect_gitignore=config.tree.respect_gitignore)
+        s = tree["stats"]
+        print(f"{'Updated' if changed else 'Up to date'}: {tree['files']} files, {len(tree['nodes'])} nodes ({s['parsed']} re-parsed, {s['reused']} reused)")
+    elif args.tree_action == "status":
+        saved = load_tree(root)
+        current = build_tree(root, config.tree.ignore, previous=saved, respect_gitignore=config.tree.respect_gitignore)
+        d = diff_trees(saved, current)
+        print(f"Tree: {len(saved['nodes'])} nodes; added={len(d['added'])} removed={len(d['removed'])} modified={len(d['modified'])}")
+        for kind, files in d.items():
+            for f in files:
+                print(f"  {kind}: {f}")
+        return 0 if not any(d.values()) else 1
+    elif args.tree_action == "explain":
+        for raw in load_tree(root)["nodes"]:
+            node = TreeNode.model_validate(raw)
+            if args.path and args.path not in node.path and args.path not in node.symbol:
+                continue
+            indent = "  " * (node.symbol.count(".") + (1 if node.symbol else 0))
+            print(f"{indent}{node.label} [{node.kind}, lines {node.start_line}-{node.end_line}, in={node.fan_in} out={node.fan_out}]")
+    else:
+        changed = subprocess.run(["git", "-C", str(root), "diff", "--name-only", args.commit, "--"], text=True, capture_output=True)
+        if changed.returncode:
+            raise ValueError(changed.stderr.strip() or "git diff failed")
+        print(changed.stdout or "No changed files.")
+    return 0
+
+
+def cmd_ask(args) -> int:
+    project = Path(args.project).expanduser().resolve()
+    config = load_config(project)
+    mode = choose_mode(args.query, config.mode, explicit_mode=args.mode,
+                       auto_mode=config.auto_mode and not args.no_auto_mode, file_scope=args.file)
+    backend_name = resolve_backend_name(config, args.backend)
+    if backend_name not in config.backends:
+        raise ConfigurationError(f"Backend is not configured: {backend_name}")
+    if args.edit_prompts:
+        return _edit_prompts(project, mode)
+    prompts = _prompts(args, project, mode)
+    registry = PromptRegistry(project, prompts)
+    if args.dry_run:
+        tree, _ = refresh_tree(project, config.tree.ignore) if config.tree.auto_refresh else (load_tree(project), False)
+        nodes = [TreeNode.model_validate(n) for n in tree["nodes"]]
+        scope = scope_ids(nodes, args.file) if args.file else None
+        extra_terms: list[str] | None = None
+        if has_non_latin_letters(args.query):
+            print("[dry-run] non-Latin query detected; running Parser for translation...", file=sys.stderr)
+            try:
+                parser_run = _Run(make_backend(config, args.backend, args.model), registry,
+                                  SpendLedger(0), args.query, None)
+                intent = parser_run.invoke("parser", QueryIntent, {
+                    "candidate_paths": list(dict.fromkeys(n.path for n in nodes[:30]))
+                })
+                extra_terms = intent.focus_terms + intent.target_scope
+                print(f"[dry-run] parser focus_terms: {intent.focus_terms}", file=sys.stderr)
+            except Exception as exc:
+                print(f"[dry-run] parser failed ({exc}); using raw query", file=sys.stderr)
+        search = ActivationIndex(nodes).search(args.query, extra_terms=extra_terms, limit=80, scope=scope)
+        aliases = {n.node_id: f"n{i}" for i, n in enumerate(nodes, 1)}
+        context, meta = materialize(project, search.ranked, budget_tokens=args.budget or config.context_budget_tokens,
+                                    include_skeleton=mode != "simple", skeleton_nodes=nodes, aliases=aliases)
+        print(f"mode={mode}; model={config.backends[backend_name].model or 'default'}; selected_nodes={len(meta)}; "
+              f"retrieval_weak={search.weak}; context_chars={len(context)}")
+        for role in registry.roles_for_mode(mode):
+            print(f"\n--- prompt: {role} ({registry.sources.get(role) or (registry.get(role) and registry.sources[role])}) ---\n{registry.get(role)}")
+        if args.explain:
+            for m in meta:
+                print(f"{m['alias']} {m['node_id']} score={m['score']:.2f} zoom={m['zoom']} tokens={m['tokens']}")
+        print(context)
+        return 0
+    builtin = [r for r in registry.roles_for_mode(mode) if registry.get(r) and registry.sources[r] == "builtin"]
+    if mode == "hard" and builtin and not args.yes:
+        if not sys.stdin.isatty():
+            raise ConfirmationRequired("Hard mode uses multiple model calls and built-in prompts. Re-run with --yes to acknowledge.")
+        print("Hard mode may use several model calls. Some roles use built-in prompts.")
+        if input("Proceed? [y/N]: ").strip().lower() not in {"y", "yes"}:
+            return 1
+    result = Orchestrator(config, project, make_backend(config, args.backend, args.model)).answer(
+        args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file)
+    if args.json:
+        print(result.model_dump_json(indent=2))
+        return 0
+    print(result.text)
+    if result.citations:
+        print("\nCitations:")
+        for c in result.citations:
+            print(f"- {c.node_id}{(' lines ' + c.lines) if c.lines else ''}: {c.what}")
+    for warning in result.warnings:
+        print(f"! {warning}")
+    cost = "n/a" if result.cost_usd is None else f"${result.cost_usd:.4f}{'+' if not result.cost_complete else ''}"
+    print(f"\nverdict={result.verdict} (model opinion); grounding={result.grounding:.0%} (deterministic); "
+          f"tokens={result.tokens_in}/{result.tokens_out}; cost={cost}; request={result.ledger_id}")
+    return 0
+
+
+def cmd_doctor(args) -> int:
+    config = load_config(args.project)
+    print(f"Python: {sys.version.split()[0]} ({'OK' if sys.version_info >= (3, 11) else 'requires 3.11+'})")
+    try:
+        tree = load_tree(args.project)
+        print(f"Project tree: OK ({len(tree['nodes'])} nodes, {tree['files']} files)")
+    except AtomicFlowError as exc:
+        print(f"Project tree: NOT READY ({exc})")
+    name = resolve_backend_name(config)
+    entry = config.backends.get(name)
+    if name == "kaggle":
+        status = credential_status()
+        if not status["configured"] or status["expired"]:
+            print(f"Kaggle Model Proxy: {'EXPIRED' if status['configured'] else 'NOT CONFIGURED'} (run `atomic kaggle auth`)")
+            return 1
+        print(f"Kaggle Model Proxy: configured; expires {status['expires_at'] or 'unknown'}; {status['models_count']} allowed models")
+    elif not entry:
+        print("LLM backend: NOT CONFIGURED")
+        return 1
+    elif not args.check_backend:
+        ok = bool(entry.resolved_api_key()) or "localhost" in entry.base_url or "127.0.0.1" in entry.base_url
+        print(f"LLM backend: {'configured' if ok else 'API key missing'} ({name}: {entry.base_url}, model={entry.model or 'unset'})")
+    if args.check_backend:
+        try:
+            reply = make_backend(config, name).chat([{"role": "user", "content": "Reply with OK."}])
+            print(f"LLM backend: {'OK' if reply.content else 'ERROR'} ({name}: live request returned {'content' if reply.content else 'no content'})")
+        except AtomicFlowError as exc:
+            print(f"LLM backend: ERROR ({exc})")
+    else:
+        print("Pass --check-backend to send a live model request (billable).")
+    print(f"Config: {user_dir() / 'config.yaml'}")
+    return 0
+
+
+def cmd_config(args) -> int:
+    if args.config_action == "validate":
+        config = load_config()
+        print(f"Configuration valid; mode={config.mode}; backends={', '.join(config.backends)}")
+    elif args.config_action == "get":
+        data = load_config(args.project).model_dump(mode="json")          # the MERGED view, not just one file
+        value = data if not args.key else _get_nested(data, args.key)
+        print(yaml.safe_dump(mask_secrets(value), sort_keys=False, allow_unicode=True).strip())
+    elif args.config_action == "set":
+        target = project_dir() / "config.yaml" if args.project else user_dir() / "config.yaml"
+        updates: dict[str, Any] = {}
+        _set_nested(updates, args.key, yaml.safe_load(args.value))
+        write_config(target, updates)                                      # validates BEFORE writing; chmod 600
+        print(f"Updated {target}: {args.key}")
+        if "api_key" in args.key and not args.key.endswith("_env"):
+            print("Tip: prefer backends.<name>.api_key_env (an environment variable name) over storing keys in YAML.")
+    else:
+        target = user_dir() / "config.yaml"
+        if not target.exists():
+            write_config(target, AtomicConfig().model_dump(mode="json"), merge=False)
+        subprocess.run([*_editor(), str(target)], check=False)
+        load_config()                                                      # surface mistakes immediately
+    return 0
+
+
+def cmd_up(args) -> int:
+    local = args.host in {"127.0.0.1", "localhost", "::1"}
+    if not local and not os.getenv("ATOMIC_FLOW_SERVER_API_KEY"):
+        raise ConfigurationError("Binding beyond loopback requires ATOMIC_FLOW_SERVER_API_KEY.")
+    if not local and not os.getenv("ATOMIC_FLOW_PROJECT_ROOT"):
+        raise ConfigurationError("Binding beyond loopback requires ATOMIC_FLOW_PROJECT_ROOT to limit filesystem access.")
+    try:
+        import uvicorn
+    except ImportError as exc:
+        raise ConfigurationError("Install the API extra with `pip install atomic-flow[api]`.") from exc
+    print(f"atomic_flow listening on http://{args.host}:{args.port}")
+    uvicorn.run("atomic_flow.api.server:app", host=args.host, port=args.port, reload=False)
+    return 0
+
+
+def cmd_status(args) -> int:
+    root = Path(args.project).expanduser().resolve()
+    print(f"Project: {root}")
+    try:
+        print(f"Tree: indexed ({len(load_tree(root)['nodes'])} nodes)")
+    except AtomicFlowError:
+        print("Tree: not indexed")
+    return 0
+
+
+def cmd_runs(args) -> int:
+    root = user_dir() / "runs"
+    if args.runs_action == "prune":
+        print(f"Removed {prune_runs(load_config().artifacts.keep_days)} old run(s).")
+    elif args.runs_action == "list":
+        for path in sorted(root.iterdir() if root.exists() else [], key=lambda p: p.stat().st_mtime, reverse=True):
+            try:
+                meta = json.loads((path / "meta.json").read_text(encoding="utf-8"))
+                print(f"{path.name}\t{meta.get('mode_used')}\t{meta.get('verdict')}\t{meta.get('model_used')}")
+            except (OSError, json.JSONDecodeError):
+                print(f"{path.name}\t(failed: see error.json)" if (path / "error.json").exists() else path.name)
+    else:
+        if not args.request_id.replace("-", "").replace("_", "").isalnum():
+            raise ValueError("Invalid request id.")
+        print((root / args.request_id / "meta.json").read_text(encoding="utf-8"))
+    return 0
+
+
+def cmd_kaggle(args) -> int:
+    action = args.kaggle_action
+    if action == "status":
         status = credential_status()
         if not status["configured"]:
             print("Kaggle Model Proxy: not configured. Run `atomic kaggle auth`.")
             return 1
-        expiry = status["expires_at"] or "unknown"
         state = "expired" if status["expired"] else "expires soon" if status.get("expires_soon") else "ready"
-        print(f"Kaggle Model Proxy: {state}; expires_at={expiry}; allowed_models={status['models_count']}; default_model={status['default_model'] or 'unset'}")
-        for model_name in status.get("models", []):
-            print(f"  - {model_name}")
+        print(f"Kaggle Model Proxy: {state}; expires_at={status['expires_at'] or 'unknown'}; allowed_models={status['models_count']}; default_model={status['default_model'] or 'unset'}")
+        for model in status["models"]:
+            print(f"  - {model}")
         return 1 if status["expired"] else 0
-    if args.kaggle_action == "auth":
-        path = args.env_file.expanduser().resolve()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        command = ["kaggle", "benchmarks", "auth", "--env-file", str(path)]
-        if args.yes:
-            command.append("--yes")
-        result = _run_kaggle_cli(command, timeout=300, secret_path=path)
-        if result == 0:
-            protect_secret_file(path)
-            status = credential_status(path)
-            print(f"Credentials saved to {path}; expiry={status['expires_at'] or 'not reported'}; secret value suppressed.")
-        return result
-    if args.kaggle_action == "init":
-        path = args.env_file.expanduser().resolve()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        example = user_dir() / "example_benchmark_task.py"
-        example.parent.mkdir(parents=True, exist_ok=True)
-        command = ["kaggle", "benchmarks", "init", "--env-file", str(path), "--example-file", str(example)]
-        if args.yes:
-            command.append("--yes")
-        result = _run_kaggle_cli(command, timeout=300, secret_path=path)
-        if result == 0:
-            protect_secret_file(path)
-            status = credential_status(path)
-            print(f"Kaggle environment initialized; credentials={path}; default_model={status['default_model'] or 'unset'}; available_models={status['models_count']}.")
-        return result
-    if args.kaggle_action == "quota":
+    if action == "quota":
         return _run_kaggle_cli(["kaggle", "benchmarks", "quota", "--format", "json"], timeout=60)
-    if args.kaggle_action == "models":
+    if action == "models":
         return _run_kaggle_cli(["kaggle", "benchmarks", "tasks", "models"], timeout=60)
+    path = (args.env_file or secret_file()).expanduser().resolve()
+    prepare_secret_file(path)                                  # 0600 BEFORE the key is written
+    command = ["kaggle", "benchmarks", action, "--env-file", str(path)]
+    if action == "init":
+        example = user_dir() / "example_benchmark_task.py"
+        command += ["--example-file", str(example)]
+    if args.yes:
+        command.append("--yes")
+    code = _run_kaggle_cli(command, timeout=300, secret_path=path)
+    if code == 0:
+        protect_secret_file(path)
+        status = credential_status(path)
+        print(f"Credentials saved to {path}; expiry={status['expires_at'] or 'not reported'}; default_model={status['default_model'] or 'unset'}; secret value suppressed.")
+    return code
+
+
+TASK_FILES = {"atomic-flow-invoice-subtotal": "invoice_subtotal.py", "atomic-flow-refund-window": "refund_window.py",
+              "atomic-flow-refund-call-chain": "refund_call_chain.py", "fix-race-condition-in-cpython-threading": "race_condition.py"}
+
+
+def cmd_benchmark(args) -> int:
+    from atomic_flow.benchmarking import benchmark_cases, run_benchmark, run_retrieval_benchmark
+    action = args.benchmark_action
+    cases = benchmark_cases()
+    if action == "list":
+        for c in cases:
+            print(f"{c['id']}\t{c['mode']}\t{', '.join(c.get('expected_nodes', [])) or '(must abstain)'}\t{c['query']}")
+    elif action == "retrieval":
+        report = run_retrieval_benchmark(k=args.k)
+        print(json.dumps(report["summary"]))
+        for r in report["results"]:
+            print(f"{r['case_id']}\t{'skipped' if r['skipped'] else ('HIT' if r['hit_all_at_k'] else 'MISS')}\tmrr={r['mrr']}\tweak={r['weak']}")
+        return 0 if report["summary"]["hit_all_at_k"] in (1, None) else 1
+    elif action == "kaggle-list":
+        return _run_kaggle_cli(["kaggle", "benchmarks", "tasks", "list"], timeout=60)
+    elif action == "push":
+        slug = args.task.strip().lower().replace("_", "-").replace(" ", "-")
+        source = (args.file or Path("benchmarks/kaggle_tasks") / TASK_FILES.get(slug, f"{slug}.py")).expanduser().resolve()
+        if not source.is_file():
+            raise ValueError(f"Benchmark task file not found: {source}")
+        return _run_kaggle_cli(["kaggle", "benchmarks", "tasks", "push", args.task, "--file", str(source), *(["--wait"] if args.wait else [])])
+    elif action == "run-kaggle":
+        if not args.yes:
+            raise ValueError("Kaggle will execute model calls. Re-run with --yes to acknowledge the benchmark run.")
+        if not args.model:
+            raise ValueError("Specify one or more --model slugs for a reproducible Kaggle run.")
+        command = ["kaggle", "benchmarks", "tasks", "run", args.task]
+        for m in args.model:
+            command += ["--model", m]
+        return _run_kaggle_cli([*command, *(["--wait"] if args.wait else [])])
+    elif action in {"status", "download", "log"}:
+        command = ["kaggle", "benchmarks", "tasks", action, args.task]
+        for m in args.model:
+            command += ["--model", m]
+        if action == "download":
+            command += ["--output", str(args.output.expanduser().resolve())]
+        return _run_kaggle_cli(command)
+    else:                                                       # run
+        if args.dry_run:
+            selected = cases[:args.limit]
+            for c in selected:
+                print(f"{c['id']}: {c['query']} -> {', '.join(c.get('expected_nodes', [])) or '(abstain)'}")
+            print(f"Would run {len(selected)} cases x {args.repeats}; mode={args.mode}; backend={args.backend}; model calls may incur cost.")
+            return 0
+        if not args.yes:
+            raise ValueError("This benchmark sends prompts to a model and can consume quota. Re-run with --yes to acknowledge.")
+        report = run_benchmark(load_config(), model=args.model, mode=args.mode, budget_tokens=args.budget, limit=args.limit,
+                               output=args.output, backend_name=args.backend, repeats=args.repeats)
+        s = report["summary"]
+        print(f"{s['passed']}/{s['total']} passed ({s['pass_rate']:.0%}); flaky={s['flaky_cases'] or 'none'}; "
+              f"tokens={s['tokens_in']} in/{s['tokens_out']} out; cost={s['cost_usd'] if s['cost_usd'] is not None else 'not reported'}; "
+              f"avg latency={s['average_latency_ms']} ms\nReport: {report['output']}")
+        return 0 if s["passed"] == s["total"] else 1
     return 0
+
+
+HANDLERS = {"init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "doctor": cmd_doctor,
+            "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
+            "benchmark": cmd_benchmark}
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        if args.command == "init":
-            if args.project:
-                root = Path(args.path).expanduser().resolve()
-                root.mkdir(parents=True, exist_ok=True)
-                target = project_dir(root)
-                target.mkdir(parents=True, exist_ok=True)
-                (target / "focus.yaml").write_text("focus: []\n", encoding="utf-8")
-                print(f"Initialized project config at {target}")
-                print("Run `atomic tree build` to index this project.")
-            else:
-                target = user_dir()
-                target.mkdir(parents=True, exist_ok=True)
-                config_path = target / "config.yaml"
-                if not config_path.exists():
-                    config_path.write_text(yaml.safe_dump(AtomicConfig().model_dump(mode="json"), sort_keys=False), encoding="utf-8")
-                print(f"Initialized user config at {target}")
-            return 0
-
-        if args.command == "tree":
-            root_value = args.project if args.tree_action == "explain" else args.path
-            root = Path(root_value).expanduser().resolve()
-            if args.tree_action in {"build", "refresh"}:
-                config = load_config(root)
-                tree = build_tree(root, config.tree.get("ignore"))
-                target = save_tree(root, tree)
-                print(f"Indexed {tree['files']} files, {len(tree['nodes'])} nodes → {target}")
-            elif args.tree_action == "status":
-                saved = load_tree(root)
-                current = build_tree(root, load_config(root).tree.get("ignore"))
-                saved_ids = {n["node_id"] for n in saved["nodes"]}
-                current_ids = {n["node_id"] for n in current["nodes"]}
-                print(f"Tree: {len(saved_ids)} nodes; changed: {len(saved_ids ^ current_ids)} nodes")
-            elif args.tree_action == "explain":
-                saved = load_tree(root)
-                for raw in saved["nodes"]:
-                    node = TreeNode.model_validate(raw)
-                    if args.path and args.path not in node.path and args.path not in node.symbol:
-                        continue
-                    indent = "  " * (node.symbol.count(".") + (1 if node.symbol else 0))
-                    label = f"{node.path}::{node.symbol}" if node.symbol else node.path
-                    print(f"{indent}{label} [{node.kind}, lines {node.start_line}-{node.end_line}]")
-            else:
-                import subprocess as sp
-                changed = sp.run(["git", "-C", str(root), "diff", "--name-only", args.commit, "--"], text=True, capture_output=True)
-                if changed.returncode:
-                    raise ValueError(changed.stderr.strip() or "git diff failed")
-                print(changed.stdout or "No changed files.")
-            return 0
-
-        if args.command == "ask":
-            project = Path(args.project).expanduser().resolve()
-            config = load_config(project)
-            mode = choose_mode(args.query, config.mode, explicit_mode=args.mode,
-                               auto_mode=config.auto_mode and not args.no_auto_mode, file_scope=args.file)
-            resolved_backend_name = (config.default_backend if config.default_backend != "auto" else "openai-compatible") if args.backend == "auto" else args.backend
-            backend_config = config.backends.get(resolved_backend_name)
-            if not backend_config:
-                raise ConfigurationError(f"Backend is not configured: {args.backend}")
-            if args.model:
-                backend_config = backend_config.model_copy(update={"model": args.model})
-            prompts = _prompts(args, project, mode)
-            registry = PromptRegistry(project, prompts)
-            if args.dry_run:
-                nodes = [TreeNode.model_validate(item) for item in load_tree(project)["nodes"]]
-                candidates = activate(args.query, nodes, limit=min(80, len(nodes)))
-                if args.file:
-                    candidates = [(n, s) for n, s in candidates if n.path == args.file or n.path.endswith("/" + args.file)]
-                context, meta = materialize(project, candidates, budget_tokens=args.budget or config.context_budget_tokens, include_skeleton=mode != "simple")
-                print(f"mode={mode}; model={backend_config.model}; selected_nodes={len(meta)}; context_chars={len(context)}")
-                for role in PromptRegistry.roles_for_mode(mode):
-                    prompt_text = registry.get(role)
-                    print(f"\n--- prompt: {role} ({registry.sources[role]}) ---\n{prompt_text}")
-                if args.explain:
-                    for node in meta:
-                        print(f"{node['node_id']} score={node['score']:.2f} zoom={node['zoom']}")
-                print(context)
-                return 0
-            default_roles = [r for r in registry.roles_for_mode(mode) if registry.get(r) and registry.sources[r] == "builtin"]
-            if mode == "hard" and default_roles and not args.yes and not sys.stdin.isatty():
-                from atomic_flow.errors import ConfirmationRequired
-                raise ConfirmationRequired("Hard mode uses multiple model calls and built-in prompts. Re-run with --yes to acknowledge.")
-            if mode == "hard" and default_roles and not args.yes:
-                print("Hard mode may use several model calls. Some roles use built-in prompts.")
-                if input("Proceed? [y/N]: ").strip().lower() not in {"y", "yes"}:
-                    return 1
-            result = Orchestrator(config, project, make_backend(config, args.backend, args.model)).answer(args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file)
-            if args.json:
-                print(result.model_dump_json(indent=2))
-            else:
-                print(result.text)
-                if result.citations:
-                    print("\nCitations:")
-                    ids = {item["node_id"]: item for item in load_tree(project)["nodes"]}
-                    for citation in result.citations:
-                        node = ids.get(citation.node_id)
-                        print(f"- {node['path']}::{node['symbol'] if node else citation.node_id}: {citation.what}")
-                print(f"\nverdict={result.verdict}; coverage={result.citation_coverage:.0%}; request={result.ledger_id}; artifacts={result.artifacts_path}")
-            return 0
-
-        if args.command == "doctor":
-            config = load_config(args.project)
-            print(f"Python: {sys.version.split()[0]} ({'OK' if sys.version_info >= (3, 11) else 'requires 3.11+'})")
-            try:
-                tree = load_tree(args.project)
-                print(f"Project tree: OK ({len(tree['nodes'])} nodes, {tree['files']} files)")
-            except AtomicFlowError as exc:
-                print(f"Project tree: NOT READY ({exc})")
-            backend_name = config.default_backend if config.default_backend != "auto" else "openai-compatible"
-            if backend_name == "kaggle":
-                status = credential_status()
-                if not status["configured"]:
-                    print("Kaggle Model Proxy: NOT CONFIGURED (run `atomic kaggle auth`)")
-                    return 1
-                if status["expired"]:
-                    print("Kaggle Model Proxy: EXPIRED (run `atomic kaggle auth`)")
-                    return 1
-                print(f"Kaggle Model Proxy: configured; expires {status['expires_at'] or 'unknown'}; {status['models_count']} allowed models")
-                if args.check_backend:
-                    try:
-                        response = make_backend(config, backend_name).chat([{"role": "user", "content": "Reply with OK."}])
-                        print(f"LLM backend: {'OK' if response.content else 'ERROR'} (kaggle: live request returned {'content' if response.content else 'no content'})")
-                    except AtomicFlowError as exc:
-                        print(f"LLM backend: ERROR ({exc})")
-                else:
-                    print("Pass --check-backend to send a live model request.")
-                print(f"Config: {user_dir() / 'config.yaml'}")
-                return 0
-            backend = config.backends.get(backend_name)
-            if not backend:
-                print("LLM backend: NOT CONFIGURED")
-            elif args.check_backend:
-                try:
-                    response = make_backend(config, backend_name).chat([{"role": "user", "content": "Reply with OK."}])
-                    print(f"LLM backend: {'OK' if response.content else 'ERROR'} ({backend_name}: live request returned {'content' if response.content else 'no content'})")
-                except AtomicFlowError as exc:
-                    print(f"LLM backend: ERROR ({exc})")
-            else:
-                configured = bool(backend.api_key) or "localhost" in backend.base_url or "127.0.0.1" in backend.base_url
-                print(f"LLM backend: {'configured' if configured else 'API key missing'} ({backend_name}: {backend.base_url}, model={backend.model})")
-                print("Pass --check-backend to send a live model request.")
-            print(f"Config: {user_dir() / 'config.yaml'}")
-            return 0
-
-        if args.command == "kaggle":
-            return _run_kaggle_command(args)
-
-        if args.command == "benchmark":
-            from atomic_flow.benchmarking import benchmark_cases, run_benchmark
-            cases = benchmark_cases()
-            if args.benchmark_action == "list":
-                for case in cases:
-                    print(f"{case['id']}\t{case['mode']}\t{case['path']}::{case['symbol']}\t{case['query']}")
-                return 0
-            if args.benchmark_action == "kaggle-list":
-                return _run_kaggle_cli(["kaggle", "benchmarks", "tasks", "list"], timeout=60)
-            if args.benchmark_action == "push":
-                task_slug = args.task.strip().lower().replace("_", "-").replace(" ", "-")
-                default_files = {
-                    "atomic-flow-invoice-subtotal": "invoice_subtotal.py",
-                    "atomic-flow-refund-window": "refund_window.py",
-                    "atomic-flow-refund-call-chain": "refund_call_chain.py",
-                    "fix-race-condition-in-cpython-threading": "race_condition.py",
-                }
-                default_file = Path("benchmarks/kaggle_tasks") / default_files.get(task_slug, f"{task_slug}.py")
-                source = (args.file or default_file).expanduser().resolve()
-                if not source.is_file():
-                    raise ValueError(f"Benchmark task file not found: {source}")
-                command = ["kaggle", "benchmarks", "tasks", "push", args.task, "--file", str(source)]
-                if args.wait:
-                    command.append("--wait")
-                return _run_kaggle_cli(command)
-            if args.benchmark_action == "run-kaggle":
-                if not args.yes:
-                    raise ValueError("Kaggle will execute model calls. Re-run with --yes to acknowledge the benchmark run.")
-                if not args.model:
-                    raise ValueError("Specify one or more --model slugs for a reproducible Kaggle run.")
-                command = ["kaggle", "benchmarks", "tasks", "run", args.task]
-                for model_name in args.model:
-                    command.extend(["--model", model_name])
-                if args.wait:
-                    command.append("--wait")
-                return _run_kaggle_cli(command)
-            if args.benchmark_action in {"status", "download", "log"}:
-                command = ["kaggle", "benchmarks", "tasks", args.benchmark_action, args.task]
-                for model_name in getattr(args, "model", []):
-                    command.extend(["--model", model_name])
-                if args.benchmark_action == "download":
-                    command.extend(["--output", str(args.output.expanduser().resolve())])
-                return _run_kaggle_cli(command)
-            if args.dry_run:
-                selected = cases[:args.limit]
-                for case in selected:
-                    print(f"{case['id']}: {case['query']} → {case['path']}::{case['symbol']}")
-                print(f"Would run {len(selected)} cases; mode={args.mode}; backend={args.backend}; model calls may incur provider cost.")
-                return 0
-            if not args.yes:
-                raise ValueError("This benchmark sends prompts to a model and can consume Kaggle quota. Re-run with --yes to acknowledge.")
-            report = run_benchmark(load_config(), model=args.model, mode=args.mode, budget_tokens=args.budget,
-                                   limit=args.limit, output=args.output, backend_name=args.backend)
-            summary = report["summary"]
-            print(f"{summary['passed']}/{summary['total']} passed ({summary['pass_rate']:.0%}); "
-                  f"tokens={summary['tokens_in']} in/{summary['tokens_out']} out; "
-                  f"cost={summary['cost_usd'] if summary['cost_usd'] is not None else 'not reported'}; "
-                  f"avg latency={summary['average_latency_ms']} ms")
-            print(f"Report: {report['output']}")
-            return 0 if summary["passed"] == summary["total"] else 1
-
-        if args.command == "config":
-            if args.config_action == "validate":
-                config = load_config()
-                print(f"Configuration valid; mode={config.mode}; backends={', '.join(config.backends)}")
-                return 0
-            target = project_dir() / "config.yaml" if args.project else user_dir() / "config.yaml"
-            data = yaml.safe_load(target.read_text(encoding="utf-8")) if target.exists() else AtomicConfig().model_dump(mode="json")
-            if args.config_action == "get":
-                value = _get_nested(data, args.key)
-                if args.key.endswith("api_key") and value:
-                    value = "********"
-                print(yaml.safe_dump(value, sort_keys=False, allow_unicode=True).strip())
-            elif args.config_action == "set":
-                value = yaml.safe_load(args.value)
-                updates: dict[str, Any] = {}
-                _set_nested(updates, args.key, value)
-                write_config(target, updates)
-                load_config(Path.cwd() if args.project else None)
-                print(f"Updated {target}: {args.key}")
-            else:
-                editor = os.getenv("EDITOR") or ("notepad" if os.name == "nt" else "vi")
-                target.parent.mkdir(parents=True, exist_ok=True)
-                if not target.exists():
-                    target.write_text(yaml.safe_dump(AtomicConfig().model_dump(mode="json"), sort_keys=False), encoding="utf-8")
-                subprocess.run(shlex.split(editor) + [str(target)], check=False)
-            return 0
-
-        if args.command == "up":
-            if args.host not in {"127.0.0.1", "localhost", "::1"} and not os.getenv("ATOMIC_FLOW_SERVER_API_KEY"):
-                raise ConfigurationError("Binding beyond loopback requires ATOMIC_FLOW_SERVER_API_KEY. Set the key before starting the API.")
-            if args.host not in {"127.0.0.1", "localhost", "::1"} and not os.getenv("ATOMIC_FLOW_PROJECT_ROOT"):
-                raise ConfigurationError("Binding beyond loopback requires ATOMIC_FLOW_PROJECT_ROOT to limit filesystem access.")
-            try:
-                import uvicorn
-            except ImportError as exc:
-                raise ConfigurationError("Install the API extra with `pip install atomic-flow[api]`.") from exc
-            print(f"atomic_flow listening on http://{args.host}:{args.port}")
-            uvicorn.run("atomic_flow.api.server:app", host=args.host, port=args.port, reload=False)
-            return 0
-
-        if args.command == "status":
-            root = Path(args.project).expanduser().resolve()
-            print(f"Project: {root}")
-            try:
-                tree = load_tree(root)
-                print(f"Tree: indexed ({len(tree['nodes'])} nodes)")
-            except AtomicFlowError:
-                print("Tree: not indexed")
-            print(f"API: configure `atomic up` to serve on 127.0.0.1:8000")
-            return 0
-
-        if args.command == "runs":
-            run_root = user_dir() / "runs"
-            if args.runs_action == "list":
-                if not run_root.exists():
-                    print("No saved requests.")
-                else:
-                    for path in sorted(run_root.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
-                        try:
-                            meta = json.loads((path / "meta.json").read_text(encoding="utf-8"))
-                            print(f"{path.name}\t{meta.get('mode_used')}\t{meta.get('verdict')}\t{meta.get('model_used')}")
-                        except (OSError, json.JSONDecodeError):
-                            continue
-            else:
-                path = run_root / args.request_id
-                meta = json.loads((path / "meta.json").read_text(encoding="utf-8"))
-                print(json.dumps(meta, ensure_ascii=False, indent=2))
-            return 0
-
-    except (AtomicFlowError, ConfigurationError, OSError, ValueError, KeyError, yaml.YAMLError) as exc:
+        return HANDLERS[args.command](args)
+    except (AtomicFlowError, OSError, ValueError, KeyError, yaml.YAMLError) as exc:
+        if args.debug:
+            traceback.print_exc()
         print(f"atomic: {exc}", file=sys.stderr)
         return 2
-    return 0
 
 
 if __name__ == "__main__":

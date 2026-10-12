@@ -1,24 +1,30 @@
 # atomic_flow
 
-Project-aware LLM development platform: indexes source code, selects relevant context, answers with verifiable citations, and measures quality with local and Kaggle-hosted benchmarks. The current first-class hosted provider is Kaggle Benchmarks Model Proxy; OpenAI-compatible and Anthropic backends remain available.
-
-## Kaggle development setup
+Project-aware LLM development platform: indexes source code, selects relevant context, answers with citations,
+**checks the answer deterministically against the context it was given**, and measures quality with free retrieval
+metrics plus local and Kaggle-hosted benchmarks. Kaggle Model Proxy, OpenAI-compatible and Anthropic backends.
 
 ```bash
-pip install -e '.[api,kaggle,benchmarks]'
-kaggle auth login
-atomic kaggle init --yes
-atomic kaggle status
-atomic init --project
-atomic tree build
-atomic benchmark list
-atomic benchmark run --dry-run
+pip install -e '.[api,kaggle,benchmarks,dev]'
+pytest                                   # no network, no keys needed (scripted fake backend)
+atomic init --project && atomic tree build
+atomic benchmark retrieval               # FREE: ranking quality, zero model calls
+atomic ask "What does Session.refresh do?" --explain
 ```
 
-`kaggle auth login` authenticates the Kaggle CLI account. `atomic kaggle init --yes` obtains a separate, short-lived Model Proxy inference key and saves it in the user profile (`~/.atomic_flow/kaggle.env`). Keep this file private and out of version control. Set up a project, then run a local benchmark with `atomic benchmark run --model <available-model> --yes`; check `atomic kaggle quota` before spending inference quota. See [Kaggle setup and benchmarks](docs/quickstart.md).
+Kaggle: `kaggle auth login`, `atomic kaggle init --yes`, `atomic kaggle status`, then
+`atomic benchmark run --model <available-model> --repeats 3 --yes` (check `atomic kaggle quota` first).
 
-## Local API
+## What changed in 0.2
 
-`atomic up` serves only on loopback by default. Configure `ATOMIC_FLOW_SERVER_API_KEY` to require a bearer key on `/v1/*`. Binding to a network interface also requires both this key and `ATOMIC_FLOW_PROJECT_ROOT`, which restricts project access to one directory. Keep provider credentials on the server; clients send the server key, never a Kaggle Model Proxy key.
+See `REVIEW.md` (problems found in 0.1 and how each was fixed) and `docs/architecture.md`.
+Tree format is v2: run `atomic tree build` once after upgrading.
 
-Project state is saved under `.atomic_flow/`; user-wide configuration and run artifacts live under `~/.atomic_flow/`. See [docs/architecture.md](docs/architecture.md) for details.
+## Safety defaults
+
+* A cloned repo's `.atomic_flow/config.yaml` cannot set `backends`/`default_backend` until you run `atomic trust`.
+* `atomic up` binds to loopback; network binds need `ATOMIC_FLOW_SERVER_API_KEY` (>=16 chars) and `ATOMIC_FLOW_PROJECT_ROOT`.
+* Run artifacts (`~/.atomic_flow/runs/`) contain prompts and source snippets: `artifacts.save: false` disables them,
+  `atomic runs prune` applies `artifacts.keep_days`.
+* `budget.daily_limit_usd` is enforced locally (calls without a known cost are not counted; set `price_in_per_mtok` /
+  `price_out_per_mtok` on a backend to make cost known).

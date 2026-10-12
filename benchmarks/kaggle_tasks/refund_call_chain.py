@@ -17,9 +17,10 @@ def refund_call_chain(llm):
         return "refund denied"
     '''
     response = llm.prompt("Explain how refund_message chooses its result, citing the rule it calls.\n" + context)
-    kbench.assertions.assert_contains_regex(r"(?i)is_refundable", response, expectation="The answer follows the cross-file helper call.")
+    kbench.assertions.assert_contains_regex(r"is_refundable", response, expectation="The answer follows the cross-file helper call.")
     kbench.assertions.assert_contains_regex(r"(?i)approved", response, expectation="The answer names the approval result.")
     kbench.assertions.assert_contains_regex(r"(?i)denied", response, expectation="The answer names the denial result.")
+    kbench.assertions.assert_contains_regex(r"\b30\b", response, expectation="The answer cites the rule's 30-day limit (the actual 'cited rule').")
 
 
 refund_call_chain.run(kbench.llm)

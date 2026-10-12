@@ -1,45 +1,84 @@
-"""Validated data exchanged between the LLM roles."""
+"""Validated data exchanged between the LLM roles.
+
+Model OUTPUTS are parsed leniently (unknown keys ignored, bad enums coerced) because a strict
+`extra="forbid"` turns one stray "reasoning" key into a failed, already-paid-for run. Internal
+results (`AnswerResult`) stay strict.
+"""
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+class LLMModel(BaseModel):
+    model_config = ConfigDict(extra="ignore")
 
 
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class QueryIntent(StrictModel):
-    task_type: Literal["explain", "diagnose", "review", "trace", "refactor", "other"] = "other"
+TaskType = Literal["explain", "diagnose", "review", "trace", "refactor", "other"]
+
+
+class QueryIntent(LLMModel):
+    task_type: TaskType = "other"
     target_scope: list[str] = Field(default_factory=list)
     focus_terms: list[str] = Field(default_factory=list)
     answer_format: str = "explanation"
 
+    @field_validator("task_type", mode="before")
+    @classmethod
+    def _coerce_task(cls, value: Any) -> Any:
+        return value if value in TaskType.__args__ else "other"          # type: ignore[attr-defined]
 
-class Citation(StrictModel):
+
+class Citation(LLMModel):
     node_id: str
-    what: str = Field(min_length=1)
+    what: str = ""
+    lines: str | None = None                                             # e.g. "12-18" (optional, verifiable)
 
 
-class Answer(StrictModel):
+class Answer(LLMModel):
     text: str
     citations: list[Citation] = Field(default_factory=list)
     confidence: Literal["high", "medium", "low"] = "medium"
     missing_context: list[str] = Field(default_factory=list)
     follow_ups: list[str] = Field(default_factory=list)
 
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def _coerce_conf(cls, value: Any) -> Any:
+        return value if value in {"high", "medium", "low"} else "medium"
 
-class AnswerCritique(StrictModel):
-    verdict: Literal["ok", "needs_more_context", "needs_retry", "wrong_answer"]
+
+Verdict = Literal["ok", "needs_more_context", "needs_retry", "wrong_answer"]
+
+
+class AnswerCritique(LLMModel):
+    verdict: Verdict
     unsupported_claims: list[str] = Field(default_factory=list)
     missing_node_ids: list[str] = Field(default_factory=list)
     feedback: str = ""
-    citation_coverage: float = Field(default=0, ge=0, le=1)
+    citation_coverage: float = 0.0
+
+    @field_validator("verdict", mode="before")
+    @classmethod
+    def _coerce_verdict(cls, value: Any) -> Any:
+        return value if value in Verdict.__args__ else "needs_retry"      # type: ignore[attr-defined]
+
+    @field_validator("citation_coverage", mode="before")
+    @classmethod
+    def _clamp(cls, value: Any) -> float:
+        try:
+            return max(0.0, min(1.0, float(value)))
+        except (TypeError, ValueError):
+            return 0.0
 
 
-class ContextPlan(StrictModel):
+class ContextPlan(LLMModel):
     node_ids: list[str] = Field(default_factory=list)
     rationale: str = ""
 
@@ -55,12 +94,18 @@ class AnswerResult(StrictModel):
     prompts_source: dict[str, str]
     attempts: int = 1
     ledger_id: str
-    artifacts_path: str
+    artifacts_path: str | None = None
     tokens_in: int = 0
     tokens_out: int = 0
-    cost_usd: float | None = None
+    cost_usd: float | None = None                  # sum of the calls that reported a cost
+    cost_complete: bool = True                     # False -> some calls had no cost, cost_usd is a lower bound
     latency_ms: int = 0
     backend_used: str
     model_used: str
-    verdict: str = "unverified"
-    citation_coverage: float = 0
+    verdict: str = "unverified"                    # critic verdict, downgraded by deterministic checks
+    citation_coverage: float = 0.0                 # critic's estimate (model opinion)
+    grounding: float = 1.0                         # deterministic: share of `identifiers` found in the context
+    unknown_identifiers: list[str] = Field(default_factory=list)
+    dropped_citations: int = 0                     # citations to nodes that were not in the context
+    retrieval_weak: bool = False
+    warnings: list[str] = Field(default_factory=list)

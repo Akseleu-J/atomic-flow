@@ -1,14 +1,14 @@
 # Role protocol
 
-Role outputs are JSON objects validated with strict Pydantic schemas in `atomic_flow.llm.schemas`.
+Outputs are JSON validated by `atomic_flow.llm.schemas` (unknown keys ignored, invalid enums coerced; one repair round on bad JSON).
 
 | Role | Output | Purpose |
 |---|---|---|
-| Parser | `QueryIntent` | Classify task, scope, and focus terms |
-| Refiner | `ContextPlan` | Select nodes for the first hard-mode context |
-| Answerer | `Answer` | Produce a grounded response with citations |
-| Critic | `AnswerCritique` | Assess support, citations, and missing context |
-| Expander | `ContextPlan` | Add context for another hard-mode attempt |
-| Reparser | `QueryIntent` | Revise interpretation after a wrong-answer verdict |
+| Parser | `QueryIntent` | Task, scope, English focus terms (also bridges non-English questions) |
+| Refiner | `ContextPlan` | Pick nodes for the first hard-mode context |
+| Answerer | `Answer` | Grounded response with citations |
+| Critic | `AnswerCritique` | Support, citations, missing context |
+| Expander | `ContextPlan` | Add context for another attempt |
+| Reparser | `QueryIntent` | New interpretation after `wrong_answer` (re-ranks retrieval) |
 
-The user sees the Answerer's text, citations, confidence, follow-ups, verdict, and request artifact path. A Critic verdict is advisory model output and should not be treated as a formal correctness guarantee.
+The critic is a model opinion. Deterministic checks (invalid citations dropped, backticked identifiers missing from context) can downgrade an `ok`.

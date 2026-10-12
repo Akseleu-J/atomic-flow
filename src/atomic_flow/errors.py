@@ -13,6 +13,10 @@ class BackendError(AtomicFlowError):
     pass
 
 
+class ResponseFormatError(BackendError):
+    """The model answered, but not with the JSON object we asked for."""
+
+
 class ConfirmationRequired(AtomicFlowError):
     pass
 
