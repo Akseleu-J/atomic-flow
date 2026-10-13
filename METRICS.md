@@ -119,3 +119,50 @@ The originally intended `Sourcing-agent-1Version` repository was not present in
 - Input tokens are high in modes that include the skeleton and large system prompts.
 - Gemini reasoning can consume a substantial part of the output-token budget.
 - `refund-call-chain` remains wording-sensitive because the answer may describe only the approval branch.
+
+## Extended benchmark — 2026-10-13 (Phase 0)
+
+- Corpus: 27 cases; 2 repeats per case, 54 total runs.
+- Model: `google/gemini-3-flash-preview`; backend: `kaggle`; mode: `medium`.
+- Passed (lenient): `52/54` (`96.30%`).
+- Strict passed: `50/54` (`92.59%`).
+- Flaky cases: `atomic-ops-backward-flow`, `atomic-ops-reference`.
+- Tokens: `779429` in / `251170` out.
+- Cost: `$1.0817077`.
+- Average latency: `25607.35 ms`.
+- Report: `/home/codespace/.atomic_flow/benchmarks/runs/20261013-131059.json`
+
+### Phase 0 benchmark observations
+
+- `min_citations` is active: lenient and strict totals differ by two runs.
+- `atomic-ops-backward-flow` passed once leniently and once failed because the answer omitted expected citations.
+- `atomic-ops-reference` passed once and once failed because the answer omitted the expected citation, not because of malformed JSON.
+- `unanswerable-payout` passed `2/2`; both answers used `confidence="low"` and were correctly abstentions.
+- No `Unterminated string` errors occurred with Kaggle `max_output_tokens=8192`.
+
+## Extended benchmark — 27 cases × 2 — 2026-10-13 13:42 UTC (Phase 0 complete)
+
+### Summary
+
+- Passed (lenient): `51/54` (`94.44%`).
+- Strict passed: `49/54` (`90.74%`).
+- Flaky cases: `atomic-ops-backward-flow`, `atomic-ops-chunk-combine`, `atomic-ops-reference`.
+- Tokens: `727478` in / `216835` out.
+- Cost: `$0.9490435`.
+- Average latency: `21614.69 ms`.
+- Report: `/home/codespace/.atomic_flow/benchmarks/runs/20261013-134238.json`.
+
+### What changed versus the previous baseline
+
+- `min_citations` is enforced: strict results are lower than lenient results (`49/54` vs `51/54`).
+- `atomic-ops-backward-flow`: `1/2` passed; one repeat omitted a required citation.
+- `atomic-ops-forward-pass`: `2/2` passed.
+- `atomic-ops-chunk-combine`: `1/2` passed.
+- `atomic-ops-reference`: `1/2` passed; the failed repeat cited the Pallas implementation instead of the required reference node.
+- `unanswerable-payout`: `2/2` passed with abstention behavior.
+- No `Unterminated string` errors occurred with `max_output_tokens=8192`.
+
+### Known issues for Phase 1
+
+- The three flaky atomic-ops cases remain citation-sensitive across repeats.
+- The benchmark command exits non-zero when any case fails, despite the overall `94.44%` lenient pass rate.

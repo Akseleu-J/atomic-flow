@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from atomic_flow.activation.redact import redact
 from atomic_flow.activation.text import raw_terms, terms
 from atomic_flow.textutil import estimate_tokens, split_lines
 from atomic_flow.tree.node import TreeNode
@@ -175,8 +176,11 @@ class _Sources:
 
     def lines(self, rel: str) -> list[str] | None:
         if rel not in self.cache:
+            path = self.root / rel
             try:
-                data = (self.root / rel).read_bytes()
+                if not path.resolve().is_relative_to(self.root):
+                    raise OSError("source is outside project root")
+                data = path.read_bytes()
                 text = data.decode("utf-8-sig")
             except (OSError, UnicodeError):
                 self.cache[rel] = None
@@ -186,7 +190,7 @@ class _Sources:
                 log.warning("Index is stale for %s; run `atomic tree refresh`. Skipping its source.", rel)
                 self.cache[rel] = None
                 return None
-            self.cache[rel] = split_lines(text)
+            self.cache[rel] = split_lines(redact(text))
         return self.cache[rel]
 
 

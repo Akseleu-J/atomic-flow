@@ -47,6 +47,15 @@ def _text(content: Any) -> str:
     return str(content or "")
 
 
+def split_conversation(turns: list[tuple[str, str]]) -> tuple[str | None, str]:
+    """Return (last user message, history before it)."""
+    idx = max((i for i, (role, text) in enumerate(turns) if role == "user" and text.strip()), default=None)
+    if idx is None:
+        return None, ""
+    history = "\n".join(f"{role.upper()}: {text}" for role, text in turns[max(0, idx - 6):idx])
+    return turns[idx][1], history
+
+
 def create_app():
     try:
         from fastapi import FastAPI, HTTPException, Request
@@ -54,15 +63,18 @@ def create_app():
     except ImportError as exc:
         raise RuntimeError("Install the API extra with `pip install atomic-flow[api]`.") from exc
 
-    app = FastAPI(title="atomic_flow", version="0.2.0")
+    server_key = os.getenv("ATOMIC_FLOW_SERVER_API_KEY", "")
+    if server_key and (len(server_key) < 16 or server_key.lower() in PLACEHOLDER_KEYS):
+        raise RuntimeError("ATOMIC_FLOW_SERVER_API_KEY is a placeholder or shorter than 16 characters.")
+
+    app = FastAPI(title="atomic_flow", version="0.2.0",
+                  docs_url=None if server_key else "/docs",
+                  redoc_url=None if server_key else "/redoc",
+                  openapi_url=None if server_key else "/openapi.json")
     slots = threading.BoundedSemaphore(int(os.getenv("ATOMIC_FLOW_MAX_CONCURRENCY", "4")))
 
     def configured_project_root() -> Path:
         return Path(os.getenv("ATOMIC_FLOW_PROJECT_ROOT", Path.cwd())).expanduser().resolve()
-
-    server_key = os.getenv("ATOMIC_FLOW_SERVER_API_KEY", "")
-    if server_key and (len(server_key) < 16 or server_key.lower() in PLACEHOLDER_KEYS):
-        raise RuntimeError("ATOMIC_FLOW_SERVER_API_KEY is a placeholder or shorter than 16 characters.")
 
     @app.middleware("http")
     async def protect_api(request: Request, call_next):
@@ -127,10 +139,9 @@ def create_app():
             raise HTTPException(400, detail={"error": "streaming_not_supported", "message": "Streaming is not available in this release."})
         turns = [(str(m.get("role", "user")), _text(m.get("content"))) for m in request.messages
                  if m.get("role") in {"system", "developer", "user", "assistant"}]
-        last_user = next((text for role, text in reversed(turns) if role == "user" and text.strip()), None)
+        last_user, history = split_conversation(turns)
         if last_user is None:
             raise HTTPException(400, detail={"error": "no_user_message", "message": "At least one user message is required."})
-        history = "\n".join(f"{role.upper()}: {text}" for role, text in turns[-7:-1])
         query = f"Conversation so far:\n{history}\n\nCurrent question: {last_user}" if history else last_user
         mode: Mode = "hard" if request.model.endswith("hard") else "simple" if request.model.endswith("simple") else "medium"
         # Retrieval uses ONLY the last user turn: BM25 over the whole transcript drowns the real question.

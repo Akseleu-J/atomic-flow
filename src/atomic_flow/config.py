@@ -27,7 +27,7 @@ BACKEND_DEFAULTS: dict[str, dict[str, Any]] = {
 }
 
 # A cloned repository must not be able to redirect your API key or source code.
-UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends")
+UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts")
 
 
 def user_dir() -> Path:
@@ -88,7 +88,7 @@ class AtomicConfig(BaseModel):
     context_budget_tokens: int = Field(default=8000, ge=256, le=200_000)
     max_attempts: int = Field(default=3, ge=1, le=10)
     auto_mode: bool = True
-    default_backend: str = "kaggle"
+    default_backend: str = "auto"
     tree: TreeConfig = Field(default_factory=TreeConfig)
     backends: dict[str, BackendConfig] = Field(default_factory=lambda: {
         "openai-compatible": BackendConfig(type="openai-compatible"),

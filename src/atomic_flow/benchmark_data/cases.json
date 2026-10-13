@@ -64,7 +64,7 @@
    "expected_nodes": ["atomic_ops/gdn2_bwd.py::dav_backward_pallas",
                       "atomic_ops/gdn2_bwd.py::gdn2_dhu_backward",
                       "atomic_ops/gdn2_pipeline.py::_gdn2_core_bwd"],
-   "min_citations": 1,
+   "min_citations": 2,
    "must_match": ["(?i)(backward|gradient|bwd|grad|dhu|dav)", "(?i)(state|chunk|hidden)"], "mode": "medium"},
   {"id": "atomic-ops-forward-pass", "query": "как работает forward pass?",
    "expected_nodes": ["atomic_ops/gdn2_fwd.py::gdn2_pallas_forward",

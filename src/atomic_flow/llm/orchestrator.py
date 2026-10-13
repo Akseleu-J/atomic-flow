@@ -31,8 +31,16 @@ M = TypeVar("M", bound=BaseModel)
 
 REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")          # request_id becomes a directory name
 _CONF_RANK = {"high": 3, "medium": 2, "low": 1}
-_REFRESH_LOCK = threading.Lock()
+_CACHE_LOCK = threading.Lock()
+_PROJECT_LOCKS: dict[str, threading.Lock] = {}
 _INDEX_CACHE: OrderedDict[tuple[str, str], ActivationIndex] = OrderedDict()
+
+
+def project_lock(project: Path) -> threading.Lock:
+    """Return the lock shared by refreshes for one project."""
+    key = str(project)
+    with _CACHE_LOCK:
+        return _PROJECT_LOCKS.setdefault(key, threading.Lock())
 
 
 def choose_mode(query: str, configured_mode: str, *, explicit_mode: str | None = None,
@@ -128,12 +136,12 @@ def scope_ids(nodes: list[TreeNode], scope: str) -> set[str]:
 
 def _get_index(project: Path, tree: dict, nodes: list[TreeNode]) -> ActivationIndex:
     key = (str(project), tree.get("fingerprint", ""))
-    with _REFRESH_LOCK:
+    with _CACHE_LOCK:
         if key in _INDEX_CACHE:
             _INDEX_CACHE.move_to_end(key)
             return _INDEX_CACHE[key]
     index = ActivationIndex(nodes)
-    with _REFRESH_LOCK:
+    with _CACHE_LOCK:
         _INDEX_CACHE[key] = index
         while len(_INDEX_CACHE) > 8:
             _INDEX_CACHE.popitem(last=False)
@@ -246,7 +254,7 @@ class Orchestrator:
                 limit: int, file_scope: str | None) -> AnswerResult:
         tree = load_tree(self.project)
         if self.config.tree.auto_refresh:
-            with _REFRESH_LOCK:
+            with project_lock(self.project):
                 tree, changed = refresh_tree(self.project, self.config.tree.ignore,
                                              respect_gitignore=self.config.tree.respect_gitignore)
             if changed:

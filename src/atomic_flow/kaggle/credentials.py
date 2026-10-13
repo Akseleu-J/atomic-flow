@@ -114,7 +114,10 @@ def prepare_secret_file(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if os.name != "nt":
         fd = os.open(path, os.O_CREAT | os.O_WRONLY, 0o600)
-        os.close(fd)
+        try:
+            os.fchmod(fd, 0o600)
+        finally:
+            os.close(fd)
 
 
 def protect_secret_file(path: Path) -> None:

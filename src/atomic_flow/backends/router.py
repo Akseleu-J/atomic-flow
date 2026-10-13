@@ -8,12 +8,26 @@ from atomic_flow.backends.kaggle import KaggleBackend
 from atomic_flow.backends.openai_compatible import OpenAICompatibleBackend
 from atomic_flow.config import AtomicConfig
 from atomic_flow.errors import ConfigurationError
+from atomic_flow.kaggle.credentials import load_credentials
 
 
 def resolve_backend_name(config: AtomicConfig, name: str = "auto") -> str:
     if name != "auto":
         return name
-    return "openai-compatible" if config.default_backend == "auto" else config.default_backend
+    if config.default_backend != "auto":
+        return config.default_backend
+    for key, entry in config.backends.items():
+        kind = entry.type or key
+        if kind == "kaggle":
+            credentials = load_credentials(required=False)
+            if credentials and not credentials.expired:
+                return key
+        elif entry.resolved_api_key() or any(host in entry.base_url for host in ("localhost", "127.0.0.1")):
+            return key
+    raise ConfigurationError(
+        "No usable backend. Set ATOMIC_FLOW_API_KEY or ANTHROPIC_API_KEY, "
+        "run `atomic kaggle auth`, or configure a local backend."
+    )
 
 
 def make_backend(config: AtomicConfig, name: str = "auto", model: str | None = None) -> LLMBackend:
@@ -22,7 +36,8 @@ def make_backend(config: AtomicConfig, name: str = "auto", model: str | None = N
     kind = (entry.type if entry and entry.type else None) or ("kaggle" if resolved == "kaggle" else "openai-compatible")
     if kind == "kaggle":
         return KaggleBackend(model=model or (entry.model if entry and entry.model else None),
-                             timeout_seconds=entry.timeout_seconds if entry else 90)
+                             timeout_seconds=entry.timeout_seconds if entry else 90,
+                             max_output_tokens=entry.max_output_tokens if entry else None)
     if entry is None:
         raise ConfigurationError(f"Backend is not configured: {resolved}")
     if model:

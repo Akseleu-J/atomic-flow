@@ -72,15 +72,22 @@ def _evaluate(case: dict[str, Any], answer, target_ids: list[str]) -> dict[str, 
     cited = {c.node_id for c in answer.citations}
     checks = {pattern: bool(re.search(pattern, text)) for pattern in case.get("must_match", [])}
     forbidden = {pattern: not re.search(pattern, text) for pattern in case.get("must_not_match", [])}
+    hits = sum(1 for target in target_ids if target in cited)
     min_required = case.get("min_citations", len(target_ids))
-    citation_hit = sum(1 for target in target_ids if target in cited) >= min_required
+    citation_hit = hits >= min_required
+    citation_strict = hits == len(target_ids)
     abstained = None
     if case.get("must_abstain"):
-        abstained = answer.confidence == "low" or bool(answer.missing_context) or bool(ABSTAIN_RE.search(text))
+        abstained = (
+            answer.confidence == "low"
+            or bool(answer.missing_context)
+            or bool(ABSTAIN_RE.search(text))
+        ) and answer.confidence != "high"
+    unknown_identifiers = getattr(answer, "unknown_identifiers", [])
     passed = (citation_hit and all(checks.values()) and all(forbidden.values())
-              and (abstained is not False) and not answer.unknown_identifiers)
-    return {"citation_hit": citation_hit, "required_patterns": checks, "forbidden_patterns": forbidden,
-            "abstained": abstained, "grounded": not answer.unknown_identifiers, "passed": passed}
+              and (abstained is not False) and not unknown_identifiers)
+    return {"citation_hit": citation_hit, "citation_strict": citation_strict, "required_patterns": checks, "forbidden_patterns": forbidden,
+            "abstained": abstained, "grounded": not unknown_identifiers, "passed": passed}
 
 
 def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str = "medium", budget_tokens: int = 5000,
@@ -124,7 +131,8 @@ def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str =
         "model": model or getattr(backend.config, "model", "unknown"), "backend": backend.name, "mode": mode,
         "budget_tokens": budget_tokens, "repeats": repeats,
         "summary": {
-            "passed": passed, "total": total, "pass_rate": passed / total,
+            "passed": passed, "strict_passed": sum(bool(r.get("citation_strict")) and bool(r["passed"]) for r in results),
+            "total": total, "pass_rate": passed / total,
             "flaky_cases": sorted(c for c, v in per_case.items() if 0 < sum(v) < len(v)),
             "average_latency_ms": round(mean(r["latency_ms"] for r in results if "latency_ms" in r), 2) if any("latency_ms" in r for r in results) else None,
             "tokens_in": sum(r.get("tokens_in", 0) for r in results), "tokens_out": sum(r.get("tokens_out", 0) for r in results),

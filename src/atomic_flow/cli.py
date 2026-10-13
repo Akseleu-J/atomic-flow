@@ -19,7 +19,7 @@ from atomic_flow.activation.activate import ActivationIndex, materialize
 from atomic_flow.activation.text import has_non_latin_letters
 from atomic_flow.backends.router import make_backend, resolve_backend_name
 from atomic_flow.budget import SpendLedger, prune_runs
-from atomic_flow.config import AtomicConfig, load_config, mask_secrets, project_dir, trust_project, user_dir, write_config
+from atomic_flow.config import AtomicConfig, is_trusted, load_config, mask_secrets, project_dir, trust_project, user_dir, write_config
 from atomic_flow.errors import AtomicFlowError, ConfigurationError, ConfirmationRequired
 from atomic_flow.kaggle.credentials import (
     credential_status,
@@ -73,6 +73,8 @@ def _parser() -> argparse.ArgumentParser:
     ask.add_argument("--edit-prompts", action="store_true")
     ask.add_argument("--yes", "-y", action="store_true")
     ask.add_argument("--dry-run", action="store_true")
+    ask.add_argument("--no-translate", action="store_true",
+                     help="Dry-run: never call the Parser (zero model calls)")
     ask.add_argument("--explain", action="store_true")
     ask.add_argument("--json", action="store_true")
 
@@ -194,6 +196,8 @@ def _edit_prompts(project: Path, mode: str) -> int:
         paths.append(path)
     subprocess.run([*_editor(), *map(str, paths)], check=False)
     print("Prompts saved under", prompt_dir, "- rerun your query.")           # matches the docs: edit, then exit
+    if not is_trusted(project):
+        print("This project is not trusted yet. Run `atomic trust .` so these prompts are actually used.")
     return 0
 
 
@@ -282,19 +286,20 @@ def cmd_ask(args) -> int:
     config = load_config(project)
     mode = choose_mode(args.query, config.mode, explicit_mode=args.mode,
                        auto_mode=config.auto_mode and not args.no_auto_mode, file_scope=args.file)
-    backend_name = resolve_backend_name(config, args.backend)
-    if backend_name not in config.backends:
-        raise ConfigurationError(f"Backend is not configured: {backend_name}")
     if args.edit_prompts:
         return _edit_prompts(project, mode)
     prompts = _prompts(args, project, mode)
     registry = PromptRegistry(project, prompts)
     if args.dry_run:
+        try:
+            backend_name: str | None = resolve_backend_name(config, args.backend)
+        except ConfigurationError:
+            backend_name = None
         tree, _ = refresh_tree(project, config.tree.ignore) if config.tree.auto_refresh else (load_tree(project), False)
         nodes = [TreeNode.model_validate(n) for n in tree["nodes"]]
         scope = scope_ids(nodes, args.file) if args.file else None
         extra_terms: list[str] | None = None
-        if has_non_latin_letters(args.query):
+        if has_non_latin_letters(args.query) and backend_name is not None and not args.no_translate:
             print("[dry-run] non-Latin query detected; running Parser for translation...", file=sys.stderr)
             try:
                 parser_run = _Run(make_backend(config, args.backend, args.model), registry,
@@ -310,7 +315,8 @@ def cmd_ask(args) -> int:
         aliases = {n.node_id: f"n{i}" for i, n in enumerate(nodes, 1)}
         context, meta = materialize(project, search.ranked, budget_tokens=args.budget or config.context_budget_tokens,
                                     include_skeleton=mode != "simple", skeleton_nodes=nodes, aliases=aliases)
-        print(f"mode={mode}; model={config.backends[backend_name].model or 'default'}; selected_nodes={len(meta)}; "
+        model_label = (config.backends[backend_name].model if backend_name in config.backends else "") if backend_name else ""
+        print(f"mode={mode}; model={model_label or 'default'}; selected_nodes={len(meta)}; "
               f"retrieval_weak={search.weak}; context_chars={len(context)}")
         for role in registry.roles_for_mode(mode):
             print(f"\n--- prompt: {role} ({registry.sources.get(role) or (registry.get(role) and registry.sources[role])}) ---\n{registry.get(role)}")
@@ -352,7 +358,11 @@ def cmd_doctor(args) -> int:
         print(f"Project tree: OK ({len(tree['nodes'])} nodes, {tree['files']} files)")
     except AtomicFlowError as exc:
         print(f"Project tree: NOT READY ({exc})")
-    name = resolve_backend_name(config)
+    try:
+        name = resolve_backend_name(config)
+    except ConfigurationError as exc:
+        print(f"LLM backend: NOT CONFIGURED ({exc})")
+        return 1
     entry = config.backends.get(name)
     if name == "kaggle":
         status = credential_status()

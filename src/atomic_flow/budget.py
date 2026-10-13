@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import threading
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,37 +14,43 @@ from atomic_flow.errors import BudgetExceeded
 
 
 class SpendLedger:
-    def __init__(self, daily_limit_usd: float, path: Path | None = None):
+    _lock = threading.Lock()
+
+    def __init__(self, daily_limit_usd: float, directory: Path | None = None):
         self.limit = daily_limit_usd
-        self.path = path or user_dir() / "ledger.jsonl"
-        self._base = self.today_total()
+
+        self.dir = directory or user_dir() / "ledger"
+
+    @property
+    def path(self) -> Path:
+        return self.dir / f"{datetime.now(UTC).date().isoformat()}.jsonl"
 
     def today_total(self) -> float:
-        today = datetime.now(UTC).date().isoformat()
         total = 0.0
         try:
-            for line in self.path.read_text(encoding="utf-8").splitlines():
-                try:
-                    row = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if str(row.get("ts", "")).startswith(today):
-                    total += float(row.get("cost_usd") or 0.0)
+            with self.path.open(encoding="utf-8") as handle:
+                lines = handle
+                for line in lines:
+                    try:
+                        total += float(json.loads(line).get("cost_usd") or 0.0)
+                    except (json.JSONDecodeError, TypeError, ValueError, AttributeError):
+                        continue
         except OSError:
             pass
         return total
 
     def check(self, spent_this_request: float = 0.0) -> None:
-        if self.limit > 0 and self._base + spent_this_request >= self.limit:
-            raise BudgetExceeded(f"Daily limit ${self.limit:.2f} reached (${self._base + spent_this_request:.4f} spent today). "
+        spent = self.today_total() + spent_this_request
+        if self.limit > 0 and spent >= self.limit:
+            raise BudgetExceeded(f"Daily limit ${self.limit:.2f} reached (${spent:.4f} spent today). "
                                  "Raise budget.daily_limit_usd or set it to 0 to disable. Only calls with a known cost are counted.")
 
     def record(self, **fields: object) -> None:
+        row = json.dumps({"ts": datetime.now(UTC).isoformat(), **fields}, ensure_ascii=False) + "\n"
         try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            row = {"ts": datetime.now(UTC).isoformat(), **fields}
-            with self.path.open("a", encoding="utf-8") as handle:
-                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+            self.dir.mkdir(parents=True, exist_ok=True)
+            with self._lock, self.path.open("a", encoding="utf-8") as handle:
+                handle.write(row)
         except OSError:
             pass
 

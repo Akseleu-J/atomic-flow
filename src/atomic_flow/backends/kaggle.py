@@ -14,7 +14,8 @@ def normalize_model(model: str) -> str:
 
 
 class KaggleBackend(OpenAICompatibleBackend):
-    def __init__(self, *, model: str | None = None, credentials: KaggleCredentials | None = None, timeout_seconds: float = 90):
+    def __init__(self, *, model: str | None = None, credentials: KaggleCredentials | None = None,
+                 timeout_seconds: float = 90, max_output_tokens: int | None = None):
         self.credentials = credentials or load_credentials()
         if self.credentials.expired:
             raise ConfigurationError("Kaggle Model Proxy key has expired. Run `atomic kaggle auth` to refresh it.")
@@ -35,7 +36,7 @@ class KaggleBackend(OpenAICompatibleBackend):
             BackendConfig(type="kaggle", name="kaggle", base_url=base,
                           api_key=self.credentials.api_key, model=chosen_model,
                           timeout_seconds=timeout_seconds,
-                          max_output_tokens=4096),   # Gemini 3 Flash тратит часть на reasoning
+                          max_output_tokens=max_output_tokens or 8192),
             backend_name="kaggle",
         )
 

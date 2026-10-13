@@ -10,12 +10,13 @@ import os
 from collections import Counter, defaultdict
 from pathlib import Path, PurePosixPath
 
+from atomic_flow.activation.redact import redact
 from atomic_flow.errors import TreeError
 from atomic_flow.textutil import split_lines
 from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES, PYTHON_SUFFIXES, SOURCE_SUFFIXES
 from atomic_flow.tree.node import TreeNode
 
-TREE_VERSION = 2
+TREE_VERSION = 3
 
 
 def node_id(path: str, symbol: str = "") -> str:
@@ -120,7 +121,7 @@ class _PythonVisitor(ast.NodeVisitor):
             node_id=node_id(self.rel, symbol), path=self.rel, symbol=symbol, kind=kind,  # type: ignore[arg-type]
             start_line=first, end_line=getattr(node, "end_lineno", None) or node.lineno,
             parent_id=self.stack[-1].node_id if self.stack else self.file_id,
-            signature=_signature(node), summary=_first_line(ast.get_docstring(node)),
+            signature=redact(_signature(node)), summary=redact(_first_line(ast.get_docstring(node))),
         )
         self.nodes.append(item)
         self.scope.append(symbol.rsplit(".", 1)[-1])
@@ -139,14 +140,14 @@ def _index_file(rel: str, source: str, digest: str, size: int, mtime_ns: int, is
                          content_hash=digest, size=size, mtime_ns=mtime_ns)
     if not is_python:
         first = next((line.strip().lstrip("#").strip() for line in lines if line.strip()), "")
-        file_node.summary = first[:160]
+        file_node.summary = redact(first[:160])
         return [file_node]
     try:
         tree = ast.parse(source, filename=rel)
     except (SyntaxError, ValueError, RecursionError):
         file_node.summary = "(unparseable Python file)"
         return [file_node]
-    file_node.summary = _first_line(ast.get_docstring(tree))
+    file_node.summary = redact(_first_line(ast.get_docstring(tree)))
     visitor = _PythonVisitor(rel, file_node.node_id)
     visitor.visit(tree)
     file_node.imports = sorted(visitor.imports)
@@ -254,6 +255,8 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
             path = current_path / name
             suffix = path.suffix.lower()
             if suffix not in SOURCE_SUFFIXES or skip(rel, False):
+                continue
+            if path.is_symlink() and not path.resolve().is_relative_to(root):
                 continue
             try:
                 stat = path.stat()
