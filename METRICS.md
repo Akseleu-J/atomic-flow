@@ -166,3 +166,28 @@ The originally intended `Sourcing-agent-1Version` repository was not present in
 
 - The three flaky atomic-ops cases remain citation-sensitive across repeats.
 - The benchmark command exits non-zero when any case fails, despite the overall `94.44%` lenient pass rate.
+
+## Extended benchmark - 27 cases x 2 - 2026-10-13 14:08 UTC (latest)
+
+### Summary
+
+- Passed (lenient): `54/54` (`100%`).
+- Strict passed: `51/54` (`94.44%`).
+- Flaky cases: none.
+- Tokens: `746428` in / `230388` out.
+- Cost: `$1.0129556`.
+- Average latency: `22338.24 ms`.
+- Report: `/home/codespace/.atomic_flow/benchmarks/runs/20261013-140804.json`.
+
+### What changed versus the previous baseline
+
+- `min_citations` remains active: strict results are lower than lenient results (`51/54` vs `54/54`).
+- `atomic-ops-backward-flow`: `2/2` passed leniently, but `0/2` passed strict citation checks.
+- `atomic-ops-forward-pass`: `2/2` passed leniently and `1/2` passed strict checks.
+- `atomic-ops-reference`: `2/2` passed; the previous JSON truncation issue did not recur.
+- `unanswerable-payout`: `2/2` passed with the strengthened abstention check.
+- No `Unterminated string` errors occurred with Kaggle `max_output_tokens=8192`.
+
+### Known issues for Phase 1
+
+- Strict citation completeness remains the only benchmark gap; the affected cases are `atomic-ops-backward-flow` and `atomic-ops-forward-pass`.
