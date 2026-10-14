@@ -58,6 +58,21 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
     if tool is None:
         available = sorted(registry._tools)
         return {"error": f"unknown tool: {name}", "available": available}, record
+    if getattr(ctx, "policy", None) is not None:
+        decision = ctx.policy.decide(name, parsed.get("args", {}), project_trusted=getattr(ctx, "trusted", False))
+        record["policy_action"] = decision.action
+        if decision.action == "forbid":
+            return {"error": f"tool '{name}' is forbidden by policy", "reason": decision.reason}, record
+        if decision.action == "ask":
+            callback = getattr(ctx, "approval_callback", None)
+            if callback is None:
+                return {"error": "tool requires approval but no approval channel is available",
+                        "reason": decision.reason,
+                        "hint": "run with an interactive CLI or pre-authorize via policy.yaml"}, record
+            if not callback(name, parsed.get("args", {}), decision.reason):
+                return {"error": f"tool '{name}' was not approved by the user", "reason": decision.reason}, record
+        if name == "edit_node":
+            ctx.edits_enabled = True
     try:
         args = tool.args_schema.model_validate(parsed["args"])
     except ValidationError as exc:

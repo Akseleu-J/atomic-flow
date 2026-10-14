@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from atomic_flow.tree.node import TreeNode
 
@@ -21,3 +21,6 @@ class ToolContext:
     budget_spent: float = 0.0
     edits_enabled: bool = False
     undo_stack: Any = None
+    policy: Any = None
+    trusted: bool = False
+    approval_callback: Callable[[str, dict[str, Any], str], bool] | None = None

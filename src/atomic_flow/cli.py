@@ -191,6 +191,29 @@ def _prompts(args, project: Path, mode: str) -> dict[str, str]:
     return values
 
 
+def _make_approval_callback(auto_yes: bool):
+    def ask(tool: str, args: dict[str, Any], reason: str) -> bool:
+        if auto_yes:
+            return True
+        print(f"\n[policy] {reason}")
+        if tool == "edit_node":
+            lines = str(args.get("new_source", "")).splitlines()
+            print(f"  edit_node on {args.get('node_id')}")
+            print(f"  new source ({len(lines)} lines):")
+            for line in lines[:20]:
+                print(f"    {line}")
+            if len(lines) > 20:
+                print("    ...")
+        elif tool == "run_command":
+            print(f"  command: {args.get('command')}")
+        try:
+            answer = input("  Approve? [y/N]: ").strip().lower()
+        except EOFError:
+            return False
+        return answer in {"y", "yes"}
+    return ask
+
+
 def _edit_prompts(project: Path, mode: str) -> int:
     registry = PromptRegistry(project)
     prompt_dir = project_dir(project) / "prompts"
@@ -339,7 +362,11 @@ def cmd_ask(args) -> int:
         print("Hard mode may use several model calls. Some roles use built-in prompts.")
         if input("Proceed? [y/N]: ").strip().lower() not in {"y", "yes"}:
             return 1
-    result = Orchestrator(config, project, make_backend(config, args.backend, args.model)).answer(
+    approval_callback = _make_approval_callback(
+        args.yes or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
+    )
+    result = Orchestrator(config, project, make_backend(config, args.backend, args.model),
+                          approval_callback=approval_callback).answer(
         args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file,
         approve_edits=args.approve_edits)
     if args.json:

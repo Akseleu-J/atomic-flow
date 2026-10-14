@@ -19,7 +19,7 @@ from pydantic import BaseModel, ValidationError
 from atomic_flow.activation.activate import ActivationIndex, SearchResult, materialize
 from atomic_flow.backends.base import ChatResult, LLMBackend
 from atomic_flow.budget import SpendLedger
-from atomic_flow.config import AtomicConfig, user_dir
+from atomic_flow.config import AtomicConfig, is_trusted, user_dir
 from atomic_flow.errors import ResponseFormatError
 from atomic_flow.llm.prompts import PromptRegistry
 from atomic_flow.llm.schemas import Answer, AnswerCritique, AnswerResult, ContextPlan, QueryIntent
@@ -278,10 +278,12 @@ class _Attempt:
 
 
 class Orchestrator:
-    def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend):
+    def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend,
+                 approval_callback=None):
         self.config = config
         self.project = Path(project).expanduser().resolve()
         self.backend = backend
+        self.approval_callback = approval_callback
 
     def answer(self, query: str, *, mode: str | None = None, budget_tokens: int | None = None,
                role_prompts: dict[str, str] | None = None, request_id: str | None = None,
@@ -329,15 +331,19 @@ class Orchestrator:
         by_id = {n.node_id: n for n in nodes}
         index = _get_index(self.project, tree, nodes)
         from atomic_flow.agents.context import ToolContext
+        from atomic_flow.agents.policy import PolicyEngine
         from atomic_flow.agents.tools import ROLE_TOOLS, default_registry
         from atomic_flow.agents.undo import UndoStack
 
         edits_enabled = approve_edits or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
+        trusted = is_trusted(self.project)
+        policy = PolicyEngine.load(self.project) if trusted else PolicyEngine()
         run.tool_registry = default_registry()
         run.tool_ctx = ToolContext(project_root=self.project, nodes_by_id=by_id,
                        aliases=aliases.alias_of, alias_to_id=aliases.id_of, index=index,
                        edits_enabled=edits_enabled,
-                       undo_stack=UndoStack(user_dir() / "edits") if edits_enabled else None)
+                       undo_stack=UndoStack(user_dir() / "edits"), policy=policy,
+                       trusted=trusted, approval_callback=self.approval_callback)
         run.role_tools = ROLE_TOOLS
         scope = scope_ids(nodes, file_scope) if file_scope else None
         search: SearchResult = index.search(rq, limit=80, scope=scope)
