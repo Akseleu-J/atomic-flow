@@ -19,3 +19,5 @@ class ToolContext:
     sources: dict[str, list[str] | None] = field(default_factory=dict)
     index: Any = None
     budget_spent: float = 0.0
+    edits_enabled: bool = False
+    undo_stack: Any = None

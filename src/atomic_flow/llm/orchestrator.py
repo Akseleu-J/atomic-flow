@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import threading
 import uuid
@@ -284,7 +285,8 @@ class Orchestrator:
 
     def answer(self, query: str, *, mode: str | None = None, budget_tokens: int | None = None,
                role_prompts: dict[str, str] | None = None, request_id: str | None = None,
-               file_scope: str | None = None, retrieval_query: str | None = None) -> AnswerResult:
+               file_scope: str | None = None, retrieval_query: str | None = None,
+               approve_edits: bool = False) -> AnswerResult:
         mode = mode or self.config.mode
         if mode not in {"simple", "medium", "hard"}:
             raise ValueError("mode must be simple, medium, or hard")
@@ -301,7 +303,7 @@ class Orchestrator:
                                         "created_at": datetime.now(UTC).isoformat()})
         try:
             return self._answer(run, registry, req_id, query, retrieval_query or query, mode,
-                                budget_tokens or self.config.context_budget_tokens, file_scope)
+                                budget_tokens or self.config.context_budget_tokens, file_scope, approve_edits)
         except Exception as exc:
             run.write_json("error.json", {"type": type(exc).__name__, "message": str(exc), "roles_done": run.roles})
             raise
@@ -312,7 +314,7 @@ class Orchestrator:
 
     # ------------------------------------------------------------------ pipeline
     def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str,
-                limit: int, file_scope: str | None) -> AnswerResult:
+                limit: int, file_scope: str | None, approve_edits: bool = False) -> AnswerResult:
         tree = load_tree(self.project)
         if self.config.tree.auto_refresh:
             with project_lock(self.project):
@@ -328,10 +330,14 @@ class Orchestrator:
         index = _get_index(self.project, tree, nodes)
         from atomic_flow.agents.context import ToolContext
         from atomic_flow.agents.tools import ROLE_TOOLS, default_registry
+        from atomic_flow.agents.undo import UndoStack
 
+        edits_enabled = approve_edits or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
         run.tool_registry = default_registry()
         run.tool_ctx = ToolContext(project_root=self.project, nodes_by_id=by_id,
-                       aliases=aliases.alias_of, alias_to_id=aliases.id_of, index=index)
+                       aliases=aliases.alias_of, alias_to_id=aliases.id_of, index=index,
+                       edits_enabled=edits_enabled,
+                       undo_stack=UndoStack(user_dir() / "edits") if edits_enabled else None)
         run.role_tools = ROLE_TOOLS
         scope = scope_ids(nodes, file_scope) if file_scope else None
         search: SearchResult = index.search(rq, limit=80, scope=scope)

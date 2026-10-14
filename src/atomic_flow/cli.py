@@ -32,6 +32,7 @@ from atomic_flow.kaggle.credentials import (
 from atomic_flow.llm.orchestrator import Orchestrator, _Run, choose_mode, scope_ids
 from atomic_flow.llm.prompts import PromptRegistry
 from atomic_flow.llm.schemas import QueryIntent
+from atomic_flow.agents.undo import UndoStack
 from atomic_flow.tree.builder import build_tree, diff_trees, load_tree, refresh_tree, save_tree
 from atomic_flow.tree.node import TreeNode
 
@@ -71,12 +72,18 @@ def _parser() -> argparse.ArgumentParser:
     ask.add_argument("--backend", default="auto")
     ask.add_argument("--role-prompt", action="append", default=[], metavar="ROLE=TEXT|@FILE")
     ask.add_argument("--edit-prompts", action="store_true")
+    ask.add_argument("--approve-edits", action="store_true",
+                     help="Allow the model to edit files in this request; verification runs after each edit.")
     ask.add_argument("--yes", "-y", action="store_true")
     ask.add_argument("--dry-run", action="store_true")
     ask.add_argument("--no-translate", action="store_true",
                      help="Dry-run: never call the Parser (zero model calls)")
     ask.add_argument("--explain", action="store_true")
     ask.add_argument("--json", action="store_true")
+
+    undo = cmd.add_parser("undo", help="Restore a previous approved edit")
+    undo.add_argument("edit_id", nargs="?", default="last")
+    undo.add_argument("--project", default=".")
 
     doctor = cmd.add_parser("doctor", help="Check local configuration and project readiness")
     doctor.add_argument("--project", default=".")
@@ -333,7 +340,8 @@ def cmd_ask(args) -> int:
         if input("Proceed? [y/N]: ").strip().lower() not in {"y", "yes"}:
             return 1
     result = Orchestrator(config, project, make_backend(config, args.backend, args.model)).answer(
-        args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file)
+        args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file,
+        approve_edits=args.approve_edits)
     if args.json:
         print(result.model_dump_json(indent=2))
         return 0
@@ -347,6 +355,16 @@ def cmd_ask(args) -> int:
     cost = "n/a" if result.cost_usd is None else f"${result.cost_usd:.4f}{'+' if not result.cost_complete else ''}"
     print(f"\nverdict={result.verdict} (model opinion); grounding={result.grounding:.0%} (deterministic); "
           f"tokens={result.tokens_in}/{result.tokens_out}; cost={cost}; request={result.ledger_id}")
+    return 0
+
+
+def cmd_undo(args) -> int:
+    project = Path(args.project).expanduser().resolve()
+    record = UndoStack(user_dir() / "edits").undo(project, args.edit_id)
+    if record is None:
+        print(f"Edit not found or backup unavailable: {args.edit_id}", file=sys.stderr)
+        return 1
+    print(f"Restored {record.rel_path} from {record.edit_id}")
     return 0
 
 
@@ -548,7 +566,7 @@ def cmd_benchmark(args) -> int:
     return 0
 
 
-HANDLERS = {"init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "doctor": cmd_doctor,
+HANDLERS = {"init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
             "benchmark": cmd_benchmark}
 
