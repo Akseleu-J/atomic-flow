@@ -51,9 +51,11 @@ def choose_mode(query: str, configured_mode: str, *, explicit_mode: str | None =
     if not auto_mode:
         return configured_mode
     text = query.casefold()
-    hard_terms = ("refactor", "migration", "migrate", "trace", "review", "audit", "рефактор", "миграц",
-                  "трассир", "аудит", "across files", "cross-file")
-    if any(term in text for term in hard_terms):
+    if re.search(
+        r"\b(refactor\w*|migrat\w*|trace\b|review|audit\w*|"
+        r"рефактор\w*|миграц\w*|трассир\w*|аудит\w*)\b|across files|cross-file",
+        text,
+    ):
         return "hard"
     if file_scope and any(term in text for term in ("explain", "what does", "что делает", "объясни")):
         return "simple"
@@ -151,8 +153,13 @@ def _get_index(project: Path, tree: dict, nodes: list[TreeNode]) -> ActivationIn
 # --------------------------------------------------------------------------- per-request state
 
 class _Run:
-    def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str, artifact_dir: Path | None):
+    def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str,
+                 artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None):
         self.backend, self.registry, self.ledger, self.query, self.dir = backend, registry, ledger, query, artifact_dir
+        self.tool_registry = tool_registry
+        self.tool_ctx = tool_ctx
+        self.role_tools = role_tools or {}
+        self.tool_calls: list[dict[str, Any]] = []
         self.roles: list[str] = []
         self.tokens_in = self.tokens_out = self.latency_ms = 0
         self.cost = 0.0
@@ -175,6 +182,12 @@ class _Run:
             self.cost += response.cost_usd
 
     def invoke(self, role: str, schema: type[M], data: dict[str, Any], context: str | None = None) -> M:
+        allowed = self.role_tools.get(role, [])
+        if not allowed or self.tool_registry is None or self.tool_ctx is None:
+            return self._invoke_single(role, schema, data, context)
+        return self._invoke_with_tools(role, schema, data, context, allowed)
+
+    def _invoke_single(self, role: str, schema: type[M], data: dict[str, Any], context: str | None = None) -> M:
         system = self.registry.compose(role, schema.__name__)
         messages = [{"role": "system", "content": system},
                     {"role": "user", "content": render_user(self.query, role, data, context)}]
@@ -199,6 +212,54 @@ class _Run:
         self.roles.append(role)
         self.write_json(f"{step:02d}_{role}.json", parsed.model_dump())
         return parsed
+
+    def _invoke_with_tools(self, role: str, schema: type[M], data: dict[str, Any], context: str | None,
+                           tool_names: list[str]) -> M:
+        from atomic_flow.agents.loop import (
+            TOOL_LOOP_MAX_TURNS, execute_tool, looks_like_tool_call, render_tools_block,
+        )
+
+        base_system = self.registry.compose(role, schema.__name__)
+        tools_block = render_tools_block(self.tool_registry, tool_names)
+        system = base_system + ("\n\n" + tools_block if tools_block else "")
+        messages = [{"role": "system", "content": system},
+                    {"role": "user", "content": render_user(self.query, role, data, context)}]
+        step = len(self.roles)
+        self.write(f"{step:02d}_{role}_prompt.txt", system + "\n\n" + messages[1]["content"])
+
+        for turn in range(TOOL_LOOP_MAX_TURNS + 1):
+            self.ledger.check(self.cost)
+            response = self.backend.chat(messages, json_mode=True)
+            self._account(response)
+            try:
+                parsed_any: Any = json.loads(response.content)
+            except json.JSONDecodeError:
+                parsed_any = None
+
+            if looks_like_tool_call(parsed_any):
+                result, record = execute_tool(parsed_any, self.tool_registry, self.tool_ctx)
+                self.tool_calls.append(record)
+                self.write_json(f"{step:02d}_{role}_tool_{turn}.json", {"call": record, "result": result})
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({"role": "user", "content":
+                                 f"<tool_result>{json.dumps(result, ensure_ascii=False)[:8000]}</tool_result>"})
+                continue
+
+            try:
+                final = parse_json(response.content, schema)
+            except Exception as exc:  # noqa: BLE001 - retry the model's malformed final response
+                if turn == TOOL_LOOP_MAX_TURNS:
+                    raise
+                messages.append({"role": "assistant", "content": response.content or "{}"})
+                messages.append({"role": "user", "content":
+                                 f"Rejected: {exc}. Return ONLY one valid JSON object, no tool call."})
+                continue
+
+            self.roles.append(role)
+            self.write_json(f"{step:02d}_{role}.json", final.model_dump())
+            return final
+
+        raise ResponseFormatError(f"{role}: tool loop exceeded {TOOL_LOOP_MAX_TURNS} turns")
 
 
 @dataclass
@@ -265,6 +326,13 @@ class Orchestrator:
         aliases = _Aliases(nodes)
         by_id = {n.node_id: n for n in nodes}
         index = _get_index(self.project, tree, nodes)
+        from atomic_flow.agents.context import ToolContext
+        from atomic_flow.agents.tools import ROLE_TOOLS, default_registry
+
+        run.tool_registry = default_registry()
+        run.tool_ctx = ToolContext(project_root=self.project, nodes_by_id=by_id,
+                       aliases=aliases.alias_of, alias_to_id=aliases.id_of, index=index)
+        run.role_tools = ROLE_TOOLS
         scope = scope_ids(nodes, file_scope) if file_scope else None
         search: SearchResult = index.search(rq, limit=80, scope=scope)
         intent = QueryIntent()
@@ -389,7 +457,8 @@ class Orchestrator:
             cost_usd=run.cost if (run.cost or not run.cost_missing) else None, cost_complete=not run.cost_missing,
             latency_ms=run.latency_ms, backend_used=self.backend.name, model_used=self.backend.config.model,
             verdict=best.verdict, citation_coverage=best.coverage, grounding=best.grounding,
-            unknown_identifiers=best.unknown, dropped_citations=best.dropped, retrieval_weak=search.weak, warnings=warnings)
+            unknown_identifiers=best.unknown, dropped_citations=best.dropped, retrieval_weak=search.weak,
+            warnings=warnings, tool_calls=run.tool_calls)
         run.write("final.md", best.answer.text + "\n")
         run.write_json("meta.json", result.model_dump())
         return result

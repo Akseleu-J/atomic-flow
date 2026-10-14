@@ -109,3 +109,4 @@ class AnswerResult(StrictModel):
     dropped_citations: int = 0                     # citations to nodes that were not in the context
     retrieval_weak: bool = False
     warnings: list[str] = Field(default_factory=list)
+    tool_calls: list[dict[str, Any]] = Field(default_factory=list)
