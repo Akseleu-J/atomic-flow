@@ -24,8 +24,15 @@ def render_tools_block(registry: ToolRegistry, names: list[str]) -> str:
         return ""
     lines = [
         "TOOLS",
-        "You may call a tool when the current context is insufficient.",
+        "You may call a tool when the current context is insufficient or when the task requires an action.",
         'Return ONLY this JSON to call a tool: {"tool": "<name>", "args": {<arguments>}}.',
+        "**If the user's request asks to modify code (rename, add, remove, refactor, fix, update), "
+        "this is an ACTION request. Your next response must be a tool call, not a final answer.**",
+        "**For action requests you MUST call `edit_node` with the full new body instead of describing the change in your answer.**",
+        "Before calling `edit_node`, you MUST call `read_node` with zoom=2 to obtain the current full body. "
+        "The context may contain only a signature. Do not call `read_node` repeatedly once the target body is visible.",
+        "After the body is fetched, call `edit_node` immediately and stop exploring; avoid extra read/search calls.",
+        "After an edit you may call `run_command` to verify.",
         "Use at most a few calls total, then return the normal role output.",
         "Available tools:",
     ]

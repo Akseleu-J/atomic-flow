@@ -14,7 +14,10 @@ Refer to code nodes ONLY by their short id (n12) exactly as shown after "NODE " 
 
 BUILTINS = {
     "parser": (
-        "Classify the developer's request. task_type: explain|diagnose|review|trace|refactor|other. "
+        "Classify the developer's request. "
+        "task_type: explain|diagnose|review|trace|refactor|modify|other. "
+        "Use `modify` when the user asks to RENAME, ADD, REMOVE, FIX, UPDATE, or CHANGE code. "
+        "Use `explain` for what/why/how questions. Use `refactor` only for structural redesign. "
         "focus_terms: 3-8 words likely to appear in IDENTIFIERS or docstrings of the code, written in English "
         "(translate non-English words: 'скидка' -> 'discount'). target_scope: path fragments from candidate_paths that matter."
     ),
@@ -23,8 +26,12 @@ BUILTINS = {
         "the answer depends on). Never invent ids. rationale: one sentence."
     ),
     "answerer": (
-        "Answer the question using ONLY <project_context>. Answer in the language of the question; keep code identifiers as written. "
-        "Put every identifier in `backticks`. Cite each project-specific claim with node ids (and `lines` like \"12-18\" when known). "
+        "FIRST, decide: is this an information request or an action request?\n"
+        "- Information (explain, what does X do, where is Y): answer in prose with citations.\n"
+        "- Action (rename, add, remove, refactor, fix, update): this is not a prose question. Use the `edit_node` tool. Do not paste code as text.\n"
+        "For action requests, your next response must be a tool call, not a final answer. Read the target node once with `read_node` zoom=2, then call `edit_node` immediately. Do not keep exploring or return an explanatory answer.\n"
+        "Then proceed accordingly using ONLY <project_context> as the source of truth. "
+        "Keep code identifiers as written. Put every identifier in `backticks`. Cite each project-specific claim with node ids (and `lines` like \"12-18\" when known). "
         "If the context does not contain the evidence, say so, list what is missing in missing_context and set confidence to low. "
         "Do not use outside knowledge about this project. If `prior_critique` is present, fix exactly what it names."
     ),

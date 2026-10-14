@@ -2,8 +2,8 @@ import pytest
 from conftest import ScriptedBackend, alias_of
 
 from atomic_flow.errors import BackendError, BudgetExceeded
-from atomic_flow.llm.orchestrator import Orchestrator, choose_mode, normalize_scope, parse_json
-from atomic_flow.llm.schemas import Answer
+from atomic_flow.llm.orchestrator import Orchestrator, _looks_like_action, choose_mode, normalize_scope, parse_json
+from atomic_flow.llm.schemas import Answer, QueryIntent
 
 OK = {"verdict": "ok", "unsupported_claims": [], "missing_node_ids": [], "feedback": "", "citation_coverage": 1.0}
 
@@ -114,6 +114,13 @@ def test_scope_normalization_keeps_dotfiles():
 def test_choose_mode():
     assert choose_mode("review the flow", "medium") == "hard"
     assert choose_mode("explain this", "medium", file_scope="a.py") == "simple"
+
+
+def test_action_keywords_are_detected_deterministically():
+    assert _looks_like_action("Rename the parameter 'root' in refresh_tree to 'project_root'")
+    assert _looks_like_action("Fix the refund check and update the tests")
+    assert not _looks_like_action("What does refresh_tree do?")
+    assert QueryIntent(task_type="rename").task_type == "modify"
 
 
 def test_parse_json_variants():

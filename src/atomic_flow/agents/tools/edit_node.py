@@ -26,8 +26,10 @@ def _split_lines(text: str) -> list[str]:
 class EditNodeTool(Tool):
     name = "edit_node"
     description = (
-        "Replace a function or class. The file is backed up, py_compile and matching tests run, "
-        "and failed edits are rolled back. Requires explicit edit approval."
+        "Use this tool whenever the user asks to CHANGE code (rename, add, remove, refactor, fix). "
+        "Provide the complete new function/class body; do not paste the new code as text in your answer. "
+        "After the edit the file is verified with py_compile and matching tests; if verification fails, "
+        "the change is rolled back automatically."
     )
     args_schema = EditNodeArgs
 

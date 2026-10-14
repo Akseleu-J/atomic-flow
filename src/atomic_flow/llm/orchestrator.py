@@ -35,6 +35,25 @@ _CONF_RANK = {"high": 3, "medium": 2, "low": 1}
 _CACHE_LOCK = threading.Lock()
 _PROJECT_LOCKS: dict[str, threading.Lock] = {}
 _INDEX_CACHE: OrderedDict[tuple[str, str], ActivationIndex] = OrderedDict()
+_ACTION_VERBS = re.compile(
+    r"\b("
+    r"rename|renaming|renamed|"
+    r"add|adding|added|insert|inserting|"
+    r"remove|removing|removed|delete|deleting|deleted|"
+    r"change|changing|changed|modify|modifying|modified|"
+    r"update|updating|updated|patch|patching|patched|"
+    r"fix|fixing|fixed|refactor|refactoring|refactored|"
+    r"implement|implementing|implemented|"
+    r"write|writing|written|"
+    r"переимен|добав|удал|измени|обнови|исправ|рефактор|реализ"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def _looks_like_action(query: str) -> bool:
+    """Deterministic action detector used as a floor for the LLM-based Parser."""
+    return bool(_ACTION_VERBS.search(query))
 
 
 def project_lock(project: Path) -> threading.Lock:
@@ -160,6 +179,7 @@ class _Run:
         self.tool_registry = tool_registry
         self.tool_ctx = tool_ctx
         self.role_tools = role_tools or {}
+        self.intent: QueryIntent | None = None
         self.tool_calls: list[dict[str, Any]] = []
         self.roles: list[str] = []
         self.tokens_in = self.tokens_out = self.latency_ms = 0
@@ -227,6 +247,10 @@ class _Run:
                     {"role": "user", "content": render_user(self.query, role, data, context)}]
         step = len(self.roles)
         self.write(f"{step:02d}_{role}_prompt.txt", system + "\n\n" + messages[1]["content"])
+        is_action = (
+            self.intent is not None
+            and self.intent.task_type in {"modify", "refactor"}
+        )
 
         for turn in range(TOOL_LOOP_MAX_TURNS + 1):
             self.ledger.check(self.cost)
@@ -244,6 +268,17 @@ class _Run:
                 messages.append({"role": "assistant", "content": response.content})
                 messages.append({"role": "user", "content":
                                  f"<tool_result>{json.dumps(result, ensure_ascii=False)[:8000]}</tool_result>"})
+                continue
+
+            if is_action and turn == 0 and role == "answerer":
+                messages.append({"role": "assistant", "content": response.content or "{}"})
+                messages.append({"role": "user", "content": (
+                    "Rejected: this request asks to MODIFY code, but you returned prose instead of a tool call. "
+                    "You must return exactly one JSON object of the form "
+                    '{"tool": "edit_node", "args": {"node_id": "<id>", "new_source": "<full new body>"}}. '
+                    "If you need the full body first, call read_node with zoom=2. "
+                    "Do NOT return the change as text."
+                )})
                 continue
 
             try:
@@ -348,6 +383,7 @@ class Orchestrator:
         scope = scope_ids(nodes, file_scope) if file_scope else None
         search: SearchResult = index.search(rq, limit=80, scope=scope)
         intent = QueryIntent()
+        run.intent = intent
         warnings: list[str] = []
 
         def view(pairs: list[tuple[TreeNode, float]]) -> list[dict]:
@@ -361,6 +397,10 @@ class Orchestrator:
                 intent = run.invoke("parser", QueryIntent, {"candidate_paths": paths})
             else:
                 intent = run.invoke("reparser", QueryIntent, extra)
+            if intent.task_type in {"explain", "other"} and _looks_like_action(rq):
+                intent = intent.model_copy(update={"task_type": "modify"})
+                run.write_json("00_intent_patched.json", intent.model_dump())
+            run.intent = intent
             search = index.search(rq, extra_terms=intent.focus_terms + intent.target_scope, limit=80, scope=scope)
 
         if mode != "simple" or search.weak:        # simple mode only pays for a parser call when BM25 found nothing

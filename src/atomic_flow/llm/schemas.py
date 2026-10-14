@@ -20,7 +20,7 @@ class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-TaskType = Literal["explain", "diagnose", "review", "trace", "refactor", "other"]
+TaskType = Literal["explain", "diagnose", "review", "trace", "refactor", "modify", "other"]
 
 
 class QueryIntent(LLMModel):
@@ -32,7 +32,13 @@ class QueryIntent(LLMModel):
     @field_validator("task_type", mode="before")
     @classmethod
     def _coerce_task(cls, value: Any) -> Any:
-        return value if value in TaskType.__args__ else "other"          # type: ignore[attr-defined]
+        if isinstance(value, str):
+            v = value.strip().lower()
+            if v in {"rename", "add", "remove", "delete", "update", "fix", "edit", "change", "patch"}:
+                return "modify"
+            if v in TaskType.__args__:
+                return v
+        return "other"          # type: ignore[attr-defined]
 
 
 class Citation(LLMModel):
