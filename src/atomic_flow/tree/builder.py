@@ -15,8 +15,9 @@ from atomic_flow.errors import TreeError
 from atomic_flow.textutil import split_lines
 from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES, PYTHON_SUFFIXES, SOURCE_SUFFIXES
 from atomic_flow.tree.node import TreeNode
+from atomic_flow.tree.references import collect_references
 
-TREE_VERSION = 3
+TREE_VERSION = 4
 
 
 def node_id(path: str, symbol: str = "") -> str:
@@ -151,6 +152,14 @@ def _index_file(rel: str, source: str, digest: str, size: int, mtime_ns: int, is
     visitor = _PythonVisitor(rel, file_node.node_id)
     visitor.visit(tree)
     file_node.imports = sorted(visitor.imports)
+    try:
+        references, aliases = collect_references(source)
+    except (SyntaxError, ValueError, RecursionError):
+        references, aliases = {}, {}
+    file_node.reference_ids = sorted({aliases.get(name, name) for name in references.get("", set())})
+    for item in visitor.nodes:
+        scope = item.symbol.rsplit(".", 1)[-1].split("#")[0]
+        item.reference_ids = sorted({aliases.get(name, name) for name in references.get(scope, set())})
     return [file_node, *visitor.nodes]
 
 
@@ -195,7 +204,7 @@ def _link(nodes: list[TreeNode]) -> None:
             defs[n.symbol.rsplit(".", 1)[-1].split("#")[0]].append(n)
     fan_in: Counter[str] = Counter()
     for n in nodes:
-        n.callees, n.fan_in, n.fan_out = [], 0, 0
+        n.callees, n.reference_ids, n.fan_in, n.fan_out = [], n.reference_ids, 0, 0
     for n in nodes:
         if n.kind not in {"function", "class"}:
             continue
@@ -213,6 +222,21 @@ def _link(nodes: list[TreeNode]) -> None:
                     resolved.append(c.node_id)
         n.callees = resolved
         n.fan_out = len(resolved)
+        fan_in.update(resolved)
+    for n in nodes:
+        resolved: list[str] = []
+        for name in n.reference_ids:
+            candidates = defs.get(name, [])
+            picked = [c for c in candidates if c.path == n.path]
+            if not picked:
+                allowed = imported.get(n.path, set())
+                picked = [c for c in candidates if c.path in allowed]
+            if not picked and len(candidates) == 1:
+                picked = candidates
+            for c in picked[:3]:
+                if c.node_id != n.node_id and c.node_id not in resolved:
+                    resolved.append(c.node_id)
+        n.reference_ids = resolved
         fan_in.update(resolved)
     for n in nodes:
         n.fan_in = fan_in[n.node_id]

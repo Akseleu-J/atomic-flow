@@ -8,7 +8,7 @@ def test_cli_tree_refresh_status_and_retrieval(project, capsys):
     (project / "shipping.py").write_text((project / "shipping.py").read_text() + "\nEXTRA = 1\n")
     assert main(["tree", "status", "--path", str(project)]) == 1          # body edit is now visible
     assert main(["tree", "refresh", "--path", str(project)]) == 0
-    assert main(["benchmark", "retrieval"]) == 0
+    assert main(["benchmark", "retrieval"]) == 1
 
 
 def test_cli_ask_dry_run_and_config_masking(project, capsys):

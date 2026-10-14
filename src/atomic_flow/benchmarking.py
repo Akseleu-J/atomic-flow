@@ -90,7 +90,7 @@ def _evaluate(case: dict[str, Any], answer, target_ids: list[str]) -> dict[str, 
             "abstained": abstained, "grounded": not unknown_identifiers, "passed": passed}
 
 
-def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str = "medium", budget_tokens: int = 5000,
+def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str | None = None, budget_tokens: int = 5000,
                   limit: int | None = None, output: str | Path | None = None, backend_name: str = "auto",
                   repeats: int = 1) -> dict[str, Any]:
     cases = benchmark_cases()[:limit]
@@ -107,8 +107,9 @@ def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str =
                 raise ValueError(f"Benchmark case {case['id']} points to missing node(s): {missing}")
             for repeat in range(repeats):
                 try:
-                    answer = Orchestrator(config, project, backend).answer(case["query"], mode=mode, budget_tokens=budget_tokens)
-                    result = {"case_id": case["id"], "repeat": repeat, "mode": mode, "text": answer.text,
+                    case_mode = mode or case.get("mode", "medium")  # CLI --mode forces, else per-case
+                    answer = Orchestrator(config, project, backend).answer(case["query"], mode=case_mode, budget_tokens=budget_tokens)
+                    result = {"case_id": case["id"], "repeat": repeat, "mode": case_mode, "text": answer.text,
                               "expected_nodes": targets, "cited": [c.node_id for c in answer.citations],
                               "verdict": answer.verdict, "confidence": answer.confidence, "grounding": answer.grounding,
                               "tokens_in": answer.tokens_in, "tokens_out": answer.tokens_out, "cost_usd": answer.cost_usd,

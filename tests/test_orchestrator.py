@@ -80,8 +80,11 @@ def alias_of_any(user_text, label):
 
 
 def test_weak_retrieval_in_simple_mode_calls_parser(project, config):
-    backend = ScriptedBackend({"parser": {"focus_terms": ["discount"]}, "answerer": {"text": "nothing", "confidence": "low"}})
-    result = Orchestrator(config, project, backend).answer("Как считается скидка?", mode="simple")
+    backend = ScriptedBackend({
+        "parser": lambda user: {"task_type": "other", "focus_terms": []},
+        "answerer": lambda user: {"text": "ok", "confidence": "low"},
+    })
+    result = Orchestrator(config, project, backend).answer("zzz_nonexistent_symbol_qqq", mode="simple")
     assert backend.roles() == ["parser", "answerer"] and result.roles_invoked == ["parser", "answerer"]
 
 

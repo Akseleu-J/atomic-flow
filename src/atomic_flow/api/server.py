@@ -156,4 +156,8 @@ def create_app():
     return app
 
 
-app = create_app()
+def __getattr__(name):
+    if name == "app":
+        return create_app()
+    raise AttributeError(name)
+

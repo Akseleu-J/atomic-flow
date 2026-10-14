@@ -10,15 +10,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from atomic_flow.activation.redact import redact
-from atomic_flow.activation.text import raw_terms, terms
+from atomic_flow.activation.text import raw_terms, synonyms_for, terms
 from atomic_flow.textutil import estimate_tokens, split_lines
 from atomic_flow.tree.node import TreeNode
 
 log = logging.getLogger(__name__)
 
 K1, B = 1.2, 0.75
+GENERIC_NAMES = frozenset({"step", "body", "main", "run", "init", "test", "setup"})
 FIELD_WEIGHTS = {"symbol": 3.0, "path": 1.5, "signature": 1.5, "summary": 1.0, "callees": 0.7, "imports": 0.4}
 SPREAD_CALLEE, SPREAD_CALLER, SPREAD_PARENT = 0.55, 0.40, 0.35
+SPREAD_REFERENCE = 0.30
 
 
 def _kind_penalty(path: str) -> float:
@@ -79,12 +81,17 @@ class ActivationIndex:
     def search(self, query: str, *, extra_terms: list[str] | None = None, limit: int = 40,
                scope: set[str] | None = None, seeds: int = 10) -> SearchResult:
         text = query + " " + " ".join(extra_terms or [])
-        q_terms = list(dict.fromkeys(terms(text)))
+        primary = list(dict.fromkeys(terms(text)))
+        q_weight = {term: 1.0 for term in primary}
+        for term in primary:
+            for synonym in synonyms_for(term):
+                q_weight.setdefault(synonym, 0.5)
+        q_terms = list(q_weight)
         q_raw = raw_terms(text)
         n_docs = len(self.nodes)
         allowed = None if scope is None else {self.pos[s] for s in scope if s in self.pos}
         scores: dict[int, float] = defaultdict(float)
-        for term in q_terms:
+        for term, query_weight in q_weight.items():
             plist = self.postings.get(term)
             if not plist:
                 continue
@@ -93,14 +100,15 @@ class ActivationIndex:
             for i, weight in plist:
                 if allowed is not None and i not in allowed:
                     continue
-                scores[i] += idf * weight * (K1 + 1) / (weight + K1 * (1 - B + B * self.dl[i] / self.avgdl))
+                scores[i] += query_weight * idf * weight * (K1 + 1) / (weight + K1 * (1 - B + B * self.dl[i] / self.avgdl))
         for i in list(scores):
             kind = self.nodes[i].kind
             if kind in {"function", "class"}:
                 scores[i] *= 1.15
             # Exact-name priors compare WHOLE tokens. (The old `t in node.path` was a substring test,
             # so stop-words like "is"/"or"/"an" boosted any path that merely contained those letters.)
-            if self.symbol_key[i] in q_raw or (self.file_stem[i] and self.file_stem[i] in q_raw):
+            name = self.symbol_key[i]
+            if (len(name) >= 4 and name not in GENERIC_NAMES and name in q_raw) or (self.file_stem[i] and self.file_stem[i] in q_raw):
                 scores[i] *= 1.35
         for i in list(scores):
             scores[i] *= self.kind_penalty[i]
@@ -119,6 +127,7 @@ class ActivationIndex:
                 break
             node = self.nodes[i]
             related = [(self.pos[c], SPREAD_CALLEE) for c in node.callees if c in self.pos]
+            related += [(self.pos[r], SPREAD_REFERENCE) for r in node.reference_ids if r in self.pos]
             related += [(j, SPREAD_CALLER) for j in self.callers.get(i, [])]
             if node.parent_id in self.pos and self.nodes[self.pos[node.parent_id]].kind == "class":
                 related.append((self.pos[node.parent_id], SPREAD_PARENT))
@@ -132,8 +141,8 @@ class ActivationIndex:
         top_terms: set[str] = set()
         for i, _ in order[:10]:
             top_terms.update(self.tf[i])
-        matched = sum(1 for t in q_terms if t in top_terms)
-        ratio = matched / len(q_terms) if q_terms else 0.0
+        matched = sum(1 for term in primary if term in top_terms)
+        ratio = matched / len(primary) if primary else 0.0
         return SearchResult([(self.nodes[i], s) for i, s in ranked_idx], top, ratio, ratio < 0.2, q_terms)
 
     def neighbors(self, node_ids: set[str]) -> list[TreeNode]:
@@ -144,7 +153,8 @@ class ActivationIndex:
             if i is None:
                 continue
             node = self.nodes[i]
-            for other in [*node.callees, *(self.nodes[j].node_id for j in self.callers.get(i, [])), node.parent_id or ""]:
+            for other in [*node.callees, *node.reference_ids,
+                          *(self.nodes[j].node_id for j in self.callers.get(i, [])), node.parent_id or ""]:
                 if other in self.pos and other not in node_ids and self.nodes[self.pos[other]].kind != "file":
                     out[other] = self.nodes[self.pos[other]]
         return sorted(out.values(), key=lambda n: (n.path, n.symbol))

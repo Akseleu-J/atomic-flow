@@ -424,7 +424,7 @@ def cmd_up(args) -> int:
     except ImportError as exc:
         raise ConfigurationError("Install the API extra with `pip install atomic-flow[api]`.") from exc
     print(f"atomic_flow listening on http://{args.host}:{args.port}")
-    uvicorn.run("atomic_flow.api.server:app", host=args.host, port=args.port, reload=False)
+    uvicorn.run("atomic_flow.api.server:create_app", factory=True, host=args.host, port=args.port, reload=False)
     return 0
 
 

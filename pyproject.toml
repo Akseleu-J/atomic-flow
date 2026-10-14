@@ -25,7 +25,7 @@ atomic = "atomic_flow.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-atomic_flow = ["benchmark_data/*.json", "benchmark_data/fixtures/*.py"]
+atomic_flow = ["benchmark_data/*.json", "benchmark_data/fixtures/**/*.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
