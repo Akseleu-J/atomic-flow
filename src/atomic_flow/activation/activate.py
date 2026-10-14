@@ -13,6 +13,7 @@ from atomic_flow.activation.redact import redact
 from atomic_flow.activation.text import raw_terms, synonyms_for, terms
 from atomic_flow.textutil import estimate_tokens, split_lines
 from atomic_flow.tree.node import TreeNode
+from atomic_flow.tree.pagerank import build_adjacency, pagerank
 
 log = logging.getLogger(__name__)
 
@@ -77,6 +78,7 @@ class ActivationIndex:
             for callee in n.callees:
                 if callee in self.pos:
                     self.callers[self.pos[callee]].append(i)
+        self.adjacency = build_adjacency(nodes)
 
     def search(self, query: str, *, extra_terms: list[str] | None = None, limit: int = 40,
                scope: set[str] | None = None, seeds: int = 10) -> SearchResult:
@@ -120,6 +122,15 @@ class ActivationIndex:
             return SearchResult([(self.nodes[i], 0.1) for i in hubs], 0.0, 0.0, True, q_terms)
         top = order[0][1]
         norm = {i: s / top for i, s in order}
+        seed_count = min(10, len(order))
+        pagerank_seeds = {self.nodes[i].node_id: norm[i] for i, _ in order[:seed_count] if norm[i] > 0.2}
+        if pagerank_seeds:
+            graph_scores = pagerank(self.adjacency, pagerank_seeds, alpha=0.85, max_iters=15)
+            if graph_scores:
+                max_graph_score = max(graph_scores.values()) or 1.0
+                for i in list(norm):
+                    graph_norm = graph_scores.get(self.nodes[i].node_id, 0.0) / max_graph_score
+                    norm[i] = 0.75 * norm[i] + 0.25 * graph_norm
         spread: dict[int, float] = {}
         for i, _ in order[:seeds]:
             a = norm[i]
