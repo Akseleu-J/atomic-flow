@@ -5,12 +5,13 @@ from atomic_flow.agents.base import ToolRegistry
 from atomic_flow.agents.tools.edit_node import EditNodeTool
 from atomic_flow.agents.tools.find_callers import FindCallersTool
 from atomic_flow.agents.tools.read_node import ReadNodeTool
+from atomic_flow.agents.tools.run_command import RunCommandTool
 from atomic_flow.agents.tools.search_tree import SearchTreeTool
 
 
 def default_registry() -> ToolRegistry:
 	registry = ToolRegistry()
-	for tool in (ReadNodeTool(), FindCallersTool(), SearchTreeTool(), EditNodeTool()):
+	for tool in (ReadNodeTool(), FindCallersTool(), SearchTreeTool(), EditNodeTool(), RunCommandTool()):
 		registry.register(tool)
 	return registry
 
@@ -18,8 +19,8 @@ def default_registry() -> ToolRegistry:
 ROLE_TOOLS: dict[str, list[str]] = {
 	"parser": [],
 	"refiner": ["search_tree", "read_node"],
-	"answerer": ["read_node", "find_callers", "search_tree", "edit_node"],
-	"critic": ["read_node"],
+	"answerer": ["read_node", "find_callers", "search_tree", "edit_node", "run_command"],
+	"critic": ["read_node", "run_command"],
 	"expander": ["search_tree", "read_node", "find_callers"],
 	"reparser": [],
 }
