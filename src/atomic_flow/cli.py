@@ -81,6 +81,18 @@ def _parser() -> argparse.ArgumentParser:
     ask.add_argument("--explain", action="store_true")
     ask.add_argument("--json", action="store_true")
 
+    task_p = cmd.add_parser("task", help="Run a multi-step task")
+    task_p.add_argument("query", nargs="?", default="")
+    task_p.add_argument("--project", default=".")
+    task_p.add_argument("--model")
+    task_p.add_argument("--backend", default="auto")
+    task_p.add_argument("--yes", "-y", action="store_true")
+    task_p.add_argument("--dry-run", action="store_true", help="Show plan only")
+    task_p.add_argument("--list", action="store_true", dest="task_list")
+    task_p.add_argument("--show", metavar="TASK_ID")
+    task_p.add_argument("--resume", metavar="TASK_ID")
+    task_p.add_argument("--cancel", metavar="TASK_ID")
+
     undo = cmd.add_parser("undo", help="Restore a previous approved edit")
     undo.add_argument("edit_id", nargs="?", default="last")
     undo.add_argument("--project", default=".")
@@ -385,6 +397,115 @@ def cmd_ask(args) -> int:
     return 0
 
 
+def cmd_task(args) -> int:
+    from atomic_flow.agents.planner import plan_task
+    from atomic_flow.agents.task import list_tasks, load, save
+    from atomic_flow.agents.task_loop import TaskRunner
+
+    if args.task_list:
+        tasks = list_tasks()
+        if not tasks:
+            print("no tasks")
+            return 0
+        for task in tasks:
+            done = sum(1 for step in task.steps if step.status == "done")
+            print(f"{task.id}\t{task.status}\t{done}/{len(task.steps)}\t${task.budget_spent:.4f}\t{task.query[:60]}")
+        return 0
+
+    if args.show:
+        try:
+            task = load(args.show)
+        except FileNotFoundError as exc:
+            print(f"atomic: {exc}", file=sys.stderr)
+            return 2
+        _print_task(task, verbose=True)
+        return 0
+
+    if args.cancel:
+        try:
+            task = load(args.cancel)
+        except FileNotFoundError as exc:
+            print(f"atomic: {exc}", file=sys.stderr)
+            return 2
+        task.status = "failed"
+        task.error = "cancelled by user"
+        save(task)
+        print(f"cancelled: {task.id}")
+        return 0
+
+    if args.resume:
+        try:
+            task = load(args.resume)
+        except FileNotFoundError as exc:
+            print(f"atomic: {exc}", file=sys.stderr)
+            return 2
+        if task.status == "done":
+            print(f"task {task.id} already done")
+            return 0
+        config = load_config(task.project)
+        backend = make_backend(config, args.backend, args.model)
+        runner = TaskRunner(config, Path(task.project), backend,
+                           approval_callback=_make_approval_callback(args.yes))
+        task = runner.resume(task)
+        _print_task(task)
+        return 0 if task.status == "done" else 1
+
+    if not args.query:
+        print("atomic task: query is required (or use --list/--show/--resume/--cancel)", file=sys.stderr)
+        return 2
+
+    project = Path(args.project).expanduser().resolve()
+    config = load_config(project)
+    try:
+        tree = load_tree(project)
+    except Exception:
+        tree = build_tree(project, config.tree.ignore, respect_gitignore=config.tree.respect_gitignore)
+    nodes = [TreeNode.model_validate(n) for n in tree["nodes"]]
+    index = ActivationIndex(nodes)
+    search = index.search(args.query, limit=30)
+    candidates = [f"{n.path}::{n.symbol}" if n.symbol else n.path for n, _ in search.ranked]
+    backend = make_backend(config, args.backend, args.model)
+
+    print(f"planning: {args.query}")
+    plan = plan_task(args.query, project_root=project, backend=backend,
+                     candidates=candidates, n_files=tree.get("files", len(nodes)))
+    print(f"\nplan ({len(plan.steps)} steps):")
+    for i, step in enumerate(plan.steps, 1):
+        print(f"  {i}. {step.description}  [{step.verify_with}]")
+    if plan.rationale:
+        print(f"rationale: {plan.rationale}")
+    print()
+
+    if args.dry_run:
+        return 0
+    if not args.yes:
+        if input("Proceed? [y/N]: ").strip().lower() not in {"y", "yes"}:
+            print("cancelled")
+            return 1
+
+    approval_cb = _make_approval_callback(args.yes)
+    runner = TaskRunner(config, project, backend, approval_callback=approval_cb)
+    task = runner.run_plan(args.query, plan)
+    _print_task(task)
+    return 0 if task.status == "done" else 1
+
+
+def _print_task(task, verbose: bool = False) -> None:
+    print(f"\ntask:   {task.id}")
+    print(f"query:  {task.query}")
+    print(f"status: {task.status}")
+    print(f"budget: ${task.budget_spent:.4f}")
+    if task.rationale and verbose:
+        print(f"rationale: {task.rationale}")
+    print("steps:")
+    for step in task.steps:
+        mark = {"done": "✓", "failed": "✗", "running": "→", "pending": "·"}[step.status]
+        suffix = f"  -- {step.result_summary[:120]}" if step.result_summary else ""
+        print(f"  [{mark}] {step.index + 1}. {step.description}{suffix}")
+    if task.error:
+        print(f"error: {task.error}")
+
+
 def cmd_undo(args) -> int:
     project = Path(args.project).expanduser().resolve()
     record = UndoStack(user_dir() / "edits").undo(project, args.edit_id)
@@ -593,7 +714,7 @@ def cmd_benchmark(args) -> int:
     return 0
 
 
-HANDLERS = {"init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "undo": cmd_undo, "doctor": cmd_doctor,
+HANDLERS = {"init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
             "benchmark": cmd_benchmark}
 

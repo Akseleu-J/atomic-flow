@@ -82,6 +82,13 @@ class TreeConfig(BaseModel):
     auto_refresh: bool = True                                   # re-index changed files before every question
 
 
+class TaskConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    max_replans: int = Field(default=2, ge=0, le=5)
+    max_budget_usd: float = Field(default=2.0, ge=0)
+    fail_on_budget_exceeded: bool = True
+
+
 class AtomicConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     mode: Literal["simple", "medium", "hard"] = "medium"
@@ -96,6 +103,7 @@ class AtomicConfig(BaseModel):
     })
     budget: BudgetConfig = Field(default_factory=BudgetConfig)
     artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
+    task: TaskConfig = Field(default_factory=TaskConfig)
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:

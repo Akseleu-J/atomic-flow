@@ -57,6 +57,22 @@ def looks_like_tool_call(parsed: Any) -> bool:
     )
 
 
+def _summarize_result(result: dict) -> dict:
+    """Compact form for meta.json — drops large source bodies."""
+    if not isinstance(result, dict):
+        return {"status": "unexpected"}
+    out: dict = {}
+    for key in ("status", "error", "exit_code", "command", "reason",
+               "node_id", "path", "symbol"):
+        if key in result:
+            out[key] = result[key]
+    if isinstance(result.get("counts"), dict):
+        out["counts"] = result["counts"]
+    if isinstance(result.get("results"), list):
+        out["results_count"] = len(result["results"])
+    return out
+
+
 def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContext) -> tuple[dict[str, Any], dict[str, Any]]:
     """Validate and execute a tool call, returning its result and audit record."""
     name = parsed["tool"]
@@ -88,4 +104,5 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         result = tool.run(args, ctx)
     except Exception as exc:  # noqa: BLE001 - a broken tool must not kill the run
         result = {"error": f"{type(exc).__name__}: {exc}"}
+    record["result_summary"] = _summarize_result(result)
     return result, record
