@@ -1,0 +1,71 @@
+......................................................s................. [ 50%]
+.........s.........FF..FFF.F............................................ [100%]
+================================== FAILURES ===================================
+______________ test_verify_runs_pytest_itself_when_model_did_not ______________
+tests\test_task.py:209: in test_verify_runs_pytest_itself_when_model_did_not
+    assert task.status == "done"
+E   AssertionError: assert 'failed' == 'done'
+E     
+E     - done
+E     + failed
+__________________ test_verify_fails_task_when_pytest_fails ___________________
+tests\test_task.py:243: in test_verify_fails_task_when_pytest_fails
+    assert "pytest" in task.error.lower()
+E   AssertionError: assert 'pytest' in 'executionunavailable: docker unavailable; no local fallback. see docs/execution.md.'
+E    +  where 'executionunavailable: docker unavailable; no local fallback. see docs/execution.md.' = <built-in method lower of str object at 0x000002410C3D17B0>()
+E    +    where <built-in method lower of str object at 0x000002410C3D17B0> = 'ExecutionUnavailable: Docker unavailable; no local fallback. See docs/EXECUTION.md.'.lower
+E    +      where 'ExecutionUnavailable: Docker unavailable; no local fallback. See docs/EXECUTION.md.' = Task(id='task_c3c8264e1e57', query='do', project='C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomi...vailable; no local fallback. See docs/EXECUTION.md.', rationale='', replan_count=0, changeset_id='change_ff8c45a7a1b9').error
+_________________ test_resume_conflict_sends_no_model_request _________________
+tests\test_task_changeset.py:61: in test_resume_conflict_sends_no_model_request
+    result = TaskRunner(AtomicConfig(), root, backend).resume(task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:50: in resume
+    task = load(task.id)
+           ^^^^^^^^^^^^^
+src\atomic_flow\agents\task.py:83: in load
+    raise FileNotFoundError(f"no such task: {task_id}")
+E   FileNotFoundError: no such task: task_dd9796e502cc
+_______________ test_legacy_checkpoint_is_not_silently_replayed _______________
+tests\test_task_changeset.py:72: in test_legacy_checkpoint_is_not_silently_replayed
+    result = TaskRunner(AtomicConfig(), tmp_path, backend).resume(task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:50: in resume
+    task = load(task.id)
+           ^^^^^^^^^^^^^
+src\atomic_flow\agents\task.py:83: in load
+    raise FileNotFoundError(f"no such task: {task_id}")
+E   FileNotFoundError: no such task: task_5f00cf82b7fb
+____________________ test_interrupted_step_requires_review ____________________
+tests\test_task_changeset.py:84: in test_interrupted_step_requires_review
+    result = TaskRunner(AtomicConfig(), root, backend).resume(task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:50: in resume
+    task = load(task.id)
+           ^^^^^^^^^^^^^
+src\atomic_flow\agents\task.py:83: in load
+    raise FileNotFoundError(f"no such task: {task_id}")
+E   FileNotFoundError: no such task: task_9b26f71162f9
+_____________ test_completed_publish_is_not_replayed_after_crash ______________
+tests\test_task_changeset.py:129: in test_completed_publish_is_not_replayed_after_crash
+    result = TaskRunner(AtomicConfig(), root, backend).resume(task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:50: in resume
+    task = load(task.id)
+           ^^^^^^^^^^^^^
+src\atomic_flow\agents\task.py:83: in load
+    raise FileNotFoundError(f"no such task: {task_id}")
+E   FileNotFoundError: no such task: task_60a832e7f0ed
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_task.py::test_verify_runs_pytest_itself_when_model_did_not
+FAILED tests/test_task.py::test_verify_fails_task_when_pytest_fails - Asserti...
+FAILED tests/test_task_changeset.py::test_resume_conflict_sends_no_model_request
+FAILED tests/test_task_changeset.py::test_legacy_checkpoint_is_not_silently_replayed
+FAILED tests/test_task_changeset.py::test_interrupted_step_requires_review - ...
+FAILED tests/test_task_changeset.py::test_completed_publish_is_not_replayed_after_crash
+6 failed, 136 passed, 2 skipped, 1 warning in 17.88s

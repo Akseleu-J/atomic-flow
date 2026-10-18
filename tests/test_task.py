@@ -1,17 +1,16 @@
 """Task persistence and TaskRunner with a fake backend."""
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from atomic_flow.agents.planner import Plan, PlanStep
-from atomic_flow.agents.task import Task, Step, list_tasks, load, save
-from atomic_flow.agents.task_loop import StepFailure, TaskRunner
+from atomic_flow.agents.task import Step, Task, list_tasks, load, save
+from atomic_flow.agents.task_loop import TaskRunner
 
 
 @pytest.fixture
 def isolated_home(tmp_path, monkeypatch):
+    monkeypatch.setenv("ATOMIC_FLOW_EXECUTION_MODE", "local")
     monkeypatch.setenv("ATOMIC_FLOW_HOME", str(tmp_path / "home"))
     yield
 
@@ -52,9 +51,9 @@ def test_task_runner_marks_done(monkeypatch, isolated_home, tmp_path):
             self.cost_usd = 0.01
 
     responses = [
-        R([{"tool": "edit_node", "result_summary": {"status": "applied", "path": "x.py"}}]),
+        R([{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py"}}]),
         R([{"tool": "run_command", "args": {"command": "pytest"},
-            "result_summary": {"exit_code": 0}}]),
+            "result_summary": {"outcome": "success", "exit_code": 0}}]),
     ]
 
     class FakeOrch:
@@ -105,6 +104,7 @@ def test_task_runner_stops_on_failed_edit(monkeypatch, isolated_home, tmp_path):
 
 def test_task_runner_resume_continues_from_checkpoint(monkeypatch, isolated_home, tmp_path):
     from atomic_flow.agents import task_loop
+    from atomic_flow.agents.changeset import ChangeSet
 
     class R:
         def __init__(self, calls):
@@ -121,7 +121,7 @@ def test_task_runner_resume_continues_from_checkpoint(monkeypatch, isolated_home
         def answer(self, *a, **kw):
             calls_made.append(kw.get("mode"))
             return R([{"tool": "edit_node",
-                       "result_summary": {"status": "applied", "path": "x.py"}}])
+                       "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py"}}])
 
     monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
 
@@ -134,6 +134,7 @@ def test_task_runner_resume_continues_from_checkpoint(monkeypatch, isolated_home
         ],
     )
     task.current_index = 1
+    task.changeset_id = ChangeSet.create(tmp_path).id
     save(task)
 
     runner = TaskRunner(config=None, project=tmp_path, backend=None)
@@ -154,7 +155,7 @@ def test_replan_appends_steps_on_failure(monkeypatch, isolated_home, tmp_path):
 
     responses = [
         R([{"tool": "edit_node", "result_summary": {"status": "rolled_back", "reason": "syntax"}}]),
-        R([{"tool": "edit_node", "result_summary": {"status": "applied", "path": "x.py"}}]),
+        R([{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py"}}]),
     ]
 
     class FakeOrch:
@@ -190,7 +191,7 @@ def test_verify_runs_pytest_itself_when_model_did_not(monkeypatch, isolated_home
     (tmp_path / "tests" / "test_m.py").write_text("from pkg.m import f\ndef test_f():\n    assert f() == 1\n")
 
     class R:
-        tool_calls = [{"tool": "edit_node", "result_summary": {"status": "applied", "path": "pkg/m.py"}}]
+        tool_calls = [{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "pkg/m.py"}}]
         ledger_id = "req_x"
         cost_usd = 0.0
 
@@ -220,7 +221,7 @@ def test_verify_fails_task_when_pytest_fails(monkeypatch, isolated_home, tmp_pat
     (tmp_path / "tests" / "test_m.py").write_text("from pkg.m import f\ndef test_f():\n    assert f() == 999\n")
 
     class R:
-        tool_calls = [{"tool": "edit_node", "result_summary": {"status": "applied", "path": "pkg/m.py"}}]
+        tool_calls = [{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "pkg/m.py"}}]
         ledger_id = "req_x"
         cost_usd = 0.0
 

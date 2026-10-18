@@ -27,7 +27,7 @@ BACKEND_DEFAULTS: dict[str, dict[str, Any]] = {
 }
 
 # A cloned repository must not be able to redirect your API key or source code.
-UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts")
+UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task")
 
 
 def user_dir() -> Path:
@@ -89,6 +89,13 @@ class TaskConfig(BaseModel):
     fail_on_budget_exceeded: bool = True
 
 
+class ExecutionConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid", validate_default=True)
+    mode: Literal["docker", "local"] = Field(default_factory=lambda: os.getenv("ATOMIC_FLOW_EXECUTION_MODE", "docker"))
+    image: str = "atomic-flow-checks:local"
+    output_bytes: int = Field(default=16384, ge=1024, le=1_000_000)
+
+
 class AtomicConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     mode: Literal["simple", "medium", "hard"] = "medium"
@@ -104,6 +111,7 @@ class AtomicConfig(BaseModel):
     budget: BudgetConfig = Field(default_factory=BudgetConfig)
     artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
     task: TaskConfig = Field(default_factory=TaskConfig)
+    execution: ExecutionConfig = Field(default_factory=ExecutionConfig)
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
@@ -161,6 +169,8 @@ def load_config(project: str | Path | None = None) -> AtomicConfig:
                         ", ".join(dropped), root)
         project_yaml = {k: v for k, v in project_yaml.items() if k not in UNTRUSTED_PROJECT_KEYS}
     _deep_update(merged, project_yaml)
+    if "ATOMIC_FLOW_EXECUTION_MODE" in os.environ:
+        merged.setdefault("execution", {})["mode"] = os.environ["ATOMIC_FLOW_EXECUTION_MODE"]
 
     backends = merged.setdefault("backends", {})
     for key, entry in backends.items():                                   # fill provider defaults per entry

@@ -1,0 +1,8 @@
+2	UP037	[*] quoted-annotation
+2	I001 	[*] unsorted-imports
+2	B007 	[ ] unused-loop-control-variable
+1	B017 	[ ] assert-raises-exception
+1	UP035	[*] deprecated-import
+1	F401 	[*] unused-import
+Found 9 errors.
+[*] 6 fixable with `--fix` (2 unsafe fixes available with `--fix --unsafe-fixes`).

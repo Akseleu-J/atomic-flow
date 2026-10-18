@@ -20,6 +20,14 @@ def test_edit_node_requires_explicit_approval(tmp_path):
     assert "return 1" in (tmp_path / "sample.py").read_text()
 
 
+def test_noop_edit_is_not_reported_as_applied(tmp_path):
+    stack = UndoStack(tmp_path / "edits")
+    ctx, node = make_context(tmp_path, enabled=True, stack=stack)
+    result = EditNodeTool().run(EditNodeArgs(node_id=node.node_id, new_source="def sample():\n    return 1"), ctx)
+    assert result["error"] == "replacement does not change source"
+    assert stack.list() == []
+
+
 def test_edit_node_verifies_and_records_backup(tmp_path):
     stack = UndoStack(tmp_path / "edits")
     ctx, node = make_context(tmp_path, enabled=True, stack=stack)
