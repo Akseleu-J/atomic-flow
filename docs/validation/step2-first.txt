@@ -4,7 +4,7 @@ ______________ test_task_runner_resume_continues_from_checkpoint ______________
 tests\test_task.py:139: in test_task_runner_resume_continues_from_checkpoint
     assert result.status == "done"
 E   AssertionError: assert 'failed' == 'done'
-E     
+E
 E     - done
 E     + failed
 =========================== short test summary info ===========================
