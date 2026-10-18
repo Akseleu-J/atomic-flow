@@ -266,6 +266,11 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
     root = Path(root).expanduser().resolve()
     if not root.is_dir():
         raise TreeError(f"Project directory does not exist: {root}")
+    from atomic_flow.config import user_dir
+
+    private_root = user_dir().resolve()
+    if root == private_root:
+        raise TreeError("Refusing to index atomic_flow private state as project source.")
     skip = _Ignore(root, list(DEFAULT_IGNORE if ignore is None else ignore), respect_gitignore)
     old = _group_by_path(previous)
     per_file: dict[str, list[TreeNode]] = {}
@@ -273,7 +278,8 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
     for current, dirs, files in os.walk(root):
         current_path = Path(current)
         rel_dir = current_path.relative_to(root).as_posix()
-        dirs[:] = sorted(d for d in dirs if not skip(_join(rel_dir, d), True))
+        dirs[:] = sorted(d for d in dirs if not skip(_join(rel_dir, d), True)
+                         and (current_path / d).resolve() != private_root)
         for name in sorted(files):
             rel = _join(rel_dir, name)
             path = current_path / name

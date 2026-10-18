@@ -6,6 +6,7 @@ Writes go through tmp+replace so a crashed process never leaves a half-written t
 from __future__ import annotations
 
 import json
+import re
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -47,9 +48,10 @@ class Task:
     error: str = ""
     rationale: str = ""
     replan_count: int = 0
+    changeset_id: str = ""
 
     @classmethod
-    def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> "Task":
+    def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> Task:
         return cls(
             id="task_" + uuid.uuid4().hex[:12],
             query=query,
@@ -64,6 +66,7 @@ def tasks_dir() -> Path:
 
 
 def save(task: Task) -> Path:
+    _validate_id(task.id)
     directory = tasks_dir()
     directory.mkdir(parents=True, exist_ok=True)
     target = directory / f"{task.id}.json"
@@ -74,12 +77,20 @@ def save(task: Task) -> Path:
 
 
 def load(task_id: str) -> Task:
+    _validate_id(task_id)
     path = tasks_dir() / f"{task_id}.json"
     if not path.is_file():
         raise FileNotFoundError(f"no such task: {task_id}")
     data = json.loads(path.read_text(encoding="utf-8"))
+    if data.get("id") != task_id:
+        raise ValueError("task id does not match its file")
     raw_steps = data.pop("steps", [])
     return Task(steps=[Step(**s) for s in raw_steps], **data)
+
+
+def _validate_id(task_id: str):
+    if not re.fullmatch(r"task_[a-f0-9]{12}", task_id):
+        raise ValueError("invalid task id")
 
 
 def list_tasks() -> list[Task]:

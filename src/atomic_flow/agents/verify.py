@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import py_compile
-import subprocess
-import sys
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from atomic_flow.agents.execution import run_python
+from atomic_flow.config import ExecutionConfig
 
 
 @dataclass
@@ -24,12 +26,15 @@ def _matching_tests(project_root: Path, rel_path: str) -> list[str]:
     candidates: list[str] = []
     for pattern in (f"tests/test_{stem}.py", f"tests/**/test_{stem}.py",
                     f"tests/test_{stem}_*.py", f"tests/**/test_{stem}_*.py"):
-        candidates.extend(str(path.relative_to(project_root)) for path in project_root.glob(pattern))
+        candidates.extend(path.relative_to(project_root).as_posix() for path in project_root.glob(pattern))
     return sorted(set(candidates))
 
 
 def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
-                timeout_seconds: int = 120) -> VerificationResult:
+                timeout_seconds: int = 120, execution: ExecutionConfig | None = None,
+                cancel_check: Callable[[], None] | None = None) -> VerificationResult:
+    if cancel_check:
+        cancel_check()
     full = project_root / rel_path
     if not full.exists():
         return VerificationResult(ok=False, checks=["exists"], message=f"file missing: {rel_path}")
@@ -46,12 +51,9 @@ def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
     test_files = _matching_tests(project_root, rel_path)
     if not test_files:
         return VerificationResult(ok=True, checks=["syntax"], message="py_compile OK; no matching tests")
-    try:
-        result = subprocess.run(
-            [sys.executable, "-m", "pytest", "-q", "--no-header", "-x", *test_files],
-            cwd=project_root, capture_output=True, text=True, timeout=timeout_seconds,
-        )
-    except subprocess.TimeoutExpired:
+    result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *test_files],
+                        project_root, config=execution, timeout=timeout_seconds, cancel_check=cancel_check)
+    if result.timed_out:
         return VerificationResult(ok=False, checks=["syntax", "pytest"],
                                   message=f"pytest timed out after {timeout_seconds}s")
     output = (result.stdout + result.stderr)[-3000:]

@@ -5,10 +5,14 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
+from atomic_flow.agents.control import check_cancel, task_lease
+from atomic_flow.agents.execution import TaskCancelled, run_python
 from atomic_flow.agents.planner import Plan, replan_task
-from atomic_flow.agents.task import Step, Task, save
+from atomic_flow.agents.task import Step, Task, load, save
 from atomic_flow.config import AtomicConfig
 from atomic_flow.llm.orchestrator import Orchestrator
+from atomic_flow.tree.builder import build_tree, save_tree
 
 
 @dataclass
@@ -19,10 +23,12 @@ class StepFailure(Exception):
 
 class TaskRunner:
     def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None):
-        self.config = config
+        self.config = config if config is not None else AtomicConfig()
         self.project = project
         self.backend = backend
         self.approval_callback = approval_callback
+        self.changeset: ChangeSet | None = None
+        self.cancel_check = lambda: None
 
     def run_plan(self, query: str, plan: Plan) -> Task:
         steps = [
@@ -40,16 +46,101 @@ class TaskRunner:
         return self.resume(task)
 
     def resume(self, task: Task) -> Task:
+        with task_lease(task.id):
+            try:
+                task = load(task.id)
+            except FileNotFoundError:
+                save(task)
+            self.changeset = None
+            if task.status in {"done", "failed"}:
+                return task
+            self.cancel_check = lambda: check_cancel(task.id)
+            try:
+                return self._resume_locked(task)
+            except TaskCancelled as exc:
+                if self.changeset and self.changeset.state["status"] == "active":
+                    self.changeset.abort()
+                task.status = "failed"
+                task.error = str(exc)
+                task.finished_at = time.time()
+                save(task)
+                return task
+
+    def _resume_locked(self, task: Task) -> Task:
+        self.cancel_check()
+        try:
+            if Path(task.project).resolve() != self.project.resolve():
+                raise ChangeSetConflict("task belongs to another project")
+            if task.changeset_id:
+                self.changeset = ChangeSet.open(self.project, task.changeset_id)
+                if self.changeset.state["status"] == "published" and task.current_index == len(task.steps):
+                    self.changeset.verify_published()
+                    task.status = "done"
+                    task.finished_at = time.time()
+                    task.error = ""
+                    save(task)
+                    return task
+                if self.changeset.state["status"] in {"publishing", "recovery_conflict"}:
+                    self.changeset.recover()
+                    raise ChangeSetConflict("interrupted publication recovered; review task before starting a new task")
+                if self.changeset.state["status"] != "active":
+                    raise ChangeSetConflict("changeset is closed; start a new task instead of replaying edits")
+                self.changeset.check_original()
+                self.changeset.validate_workspace()
+                if any(step.status == "running" for step in task.steps):
+                    raise ChangeSetConflict("interrupted step may have side effects; review its workspace before resuming")
+            else:
+                if task.current_index:
+                    raise ChangeSetConflict("legacy checkpoint has no workspace; cannot safely replay/resume it")
+                self.changeset = ChangeSet.create(self.project)
+                task.changeset_id = self.changeset.id
+            save_tree(self.changeset.workspace, build_tree(self.changeset.workspace, self.config.tree.ignore,
+                      respect_gitignore=self.config.tree.respect_gitignore))
+        except (OSError, ValueError) as exc:
+            task.status = "failed"
+            task.error = str(exc)
+            save(task)
+            return task
+        result = self._resume_steps(task)
+        if result.status == "running" and result.current_index == len(result.steps):
+            try:
+                self.changeset.publish(cancel_check=self.cancel_check, finalize=lambda: save_tree(
+                    self.project, build_tree(self.project, self.config.tree.ignore,
+                                             respect_gitignore=self.config.tree.respect_gitignore)))
+                result.status = "done"
+                result.finished_at = time.time()
+                result.error = ""
+            except TaskCancelled:
+                raise
+            except (OSError, ValueError) as exc:
+                result.status = "failed"
+                result.error = f"publication failed: {exc} (journal: {self.changeset.id})"
+        elif result.status == "failed":
+            self.changeset.abort()
+        save(result)
+        return result
+
+    def _resume_steps(self, task: Task) -> Task:
         task.status = "running"
         save(task)
 
         while task.current_index < len(task.steps):
+            self.cancel_check()
+            if (self.config.task.fail_on_budget_exceeded and self.config.task.max_budget_usd > 0
+                    and task.budget_spent >= self.config.task.max_budget_usd):
+                task.status = "paused"
+                task.error = "task budget exhausted before next step"
+                save(task)
+                return task
             step = task.steps[task.current_index]
             step.status = "running"
             step.started_at = time.time()
             save(task)
+            checkpoint = None
             try:
+                checkpoint = self.changeset.checkpoint()
                 self._execute_step(task, step)
+                self.cancel_check()
                 step.status = "done"
                 step.result_summary = step.result_summary or "ok"
                 step.finished_at = time.time()
@@ -60,7 +151,21 @@ class TaskRunner:
                 step.status = "failed"
                 step.result_summary = f"{type(exc).__name__}: {exc}"[:500]
                 step.finished_at = time.time()
+                try:
+                    if checkpoint is None:
+                        raise ChangeSetConflict(f"checkpoint failed: {exc}")
+                    self.changeset.restore_checkpoint(checkpoint)
+                    save_tree(self.changeset.workspace, build_tree(
+                        self.changeset.workspace, self.config.tree.ignore,
+                        respect_gitignore=self.config.tree.respect_gitignore))
+                except Exception as restore_error:
+                    task.status = "failed"
+                    task.error = f"workspace rollback failed: {restore_error}"
+                    save(task)
+                    return task
                 save(task)
+                if isinstance(exc, TaskCancelled):
+                    raise
 
             if self.config is not None and self.config.task.max_budget_usd > 0 \
                     and task.budget_spent >= self.config.task.max_budget_usd \
@@ -78,6 +183,7 @@ class TaskRunner:
                 return task
 
             try:
+                self.cancel_check()
                 new_plan = replan_task(
                     task.query,
                     completed=[f"{s.index + 1}. {s.description}" for s in task.steps if s.status == "done"],
@@ -85,7 +191,7 @@ class TaskRunner:
                     verify_with=step.verify_with,
                     error=step.result_summary,
                     remaining=[f"{s.index + 1}. {s.description}" for s in task.steps[task.current_index + 1:]],
-                    project_root=self.project,
+                    project_root=self.changeset.workspace,
                     backend=self.backend,
                 )
             except Exception as exc:
@@ -115,59 +221,83 @@ class TaskRunner:
             task.current_index = base_index
             save(task)
 
-        task.status = "done"
-        task.finished_at = time.time()
+        # Completion is recorded only after publishing the workspace successfully.
         save(task)
         return task
 
     def _execute_step(self, task: Task, step: Step) -> None:
         subquery = f"[Step {step.index + 1}/{len(task.steps)}] {step.description}"
-        orch = Orchestrator(self.config, self.project, self.backend)
-        orch._approval_callback = self.approval_callback
+        workspace = self.changeset.workspace if self.changeset else self.project
+        orch = Orchestrator(self.config, workspace, self.backend, approval_callback=self.approval_callback,
+                            settings_project=self.project, cancel_check=self.cancel_check)
         result = orch.answer(subquery, mode="medium", approve_edits=True)
         step.request_id = result.ledger_id
         task.budget_spent += result.cost_usd or 0.0
+        if self.changeset:
+            edits = {}
+            for call in result.tool_calls or []:
+                summary = call.get("result_summary") or {}
+                if call.get("tool") == "edit_node" and summary.get("status") == "applied":
+                    edits[summary["path"]] = summary.get("content_hash")
+            for path, expected_hash in edits.items():
+                self.changeset.track(path, expected_hash)
         self._verify_step(step, result)
 
     def _verify_step(self, step: Step, result) -> None:
-        if step.verify_with == "none":
-            return
         calls = result.tool_calls or []
+        if step.verify_with not in {"none", "py_compile", "pytest"}:
+            raise StepFailure(step.index, f"unknown verification method: {step.verify_with}")
+        edits = []
+        last_edit = -1
+        for i, call in enumerate(calls):
+            summary = call.get("result_summary")
+            if not isinstance(summary, dict) or not summary:
+                raise StepFailure(step.index, f"{call.get('tool')}: missing tool result")
+            if summary.get("status") == "rolled_back":
+                raise StepFailure(step.index, f"edit rolled back: {summary.get('reason', 'verification failed')}")
+            if summary.get("outcome") in {"error", "denied"} or summary.get("error"):
+                raise StepFailure(step.index, f"{call.get('tool')}: {summary.get('error') or summary['outcome']}")
+            if summary.get("outcome") != "success":
+                raise StepFailure(step.index, f"{call.get('tool')}: missing successful tool outcome")
+            if call.get("tool") == "edit_node":
+                if summary.get("status") != "applied" or "syntax" not in summary.get("checks", []):
+                    raise StepFailure(step.index, "edit lacks applied status and syntax verification")
+                edits.append(summary)
+                last_edit = i
+            if call.get("tool") == "run_command" and (
+                type(summary.get("exit_code")) is not int or summary["exit_code"] != 0
+            ):
+                raise StepFailure(step.index, f"command failed or missing exit_code: {summary.get('exit_code')}")
 
+        if (step.verify_with == "py_compile" or "edit_node" in step.tools_needed) and not edits:
+            raise StepFailure(step.index, "step requires a verified edit, but no edit was applied")
+        if "run_command" in step.tools_needed and not any(call.get("tool") == "run_command" for call in calls):
+            raise StepFailure(step.index, "step requires run_command, but no command was executed")
+        if step.verify_with == "none":
+            step.result_summary = "completed (verification not requested)"
+            return
         if step.verify_with == "py_compile":
-            for call in calls:
-                if call.get("tool") != "edit_node":
-                    continue
-                status = (call.get("result_summary") or {}).get("status")
-                if status == "rolled_back":
-                    reason = (call.get("result_summary") or {}).get("reason", "edit rolled back")
-                    raise StepFailure(step.index, f"edit rolled back: {reason}")
-                if status and status not in {"applied"}:
-                    raise StepFailure(step.index, f"edit ended with status={status}")
+            step.result_summary = "ok (syntax passed; tests " + (
+                "passed)" if all("pytest" in edit.get("checks", []) for edit in edits) else "not run for all edits)"
+            )
             return
 
         if step.verify_with == "pytest":
-            pytest_calls = [
-                call for call in calls
+            fresh_pytest_calls = [
+                call for i, call in enumerate(calls)
                 if call.get("tool") == "run_command"
                 and call.get("args", {}).get("command") == "pytest"
+                and not call.get("args", {}).get("target")
+                and i > last_edit
             ]
-            for call in pytest_calls:
-                summary = call.get("result_summary") or {}
-                code = summary.get("exit_code")
-                if code not in (0, None):
-                    raise StepFailure(step.index, f"pytest exit_code={code}")
-            if pytest_calls:
+            if fresh_pytest_calls:
+                step.result_summary = "ok (pytest passed after last edit)"
                 return
 
-            import subprocess
-            import sys
-            try:
-                proc = subprocess.run(
-                    [sys.executable, "-m", "pytest", "-q", "--no-header", "-x"],
-                    cwd=self.project, capture_output=True, text=True, timeout=180,
-                )
-            except subprocess.TimeoutExpired:
+            proc = run_python(["-m", "pytest", "-q", "--no-header", "-x"],
+                              self.changeset.workspace if self.changeset else self.project,
+                              config=self.config.execution, timeout=180, cancel_check=self.cancel_check)
+            if proc.timed_out:
                 raise StepFailure(step.index, "pytest timed out after 180s")
             if proc.returncode != 0:
                 out = (proc.stdout + proc.stderr)[-1500:]

@@ -9,10 +9,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from atomic_flow.agents.base import ToolRegistry
 from atomic_flow.agents.context import ToolContext
+from atomic_flow.agents.policy import PolicyEngine
+from atomic_flow.agents.result import Outcome, ToolResult
 
 TOOL_LOOP_MAX_TURNS = 6
 
@@ -30,6 +32,7 @@ def render_tools_block(registry: ToolRegistry, names: list[str]) -> str:
         "this is an ACTION request. Your next response must be a tool call, not a final answer.**",
         "**For action requests you MUST call `edit_node` with the full new body instead of describing the change in your answer.**",
         "Before calling `edit_node`, you MUST call `read_node` with zoom=2 to obtain the current full body. "
+        "If read_node returns next_offset, read the remaining pages with that offset before editing. "
         "The context may contain only a signature. Do not call `read_node` repeatedly once the target body is visible.",
         "After the body is fetched, call `edit_node` immediately and stop exploring; avoid extra read/search calls.",
         "After an edit you may call `run_command` to verify.",
@@ -57,52 +60,47 @@ def looks_like_tool_call(parsed: Any) -> bool:
     )
 
 
-def _summarize_result(result: dict) -> dict:
-    """Compact form for meta.json — drops large source bodies."""
-    if not isinstance(result, dict):
-        return {"status": "unexpected"}
-    out: dict = {}
-    for key in ("status", "error", "exit_code", "command", "reason",
-               "node_id", "path", "symbol"):
-        if key in result:
-            out[key] = result[key]
-    if isinstance(result.get("counts"), dict):
-        out["counts"] = result["counts"]
-    if isinstance(result.get("results"), list):
-        out["results_count"] = len(result["results"])
-    return out
-
-
-def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContext) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Validate and execute a tool call, returning its result and audit record."""
+def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContext, *,
+                 allowed_tools: list[str] | tuple[str, ...], role: str = "") -> tuple[dict[str, Any], dict[str, Any]]:
+    """Validate, authorize and audit every outcome, including early rejections."""
+    ctx.cancel_check()
     name = parsed["tool"]
     tool = registry.get(name)
-    record = {"tool": name, "args": parsed.get("args", {})}
+    record = {"tool": name, "args": parsed.get("args", {}), "role": role}
+
+    def finish(payload: Any, outcome: Outcome | None = None):
+        result = ToolResult.from_payload(payload, outcome=outcome)
+        record["result_summary"] = result.summary()
+        return result.model_payload(), record
+
+    if name not in allowed_tools:
+        return finish({"error": f"tool '{name}' is not allowed for role '{role}'"}, "denied")
     if tool is None:
-        available = sorted(registry._tools)
-        return {"error": f"unknown tool: {name}", "available": available}, record
-    if getattr(ctx, "policy", None) is not None:
-        decision = ctx.policy.decide(name, parsed.get("args", {}), project_trusted=getattr(ctx, "trusted", False))
+        return finish({"error": f"unknown tool: {name}"})
+    try:
+        args = tool.args_schema.model_validate(parsed.get("args", {}))
+    except ValidationError as exc:
+        return finish({"error": "invalid tool arguments", "details": exc.errors(include_url=False, include_context=False)[:3]})
+    if name == "edit_node" and not ctx.edits_enabled:
+        return finish({"error": "edits disabled", "hint": "enable edits explicitly for this request"}, "denied")
+    try:
+        decision = (ctx.policy or PolicyEngine()).decide(name, args.model_dump(), project_trusted=ctx.trusted)
         record["policy_action"] = decision.action
         if decision.action == "forbid":
-            return {"error": f"tool '{name}' is forbidden by policy", "reason": decision.reason}, record
+            return finish({"error": f"tool '{name}' is forbidden by policy", "reason": decision.reason}, "denied")
         if decision.action == "ask":
-            callback = getattr(ctx, "approval_callback", None)
+            callback = ctx.approval_callback
             if callback is None:
-                return {"error": "tool requires approval but no approval channel is available",
-                        "reason": decision.reason,
-                        "hint": "run with an interactive CLI or pre-authorize via policy.yaml"}, record
-            if not callback(name, parsed.get("args", {}), decision.reason):
-                return {"error": f"tool '{name}' was not approved by the user", "reason": decision.reason}, record
-        if name == "edit_node":
-            ctx.edits_enabled = True
-    try:
-        args = tool.args_schema.model_validate(parsed["args"])
-    except ValidationError as exc:
-        return {"error": "invalid tool arguments", "details": exc.errors(include_url=False)[:3]}, record
-    try:
+                return finish({"error": "tool requires approval but no approval channel is available",
+                               "reason": decision.reason}, "denied")
+            if not callback(name, args.model_dump(), decision.reason):
+                return finish({"error": f"tool '{name}' was not approved by the user", "reason": decision.reason}, "denied")
+        elif decision.action != "auto":
+            return finish({"error": "unknown policy decision"}, "denied")
         result = tool.run(args, ctx)
     except Exception as exc:  # noqa: BLE001 - a broken tool must not kill the run
+        from atomic_flow.agents.execution import TaskCancelled
+        if isinstance(exc, TaskCancelled):
+            raise
         result = {"error": f"{type(exc).__name__}: {exc}"}
-    record["result_summary"] = _summarize_result(result)
-    return result, record
+    return finish(result)

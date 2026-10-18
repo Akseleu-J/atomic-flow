@@ -1,0 +1,26 @@
+usage: atomic [-h] [--version] [--debug]
+              {init,trust,tree,ask,undo,doctor,config,up,status,runs,kaggle,benchmark}
+              ...
+
+Project-aware local LLM gateway
+
+positional arguments:
+  {init,trust,tree,ask,undo,doctor,config,up,status,runs,kaggle,benchmark}
+    init                Initialize user or project configuration
+    trust               Allow a project's .atomic_flow/config.yaml to set
+                        backends
+    tree                Build and inspect the project tree
+    ask                 Ask a question about a project
+    undo                Restore a previous approved edit
+    doctor              Check local configuration and project readiness
+    config              Read or update configuration
+    up                  Run the HTTP API in the foreground
+    status              Show local service and project status
+    runs                Inspect saved request artifacts
+    kaggle              Manage Kaggle Model Proxy credentials and quota
+    benchmark           Run local evaluations or manage Kaggle benchmark tasks
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --debug               Show tracebacks

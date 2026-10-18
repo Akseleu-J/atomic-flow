@@ -17,10 +17,11 @@ import yaml
 from atomic_flow import __version__
 from atomic_flow.activation.activate import ActivationIndex, materialize
 from atomic_flow.activation.text import has_non_latin_letters
+from atomic_flow.agents.undo import UndoStack
 from atomic_flow.backends.router import make_backend, resolve_backend_name
 from atomic_flow.budget import SpendLedger, prune_runs
 from atomic_flow.config import AtomicConfig, is_trusted, load_config, mask_secrets, project_dir, trust_project, user_dir, write_config
-from atomic_flow.errors import AtomicFlowError, ConfigurationError, ConfirmationRequired
+from atomic_flow.errors import AtomicFlowError, ConfigurationError, ConfirmationRequired, TreeError
 from atomic_flow.kaggle.credentials import (
     credential_status,
     load_credentials,
@@ -32,7 +33,6 @@ from atomic_flow.kaggle.credentials import (
 from atomic_flow.llm.orchestrator import Orchestrator, _Run, choose_mode, scope_ids
 from atomic_flow.llm.prompts import PromptRegistry
 from atomic_flow.llm.schemas import QueryIntent
-from atomic_flow.agents.undo import UndoStack
 from atomic_flow.tree.builder import build_tree, diff_trees, load_tree, refresh_tree, save_tree
 from atomic_flow.tree.node import TreeNode
 
@@ -91,6 +91,7 @@ def _parser() -> argparse.ArgumentParser:
     task_p.add_argument("--list", action="store_true", dest="task_list")
     task_p.add_argument("--show", metavar="TASK_ID")
     task_p.add_argument("--resume", metavar="TASK_ID")
+    task_p.add_argument("--recover", metavar="TASK_ID", help="Recover an interrupted publication offline; never calls a model")
     task_p.add_argument("--cancel", metavar="TASK_ID")
 
     undo = cmd.add_parser("undo", help="Restore a previous approved edit")
@@ -398,9 +399,31 @@ def cmd_ask(args) -> int:
 
 
 def cmd_task(args) -> int:
+    from atomic_flow.agents.changeset import ChangeSet
     from atomic_flow.agents.planner import plan_task
     from atomic_flow.agents.task import list_tasks, load, save
     from atomic_flow.agents.task_loop import TaskRunner
+
+    if args.recover:
+        task = load(args.recover)
+        if not task.changeset_id:
+            raise ValueError("Task has no changeset journal to recover.")
+        project = Path(task.project).resolve()
+        change = ChangeSet.open(project, task.changeset_id)
+        if change.state["status"] == "published":
+            change.verify_published()
+            if task.current_index != len(task.steps):
+                raise ValueError("Published changeset has incomplete task state; review required.")
+            task.status = "done"
+            task.error = ""
+        else:
+            change.recover()
+            task.status = "failed"
+            task.error = "Interrupted publication rolled back; review before starting a new task."
+        save_tree(project, build_tree(project))
+        save(task)
+        _print_task(task, verbose=True)
+        return 0
 
     if args.task_list:
         tasks = list_tasks()
@@ -427,10 +450,9 @@ def cmd_task(args) -> int:
         except FileNotFoundError as exc:
             print(f"atomic: {exc}", file=sys.stderr)
             return 2
-        task.status = "failed"
-        task.error = "cancelled by user"
-        save(task)
-        print(f"cancelled: {task.id}")
+        from atomic_flow.agents.control import request_cancel
+        request_cancel(task.id)
+        print(f"cancellation requested: {task.id}")
         return 0
 
     if args.resume:
@@ -458,8 +480,9 @@ def cmd_task(args) -> int:
     config = load_config(project)
     try:
         tree = load_tree(project)
-    except Exception:
+    except TreeError:
         tree = build_tree(project, config.tree.ignore, respect_gitignore=config.tree.respect_gitignore)
+        save_tree(project, tree)
     nodes = [TreeNode.model_validate(n) for n in tree["nodes"]]
     index = ActivationIndex(nodes)
     search = index.search(args.query, limit=30)
@@ -497,6 +520,10 @@ def _print_task(task, verbose: bool = False) -> None:
     print(f"budget: ${task.budget_spent:.4f}")
     if task.rationale and verbose:
         print(f"rationale: {task.rationale}")
+    if task.changeset_id:
+        print(f"changeset: {task.changeset_id}")
+        if verbose:
+            print(f"workspace: {user_dir() / 'changesets' / task.changeset_id / 'workspace'}")
     print("steps:")
     for step in task.steps:
         mark = {"done": "✓", "failed": "✗", "running": "→", "pending": "·"}[step.status]
@@ -508,10 +535,12 @@ def _print_task(task, verbose: bool = False) -> None:
 
 def cmd_undo(args) -> int:
     project = Path(args.project).expanduser().resolve()
+    config = load_config(project)
     record = UndoStack(user_dir() / "edits").undo(project, args.edit_id)
     if record is None:
         print(f"Edit not found or backup unavailable: {args.edit_id}", file=sys.stderr)
         return 1
+    save_tree(project, build_tree(project, config.tree.ignore, respect_gitignore=config.tree.respect_gitignore))
     print(f"Restored {record.rel_path} from {record.edit_id}")
     return 0
 

@@ -13,6 +13,7 @@ from atomic_flow.tree.builder import build_tree, save_tree
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
+    monkeypatch.setenv("ATOMIC_FLOW_EXECUTION_MODE", "local")
     monkeypatch.setenv("ATOMIC_FLOW_HOME", str(tmp_path / "home"))
     for var in ("ATOMIC_FLOW_BASE_URL", "ATOMIC_FLOW_API_KEY", "ATOMIC_FLOW_MODEL", "ATOMIC_FLOW_SERVER_API_KEY",
                 "ATOMIC_FLOW_PROJECT_ROOT", "ATOMIC_FLOW_REQUIRE_API_KEY"):
