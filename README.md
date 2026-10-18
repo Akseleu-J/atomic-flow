@@ -52,8 +52,10 @@ Old task checkpoints without a workspace cannot be resumed partway through, and 
 This is recoverable filesystem staging, not a sandbox, Git worktree, or an atomic multi-file filesystem operation.
 Quality commands and pytest use Docker by default, with an explicit trusted local mode.
 See [execution and Colab validation](docs/EXECUTION.md) for setup, cancellation, process limits and current evidence.
-The real Colab probe could not start the restricted container because cgroups are read-only;
-container isolation acceptance still requires a suitable Docker host.
+The real Colab probe could not start the restricted container because cgroups are read-only.
+GitHub Actions now runs Python 3.11/3.12 checks and a required real Docker acceptance job;
+[the first successful run](https://github.com/Akseleu-J/atomic-flow/actions/runs/39102109420)
+passed all six container integration checks, including task publish/rollback and cancellation cleanup.
 The workspace omits Git metadata, environments/caches, private atomic state, and most hidden files; projects depending on
 those files or Git metadata need a dedicated workspace/environment strategy before use.
 `atomic ask --approve-edits` continues to edit directly with per-edit backup/hash checks.

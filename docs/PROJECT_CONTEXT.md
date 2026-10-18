@@ -9,7 +9,9 @@
 
 18 октября: пакет 4 (`IMPLEMENTATION_STEP_4.md`): CI Python 3.11/3.12 + настоящий Docker job,
 режим `--require-docker`, nonroot UID/GID хоста для приватных Unix workspace и новые integration tests.
-Windows: **170 passed, 9 skipped**. CI пока подготовлен; удалённый результат требует отдельного подтверждения.
+Windows: **170 passed, 9 skipped**. GitHub Actions run `39102109420`, source `5a4fbc5`:
+Python 3.11/3.12 jobs PASS; Docker job — **156 passed, 6 skipped** + **17 passed** + **6 real Docker passed**.
+Логи и image ID: `validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/`.
 Codespace лимит исчерпан. Выбран маршрут: код локально, контейнерные проверки в GitHub Actions.
 На ноутбуке 3.4 GiB RAM, свободно около 0.4 GiB; Docker Desktop не устанавливать.
 
@@ -76,7 +78,7 @@ CLI при отсутствии tree строит его без save, а Orchest
 4. Сверить изменённые файлы с сохранёнными SHA-256; читать их перед правками.
 5. После изменений обновить затронутые разделы карты и при необходимости индекс.
 
-`project-index.json`: **115 файлов** (tracked + новые Python в src/tests), **97 Python-файлов**, **652 определения**,
+`project-index.json` содержит статический инвентарь файлов и символов (счётчики — в самом JSON),
 включая методы, вложенные функции, тесты и benchmark fixtures. Это статический AST-инвентарь,
 а не точный граф исполнения. SHA-256 позволяет обнаружить дрейф. Новые untracked-файлы карты
 намеренно не включены в исходный снимок. Генератор: `tools/update_project_index.py`, только стандартная библиотека;

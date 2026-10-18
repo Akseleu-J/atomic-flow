@@ -27,5 +27,19 @@ for its exact source commit. Ruff on affected execution/test/validation modules,
 Git diff checks passed. Dependencies and base image are still floating; runtime image ID and
 installed dependency versions are recorded for each CI job.
 
-Pending at preparation: remote CI execution and its artifacts. This package does not close
+## Confirmed GitHub Actions result
+
+Run: https://github.com/Akseleu-J/atomic-flow/actions/runs/39102109420
+
+Tested source commit: `5a4fbc5d5cdc3b101d2558046a964586c06b0c22`.
+All three jobs succeeded: Python 3.11, Python 3.12 and Real Docker acceptance.
+The Docker job recorded **156 passed, 6 skipped** in the standard CPU suite,
+**17 passed** root tests and **6 passed** opt-in real container tests.
+Its `container=PASS`, zero model calls and image ID are stored in
+`validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/`.
+`tested-commit.txt`, `dependencies.txt`, Docker version/build logs and results.json bind the evidence
+to that commit and execution environment. This verifies the tested boundaries and fixtures,
+not resistance to all container escapes or compatibility with every target project's dependencies.
+
+This package does not close
 planner/replanner cost accounting, hard per-call task budget or live model quality validation.
