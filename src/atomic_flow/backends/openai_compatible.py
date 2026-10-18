@@ -64,7 +64,11 @@ class OpenAICompatibleBackend:
             cost = usage.get("cost_usd", usage.get("total_cost_usd"))
             if cost is None and nano:
                 cost = nano / 1_000_000_000
-            cost = float(cost) if cost is not None else estimate_cost(self.config, tokens_in, tokens_out)
+            has_usage = (any(k in usage for k in ("prompt_tokens", "input_tokens"))
+                         and any(k in usage for k in ("completion_tokens", "output_tokens")))
+            free = self.config.price_in_per_mtok == self.config.price_out_per_mtok == 0
+            cost = (float(cost) if cost is not None else
+                    estimate_cost(self.config, tokens_in, tokens_out) if has_usage or free else None)
             return ChatResult(str(content or ""), tokens_in, tokens_out, cost, int((time.monotonic() - started) * 1000),
                               truncated=choice.get("finish_reason") == "length")
         except (KeyError, IndexError, TypeError, ValueError, AttributeError) as exc:

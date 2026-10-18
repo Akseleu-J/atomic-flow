@@ -400,31 +400,31 @@ def cmd_ask(args) -> int:
 
 def cmd_task(args) -> int:
     from atomic_flow.agents.changeset import ChangeSet
-    from atomic_flow.agents.planner import plan_task
     from atomic_flow.agents.task import list_tasks, load, save
     from atomic_flow.agents.task_loop import TaskRunner
 
     if args.recover:
-        task = load(args.recover)
-        if not task.changeset_id:
-            raise ValueError("Task has no changeset journal to recover.")
-        project = Path(task.project).resolve()
-        change = ChangeSet.open(project, task.changeset_id)
-        if change.state["status"] == "published":
-            change.verify_published()
-            if task.current_index != len(task.steps):
-                raise ValueError("Published changeset has incomplete task state; review required.")
-            task.status = "done"
-            task.error = ""
-        else:
-            change.recover()
-            task.status = "failed"
-            task.error = "Interrupted publication rolled back; review before starting a new task."
-        save_tree(project, build_tree(project))
-        save(task)
-        _print_task(task, verbose=True)
-        return 0
-
+        from atomic_flow.agents.control import task_lease
+        with task_lease(args.recover):
+            task = load(args.recover)
+            if not task.changeset_id:
+                raise ValueError("Task has no changeset journal to recover.")
+            project = Path(task.project).resolve()
+            change = ChangeSet.open(project, task.changeset_id)
+            if change.state["status"] == "published":
+                change.verify_published()
+                if task.current_index != len(task.steps):
+                    raise ValueError("Published changeset has incomplete task state; review required.")
+                task.status = "done"
+                task.error = ""
+            else:
+                change.recover()
+                task.status = "failed"
+                task.error = "Interrupted publication rolled back; review before starting a new task."
+            save_tree(project, build_tree(project))
+            save(task)
+            _print_task(task, verbose=True)
+            return 0
     if args.task_list:
         tasks = list_tasks()
         if not tasks:
@@ -489,26 +489,27 @@ def cmd_task(args) -> int:
     candidates = [f"{n.path}::{n.symbol}" if n.symbol else n.path for n, _ in search.ranked]
     backend = make_backend(config, args.backend, args.model)
 
+    approval_cb = _make_approval_callback(args.yes)
+    runner = TaskRunner(config, project, backend, approval_callback=approval_cb)
     print(f"planning: {args.query}")
-    plan = plan_task(args.query, project_root=project, backend=backend,
-                     candidates=candidates, n_files=tree.get("files", len(nodes)))
-    print(f"\nplan ({len(plan.steps)} steps):")
-    for i, step in enumerate(plan.steps, 1):
+    task = runner.prepare(args.query, candidates=candidates, n_files=tree.get("files", len(nodes)))
+    if not task.plan_ready:
+        _print_task(task)
+        return 1
+    print(f"\nplan ({len(task.steps)} steps), task={task.id}:")
+    for i, step in enumerate(task.steps, 1):
         print(f"  {i}. {step.description}  [{step.verify_with}]")
-    if plan.rationale:
-        print(f"rationale: {plan.rationale}")
+    if task.rationale:
+        print(f"rationale: {task.rationale}")
     print()
-
     if args.dry_run:
+        print(f"plan saved: {task.id}; planning model calls are included in its budget")
         return 0
     if not args.yes:
         if input("Proceed? [y/N]: ").strip().lower() not in {"y", "yes"}:
-            print("cancelled")
+            print(f"execution not started; plan saved: {task.id}")
             return 1
-
-    approval_cb = _make_approval_callback(args.yes)
-    runner = TaskRunner(config, project, backend, approval_callback=approval_cb)
-    task = runner.run_plan(args.query, plan)
+    task = runner.resume(task)
     _print_task(task)
     return 0 if task.status == "done" else 1
 
@@ -518,6 +519,12 @@ def _print_task(task, verbose: bool = False) -> None:
     print(f"query:  {task.query}")
     print(f"status: {task.status}")
     print(f"budget: ${task.budget_spent:.4f}")
+    if task.budget_events:
+        unresolved = [event for event in task.budget_events if event.get("status") != "completed"]
+        calls = sum(not event.get("not_sent") for event in task.budget_events)
+        print(f"model calls: {calls}; unresolved: {len(unresolved)}")
+        if unresolved:
+            print(f"held estimate: ${sum(event.get('reserved_usd', 0) for event in unresolved):.4f} (cost unknown)")
     if task.rationale and verbose:
         print(f"rationale: {task.rationale}")
     if task.changeset_id:

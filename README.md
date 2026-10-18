@@ -67,3 +67,13 @@ the exact expected current file hash; older backups without that metadata are no
 `atomic task --cancel TASK_ID` signals the running worker without racing its task JSON saves.
 Cancellation stops managed checks and is observed around model calls and publication. An in-flight synchronous
 model call completes or times out before cancellation is observed. Simultaneous runners for the same task are rejected.
+
+Planning, replanning and repair calls share durable task budget events. `--dry-run` saves
+the plan and planning cost. A budget pause restores the current step checkpoint; known-cost
+work can resume after adjusting its limit. Unknown/in-flight charges block automatic replay.
+Offline `--recover` uses the runner's task lease.
+
+With a USD limit enabled, configure backend `price_in_per_mtok` and `price_out_per_mtok`.
+Use 0/0 only for a confirmed free backend. Task calls default to a finite output limit,
+no transport retries and at most 100 model calls. Reservations use declared prices and an
+input allowance; they cannot guarantee provider billing. See [task budgets](docs/IMPLEMENTATION_STEP_5.md).

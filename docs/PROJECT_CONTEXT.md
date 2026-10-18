@@ -7,6 +7,13 @@
 
 ## Локальные исправления поверх HEAD — актуальный статус
 
+Пакет 5 (`IMPLEMENTATION_STEP_5.md`): общий per-call budget planner/replanner/repair,
+task до планирования, сохранение расходов dry-run, дневные резервы под OS lease,
+лимит chat-вызовов, rollback/pause при бюджете. Unknown/in-flight расходы блокируют replay.
+--recover использует lease runner. Windows: **193 passed, 9 skipped**; удалённый CI ещё проверяется.
+USD reservation — оценка по заданным ценам, не гарантия счёта провайдера.
+Для бесплатного backend нужны явные цены 0/0; проверки только scripted/mocked.
+
 18 октября: пакет 4 (`IMPLEMENTATION_STEP_4.md`): CI Python 3.11/3.12 + настоящий Docker job,
 режим `--require-docker`, nonroot UID/GID хоста для приватных Unix workspace и новые integration tests.
 Windows: **170 passed, 9 skipped**. GitHub Actions run `39102109420`, source `5a4fbc5`:
@@ -22,7 +29,7 @@ Codespace лимит исчерпан. Выбран маршрут: код ло�
 В настоящем Colab установлен Docker; ограниченный контейнер не стартовал из-за read-only cgroups
 (после перехода daemon на no-bridge/VFS). Это UNAVAILABLE, не подтверждение изоляции.
 Полный source bundle в Colab ещё не запускался. Лог: `validation/step3-colab-preflight.md`.
-Открыты: общий budget для planner/replanner, hard task cap, Windows Job Objects, recovery CLI lease,
+Исторические границы пакета 3 (сверять с пакетами 4/5): общий budget для planner/replanner, hard task cap, Windows Job Objects, recovery CLI lease,
 запуск настоящего Docker integration на подходящей Linux-среде и фиксация image/dependencies.
 
 Пакет 2 реализован: `IMPLEMENTATION_STEP_2.md`. Текущая проверка: **142 passed, 2 skipped** + **17 passed** отдельно.

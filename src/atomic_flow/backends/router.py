@@ -35,9 +35,15 @@ def make_backend(config: AtomicConfig, name: str = "auto", model: str | None = N
     entry = config.backends.get(resolved)
     kind = (entry.type if entry and entry.type else None) or ("kaggle" if resolved == "kaggle" else "openai-compatible")
     if kind == "kaggle":
-        return KaggleBackend(model=model or (entry.model if entry and entry.model else None),
-                             timeout_seconds=entry.timeout_seconds if entry else 90,
-                             max_output_tokens=entry.max_output_tokens if entry else None)
+        backend = KaggleBackend(model=model or (entry.model if entry and entry.model else None),
+                                timeout_seconds=entry.timeout_seconds if entry else 90,
+                                max_output_tokens=entry.max_output_tokens if entry else None)
+        if entry:
+            backend.config = backend.config.model_copy(update={
+                "price_in_per_mtok": entry.price_in_per_mtok, "price_out_per_mtok": entry.price_out_per_mtok,
+                "max_retries": entry.max_retries,
+            })
+        return backend
     if entry is None:
         raise ConfigurationError(f"Backend is not configured: {resolved}")
     if model:

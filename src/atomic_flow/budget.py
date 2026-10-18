@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import math
+import os
 import shutil
 import threading
 import time
@@ -11,6 +13,7 @@ from pathlib import Path
 
 from atomic_flow.config import user_dir
 from atomic_flow.errors import BudgetExceeded
+from atomic_flow.locking import exclusive_file
 
 
 class SpendLedger:
@@ -25,33 +28,59 @@ class SpendLedger:
     def path(self) -> Path:
         return self.dir / f"{datetime.now(UTC).date().isoformat()}.jsonl"
 
-    def today_total(self) -> float:
-        total = 0.0
+    def today_total(self, *, strict: bool = False) -> float:
+        entries = {}
         try:
             with self.path.open(encoding="utf-8") as handle:
-                lines = handle
-                for line in lines:
+                for i, line in enumerate(handle):
                     try:
-                        total += float(json.loads(line).get("cost_usd") or 0.0)
-                    except (json.JSONDecodeError, TypeError, ValueError, AttributeError):
-                        continue
-        except OSError:
+                        row = json.loads(line)
+                        cost = float(row.get("cost_usd") if row.get("cost_usd") is not None
+                                     else row.get("reserved_usd") or 0.0)
+                        if not math.isfinite(cost) or cost < 0:
+                            raise ValueError("invalid ledger cost")
+                        entries[row.get("call_id") or f"legacy_{i}"] = cost
+                    except (json.JSONDecodeError, TypeError, ValueError, AttributeError) as exc:
+                        if strict:
+                            raise BudgetExceeded("invalid spend ledger; review it before more model calls") from exc
+        except FileNotFoundError:
             pass
-        return total
+        except OSError:
+            if strict:
+                raise
+        return sum(entries.values())
 
     def check(self, spent_this_request: float = 0.0) -> None:
         spent = self.today_total() + spent_this_request
         if self.limit > 0 and spent >= self.limit:
-            raise BudgetExceeded(f"Daily limit ${self.limit:.2f} reached (${spent:.4f} spent today). "
-                                 "Raise budget.daily_limit_usd or set it to 0 to disable. Only calls with a known cost are counted.")
+            raise BudgetExceeded(f"Daily limit ${self.limit:.2f} reached (${spent:.4f} spent/reserved today). "
+                                 "Raise budget.daily_limit_usd or set it to 0 to disable.")
+
+    def _append(self, fields):
+        row = json.dumps({"ts": datetime.now(UTC).isoformat(), **fields}, ensure_ascii=False) + "\n"
+        with self.path.open("a", encoding="utf-8") as handle:
+            handle.write(row)
+            handle.flush()
+            os.fsync(handle.fileno())
+
+    def reserve(self, **fields):
+        """Atomic admission across cooperating processes; holds persist after a crash."""
+        amount = fields["reserved_usd"]
+        self.dir.mkdir(parents=True, exist_ok=True)
+        with self._lock, exclusive_file(self.dir / "spend.lock", blocking=True):
+            total = self.today_total(strict=True)
+            if self.limit > 0 and (total >= self.limit or total + amount > self.limit):
+                raise BudgetExceeded("daily budget cannot cover the next model-call reservation")
+            self._append({**fields, "status": "in_flight", "cost_usd": None})
 
     def record(self, **fields: object) -> None:
-        row = json.dumps({"ts": datetime.now(UTC).isoformat(), **fields}, ensure_ascii=False) + "\n"
         try:
             self.dir.mkdir(parents=True, exist_ok=True)
-            with self._lock, self.path.open("a", encoding="utf-8") as handle:
-                handle.write(row)
-        except OSError:
+            with self._lock, exclusive_file(self.dir / "spend.lock", blocking=True):
+                self._append(fields)
+        except (OSError, ValueError):
+            # Task calls already have a durable reservation and task-local response record.
+            # The unresolved ledger reservation stays conservative if settlement fails.
             pass
 
 

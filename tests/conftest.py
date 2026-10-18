@@ -41,7 +41,7 @@ class ScriptedBackend:
 
     def __init__(self, handlers: dict):
         self.handlers = {k: (list(v) if isinstance(v, list) else v) for k, v in handlers.items()}
-        self.config = BackendConfig(model="fake-model")
+        self.config = BackendConfig(model="fake-model", price_in_per_mtok=1, price_out_per_mtok=1)
         self.calls: list[tuple[str, list[dict]]] = []
 
     def chat(self, messages, *, json_mode=False, model=None) -> ChatResult:
