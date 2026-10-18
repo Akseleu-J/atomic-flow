@@ -8,9 +8,11 @@ from pathlib import Path
 from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
 from atomic_flow.agents.control import check_cancel, task_lease
 from atomic_flow.agents.execution import TaskCancelled, run_python
-from atomic_flow.agents.planner import Plan, replan_task
+from atomic_flow.agents.planner import Plan, plan_task, replan_task
 from atomic_flow.agents.task import Step, Task, load, save
+from atomic_flow.agents.task_budget import TaskBudgetBackend, check_accounting
 from atomic_flow.config import AtomicConfig
+from atomic_flow.errors import BudgetExceeded
 from atomic_flow.llm.orchestrator import Orchestrator
 from atomic_flow.tree.builder import build_tree, save_tree
 
@@ -29,18 +31,42 @@ class TaskRunner:
         self.approval_callback = approval_callback
         self.changeset: ChangeSet | None = None
         self.cancel_check = lambda: None
+        self.task_backend = backend
+
+    @staticmethod
+    def _steps(plan: Plan) -> list[Step]:
+        return [Step(index=i, description=p.description, tools_needed=list(p.tools_needed),
+                     expected_outcome=p.expected_outcome, verify_with=p.verify_with)
+                for i, p in enumerate(plan.steps)]
+
+    def prepare(self, query: str, *, candidates: list[str], n_files: int) -> Task:
+        """Persist a task before planning, including rejected/repaired planner responses."""
+        task = Task.new(query, self.project, [])
+        task.plan_ready = False
+        save(task)
+        with task_lease(task.id):
+            def check():
+                check_cancel(task.id)
+            backend = TaskBudgetBackend(self.backend, task, self.config, check, phase="plan")
+            try:
+                plan = plan_task(query, project_root=self.project, backend=backend,
+                                 candidates=candidates, n_files=n_files)
+                task.steps = self._steps(plan)
+                task.rationale = plan.rationale
+                task.plan_ready = True
+                task.status = "paused"
+                task.error = "plan ready; execution not started"
+            except BudgetExceeded as exc:
+                task.status, task.error = "paused", str(exc)
+            except TaskCancelled as exc:
+                task.status, task.error = "failed", str(exc)
+            except Exception as exc:
+                task.status, task.error = "failed", f"planning failed: {type(exc).__name__}"
+            save(task)
+        return task
 
     def run_plan(self, query: str, plan: Plan) -> Task:
-        steps = [
-            Step(
-                index=i,
-                description=p.description,
-                tools_needed=list(p.tools_needed),
-                expected_outcome=p.expected_outcome,
-                verify_with=p.verify_with,
-            )
-            for i, p in enumerate(plan.steps)
-        ]
+        steps = self._steps(plan)
         task = Task.new(query=query, project=self.project, steps=steps, rationale=plan.rationale)
         save(task)
         return self.resume(task)
@@ -55,8 +81,16 @@ class TaskRunner:
             if task.status in {"done", "failed"}:
                 return task
             self.cancel_check = lambda: check_cancel(task.id)
+            self.task_backend = TaskBudgetBackend(self.backend, task, self.config, self.cancel_check)
             try:
+                check_accounting(task)
+                if not task.plan_ready:
+                    raise BudgetExceeded("planning incomplete; review costs and start a new task")
                 return self._resume_locked(task)
+            except BudgetExceeded as exc:
+                task.status, task.error = "paused", str(exc)
+                save(task)
+                return task
             except TaskCancelled as exc:
                 if self.changeset and self.changeset.state["status"] == "active":
                     self.changeset.abort()
@@ -122,6 +156,7 @@ class TaskRunner:
 
     def _resume_steps(self, task: Task) -> Task:
         task.status = "running"
+        task.error = ""
         save(task)
 
         while task.current_index < len(task.steps):
@@ -164,6 +199,12 @@ class TaskRunner:
                     save(task)
                     return task
                 save(task)
+                if isinstance(exc, BudgetExceeded):
+                    step.status = "pending"
+                    step.started_at = step.finished_at = None
+                    task.status, task.error = "paused", str(exc)
+                    save(task)
+                    return task
                 if isinstance(exc, TaskCancelled):
                     raise
 
@@ -184,6 +225,7 @@ class TaskRunner:
 
             try:
                 self.cancel_check()
+                self.task_backend.phase = "replan"
                 new_plan = replan_task(
                     task.query,
                     completed=[f"{s.index + 1}. {s.description}" for s in task.steps if s.status == "done"],
@@ -192,8 +234,14 @@ class TaskRunner:
                     error=step.result_summary,
                     remaining=[f"{s.index + 1}. {s.description}" for s in task.steps[task.current_index + 1:]],
                     project_root=self.changeset.workspace,
-                    backend=self.backend,
+                    backend=self.task_backend,
                 )
+            except BudgetExceeded as exc:
+                task.status, task.error = "paused", str(exc)
+                save(task)
+                return task
+            except TaskCancelled:
+                raise
             except Exception as exc:
                 task.status = "failed"
                 task.error = step.result_summary if self.backend is None or not hasattr(self.backend, "chat") else f"replan failed: {exc}"
@@ -228,11 +276,12 @@ class TaskRunner:
     def _execute_step(self, task: Task, step: Step) -> None:
         subquery = f"[Step {step.index + 1}/{len(task.steps)}] {step.description}"
         workspace = self.changeset.workspace if self.changeset else self.project
-        orch = Orchestrator(self.config, workspace, self.backend, approval_callback=self.approval_callback,
+        if isinstance(self.task_backend, TaskBudgetBackend):
+            self.task_backend.phase = "step"
+        orch = Orchestrator(self.config, workspace, self.task_backend, approval_callback=self.approval_callback,
                             settings_project=self.project, cancel_check=self.cancel_check)
         result = orch.answer(subquery, mode="medium", approve_edits=True)
         step.request_id = result.ledger_id
-        task.budget_spent += result.cost_usd or 0.0
         if self.changeset:
             edits = {}
             for call in result.tool_calls or []:

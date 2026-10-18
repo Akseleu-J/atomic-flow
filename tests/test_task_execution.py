@@ -122,7 +122,8 @@ def test_cli_task_bootstraps_persisted_index(tmp_path, monkeypatch, capsys):
     class Backend(ScriptedBackend):
         def chat(self, messages, **kwargs):
             if "<role>" not in messages[1]["content"]:
-                return ChatResult(json.dumps({"steps": [{"description": "Report sample", "verify_with": "none"}]}))
+                return ChatResult(json.dumps({"steps": [{"description": "Report sample", "verify_with": "none"}]}),
+                                  tokens_in=100, tokens_out=50, cost_usd=0.001)
             return super().chat(messages, **kwargs)
 
     backend = Backend({"parser": {}, "answerer": {"text": "Sample returns one."}, "critic": {"verdict": "ok"}})

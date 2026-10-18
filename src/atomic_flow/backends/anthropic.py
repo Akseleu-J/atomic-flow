@@ -39,5 +39,8 @@ class AnthropicBackend:
             tokens_in, tokens_out = int(usage.get("input_tokens", 0)), int(usage.get("output_tokens", 0))
         except (AttributeError, TypeError, ValueError) as exc:
             raise BackendError("Unexpected Anthropic response shape.") from exc
-        return ChatResult(content, tokens_in, tokens_out, estimate_cost(self.config, tokens_in, tokens_out),
+        has_usage = "input_tokens" in usage and "output_tokens" in usage
+        free = self.config.price_in_per_mtok == self.config.price_out_per_mtok == 0
+        cost = estimate_cost(self.config, tokens_in, tokens_out) if has_usage or free else None
+        return ChatResult(content, tokens_in, tokens_out, cost,
                           int((time.monotonic() - started) * 1000), truncated=payload.get("stop_reason") == "max_tokens")

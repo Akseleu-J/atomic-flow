@@ -87,6 +87,8 @@ class TaskConfig(BaseModel):
     max_replans: int = Field(default=2, ge=0, le=5)
     max_budget_usd: float = Field(default=2.0, ge=0)
     fail_on_budget_exceeded: bool = True
+    max_model_calls: int = Field(default=100, ge=1, le=1000)
+    default_max_output_tokens: int = Field(default=4096, ge=16, le=200_000)
 
 
 class ExecutionConfig(BaseModel):

@@ -44,7 +44,7 @@ between steps and during publication. A synchronous model request already in pro
 cancelled locally after it returns or hits the backend timeout; no provider-side cancellation or
 refund is promised. Cancelled tasks currently use status `failed` with `cancelled by user` error.
 An OS-held task lease excludes simultaneous runners for the same task. Manual `--recover`
-should be used only after stopping its runner; it is not coordinated by this lease yet.
+acquires the same lease and refuses to change state while its runner holds it.
 Publication observes cancellation and recovers already-written files using the existing journal.
 
 ## Colab handoff
@@ -84,3 +84,7 @@ and image ID are uploaded as a 14-day artifact. No model credentials or inferenc
 Development runs locally on Windows; container acceptance runs on GitHub's Linux runner.
 The current laptop has 3.4 GiB usable RAM, insufficient for Docker Desktop's published 8 GB
 requirement. No local Docker/WSL installation is performed as part of this setup.
+
+Task planning/call accounting and its limits are documented in `IMPLEMENTATION_STEP_5.md`.
+A finite USD budget requires explicit prices; 0/0 is valid only for a confirmed free backend.
+Unknown cost pauses execution; reservations cannot guarantee provider billing.

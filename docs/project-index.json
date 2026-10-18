@@ -1,27 +1,36 @@
 {
-  "source_commit": "5a4fbc5d5cdc3b101d2558046a964586c06b0c22",
+  "source_commit": "556ddc5e4cd6c517ca69f74891487a6a6bd2d86e",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
+    "AGENTS.md",
     "README.md",
-    "docs/IMPLEMENTATION_STEP_4.md",
+    "docs/EXECUTION.md",
+    "docs/IMPLEMENTATION_STEP_5.md",
     "docs/PROJECT_CONTEXT.md",
-    "docs/project-index.json",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/compile.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/container-boundaries.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/dependencies.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/docker-build.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/docker-info.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/docker-version.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/pytest-extra.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/pytest.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/python-version.txt",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/results.json",
-    "docs/validation/ci-20261018/validation-5a4fbc5d5cdc3b101d2558046a964586c06b0c22/tested-commit.txt"
+    "docs/validation/step5-final.txt",
+    "docs/validation/step5-first.txt",
+    "docs/validation/step5-full.txt",
+    "docs/validation/step5-targeted.txt",
+    "src/atomic_flow/agents/control.py",
+    "src/atomic_flow/agents/task.py",
+    "src/atomic_flow/agents/task_budget.py",
+    "src/atomic_flow/agents/task_loop.py",
+    "src/atomic_flow/backends/anthropic.py",
+    "src/atomic_flow/backends/openai_compatible.py",
+    "src/atomic_flow/backends/router.py",
+    "src/atomic_flow/budget.py",
+    "src/atomic_flow/cli.py",
+    "src/atomic_flow/config.py",
+    "src/atomic_flow/llm/orchestrator.py",
+    "src/atomic_flow/locking.py",
+    "tests/conftest.py",
+    "tests/test_task_budget.py",
+    "tests/test_task_execution.py"
   ],
-  "file_count": 171,
-  "python_file_count": 101,
-  "symbol_count": 666,
+  "file_count": 179,
+  "python_file_count": 104,
+  "symbol_count": 707,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -62,9 +71,9 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "4ff1d9862ede6b22975db3ab414f4b19b28bcfe54c023b0d2f48403cb6f3af7c",
-      "bytes": 1571,
-      "lines": 11
+      "sha256": "92904f473182647cbab17ff29535f5dbd1b2091123d24668ea2d5c10fe20c802",
+      "bytes": 1785,
+      "lines": 12
     },
     {
       "path": "LICENSE",
@@ -86,9 +95,9 @@
     },
     {
       "path": "README.md",
-      "sha256": "16aeb8deaad136361444957a9da2c45269b61031d7a3d10c83e0d995060cb79a",
-      "bytes": 5218,
-      "lines": 69
+      "sha256": "7c1bf2a4ca74be8f549e4612a68cbd07869da487b9d6c75bca0fed07662c5f7f",
+      "bytes": 5931,
+      "lines": 79
     },
     {
       "path": "REVIEW.md",
@@ -228,9 +237,9 @@
     },
     {
       "path": "docs/EXECUTION.md",
-      "sha256": "66bd567f8619180a906e5bd4b1efe3211b5a80400c3f6a33aef3a100f0fb838a",
-      "bytes": 5324,
-      "lines": 86
+      "sha256": "07554c8e59aca6e122212d4086b340a3984fd5a8cc2c713585e9ca7b3f474491",
+      "bytes": 5580,
+      "lines": 90
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_1.md",
@@ -257,6 +266,12 @@
       "lines": 45
     },
     {
+      "path": "docs/IMPLEMENTATION_STEP_5.md",
+      "sha256": "3b18e1317ce549d95aeb57e10bd7972c3ca3e1f49273bb8518ad4bc936261aab",
+      "bytes": 3752,
+      "lines": 61
+    },
+    {
       "path": "docs/PRODUCTION_ROADMAP.md",
       "sha256": "3501fb0c71116b9fc705c76739256a4baf51e96830e92aac5076ab257a48c7d2",
       "bytes": 16234,
@@ -264,9 +279,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "25ac9a96ab08c449efd74b5984354c5297d432b90c17f3dc32aa0360656305c6",
-      "bytes": 33712,
-      "lines": 346
+      "sha256": "75282dd633795e7968abc0ab6a185fc5983b1d2569dcfa513b2414a31ffa8fe3",
+      "bytes": 34527,
+      "lines": 353
     },
     {
       "path": "docs/architecture.md",
@@ -276,9 +291,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "84be7b1b42d6ce9e7c5b2601910211d4003df961e51ac56887e5ce3829ba9ace",
-      "bytes": 235910,
-      "lines": 7456
+      "sha256": "6f0a284b24d463e982a9ed4317bd8922a481777e3eeb23b9fccbd679e095f72a",
+      "bytes": 235942,
+      "lines": 7457
     },
     {
       "path": "docs/prompts.md",
@@ -543,6 +558,30 @@
       "sha256": "46a325a67710121914b0934bf3ec2cd31773dd7e4db0db2d97df31e94a9a6286",
       "bytes": 112,
       "lines": 2
+    },
+    {
+      "path": "docs/validation/step5-final.txt",
+      "sha256": "2791667296adf3e1c830e88796a28be1d3ddf461d8d307ae1abb770695f04e82",
+      "bytes": 843,
+      "lines": 10
+    },
+    {
+      "path": "docs/validation/step5-first.txt",
+      "sha256": "569db96e37ff91d901d564abbfc99647590ae37d483c2f32f9b43d575092a486",
+      "bytes": 2458,
+      "lines": 36
+    },
+    {
+      "path": "docs/validation/step5-full.txt",
+      "sha256": "832c14848a6976530b248eb9d13fa58b38e5263e8af4cae21a7c4b21f161c0c8",
+      "bytes": 843,
+      "lines": 10
+    },
+    {
+      "path": "docs/validation/step5-targeted.txt",
+      "sha256": "5c35aafbb0f9412667a0182497f7de02f666bbbc90b0a98cdd0addb41ad91818",
+      "bytes": 652,
+      "lines": 8
     },
     {
       "path": "padding.py",
@@ -1216,17 +1255,15 @@
     },
     {
       "path": "src/atomic_flow/agents/control.py",
-      "sha256": "ea232069e65b412c622d4eedd812e11f637a682afc3a1d15ad9bd2a9620cc06d",
-      "bytes": 1496,
-      "lines": 47,
+      "sha256": "2daf6c369480e671b9a0191cc24af364529cd44bf68f767bd2d370e2d83d3dd3",
+      "bytes": 870,
+      "lines": 27,
       "summary": "Independent cancellation signal and an OS-held single-runner task lease.",
       "imports": [
         "atomic_flow.agents.execution",
         "atomic_flow.agents.task",
-        "contextlib",
-        "fcntl",
-        "msvcrt",
-        "os"
+        "atomic_flow.locking",
+        "contextlib"
       ],
       "symbols": [
         {
@@ -1249,7 +1286,7 @@
           "name": "task_lease",
           "kind": "function",
           "line": 21,
-          "end_line": 47,
+          "end_line": 27,
           "signature": "def task_lease(task_id: str)",
           "summary": ""
         }
@@ -1654,9 +1691,9 @@
     },
     {
       "path": "src/atomic_flow/agents/task.py",
-      "sha256": "bef68eae3aa434fee540a2cf99c4ff81d7ac115e28385a2bcdb08ef87cbb8162",
-      "bytes": 3104,
-      "lines": 106,
+      "sha256": "543ac6e9c0d4f72b267664935b8b1bbfaecb9ec2924b4a361c4f5768220eb381",
+      "bytes": 3194,
+      "lines": 108,
       "summary": "Task: durable multi-step job with plan, status, and resumable state.",
       "imports": [
         "__future__",
@@ -1682,65 +1719,118 @@
           "name": "Task",
           "kind": "class",
           "line": 37,
-          "end_line": 61,
+          "end_line": 63,
           "signature": "class Task",
           "summary": ""
         },
         {
           "name": "Task.new",
           "kind": "function",
-          "line": 54,
-          "end_line": 61,
+          "line": 56,
+          "end_line": 63,
           "signature": "def new(cls, query: str, project: Path, steps: list[Step], rationale: str='')",
           "summary": ""
         },
         {
           "name": "tasks_dir",
           "kind": "function",
-          "line": 64,
-          "end_line": 65,
+          "line": 66,
+          "end_line": 67,
           "signature": "def tasks_dir()",
           "summary": ""
         },
         {
           "name": "save",
           "kind": "function",
-          "line": 68,
-          "end_line": 76,
+          "line": 70,
+          "end_line": 78,
           "signature": "def save(task: Task)",
           "summary": ""
         },
         {
           "name": "load",
           "kind": "function",
-          "line": 79,
-          "end_line": 88,
+          "line": 81,
+          "end_line": 90,
           "signature": "def load(task_id: str)",
           "summary": ""
         },
         {
           "name": "_validate_id",
           "kind": "function",
-          "line": 91,
-          "end_line": 93,
+          "line": 93,
+          "end_line": 95,
           "signature": "def _validate_id(task_id: str)",
           "summary": ""
         },
         {
           "name": "list_tasks",
           "kind": "function",
-          "line": 96,
-          "end_line": 106,
+          "line": 98,
+          "end_line": 108,
           "signature": "def list_tasks()",
           "summary": ""
         }
       ]
     },
     {
+      "path": "src/atomic_flow/agents/task_budget.py",
+      "sha256": "aa353ad861cfa715306bbce8605790261f2d171e35d9d1838014b21534971766",
+      "bytes": 7481,
+      "lines": 123,
+      "summary": "Durable per-call task accounting, including planner and failed/cancelled runs.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.task",
+        "atomic_flow.budget",
+        "atomic_flow.config",
+        "atomic_flow.errors",
+        "collections.abc",
+        "copy",
+        "math",
+        "time",
+        "uuid"
+      ],
+      "symbols": [
+        {
+          "name": "check_accounting",
+          "kind": "function",
+          "line": 20,
+          "end_line": 30,
+          "signature": "def check_accounting(task: Task)",
+          "summary": ""
+        },
+        {
+          "name": "TaskBudgetBackend",
+          "kind": "class",
+          "line": 33,
+          "end_line": 123,
+          "signature": "class TaskBudgetBackend",
+          "summary": ""
+        },
+        {
+          "name": "TaskBudgetBackend.__init__",
+          "kind": "function",
+          "line": 36,
+          "end_line": 48,
+          "signature": "def __init__(self, backend, task: Task, config: AtomicConfig, cancel_check: Callable[[], None], *, phase='step')",
+          "summary": ""
+        },
+        {
+          "name": "TaskBudgetBackend.chat",
+          "kind": "function",
+          "line": 50,
+          "end_line": 123,
+          "signature": "def chat(self, messages, *, json_mode=False, model=None)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/agents/task_loop.py",
-      "sha256": "a245a78f599be467b6d935632be4ce6da68146c0ee205c78f45efa8e8d8d6fd9",
-      "bytes": 15035,
-      "lines": 306,
+      "sha256": "bf67326ee14cf070d44c50ceba57dabac723afedfbb59749a7f046e8b8592c22",
+      "bytes": 17593,
+      "lines": 355,
       "summary": "TaskRunner: execute a plan step-by-step, verifying each step.",
       "imports": [
         "__future__",
@@ -1749,7 +1839,9 @@
         "atomic_flow.agents.execution",
         "atomic_flow.agents.planner",
         "atomic_flow.agents.task",
+        "atomic_flow.agents.task_budget",
         "atomic_flow.config",
+        "atomic_flow.errors",
         "atomic_flow.llm.orchestrator",
         "atomic_flow.tree.builder",
         "dataclasses",
@@ -1760,72 +1852,96 @@
         {
           "name": "StepFailure",
           "kind": "class",
-          "line": 19,
-          "end_line": 21,
+          "line": 21,
+          "end_line": 23,
           "signature": "class StepFailure",
           "summary": ""
         },
         {
           "name": "TaskRunner",
           "kind": "class",
-          "line": 24,
-          "end_line": 306,
+          "line": 26,
+          "end_line": 355,
           "signature": "class TaskRunner",
           "summary": ""
         },
         {
           "name": "TaskRunner.__init__",
           "kind": "function",
-          "line": 25,
-          "end_line": 31,
+          "line": 27,
+          "end_line": 34,
           "signature": "def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None)",
+          "summary": ""
+        },
+        {
+          "name": "TaskRunner._steps",
+          "kind": "function",
+          "line": 37,
+          "end_line": 40,
+          "signature": "def _steps(plan: Plan)",
+          "summary": ""
+        },
+        {
+          "name": "TaskRunner.prepare",
+          "kind": "function",
+          "line": 42,
+          "end_line": 66,
+          "signature": "def prepare(self, query: str, *, candidates: list[str], n_files: int)",
+          "summary": "Persist a task before planning, including rejected/repaired planner responses."
+        },
+        {
+          "name": "TaskRunner.prepare.check",
+          "kind": "function",
+          "line": 48,
+          "end_line": 49,
+          "signature": "def check()",
           "summary": ""
         },
         {
           "name": "TaskRunner.run_plan",
           "kind": "function",
-          "line": 33,
-          "end_line": 46,
+          "line": 68,
+          "end_line": 72,
           "signature": "def run_plan(self, query: str, plan: Plan)",
           "summary": ""
         },
         {
           "name": "TaskRunner.resume",
           "kind": "function",
-          "line": 48,
-          "end_line": 67,
+          "line": 74,
+          "end_line": 101,
           "signature": "def resume(self, task: Task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._resume_locked",
           "kind": "function",
-          "line": 69,
-          "end_line": 121,
+          "line": 103,
+          "end_line": 155,
           "signature": "def _resume_locked(self, task: Task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._resume_steps",
           "kind": "function",
-          "line": 123,
-          "end_line": 226,
+          "line": 157,
+          "end_line": 274,
           "signature": "def _resume_steps(self, task: Task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._execute_step",
           "kind": "function",
-          "line": 228,
-          "end_line": 244,
+          "line": 276,
+          "end_line": 293,
           "signature": "def _execute_step(self, task: Task, step: Step)",
           "summary": ""
         },
         {
           "name": "TaskRunner._verify_step",
           "kind": "function",
-          "line": 246,
-          "end_line": 306,
+          "line": 295,
+          "end_line": 355,
           "signature": "def _verify_step(self, step: Step, result)",
           "summary": ""
         }
@@ -2364,9 +2480,9 @@
     },
     {
       "path": "src/atomic_flow/backends/anthropic.py",
-      "sha256": "54cc6ebb1eeab401ff27ebc3e0639ef804894a8d273a5a76dcf2cbb60ba5621e",
-      "bytes": 2407,
-      "lines": 43,
+      "sha256": "115c7bbd553d56c2e3e487d71848bafe0316d94897113607e06133896fd74f89",
+      "bytes": 2618,
+      "lines": 46,
       "summary": "Native Anthropic Messages API adapter.",
       "imports": [
         "__future__",
@@ -2381,7 +2497,7 @@
           "name": "AnthropicBackend",
           "kind": "class",
           "line": 13,
-          "end_line": 43,
+          "end_line": 46,
           "signature": "class AnthropicBackend",
           "summary": ""
         },
@@ -2397,7 +2513,7 @@
           "name": "AnthropicBackend.chat",
           "kind": "function",
           "line": 18,
-          "end_line": 43,
+          "end_line": 46,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
           "summary": ""
         }
@@ -2552,9 +2668,9 @@
     },
     {
       "path": "src/atomic_flow/backends/openai_compatible.py",
-      "sha256": "bb1b3d0177804cfaefae433161d756d8c1f4df380daf5fc1c169db73c01ed4d7",
-      "bytes": 4201,
-      "lines": 78,
+      "sha256": "a0f831756271451abe841ff7d336f8411739fbee7668de429aaf810c71d00856",
+      "bytes": 4524,
+      "lines": 82,
       "summary": "OpenAI-compatible chat client (stdlib only).",
       "imports": [
         "__future__",
@@ -2570,7 +2686,7 @@
           "name": "OpenAICompatibleBackend",
           "kind": "class",
           "line": 16,
-          "end_line": 78,
+          "end_line": 82,
           "signature": "class OpenAICompatibleBackend",
           "summary": ""
         },
@@ -2586,15 +2702,15 @@
           "name": "OpenAICompatibleBackend.chat",
           "kind": "function",
           "line": 21,
-          "end_line": 71,
+          "end_line": 75,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
           "summary": ""
         },
         {
           "name": "OpenAICompatibleBackend.check",
           "kind": "function",
-          "line": 73,
-          "end_line": 78,
+          "line": 77,
+          "end_line": 82,
           "signature": "def check(self)",
           "summary": ""
         }
@@ -2602,9 +2718,9 @@
     },
     {
       "path": "src/atomic_flow/backends/router.py",
-      "sha256": "ddcc89c9a53563a308eaae404f480bbedc26757a908efeaa2c4258f511f06d97",
-      "bytes": 2376,
-      "lines": 49,
+      "sha256": "f92fde9aac1ef351d9ce0083b8816f6fa02c35e634671c8618bfa9c0593ef16d",
+      "bytes": 2671,
+      "lines": 55,
       "summary": "Backend construction from named configuration entries.",
       "imports": [
         "__future__",
@@ -2629,7 +2745,7 @@
           "name": "make_backend",
           "kind": "function",
           "line": 33,
-          "end_line": 49,
+          "end_line": 55,
           "signature": "def make_backend(config: AtomicConfig, name: str='auto', model: str | None=None)",
           "summary": ""
         }
@@ -3612,16 +3728,19 @@
     },
     {
       "path": "src/atomic_flow/budget.py",
-      "sha256": "dd03fdc872f79087428c41abc3a83f3d15e5361ccc989b5f7f60e1c36ed7f628",
-      "bytes": 2576,
-      "lines": 72,
+      "sha256": "574d34d053dffddde80b1b0fa6e69afe300711103b80b8c74cd2cdd6cffd5a58",
+      "bytes": 4217,
+      "lines": 101,
       "summary": "Local spend ledger + run-artifact retention (the v0.1 `budget.daily_limit_usd` was never enforced).",
       "imports": [
         "__future__",
         "atomic_flow.config",
         "atomic_flow.errors",
+        "atomic_flow.locking",
         "datetime",
         "json",
+        "math",
+        "os",
         "pathlib",
         "shutil",
         "threading",
@@ -3631,56 +3750,72 @@
         {
           "name": "SpendLedger",
           "kind": "class",
-          "line": 16,
-          "end_line": 55,
+          "line": 19,
+          "end_line": 84,
           "signature": "class SpendLedger",
           "summary": ""
         },
         {
           "name": "SpendLedger.__init__",
           "kind": "function",
-          "line": 19,
-          "end_line": 22,
+          "line": 22,
+          "end_line": 25,
           "signature": "def __init__(self, daily_limit_usd: float, directory: Path | None=None)",
           "summary": ""
         },
         {
           "name": "SpendLedger.path",
           "kind": "function",
-          "line": 25,
-          "end_line": 26,
+          "line": 28,
+          "end_line": 29,
           "signature": "def path(self)",
           "summary": ""
         },
         {
           "name": "SpendLedger.today_total",
           "kind": "function",
-          "line": 28,
-          "end_line": 40,
-          "signature": "def today_total(self)",
+          "line": 31,
+          "end_line": 51,
+          "signature": "def today_total(self, *, strict: bool=False)",
           "summary": ""
         },
         {
           "name": "SpendLedger.check",
           "kind": "function",
-          "line": 42,
-          "end_line": 46,
+          "line": 53,
+          "end_line": 57,
           "signature": "def check(self, spent_this_request: float=0.0)",
           "summary": ""
         },
         {
+          "name": "SpendLedger._append",
+          "kind": "function",
+          "line": 59,
+          "end_line": 64,
+          "signature": "def _append(self, fields)",
+          "summary": ""
+        },
+        {
+          "name": "SpendLedger.reserve",
+          "kind": "function",
+          "line": 66,
+          "end_line": 74,
+          "signature": "def reserve(self, **fields)",
+          "summary": "Atomic admission across cooperating processes; holds persist after a crash."
+        },
+        {
           "name": "SpendLedger.record",
           "kind": "function",
-          "line": 48,
-          "end_line": 55,
+          "line": 76,
+          "end_line": 84,
           "signature": "def record(self, **fields: object)",
           "summary": ""
         },
         {
           "name": "prune_runs",
           "kind": "function",
-          "line": 58,
-          "end_line": 72,
+          "line": 87,
+          "end_line": 101,
           "signature": "def prune_runs(keep_days: int, root: Path | None=None)",
           "summary": "Delete run directories older than ``keep_days``. Artifacts contain source snippets and prompts."
         }
@@ -3688,9 +3823,9 @@
     },
     {
       "path": "src/atomic_flow/cli.py",
-      "sha256": "f810873f50a04803f7c676122e931ca1ca7ddf1b814886191a7b7e28e511a24d",
-      "bytes": 37654,
-      "lines": 763,
+      "sha256": "fbd4ace6f31067ce147fa5faa853cc5e2e31626bf1451e9d71ec866785cc3943",
+      "bytes": 38336,
+      "lines": 770,
       "summary": "Command line interface. One small handler per command instead of a 300-line `main`.",
       "imports": [
         "__future__",
@@ -3700,7 +3835,6 @@
         "atomic_flow.activation.text",
         "atomic_flow.agents.changeset",
         "atomic_flow.agents.control",
-        "atomic_flow.agents.planner",
         "atomic_flow.agents.task",
         "atomic_flow.agents.task_loop",
         "atomic_flow.agents.undo",
@@ -3835,87 +3969,87 @@
           "name": "cmd_task",
           "kind": "function",
           "line": 401,
-          "end_line": 513,
+          "end_line": 514,
           "signature": "def cmd_task(args)",
           "summary": ""
         },
         {
           "name": "_print_task",
           "kind": "function",
-          "line": 516,
-          "end_line": 533,
+          "line": 517,
+          "end_line": 540,
           "signature": "def _print_task(task, verbose: bool=False)",
           "summary": ""
         },
         {
           "name": "cmd_undo",
           "kind": "function",
-          "line": 536,
-          "end_line": 545,
+          "line": 543,
+          "end_line": 552,
           "signature": "def cmd_undo(args)",
           "summary": ""
         },
         {
           "name": "cmd_doctor",
           "kind": "function",
-          "line": 548,
-          "end_line": 583,
+          "line": 555,
+          "end_line": 590,
           "signature": "def cmd_doctor(args)",
           "summary": ""
         },
         {
           "name": "cmd_config",
           "kind": "function",
-          "line": 586,
-          "end_line": 608,
+          "line": 593,
+          "end_line": 615,
           "signature": "def cmd_config(args)",
           "summary": ""
         },
         {
           "name": "cmd_up",
           "kind": "function",
-          "line": 611,
-          "end_line": 623,
+          "line": 618,
+          "end_line": 630,
           "signature": "def cmd_up(args)",
           "summary": ""
         },
         {
           "name": "cmd_status",
           "kind": "function",
-          "line": 626,
-          "end_line": 633,
+          "line": 633,
+          "end_line": 640,
           "signature": "def cmd_status(args)",
           "summary": ""
         },
         {
           "name": "cmd_runs",
           "kind": "function",
-          "line": 636,
-          "end_line": 651,
+          "line": 643,
+          "end_line": 658,
           "signature": "def cmd_runs(args)",
           "summary": ""
         },
         {
           "name": "cmd_kaggle",
           "kind": "function",
-          "line": 654,
-          "end_line": 683,
+          "line": 661,
+          "end_line": 690,
           "signature": "def cmd_kaggle(args)",
           "summary": ""
         },
         {
           "name": "cmd_benchmark",
           "kind": "function",
-          "line": 690,
-          "end_line": 743,
+          "line": 697,
+          "end_line": 750,
           "signature": "def cmd_benchmark(args)",
           "summary": ""
         },
         {
           "name": "main",
           "kind": "function",
-          "line": 751,
-          "end_line": 759,
+          "line": 758,
+          "end_line": 766,
           "signature": "def main(argv: list[str] | None=None)",
           "summary": ""
         }
@@ -3923,9 +4057,9 @@
     },
     {
       "path": "src/atomic_flow/config.py",
-      "sha256": "2a33f1990892fbb01ebf6bbc2da9e54d4c1549c11f1327a504bb0edd07f35998",
-      "bytes": 9861,
-      "lines": 220,
+      "sha256": "3832bcc11b1a4a8d2e0c8593e83d643afd4ee35133dc7946eb46a74fa8cb1b12",
+      "bytes": 10000,
+      "lines": 222,
       "summary": "Layered user and project configuration (with a trust gate for project-level files).",
       "imports": [
         "__future__",
@@ -4008,87 +4142,87 @@
           "name": "TaskConfig",
           "kind": "class",
           "line": 85,
-          "end_line": 89,
+          "end_line": 91,
           "signature": "class TaskConfig",
           "summary": ""
         },
         {
           "name": "ExecutionConfig",
           "kind": "class",
-          "line": 92,
-          "end_line": 96,
+          "line": 94,
+          "end_line": 98,
           "signature": "class ExecutionConfig",
           "summary": ""
         },
         {
           "name": "AtomicConfig",
           "kind": "class",
-          "line": 99,
-          "end_line": 114,
+          "line": 101,
+          "end_line": 116,
           "signature": "class AtomicConfig",
           "summary": ""
         },
         {
           "name": "_read_yaml",
           "kind": "function",
-          "line": 117,
-          "end_line": 126,
+          "line": 119,
+          "end_line": 128,
           "signature": "def _read_yaml(path: Path)",
           "summary": ""
         },
         {
           "name": "_deep_update",
           "kind": "function",
-          "line": 129,
-          "end_line": 134,
+          "line": 131,
+          "end_line": 136,
           "signature": "def _deep_update(target: dict[str, Any], updates: dict[str, Any])",
           "summary": ""
         },
         {
           "name": "_trust_file",
           "kind": "function",
-          "line": 139,
-          "end_line": 140,
+          "line": 141,
+          "end_line": 142,
           "signature": "def _trust_file()",
           "summary": ""
         },
         {
           "name": "is_trusted",
           "kind": "function",
-          "line": 143,
-          "end_line": 148,
+          "line": 145,
+          "end_line": 150,
           "signature": "def is_trusted(project: str | Path)",
           "summary": ""
         },
         {
           "name": "trust_project",
           "kind": "function",
-          "line": 151,
-          "end_line": 156,
+          "line": 153,
+          "end_line": 158,
           "signature": "def trust_project(project: str | Path)",
           "summary": ""
         },
         {
           "name": "load_config",
           "kind": "function",
-          "line": 159,
-          "end_line": 189,
+          "line": 161,
+          "end_line": 191,
           "signature": "def load_config(project: str | Path | None=None)",
           "summary": "defaults < user config < project config (trust-gated) < environment."
         },
         {
           "name": "mask_secrets",
           "kind": "function",
-          "line": 192,
-          "end_line": 199,
+          "line": 194,
+          "end_line": 201,
           "signature": "def mask_secrets(value: Any)",
           "summary": "Recursively hide api keys (v0.1 only masked a key literally ending in `api_key`)."
         },
         {
           "name": "write_config",
           "kind": "function",
-          "line": 202,
-          "end_line": 220,
+          "line": 204,
+          "end_line": 222,
           "signature": "def write_config(path: Path, values: dict[str, Any], *, merge: bool=True, validate: bool=True)",
           "summary": "Validate BEFORE touching the file, write atomically, keep it private (it may hold an api_key)."
         }
@@ -4288,9 +4422,9 @@
     },
     {
       "path": "src/atomic_flow/llm/orchestrator.py",
-      "sha256": "aa9b77ea8112a9ab1db18fb6520cf60c4851f7ef0d2edadadc6c194438b084b2",
-      "bytes": 29765,
-      "lines": 558,
+      "sha256": "83dbf821adc0e64e0ecf32c9a91068647a42d50ce6c1734c5d577de13126a57e",
+      "bytes": 29963,
+      "lines": 559,
       "summary": "Simple, medium and hard request flows with per-request audit artifacts.",
       "imports": [
         "__future__",
@@ -4495,7 +4629,7 @@
           "name": "Orchestrator",
           "kind": "class",
           "line": 324,
-          "end_line": 558,
+          "end_line": 559,
           "signature": "class Orchestrator",
           "summary": ""
         },
@@ -4511,47 +4645,47 @@
           "name": "Orchestrator.answer",
           "kind": "function",
           "line": 334,
-          "end_line": 361,
+          "end_line": 362,
           "signature": "def answer(self, query: str, *, mode: str | None=None, budget_tokens: int | None=None, role_prompts: dict[str, str] | None=None, request_id: str | None=None, file_scope: str | None=None, retrieval_query: str | None=None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer",
           "kind": "function",
-          "line": 364,
-          "end_line": 558,
+          "line": 365,
+          "end_line": 559,
           "signature": "def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str, limit: int, file_scope: str | None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.view",
           "kind": "function",
-          "line": 403,
-          "end_line": 405,
+          "line": 404,
+          "end_line": 406,
           "signature": "def view(pairs: list[tuple[TreeNode, float]])",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.reparse",
           "kind": "function",
-          "line": 407,
-          "end_line": 418,
+          "line": 408,
+          "end_line": 419,
           "signature": "def reparse(extra: dict[str, Any] | None=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.build_context",
           "kind": "function",
-          "line": 431,
-          "end_line": 440,
+          "line": 432,
+          "end_line": 441,
           "signature": "def build_context()",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.sync_context",
           "kind": "function",
-          "line": 445,
-          "end_line": 459,
+          "line": 446,
+          "end_line": 460,
           "signature": "def sync_context()",
           "summary": ""
         }
@@ -4757,6 +4891,30 @@
           "line": 40,
           "end_line": 41,
           "signature": "def grounding_score(unknown: list[str], checked: int)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/locking.py",
+      "sha256": "b4850b64dc591b64ffbf5de617a1c6868a706fec579bfe428caa9ea18245c755",
+      "bytes": 1111,
+      "lines": 32,
+      "summary": "Short advisory OS file leases shared by task execution and spend reservation.",
+      "imports": [
+        "contextlib",
+        "fcntl",
+        "msvcrt",
+        "os",
+        "pathlib"
+      ],
+      "symbols": [
+        {
+          "name": "exclusive_file",
+          "kind": "function",
+          "line": 7,
+          "end_line": 32,
+          "signature": "def exclusive_file(path: Path, *, blocking=False, busy_message='resource is already locked')",
           "summary": ""
         }
       ]
@@ -5269,8 +5427,8 @@
     },
     {
       "path": "tests/conftest.py",
-      "sha256": "dffa7a75afe63afac5fdc35104e4e17111229f639982a8ac553272642b809463",
-      "bytes": 2447,
+      "sha256": "6e1846635eb183fe34497e6b3ec571d625f3c53a9c52e48e4b845a3b6e9f539d",
+      "bytes": 2490,
       "lines": 67,
       "summary": "",
       "imports": [
@@ -6912,6 +7070,285 @@
       ]
     },
     {
+      "path": "tests/test_task_budget.py",
+      "sha256": "57ddc433d20fcf614e83bd74ddcf27d435af360a33fdaf27d8842deb2b0acf35",
+      "bytes": 14205,
+      "lines": 329,
+      "summary": "Accounting acceptance uses scripted responses only; no model/API access.",
+      "imports": [
+        "atomic_flow.agents.changeset",
+        "atomic_flow.agents.control",
+        "atomic_flow.agents.execution",
+        "atomic_flow.agents.planner",
+        "atomic_flow.agents.task",
+        "atomic_flow.agents.task_budget",
+        "atomic_flow.agents.task_loop",
+        "atomic_flow.backends.anthropic",
+        "atomic_flow.backends.base",
+        "atomic_flow.backends.openai_compatible",
+        "atomic_flow.backends.router",
+        "atomic_flow.budget",
+        "atomic_flow.cli",
+        "atomic_flow.config",
+        "atomic_flow.tree.builder",
+        "conftest",
+        "json",
+        "pytest",
+        "subprocess",
+        "sys"
+      ],
+      "symbols": [
+        {
+          "name": "Responses",
+          "kind": "class",
+          "line": 23,
+          "end_line": 36,
+          "signature": "class Responses",
+          "summary": ""
+        },
+        {
+          "name": "Responses.__init__",
+          "kind": "function",
+          "line": 26,
+          "end_line": 29,
+          "signature": "def __init__(self, *responses)",
+          "summary": ""
+        },
+        {
+          "name": "Responses.chat",
+          "kind": "function",
+          "line": 31,
+          "end_line": 36,
+          "signature": "def chat(self, messages, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "reply",
+          "kind": "function",
+          "line": 39,
+          "end_line": 40,
+          "signature": "def reply(text=PLAN, cost=0.001)",
+          "summary": ""
+        },
+        {
+          "name": "sample_project",
+          "kind": "function",
+          "line": 43,
+          "end_line": 48,
+          "signature": "def sample_project(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_planning_repairs_are_persisted_and_charged_once",
+          "kind": "function",
+          "line": 51,
+          "end_line": 61,
+          "signature": "def test_planning_repairs_are_persisted_and_charged_once(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_preflight_budget_refusal_sends_no_request",
+          "kind": "function",
+          "line": 65,
+          "end_line": 77,
+          "signature": "def test_preflight_budget_refusal_sends_no_request(tmp_path, kind)",
+          "summary": ""
+        },
+        {
+          "name": "test_call_limit_survives_resume_and_counts_planner",
+          "kind": "function",
+          "line": 80,
+          "end_line": 93,
+          "signature": "def test_call_limit_survives_resume_and_counts_planner(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_uncertain_charge_is_held_and_not_replayed",
+          "kind": "function",
+          "line": 97,
+          "end_line": 104,
+          "signature": "def test_uncertain_charge_is_held_and_not_replayed(tmp_path, response)",
+          "summary": ""
+        },
+        {
+          "name": "test_process_interruption_preserves_call_reservation",
+          "kind": "function",
+          "line": 107,
+          "end_line": 117,
+          "signature": "def test_process_interruption_preserves_call_reservation(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_cancel_after_response_keeps_known_cost",
+          "kind": "function",
+          "line": 120,
+          "end_line": 136,
+          "signature": "def test_cancel_after_response_keeps_known_cost(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_cancel_after_response_keeps_known_cost.Cancelling",
+          "kind": "class",
+          "line": 124,
+          "end_line": 128,
+          "signature": "class Cancelling",
+          "summary": ""
+        },
+        {
+          "name": "test_cancel_after_response_keeps_known_cost.Cancelling.chat",
+          "kind": "function",
+          "line": 125,
+          "end_line": 128,
+          "signature": "def chat(self, messages, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_explicit_zero_price_allows_free_backend_without_reported_cost",
+          "kind": "function",
+          "line": 139,
+          "end_line": 144,
+          "signature": "def test_explicit_zero_price_allows_free_backend_without_reported_cost(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_failed_orchestrator_response_does_not_lose_cost",
+          "kind": "function",
+          "line": 147,
+          "end_line": 155,
+          "signature": "def test_failed_orchestrator_response_does_not_lose_cost(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_replanner_calls_share_task_spend_and_daily_ledger",
+          "kind": "function",
+          "line": 158,
+          "end_line": 182,
+          "signature": "def test_replanner_calls_share_task_spend_and_daily_ledger(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_replanner_calls_share_task_spend_and_daily_ledger.Replanning",
+          "kind": "class",
+          "line": 161,
+          "end_line": 166,
+          "signature": "class Replanning",
+          "summary": ""
+        },
+        {
+          "name": "test_replanner_calls_share_task_spend_and_daily_ledger.Replanning.chat",
+          "kind": "function",
+          "line": 162,
+          "end_line": 166,
+          "signature": "def chat(self, messages, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_recovery_cli_cannot_write_while_runner_holds_lease",
+          "kind": "function",
+          "line": 185,
+          "end_line": 193,
+          "signature": "def test_recovery_cli_cannot_write_while_runner_holds_lease(tmp_path, capsys)",
+          "summary": ""
+        },
+        {
+          "name": "test_daily_reservation_excludes_competing_processes",
+          "kind": "function",
+          "line": 196,
+          "end_line": 215,
+          "signature": "def test_daily_reservation_excludes_competing_processes(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_budget_pause_restores_step_and_resumes_with_known_spend",
+          "kind": "function",
+          "line": 218,
+          "end_line": 242,
+          "signature": "def test_budget_pause_restores_step_and_resumes_with_known_spend(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_missing_usage_does_not_fabricate_zero_cost",
+          "kind": "function",
+          "line": 245,
+          "end_line": 253,
+          "signature": "def test_missing_usage_does_not_fabricate_zero_cost(monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_dry_run_keeps_planning_task_and_cost",
+          "kind": "function",
+          "line": 256,
+          "end_line": 268,
+          "signature": "def test_dry_run_keeps_planning_task_and_cost(tmp_path, monkeypatch, capsys)",
+          "summary": ""
+        },
+        {
+          "name": "test_corrupt_daily_ledger_blocks_call_before_submission",
+          "kind": "function",
+          "line": 271,
+          "end_line": 278,
+          "signature": "def test_corrupt_daily_ledger_blocks_call_before_submission(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_cancel_after_reservation_sends_no_call_and_releases_hold",
+          "kind": "function",
+          "line": 281,
+          "end_line": 297,
+          "signature": "def test_cancel_after_reservation_sends_no_call_and_releases_hold(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_cancel_after_reservation_sends_no_call_and_releases_hold.cancel",
+          "kind": "function",
+          "line": 287,
+          "end_line": 290,
+          "signature": "def cancel()",
+          "summary": ""
+        },
+        {
+          "name": "test_saved_cost_cannot_disappear_on_resume",
+          "kind": "function",
+          "line": 300,
+          "end_line": 307,
+          "signature": "def test_saved_cost_cannot_disappear_on_resume(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_reported_overspend_is_accounted_and_blocks_publication",
+          "kind": "function",
+          "line": 310,
+          "end_line": 315,
+          "signature": "def test_reported_overspend_is_accounted_and_blocks_publication(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_kaggle_router_preserves_explicit_budget_prices",
+          "kind": "function",
+          "line": 318,
+          "end_line": 329,
+          "signature": "def test_kaggle_router_preserves_explicit_budget_prices(monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_kaggle_router_preserves_explicit_budget_prices.FakeKaggle",
+          "kind": "class",
+          "line": 321,
+          "end_line": 323,
+          "signature": "class FakeKaggle",
+          "summary": ""
+        },
+        {
+          "name": "test_kaggle_router_preserves_explicit_budget_prices.FakeKaggle.__init__",
+          "kind": "function",
+          "line": 322,
+          "end_line": 323,
+          "signature": "def __init__(self, **kwargs)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_task_changeset.py",
       "sha256": "7c433b0692935aab3a37c19eeafdecae645398a037103222adefe1e730b6c996",
       "bytes": 5532,
@@ -7005,9 +7442,9 @@
     },
     {
       "path": "tests/test_task_execution.py",
-      "sha256": "098f5d8c19bfeae1efe6523f226fea4584644ef1cfec00d567d568b72d0fb972",
-      "bytes": 8040,
-      "lines": 159,
+      "sha256": "2f3d1a7e5f3b2c124705ed225654175fd20a4d50541514609308c80abb6e5ef1",
+      "bytes": 8121,
+      "lines": 160,
       "summary": "Task checks must use real tool results and actual changes, not model prose.",
       "imports": [
         "atomic_flow.agents.planner",
@@ -7083,7 +7520,7 @@
           "name": "test_cli_task_bootstraps_persisted_index",
           "kind": "function",
           "line": 114,
-          "end_line": 132,
+          "end_line": 133,
           "signature": "def test_cli_task_bootstraps_persisted_index(tmp_path, monkeypatch, capsys)",
           "summary": ""
         },
@@ -7091,7 +7528,7 @@
           "name": "test_cli_task_bootstraps_persisted_index.Backend",
           "kind": "class",
           "line": 122,
-          "end_line": 126,
+          "end_line": 127,
           "signature": "class Backend",
           "summary": ""
         },
@@ -7099,15 +7536,15 @@
           "name": "test_cli_task_bootstraps_persisted_index.Backend.chat",
           "kind": "function",
           "line": 123,
-          "end_line": 126,
+          "end_line": 127,
           "signature": "def chat(self, messages, **kwargs)",
           "summary": ""
         },
         {
           "name": "test_task_failed_matching_tests_roll_back_real_edit",
           "kind": "function",
-          "line": 135,
-          "end_line": 159,
+          "line": 136,
+          "end_line": 160,
           "signature": "def test_task_failed_matching_tests_roll_back_real_edit(tmp_path)",
           "summary": ""
         }

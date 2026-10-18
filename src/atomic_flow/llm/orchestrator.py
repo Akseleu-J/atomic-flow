@@ -216,7 +216,7 @@ class _Run:
         step = len(self.roles)
         self.write(f"{step:02d}_{role}_prompt.txt", system + "\n\n" + messages[1]["content"])
         for attempt in range(3):                                # two repair rounds for occasionally truncated JSON
-            self.ledger.check(self.cost)
+            self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
             self.cancel_check()
             response = self.backend.chat(messages, json_mode=True)
             self._account(response)
@@ -259,7 +259,7 @@ class _Run:
         )
 
         for turn in range(TOOL_LOOP_MAX_TURNS + 1):
-            self.ledger.check(self.cost)
+            self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
             self.cancel_check()
             response = self.backend.chat(messages, json_mode=True)
             self._account(response)
@@ -356,9 +356,10 @@ class Orchestrator:
             run.write_json("error.json", {"type": type(exc).__name__, "message": str(exc), "roles_done": run.roles})
             raise
         finally:
-            run.ledger.record(request_id=req_id, backend=self.backend.name, model=self.backend.config.model,
-                              mode=mode, tokens_in=run.tokens_in, tokens_out=run.tokens_out,
-                              cost_usd=run.cost if not run.cost_missing or run.cost else None)
+            if not getattr(self.backend, "accounts_spend", False):
+                run.ledger.record(request_id=req_id, backend=self.backend.name, model=self.backend.config.model,
+                                  mode=mode, tokens_in=run.tokens_in, tokens_out=run.tokens_out,
+                                  cost_usd=run.cost if not run.cost_missing or run.cost else None)
 
     # ------------------------------------------------------------------ pipeline
     def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str,

@@ -49,6 +49,8 @@ class Task:
     rationale: str = ""
     replan_count: int = 0
     changeset_id: str = ""
+    plan_ready: bool = True
+    budget_events: list[dict] = field(default_factory=list)
 
     @classmethod
     def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> Task:
