@@ -1,7 +1,9 @@
 # atomic-flow — рабочая карта проекта
 
-Обновлено **16 октября 2026**, коммит
-`820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, ветка `main`, версия пакета `0.2.0`.
+Обновлено **18 октября 2026**. Исходная база:
+`820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
+Рабочая ветка `codex/execution-safety-ci`, draft PR №1. Пакеты 1–5 закоммичены;
+последний проверенный runtime-коммит — `6b4c2236068196c7cdb71e021ef039413ca82101`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -10,7 +12,9 @@
 Пакет 5 (`IMPLEMENTATION_STEP_5.md`): общий per-call budget planner/replanner/repair,
 task до планирования, сохранение расходов dry-run, дневные резервы под OS lease,
 лимит chat-вызовов, rollback/pause при бюджете. Unknown/in-flight расходы блокируют replay.
---recover использует lease runner. Windows: **193 passed, 9 skipped**; удалённый CI ещё проверяется.
+--recover использует lease runner. Windows: **193 passed, 9 skipped**.
+CI `39103452797` PASS: Python 3.11/3.12; Docker job **179 CPU + 17 root + 6 real Docker passed**.
+Логи: `validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/`.
 USD reservation — оценка по заданным ценам, не гарантия счёта провайдера.
 Для бесплатного backend нужны явные цены 0/0; проверки только scripted/mocked.
 

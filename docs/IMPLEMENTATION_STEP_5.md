@@ -50,6 +50,9 @@ so it cannot race a running task's publication or overwrite its task JSON.
   Cross-day reconciliation and filesystem power-loss transactions remain open.
 - Free USD pricing does not mean unlimited provider quota; call counts still apply.
 - Synchronous in-flight provider calls still finish or time out before local cancellation.
+- Ledger settlement remains best effort on storage failure: task-local costs are retained,
+  while the daily ledger can keep its prior estimated hold until manual reconciliation.
+  The estimate may differ from a provider-reported excess charge.
 
 ## Validation
 
@@ -59,3 +62,10 @@ Cases cover planner repair, replanning, dry-run, no-call budget refusal, unknown
 interruption, cancellation, competing-process reservations, rollback/resume, corrupt
 accounting and recovery lease exclusion. Remote CI results are recorded separately.
 No paid inference or Kaggle session was used.
+
+GitHub Actions run: https://github.com/Akseleu-J/atomic-flow/actions/runs/39103452797
+
+Source commit `6b4c2236068196c7cdb71e021ef039413ca82101`: Python 3.11/3.12 jobs pass;
+Docker job **179 passed, 6 skipped** CPU + **17 passed** root + **6 passed** real Docker.
+`container=PASS`, zero real model calls. Evidence and image/dependency identities:
+`validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/`.
