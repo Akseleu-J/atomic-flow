@@ -5,7 +5,7 @@ ______________ test_verify_runs_pytest_itself_when_model_did_not ______________
 tests\test_task.py:209: in test_verify_runs_pytest_itself_when_model_did_not
     assert task.status == "done"
 E   AssertionError: assert 'failed' == 'done'
-E     
+E
 E     - done
 E     + failed
 __________________ test_verify_fails_task_when_pytest_fails ___________________

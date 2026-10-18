@@ -5,14 +5,14 @@ ______________ test_new_source_is_used_for_grounding_and_critic _______________
 tests\test_evidence_refresh.py:26: in test_new_source_is_used_for_grounding_and_critic
     assert "new_identifier" in critic_prompt and "old_identifier" not in critic_prompt
 E   assert ('new_identifier' in '<role>critic</role>\n<question>\nupdate sample\n</question>\n<project_context>\nPROJECT SKELETON\nsample.py\n  functi...ode_ids": [\n  "n2",\n  "n6"\n ],\n "identifiers_not_in_context": [],\n "citations_dropped_as_invalid": 0\n}\n</state>' and 'old_identifier' not in '<role>criti...n}\n</state>'
-E     
+E
 E     'old_identifier' is contained here:
 E          2|     old_identifier = 1
 E          3|     return old_identifier
 E       </project_context>
 E       <state>
 E       {...
-E     
+E
 E     ...Full output truncated (21 lines hidden), use '-vv' to show)
 ============================== warnings summary ===============================
 tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
