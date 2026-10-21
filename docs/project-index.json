@@ -1,25 +1,25 @@
 {
-  "source_commit": "6b4c2236068196c7cdb71e021ef039413ca82101",
+  "source_commit": "4a0958028e433333e92014994988e8b88b742593",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    "docs/IMPLEMENTATION_STEP_5.md",
+    "AGENTS.md",
+    "README.md",
+    "docs/ARCHITECTURE_REFERENCE_REVIEW.md",
     "docs/PROJECT_CONTEXT.md",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/compile.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/container-boundaries.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/dependencies.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/docker-build.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/docker-info.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/docker-version.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/pytest-extra.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/pytest.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/python-version.txt",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/results.json",
-    "docs/validation/ci-budget-20261018/validation-6b4c2236068196c7cdb71e021ef039413ca82101/tested-commit.txt"
+    "docs/validation/step6-full-temp.txt",
+    "docs/validation/step6-full.txt",
+    "docs/validation/step6-targeted.txt",
+    "docs/validation/step6-task-recheck.txt",
+    "src/atomic_flow/config.py",
+    "src/atomic_flow/errors.py",
+    "src/atomic_flow/llm/history.py",
+    "src/atomic_flow/llm/orchestrator.py",
+    "tests/test_history.py"
   ],
-  "file_count": 190,
-  "python_file_count": 104,
-  "symbol_count": 707,
+  "file_count": 197,
+  "python_file_count": 106,
+  "symbol_count": 726,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -60,9 +60,9 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "92904f473182647cbab17ff29535f5dbd1b2091123d24668ea2d5c10fe20c802",
-      "bytes": 1785,
-      "lines": 12
+      "sha256": "e3e66960c2068c90b58da63c013d3d9797c43ce00b695f107e88afb8f545c7f4",
+      "bytes": 2049,
+      "lines": 13
     },
     {
       "path": "LICENSE",
@@ -84,9 +84,9 @@
     },
     {
       "path": "README.md",
-      "sha256": "7c1bf2a4ca74be8f549e4612a68cbd07869da487b9d6c75bca0fed07662c5f7f",
-      "bytes": 5931,
-      "lines": 79
+      "sha256": "a1578983d972fbc0b97e6ba3e1cf7a8589e196e3fdb40dc7fb9db99e75a797b0",
+      "bytes": 6381,
+      "lines": 85
     },
     {
       "path": "REVIEW.md",
@@ -225,6 +225,12 @@
       ]
     },
     {
+      "path": "docs/ARCHITECTURE_REFERENCE_REVIEW.md",
+      "sha256": "76fad5b009fbba66fc1bb4487e62a9c85f860853ab818eb97ecee9e375ba9a89",
+      "bytes": 5534,
+      "lines": 83
+    },
+    {
       "path": "docs/EXECUTION.md",
       "sha256": "07554c8e59aca6e122212d4086b340a3984fd5a8cc2c713585e9ca7b3f474491",
       "bytes": 5580,
@@ -268,9 +274,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "93a231fff037242f42a41244f8350ece44d4a6ca7fb9ebeeef7e16a0d58dffd2",
-      "bytes": 34895,
-      "lines": 357
+      "sha256": "3f5c70cc3be4c6d30a4772ae7382b3b4a0771ea5788577ef1ee9e2aab0183047",
+      "bytes": 35901,
+      "lines": 366
     },
     {
       "path": "docs/architecture.md",
@@ -280,9 +286,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "b9069d61129baafd5b9db4fb4bed31180dc8aa13798c56563da6d008597612f8",
-      "bytes": 249979,
-      "lines": 7894
+      "sha256": "1e61a3b52b8ef717c59507ff3c2baa750812f646f6ffba34db1d5f6e1351251c",
+      "bytes": 253269,
+      "lines": 7949
     },
     {
       "path": "docs/prompts.md",
@@ -637,6 +643,30 @@
       "sha256": "5c35aafbb0f9412667a0182497f7de02f666bbbc90b0a98cdd0addb41ad91818",
       "bytes": 652,
       "lines": 8
+    },
+    {
+      "path": "docs/validation/step6-full-temp.txt",
+      "sha256": "c92f9baac10ae29cb6c206f0d8c5e8ae9cb9e0873ae4c022666ddd123c38032a",
+      "bytes": 852,
+      "lines": 10
+    },
+    {
+      "path": "docs/validation/step6-full.txt",
+      "sha256": "fe6ad57aad77c335f3df12ddd4d1730e90428c23c06f55c55b2a871667954477",
+      "bytes": 2456,
+      "lines": 32
+    },
+    {
+      "path": "docs/validation/step6-targeted.txt",
+      "sha256": "151bc53221c5910f0932293558b48f1c697221e2f62a9e735a055372e97fdf3c",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "docs/validation/step6-task-recheck.txt",
+      "sha256": "de84080330c8fc6c6721349936c3a5d445aeaa737f66e93a6271ff5331e412c2",
+      "bytes": 101,
+      "lines": 2
     },
     {
       "path": "padding.py",
@@ -4112,9 +4142,9 @@
     },
     {
       "path": "src/atomic_flow/config.py",
-      "sha256": "3832bcc11b1a4a8d2e0c8593e83d643afd4ee35133dc7946eb46a74fa8cb1b12",
-      "bytes": 10000,
-      "lines": 222,
+      "sha256": "8ed347f8e07a04c4783c0102925756d2119053531fb778b00e5af2f136d0b965",
+      "bytes": 10385,
+      "lines": 230,
       "summary": "Layered user and project configuration (with a trust gate for project-level files).",
       "imports": [
         "__future__",
@@ -4210,74 +4240,82 @@
           "summary": ""
         },
         {
-          "name": "AtomicConfig",
+          "name": "ConversationConfig",
           "kind": "class",
           "line": 101,
-          "end_line": 116,
+          "end_line": 105,
+          "signature": "class ConversationConfig",
+          "summary": ""
+        },
+        {
+          "name": "AtomicConfig",
+          "kind": "class",
+          "line": 108,
+          "end_line": 124,
           "signature": "class AtomicConfig",
           "summary": ""
         },
         {
           "name": "_read_yaml",
           "kind": "function",
-          "line": 119,
-          "end_line": 128,
+          "line": 127,
+          "end_line": 136,
           "signature": "def _read_yaml(path: Path)",
           "summary": ""
         },
         {
           "name": "_deep_update",
           "kind": "function",
-          "line": 131,
-          "end_line": 136,
+          "line": 139,
+          "end_line": 144,
           "signature": "def _deep_update(target: dict[str, Any], updates: dict[str, Any])",
           "summary": ""
         },
         {
           "name": "_trust_file",
           "kind": "function",
-          "line": 141,
-          "end_line": 142,
+          "line": 149,
+          "end_line": 150,
           "signature": "def _trust_file()",
           "summary": ""
         },
         {
           "name": "is_trusted",
           "kind": "function",
-          "line": 145,
-          "end_line": 150,
+          "line": 153,
+          "end_line": 158,
           "signature": "def is_trusted(project: str | Path)",
           "summary": ""
         },
         {
           "name": "trust_project",
           "kind": "function",
-          "line": 153,
-          "end_line": 158,
+          "line": 161,
+          "end_line": 166,
           "signature": "def trust_project(project: str | Path)",
           "summary": ""
         },
         {
           "name": "load_config",
           "kind": "function",
-          "line": 161,
-          "end_line": 191,
+          "line": 169,
+          "end_line": 199,
           "signature": "def load_config(project: str | Path | None=None)",
           "summary": "defaults < user config < project config (trust-gated) < environment."
         },
         {
           "name": "mask_secrets",
           "kind": "function",
-          "line": 194,
-          "end_line": 201,
+          "line": 202,
+          "end_line": 209,
           "signature": "def mask_secrets(value: Any)",
           "summary": "Recursively hide api keys (v0.1 only masked a key literally ending in `api_key`)."
         },
         {
           "name": "write_config",
           "kind": "function",
-          "line": 204,
-          "end_line": 222,
+          "line": 212,
+          "end_line": 230,
           "signature": "def write_config(path: Path, values: dict[str, Any], *, merge: bool=True, validate: bool=True)",
           "summary": "Validate BEFORE touching the file, write atomically, keep it private (it may hold an api_key)."
         }
@@ -4285,9 +4323,9 @@
     },
     {
       "path": "src/atomic_flow/errors.py",
-      "sha256": "eb05ef742c48eac8ba99d9ebce2fec259a3aded2c7b6185c27be266f2367f140",
-      "bytes": 541,
-      "lines": 29,
+      "sha256": "00577b8148bc93cfcd667212cccb593045fccdb12ba5d11be9c47e991fc8a287",
+      "bytes": 793,
+      "lines": 37,
       "summary": "Typed errors surfaced by the CLI and HTTP API.",
       "imports": [],
       "symbols": [
@@ -4346,6 +4384,22 @@
           "end_line": 29,
           "signature": "class TreeError",
           "summary": ""
+        },
+        {
+          "name": "ContextLimitError",
+          "kind": "class",
+          "line": 32,
+          "end_line": 33,
+          "signature": "class ContextLimitError",
+          "summary": "Pinned instructions/current evidence exceed the host request limit."
+        },
+        {
+          "name": "RepeatedToolCall",
+          "kind": "class",
+          "line": 36,
+          "end_line": 37,
+          "signature": "class RepeatedToolCall",
+          "summary": "The role repeated the same request without a source revision change."
         }
       ]
     },
@@ -4476,10 +4530,84 @@
       "symbols": []
     },
     {
+      "path": "src/atomic_flow/llm/history.py",
+      "sha256": "34e51ba8807fff2e1902febe01a64287b27265fc2a69ab6835cc8d3a9818d4cd",
+      "bytes": 3564,
+      "lines": 71,
+      "summary": "Deterministic history admission for atomic-flow's text/JSON tool protocol.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.result",
+        "atomic_flow.config",
+        "atomic_flow.errors",
+        "collections",
+        "hashlib",
+        "json"
+      ],
+      "symbols": [
+        {
+          "name": "wire_bytes",
+          "kind": "function",
+          "line": 17,
+          "end_line": 18,
+          "signature": "def wire_bytes(messages: list[dict[str, str]])",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory",
+          "kind": "class",
+          "line": 21,
+          "end_line": 71,
+          "signature": "class RequestHistory",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory.__init__",
+          "kind": "function",
+          "line": 22,
+          "end_line": 27,
+          "signature": "def __init__(self, settings: ConversationConfig)",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory.check_tool",
+          "kind": "function",
+          "line": 29,
+          "end_line": 34,
+          "signature": "def check_tool(self, parsed: dict, revision: int)",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory.append_result",
+          "kind": "function",
+          "line": 36,
+          "end_line": 47,
+          "signature": "def append_result(self, messages: list[dict[str, str]], result: dict)",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory.prepare",
+          "kind": "function",
+          "line": 49,
+          "end_line": 67,
+          "signature": "def prepare(self, messages: list[dict[str, str]])",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory.stats",
+          "kind": "function",
+          "line": 69,
+          "end_line": 71,
+          "signature": "def stats(self)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/llm/orchestrator.py",
-      "sha256": "83dbf821adc0e64e0ecf32c9a91068647a42d50ce6c1734c5d577de13126a57e",
-      "bytes": 29963,
-      "lines": 559,
+      "sha256": "12746b303c00d906c00b05eccf1358fda40fb56f4f3e4a11bc7a0ccbaa19cd29",
+      "bytes": 30504,
+      "lines": 568,
       "summary": "Simple, medium and hard request flows with per-request audit artifacts.",
       "imports": [
         "__future__",
@@ -4493,6 +4621,7 @@
         "atomic_flow.budget",
         "atomic_flow.config",
         "atomic_flow.errors",
+        "atomic_flow.llm.history",
         "atomic_flow.llm.prompts",
         "atomic_flow.llm.schemas",
         "atomic_flow.llm.verify",
@@ -4515,232 +4644,232 @@
         {
           "name": "_looks_like_action",
           "kind": "function",
-          "line": 54,
-          "end_line": 56,
+          "line": 55,
+          "end_line": 57,
           "signature": "def _looks_like_action(query: str)",
           "summary": "Deterministic action detector used as a floor for the LLM-based Parser."
         },
         {
           "name": "project_lock",
           "kind": "function",
-          "line": 59,
-          "end_line": 63,
+          "line": 60,
+          "end_line": 64,
           "signature": "def project_lock(project: Path)",
           "summary": "Return the lock shared by refreshes for one project."
         },
         {
           "name": "choose_mode",
           "kind": "function",
-          "line": 66,
-          "end_line": 82,
+          "line": 67,
+          "end_line": 83,
           "signature": "def choose_mode(query: str, configured_mode: str, *, explicit_mode: str | None=None, auto_mode: bool=True, file_scope: str | None=None)",
           "summary": "Choose an initial mode before asking the user to approve a costly hard run."
         },
         {
           "name": "parse_json",
           "kind": "function",
-          "line": 87,
-          "end_line": 109,
+          "line": 88,
+          "end_line": 110,
           "signature": "def parse_json(content: str, schema: type[M])",
           "summary": ""
         },
         {
           "name": "render_user",
           "kind": "function",
-          "line": 112,
-          "end_line": 120,
+          "line": 113,
+          "end_line": 121,
           "signature": "def render_user(query: str, role: str, data: dict[str, Any], context: str | None)",
           "summary": "Code goes in as raw text. Inside a JSON string every newline/quote is escaped, which inflates"
         },
         {
           "name": "_Aliases",
           "kind": "class",
-          "line": 123,
-          "end_line": 140,
+          "line": 124,
+          "end_line": 141,
           "signature": "class _Aliases",
           "summary": "Short ids (n12) instead of 80-character node ids: fewer tokens, far fewer mis-copied citations."
         },
         {
           "name": "_Aliases.__init__",
           "kind": "function",
-          "line": 126,
-          "end_line": 129,
+          "line": 127,
+          "end_line": 130,
           "signature": "def __init__(self, nodes: list[TreeNode])",
           "summary": ""
         },
         {
           "name": "_Aliases.resolve",
           "kind": "function",
-          "line": 131,
-          "end_line": 140,
+          "line": 132,
+          "end_line": 141,
           "signature": "def resolve(self, ref: Any)",
           "summary": ""
         },
         {
           "name": "normalize_scope",
           "kind": "function",
-          "line": 143,
-          "end_line": 147,
+          "line": 144,
+          "end_line": 148,
           "signature": "def normalize_scope(scope: str)",
           "summary": ""
         },
         {
           "name": "scope_ids",
           "kind": "function",
-          "line": 150,
-          "end_line": 156,
+          "line": 151,
+          "end_line": 157,
           "signature": "def scope_ids(nodes: list[TreeNode], scope: str)",
           "summary": ""
         },
         {
           "name": "_get_index",
           "kind": "function",
-          "line": 159,
-          "end_line": 170,
+          "line": 160,
+          "end_line": 171,
           "signature": "def _get_index(project: Path, tree: dict, nodes: list[TreeNode])",
           "summary": ""
         },
         {
           "name": "_Run",
           "kind": "class",
-          "line": 175,
-          "end_line": 307,
+          "line": 176,
+          "end_line": 315,
           "signature": "class _Run",
           "summary": ""
         },
         {
           "name": "_Run.__init__",
           "kind": "function",
-          "line": 176,
-          "end_line": 188,
-          "signature": "def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str, artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None)",
+          "line": 177,
+          "end_line": 190,
+          "signature": "def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str, artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None, conversation=None)",
           "summary": ""
         },
         {
           "name": "_Run.write",
           "kind": "function",
-          "line": 190,
-          "end_line": 192,
+          "line": 192,
+          "end_line": 194,
           "signature": "def write(self, name: str, content: str)",
           "summary": ""
         },
         {
           "name": "_Run.write_json",
           "kind": "function",
-          "line": 194,
-          "end_line": 195,
+          "line": 196,
+          "end_line": 197,
           "signature": "def write_json(self, name: str, data: object)",
           "summary": ""
         },
         {
           "name": "_Run._account",
           "kind": "function",
-          "line": 197,
-          "end_line": 204,
+          "line": 199,
+          "end_line": 206,
           "signature": "def _account(self, response: ChatResult)",
           "summary": ""
         },
         {
           "name": "_Run.invoke",
           "kind": "function",
-          "line": 206,
-          "end_line": 210,
+          "line": 208,
+          "end_line": 212,
           "signature": "def invoke(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_single",
           "kind": "function",
-          "line": 212,
-          "end_line": 238,
+          "line": 214,
+          "end_line": 243,
           "signature": "def _invoke_single(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_with_tools",
           "kind": "function",
-          "line": 240,
-          "end_line": 307,
+          "line": 245,
+          "end_line": 315,
           "signature": "def _invoke_with_tools(self, role: str, schema: type[M], data: dict[str, Any], context: str | None, tool_names: list[str])",
           "summary": ""
         },
         {
           "name": "_Attempt",
           "kind": "class",
-          "line": 311,
-          "end_line": 321,
+          "line": 319,
+          "end_line": 329,
           "signature": "class _Attempt",
           "summary": ""
         },
         {
           "name": "_Attempt.score",
           "kind": "function",
-          "line": 320,
-          "end_line": 321,
+          "line": 328,
+          "end_line": 329,
           "signature": "def score(self)",
           "summary": ""
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 324,
-          "end_line": 559,
+          "line": 332,
+          "end_line": 568,
           "signature": "class Orchestrator",
           "summary": ""
         },
         {
           "name": "Orchestrator.__init__",
           "kind": "function",
-          "line": 325,
-          "end_line": 332,
+          "line": 333,
+          "end_line": 340,
           "signature": "def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend, approval_callback=None, *, settings_project: str | Path | None=None, cancel_check=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator.answer",
           "kind": "function",
-          "line": 334,
-          "end_line": 362,
+          "line": 342,
+          "end_line": 371,
           "signature": "def answer(self, query: str, *, mode: str | None=None, budget_tokens: int | None=None, role_prompts: dict[str, str] | None=None, request_id: str | None=None, file_scope: str | None=None, retrieval_query: str | None=None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer",
           "kind": "function",
-          "line": 365,
-          "end_line": 559,
+          "line": 374,
+          "end_line": 568,
           "signature": "def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str, limit: int, file_scope: str | None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.view",
           "kind": "function",
-          "line": 404,
-          "end_line": 406,
+          "line": 413,
+          "end_line": 415,
           "signature": "def view(pairs: list[tuple[TreeNode, float]])",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.reparse",
           "kind": "function",
-          "line": 408,
-          "end_line": 419,
+          "line": 417,
+          "end_line": 428,
           "signature": "def reparse(extra: dict[str, Any] | None=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.build_context",
           "kind": "function",
-          "line": 432,
-          "end_line": 441,
+          "line": 441,
+          "end_line": 450,
           "signature": "def build_context()",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.sync_context",
           "kind": "function",
-          "line": 446,
-          "end_line": 460,
+          "line": 455,
+          "end_line": 469,
           "signature": "def sync_context()",
           "summary": ""
         }
@@ -6208,6 +6337,97 @@
           "line": 158,
           "end_line": 182,
           "signature": "def test_real_container_boundaries(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_history.py",
+      "sha256": "a61e7b9872e994ba3d2e09176d1836ffd40a0239e0ad2cee040f2f4f21148560",
+      "bytes": 5719,
+      "lines": 119,
+      "summary": "",
+      "imports": [
+        "atomic_flow.config",
+        "atomic_flow.errors",
+        "atomic_flow.llm.history",
+        "atomic_flow.llm.orchestrator",
+        "atomic_flow.tree.builder",
+        "conftest",
+        "json",
+        "pytest"
+      ],
+      "symbols": [
+        {
+          "name": "messages",
+          "kind": "function",
+          "line": 13,
+          "end_line": 15,
+          "signature": "def messages()",
+          "summary": ""
+        },
+        {
+          "name": "add",
+          "kind": "function",
+          "line": 18,
+          "end_line": 21,
+          "signature": "def add(history, transcript, source, **extra)",
+          "summary": ""
+        },
+        {
+          "name": "test_old_tool_bodies_compact_but_instructions_recent_data_and_proof_stay",
+          "kind": "function",
+          "line": 24,
+          "end_line": 40,
+          "signature": "def test_old_tool_bodies_compact_but_instructions_recent_data_and_proof_stay()",
+          "summary": ""
+        },
+        {
+          "name": "test_compaction_keeps_denials_errors_and_edit_proof",
+          "kind": "function",
+          "line": 48,
+          "end_line": 60,
+          "signature": "def test_compaction_keeps_denials_errors_and_edit_proof(payload)",
+          "summary": ""
+        },
+        {
+          "name": "test_oversized_pinned_or_current_message_is_not_silently_cut",
+          "kind": "function",
+          "line": 63,
+          "end_line": 74,
+          "signature": "def test_oversized_pinned_or_current_message_is_not_silently_cut()",
+          "summary": ""
+        },
+        {
+          "name": "test_repeat_guard_canonicalizes_arguments_and_resets_for_new_revision",
+          "kind": "function",
+          "line": 77,
+          "end_line": 85,
+          "signature": "def test_repeat_guard_canonicalizes_arguments_and_resets_for_new_revision()",
+          "summary": ""
+        },
+        {
+          "name": "test_real_orchestrator_stops_repeated_tool_execution_and_keeps_audit",
+          "kind": "function",
+          "line": 88,
+          "end_line": 100,
+          "signature": "def test_real_orchestrator_stops_repeated_tool_execution_and_keeps_audit(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_orchestrator_refuses_large_request_before_any_backend_call",
+          "kind": "function",
+          "line": 103,
+          "end_line": 111,
+          "signature": "def test_real_orchestrator_refuses_large_request_before_any_backend_call(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_untrusted_project_cannot_disable_request_limits",
+          "kind": "function",
+          "line": 114,
+          "end_line": 119,
+          "signature": "def test_untrusted_project_cannot_disable_request_limits(tmp_path)",
           "summary": ""
         }
       ]

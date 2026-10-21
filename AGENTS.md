@@ -9,4 +9,5 @@ The current implementation also includes `docs/IMPLEMENTATION_STEP_2.md`: task w
 Package 3 is recorded in `docs/IMPLEMENTATION_STEP_3.md` and `docs/EXECUTION.md`: default Docker checks, explicit local mode, cancellation, task lease and Colab validation. Keep CPU tests separate from real container evidence.
 Package 4 (`docs/IMPLEMENTATION_STEP_4.md`) adds GitHub Actions for Python and real Docker checks; consult exact CI commit/results. Codespace allowance is exhausted. Do not install Docker Desktop on the 3.4 GiB RAM laptop.
 Package 5 (`docs/IMPLEMENTATION_STEP_5.md`) adds durable task accounting, shared daily reservations and recovery leasing. Do not call estimates guaranteed provider billing caps. Validation uses mocks/scripts only.
+Package 6 (`docs/ARCHITECTURE_REFERENCE_REVIEW.md`) records external-reference provenance and independently implemented bounded history/repeated-tool guard. Do not import the unlicensed mirror's code/prompts; byte admission limits are not token-window guarantees.
 Do not infer current model quality from historical `METRICS.md` results. See the context document for actual local checks.

@@ -77,3 +77,9 @@ With a USD limit enabled, configure backend `price_in_per_mtok` and `price_out_p
 Use 0/0 only for a confirmed free backend. Task calls default to a finite output limit,
 no transport retries and at most 100 model calls. Reservations use declared prices and an
 input allowance; they cannot guarantee provider billing. See [task budgets](docs/IMPLEMENTATION_STEP_5.md).
+
+Role requests now have a configurable serialized-message byte limit. Older tool bodies can
+leave the prompt with explicit provenance/proof placeholders; original instructions and recent
+results remain intact. If these cannot fit, no model request is sent. Repeated identical tool
+requests without a source revision change stop before another tool execution. See
+[history limits and architecture review](docs/ARCHITECTURE_REFERENCE_REVIEW.md).

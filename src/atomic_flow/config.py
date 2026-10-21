@@ -27,7 +27,7 @@ BACKEND_DEFAULTS: dict[str, dict[str, Any]] = {
 }
 
 # A cloned repository must not be able to redirect your API key or source code.
-UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task")
+UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task", "conversation")
 
 
 def user_dir() -> Path:
@@ -98,6 +98,13 @@ class ExecutionConfig(BaseModel):
     output_bytes: int = Field(default=16384, ge=1024, le=1_000_000)
 
 
+class ConversationConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    max_request_bytes: int = Field(default=131072, ge=4096, le=2_000_000)
+    recent_tool_results: int = Field(default=2, ge=1, le=12)
+    max_same_tool_call: int = Field(default=3, ge=1, le=12)
+
+
 class AtomicConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     mode: Literal["simple", "medium", "hard"] = "medium"
@@ -114,6 +121,7 @@ class AtomicConfig(BaseModel):
     artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
     task: TaskConfig = Field(default_factory=TaskConfig)
     execution: ExecutionConfig = Field(default_factory=ExecutionConfig)
+    conversation: ConversationConfig = Field(default_factory=ConversationConfig)
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
