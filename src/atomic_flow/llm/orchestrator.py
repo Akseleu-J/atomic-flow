@@ -19,8 +19,9 @@ from pydantic import BaseModel, ValidationError
 from atomic_flow.activation.activate import ActivationIndex, SearchResult, materialize
 from atomic_flow.backends.base import ChatResult, LLMBackend
 from atomic_flow.budget import SpendLedger
-from atomic_flow.config import AtomicConfig, is_trusted, user_dir
+from atomic_flow.config import AtomicConfig, ConversationConfig, is_trusted, user_dir
 from atomic_flow.errors import ResponseFormatError
+from atomic_flow.llm.history import RequestHistory
 from atomic_flow.llm.prompts import PromptRegistry
 from atomic_flow.llm.schemas import Answer, AnswerCritique, AnswerResult, ContextPlan, QueryIntent
 from atomic_flow.llm.verify import grounding_score, unknown_identifiers
@@ -174,7 +175,7 @@ def _get_index(project: Path, tree: dict, nodes: list[TreeNode]) -> ActivationIn
 
 class _Run:
     def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str,
-                 artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None):
+                 artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None, conversation=None):
         self.backend, self.registry, self.ledger, self.query, self.dir = backend, registry, ledger, query, artifact_dir
         self.tool_registry = tool_registry
         self.tool_ctx = tool_ctx
@@ -186,6 +187,7 @@ class _Run:
         self.tokens_in = self.tokens_out = self.latency_ms = 0
         self.cost = 0.0
         self.cost_missing = False
+        self.conversation = conversation or ConversationConfig()
 
     def write(self, name: str, content: str) -> None:
         if self.dir:
@@ -215,10 +217,13 @@ class _Run:
                     {"role": "user", "content": render_user(self.query, role, data, context)}]
         step = len(self.roles)
         self.write(f"{step:02d}_{role}_prompt.txt", system + "\n\n" + messages[1]["content"])
+        history = RequestHistory(self.conversation)
         for attempt in range(3):                                # two repair rounds for occasionally truncated JSON
             self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
             self.cancel_check()
-            response = self.backend.chat(messages, json_mode=True)
+            request = history.prepare(messages)
+            self.write_json(f"{step:02d}_{role}_context.json", history.stats())
+            response = self.backend.chat(request, json_mode=True)
             self._account(response)
             self.cancel_check()
             try:
@@ -258,10 +263,13 @@ class _Run:
             and self.intent.task_type in {"modify", "refactor"}
         )
 
+        history = RequestHistory(self.conversation)
         for turn in range(TOOL_LOOP_MAX_TURNS + 1):
             self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
             self.cancel_check()
-            response = self.backend.chat(messages, json_mode=True)
+            request = history.prepare(messages)
+            self.write_json(f"{step:02d}_{role}_context.json", history.stats())
+            response = self.backend.chat(request, json_mode=True)
             self._account(response)
             self.cancel_check()
             try:
@@ -270,13 +278,13 @@ class _Run:
                 parsed_any = None
 
             if looks_like_tool_call(parsed_any):
+                history.check_tool(parsed_any, self.tool_ctx.revision)
                 result, record = execute_tool(parsed_any, self.tool_registry, self.tool_ctx,
                                                allowed_tools=tool_names, role=role)
                 self.tool_calls.append(record)
                 self.write_json(f"{step:02d}_{role}_tool_{turn}.json", {"call": record, "result": result})
                 messages.append({"role": "assistant", "content": response.content})
-                messages.append({"role": "user", "content":
-                                 f"<tool_result>{json.dumps(result, ensure_ascii=False)}</tool_result>"})
+                history.append_result(messages, result)
                 continue
 
             if is_action and turn == 0 and role == "answerer":
@@ -346,7 +354,8 @@ class Orchestrator:
             artifact_dir = user_dir() / "runs" / req_id
             artifact_dir.mkdir(parents=True, exist_ok=True)
         registry = PromptRegistry(self.settings_project, role_prompts)
-        run = _Run(self.backend, registry, SpendLedger(self.config.budget.daily_limit_usd), query, artifact_dir)
+        run = _Run(self.backend, registry, SpendLedger(self.config.budget.daily_limit_usd), query, artifact_dir,
+                   conversation=self.config.conversation)
         run.write_json("request.json", {"query": query, "project": str(self.project), "mode": mode,
                                         "created_at": datetime.now(UTC).isoformat()})
         try:

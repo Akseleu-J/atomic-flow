@@ -1,6 +1,6 @@
 # atomic-flow — рабочая карта проекта
 
-Обновлено **18 октября 2026**. Исходная база:
+Обновлено **21 октября 2026**. Исходная база:
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `codex/execution-safety-ci`, draft PR №1. Пакеты 1–5 закоммичены;
 последний проверенный runtime-коммит — `6b4c2236068196c7cdb71e021ef039413ca82101`.
@@ -8,6 +8,15 @@
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
 ## Локальные исправления поверх HEAD — актуальный статус
+
+21 октября: пакет 6 (`ARCHITECTURE_REFERENCE_REVIEW.md`): изучена документация указанного
+зеркала Claude Code и его UNLICENSED; исходники/промпты не импортированы и не запускались.
+Независимая реализация `llm/history.py`: лимит serialized message bytes, omission старых
+tool bodies с сохранением proof/hash/pagination, остановка одинаковых запросов без новой ревизии.
+Windows: **202 passed, 9 skipped**, целевые history/evidence/budget: **34 passed**.
+Первый общий прогон дал WinError 5 при os.replace внутри OneDrive; повтор всех тестов
+с basetemp вне OneDrive прошёл. CI этого пакета фиксируется после прогона;
+качество реальных задач пока не измерено. Логи: `validation/step6-*.txt`.
 
 Пакет 5 (`IMPLEMENTATION_STEP_5.md`): общий per-call budget planner/replanner/repair,
 task до планирования, сохранение расходов dry-run, дневные резервы под OS lease,
