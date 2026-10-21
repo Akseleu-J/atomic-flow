@@ -2,8 +2,8 @@
 
 Обновлено **21 октября 2026**. Исходная база:
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
-Рабочая ветка `codex/execution-safety-ci`, draft PR №1. Пакеты 1–5 закоммичены;
-последний проверенный runtime-коммит — `6b4c2236068196c7cdb71e021ef039413ca82101`.
+Рабочая ветка `codex/execution-safety-ci`, draft PR №1. Пакеты 1–6 закоммичены;
+последний проверенный runtime-коммит — `ac36bdc044753ea47f05656ffeb3fd542e095ae6`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -15,8 +15,10 @@
 tool bodies с сохранением proof/hash/pagination, остановка одинаковых запросов без новой ревизии.
 Windows: **202 passed, 9 skipped**, целевые history/evidence/budget: **34 passed**.
 Первый общий прогон дал WinError 5 при os.replace внутри OneDrive; повтор всех тестов
-с basetemp вне OneDrive прошёл. CI этого пакета фиксируется после прогона;
-качество реальных задач пока не измерено. Логи: `validation/step6-*.txt`.
+с basetemp вне OneDrive прошёл. CI `39647657813` и PR CI `39647664551` PASS:
+Python 3.11/3.12; Docker job **188 CPU + 17 root + 6 real Docker passed**.
+Качество реальных задач пока не измерено. Логи: `validation/step6-*.txt`,
+`validation/ci-history-20261021/validation-ac36bdc044753ea47f05656ffeb3fd542e095ae6/`.
 
 Пакет 5 (`IMPLEMENTATION_STEP_5.md`): общий per-call budget planner/replanner/repair,
 task до планирования, сохранение расходов dry-run, дневные резервы под OS lease,

@@ -79,5 +79,14 @@ execution tests passed on the immediate outside-OneDrive recheck, followed by
 the passing full rerun. This does not establish reliable task storage on OneDrive.
 No production task storage behavior was changed to hide that environment failure.
 
-Linux and real Docker CI evidence is recorded below after completion. These tests
-establish guard behavior, not real-model task quality or token/context sufficiency.
+Runtime commit: `ac36bdc044753ea47f05656ffeb3fd542e095ae6`.
+Push CI: https://github.com/Akseleu-J/atomic-flow/actions/runs/39647657813
+PR CI: https://github.com/Akseleu-J/atomic-flow/actions/runs/39647664551
+Both passed Python 3.11/3.12 and Real Docker acceptance. The Docker job passed
+**188 CPU tests (6 skipped), 17 root tests and 6 real Docker tests**, with
+`container=PASS`, zero model calls. Exact-commit evidence including image ID:
+`validation/ci-history-20261021/validation-ac36bdc044753ea47f05656ffeb3fd542e095ae6/`.
+The PR artifact separately identifies its synthetic merge commit `10005731aaf5e24d4831f91c290686b772d8b73d`.
+These tests establish guard behavior, not real-model task quality or token/context sufficiency.
+
+Exported text logs normalize trailing whitespace and final newlines; source/image identities and JSON results are retained.
