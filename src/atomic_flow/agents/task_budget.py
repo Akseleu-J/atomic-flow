@@ -6,6 +6,7 @@ They are admission estimates, not a guarantee about provider billing/tokenizatio
 from __future__ import annotations
 
 import copy
+import json
 import math
 import time
 import uuid
@@ -66,11 +67,19 @@ class TaskBudgetBackend:
                     raise BudgetExceeded("task session input does not match the saved task")
 
     def chat(self, messages, *, json_mode=False, model=None):
+        return self._chat(messages, json_mode=json_mode, model=model)
+
+    def chat_tools(self, messages, *, tools, model=None):
+        if not self.settings.experimental.native_tools or not hasattr(self.backend, "chat_tools"):
+            raise BackendError("Native tools are disabled or unavailable")
+        return self._chat(messages, model=model, native_tools=tools)
+
+    def _chat(self, messages, *, json_mode=False, model=None, native_tools=None):
         self.cancel_check()
         if self.backend is None:
             raise BackendError("No model backend configured")
         from atomic_flow.llm.request_budget import admit_request
-        admit_request(messages, self.config, self.settings.conversation)
+        admit_request(messages, self.config, self.settings.conversation, tool_schemas=native_tools)
         check_accounting(self.task)
         if sum(not event.get("not_sent") for event in self.task.budget_events) >= self.settings.task.max_model_calls:
             raise BudgetExceeded("task model-call limit reached")
@@ -83,7 +92,7 @@ class TaskBudgetBackend:
             raise BudgetExceeded("configure input/output prices before task calls; use explicit 0/0 only for a free backend")
         # Text-only messages. Byte count plus framing allowance intentionally overestimates
         # common tokenizers; unsupported provider framing/billing may still exceed it.
-        input_allowance = sum(len(m["content"].encode("utf-8")) + 512 for m in messages) + 1024
+        input_allowance = len(json.dumps({"messages": messages, "tools": native_tools}, ensure_ascii=False).encode()) + 512 * len(messages) + 1024
         reservation = ((input_allowance * prices[0] + self.config.max_output_tokens * prices[1]) / 1_000_000
                        if known_prices else 0.0)
         if not math.isfinite(reservation) or reservation < 0:
@@ -121,7 +130,8 @@ class TaskBudgetBackend:
             self.ledger.record(task_id=self.task.id, call_id=event["id"], cost_usd=0.0, status="not_sent")
             raise
         try:
-            response = self.backend.chat(messages, json_mode=json_mode, model=model)
+            response = (self.backend.chat_tools(messages, tools=native_tools, model=model) if native_tools
+                        else self.backend.chat(messages, json_mode=json_mode, model=model))
         except Exception as exc:
             event["status"] = "unknown"
             event["error_type"] = type(exc).__name__  # never store secrets from backend error text

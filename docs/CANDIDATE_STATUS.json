@@ -7,8 +7,8 @@
     {
       "id": 1,
       "candidate": "Native tool calls с сохранением text-JSON fallback",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 9
     },
     {
       "id": 2,

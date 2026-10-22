@@ -23,12 +23,13 @@ def wire_bytes(messages: list[dict[str, str]]) -> int:
 class RequestHistory:
     def __init__(self, settings: ConversationConfig, backend_config: BackendConfig | None = None, *,
                  output_reserve_tokens: int | None = None, tool_schemas: list[dict] | None = None,
-                 token_counter: TokenCounter | None = None):
+                 token_counter: TokenCounter | None = None, request_renderer=None):
         self.settings = settings
         self.backend_config = backend_config or BackendConfig()
         self.output_reserve_tokens = output_reserve_tokens
         self.tool_schemas = tool_schemas
         self.token_counter = token_counter
+        self.request_renderer = request_renderer or (lambda messages: [dict(m) for m in messages])
         self.last_admission: RequestAdmission | None = None
         self.results: list[tuple[int, str]] = []
         self.compacted: set[int] = set()
@@ -88,7 +89,7 @@ class RequestHistory:
 
     def prepare(self, messages: list[dict[str, str]]) -> list[dict[str, str]]:
         def admission():
-            return admit_request(messages, self.backend_config, self.settings,
+            return admit_request(self.request_renderer(messages), self.backend_config, self.settings,
                                  output_reserve_tokens=self.output_reserve_tokens,
                                  tool_schemas=self.tool_schemas, token_counter=self.token_counter)
 
@@ -115,10 +116,10 @@ class RequestHistory:
             admitted = admission()  # Preserve the precise failed limit and fail closed.
         self.last_admission = admitted
         self.pressure_ratio = self.pressure(admitted)
-        self.last_breakdown = self.breakdown(messages, admitted)
+        self.last_breakdown = self.breakdown(self.request_renderer(messages), admitted)
         self.peak_bytes = max(self.peak_bytes, admitted.serialized_request_bytes)
         # Backends see a stable snapshot; future compaction cannot mutate prior audit captures.
-        return [dict(message) for message in messages]
+        return self.request_renderer(messages)
 
     def stats(self) -> dict:
         return {"compacted_tool_results": len(self.compacted), "peak_request_bytes": self.peak_bytes,

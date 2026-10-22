@@ -1,3 +1,3 @@
 # Preserve evidence bytes: provenance hashes refer to the actual captured files.
-validation/** -text whitespace=cr-at-eol
+validation/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 benchmarks/pilot/** -text

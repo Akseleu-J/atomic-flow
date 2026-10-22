@@ -1,38 +1,39 @@
 {
-  "source_commit": "60ac30bdaf55ba0b61bfec79ae9307d253c9e96a",
+  "source_commit": "ea60439800bccecd1c5c5918fc3777492237b3a7",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    ".github/workflows/checks.yml",
+    ".gitattributes",
     "AGENTS.md",
     "docs/CANDIDATE_STATUS.json",
     "docs/IMPLEMENTATION_STEP_8.md",
+    "docs/IMPLEMENTATION_STEP_9.md",
     "docs/PROJECT_CONTEXT.md",
-    "src/atomic_flow/agents/context.py",
-    "src/atomic_flow/agents/loop.py",
-    "src/atomic_flow/agents/policy.py",
     "src/atomic_flow/agents/task_budget.py",
-    "src/atomic_flow/agents/tools/__init__.py",
-    "src/atomic_flow/agents/tools/find_files.py",
-    "src/atomic_flow/agents/tools/read_file.py",
-    "src/atomic_flow/agents/tools/read_many.py",
-    "src/atomic_flow/backends/anthropic.py",
     "src/atomic_flow/backends/base.py",
+    "src/atomic_flow/backends/native.py",
     "src/atomic_flow/backends/openai_compatible.py",
-    "src/atomic_flow/cli.py",
     "src/atomic_flow/config.py",
-    "src/atomic_flow/diagnostics.py",
     "src/atomic_flow/llm/history.py",
     "src/atomic_flow/llm/orchestrator.py",
-    "src/atomic_flow/llm/schemas.py",
-    "tests/test_context_usage_batch.py",
-    "tests/test_runtime_discovery.py",
-    "validation/step8-windows-final.txt",
-    "validation/step8-windows.txt"
+    "tests/test_native_transport.py",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/compile.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/container-boundaries.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/dependencies.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/docker-build.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/docker-info.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/docker-version.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/pytest-extra.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/pytest.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/python-version.txt",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/results.json",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/task-calibration.json",
+    "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/tested-commit.txt",
+    "validation/step9-windows.txt"
   ],
-  "file_count": 294,
-  "python_file_count": 136,
-  "symbol_count": 1009,
+  "file_count": 310,
+  "python_file_count": 138,
+  "symbol_count": 1033,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -61,8 +62,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "d2be6cf78618107b21f8bfd57efb36235431e8273f66f87bdc46570391c4f202",
-      "bytes": 148,
+      "sha256": "2cccd57ee1486f1cc1fa1a7e051a7e3d3af89c1880fb0ba4064b3720ea643e9b",
+      "bytes": 176,
       "lines": 3
     },
     {
@@ -79,9 +80,9 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "588c88fa0330ecc82945e2a67f6a59d8bf1d756c94c9897cc002cc923a19cc40",
-      "bytes": 2983,
-      "lines": 16
+      "sha256": "64d86136192f1b5c09b68074357dcc095dc1c69c8d10dc91f1b729f76af38eef",
+      "bytes": 3269,
+      "lines": 17
     },
     {
       "path": "LICENSE",
@@ -339,8 +340,8 @@
     },
     {
       "path": "docs/CANDIDATE_STATUS.json",
-      "sha256": "9e0a1e9bbc73d08a101c0ad47485c55fb20401bbb8921029be3cf0d5b0e3cab2",
-      "bytes": 10861,
+      "sha256": "e3bb318928be0dc350c766bb18ef719be618fdb20baa4ab2218081a8f6c4af9f",
+      "bytes": 10869,
       "lines": 380
     },
     {
@@ -393,9 +394,15 @@
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_8.md",
-      "sha256": "51973c262d4e538cd91be953df661aefa87d717ce449aebb0f4f36aa5f7406dd",
-      "bytes": 8475,
-      "lines": 74
+      "sha256": "4cffd1768eda33bac63a6914765594e6be39e374a385f58424acff3f56d748e4",
+      "bytes": 8797,
+      "lines": 78
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_9.md",
+      "sha256": "2a1f69b68079a0ba0844f1cd6ef44535e64785c37b94ff9e051f791fcf3fa230",
+      "bytes": 4041,
+      "lines": 54
     },
     {
       "path": "docs/PRODUCTION_ROADMAP.md",
@@ -405,9 +412,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "df37aa5c433be679d1e8c22fde31b437133275c8b095650f03f327bd3f4b0ad4",
-      "bytes": 39331,
-      "lines": 402
+      "sha256": "abf2b3640a4d3fa93457b00b6a5e61594f7f00289f81ab0fa954677ae1b5121e",
+      "bytes": 39860,
+      "lines": 409
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -429,9 +436,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "9c9ebcf22293cd15a3439dd2d67e6d6408cd6bef3f4c3c3fcb47565bc1af491f",
-      "bytes": 356106,
-      "lines": 10976
+      "sha256": "5f686f77ed40cc407280c541b4919d8c3ad730a188c8f7ae180fb781b625050c",
+      "bytes": 373455,
+      "lines": 11524
     },
     {
       "path": "docs/prompts.md",
@@ -2523,9 +2530,9 @@
     },
     {
       "path": "src/atomic_flow/agents/task_budget.py",
-      "sha256": "c91050f88a3a1fba357bb18133df49b82267fb3867face4fa0547c60b9cd9eaf",
-      "bytes": 10056,
-      "lines": 163,
+      "sha256": "633bcb163af3f3952fdcee490e04df3169b45b61132ad95bba3e81e707c5f552",
+      "bytes": 10715,
+      "lines": 173,
       "summary": "Durable per-call task accounting, including planner and failed/cancelled runs.",
       "imports": [
         "__future__",
@@ -2538,6 +2545,7 @@
         "atomic_flow.sessions",
         "collections.abc",
         "copy",
+        "json",
         "math",
         "pathlib",
         "time",
@@ -2547,33 +2555,49 @@
         {
           "name": "check_accounting",
           "kind": "function",
-          "line": 21,
-          "end_line": 31,
+          "line": 22,
+          "end_line": 32,
           "signature": "def check_accounting(task: Task)",
           "summary": ""
         },
         {
           "name": "TaskBudgetBackend",
           "kind": "class",
-          "line": 34,
-          "end_line": 163,
+          "line": 35,
+          "end_line": 173,
           "signature": "class TaskBudgetBackend",
           "summary": ""
         },
         {
           "name": "TaskBudgetBackend.__init__",
           "kind": "function",
-          "line": 37,
-          "end_line": 66,
+          "line": 38,
+          "end_line": 67,
           "signature": "def __init__(self, backend, task: Task, config: AtomicConfig, cancel_check: Callable[[], None], *, phase='step')",
           "summary": ""
         },
         {
           "name": "TaskBudgetBackend.chat",
           "kind": "function",
-          "line": 68,
-          "end_line": 163,
+          "line": 69,
+          "end_line": 70,
           "signature": "def chat(self, messages, *, json_mode=False, model=None)",
+          "summary": ""
+        },
+        {
+          "name": "TaskBudgetBackend.chat_tools",
+          "kind": "function",
+          "line": 72,
+          "end_line": 75,
+          "signature": "def chat_tools(self, messages, *, tools, model=None)",
+          "summary": ""
+        },
+        {
+          "name": "TaskBudgetBackend._chat",
+          "kind": "function",
+          "line": 77,
+          "end_line": 173,
+          "signature": "def _chat(self, messages, *, json_mode=False, model=None, native_tools=None)",
           "summary": ""
         }
       ]
@@ -3794,9 +3818,9 @@
     },
     {
       "path": "src/atomic_flow/backends/base.py",
-      "sha256": "8ab332ad74d80aa5c27039ef241fc12af1f9a3accd949f03a60ef900bd8bfefa",
-      "bytes": 2061,
-      "lines": 50,
+      "sha256": "1b2450928aaa7ba266ff1c8bf6524a712ca248b3ddc6b85dce685869cb92a3f6",
+      "bytes": 2914,
+      "lines": 68,
       "summary": "Shared backend contract: result type, Protocol, cost estimate.",
       "imports": [
         "__future__",
@@ -3806,50 +3830,74 @@
       ],
       "symbols": [
         {
-          "name": "ChatResult",
+          "name": "NativeToolCall",
           "kind": "class",
           "line": 12,
+          "end_line": 24,
+          "signature": "class NativeToolCall",
+          "summary": ""
+        },
+        {
+          "name": "NativeToolCall.__post_init__",
+          "kind": "function",
+          "line": 17,
           "end_line": 21,
+          "signature": "def __post_init__(self)",
+          "summary": ""
+        },
+        {
+          "name": "NativeToolCall.wire",
+          "kind": "function",
+          "line": 23,
+          "end_line": 24,
+          "signature": "def wire(self)",
+          "summary": ""
+        },
+        {
+          "name": "ChatResult",
+          "kind": "class",
+          "line": 28,
+          "end_line": 38,
           "signature": "class ChatResult",
           "summary": ""
         },
         {
           "name": "backend_capabilities",
           "kind": "function",
-          "line": 24,
-          "end_line": 33,
+          "line": 41,
+          "end_line": 51,
           "signature": "def backend_capabilities(config: BackendConfig)",
           "summary": "Describe implemented transport, without guessing a remote model's support."
         },
         {
           "name": "optional_token_count",
           "kind": "function",
-          "line": 36,
-          "end_line": 37,
+          "line": 54,
+          "end_line": 55,
           "signature": "def optional_token_count(value)",
           "summary": ""
         },
         {
           "name": "LLMBackend",
           "kind": "class",
-          "line": 40,
-          "end_line": 44,
+          "line": 58,
+          "end_line": 62,
           "signature": "class LLMBackend",
           "summary": ""
         },
         {
           "name": "LLMBackend.chat",
           "kind": "function",
-          "line": 44,
-          "end_line": 44,
+          "line": 62,
+          "end_line": 62,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
           "summary": ""
         },
         {
           "name": "estimate_cost",
           "kind": "function",
-          "line": 47,
-          "end_line": 50,
+          "line": 65,
+          "end_line": 68,
           "signature": "def estimate_cost(config: BackendConfig, tokens_in: int, tokens_out: int)",
           "summary": ""
         }
@@ -3956,10 +4004,39 @@
       ]
     },
     {
+      "path": "src/atomic_flow/backends/native.py",
+      "sha256": "c1c7107f20135d434c48b8ae401b332db48eed4e6711c1b1f91307c33a24d2da",
+      "bytes": 1932,
+      "lines": 42,
+      "summary": "Host-owned native call/result IDs around the existing internal tool loop.",
+      "imports": [
+        "__future__",
+        "json"
+      ],
+      "symbols": [
+        {
+          "name": "native_schemas",
+          "kind": "function",
+          "line": 7,
+          "end_line": 9,
+          "signature": "def native_schemas(schemas: list[dict])",
+          "summary": ""
+        },
+        {
+          "name": "native_messages",
+          "kind": "function",
+          "line": 12,
+          "end_line": 42,
+          "signature": "def native_messages(messages: list[dict])",
+          "summary": "Translate host-marked assistant calls and results to Chat Completions wire format."
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/backends/openai_compatible.py",
-      "sha256": "17ab2bfee51a901c064690a0bf5f0e99fdc3a855205f8588b2c2bc36a597f560",
-      "bytes": 4797,
-      "lines": 84,
+      "sha256": "35769112435dc7beb6cd49a3956f55ae9b76b96496d757742ea3c78b9cc2682d",
+      "bytes": 6360,
+      "lines": 113,
       "summary": "OpenAI-compatible chat client (stdlib only).",
       "imports": [
         "__future__",
@@ -3967,6 +4044,7 @@
         "atomic_flow.backends.http",
         "atomic_flow.config",
         "atomic_flow.errors",
+        "json",
         "time",
         "typing"
       ],
@@ -3974,32 +4052,48 @@
         {
           "name": "OpenAICompatibleBackend",
           "kind": "class",
-          "line": 16,
-          "end_line": 84,
+          "line": 17,
+          "end_line": 113,
           "signature": "class OpenAICompatibleBackend",
           "summary": ""
         },
         {
           "name": "OpenAICompatibleBackend.__init__",
           "kind": "function",
-          "line": 17,
-          "end_line": 19,
+          "line": 18,
+          "end_line": 20,
           "signature": "def __init__(self, config: BackendConfig, *, backend_name: str | None=None)",
           "summary": ""
         },
         {
           "name": "OpenAICompatibleBackend.chat",
           "kind": "function",
-          "line": 21,
-          "end_line": 77,
+          "line": 22,
+          "end_line": 23,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
+          "summary": ""
+        },
+        {
+          "name": "OpenAICompatibleBackend.chat_tools",
+          "kind": "function",
+          "line": 25,
+          "end_line": 28,
+          "signature": "def chat_tools(self, messages, *, tools: list[dict], model=None)",
+          "summary": ""
+        },
+        {
+          "name": "OpenAICompatibleBackend._chat",
+          "kind": "function",
+          "line": 30,
+          "end_line": 106,
+          "signature": "def _chat(self, messages, *, json_mode=False, model=None, tools=None)",
           "summary": ""
         },
         {
           "name": "OpenAICompatibleBackend.check",
           "kind": "function",
-          "line": 79,
-          "end_line": 84,
+          "line": 108,
+          "end_line": 113,
           "signature": "def check(self)",
           "summary": ""
         }
@@ -5375,9 +5469,9 @@
     },
     {
       "path": "src/atomic_flow/config.py",
-      "sha256": "a3963012f8219bf4c64beafe6881c453854a558eff3cd3e56a9d6f5e4f9dbe14",
-      "bytes": 13276,
-      "lines": 287,
+      "sha256": "323978519390221092d6e275cb8ef52421de6b3814732af3f0b1afd1610fa951",
+      "bytes": 13373,
+      "lines": 289,
       "summary": "Layered user and project configuration (with a trust gate for project-level files).",
       "imports": [
         "__future__",
@@ -5413,175 +5507,175 @@
           "name": "BackendConfig",
           "kind": "class",
           "line": 41,
-          "end_line": 69,
+          "end_line": 70,
           "signature": "class BackendConfig",
           "summary": ""
         },
         {
           "name": "BackendConfig._http_only",
           "kind": "function",
-          "line": 63,
-          "end_line": 66,
+          "line": 64,
+          "end_line": 67,
           "signature": "def _http_only(cls, value: str)",
           "summary": ""
         },
         {
           "name": "BackendConfig.resolved_api_key",
           "kind": "function",
-          "line": 68,
-          "end_line": 69,
+          "line": 69,
+          "end_line": 70,
           "signature": "def resolved_api_key(self)",
           "summary": ""
         },
         {
           "name": "BudgetConfig",
           "kind": "class",
-          "line": 72,
-          "end_line": 74,
+          "line": 73,
+          "end_line": 75,
           "signature": "class BudgetConfig",
           "summary": ""
         },
         {
           "name": "ArtifactsConfig",
           "kind": "class",
-          "line": 77,
-          "end_line": 80,
+          "line": 78,
+          "end_line": 81,
           "signature": "class ArtifactsConfig",
           "summary": ""
         },
         {
           "name": "TreeConfig",
           "kind": "class",
-          "line": 83,
-          "end_line": 87,
+          "line": 84,
+          "end_line": 88,
           "signature": "class TreeConfig",
           "summary": ""
         },
         {
           "name": "TaskConfig",
           "kind": "class",
-          "line": 90,
-          "end_line": 96,
+          "line": 91,
+          "end_line": 97,
           "signature": "class TaskConfig",
           "summary": ""
         },
         {
           "name": "ExecutionConfig",
           "kind": "class",
-          "line": 99,
-          "end_line": 103,
+          "line": 100,
+          "end_line": 104,
           "signature": "class ExecutionConfig",
           "summary": ""
         },
         {
           "name": "ConversationConfig",
           "kind": "class",
-          "line": 106,
-          "end_line": 111,
+          "line": 107,
+          "end_line": 112,
           "signature": "class ConversationConfig",
           "summary": ""
         },
         {
           "name": "ExperimentalConfig",
           "kind": "class",
-          "line": 114,
-          "end_line": 116,
+          "line": 115,
+          "end_line": 118,
           "signature": "class ExperimentalConfig",
           "summary": ""
         },
         {
           "name": "AtomicConfig",
           "kind": "class",
-          "line": 119,
-          "end_line": 136,
+          "line": 121,
+          "end_line": 138,
           "signature": "class AtomicConfig",
           "summary": ""
         },
         {
           "name": "_read_yaml",
           "kind": "function",
-          "line": 139,
-          "end_line": 148,
+          "line": 141,
+          "end_line": 150,
           "signature": "def _read_yaml(path: Path)",
           "summary": ""
         },
         {
           "name": "_deep_update",
           "kind": "function",
-          "line": 151,
-          "end_line": 156,
+          "line": 153,
+          "end_line": 158,
           "signature": "def _deep_update(target: dict[str, Any], updates: dict[str, Any])",
           "summary": ""
         },
         {
           "name": "_trust_file",
           "kind": "function",
-          "line": 161,
-          "end_line": 162,
+          "line": 163,
+          "end_line": 164,
           "signature": "def _trust_file()",
           "summary": ""
         },
         {
           "name": "is_trusted",
           "kind": "function",
-          "line": 165,
-          "end_line": 170,
+          "line": 167,
+          "end_line": 172,
           "signature": "def is_trusted(project: str | Path)",
           "summary": ""
         },
         {
           "name": "trust_project",
           "kind": "function",
-          "line": 173,
-          "end_line": 178,
+          "line": 175,
+          "end_line": 180,
           "signature": "def trust_project(project: str | Path)",
           "summary": ""
         },
         {
           "name": "load_config",
           "kind": "function",
-          "line": 181,
-          "end_line": 183,
+          "line": 183,
+          "end_line": 185,
           "signature": "def load_config(project: str | Path | None=None)",
           "summary": "defaults < user config < project config (trust-gated) < environment."
         },
         {
           "name": "_resolve_config",
           "kind": "function",
-          "line": 186,
-          "end_line": 243,
+          "line": 188,
+          "end_line": 245,
           "signature": "def _resolve_config(project: str | Path | None=None)",
           "summary": ""
         },
         {
           "name": "_resolve_config.record",
           "kind": "function",
-          "line": 190,
-          "end_line": 196,
+          "line": 192,
+          "end_line": 198,
           "signature": "def record(values, source, prefix='')",
           "summary": ""
         },
         {
           "name": "explain_config",
           "kind": "function",
-          "line": 246,
-          "end_line": 256,
+          "line": 248,
+          "end_line": 258,
           "signature": "def explain_config(project: str | Path | None=None)",
           "summary": "Masked effective values and leaf origins from the same resolver as runtime."
         },
         {
           "name": "mask_secrets",
           "kind": "function",
-          "line": 259,
-          "end_line": 266,
+          "line": 261,
+          "end_line": 268,
           "signature": "def mask_secrets(value: Any)",
           "summary": "Recursively hide api keys (v0.1 only masked a key literally ending in `api_key`)."
         },
         {
           "name": "write_config",
           "kind": "function",
-          "line": 269,
-          "end_line": 287,
+          "line": 271,
+          "end_line": 289,
           "signature": "def write_config(path: Path, values: dict[str, Any], *, merge: bool=True, validate: bool=True)",
           "summary": "Validate BEFORE touching the file, write atomically, keep it private (it may hold an api_key)."
         }
@@ -5888,9 +5982,9 @@
     },
     {
       "path": "src/atomic_flow/llm/history.py",
-      "sha256": "f83fc861aa45641826413b852d79c28d4874bea9487a482b86477d215a09c4ec",
-      "bytes": 6863,
-      "lines": 129,
+      "sha256": "f4bfa4efbf791777f4615004964fef5066a4405e6c42d05ffdd6a2a0d1654930",
+      "bytes": 7023,
+      "lines": 130,
       "summary": "Deterministic history admission for atomic-flow's text/JSON tool protocol.",
       "imports": [
         "__future__",
@@ -5916,7 +6010,7 @@
           "name": "RequestHistory",
           "kind": "class",
           "line": 23,
-          "end_line": 129,
+          "end_line": 130,
           "signature": "class RequestHistory",
           "summary": ""
         },
@@ -5924,63 +6018,63 @@
           "name": "RequestHistory.__init__",
           "kind": "function",
           "line": 24,
-          "end_line": 38,
-          "signature": "def __init__(self, settings: ConversationConfig, backend_config: BackendConfig | None=None, *, output_reserve_tokens: int | None=None, tool_schemas: list[dict] | None=None, token_counter: TokenCounter | None=None)",
+          "end_line": 39,
+          "signature": "def __init__(self, settings: ConversationConfig, backend_config: BackendConfig | None=None, *, output_reserve_tokens: int | None=None, tool_schemas: list[dict] | None=None, token_counter: TokenCounter | None=None, request_renderer=None)",
           "summary": ""
         },
         {
           "name": "RequestHistory.pressure",
           "kind": "function",
-          "line": 40,
-          "end_line": 46,
+          "line": 41,
+          "end_line": 47,
           "signature": "def pressure(self, admitted: RequestAdmission)",
           "summary": ""
         },
         {
           "name": "RequestHistory.breakdown",
           "kind": "function",
-          "line": 49,
-          "end_line": 67,
+          "line": 50,
+          "end_line": 68,
           "signature": "def breakdown(messages: list[dict[str, str]], admitted: RequestAdmission)",
           "summary": ""
         },
         {
           "name": "RequestHistory.check_tool",
           "kind": "function",
-          "line": 69,
-          "end_line": 74,
+          "line": 70,
+          "end_line": 75,
           "signature": "def check_tool(self, parsed: dict, revision: int)",
           "summary": ""
         },
         {
           "name": "RequestHistory.append_result",
           "kind": "function",
-          "line": 76,
-          "end_line": 87,
+          "line": 77,
+          "end_line": 88,
           "signature": "def append_result(self, messages: list[dict[str, str]], result: dict)",
           "summary": ""
         },
         {
           "name": "RequestHistory.prepare",
           "kind": "function",
-          "line": 89,
-          "end_line": 121,
+          "line": 90,
+          "end_line": 122,
           "signature": "def prepare(self, messages: list[dict[str, str]])",
           "summary": ""
         },
         {
           "name": "RequestHistory.prepare.admission",
           "kind": "function",
-          "line": 90,
-          "end_line": 93,
+          "line": 91,
+          "end_line": 94,
           "signature": "def admission()",
           "summary": ""
         },
         {
           "name": "RequestHistory.stats",
           "kind": "function",
-          "line": 123,
-          "end_line": 129,
+          "line": 124,
+          "end_line": 130,
           "signature": "def stats(self)",
           "summary": ""
         }
@@ -6032,9 +6126,9 @@
     },
     {
       "path": "src/atomic_flow/llm/orchestrator.py",
-      "sha256": "cd9edde1b909c7a0f1dc1fc9bcc403afc68dcd13b18273f1aaeac8787ab28606",
-      "bytes": 39177,
-      "lines": 698,
+      "sha256": "22751ddb77d922b493442c60e067b82be5d7f56456e1d74a22cb56bf25f48d52",
+      "bytes": 41278,
+      "lines": 731,
       "summary": "Simple, medium and hard request flows with per-request audit artifacts.",
       "imports": [
         "__future__",
@@ -6047,6 +6141,7 @@
         "atomic_flow.agents.tools",
         "atomic_flow.agents.undo",
         "atomic_flow.backends.base",
+        "atomic_flow.backends.native",
         "atomic_flow.budget",
         "atomic_flow.config",
         "atomic_flow.errors",
@@ -6167,7 +6262,7 @@
           "name": "_Run",
           "kind": "class",
           "line": 179,
-          "end_line": 420,
+          "end_line": 453,
           "signature": "class _Run",
           "summary": ""
         },
@@ -6175,167 +6270,175 @@
           "name": "_Run.__init__",
           "kind": "function",
           "line": 180,
-          "end_line": 205,
-          "signature": "def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str, artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None, conversation=None)",
+          "end_line": 209,
+          "signature": "def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str, artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None, conversation=None, native_tools=False)",
+          "summary": ""
+        },
+        {
+          "name": "_Run.assistant_message",
+          "kind": "function",
+          "line": 212,
+          "end_line": 216,
+          "signature": "def assistant_message(response: ChatResult)",
           "summary": ""
         },
         {
           "name": "_Run.system",
           "kind": "function",
-          "line": 207,
-          "end_line": 212,
+          "line": 218,
+          "end_line": 223,
           "signature": "def system(self, base: str)",
           "summary": ""
         },
         {
           "name": "_Run.event",
           "kind": "function",
-          "line": 214,
-          "end_line": 219,
+          "line": 225,
+          "end_line": 230,
           "signature": "def event(self, kind: str, payload: dict, *, call_id=None, outcome=None)",
           "summary": ""
         },
         {
           "name": "_Run.chat",
           "kind": "function",
-          "line": 221,
-          "end_line": 258,
+          "line": 232,
+          "end_line": 273,
           "signature": "def chat(self, messages: list[dict[str, str]], role: str)",
           "summary": ""
         },
         {
           "name": "_Run.usage_report",
           "kind": "function",
-          "line": 260,
-          "end_line": 271,
+          "line": 275,
+          "end_line": 286,
           "signature": "def usage_report(self)",
           "summary": ""
         },
         {
           "name": "_Run.write",
           "kind": "function",
-          "line": 273,
-          "end_line": 275,
+          "line": 288,
+          "end_line": 290,
           "signature": "def write(self, name: str, content: str)",
           "summary": ""
         },
         {
           "name": "_Run.write_json",
           "kind": "function",
-          "line": 277,
-          "end_line": 278,
+          "line": 292,
+          "end_line": 293,
           "signature": "def write_json(self, name: str, data: object)",
           "summary": ""
         },
         {
           "name": "_Run._account",
           "kind": "function",
-          "line": 280,
-          "end_line": 287,
+          "line": 295,
+          "end_line": 302,
           "signature": "def _account(self, response: ChatResult)",
           "summary": ""
         },
         {
           "name": "_Run.invoke",
           "kind": "function",
-          "line": 289,
-          "end_line": 293,
+          "line": 304,
+          "end_line": 308,
           "signature": "def invoke(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_single",
           "kind": "function",
-          "line": 295,
-          "end_line": 323,
+          "line": 310,
+          "end_line": 338,
           "signature": "def _invoke_single(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_with_tools",
           "kind": "function",
-          "line": 325,
-          "end_line": 420,
+          "line": 340,
+          "end_line": 453,
           "signature": "def _invoke_with_tools(self, role: str, schema: type[M], data: dict[str, Any], context: str | None, tool_names: list[str])",
           "summary": ""
         },
         {
           "name": "_Attempt",
           "kind": "class",
-          "line": 424,
-          "end_line": 434,
+          "line": 457,
+          "end_line": 467,
           "signature": "class _Attempt",
           "summary": ""
         },
         {
           "name": "_Attempt.score",
           "kind": "function",
-          "line": 433,
-          "end_line": 434,
+          "line": 466,
+          "end_line": 467,
           "signature": "def score(self)",
           "summary": ""
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 437,
-          "end_line": 698,
+          "line": 470,
+          "end_line": 731,
           "signature": "class Orchestrator",
           "summary": ""
         },
         {
           "name": "Orchestrator.__init__",
           "kind": "function",
-          "line": 438,
-          "end_line": 448,
+          "line": 471,
+          "end_line": 481,
           "signature": "def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend, approval_callback=None, *, settings_project: str | Path | None=None, cancel_check=None, question_callback=None, private_workspace=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator.answer",
           "kind": "function",
-          "line": 450,
-          "end_line": 488,
+          "line": 483,
+          "end_line": 521,
           "signature": "def answer(self, query: str, *, mode: str | None=None, budget_tokens: int | None=None, role_prompts: dict[str, str] | None=None, request_id: str | None=None, file_scope: str | None=None, retrieval_query: str | None=None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer",
           "kind": "function",
-          "line": 491,
-          "end_line": 698,
+          "line": 524,
+          "end_line": 731,
           "signature": "def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str, limit: int, file_scope: str | None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.view",
           "kind": "function",
-          "line": 542,
-          "end_line": 544,
+          "line": 575,
+          "end_line": 577,
           "signature": "def view(pairs: list[tuple[TreeNode, float]])",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.reparse",
           "kind": "function",
-          "line": 546,
-          "end_line": 557,
+          "line": 579,
+          "end_line": 590,
           "signature": "def reparse(extra: dict[str, Any] | None=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.build_context",
           "kind": "function",
-          "line": 570,
-          "end_line": 579,
+          "line": 603,
+          "end_line": 612,
           "signature": "def build_context()",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.sync_context",
           "kind": "function",
-          "line": 584,
-          "end_line": 598,
+          "line": 617,
+          "end_line": 631,
           "signature": "def sync_context()",
           "summary": ""
         }
@@ -9030,6 +9133,140 @@
       ]
     },
     {
+      "path": "tests/test_native_transport.py",
+      "sha256": "480cc379d180c477bea67b0ff0514feb523e043a39939abaff17d219273f1f02",
+      "bytes": 7344,
+      "lines": 136,
+      "summary": "",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.task",
+        "atomic_flow.agents.task_budget",
+        "atomic_flow.backends.base",
+        "atomic_flow.backends.native",
+        "atomic_flow.backends.openai_compatible",
+        "atomic_flow.config",
+        "atomic_flow.errors",
+        "atomic_flow.llm.orchestrator",
+        "atomic_flow.tree.builder",
+        "pytest"
+      ],
+      "symbols": [
+        {
+          "name": "tool_payload",
+          "kind": "function",
+          "line": 16,
+          "end_line": 19,
+          "signature": "def tool_payload(name='read_file', arguments='{\"path\":\"a.py\"}', identity='call_1')",
+          "summary": ""
+        },
+        {
+          "name": "final_payload",
+          "kind": "function",
+          "line": 22,
+          "end_line": 24,
+          "signature": "def final_payload()",
+          "summary": ""
+        },
+        {
+          "name": "prepare",
+          "kind": "function",
+          "line": 27,
+          "end_line": 41,
+          "signature": "def prepare(root, monkeypatch, responses)",
+          "summary": ""
+        },
+        {
+          "name": "prepare.request",
+          "kind": "function",
+          "line": 32,
+          "end_line": 34,
+          "signature": "def request(endpoint, body, headers, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_native_call_roundtrip_uses_actual_ids_and_host_dispatch",
+          "kind": "function",
+          "line": 44,
+          "end_line": 54,
+          "signature": "def test_native_call_roundtrip_uses_actual_ids_and_host_dispatch(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_native_write_cannot_bypass_edit_opt_in",
+          "kind": "function",
+          "line": 57,
+          "end_line": 63,
+          "signature": "def test_native_write_cannot_bypass_edit_opt_in(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_repeated_native_id_is_rejected_before_second_tool_runs",
+          "kind": "function",
+          "line": 66,
+          "end_line": 69,
+          "signature": "def test_repeated_native_id_is_rejected_before_second_tool_runs(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_native_flag_off_preserves_text_json_default",
+          "kind": "function",
+          "line": 72,
+          "end_line": 76,
+          "signature": "def test_native_flag_off_preserves_text_json_default(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_task_budget_accounts_native_schema_admission_and_usage",
+          "kind": "function",
+          "line": 79,
+          "end_line": 90,
+          "signature": "def test_task_budget_accounts_native_schema_admission_and_usage(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_task_native_transport_failure_blocks_replay",
+          "kind": "function",
+          "line": 93,
+          "end_line": 101,
+          "signature": "def test_task_native_transport_failure_blocks_replay(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_native_pairing_only_accepts_host_metadata_and_resolves_deferred_call",
+          "kind": "function",
+          "line": 104,
+          "end_line": 112,
+          "signature": "def test_native_pairing_only_accepts_host_metadata_and_resolves_deferred_call()",
+          "summary": ""
+        },
+        {
+          "name": "test_kaggle_native_fails_before_sending_request",
+          "kind": "function",
+          "line": 115,
+          "end_line": 118,
+          "signature": "def test_kaggle_native_fails_before_sending_request(monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_invalid_native_arguments_are_repaired_without_executing",
+          "kind": "function",
+          "line": 121,
+          "end_line": 127,
+          "signature": "def test_invalid_native_arguments_are_repaired_without_executing(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_native_request_admission_includes_tool_schemas_before_model_call",
+          "kind": "function",
+          "line": 130,
+          "end_line": 136,
+          "signature": "def test_native_request_admission_includes_tool_schemas_before_model_call(tmp_path, monkeypatch)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_orchestrator.py",
       "sha256": "3f1465bbb31424d56d56ce71c56e7fd41e8c747407c4246de8c33ecc036c393c",
       "bytes": 6941,
@@ -11461,6 +11698,78 @@
       "lines": 1
     },
     {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/container-boundaries.txt",
+      "sha256": "6767b6686fcd6b873f427bb736bd116bb054468734409776e937ee4444ce7a6d",
+      "bytes": 98,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/dependencies.txt",
+      "sha256": "1a4c2047b34fbe0afb60e8b0f335acaf25764add51efab46051beec5029c83e3",
+      "bytes": 536,
+      "lines": 28
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/docker-build.txt",
+      "sha256": "148f51146799278fd18c1207b881f244251e961de5eb86b2890d22a5e4ac3b77",
+      "bytes": 12988,
+      "lines": 175
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/docker-info.txt",
+      "sha256": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f",
+      "bytes": 1491,
+      "lines": 61
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098",
+      "bytes": 769,
+      "lines": 27
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/pytest-extra.txt",
+      "sha256": "05f0c6f8a7918aee199f9622e29aae29357785ab3b2b8a549a713423a2946786",
+      "bytes": 99,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/pytest.txt",
+      "sha256": "9990e3296c4d61cfe14cb092b1ccd1216472291907361b4411119e0cceba2d12",
+      "bytes": 952,
+      "lines": 12
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+      "bytes": 15,
+      "lines": 1
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/results.json",
+      "sha256": "8cd7c29452f08e87f3dc91c12162aa97baec6c9fcc965958a3e1404505018db3",
+      "bytes": 355,
+      "lines": 11
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/task-calibration.json",
+      "sha256": "69fee2d727af6a95028e3474eb5ebb3d7686b8ff50285f4401a5c12b5e8cfa47",
+      "bytes": 5504,
+      "lines": 190
+    },
+    {
+      "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/tested-commit.txt",
+      "sha256": "10d3d0fdf412c1b57d6a4a5a0a139180b0c1223a6e5e9ba4bc3f726bfe4001b0",
+      "bytes": 41,
+      "lines": 1
+    },
+    {
       "path": "validation/pilot-calibration-local.json",
       "sha256": "3507b9eabbd1a3719386961ba60b8ed7e332fc327c01377e9f456906ee1388dc",
       "bytes": 5715,
@@ -11519,6 +11828,12 @@
       "sha256": "e25447e63ed53b373629d34f376fb267c8c7519ff1c7ff1686c66636b5ec270a",
       "bytes": 6210,
       "lines": 99
+    },
+    {
+      "path": "validation/step9-windows.txt",
+      "sha256": "e67a3883b8d8b496f2636690505b7f6e153fb3dbd53f5a47219c06b12ab8e22a",
+      "bytes": 1015,
+      "lines": 12
     }
   ]
 }
