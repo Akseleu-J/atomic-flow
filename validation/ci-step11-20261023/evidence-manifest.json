@@ -1,0 +1,42 @@
+{
+  "runtime_commit": "39e359aa85bd32d931800b5acde6380c40cc1166",
+  "model_calls": 0,
+  "windows": {
+    "passed": 391,
+    "skipped": 13,
+    "log": "step11-windows-final.txt"
+  },
+  "source_blob_sha256": {
+    "src/atomic_flow/runtime.py": "b77c440ce0740af7b156d679592d32cea02a20cc9f96d273220ddb395a88f6f3",
+    "src/atomic_flow/sdk.py": "00058da32676a8c6f50c68388adcc60a778adeef9e331e58d0371314e23e03e7",
+    "src/atomic_flow/backends/http.py": "6c90a36fcf827f5739fd9d87a35d99967414954cd96e7b3581c09a3eecfb5ede",
+    "src/atomic_flow/llm/orchestrator.py": "029f56576ee962b08e255f5443d9f3da46acb27cf8935e9d740839b394b82ad7",
+    "src/atomic_flow/api/server.py": "063d880e99dbd2816b505ede08d2df2ff2c3702d1908ee07e60f726da0ea8771",
+    "tests/test_run_control.py": "c9372ce0c9f09a5e3f599db4afe453b711de94f62cdcae6ae0ef576d1d337a30"
+  },
+  "push_run": 39862268360,
+  "pull_request_run": 39862274999,
+  "linux": {
+    "cpu_passed": 381,
+    "cpu_skipped": 6,
+    "extra_passed": 17,
+    "docker_passed": 6,
+    "container": "PASS",
+    "image_id": "sha256:d36468372521b3c52a12f08ddf0388a26a07124d45fc68a9cec67bbc7a12fce8",
+    "historical_calibration": "pass"
+  },
+  "artifact_sha256": {
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/container-boundaries.txt": "c697810c53c2a91cbc1a4df83772c52eb8c289cf8f537e282200ac05682d3928",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/dependencies.txt": "eae2a1725fc05cdc275518aed0b2b0a3a2ed76623824290dbf6debbe58e5cc3a",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/docker-build.txt": "c13117858f4d3a730bed356f405efe4740698b5167f5554e7354fda463de4fb8",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/docker-info.txt": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/docker-version.txt": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/pytest-extra.txt": "05f0c6f8a7918aee199f9622e29aae29357785ab3b2b8a549a713423a2946786",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/pytest.txt": "26c3e8467c22b3d7d5b596a43d562c3a0f6cc657211b41e9d78b1ff74fd481ef",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/python-version.txt": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/results.json": "b841a89953b9c169c94f94992916ba560d1fab658d6f6b5ab7b8c7436575051c",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/task-calibration.json": "cad4c88030442cb3a2f66a080d9dca967428f1f96d9dd6093e957cf0cce67efd",
+    "validation-39e359aa85bd32d931800b5acde6380c40cc1166/tested-commit.txt": "8962aab276b114d8950d0bef6e954531819061d4d109fe754d6ec9c0e0ff0f97"
+  }
+}
