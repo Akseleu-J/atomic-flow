@@ -4,8 +4,8 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–7 закоммичены;
-последний проверенный runtime-коммит — `0bae3ade4124e3772f20160aa3c8b0c565c497a3`.
+Пакеты 1–10 закоммичены;
+последний проверенный runtime-коммит — `e9c50bfc7e62cf187c2203fa1b10c56aed1e4f0a`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -17,6 +17,12 @@ revision-bound diagnostics и final host completion gate перед публик
 Каталог: **29 scoped / 33 planned**, `CANDIDATE_STATUS.json`. User-approved scope
 остаётся весь оставшийся каталог, но planned пункты не объявляются реализованными.
 Платные model calls не использованы; это scripted/CPU проверки, не task quality.
+Docker artifact CI `39793671877` подтверждает точный source `e9c50bf`: **353 CPU +
+17 extra + 6 real Docker passed**, calibration PASS; `validation/ci-step10-20261022/`.
+Run conclusion success; API jobs-list в этот момент возвращал queued, поэтому
+опора — скачанные tested-commit/results/logs, не один status badge.
+Продолжение всех 33 planned требований с зависимостями и acceptance gates:
+`REMAINING_IMPLEMENTATION.md`; следующий пакет — controls/events/cancel/SDK.
 
 22 октября: пакет 9 — native function transport для opt-in OpenAI-compatible
 backend, один call/ответ, IDs и host-owned pairing, общий dispatcher и budgets;
@@ -29,7 +35,8 @@ CI `9272c1d`: push `39789172874` / PR `39789178362` PASS; Docker 334 CPU + 17 ex
 parallel reads opt-in, policy explain/lint, effective config origins, expanded offline doctor,
 proactive history pressure/byte breakdown, backend capabilities, per-role usage/cache diagnostics.
 Пользователь разрешил продолжить остальные пункты каталога с тестами. Весь каталог
-ещё не закрыт: 24 scoped / 38 planned, `CANDIDATE_STATUS.json`. Windows: **334 passed,
+после этого пакета содержал 24 scoped / 38 planned; актуальный статус см. выше.
+Windows: **334 passed,
 13 skipped**, changed-code Ruff/compileall PASS; `validation/step8-windows-final.txt`.
 CI `ea60439` PASS: push `39786981570`, PR `39786986720`; Docker **324 CPU + 17 extra
 + 6 real Docker**, calibration PASS. Evidence `validation/ci-step8-20261022/`.
