@@ -10,6 +10,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import uuid
 from pathlib import Path
 
@@ -20,6 +21,9 @@ from atomic_flow.tree.defaults import DEFAULT_IGNORE
 
 class ChangeSetConflict(SourceConflict):
     pass
+
+
+_UNSPECIFIED_HASH = object()
 
 
 def _files(root: Path, excluded: Path | None = None) -> dict[str, str]:
@@ -97,10 +101,11 @@ class ChangeSet:
         if _files(self.project, Path(self.state["excluded"])) != self.state["baseline"]:
             raise ChangeSetConflict("original project changed since task snapshot; refusing publication/resume")
 
-    def track(self, rel: str, expected_hash: str | None = None):
+    def track(self, rel: str, expected_hash: str | None | object = _UNSPECIFIED_HASH):
         path = confined_path(self.workspace, rel)
         current = digest(path.read_bytes()) if path.exists() else None
-        if expected_hash is not None and current != expected_hash:
+        # An explicit None is proof of deletion, rather than an omitted check.
+        if expected_hash is not _UNSPECIFIED_HASH and current != expected_hash:
             raise ChangeSetConflict(f"workspace no longer matches verified edit: {rel}")
         if self.state["status"] != "active":
             raise ChangeSetConflict("changeset is not active")
@@ -149,6 +154,7 @@ class ChangeSet:
                 if digest(data) != previous[rel]:
                     raise ChangeSetConflict(f"checkpoint damaged: {rel}")
                 replace_checked(self.workspace, rel, data, current.get(rel))
+                confined_path(self.workspace, rel).chmod(stat.S_IMODE(confined_path(checkpoint["folder"], rel).stat().st_mode))
             else:
                 target = confined_path(self.workspace, rel)
                 if digest(target.read_bytes()) != current[rel]:
@@ -167,6 +173,11 @@ class ChangeSet:
             target.unlink()
         else:
             replace_checked(self.project, rel, data, expected)
+            # Newly created/moved source inherits its verified workspace mode.
+            # Existing targets keep replace_checked's permission-preserving rule.
+            mode = self.state["changes"].get(rel, {}).get("after_mode")
+            if expected is None and mode is not None:
+                confined_path(self.project, rel).chmod(mode)
 
     def publish(self, finalize=None, cancel_check=lambda: None):
         cancel_check()
@@ -177,7 +188,12 @@ class ChangeSet:
         staged = self.validate_workspace()
         changed = sorted(rel for rel in baseline.keys() | staged.keys() if baseline.get(rel) != staged.get(rel))
         backup_root = self.directory / "before"
-        self.state["changes"] = {rel: {"before": baseline.get(rel), "after": staged.get(rel)} for rel in changed}
+        self.state["changes"] = {
+            rel: {"before": baseline.get(rel), "after": staged.get(rel),
+                  "before_mode": stat.S_IMODE(confined_path(self.project, rel).stat().st_mode) if rel in baseline else None,
+                  "after_mode": stat.S_IMODE(confined_path(self.workspace, rel).stat().st_mode) if rel in staged else None}
+            for rel in changed
+        }
         self.state["published_manifest"] = staged
         for rel in changed:
             if rel in baseline:
@@ -234,6 +250,8 @@ class ChangeSet:
                     if digest(data) != hashes["before"]:
                         raise ChangeSetConflict(f"backup damaged: {rel}")
                     replace_checked(self.project, rel, data, hashes["after"])
+                    if hashes.get("before_mode") is not None:
+                        confined_path(self.project, rel).chmod(hashes["before_mode"])
             except OSError:
                 conflicts.append(rel)
         self.state["status"] = "recovery_conflict" if conflicts else "rolled_back"

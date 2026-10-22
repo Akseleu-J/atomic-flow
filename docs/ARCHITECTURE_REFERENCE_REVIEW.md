@@ -1,5 +1,9 @@
 # External architecture review — 21 October 2026
 
+Follow-up (22 October): `REFERENCE_OPPORTUNITIES.md` expands this narrow initial
+review into 62 discussion candidates. Its source-sampling scope and evidence grades
+are explicit. The follow-up changes documentation only; it is not another implementation package.
+
 Requested reference: https://github.com/777genius/claude-code-source-code-full
 
 The repository describes itself as a mirror of a reportedly exposed source snapshot.

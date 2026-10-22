@@ -4,6 +4,7 @@ from __future__ import annotations
 import pytest
 
 from atomic_flow.agents.planner import Plan, PlanStep
+from atomic_flow.agents.source import digest
 from atomic_flow.agents.task import Step, Task, list_tasks, load, save
 from atomic_flow.agents.task_loop import TaskRunner
 
@@ -191,7 +192,7 @@ def test_verify_runs_pytest_itself_when_model_did_not(monkeypatch, isolated_home
     (tmp_path / "tests" / "test_m.py").write_text("from pkg.m import f\ndef test_f():\n    assert f() == 1\n")
 
     class R:
-        tool_calls = [{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "pkg/m.py"}}]
+        tool_calls = [{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "pkg/m.py", "content_hash": digest((tmp_path / "pkg/m.py").read_bytes())}}]
         ledger_id = "req_x"
         cost_usd = 0.0
 
@@ -221,7 +222,7 @@ def test_verify_fails_task_when_pytest_fails(monkeypatch, isolated_home, tmp_pat
     (tmp_path / "tests" / "test_m.py").write_text("from pkg.m import f\ndef test_f():\n    assert f() == 999\n")
 
     class R:
-        tool_calls = [{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "pkg/m.py"}}]
+        tool_calls = [{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "pkg/m.py", "content_hash": digest((tmp_path / "pkg/m.py").read_bytes())}}]
         ledger_id = "req_x"
         cost_usd = 0.0
 

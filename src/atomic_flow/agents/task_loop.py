@@ -16,6 +16,8 @@ from atomic_flow.errors import BudgetExceeded
 from atomic_flow.llm.orchestrator import Orchestrator
 from atomic_flow.tree.builder import build_tree, save_tree
 
+MUTATING_TOOLS = {"edit_node", "patch_file", "create_file", "delete_file", "move_file"}
+
 
 @dataclass
 class StepFailure(Exception):
@@ -24,11 +26,12 @@ class StepFailure(Exception):
 
 
 class TaskRunner:
-    def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None):
+    def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None):
         self.config = config if config is not None else AtomicConfig()
         self.project = project
         self.backend = backend
         self.approval_callback = approval_callback
+        self.question_callback = question_callback
         self.changeset: ChangeSet | None = None
         self.cancel_check = lambda: None
         self.task_backend = backend
@@ -235,6 +238,7 @@ class TaskRunner:
                     remaining=[f"{s.index + 1}. {s.description}" for s in task.steps[task.current_index + 1:]],
                     project_root=self.changeset.workspace,
                     backend=self.task_backend,
+                    settings_project=self.project,
                 )
             except BudgetExceeded as exc:
                 task.status, task.error = "paused", str(exc)
@@ -279,15 +283,20 @@ class TaskRunner:
         if isinstance(self.task_backend, TaskBudgetBackend):
             self.task_backend.phase = "step"
         orch = Orchestrator(self.config, workspace, self.task_backend, approval_callback=self.approval_callback,
-                            settings_project=self.project, cancel_check=self.cancel_check)
+                            settings_project=self.project, cancel_check=self.cancel_check,
+                            question_callback=self.question_callback, private_workspace=self.changeset is not None)
         result = orch.answer(subquery, mode="medium", approve_edits=True)
         step.request_id = result.ledger_id
         if self.changeset:
             edits = {}
             for call in result.tool_calls or []:
                 summary = call.get("result_summary") or {}
-                if call.get("tool") == "edit_node" and summary.get("status") == "applied":
-                    edits[summary["path"]] = summary.get("content_hash")
+                if call.get("tool") in MUTATING_TOOLS and summary.get("status") == "applied":
+                    if summary.get("changes"):
+                        for change in summary["changes"]:
+                            edits[change["path"]] = change["after_hash"]
+                    else:
+                        edits[summary["path"]] = summary.get("content_hash")
             for path, expected_hash in edits.items():
                 self.changeset.track(path, expected_hash)
         self._verify_step(step, result)
@@ -308,9 +317,11 @@ class TaskRunner:
                 raise StepFailure(step.index, f"{call.get('tool')}: {summary.get('error') or summary['outcome']}")
             if summary.get("outcome") != "success":
                 raise StepFailure(step.index, f"{call.get('tool')}: missing successful tool outcome")
-            if call.get("tool") == "edit_node":
-                if summary.get("status") != "applied" or "syntax" not in summary.get("checks", []):
+            if call.get("tool") in MUTATING_TOOLS:
+                if summary.get("status") != "applied" or not summary.get("checks"):
                     raise StepFailure(step.index, "edit lacks applied status and syntax verification")
+                if call.get("tool") == "edit_node" and "syntax" not in summary.get("checks", []):
+                    raise StepFailure(step.index, "edit lacks syntax verification")
                 edits.append(summary)
                 last_edit = i
             if call.get("tool") == "run_command" and (
@@ -318,7 +329,7 @@ class TaskRunner:
             ):
                 raise StepFailure(step.index, f"command failed or missing exit_code: {summary.get('exit_code')}")
 
-        if (step.verify_with == "py_compile" or "edit_node" in step.tools_needed) and not edits:
+        if (step.verify_with == "py_compile" or MUTATING_TOOLS.intersection(step.tools_needed)) and not edits:
             raise StepFailure(step.index, "step requires a verified edit, but no edit was applied")
         if "run_command" in step.tools_needed and not any(call.get("tool") == "run_command" for call in calls):
             raise StepFailure(step.index, "step requires run_command, but no command was executed")
@@ -326,7 +337,8 @@ class TaskRunner:
             step.result_summary = "completed (verification not requested)"
             return
         if step.verify_with == "py_compile":
-            step.result_summary = "ok (syntax passed; tests " + (
+            syntax = "passed" if all("syntax" in edit.get("checks", []) for edit in edits) else "not run for all files"
+            step.result_summary = f"ok (file verification passed; syntax {syntax}; tests " + (
                 "passed)" if all("pytest" in edit.get("checks", []) for edit in edits) else "not run for all edits)"
             )
             return

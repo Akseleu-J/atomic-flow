@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import os
 import re
+import tempfile
 import threading
 import uuid
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, TypeVar
@@ -177,6 +179,9 @@ class _Run:
     def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str,
                  artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None, conversation=None):
         self.backend, self.registry, self.ledger, self.query, self.dir = backend, registry, ledger, query, artifact_dir
+        if backend.config.max_output_tokens is None:
+            self.backend = copy.copy(backend)
+            self.backend.config = backend.config.model_copy(update={"max_output_tokens": 4096})
         self.tool_registry = tool_registry
         self.tool_ctx = tool_ctx
         self.role_tools = role_tools or {}
@@ -188,6 +193,52 @@ class _Run:
         self.cost = 0.0
         self.cost_missing = False
         self.conversation = conversation or ConversationConfig()
+        self.journal = None
+        self.call_sequence = 0
+        self.result_temp = None
+        self.settings_project = registry.project
+        self.instructions_trusted = is_trusted(registry.project)
+        self.instruction_paths: set[str] = set()
+        self.context_reads: list[dict] = []
+
+    def system(self, base: str) -> str:
+        from atomic_flow.llm.instructions import load_instructions
+
+        bundle = load_instructions(self.settings_project, sorted(self.instruction_paths), self.instructions_trusted)
+        self.write_json("instructions.json", [asdict(source) for source in bundle.sources])
+        return base + ("\n\n" + bundle.text if bundle.text else "")
+
+    def event(self, kind: str, payload: dict, *, call_id=None, outcome=None):
+        if self.journal is not None:
+            # Dataclass contracts contain tuples; transport JSON gives the journal
+            # the same plain values as persisted request/tool artifacts.
+            plain = json.loads(json.dumps(payload, ensure_ascii=False, allow_nan=False))
+            self.journal.append(kind, plain, call_id=call_id, outcome=outcome)
+
+    def chat(self, messages: list[dict[str, str]], role: str) -> ChatResult:
+        self.call_sequence += 1
+        call_id = f"model_{self.call_sequence}"
+        self.event("model_request", {"role": role, "messages": messages}, call_id=call_id)
+        try:
+            response = self.backend.chat(messages, json_mode=True)
+        except Exception as exc:
+            self.event("model_failed", {"type": type(exc).__name__, "message": str(exc)},
+                       call_id=call_id, outcome="unknown")
+            raise
+        # Account before optional transcript I/O: a persistence error cannot erase spend.
+        self._account(response)
+        self.event("model_response", {"role": role, "content": response.content,
+                   "tokens_in": response.tokens_in, "tokens_out": response.tokens_out,
+                   "cost_usd": response.cost_usd}, call_id=call_id, outcome="success")
+        if self.tool_ctx is not None and role == "answerer":
+            for item in self.context_reads:
+                if item.get("source_complete") and item.get("content_hash") == self.tool_ctx.file_hashes.get(item["path"]):
+                    size = item["rendered_chars"]
+                    node = self.tool_ctx.nodes_by_id.get(item["node_id"])
+                    self.tool_ctx.record_read(item["path"], item["content_hash"], "materialized", 0, size, size,
+                                              node_id=node.node_id if node and node.kind != "file" else None,
+                                              source_complete=True)
+        return response
 
     def write(self, name: str, content: str) -> None:
         if self.dir:
@@ -212,19 +263,18 @@ class _Run:
         return self._invoke_with_tools(role, schema, data, context, allowed)
 
     def _invoke_single(self, role: str, schema: type[M], data: dict[str, Any], context: str | None = None) -> M:
-        system = self.registry.compose(role, schema.__name__)
+        system = self.system(self.registry.compose(role, schema.__name__))
         messages = [{"role": "system", "content": system},
                     {"role": "user", "content": render_user(self.query, role, data, context)}]
         step = len(self.roles)
         self.write(f"{step:02d}_{role}_prompt.txt", system + "\n\n" + messages[1]["content"])
-        history = RequestHistory(self.conversation)
+        history = RequestHistory(self.conversation, self.backend.config)
         for attempt in range(3):                                # two repair rounds for occasionally truncated JSON
             self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
             self.cancel_check()
             request = history.prepare(messages)
             self.write_json(f"{step:02d}_{role}_context.json", history.stats())
-            response = self.backend.chat(request, json_mode=True)
-            self._account(response)
+            response = self.chat(request, role)
             self.cancel_check()
             try:
                 parsed = parse_json(response.content, schema)
@@ -253,7 +303,8 @@ class _Run:
 
         base_system = self.registry.compose(role, schema.__name__)
         tools_block = render_tools_block(self.tool_registry, tool_names)
-        system = base_system + ("\n\n" + tools_block if tools_block else "")
+        system_base = base_system + ("\n\n" + tools_block if tools_block else "")
+        system = self.system(system_base)
         messages = [{"role": "system", "content": system},
                     {"role": "user", "content": render_user(self.query, role, data, context)}]
         step = len(self.roles)
@@ -263,14 +314,13 @@ class _Run:
             and self.intent.task_type in {"modify", "refactor"}
         )
 
-        history = RequestHistory(self.conversation)
+        history = RequestHistory(self.conversation, self.backend.config)
         for turn in range(TOOL_LOOP_MAX_TURNS + 1):
             self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
             self.cancel_check()
             request = history.prepare(messages)
             self.write_json(f"{step:02d}_{role}_context.json", history.stats())
-            response = self.backend.chat(request, json_mode=True)
-            self._account(response)
+            response = self.chat(request, role)
             self.cancel_check()
             try:
                 parsed_any: Any = json.loads(response.content)
@@ -278,22 +328,47 @@ class _Run:
                 parsed_any = None
 
             if looks_like_tool_call(parsed_any):
+                args = parsed_any.get("args", {})
+                self.instruction_paths.update(args[key] for key in ("path", "source", "destination")
+                                              if isinstance(args.get(key), str))
+                node_id = args.get("node_id")
+                if isinstance(node_id, str):
+                    node = self.tool_ctx.nodes_by_id.get(self.tool_ctx.alias_to_id.get(node_id, node_id))
+                    if node:
+                        self.instruction_paths.add(node.path)
+                scoped_system = self.system(system_base)
+                if scoped_system != messages[0]["content"]:
+                    messages[0] = {"role": "system", "content": scoped_system}
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({"role": "user", "content": "Additional scoped instructions are now loaded. "
+                                     "The previous tool call was not executed. Review the guidance and return the appropriate call."})
+                    continue
                 history.check_tool(parsed_any, self.tool_ctx.revision)
+                tool_id = f"tool_{len(self.tool_calls) + 1}"
+                self.event("tool_request", {"role": role, "call": parsed_any}, call_id=tool_id)
                 result, record = execute_tool(parsed_any, self.tool_registry, self.tool_ctx,
                                                allowed_tools=tool_names, role=role)
                 self.tool_calls.append(record)
+                from atomic_flow.agents.result import ToolResult
+                observed = result if len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= 32768 else ToolResult.from_payload(
+                    result, outcome=result.get("outcome")).summary()
+                self.event("tool_result", {"role": role, "call": record, "result": observed,
+                           "artifact": f"{step:02d}_{role}_tool_{turn}.json"}, call_id=tool_id, outcome=result.get("outcome"))
                 self.write_json(f"{step:02d}_{role}_tool_{turn}.json", {"call": record, "result": result})
                 messages.append({"role": "assistant", "content": response.content})
-                history.append_result(messages, result)
+                model_result = result
+                if parsed_any["tool"] not in {"read_node", "read_file", "read_result"} and len(
+                    json.dumps(result, ensure_ascii=False).encode("utf-8")) > 32768:
+                    model_result = self.tool_ctx.result_store.put(result)
+                history.append_result(messages, model_result)
                 continue
 
             if is_action and turn == 0 and role == "answerer":
                 messages.append({"role": "assistant", "content": response.content or "{}"})
                 messages.append({"role": "user", "content": (
                     "Rejected: this request asks to MODIFY code, but you returned prose instead of a tool call. "
-                    "You must return exactly one JSON object of the form "
-                    '{"tool": "edit_node", "args": {"node_id": "<id>", "new_source": "<full new body>"}}. '
-                    "If you need the full body first, call read_node with zoom=2. "
+                    "Return a validated call to an available editing tool, or read current source first. "
+                    'Use {"tool": "<available tool>", "args": {<validated arguments>}}. '
                     "Do NOT return the change as text."
                 )})
                 continue
@@ -331,11 +406,14 @@ class _Attempt:
 
 class Orchestrator:
     def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend,
-                 approval_callback=None, *, settings_project: str | Path | None = None, cancel_check=None):
+                 approval_callback=None, *, settings_project: str | Path | None = None, cancel_check=None,
+                 question_callback=None, private_workspace=False):
         self.config = config
         self.project = Path(project).expanduser().resolve()
         self.backend = backend
         self.approval_callback = approval_callback
+        self.question_callback = question_callback
+        self.private_workspace = private_workspace
         self.settings_project = Path(settings_project).resolve() if settings_project else self.project
         self.cancel_check = cancel_check or (lambda: None)
 
@@ -359,16 +437,25 @@ class Orchestrator:
         run.write_json("request.json", {"query": query, "project": str(self.project), "mode": mode,
                                         "created_at": datetime.now(UTC).isoformat()})
         try:
-            return self._answer(run, registry, req_id, query, retrieval_query or query, mode,
-                                budget_tokens or self.config.context_budget_tokens, file_scope, approve_edits)
+            if self.config.artifacts.save:
+                from atomic_flow.sessions import SessionJournal
+                run.journal = SessionJournal.create(self.project, req_id, metadata={"mode": mode})
+                run.event("user_input", {"text": query})
+            result = self._answer(run, registry, req_id, query, retrieval_query or query, mode,
+                                  budget_tokens or self.config.context_budget_tokens, file_scope, approve_edits)
+            run.event("completed", {"verdict": result.verdict}, outcome="success")
+            return result
         except Exception as exc:
             run.write_json("error.json", {"type": type(exc).__name__, "message": str(exc), "roles_done": run.roles})
+            run.event("failed", {"type": type(exc).__name__, "message": str(exc)}, outcome="error")
             raise
         finally:
             if not getattr(self.backend, "accounts_spend", False):
                 run.ledger.record(request_id=req_id, backend=self.backend.name, model=self.backend.config.model,
                                   mode=mode, tokens_in=run.tokens_in, tokens_out=run.tokens_out,
                                   cost_usd=run.cost if not run.cost_missing or run.cost else None)
+            if run.result_temp is not None:
+                run.result_temp.cleanup()
 
     # ------------------------------------------------------------------ pipeline
     def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str,
@@ -393,7 +480,8 @@ class Orchestrator:
 
         edits_enabled = approve_edits or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
         trusted = is_trusted(self.settings_project)
-        policy = PolicyEngine.load(self.settings_project) if trusted else PolicyEngine()
+        policy = PolicyEngine.load(self.settings_project, user_path=user_dir() / "policy.yaml",
+                                   project_trusted=trusted)
         run.tool_registry = default_registry()
         run.tool_ctx = ToolContext(project_root=self.project, nodes_by_id=by_id,
                        aliases=aliases.alias_of, alias_to_id=aliases.id_of, index=index,
@@ -401,11 +489,21 @@ class Orchestrator:
                        undo_stack=UndoStack(user_dir() / "edits"), policy=policy,
                        trusted=trusted, approval_callback=self.approval_callback,
                        tree_ignore=self.config.tree.ignore, respect_gitignore=self.config.tree.respect_gitignore,
-                       execution=self.config.execution, cancel_check=self.cancel_check)
+                       execution=self.config.execution, cancel_check=self.cancel_check,
+                       enforce_read_before_edit=True, question_callback=self.question_callback,
+                       journal_event=run.event, private_workspace=self.private_workspace)
+        from atomic_flow.agents.result_store import LargeResultStore
+        if run.dir is not None:
+            result_root = run.dir
+        else:
+            run.result_temp = tempfile.TemporaryDirectory(prefix="atomic-results-")
+            result_root = Path(run.result_temp.name)
+        run.tool_ctx.result_store = LargeResultStore(result_root)
         run.role_tools = ROLE_TOOLS
         run.cancel_check = self.cancel_check
         scope = scope_ids(nodes, file_scope) if file_scope else None
         search: SearchResult = index.search(rq, limit=80, scope=scope)
+        run.instruction_paths = {node.path for node, _ in search.ranked[:10]}
         intent = QueryIntent()
         run.intent = intent
         warnings: list[str] = []
@@ -480,6 +578,7 @@ class Orchestrator:
         for attempt in range(1, max_attempts + 1):
             attempts = attempt
             evidence_context = sync_context()
+            run.context_reads = meta
             valid = {m["node_id"] for m in meta} | set(run.tool_ctx.evidence)
             valid_aliases = sorted(aliases.alias_of[i] for i in valid)
             data = {"intent": intent.model_dump(), "retrieval_weak": search.weak, "ledger": ledger,

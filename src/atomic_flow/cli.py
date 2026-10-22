@@ -127,6 +127,15 @@ def _parser() -> argparse.ArgumentParser:
     rs.add_parser("show").add_argument("request_id")
     rs.add_parser("prune", help="Delete artifacts older than artifacts.keep_days")
 
+    session = cmd.add_parser("session", help="Inspect saved session events; never replay actions")
+    ss = session.add_subparsers(dest="session_action", required=True)
+    ss.add_parser("list")
+    ss.add_parser("show").add_argument("session_id")
+    export = ss.add_parser("export")
+    export.add_argument("session_id")
+    export.add_argument("destination", type=Path)
+    ss.add_parser("recover-tail", help="Explicitly discard only an interrupted final record").add_argument("session_id")
+
     kaggle = cmd.add_parser("kaggle", help="Manage Kaggle Model Proxy credentials and quota")
     ks = kaggle.add_subparsers(dest="kaggle_action", required=True)
     for name in ("init", "auth"):
@@ -219,12 +228,40 @@ def _make_approval_callback(auto_yes: bool):
                 print("    ...")
         elif tool == "run_command":
             print(f"  command: {args.get('command')}")
+        elif tool in {"patch_file", "create_file", "delete_file", "move_file"}:
+            print(f"  operation: {tool}; path: {args.get('path')}")
+            if "destination" in args:
+                print(f"  destination: {args['destination']}")
+            if "expected_hash" in args:
+                print(f"  expected current hash: {args['expected_hash']}")
+            for key in ("old_text", "new_text", "content"):
+                if key in args:
+                    from atomic_flow.activation.redact import redact
+                    preview = redact(str(args[key]))
+                    print(f"  {key} ({len(preview)} characters): {preview[:1500]}")
         try:
             answer = input("  Approve? [y/N]: ").strip().lower()
         except EOFError:
             return False
         return answer in {"y", "yes"}
     return ask
+
+
+def _ask_user_question(question: dict) -> str | None:
+    """A specification answer is always explicit; --yes cannot answer it."""
+    if not sys.stdin.isatty():
+        return None
+    print("\n" + question["question"], file=sys.stderr)
+    options = question.get("options") or []
+    for index, option in enumerate(options, 1):
+        print(f"  {index}. {option}", file=sys.stderr)
+    try:
+        answer = input("Answer (empty cancels): ").strip()
+    except (EOFError, KeyboardInterrupt):
+        return None
+    if answer.isdigit() and 1 <= int(answer) <= len(options):
+        return options[int(answer) - 1]
+    return answer or None
 
 
 def _edit_prompts(project: Path, mode: str) -> int:
@@ -379,7 +416,7 @@ def cmd_ask(args) -> int:
         args.yes or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
     )
     result = Orchestrator(config, project, make_backend(config, args.backend, args.model),
-                          approval_callback=approval_callback).answer(
+                          approval_callback=approval_callback, question_callback=_ask_user_question).answer(
         args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file,
         approve_edits=args.approve_edits)
     if args.json:
@@ -467,7 +504,7 @@ def cmd_task(args) -> int:
         config = load_config(task.project)
         backend = make_backend(config, args.backend, args.model)
         runner = TaskRunner(config, Path(task.project), backend,
-                           approval_callback=_make_approval_callback(args.yes))
+                           approval_callback=_make_approval_callback(args.yes), question_callback=_ask_user_question)
         task = runner.resume(task)
         _print_task(task)
         return 0 if task.status == "done" else 1
@@ -490,7 +527,7 @@ def cmd_task(args) -> int:
     backend = make_backend(config, args.backend, args.model)
 
     approval_cb = _make_approval_callback(args.yes)
-    runner = TaskRunner(config, project, backend, approval_callback=approval_cb)
+    runner = TaskRunner(config, project, backend, approval_callback=approval_cb, question_callback=_ask_user_question)
     print(f"planning: {args.query}")
     task = runner.prepare(args.query, candidates=candidates, n_files=tree.get("files", len(nodes)))
     if not task.plan_ready:
@@ -750,7 +787,27 @@ def cmd_benchmark(args) -> int:
     return 0
 
 
-HANDLERS = {"init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
+def cmd_session(args) -> int:
+    from dataclasses import asdict
+
+    from atomic_flow.sessions import SessionJournal, list_sessions
+
+    if args.session_action == "list":
+        data = list_sessions()
+    else:
+        journal = SessionJournal.open(args.session_id)
+        if args.session_action == "export":
+            print(journal.export(args.destination))
+            return 0
+        if args.session_action == "recover-tail":
+            journal.recover_tail()
+        snapshot = journal.read()
+        data = {**asdict(snapshot), "pending_call_ids": snapshot.pending_call_ids}
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+    return 0
+
+
+HANDLERS = {"session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
             "benchmark": cmd_benchmark}
 

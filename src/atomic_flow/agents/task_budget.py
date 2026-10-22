@@ -10,6 +10,7 @@ import math
 import time
 import uuid
 from collections.abc import Callable
+from pathlib import Path
 
 from atomic_flow.agents.task import Task, save
 from atomic_flow.budget import SpendLedger
@@ -46,11 +47,30 @@ class TaskBudgetBackend:
             self.backend.config = self.config
         self.name = getattr(backend, "name", "unconfigured")
         self.ledger = SpendLedger(config.budget.daily_limit_usd)
+        self.journal = None
+        if config.artifacts.save:
+            from atomic_flow.sessions import SessionJournal
+            try:
+                self.journal = SessionJournal.create(Path(task.project), task.id, metadata={"kind": "task"})
+            except FileExistsError:
+                self.journal = SessionJournal.open(task.id)
+            snapshot = self.journal.read()
+            inputs = [event for event in snapshot.events if event["event_type"] == "user_input"]
+            if not inputs:
+                if any(event["event_type"] in {"model_request", "tool_request"} for event in snapshot.events):
+                    raise BudgetExceeded("task session has calls without saved input; inspect state before continuing")
+                self.journal.append("user_input", {"text": task.query})
+            else:
+                from atomic_flow.activation.redact import redact
+                if any(event["payload"].get("text") != redact(task.query) for event in inputs):
+                    raise BudgetExceeded("task session input does not match the saved task")
 
     def chat(self, messages, *, json_mode=False, model=None):
         self.cancel_check()
         if self.backend is None:
             raise BackendError("No model backend configured")
+        from atomic_flow.llm.request_budget import admit_request
+        admit_request(messages, self.config, self.settings.conversation)
         check_accounting(self.task)
         if sum(not event.get("not_sent") for event in self.task.budget_events) >= self.settings.task.max_model_calls:
             raise BudgetExceeded("task model-call limit reached")
@@ -93,6 +113,14 @@ class TaskBudgetBackend:
             self.ledger.record(task_id=self.task.id, call_id=event["id"], cost_usd=0.0, status="not_sent")
             raise
         try:
+            if self.journal:
+                self.journal.append("model_request", {"phase": self.phase, "messages": messages}, call_id=event["id"])
+        except Exception:
+            event.update(status="completed", cost_usd=0.0, not_sent=True)
+            save(self.task)
+            self.ledger.record(task_id=self.task.id, call_id=event["id"], cost_usd=0.0, status="not_sent")
+            raise
+        try:
             response = self.backend.chat(messages, json_mode=json_mode, model=model)
         except Exception as exc:
             event["status"] = "unknown"
@@ -100,6 +128,9 @@ class TaskBudgetBackend:
             save(self.task)
             self.ledger.record(task_id=self.task.id, call_id=event["id"], backend=self.name,
                                model=self.config.model, cost_usd=None, reserved_usd=reservation, status="unknown")
+            if self.journal:
+                self.journal.append("model_failed", {"phase": self.phase, "error_type": type(exc).__name__},
+                                    call_id=event["id"], outcome="unknown")
             raise BudgetExceeded("model request failed; charge is unknown, automatic retries are blocked") from exc
         cost = response.cost_usd
         if cost is None and known_prices and prices == (0, 0):
@@ -110,6 +141,9 @@ class TaskBudgetBackend:
             save(self.task)
             self.ledger.record(task_id=self.task.id, call_id=event["id"], backend=self.name,
                                model=self.config.model, cost_usd=None, reserved_usd=reservation, status="unknown")
+            if self.journal:
+                self.journal.append("model_response", {"phase": self.phase, "content": response.content},
+                                    call_id=event["id"], outcome="unknown")
             raise BudgetExceeded("model response has no valid cost; review usage before continuing")
         event.update(status="completed", cost_usd=cost, tokens_in=response.tokens_in,
                      tokens_out=response.tokens_out, finished_at=time.time())
@@ -117,6 +151,10 @@ class TaskBudgetBackend:
         save(self.task)  # includes costs even if parsing/verification/cancellation later fails
         self.ledger.record(task_id=self.task.id, call_id=event["id"], backend=self.name, model=self.config.model,
                            cost_usd=cost, tokens_in=response.tokens_in, tokens_out=response.tokens_out, status="completed")
+        if self.journal:
+            self.journal.append("model_response", {"phase": self.phase, "content": response.content,
+                                "cost_usd": cost, "tokens_in": response.tokens_in, "tokens_out": response.tokens_out},
+                                call_id=event["id"], outcome="success")
         self.cancel_check()
         if enforce and (self.task.budget_spent > self.settings.task.max_budget_usd or cost > reservation):
             raise BudgetExceeded("reported model cost exceeded its reservation; task paused before further calls/publication")

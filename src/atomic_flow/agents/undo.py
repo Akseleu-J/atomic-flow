@@ -68,6 +68,8 @@ class UndoStack:
             return None
 
     def undo(self, project_root: Path, edit_id: str = "last") -> EditRecord | None:
+        if edit_id.startswith("fileedit_"):
+            return self._undo_files(project_root, edit_id)
         if edit_id != "last" and not re.fullmatch(r"edit_[a-f0-9]{12}", edit_id):
             return None
         root = str(project_root.resolve())
@@ -76,6 +78,18 @@ class UndoStack:
         ) if path.is_dir()]
         records = [record for record in candidates if record is not None and record.project == root]
         record = max(records, key=lambda item: item.timestamp, default=None)
+        if edit_id == "last":
+            file_records = []
+            for folder in self.storage_dir.glob("fileedit_*"):
+                try:
+                    data = json.loads((folder / "file-transaction.json").read_text(encoding="utf-8"))
+                    if data["project"] == root and data["status"] == "applied":
+                        file_records.append((float(data["timestamp"]), folder.name))
+                except (OSError, ValueError, KeyError, TypeError):
+                    continue
+            latest = max(file_records, default=None)
+            if latest and (record is None or latest[0] > record.timestamp):
+                return self._undo_files(project_root, latest[1])
         if record is None:
             return None
         try:
@@ -85,6 +99,18 @@ class UndoStack:
         self._write_meta(record, undone=True)
         self._memory = [item for item in self._memory if item.edit_id != record.edit_id]
         return record
+
+    def _undo_files(self, project_root: Path, edit_id: str) -> EditRecord | None:
+        from atomic_flow.agents.file_transaction import undo
+
+        state = undo(self.storage_dir, project_root, edit_id, interrupted=True)
+        if state is None:
+            return None
+        paths = list(state["changes"])
+        first = state["changes"][paths[0]]
+        return EditRecord(edit_id, ", ".join(paths), "", "", "", state["timestamp"],
+                          self.storage_dir / edit_id, str(project_root.resolve()),
+                          first["before"] or "", first["after"] or "")
 
     def list(self) -> list[EditRecord]:
         return list(self._memory)

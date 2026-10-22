@@ -1,14 +1,32 @@
 """Planner: break a task into concrete, verifiable steps."""
 from __future__ import annotations
 
+import copy
 from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 from atomic_flow.backends.base import LLMBackend
+from atomic_flow.config import BackendConfig, is_trusted
+from atomic_flow.llm.instructions import load_instructions
 from atomic_flow.llm.orchestrator import parse_json
+from atomic_flow.llm.request_budget import admit_request
 from atomic_flow.llm.schemas import StrictModel
+
+
+def _chat(backend, messages):
+    if not hasattr(backend, "config"):
+        config = BackendConfig(model=getattr(backend, "name", "unknown"))
+    elif backend.config.max_output_tokens is None:
+        backend = copy.copy(backend)
+        backend.config = backend.config.model_copy(update={"max_output_tokens": 4096})
+        config = backend.config
+    else:
+        config = backend.config
+    settings = getattr(backend, "settings", None)
+    admit_request(messages, config, settings.conversation if settings else None)
+    return backend.chat(messages, json_mode=True)
 
 
 VerifyMethod = Literal["py_compile", "pytest", "none"]
@@ -87,9 +105,12 @@ def plan_task(
         {"role": "system", "content": "Reply with ONE JSON object. No prose."},
         {"role": "user", "content": prompt},
     ]
+    guidance = load_instructions(project_root, (c.split("::")[0] for c in candidates[:30]), is_trusted(project_root))
+    if guidance.text:
+        messages[0]["content"] += "\n\n" + guidance.text
     last_error: Exception | None = None
-    for attempt in range(2):
-        response = backend.chat(messages, json_mode=True)
+    for _attempt in range(2):
+        response = _chat(backend, messages)
         try:
             return parse_json(response.content, Plan)
         except Exception as exc:
@@ -139,6 +160,7 @@ def replan_task(
     remaining: list[str],
     project_root: Path,
     backend: LLMBackend,
+    settings_project: Path | None = None,
 ) -> Plan:
     prompt = REPLAN_PROMPT.format(
         query=query,
@@ -152,9 +174,13 @@ def replan_task(
         {"role": "system", "content": "Reply with ONE JSON object. No prose."},
         {"role": "user", "content": prompt},
     ]
+    instruction_root = settings_project or project_root
+    guidance = load_instructions(instruction_root, trusted=is_trusted(instruction_root))
+    if guidance.text:
+        messages[0]["content"] += "\n\n" + guidance.text
     last_error: Exception | None = None
-    for attempt in range(2):
-        response = backend.chat(messages, json_mode=True)
+    for _attempt in range(2):
+        response = _chat(backend, messages)
         try:
             return parse_json(response.content, Plan)
         except Exception as exc:
