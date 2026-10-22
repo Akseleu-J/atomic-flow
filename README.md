@@ -83,3 +83,9 @@ leave the prompt with explicit provenance/proof placeholders; original instructi
 results remain intact. If these cannot fit, no model request is sent. Repeated identical tool
 requests without a source revision change stop before another tool execution. See
 [history limits and architecture review](docs/ARCHITECTURE_REFERENCE_REVIEW.md).
+
+The selected twelve improvements add full-request admission, scoped project instructions,
+actual read coverage, bounded text search, hash-bound file operations, layered tool policies,
+explicit user questions, stored result pages and versioned session/task observations.
+Use `atomic session list|show|export|recover-tail` to inspect journals without replaying actions.
+See [package 7](docs/IMPLEMENTATION_STEP_7.md) for usage, validation and limits.

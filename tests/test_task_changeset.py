@@ -20,8 +20,10 @@ def test_multistep_task_publishes_all_or_none(tmp_path, second_ok):
     backend = ScriptedBackend({
         "parser": {"task_type": "modify", "focus_terms": ["return"]},
         "answerer": [
+            {"tool": "read_node", "args": {"node_id": "a.py::a", "zoom": 2}},
             {"tool": "edit_node", "args": {"node_id": "a.py::a", "new_source": "def a():\n    return 2"}},
             {"text": "First change ready."},
+            {"tool": "read_node", "args": {"node_id": "b.py::b", "zoom": 2}},
             {"tool": "edit_node", "args": {"node_id": "b.py::b", "new_source": "def b():\n    return 2" if second_ok else "def b(:"}},
             {"text": "Second change ready."},
         ],

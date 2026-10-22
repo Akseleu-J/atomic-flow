@@ -50,6 +50,11 @@ class BackendConfig(BaseModel):
     max_retries: int = Field(default=2, ge=0, le=5)
     temperature: float | None = Field(default=0.1, ge=0, le=2)   # null -> omit (some reasoning models reject it)
     max_output_tokens: int | None = Field(default=None, ge=16, le=200_000)
+    # Explicit per-model limits: no guessed provider catalogue or tokenizer download.
+    context_window_tokens: int | None = Field(default=None, ge=128, le=10_000_000)
+    max_input_tokens: int | None = Field(default=None, ge=1, le=10_000_000)
+    request_framing_tokens: int = Field(default=32, ge=0, le=100_000)
+    message_framing_tokens: int = Field(default=8, ge=0, le=10_000)
     price_in_per_mtok: float | None = Field(default=None, ge=0)  # lets budget enforcement work without provider cost
     price_out_per_mtok: float | None = Field(default=None, ge=0)
 

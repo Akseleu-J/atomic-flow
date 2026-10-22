@@ -50,6 +50,7 @@ class EditNodeTool(Tool):
 
         try:
             original = ctx.read_source(node.path)
+            ctx.require_read(node.path, ctx.file_hashes[node.path], node.node_id)
             text = original.decode("utf-8-sig")
         except (OSError, UnicodeError) as exc:
             return {"error": f"cannot read {node.path}: {exc}"}

@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from atomic_flow.activation.redact import redact
 from atomic_flow.agents.base import Tool
 from atomic_flow.agents.context import ToolContext
+from atomic_flow.agents.tools.file_paths import admitted_path
 from atomic_flow.tree.node import TreeNode
 
 
@@ -40,13 +41,22 @@ class ReadNodeTool(Tool):
                     "hint": "use search_tree to find valid ids"}
 
         try:
+            ctx.cancel_check()
+            admitted_path(ctx, node.path, existing=True)
             text = ctx.read_source(node.path).decode("utf-8-sig")
         except (OSError, UnicodeError) as exc:
             return {"error": f"cannot read {node.path}: {exc}"}
         lines = _split_lines(redact(text))
         source = self._render(node, lines, args.zoom, ctx)
-        page = source[args.offset:args.offset + args.limit]
-        next_offset = args.offset + len(page) if args.offset + len(page) < len(source) else None
+        offset = min(args.offset, len(source))
+        page = source[offset:offset + args.limit]
+        next_offset = offset + len(page) if offset + len(page) < len(source) else None
+        ctx.cancel_check()
+        source_complete = args.zoom >= 2
+        coverage = ctx.record_read(node.path, ctx.file_hashes[node.path], f"node_zoom_{args.zoom}",
+                                   offset, offset + len(page), len(source),
+                                   node_id=None if node.kind == "file" else node.node_id,
+                                   source_complete=source_complete)
         ctx.evidence[node.node_id] = (ctx.evidence.get(node.node_id, "") + "\n" + page).strip()
         return {
             "node_id": ctx.aliases.get(node.node_id, node.node_id),
@@ -56,14 +66,17 @@ class ReadNodeTool(Tool):
             "lines": f"{node.start_line}-{node.end_line}",
             "zoom": args.zoom,
             "source": page,
-            "offset": args.offset, "next_offset": next_offset, "truncated": next_offset is not None,
+            "offset": offset, "next_offset": next_offset, "truncated": next_offset is not None,
             "content_hash": ctx.file_hashes[node.path],
+            "source_complete": source_complete, "read_complete": coverage["read_complete"] and source_complete,
+            "rendered_complete": coverage["read_complete"], "total_chars": len(source),
+            "representation": "redacted",
         }
 
     @staticmethod
     def _render(node: TreeNode, lines: list[str], zoom: int, ctx: ToolContext) -> str:
         if node.kind == "file":
-            limit = {0: 5, 1: 20, 2: 60, 3: 200}.get(zoom, 60)
+            limit = {0: 5, 1: 20}.get(zoom, len(lines))
             body = lines[:limit]
             head = f"# {node.path} (showing {len(body)} of {len(lines)} lines)\n"
             return head + "\n".join(body)

@@ -33,6 +33,52 @@ class ToolContext:
     respect_gitignore: bool = True
     execution: ExecutionConfig = field(default_factory=ExecutionConfig)
     cancel_check: Callable[[], None] = field(default=lambda: None)
+    enforce_read_before_edit: bool = False
+    reads: list[dict[str, Any]] = field(default_factory=list)
+    question_callback: Callable[[dict[str, Any]], str | None] | None = None
+    journal_event: Callable[..., Any] | None = None
+    result_store: Any = None
+    private_workspace: bool = False
+
+    def record_read(self, path: str, content_hash: str, view: str, offset: int, end: int,
+                    total: int, node_id: str | None = None, source_complete: bool = False) -> dict[str, Any]:
+        """Record only the redacted characters actually returned by a source tool.
+
+        A complete rendering and a complete read are different: a signature can
+        be fully returned without revealing the definition's body.
+        """
+        if not 0 <= offset <= end <= total:
+            raise ValueError("invalid rendered read range")
+        key = (path, content_hash, view, node_id)
+        item = next((r for r in self.reads if (r["path"], r["content_hash"], r["view"], r["node_id"]) == key), None)
+        if item is None:
+            item = {"path": path, "content_hash": content_hash, "view": view, "node_id": node_id,
+                    "total": total, "ranges": [], "source_complete": source_complete,
+                    "representation": "redacted"}
+            self.reads.append(item)
+        if item["total"] != total or item["source_complete"] != source_complete:
+            raise ValueError("rendered source changed within one indexed revision")
+        ranges = sorted([*item["ranges"], [offset, end]])
+        merged: list[list[int]] = []
+        for start, stop in ranges:
+            if merged and start <= merged[-1][1]:
+                merged[-1][1] = max(merged[-1][1], stop)
+            else:
+                merged.append([start, stop])
+        item["ranges"] = merged
+        item["read_complete"] = total == 0 or merged == [[0, total]]
+        return {**item, "ranges": [r[:] for r in merged]}
+
+    def read_coverage(self, path: str, content_hash: str, node_id: str | None = None) -> dict[str, Any]:
+        matching = [r for r in self.reads if r["path"] == path and r["content_hash"] == content_hash
+                    and (r["node_id"] is None or r["node_id"] == node_id)]
+        return {"path": path, "content_hash": content_hash, "node_id": node_id,
+                "read_complete": any(r["read_complete"] and r["source_complete"] for r in matching),
+                "views": [{**r, "ranges": [span[:] for span in r["ranges"]]} for r in matching]}
+
+    def require_read(self, path: str, content_hash: str, node_id: str | None = None) -> None:
+        if self.enforce_read_before_edit and not self.read_coverage(path, content_hash, node_id)["read_complete"]:
+            raise OSError("read the complete current source before editing; follow read_file/read_node next_offset")
 
     def __post_init__(self):
         from atomic_flow.agents.source import confined_path, digest
@@ -68,6 +114,8 @@ class ToolContext:
                 next_alias += 1
         old_hashes = self.file_hashes.copy()
         self.file_hashes = {n.path: n.content_hash for n in fresh.values() if n.kind == "file"}
+        self.reads = [r for r in self.reads if self.file_hashes.get(r["path"]) == r["content_hash"]
+                      and (r["node_id"] is None or r["node_id"] in fresh)]
         self.evidence = {nid: text for nid, text in self.evidence.items() if nid in fresh
                          and old_hashes.get(fresh[nid].path) == self.file_hashes.get(fresh[nid].path)}
         self.nodes_by_id.clear()
