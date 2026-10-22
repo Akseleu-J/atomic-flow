@@ -35,6 +35,11 @@ python tools/evaluate_tasks.py --output colab-results/task-calibration.json
 
 Docker CI получает полную историю checkout и выполняет эту команду после сборки
 `atomic-flow-checks:local`; JSON включён в validation artifact.
+На runtime-коммите `1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7` Docker calibration
+**PASS: base 6 FAIL / gold 6 PASS**. [Push CI 39727907865](https://github.com/Akseleu-J/atomic-flow/actions/runs/39727907865)
+и [PR CI 39727911516](https://github.com/Akseleu-J/atomic-flow/actions/runs/39727911516)
+успешны: Python 3.11/3.12; Docker job **292 CPU + 17 extra + 6 real Docker passed**.
+Скачанный artifact: `validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/`.
 Grader хранится вне workspace и передаётся процессу как доверенный Python-код.
 Это регрессионные проверки поведения, а не защищённый от злонамеренного кандидата grading service.
 Проверки patch/ask_user покрывают заявленные в grader happy/error paths; остальные
