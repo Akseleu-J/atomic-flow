@@ -11,10 +11,19 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 
 ## Локальные исправления поверх HEAD — актуальный статус
 
+22 октября: пакет 10 — lazy tool catalog/host factories, data-only provenance,
+revision-bound diagnostics и final host completion gate перед публикацией Task.
+`IMPLEMENTATION_STEP_10.md`; Windows **363 passed, 13 skipped**, Ruff/compileall PASS.
+Каталог: **29 scoped / 33 planned**, `CANDIDATE_STATUS.json`. User-approved scope
+остаётся весь оставшийся каталог, но planned пункты не объявляются реализованными.
+Платные model calls не использованы; это scripted/CPU проверки, не task quality.
+
 22 октября: пакет 9 — native function transport для opt-in OpenAI-compatible
 backend, один call/ответ, IDs и host-owned pairing, общий dispatcher и budgets;
 Kaggle сохраняет text-JSON. `IMPLEMENTATION_STEP_9.md`. Windows **344 passed,
 13 skipped**, Ruff/compileall PASS. Только scripted HTTP, не live paid models.
+CI `9272c1d`: push `39789172874` / PR `39789178362` PASS; Docker 334 CPU + 17 extra
++ 6 real Docker, calibration PASS. Evidence `validation/ci-step9-20261022/`.
 
 22 октября: пакет 8 реализован, `IMPLEMENTATION_STEP_8.md`: find_files, line-range read,
 parallel reads opt-in, policy explain/lint, effective config origins, expanded offline doctor,

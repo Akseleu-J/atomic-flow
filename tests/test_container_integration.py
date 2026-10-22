@@ -51,6 +51,7 @@ def test_task_container_verification_controls_publication(tmp_path, expected):
     assert f"return {expected}" in (project / "sample.py").read_text()
     if expected == 2:
         assert "pytest auto-run" in task.steps[0].result_summary
+        assert task.completion_report["ready_to_publish"] and task.completion_report["tests"] == "passed"
     else:
         assert "rolled back" in task.error
 

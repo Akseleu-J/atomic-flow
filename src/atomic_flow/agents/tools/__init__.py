@@ -13,13 +13,14 @@ from atomic_flow.agents.tools.read_result import ReadResultTool
 from atomic_flow.agents.tools.run_command import RunCommandTool
 from atomic_flow.agents.tools.search_text import SearchTextTool
 from atomic_flow.agents.tools.search_tree import SearchTreeTool
+from atomic_flow.agents.tools.tool_catalog import ToolCatalogTool
 
 
 def default_registry(*, enable_parallel_reads: bool = False) -> ToolRegistry:
 	registry = ToolRegistry()
 	for tool in (ReadNodeTool(), FindCallersTool(), SearchTreeTool(), EditNodeTool(), RunCommandTool(),
                  SearchTextTool(), ReadFileTool(), PatchFileTool(), CreateFileTool(), DeleteFileTool(), MoveFileTool(),
-                 AskUserTool(), ReadResultTool(), FindFilesTool()):
+                 AskUserTool(), ReadResultTool(), FindFilesTool(), ToolCatalogTool()):
 		registry.register(tool)
 	if enable_parallel_reads:
 		from atomic_flow.agents.tools.read_many import ReadManyTool
@@ -43,3 +44,4 @@ for _role in ("refiner", "critic", "expander"):
 for _role in ("refiner", "answerer", "critic", "expander"):
     ROLE_TOOLS[_role].append("find_files")
     ROLE_TOOLS[_role].append("read_many")
+    ROLE_TOOLS[_role].append("tool_catalog")

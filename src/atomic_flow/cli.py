@@ -568,6 +568,14 @@ def _print_task(task, verbose: bool = False) -> None:
     print(f"query:  {task.query}")
     print(f"status: {task.status}")
     print(f"budget: ${task.budget_spent:.4f}")
+    if getattr(task, "completion_report", None):
+        report = task.completion_report
+        print(f"final host gate: {'passed' if report.get('ready_to_publish') else 'not passed'}; tests={report.get('tests', 'unknown')}")
+        if verbose:
+            for check in report.get("checks", []):
+                print(f"  {check.get('name')}: {check.get('status')}")
+            for diagnostic in report.get("diagnostics", [])[:20]:
+                print(f"  {diagnostic.get('path')}:{diagnostic.get('line')}:{diagnostic.get('column')}: {diagnostic.get('message')}")
     if task.budget_events:
         unresolved = [event for event in task.budget_events if event.get("status") != "completed"]
         calls = sum(not event.get("not_sent") for event in task.budget_events)

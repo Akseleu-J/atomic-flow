@@ -64,6 +64,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
     edit_id, state = file_transaction.begin(storage, ctx.project_root, before, after)
     checks = ["filesystem"]
     verification = {"filesystem": "not_run", "syntax": "not_run", "pytest": "not_run"}
+    diagnostics = []
     try:
         file_transaction.apply(storage, ctx.project_root, edit_id, state, after, ctx.cancel_check, after_modes)
         verification["filesystem"] = "passed"
@@ -74,6 +75,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
             if data is None:
                 continue
             verdict = verify_edit(ctx.project_root, path, execution=ctx.execution, cancel_check=ctx.cancel_check)
+            diagnostics.extend(verdict.diagnostics)
             for check in verdict.checks:
                 if check != "skip":
                     if check not in checks:
@@ -118,12 +120,12 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
             raise
         return {"status": "rolled_back" if restored else "rollback_failed", "reason": str(exc),
                 "edit_id": edit_id, "checks": checks, "verification": verification,
-                "index_refresh_error": refresh_error}
+                "index_refresh_error": refresh_error, "diagnostics": diagnostics}
     changes = [{"path": path, "before_hash": hashes["before"], "after_hash": hashes["after"]}
                for path, hashes in state["changes"].items()]
     return {"status": "applied", "edit_id": edit_id, "path": next(iter(after)), "paths": list(after),
             "changes": changes, "content_hash": changes[0]["after_hash"], "checks": checks,
-            "verification": verification, "index_revision": ctx.revision,
+            "verification": verification, "index_revision": ctx.revision, "diagnostics": diagnostics,
             "undo_hint": f"atomic undo {edit_id}"}
 
 

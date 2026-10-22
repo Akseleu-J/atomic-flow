@@ -44,6 +44,8 @@ def test_task_list_sorted(isolated_home, tmp_path):
 
 def test_task_runner_marks_done(monkeypatch, isolated_home, tmp_path):
     from atomic_flow.agents import task_loop
+    # The final host gate independently reruns declared task checks.
+    (tmp_path / "test_completion.py").write_text("def test_final_state():\n    assert True\n")
 
     class R:
         def __init__(self, calls):

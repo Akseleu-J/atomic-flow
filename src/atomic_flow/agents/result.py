@@ -57,6 +57,7 @@ class ToolResult:
             "status", "error", "exit_code", "command", "reason", "node_id", "path", "symbol", "checks", "edit_id",
             "content_hash", "index_revision", "changes", "paths", "result_id", "next_offset",
             "read_complete", "source_complete", "instruction_sources",
+            "provenance",
         ) if key in self.payload}
         if isinstance(self.payload.get("counts"), dict):
             out["counts"] = self.payload["counts"]

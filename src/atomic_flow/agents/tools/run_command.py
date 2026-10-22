@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from atomic_flow.agents.base import Tool
 from atomic_flow.agents.context import ToolContext
+from atomic_flow.agents.diagnostics import quality_diagnostics
 from atomic_flow.agents.execution import run_python
 
 ALLOWED = {
@@ -44,4 +45,5 @@ class RunCommandTool(Tool):
         if result.timed_out:
             return {"command": args.command, "error": "command timed out after 120 seconds"}
         return {"command": args.command, "exit_code": result.returncode,
-                "stdout": result.stdout[-4000:], "stderr": result.stderr[-2000:]}
+                "stdout": result.stdout[-4000:], "stderr": result.stderr[-2000:], "index_revision": ctx.revision,
+                **quality_diagnostics(args.command, result.stdout + "\n" + result.stderr, ctx.project_root, dict(ctx.file_hashes))}

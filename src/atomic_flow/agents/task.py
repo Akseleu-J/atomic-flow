@@ -56,6 +56,7 @@ class Task:
     plan_ready: bool = True
     budget_events: list[dict] = field(default_factory=list)
     schema_version: int = TASK_SCHEMA_VERSION
+    completion_report: dict = field(default_factory=dict)
 
     @classmethod
     def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> Task:
@@ -136,6 +137,8 @@ def _decode(raw: object, task_id: str) -> Task:
     if "budget_events" in data and (not isinstance(data["budget_events"], list)
                                      or any(not isinstance(e, dict) for e in data["budget_events"])):
         raise StateError("invalid task state: budget_events must be a list of objects")
+    if "completion_report" in data and not isinstance(data["completion_report"], dict):
+        raise StateError("invalid task state: completion_report must be an object")
     raw_steps = data.pop("steps", [])
     if not isinstance(raw_steps, list):
         raise StateError("invalid task state: steps must be a list")

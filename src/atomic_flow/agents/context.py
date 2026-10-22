@@ -41,6 +41,7 @@ class ToolContext:
     private_workspace: bool = False
     active_allowed_tools: tuple[str, ...] = ()
     active_role: str = ""
+    active_registry: Any = None
 
     def record_read(self, path: str, content_hash: str, view: str, offset: int, end: int,
                     total: int, node_id: str | None = None, source_complete: bool = False) -> dict[str, Any]:
