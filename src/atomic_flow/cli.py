@@ -101,12 +101,24 @@ def _parser() -> argparse.ArgumentParser:
     doctor = cmd.add_parser("doctor", help="Check local configuration and project readiness")
     doctor.add_argument("--project", default=".")
     doctor.add_argument("--check-backend", action="store_true", help="Send a small live request to the configured model")
+    doctor.add_argument("--json", action="store_true", help="Offline readiness report only; cannot combine with --check-backend")
+
+    policy = cmd.add_parser("policy", help="Offline permission explanation and conservative rule lint")
+    ps = policy.add_subparsers(dest="policy_action", required=True)
+    lint = ps.add_parser("lint")
+    lint.add_argument("--project", default=".")
+    pe = ps.add_parser("explain")
+    pe.add_argument("tool")
+    pe.add_argument("--args", default="{}", dest="tool_args")
+    pe.add_argument("--project", default=".")
 
     config = cmd.add_parser("config", help="Read or update configuration")
     cs = config.add_subparsers(dest="config_action", required=True)
     get = cs.add_parser("get")
     get.add_argument("key", nargs="?")
     get.add_argument("--project", default=None, help="Project directory (merged view)")
+    ce = cs.add_parser("explain", help="Effective masked values, origins and untrusted settings ignored")
+    ce.add_argument("--project", default=".")
     setter = cs.add_parser("set")
     setter.add_argument("key")
     setter.add_argument("value")
@@ -591,6 +603,16 @@ def cmd_undo(args) -> int:
 
 def cmd_doctor(args) -> int:
     config = load_config(args.project)
+    from atomic_flow.diagnostics import offline_diagnostics
+
+    readiness = offline_diagnostics(Path(args.project), config)
+    if getattr(args, "json", False):
+        if args.check_backend:
+            raise ValueError("--json is offline; use --check-backend separately")
+        print(json.dumps(readiness, ensure_ascii=False, indent=2))
+        return 0 if readiness["healthy"] else 1
+    for check in readiness["checks"]:
+        print(f"{check['check']}: {check['status']}")
     print(f"Python: {sys.version.split()[0]} ({'OK' if sys.version_info >= (3, 11) else 'requires 3.11+'})")
     try:
         tree = load_tree(args.project)
@@ -628,7 +650,10 @@ def cmd_doctor(args) -> int:
 
 
 def cmd_config(args) -> int:
-    if args.config_action == "validate":
+    if args.config_action == "explain":
+        from atomic_flow.config import explain_config
+        print(json.dumps(explain_config(args.project), ensure_ascii=False, indent=2))
+    elif args.config_action == "validate":
         config = load_config()
         print(f"Configuration valid; mode={config.mode}; backends={', '.join(config.backends)}")
     elif args.config_action == "get":
@@ -649,6 +674,26 @@ def cmd_config(args) -> int:
             write_config(target, AtomicConfig().model_dump(mode="json"), merge=False)
         subprocess.run([*_editor(), str(target)], check=False)
         load_config()                                                      # surface mistakes immediately
+    return 0
+
+
+def cmd_policy(args) -> int:
+    from atomic_flow.agents.policy import PolicyEngine
+
+    root = Path(args.project).expanduser().resolve()
+    trusted = is_trusted(root)
+    engine = PolicyEngine.load(root, user_path=user_dir() / "policy.yaml", project_trusted=trusted)
+    if args.policy_action == "lint":
+        output = {"findings": engine.lint(), "project_policy_loaded": trusted,
+                  "limits": "Only identical predicates; no proof of regex/glob overlap or completeness."}
+    else:
+        if len(args.tool_args.encode("utf-8")) > 32768:
+            raise ValueError("--args exceeds 32 KiB")
+        tool_args = json.loads(args.tool_args)
+        if not isinstance(tool_args, dict):
+            raise ValueError("--args must be a JSON object")
+        output = engine.explain(args.tool, tool_args, project_trusted=trusted)
+    print(json.dumps(output, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -807,7 +852,7 @@ def cmd_session(args) -> int:
     return 0
 
 
-HANDLERS = {"session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
+HANDLERS = {"policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
             "benchmark": cmd_benchmark}
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from atomic_flow.backends.base import ChatResult, estimate_cost
+from atomic_flow.backends.base import ChatResult, estimate_cost, optional_token_count
 from atomic_flow.backends.http import HTTPStatusError, post_json
 from atomic_flow.config import BackendConfig
 from atomic_flow.errors import BackendError
@@ -57,20 +57,22 @@ class OpenAICompatibleBackend:
             tokens_in = int(usage.get("prompt_tokens", usage.get("input_tokens", 0)))
             tokens_out = int(usage.get("completion_tokens", usage.get("output_tokens", 0)))
             cost_block = usage.get("cost") or {}
-            nano = float(cost_block.get("input_tokens_cost_nanodollars") or 0)
-            nano += float(cost_block.get("output_tokens_cost_nanodollars") or 0)
-            nano += float(usage.get("input_tokens_cost_nanodollars") or 0)
-            nano += float(usage.get("output_tokens_cost_nanodollars") or 0)
+            # Some proxies duplicate these fields at both levels. Nested values win.
+            nano = sum(float(cost_block.get(k, usage.get(k)) or 0) for k in (
+                "input_tokens_cost_nanodollars", "output_tokens_cost_nanodollars"))
             cost = usage.get("cost_usd", usage.get("total_cost_usd"))
             if cost is None and nano:
                 cost = nano / 1_000_000_000
+            reported_cost = cost is not None
             has_usage = (any(k in usage for k in ("prompt_tokens", "input_tokens"))
                          and any(k in usage for k in ("completion_tokens", "output_tokens")))
             free = self.config.price_in_per_mtok == self.config.price_out_per_mtok == 0
             cost = (float(cost) if cost is not None else
                     estimate_cost(self.config, tokens_in, tokens_out) if has_usage or free else None)
             return ChatResult(str(content or ""), tokens_in, tokens_out, cost, int((time.monotonic() - started) * 1000),
-                              truncated=choice.get("finish_reason") == "length")
+                              truncated=choice.get("finish_reason") == "length",
+                              cache_read_tokens=optional_token_count((usage.get("prompt_tokens_details") or {}).get("cached_tokens")),
+                              cost_source="provider" if reported_cost else "configured_estimate" if cost is not None else "unknown")
         except (KeyError, IndexError, TypeError, ValueError, AttributeError) as exc:
             raise BackendError("The LLM backend response did not contain choices[0].message.content.") from exc
 

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections import Counter
 
 from atomic_flow.agents.result import ToolResult
@@ -33,6 +34,37 @@ class RequestHistory:
         self.compacted: set[int] = set()
         self.calls: Counter = Counter()
         self.peak_bytes = 0
+        self.last_breakdown: dict = {}
+        self.pressure_ratio = 0.0
+
+    def pressure(self, admitted: RequestAdmission) -> float:
+        ratios = [admitted.serialized_request_bytes / self.settings.max_request_bytes]
+        if admitted.max_input_tokens:
+            ratios.append(admitted.estimated_input_tokens / admitted.max_input_tokens)
+        if admitted.context_window_tokens:
+            ratios.append((admitted.estimated_input_tokens + admitted.output_reserve_tokens) / admitted.context_window_tokens)
+        return max(ratios)
+
+    @staticmethod
+    def breakdown(messages: list[dict[str, str]], admitted: RequestAdmission) -> dict:
+        parts = {"system_and_tools": 0, "source": 0, "tool_results": 0, "query_state_and_history": 0}
+        content_bytes = 0
+        for message in messages:
+            text = message["content"]
+            size = len(text.encode("utf-8"))
+            content_bytes += size
+            if message["role"] == "system":
+                parts["system_and_tools"] += size
+                continue
+            remaining = size
+            for match in re.finditer(r"<(project_context|tool_result)>[\s\S]*?</\1>", text):
+                amount = len(match.group().encode("utf-8"))
+                parts["source" if match[1] == "project_context" else "tool_results"] += amount
+                remaining -= amount
+            parts["query_state_and_history"] += remaining
+        parts["json_envelope_and_escaping"] = admitted.serialized_request_bytes - content_bytes
+        return {"serialized_bytes_by_component": parts, "output_reserve_tokens": admitted.output_reserve_tokens,
+                "accounting": "Exact serialized byte partition, not provider token counts. System includes text tool schemas."}
 
     def check_tool(self, parsed: dict, revision: int):
         key = (revision, hashlib.sha256(json.dumps(parsed, sort_keys=True, ensure_ascii=False,
@@ -67,7 +99,7 @@ class RequestHistory:
         # Compact oldest bodies first, keeping the newest configured results intact.
         candidates = self.results[:-self.settings.recent_tool_results]
         for index, compact in candidates:
-            if admitted is not None:
+            if admitted is not None and self.pressure(admitted) < self.settings.compact_at_ratio:
                 break
             if index in self.compacted:
                 continue
@@ -82,6 +114,8 @@ class RequestHistory:
         if admitted is None:
             admitted = admission()  # Preserve the precise failed limit and fail closed.
         self.last_admission = admitted
+        self.pressure_ratio = self.pressure(admitted)
+        self.last_breakdown = self.breakdown(messages, admitted)
         self.peak_bytes = max(self.peak_bytes, admitted.serialized_request_bytes)
         # Backends see a stable snapshot; future compaction cannot mutate prior audit captures.
         return [dict(message) for message in messages]
@@ -89,4 +123,7 @@ class RequestHistory:
     def stats(self) -> dict:
         return {"compacted_tool_results": len(self.compacted), "peak_request_bytes": self.peak_bytes,
                 "max_request_bytes": self.settings.max_request_bytes,
+                "pressure_ratio": self.pressure_ratio, "compact_at_ratio": self.settings.compact_at_ratio,
+                "near_capacity": self.pressure_ratio >= self.settings.compact_at_ratio,
+                "context_breakdown": self.last_breakdown,
                 "request_admission": self.last_admission.as_dict() if self.last_admission else None}
