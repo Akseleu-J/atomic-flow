@@ -146,7 +146,9 @@ class TaskBudgetBackend:
                                     call_id=event["id"], outcome="unknown")
             raise BudgetExceeded("model response has no valid cost; review usage before continuing")
         event.update(status="completed", cost_usd=cost, tokens_in=response.tokens_in,
-                     tokens_out=response.tokens_out, finished_at=time.time())
+                     tokens_out=response.tokens_out, finished_at=time.time(),
+                     cache_read_tokens=response.cache_read_tokens, cache_write_tokens=response.cache_write_tokens,
+                     cost_source=response.cost_source)
         self.task.budget_spent += cost
         save(self.task)  # includes costs even if parsing/verification/cancellation later fails
         self.ledger.record(task_id=self.task.id, call_id=event["id"], backend=self.name, model=self.config.model,

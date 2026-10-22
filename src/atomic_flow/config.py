@@ -27,7 +27,7 @@ BACKEND_DEFAULTS: dict[str, dict[str, Any]] = {
 }
 
 # A cloned repository must not be able to redirect your API key or source code.
-UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task", "conversation")
+UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task", "conversation", "experimental")
 
 
 def user_dir() -> Path:
@@ -108,6 +108,12 @@ class ConversationConfig(BaseModel):
     max_request_bytes: int = Field(default=131072, ge=4096, le=2_000_000)
     recent_tool_results: int = Field(default=2, ge=1, le=12)
     max_same_tool_call: int = Field(default=3, ge=1, le=12)
+    compact_at_ratio: float = Field(default=0.85, gt=0.1, le=1.0)
+
+
+class ExperimentalConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    parallel_reads: bool = False
 
 
 class AtomicConfig(BaseModel):
@@ -127,6 +133,7 @@ class AtomicConfig(BaseModel):
     task: TaskConfig = Field(default_factory=TaskConfig)
     execution: ExecutionConfig = Field(default_factory=ExecutionConfig)
     conversation: ConversationConfig = Field(default_factory=ConversationConfig)
+    experimental: ExperimentalConfig = Field(default_factory=ExperimentalConfig)
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
@@ -173,10 +180,28 @@ def trust_project(project: str | Path) -> None:
 
 def load_config(project: str | Path | None = None) -> AtomicConfig:
     """defaults < user config < project config (trust-gated) < environment."""
+    return _resolve_config(project)[0]
+
+
+def _resolve_config(project: str | Path | None = None) -> tuple[AtomicConfig, dict]:
     merged = AtomicConfig().model_dump(mode="python")
-    _deep_update(merged, _read_yaml(user_dir() / "config.yaml"))
+    sources = {}
+
+    def record(values, source, prefix=""):
+        for key, value in values.items():
+            name = f"{prefix}.{key}" if prefix else str(key)
+            if isinstance(value, dict):
+                record(value, source, name)
+            else:
+                sources[name] = source
+
+    record(merged, "default")
+    user_yaml = _read_yaml(user_dir() / "config.yaml")
+    _deep_update(merged, user_yaml)
+    record(user_yaml, "user")
     project_yaml = _read_yaml(project_dir(project) / "config.yaml")
     root = Path(project or Path.cwd()).expanduser().resolve()
+    dropped = []
     if project_yaml and not is_trusted(root):
         dropped = [key for key in UNTRUSTED_PROJECT_KEYS if key in project_yaml]
         if dropped:
@@ -184,24 +209,51 @@ def load_config(project: str | Path | None = None) -> AtomicConfig:
                         ", ".join(dropped), root)
         project_yaml = {k: v for k, v in project_yaml.items() if k not in UNTRUSTED_PROJECT_KEYS}
     _deep_update(merged, project_yaml)
+    record(project_yaml, "project")
     if "ATOMIC_FLOW_EXECUTION_MODE" in os.environ:
         merged.setdefault("execution", {})["mode"] = os.environ["ATOMIC_FLOW_EXECUTION_MODE"]
+        sources["execution.mode"] = "environment:ATOMIC_FLOW_EXECUTION_MODE"
 
     backends = merged.setdefault("backends", {})
     for key, entry in backends.items():                                   # fill provider defaults per entry
+        if not isinstance(entry, dict):
+            raise ConfigurationError(f"Backend {key!r} must be a mapping")
         kind = entry.get("type") or (key if key in BACKEND_DEFAULTS else "openai-compatible")
+        if kind not in BACKEND_DEFAULTS:
+            raise ConfigurationError(f"Unknown backend type for {key!r}")
         entry["type"] = kind
+        sources.setdefault(f"backends.{key}.type", "provider_default")
         for field_name, default in BACKEND_DEFAULTS[kind].items():
             if not entry.get(field_name):
                 entry[field_name] = default
+                sources[f"backends.{key}.{field_name}"] = "provider_default"
     openai = backends.setdefault("openai-compatible", {"type": "openai-compatible"})
     openai["base_url"] = os.getenv("ATOMIC_FLOW_BASE_URL", openai.get("base_url") or BACKEND_DEFAULTS["openai-compatible"]["base_url"])
     openai["api_key"] = os.getenv("ATOMIC_FLOW_API_KEY", openai.get("api_key", ""))
     openai["model"] = os.getenv("ATOMIC_FLOW_MODEL", openai.get("model") or BACKEND_DEFAULTS["openai-compatible"]["model"])
+    for field_name, variable in (("base_url", "ATOMIC_FLOW_BASE_URL"), ("api_key", "ATOMIC_FLOW_API_KEY"),
+                                 ("model", "ATOMIC_FLOW_MODEL")):
+        if variable in os.environ:
+            sources[f"backends.openai-compatible.{field_name}"] = "environment:" + variable
     try:
-        return AtomicConfig.model_validate(merged)
+        config = AtomicConfig.model_validate(merged)
     except ValidationError as exc:
         raise ConfigurationError(f"Invalid atomic_flow configuration:\n{exc}") from exc
+    return config, {"sources": sources, "ignored_untrusted_project_keys": dropped,
+                    "project_trusted": is_trusted(root)}
+
+
+def explain_config(project: str | Path | None = None) -> dict:
+    """Masked effective values and leaf origins from the same resolver as runtime."""
+    config, explanation = _resolve_config(project)
+    explanation["effective"] = mask_secrets(config.model_dump(mode="json"))
+    explanation["credential_environment"] = {
+        name: {"variable": entry.api_key_env, "present": bool(os.getenv(entry.api_key_env))}
+        for name, entry in config.backends.items() if entry.api_key_env
+    }
+    from atomic_flow.backends.base import backend_capabilities
+    explanation["backend_capabilities"] = {name: backend_capabilities(entry) for name, entry in config.backends.items()}
+    return explanation
 
 
 def mask_secrets(value: Any) -> Any:

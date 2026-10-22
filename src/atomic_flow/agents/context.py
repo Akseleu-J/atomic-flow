@@ -39,6 +39,8 @@ class ToolContext:
     journal_event: Callable[..., Any] | None = None
     result_store: Any = None
     private_workspace: bool = False
+    active_allowed_tools: tuple[str, ...] = ()
+    active_role: str = ""
 
     def record_read(self, path: str, content_hash: str, view: str, offset: int, end: int,
                     total: int, node_id: str | None = None, source_complete: bool = False) -> dict[str, Any]:

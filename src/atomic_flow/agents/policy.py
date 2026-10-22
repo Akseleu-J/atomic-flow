@@ -31,7 +31,7 @@ class Decision:
     source: str = "default"
 
 
-READ_ONLY_TOOLS = {"read_node", "find_callers", "search_tree", "search_text", "read_result", "read_file"}
+READ_ONLY_TOOLS = {"read_node", "find_callers", "search_tree", "search_text", "read_result", "read_file", "find_files", "read_many"}
 
 
 class PolicyEngine:
@@ -126,6 +126,49 @@ class PolicyEngine:
             if self._tool_matches(rule.tool, tool_name) and self._context_matches(rule, args, project_trusted):
                 return self._decision("default", rule)
         return Decision("ask", reason="default: no matching rule; approval required", source="default")
+
+    def explain(self, tool_name: str, args: dict[str, Any], *, project_trusted: bool) -> dict:
+        """Offline decision trace; never invokes a callback or an actual tool."""
+        decision = self.decide(tool_name, args, project_trusted=project_trusted)
+        matches = []
+        selected = False
+        for source, rules in [*self.layers.items(), ("default", self._default_rules())]:
+            for index, rule in enumerate(rules):
+                if self._tool_matches(rule.tool, tool_name) and self._context_matches(rule, args, project_trusted):
+                    choose = not selected and source == decision.source and rule == decision.rule
+                    matches.append({"source": source, "index": index, "tool": rule.tool, "action": rule.action,
+                                    "selected": choose})
+                    selected |= choose
+        return {"tool": tool_name, "project_trusted": project_trusted, "action": decision.action,
+                "source": decision.source, "reason": decision.reason, "matches": matches,
+                "semantics": "All matching forbids win; otherwise first per layer, ask wins across layers. No tool was run."}
+
+    def lint(self) -> list[dict]:
+        """Conservative diagnostics only for identical predicates, not regex satisfiability."""
+        findings = []
+        previous = []
+        for source, rules in self.layers.items():
+            for index, rule in enumerate(rules):
+                for old_source, old_index, old in previous:
+                    if (old.when, old.lines_lt, old.command_matches, old.path_matches) != (
+                        rule.when, rule.lines_lt, rule.command_matches, rule.path_matches
+                    ):
+                        continue
+                    old_tools, tools = set(old.tool.split("|")), set(rule.tool.split("|"))
+                    subset = "*" in old_tools or tools <= old_tools
+                    overlap = subset or "*" in tools or bool(old_tools & tools)
+                    code = None
+                    if old_source == source and subset and old.action == rule.action:
+                        code = "duplicate_or_redundant"
+                    elif overlap and "forbid" in {old.action, rule.action} and old.action != rule.action:
+                        code = "deny_overrides_allow"
+                    elif old_source == source and subset and rule.action != "forbid":
+                        code = "shadowed_by_first_match"
+                    if code:
+                        findings.append({"code": code, "source": source, "index": index,
+                                         "other_source": old_source, "other_index": old_index})
+                previous.append((source, index, rule))
+        return findings
 
     @staticmethod
     def _decision(source: str, rule: Rule) -> Decision:

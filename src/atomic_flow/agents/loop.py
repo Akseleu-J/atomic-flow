@@ -121,11 +121,14 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
                 raise TimeoutError("tool cooperative deadline exceeded")
 
         ctx.cancel_check = check_deadline
+        previous_allowed, previous_role = ctx.active_allowed_tools, ctx.active_role
+        ctx.active_allowed_tools, ctx.active_role = tuple(allowed_tools), role
         try:
             check_deadline()
             result = tool.run(args, ctx)
         finally:
             ctx.cancel_check = original_check
+            ctx.active_allowed_tools, ctx.active_role = previous_allowed, previous_role
         original_check()
         if time.monotonic() >= deadline:
             return finish(_contract_error(result, "tool cooperative deadline exceeded", contract.effects))

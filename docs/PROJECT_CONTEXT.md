@@ -2,12 +2,21 @@
 
 Обновлено **22 октября 2026**. Исходная база:
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
-Рабочая ветка `codex/execution-safety-ci`, draft PR №1. Пакеты 1–7 закоммичены;
+Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
+PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
+Пакеты 1–7 закоммичены;
 последний проверенный runtime-коммит — `0bae3ade4124e3772f20160aa3c8b0c565c497a3`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
 ## Локальные исправления поверх HEAD — актуальный статус
+
+22 октября: пакет 8 реализован, `IMPLEMENTATION_STEP_8.md`: find_files, line-range read,
+parallel reads opt-in, policy explain/lint, effective config origins, expanded offline doctor,
+proactive history pressure/byte breakdown, backend capabilities, per-role usage/cache diagnostics.
+Пользователь разрешил продолжить остальные пункты каталога с тестами. Весь каталог
+ещё не закрыт: 24 scoped / 38 planned, `CANDIDATE_STATUS.json`. Windows: **334 passed,
+13 skipped**, changed-code Ruff/compileall PASS; `validation/step8-windows-final.txt`.
 
 22 октября: начат evaluation gate, `EVALUATION_PILOT.md`. Калибровка 6 известных
 исторических изменений (12 RU/EN формулировок): base 6 FAIL / gold 6 PASS локально,

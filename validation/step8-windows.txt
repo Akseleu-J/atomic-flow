@@ -1,0 +1,99 @@
+............................sssss................................s...... [ 20%]
+...s.................s......ss.....F........................s........... [ 41%]
+.........s.............................................................. [ 62%]
+..............s......................................................... [ 82%]
+...........................................................              [100%]
+================================== FAILURES ===================================
+___________ test_large_result_retrieval_keeps_action_proof_separate ___________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-step8-full/test_large_result_retrieval_ke0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027C093550A0>
+
+    def test_large_result_retrieval_keeps_action_proof_separate(tmp_path, monkeypatch):
+        from atomic_flow.agents import tools
+    
+        root = project(tmp_path)
+    
+        class Empty(BaseModel):
+            pass
+    
+        class Probe(Tool):
+            name, description, args_schema = "large_probe", "Large data for acceptance", Empty
+    
+            def run(self, args, ctx):
+                return {"data": "source " * 8000}
+    
+        registry = tools.default_registry()
+        registry.register(Probe())
+        monkeypatch.setattr(tools, "default_registry", lambda: registry)
+        monkeypatch.setitem(tools.ROLE_TOOLS, "answerer", [*tools.ROLE_TOOLS["answerer"], "large_probe"])
+    
+        class Backend(ScriptedBackend):
+            def chat(self, messages, **kwargs):
+                self.calls.append(("answerer", messages))
+                if len(self.calls) == 1:
+                    result = {"tool": "large_probe", "args": {}}
+                elif len(self.calls) == 2:
+                    preview = json.loads(messages[-1]["content"].removeprefix("<tool_result>").removesuffix("</tool_result>"))
+                    assert "data" not in preview and preview["history_body_omitted"]
+                    result = {"tool": "read_result", "args": {"result_id": preview["result_id"], "limit": 256}}
+                else:
+                    page = json.loads(messages[-1]["content"].removeprefix("<tool_result>").removesuffix("</tool_result>"))
+                    assert page["original_outcome"] == "success" and page["truncated"]
+                    assert "status" not in page and "checks" not in page
+                    result = final()
+                return ChatResult(json.dumps(result), 10, 10, 0, 0)
+    
+>       result = Orchestrator(AtomicConfig(), root, Backend({}), approval_callback=lambda *a: True).answer(
+            "sample", mode="simple", request_id="large_integration")
+
+tests\test_first12_integration.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\llm\orchestrator.py:474: in answer
+    result = self._answer(run, registry, req_id, query, retrieval_query or query, mode,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <atomic_flow.llm.orchestrator.Orchestrator object at 0x0000027C093551C0>
+run = <atomic_flow.llm.orchestrator._Run object at 0x0000027C09356720>
+registry = <atomic_flow.llm.prompts.PromptRegistry object at 0x0000027C09357320>
+req_id = 'large_integration', query = 'sample', rq = 'sample', mode = 'simple'
+limit = 8000, file_scope = None, approve_edits = False
+
+    def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str,
+                limit: int, file_scope: str | None, approve_edits: bool = False) -> AnswerResult:
+        tree = load_tree(self.project)
+        if self.config.tree.auto_refresh:
+            with project_lock(self.project):
+                tree, changed = refresh_tree(self.project, self.config.tree.ignore,
+                                             respect_gitignore=self.config.tree.respect_gitignore)
+            if changed:
+                log.info("Project index refreshed before answering.")
+        nodes = [TreeNode.model_validate(item) for item in tree.get("nodes", [])]
+        if not nodes:
+            raise ValueError(f"Project tree is empty. Run `atomic tree build` in {self.project}.")
+        aliases = _Aliases(nodes)
+        by_id = {n.node_id: n for n in nodes}
+        index = _get_index(self.project, tree, nodes)
+        from atomic_flow.agents.context import ToolContext
+        from atomic_flow.agents.policy import PolicyEngine
+        from atomic_flow.agents.tools import ROLE_TOOLS, default_registry
+        from atomic_flow.agents.undo import UndoStack
+    
+        edits_enabled = approve_edits or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
+        trusted = is_trusted(self.settings_project)
+        policy = PolicyEngine.load(self.settings_project, user_path=user_dir() / "policy.yaml",
+                                   project_trusted=trusted)
+>       run.tool_registry = default_registry(enable_parallel_reads=self.config.experimental.parallel_reads)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_large_result_retrieval_keeps_action_proof_separate.<locals>.<lambda>() got an unexpected keyword argument 'enable_parallel_reads'
+
+src\atomic_flow\llm\orchestrator.py:515: TypeError
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_first12_integration.py::test_large_result_retrieval_keeps_action_proof_separate
+1 failed, 333 passed, 13 skipped, 1 warning in 115.65s (0:01:55)

@@ -2,7 +2,7 @@ name: Project and container checks
 
 on:
   push:
-    branches: [main, 'codex/**']
+    branches: [main, experimental, 'codex/**']
   pull_request:
   workflow_dispatch:
 

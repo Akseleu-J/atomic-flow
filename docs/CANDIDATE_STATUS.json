@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "authorized_scope": "All remaining catalogue candidates, per user request 2026-10-22. Each needs concrete integration and tests; no blanket completion claim.",
+  "branch": "experimental",
+  "status_meaning": "implemented_scoped is bounded by package documentation; not feature parity or production acceptance. planned is unimplemented.",
+  "candidates": [
+    {
+      "id": 1,
+      "candidate": "Native tool calls с сохранением text-JSON fallback",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 2,
+      "candidate": "Описание возможностей backend/model",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 3,
+      "candidate": "Поток событий выполнения",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 4,
+      "candidate": "Отмена сетевого/model call",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 5,
+      "candidate": "Уточнения пользователя во время работы",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 6,
+      "candidate": "Структурированный вопрос пользователю как tool",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 7,
+      "candidate": "Отдельное состояние plan/review/execute",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 8,
+      "candidate": "Политика retry по типу вызова и исходу",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 9,
+      "candidate": "Бюджет полного запроса с учётом модели",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 10,
+      "candidate": "Упреждающее управление заполнением контекста",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 11,
+      "candidate": "Структурированное состояние после сжатия",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 12,
+      "candidate": "Большие tool results вне prompt с повторным чтением",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 13,
+      "candidate": "Учёт того, что модель действительно прочитала",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 14,
+      "candidate": "Стабильный prompt и диагностика cache",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 15,
+      "candidate": "Объяснение состава контекста",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 16,
+      "candidate": "Runtime-загрузка проектных инструкций по области файлов",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 17,
+      "candidate": "Память проекта и пользователя между сессиями",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 18,
+      "candidate": "Выборочная загрузка памяти вместо всей папки",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 19,
+      "candidate": "Поиск по исходному тексту с regex",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 20,
+      "candidate": "Glob и явный обзор файлов",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 21,
+      "candidate": "Универсальный read по диапазону строк",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 22,
+      "candidate": "Контролируемое редактирование небольшого фрагмента",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 23,
+      "candidate": "Создание, удаление и перенос файлов",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 24,
+      "candidate": "Работа с notebook по ячейкам",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 25,
+      "candidate": "LSP для definitions/references/rename",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 26,
+      "candidate": "Диагностика после правки",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 27,
+      "candidate": "Изменения файлов извне и обновление индекса",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 28,
+      "candidate": "Несколько корней workspace",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 29,
+      "candidate": "Полное описание свойств каждого tool",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 30,
+      "candidate": "Ограниченный параллелизм безопасных reads",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 31,
+      "candidate": "Приоритет и область policy rules",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 32,
+      "candidate": "Explain/lint для разрешений",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 33,
+      "candidate": "Профили sandbox по задаче",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 34,
+      "candidate": "Область действия credentials",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 35,
+      "candidate": "Явное происхождение внешних данных",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 36,
+      "candidate": "Hooks до/после tool и жизненного цикла",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 37,
+      "candidate": "Проверка завершения всей задачи",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 38,
+      "candidate": "Единый журнал сессии",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 39,
+      "candidate": "Resume, fork и экспорт именно диалога",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 40,
+      "candidate": "Версии схем и миграции состояния",
+      "status": "implemented_scoped",
+      "package": 7
+    },
+    {
+      "id": 41,
+      "candidate": "Пользовательский rewind к контрольной точке",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 42,
+      "candidate": "Фоновые команды как durable jobs",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 43,
+      "candidate": "Постраничный output/tail фоновой работы",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 44,
+      "candidate": "Зависимости задач и обработка blocked",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 45,
+      "candidate": "Git worktree как дополнительный workspace backend",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 46,
+      "candidate": "Изолированные специализированные subagents",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 47,
+      "candidate": "Контролируемый handoff и результаты workers",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 48,
+      "candidate": "MCP client",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 49,
+      "candidate": "Отложенное обнаружение tools",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 50,
+      "candidate": "MCP server для возможностей atomic-flow",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 51,
+      "candidate": "Skills / переиспользуемые workflows",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 52,
+      "candidate": "Управляемые plugins",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 53,
+      "candidate": "Headless SDK и стабильный event protocol",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 54,
+      "candidate": "IDE bridge",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 55,
+      "candidate": "Web search/fetch для документации",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 56,
+      "candidate": "Единая трасса выполнения",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 57,
+      "candidate": "Подробный отчёт usage/cost",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 58,
+      "candidate": "Расширенный offline doctor",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 59,
+      "candidate": "Объяснение эффективной конфигурации",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 60,
+      "candidate": "Загрузка необязательных компонентов по необходимости",
+      "status": "planned",
+      "package": null
+    },
+    {
+      "id": 61,
+      "candidate": "Явные экспериментальные возможности",
+      "status": "implemented_scoped",
+      "package": 8
+    },
+    {
+      "id": 62,
+      "candidate": "Сменяемый удалённый executor",
+      "status": "planned",
+      "package": null
+    }
+  ]
+}

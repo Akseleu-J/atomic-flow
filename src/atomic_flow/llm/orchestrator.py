@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import logging
 import os
@@ -200,6 +201,8 @@ class _Run:
         self.instructions_trusted = is_trusted(registry.project)
         self.instruction_paths: set[str] = set()
         self.context_reads: list[dict] = []
+        self.usage_calls: list[dict] = []
+        self.prompt_prefixes: dict[str, str] = {}
 
     def system(self, base: str) -> str:
         from atomic_flow.llm.instructions import load_instructions
@@ -219,14 +222,28 @@ class _Run:
         self.call_sequence += 1
         call_id = f"model_{self.call_sequence}"
         self.event("model_request", {"role": role, "messages": messages}, call_id=call_id)
+        prefix = json.dumps({"model": self.backend.config.model, "system": [m for m in messages if m["role"] == "system"]},
+                            sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        fingerprint = hashlib.sha256(prefix.encode()).hexdigest()
+        usage = {"call_id": call_id, "role": role, "status": "in_flight", "cost_usd": None,
+                 "system_prefix_sha256": fingerprint,
+                 "system_prefix_changed": role in self.prompt_prefixes and self.prompt_prefixes[role] != fingerprint}
+        self.prompt_prefixes[role] = fingerprint
+        self.usage_calls.append(usage)
         try:
             response = self.backend.chat(messages, json_mode=True)
         except Exception as exc:
+            usage.update(status="unknown", error_type=type(exc).__name__)
+            self.write_json("usage.json", self.usage_report())
             self.event("model_failed", {"type": type(exc).__name__, "message": str(exc)},
                        call_id=call_id, outcome="unknown")
             raise
         # Account before optional transcript I/O: a persistence error cannot erase spend.
         self._account(response)
+        usage.update(status="response", cost_usd=response.cost_usd, tokens_in=response.tokens_in, tokens_out=response.tokens_out,
+                     cache_read_tokens=response.cache_read_tokens, cache_write_tokens=response.cache_write_tokens,
+                     cost_source=response.cost_source, latency_ms=response.latency_ms)
+        self.write_json("usage.json", self.usage_report())
         self.event("model_response", {"role": role, "content": response.content,
                    "tokens_in": response.tokens_in, "tokens_out": response.tokens_out,
                    "cost_usd": response.cost_usd}, call_id=call_id, outcome="success")
@@ -239,6 +256,19 @@ class _Run:
                                               node_id=node.node_id if node and node.kind != "file" else None,
                                               source_complete=True)
         return response
+
+    def usage_report(self) -> dict:
+        roles = {}
+        for row in self.usage_calls:
+            group = roles.setdefault(row["role"], {"calls": 0, "tokens_in": 0, "tokens_out": 0,
+                                                   "known_cost_usd": 0.0, "unknown_cost_calls": 0})
+            group["calls"] += 1
+            group["tokens_in"] += row.get("tokens_in", 0)
+            group["tokens_out"] += row.get("tokens_out", 0)
+            group["known_cost_usd"] += row.get("cost_usd") or 0
+            group["unknown_cost_calls"] += row.get("cost_usd") is None
+        return {"calls": [dict(row) for row in self.usage_calls], "by_role": roles,
+                "cache_note": "Prefix fingerprints diagnose local changes only; cache usage is provider-reported or unknown."}
 
     def write(self, name: str, content: str) -> None:
         if self.dir:
@@ -357,7 +387,7 @@ class _Run:
                 self.write_json(f"{step:02d}_{role}_tool_{turn}.json", {"call": record, "result": result})
                 messages.append({"role": "assistant", "content": response.content})
                 model_result = result
-                if parsed_any["tool"] not in {"read_node", "read_file", "read_result"} and len(
+                if parsed_any["tool"] not in {"read_node", "read_file", "read_result", "read_many"} and len(
                     json.dumps(result, ensure_ascii=False).encode("utf-8")) > 32768:
                     model_result = self.tool_ctx.result_store.put(result)
                 history.append_result(messages, model_result)
@@ -482,7 +512,8 @@ class Orchestrator:
         trusted = is_trusted(self.settings_project)
         policy = PolicyEngine.load(self.settings_project, user_path=user_dir() / "policy.yaml",
                                    project_trusted=trusted)
-        run.tool_registry = default_registry()
+        run.tool_registry = (default_registry(enable_parallel_reads=True)
+                             if self.config.experimental.parallel_reads else default_registry())
         run.tool_ctx = ToolContext(project_root=self.project, nodes_by_id=by_id,
                        aliases=aliases.alias_of, alias_to_id=aliases.id_of, index=index,
                        edits_enabled=edits_enabled,
@@ -661,7 +692,7 @@ class Orchestrator:
             latency_ms=run.latency_ms, backend_used=self.backend.name, model_used=self.backend.config.model,
             verdict=best.verdict, citation_coverage=best.coverage, grounding=best.grounding,
             unknown_identifiers=best.unknown, dropped_citations=best.dropped, retrieval_weak=search.weak,
-            warnings=warnings, tool_calls=run.tool_calls)
+            warnings=warnings, tool_calls=run.tool_calls, usage=run.usage_report())
         run.write("final.md", best.answer.text + "\n")
         run.write_json("meta.json", result.model_dump())
         return result

@@ -1,27 +1,38 @@
 {
-  "source_commit": "1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7",
+  "source_commit": "60ac30bdaf55ba0b61bfec79ae9307d253c9e96a",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    ".gitattributes",
-    "docs/EVALUATION_PILOT.md",
+    ".github/workflows/checks.yml",
+    "AGENTS.md",
+    "docs/CANDIDATE_STATUS.json",
+    "docs/IMPLEMENTATION_STEP_8.md",
     "docs/PROJECT_CONTEXT.md",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/compile.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/container-boundaries.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/dependencies.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-build.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-info.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-version.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/pytest-extra.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/pytest.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/python-version.txt",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/results.json",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/task-calibration.json",
-    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/tested-commit.txt"
+    "src/atomic_flow/agents/context.py",
+    "src/atomic_flow/agents/loop.py",
+    "src/atomic_flow/agents/policy.py",
+    "src/atomic_flow/agents/task_budget.py",
+    "src/atomic_flow/agents/tools/__init__.py",
+    "src/atomic_flow/agents/tools/find_files.py",
+    "src/atomic_flow/agents/tools/read_file.py",
+    "src/atomic_flow/agents/tools/read_many.py",
+    "src/atomic_flow/backends/anthropic.py",
+    "src/atomic_flow/backends/base.py",
+    "src/atomic_flow/backends/openai_compatible.py",
+    "src/atomic_flow/cli.py",
+    "src/atomic_flow/config.py",
+    "src/atomic_flow/diagnostics.py",
+    "src/atomic_flow/llm/history.py",
+    "src/atomic_flow/llm/orchestrator.py",
+    "src/atomic_flow/llm/schemas.py",
+    "tests/test_context_usage_batch.py",
+    "tests/test_runtime_discovery.py",
+    "validation/step8-windows-final.txt",
+    "validation/step8-windows.txt"
   ],
-  "file_count": 285,
-  "python_file_count": 131,
-  "symbol_count": 960,
+  "file_count": 294,
+  "python_file_count": 136,
+  "symbol_count": 1009,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -56,8 +67,8 @@
     },
     {
       "path": ".github/workflows/checks.yml",
-      "sha256": "b29cead2af4763182e0d0d18159bd1e5c9e6bc099a98a668a03e7639210f28e0",
-      "bytes": 2449,
+      "sha256": "adee1c6b669f33eb9674aac571f2588503f03e08207b26c56abb9248d729c6d9",
+      "bytes": 2463,
       "lines": 70
     },
     {
@@ -68,9 +79,9 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9183d8bf00dc4ef45770d76f101d839efb17ba23a11e7ff5d201daf038cd70e8",
-      "bytes": 2627,
-      "lines": 15
+      "sha256": "588c88fa0330ecc82945e2a67f6a59d8bf1d756c94c9897cc002cc923a19cc40",
+      "bytes": 2983,
+      "lines": 16
     },
     {
       "path": "LICENSE",
@@ -327,6 +338,12 @@
       "lines": 96
     },
     {
+      "path": "docs/CANDIDATE_STATUS.json",
+      "sha256": "9e0a1e9bbc73d08a101c0ad47485c55fb20401bbb8921029be3cf0d5b0e3cab2",
+      "bytes": 10861,
+      "lines": 380
+    },
+    {
       "path": "docs/EVALUATION_PILOT.md",
       "sha256": "1367c53b24f5aa988e9dfc1296b79a872ceb87fca53a60815b7b94c16a15fd5b",
       "bytes": 12292,
@@ -375,6 +392,12 @@
       "lines": 120
     },
     {
+      "path": "docs/IMPLEMENTATION_STEP_8.md",
+      "sha256": "51973c262d4e538cd91be953df661aefa87d717ce449aebb0f4f36aa5f7406dd",
+      "bytes": 8475,
+      "lines": 74
+    },
+    {
       "path": "docs/PRODUCTION_ROADMAP.md",
       "sha256": "3501fb0c71116b9fc705c76739256a4baf51e96830e92aac5076ab257a48c7d2",
       "bytes": 16234,
@@ -382,9 +405,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "a0998674ea3f8df52a78f5f0df6070eeb6e903cebad6d4c2962aae3865d47eaa",
-      "bytes": 38511,
-      "lines": 393
+      "sha256": "df37aa5c433be679d1e8c22fde31b437133275c8b095650f03f327bd3f4b0ad4",
+      "bytes": 39331,
+      "lines": 402
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -406,9 +429,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "5582a2a4ca492c67292512248ad0f45ea83865e6f67f72d6603413825f3c21b1",
-      "bytes": 352367,
-      "lines": 10910
+      "sha256": "9c9ebcf22293cd15a3439dd2d67e6d6408cd6bef3f4c3c3fcb47565bc1af491f",
+      "bytes": 356106,
+      "lines": 10976
     },
     {
       "path": "docs/prompts.md",
@@ -1655,9 +1678,9 @@
     },
     {
       "path": "src/atomic_flow/agents/context.py",
-      "sha256": "5ad11459015804d7e871fdd28e5d8953cb28878ed6424cfe9ed425b62812ac63",
-      "bytes": 6497,
-      "lines": 126,
+      "sha256": "ad6b89c0bf45c130747bb655e7bccd90e4c2ac814a67b472ce4e282059d998e6",
+      "bytes": 6572,
+      "lines": 128,
       "summary": "Shared state available to tools during one role turn.",
       "imports": [
         "__future__",
@@ -1676,55 +1699,55 @@
           "name": "ToolContext",
           "kind": "class",
           "line": 14,
-          "end_line": 126,
+          "end_line": 128,
           "signature": "class ToolContext",
           "summary": "Everything a tool needs to run for one request."
         },
         {
           "name": "ToolContext.record_read",
           "kind": "function",
-          "line": 43,
-          "end_line": 70,
+          "line": 45,
+          "end_line": 72,
           "signature": "def record_read(self, path: str, content_hash: str, view: str, offset: int, end: int, total: int, node_id: str | None=None, source_complete: bool=False)",
           "summary": "Record only the redacted characters actually returned by a source tool."
         },
         {
           "name": "ToolContext.read_coverage",
           "kind": "function",
-          "line": 72,
-          "end_line": 77,
+          "line": 74,
+          "end_line": 79,
           "signature": "def read_coverage(self, path: str, content_hash: str, node_id: str | None=None)",
           "summary": ""
         },
         {
           "name": "ToolContext.require_read",
           "kind": "function",
-          "line": 79,
-          "end_line": 81,
+          "line": 81,
+          "end_line": 83,
           "signature": "def require_read(self, path: str, content_hash: str, node_id: str | None=None)",
           "summary": ""
         },
         {
           "name": "ToolContext.__post_init__",
           "kind": "function",
-          "line": 83,
-          "end_line": 94,
+          "line": 85,
+          "end_line": 96,
           "signature": "def __post_init__(self)",
           "summary": ""
         },
         {
           "name": "ToolContext.read_source",
           "kind": "function",
-          "line": 96,
-          "end_line": 99,
+          "line": 98,
+          "end_line": 101,
           "signature": "def read_source(self, rel: str)",
           "summary": ""
         },
         {
           "name": "ToolContext.refresh",
           "kind": "function",
-          "line": 101,
-          "end_line": 126,
+          "line": 103,
+          "end_line": 128,
           "signature": "def refresh(self)",
           "summary": "Reparse after a verified edit; preserve aliases, never recycle removed ids."
         }
@@ -1943,9 +1966,9 @@
     },
     {
       "path": "src/atomic_flow/agents/loop.py",
-      "sha256": "a23928d243458c68b0569b8ae2b1113efdccee8d01d2144deeafa03ecb9ff445",
-      "bytes": 8581,
-      "lines": 164,
+      "sha256": "657e4db59fbea5d004a0d33efd05fe23395b79c6535186ecc05c126f8cd99e8b",
+      "bytes": 8835,
+      "lines": 167,
       "summary": "Tool-use loop for text-only model backends.",
       "imports": [
         "__future__",
@@ -1982,7 +2005,7 @@
           "name": "execute_tool",
           "kind": "function",
           "line": 67,
-          "end_line": 151,
+          "end_line": 154,
           "signature": "def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContext, *, allowed_tools: list[str] | tuple[str, ...], role: str='')",
           "summary": "Validate, authorize and audit every outcome, including early rejections."
         },
@@ -2005,8 +2028,8 @@
         {
           "name": "_contract_error",
           "kind": "function",
-          "line": 154,
-          "end_line": 164,
+          "line": 157,
+          "end_line": 167,
           "signature": "def _contract_error(result: Any, message: str, effects: tuple[str, ...])",
           "summary": "Retain mutation proof when a completed tool violates its return contract."
         }
@@ -2076,9 +2099,9 @@
     },
     {
       "path": "src/atomic_flow/agents/policy.py",
-      "sha256": "3d2a19d5f98f2c52384d2d4f691c5413d63475328a29f354a1499d81cb506f90",
-      "bytes": 7712,
-      "lines": 166,
+      "sha256": "7ef20303d33de440672145e1ba42e76baa94dc5491ddd0e2e8d8b4d095ea5bff",
+      "bytes": 10499,
+      "lines": 209,
       "summary": "Layered, deny-first approval rules for model-invoked tools.",
       "imports": [
         "__future__",
@@ -2111,7 +2134,7 @@
           "name": "PolicyEngine",
           "kind": "class",
           "line": 37,
-          "end_line": 166,
+          "end_line": 209,
           "signature": "class PolicyEngine",
           "summary": "Every matching denial wins across every layer, regardless of rule order."
         },
@@ -2156,34 +2179,50 @@
           "summary": ""
         },
         {
+          "name": "PolicyEngine.explain",
+          "kind": "function",
+          "line": 130,
+          "end_line": 144,
+          "signature": "def explain(self, tool_name: str, args: dict[str, Any], *, project_trusted: bool)",
+          "summary": "Offline decision trace; never invokes a callback or an actual tool."
+        },
+        {
+          "name": "PolicyEngine.lint",
+          "kind": "function",
+          "line": 146,
+          "end_line": 171,
+          "signature": "def lint(self)",
+          "summary": "Conservative diagnostics only for identical predicates, not regex satisfiability."
+        },
+        {
           "name": "PolicyEngine._decision",
           "kind": "function",
-          "line": 131,
-          "end_line": 133,
+          "line": 174,
+          "end_line": 176,
           "signature": "def _decision(source: str, rule: Rule)",
           "summary": ""
         },
         {
           "name": "PolicyEngine._tool_matches",
           "kind": "function",
-          "line": 136,
-          "end_line": 137,
+          "line": 179,
+          "end_line": 180,
           "signature": "def _tool_matches(pattern: str, tool_name: str)",
           "summary": ""
         },
         {
           "name": "PolicyEngine._context_matches",
           "kind": "function",
-          "line": 140,
-          "end_line": 166,
+          "line": 183,
+          "end_line": 209,
           "signature": "def _context_matches(rule: Rule, args: dict[str, Any], trusted: bool)",
           "summary": ""
         },
         {
           "name": "PolicyEngine._context_matches.safe",
           "kind": "function",
-          "line": 158,
-          "end_line": 159,
+          "line": 201,
+          "end_line": 202,
           "signature": "def safe(path: str)",
           "summary": ""
         }
@@ -2484,9 +2523,9 @@
     },
     {
       "path": "src/atomic_flow/agents/task_budget.py",
-      "sha256": "91725800ee4701eb2513e737777106ee29a107e7ce2bc1caa448e91159de6631",
-      "bytes": 9886,
-      "lines": 161,
+      "sha256": "c91050f88a3a1fba357bb18133df49b82267fb3867face4fa0547c60b9cd9eaf",
+      "bytes": 10056,
+      "lines": 163,
       "summary": "Durable per-call task accounting, including planner and failed/cancelled runs.",
       "imports": [
         "__future__",
@@ -2517,7 +2556,7 @@
           "name": "TaskBudgetBackend",
           "kind": "class",
           "line": 34,
-          "end_line": 161,
+          "end_line": 163,
           "signature": "class TaskBudgetBackend",
           "summary": ""
         },
@@ -2533,7 +2572,7 @@
           "name": "TaskBudgetBackend.chat",
           "kind": "function",
           "line": 68,
-          "end_line": 161,
+          "end_line": 163,
           "signature": "def chat(self, messages, *, json_mode=False, model=None)",
           "summary": ""
         }
@@ -2662,9 +2701,9 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/__init__.py",
-      "sha256": "e72bd58e0f15dd86e33bdc561192bbf4edaedc2c2a5736090435dbc6f6191617",
-      "bytes": 1850,
-      "lines": 37,
+      "sha256": "5b8dd9e9a412e2d4611066087e1000310bdb548127e145b4ebdacee5302d99b4",
+      "bytes": 2246,
+      "lines": 45,
       "summary": "Default tool registry wired to the shared tool implementations.",
       "imports": [
         "__future__",
@@ -2673,7 +2712,9 @@
         "atomic_flow.agents.tools.edit_node",
         "atomic_flow.agents.tools.file_ops",
         "atomic_flow.agents.tools.find_callers",
+        "atomic_flow.agents.tools.find_files",
         "atomic_flow.agents.tools.read_file",
+        "atomic_flow.agents.tools.read_many",
         "atomic_flow.agents.tools.read_node",
         "atomic_flow.agents.tools.read_result",
         "atomic_flow.agents.tools.run_command",
@@ -2684,9 +2725,9 @@
         {
           "name": "default_registry",
           "kind": "function",
-          "line": 17,
-          "end_line": 23,
-          "signature": "def default_registry()",
+          "line": 18,
+          "end_line": 27,
+          "signature": "def default_registry(*, enable_parallel_reads: bool=False)",
           "summary": ""
         }
       ]
@@ -3011,10 +3052,75 @@
       ]
     },
     {
+      "path": "src/atomic_flow/agents/tools/find_files.py",
+      "sha256": "3509381e8beff0a9fd26e2fc7d080b515c413a2f0848b1d0502a4bcccffbfc32",
+      "bytes": 2685,
+      "lines": 72,
+      "summary": "Bounded glob discovery over admitted indexed project files.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.base",
+        "atomic_flow.agents.tools.file_paths",
+        "fnmatch",
+        "pydantic",
+        "re"
+      ],
+      "symbols": [
+        {
+          "name": "FindFilesArgs",
+          "kind": "class",
+          "line": 13,
+          "end_line": 26,
+          "signature": "class FindFilesArgs",
+          "summary": ""
+        },
+        {
+          "name": "FindFilesArgs.relative_pattern",
+          "kind": "function",
+          "line": 21,
+          "end_line": 26,
+          "signature": "def relative_pattern(cls, value)",
+          "summary": ""
+        },
+        {
+          "name": "glob_matches",
+          "kind": "function",
+          "line": 29,
+          "end_line": 47,
+          "signature": "def glob_matches(path: str, pattern: str)",
+          "summary": ""
+        },
+        {
+          "name": "glob_matches.match",
+          "kind": "function",
+          "line": 35,
+          "end_line": 45,
+          "signature": "def match(i, j)",
+          "summary": ""
+        },
+        {
+          "name": "FindFilesTool",
+          "kind": "class",
+          "line": 50,
+          "end_line": 72,
+          "signature": "class FindFilesTool",
+          "summary": ""
+        },
+        {
+          "name": "FindFilesTool.run",
+          "kind": "function",
+          "line": 56,
+          "end_line": 72,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/agents/tools/read_file.py",
-      "sha256": "38d5143cbb65864d025d04394864db44da38464fcd8fc9e25270eef41c06c3c4",
-      "bytes": 2197,
-      "lines": 46,
+      "sha256": "e666d573e9ad5f5845d99dda2728acd1eeb94276905ddbd4281d8b337f5df912",
+      "bytes": 3254,
+      "lines": 61,
       "summary": "Read admitted UTF-8 source using character offsets in the redacted view.",
       "imports": [
         "__future__",
@@ -3030,24 +3136,93 @@
           "name": "ReadFileArgs",
           "kind": "class",
           "line": 14,
-          "end_line": 18,
+          "end_line": 26,
           "signature": "class ReadFileArgs",
+          "summary": ""
+        },
+        {
+          "name": "ReadFileArgs.line_order",
+          "kind": "function",
+          "line": 23,
+          "end_line": 26,
+          "signature": "def line_order(self)",
           "summary": ""
         },
         {
           "name": "ReadFileTool",
           "kind": "class",
-          "line": 21,
-          "end_line": 46,
+          "line": 29,
+          "end_line": 61,
           "signature": "class ReadFileTool",
           "summary": ""
         },
         {
           "name": "ReadFileTool.run",
           "kind": "function",
-          "line": 27,
-          "end_line": 46,
+          "line": 35,
+          "end_line": 61,
           "signature": "def run(self, args: ReadFileArgs, ctx: ToolContext)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/read_many.py",
+      "sha256": "51739092c5d67870d58f3ff95ad6d88c9ff8a3ee10991b81dd1c9528da5b2e56",
+      "bytes": 5159,
+      "lines": 94,
+      "summary": "Bounded parallel read calls with per-child dispatch and revision validation.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.base",
+        "atomic_flow.agents.loop",
+        "atomic_flow.agents.policy",
+        "atomic_flow.agents.source",
+        "atomic_flow.agents.tools",
+        "concurrent.futures",
+        "copy",
+        "json",
+        "pydantic"
+      ],
+      "symbols": [
+        {
+          "name": "ReadRequest",
+          "kind": "class",
+          "line": 16,
+          "end_line": 19,
+          "signature": "class ReadRequest",
+          "summary": ""
+        },
+        {
+          "name": "ReadManyArgs",
+          "kind": "class",
+          "line": 22,
+          "end_line": 24,
+          "signature": "class ReadManyArgs",
+          "summary": ""
+        },
+        {
+          "name": "ReadManyTool",
+          "kind": "class",
+          "line": 27,
+          "end_line": 94,
+          "signature": "class ReadManyTool",
+          "summary": ""
+        },
+        {
+          "name": "ReadManyTool.run",
+          "kind": "function",
+          "line": 34,
+          "end_line": 94,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "ReadManyTool.run.run",
+          "kind": "function",
+          "line": 57,
+          "end_line": 66,
+          "signature": "def run(request)",
           "summary": ""
         }
       ]
@@ -3578,9 +3753,9 @@
     },
     {
       "path": "src/atomic_flow/backends/anthropic.py",
-      "sha256": "115c7bbd553d56c2e3e487d71848bafe0316d94897113607e06133896fd74f89",
-      "bytes": 2618,
-      "lines": 46,
+      "sha256": "9f5d0e137721ef1415d4a69d0a2d9511d5e493868fb3bd1fadb991e6e1950806",
+      "bytes": 3134,
+      "lines": 52,
       "summary": "Native Anthropic Messages API adapter.",
       "imports": [
         "__future__",
@@ -3595,7 +3770,7 @@
           "name": "AnthropicBackend",
           "kind": "class",
           "line": 13,
-          "end_line": 46,
+          "end_line": 52,
           "signature": "class AnthropicBackend",
           "summary": ""
         },
@@ -3611,7 +3786,7 @@
           "name": "AnthropicBackend.chat",
           "kind": "function",
           "line": 18,
-          "end_line": 46,
+          "end_line": 52,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
           "summary": ""
         }
@@ -3619,9 +3794,9 @@
     },
     {
       "path": "src/atomic_flow/backends/base.py",
-      "sha256": "0a4fd3220c8284abfd5656679436e258d8569efebec5d44e5617866416955c1d",
-      "bytes": 993,
-      "lines": 31,
+      "sha256": "8ab332ad74d80aa5c27039ef241fc12af1f9a3accd949f03a60ef900bd8bfefa",
+      "bytes": 2061,
+      "lines": 50,
       "summary": "Shared backend contract: result type, Protocol, cost estimate.",
       "imports": [
         "__future__",
@@ -3634,31 +3809,47 @@
           "name": "ChatResult",
           "kind": "class",
           "line": 12,
-          "end_line": 18,
+          "end_line": 21,
           "signature": "class ChatResult",
+          "summary": ""
+        },
+        {
+          "name": "backend_capabilities",
+          "kind": "function",
+          "line": 24,
+          "end_line": 33,
+          "signature": "def backend_capabilities(config: BackendConfig)",
+          "summary": "Describe implemented transport, without guessing a remote model's support."
+        },
+        {
+          "name": "optional_token_count",
+          "kind": "function",
+          "line": 36,
+          "end_line": 37,
+          "signature": "def optional_token_count(value)",
           "summary": ""
         },
         {
           "name": "LLMBackend",
           "kind": "class",
-          "line": 21,
-          "end_line": 25,
+          "line": 40,
+          "end_line": 44,
           "signature": "class LLMBackend",
           "summary": ""
         },
         {
           "name": "LLMBackend.chat",
           "kind": "function",
-          "line": 25,
-          "end_line": 25,
+          "line": 44,
+          "end_line": 44,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
           "summary": ""
         },
         {
           "name": "estimate_cost",
           "kind": "function",
-          "line": 28,
-          "end_line": 31,
+          "line": 47,
+          "end_line": 50,
           "signature": "def estimate_cost(config: BackendConfig, tokens_in: int, tokens_out: int)",
           "summary": ""
         }
@@ -3766,9 +3957,9 @@
     },
     {
       "path": "src/atomic_flow/backends/openai_compatible.py",
-      "sha256": "a0f831756271451abe841ff7d336f8411739fbee7668de429aaf810c71d00856",
-      "bytes": 4524,
-      "lines": 82,
+      "sha256": "17ab2bfee51a901c064690a0bf5f0e99fdc3a855205f8588b2c2bc36a597f560",
+      "bytes": 4797,
+      "lines": 84,
       "summary": "OpenAI-compatible chat client (stdlib only).",
       "imports": [
         "__future__",
@@ -3784,7 +3975,7 @@
           "name": "OpenAICompatibleBackend",
           "kind": "class",
           "line": 16,
-          "end_line": 82,
+          "end_line": 84,
           "signature": "class OpenAICompatibleBackend",
           "summary": ""
         },
@@ -3800,15 +3991,15 @@
           "name": "OpenAICompatibleBackend.chat",
           "kind": "function",
           "line": 21,
-          "end_line": 75,
+          "end_line": 77,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
           "summary": ""
         },
         {
           "name": "OpenAICompatibleBackend.check",
           "kind": "function",
-          "line": 77,
-          "end_line": 82,
+          "line": 79,
+          "end_line": 84,
           "signature": "def check(self)",
           "summary": ""
         }
@@ -4921,9 +5112,9 @@
     },
     {
       "path": "src/atomic_flow/cli.py",
-      "sha256": "bb9ed2b01e9d4d31b77355d7397eb9e1825ff68cb8ceaebe0317db42a541c086",
-      "bytes": 40993,
-      "lines": 827,
+      "sha256": "3ea496ae86f2eebaf110e76b3264f2c62a31a72034eb27ac062bc204fe8c7682",
+      "bytes": 43347,
+      "lines": 872,
       "summary": "Command line interface. One small handler per command instead of a 300-line `main`.",
       "imports": [
         "__future__",
@@ -4934,6 +5125,7 @@
         "atomic_flow.activation.text",
         "atomic_flow.agents.changeset",
         "atomic_flow.agents.control",
+        "atomic_flow.agents.policy",
         "atomic_flow.agents.task",
         "atomic_flow.agents.task_loop",
         "atomic_flow.agents.undo",
@@ -4941,6 +5133,7 @@
         "atomic_flow.benchmarking",
         "atomic_flow.budget",
         "atomic_flow.config",
+        "atomic_flow.diagnostics",
         "atomic_flow.errors",
         "atomic_flow.kaggle.credentials",
         "atomic_flow.llm.orchestrator",
@@ -4966,207 +5159,215 @@
           "name": "_parser",
           "kind": "function",
           "line": 40,
-          "end_line": 181,
+          "end_line": 193,
           "signature": "def _parser()",
           "summary": ""
         },
         {
           "name": "_set_nested",
           "kind": "function",
-          "line": 186,
-          "end_line": 190,
+          "line": 198,
+          "end_line": 202,
           "signature": "def _set_nested(data: dict[str, Any], key: str, value: Any)",
           "summary": ""
         },
         {
           "name": "_get_nested",
           "kind": "function",
-          "line": 193,
-          "end_line": 199,
+          "line": 205,
+          "end_line": 211,
           "signature": "def _get_nested(data: dict[str, Any], key: str)",
           "summary": ""
         },
         {
           "name": "_editor",
           "kind": "function",
-          "line": 202,
-          "end_line": 203,
+          "line": 214,
+          "end_line": 215,
           "signature": "def _editor()",
           "summary": ""
         },
         {
           "name": "_prompts",
           "kind": "function",
-          "line": 206,
-          "end_line": 213,
+          "line": 218,
+          "end_line": 225,
           "signature": "def _prompts(args, project: Path, mode: str)",
           "summary": ""
         },
         {
           "name": "_make_approval_callback",
           "kind": "function",
-          "line": 216,
-          "end_line": 247,
+          "line": 228,
+          "end_line": 259,
           "signature": "def _make_approval_callback(auto_yes: bool)",
           "summary": ""
         },
         {
           "name": "_make_approval_callback.ask",
           "kind": "function",
-          "line": 217,
-          "end_line": 246,
+          "line": 229,
+          "end_line": 258,
           "signature": "def ask(tool: str, args: dict[str, Any], reason: str)",
           "summary": ""
         },
         {
           "name": "_ask_user_question",
           "kind": "function",
-          "line": 250,
-          "end_line": 264,
+          "line": 262,
+          "end_line": 276,
           "signature": "def _ask_user_question(question: dict)",
           "summary": "A specification answer is always explicit; --yes cannot answer it."
         },
         {
           "name": "_edit_prompts",
           "kind": "function",
-          "line": 267,
-          "end_line": 281,
+          "line": 279,
+          "end_line": 293,
           "signature": "def _edit_prompts(project: Path, mode: str)",
           "summary": ""
         },
         {
           "name": "_run_kaggle_cli",
           "kind": "function",
-          "line": 284,
-          "end_line": 299,
+          "line": 296,
+          "end_line": 311,
           "signature": "def _run_kaggle_cli(command: list[str], *, timeout: int=86400, secret_path: Path | None=None)",
           "summary": ""
         },
         {
           "name": "cmd_init",
           "kind": "function",
-          "line": 304,
-          "end_line": 321,
+          "line": 316,
+          "end_line": 333,
           "signature": "def cmd_init(args)",
           "summary": ""
         },
         {
           "name": "cmd_trust",
           "kind": "function",
-          "line": 324,
-          "end_line": 327,
+          "line": 336,
+          "end_line": 339,
           "signature": "def cmd_trust(args)",
           "summary": ""
         },
         {
           "name": "cmd_tree",
           "kind": "function",
-          "line": 330,
-          "end_line": 361,
+          "line": 342,
+          "end_line": 373,
           "signature": "def cmd_tree(args)",
           "summary": ""
         },
         {
           "name": "cmd_ask",
           "kind": "function",
-          "line": 364,
-          "end_line": 435,
+          "line": 376,
+          "end_line": 447,
           "signature": "def cmd_ask(args)",
           "summary": ""
         },
         {
           "name": "cmd_task",
           "kind": "function",
-          "line": 438,
-          "end_line": 551,
+          "line": 450,
+          "end_line": 563,
           "signature": "def cmd_task(args)",
           "summary": ""
         },
         {
           "name": "_print_task",
           "kind": "function",
-          "line": 554,
-          "end_line": 577,
+          "line": 566,
+          "end_line": 589,
           "signature": "def _print_task(task, verbose: bool=False)",
           "summary": ""
         },
         {
           "name": "cmd_undo",
           "kind": "function",
-          "line": 580,
-          "end_line": 589,
+          "line": 592,
+          "end_line": 601,
           "signature": "def cmd_undo(args)",
           "summary": ""
         },
         {
           "name": "cmd_doctor",
           "kind": "function",
-          "line": 592,
-          "end_line": 627,
+          "line": 604,
+          "end_line": 649,
           "signature": "def cmd_doctor(args)",
           "summary": ""
         },
         {
           "name": "cmd_config",
           "kind": "function",
-          "line": 630,
-          "end_line": 652,
+          "line": 652,
+          "end_line": 677,
           "signature": "def cmd_config(args)",
+          "summary": ""
+        },
+        {
+          "name": "cmd_policy",
+          "kind": "function",
+          "line": 680,
+          "end_line": 697,
+          "signature": "def cmd_policy(args)",
           "summary": ""
         },
         {
           "name": "cmd_up",
           "kind": "function",
-          "line": 655,
-          "end_line": 667,
+          "line": 700,
+          "end_line": 712,
           "signature": "def cmd_up(args)",
           "summary": ""
         },
         {
           "name": "cmd_status",
           "kind": "function",
-          "line": 670,
-          "end_line": 677,
+          "line": 715,
+          "end_line": 722,
           "signature": "def cmd_status(args)",
           "summary": ""
         },
         {
           "name": "cmd_runs",
           "kind": "function",
-          "line": 680,
-          "end_line": 695,
+          "line": 725,
+          "end_line": 740,
           "signature": "def cmd_runs(args)",
           "summary": ""
         },
         {
           "name": "cmd_kaggle",
           "kind": "function",
-          "line": 698,
-          "end_line": 727,
+          "line": 743,
+          "end_line": 772,
           "signature": "def cmd_kaggle(args)",
           "summary": ""
         },
         {
           "name": "cmd_benchmark",
           "kind": "function",
-          "line": 734,
-          "end_line": 787,
+          "line": 779,
+          "end_line": 832,
           "signature": "def cmd_benchmark(args)",
           "summary": ""
         },
         {
           "name": "cmd_session",
           "kind": "function",
-          "line": 790,
-          "end_line": 807,
+          "line": 835,
+          "end_line": 852,
           "signature": "def cmd_session(args)",
           "summary": ""
         },
         {
           "name": "main",
           "kind": "function",
-          "line": 815,
-          "end_line": 823,
+          "line": 860,
+          "end_line": 868,
           "signature": "def main(argv: list[str] | None=None)",
           "summary": ""
         }
@@ -5174,12 +5375,13 @@
     },
     {
       "path": "src/atomic_flow/config.py",
-      "sha256": "f45b968d7349042819a7f006bc1cf70d6801be56aff8975440fca1695aceca91",
-      "bytes": 10773,
-      "lines": 235,
+      "sha256": "a3963012f8219bf4c64beafe6881c453854a558eff3cd3e56a9d6f5e4f9dbe14",
+      "bytes": 13276,
+      "lines": 287,
       "summary": "Layered user and project configuration (with a trust gate for project-level files).",
       "imports": [
         "__future__",
+        "atomic_flow.backends.base",
         "atomic_flow.errors",
         "atomic_flow.tree.defaults",
         "logging",
@@ -5275,81 +5477,140 @@
           "name": "ConversationConfig",
           "kind": "class",
           "line": 106,
-          "end_line": 110,
+          "end_line": 111,
           "signature": "class ConversationConfig",
+          "summary": ""
+        },
+        {
+          "name": "ExperimentalConfig",
+          "kind": "class",
+          "line": 114,
+          "end_line": 116,
+          "signature": "class ExperimentalConfig",
           "summary": ""
         },
         {
           "name": "AtomicConfig",
           "kind": "class",
-          "line": 113,
-          "end_line": 129,
+          "line": 119,
+          "end_line": 136,
           "signature": "class AtomicConfig",
           "summary": ""
         },
         {
           "name": "_read_yaml",
           "kind": "function",
-          "line": 132,
-          "end_line": 141,
+          "line": 139,
+          "end_line": 148,
           "signature": "def _read_yaml(path: Path)",
           "summary": ""
         },
         {
           "name": "_deep_update",
           "kind": "function",
-          "line": 144,
-          "end_line": 149,
+          "line": 151,
+          "end_line": 156,
           "signature": "def _deep_update(target: dict[str, Any], updates: dict[str, Any])",
           "summary": ""
         },
         {
           "name": "_trust_file",
           "kind": "function",
-          "line": 154,
-          "end_line": 155,
+          "line": 161,
+          "end_line": 162,
           "signature": "def _trust_file()",
           "summary": ""
         },
         {
           "name": "is_trusted",
           "kind": "function",
-          "line": 158,
-          "end_line": 163,
+          "line": 165,
+          "end_line": 170,
           "signature": "def is_trusted(project: str | Path)",
           "summary": ""
         },
         {
           "name": "trust_project",
           "kind": "function",
-          "line": 166,
-          "end_line": 171,
+          "line": 173,
+          "end_line": 178,
           "signature": "def trust_project(project: str | Path)",
           "summary": ""
         },
         {
           "name": "load_config",
           "kind": "function",
-          "line": 174,
-          "end_line": 204,
+          "line": 181,
+          "end_line": 183,
           "signature": "def load_config(project: str | Path | None=None)",
           "summary": "defaults < user config < project config (trust-gated) < environment."
         },
         {
+          "name": "_resolve_config",
+          "kind": "function",
+          "line": 186,
+          "end_line": 243,
+          "signature": "def _resolve_config(project: str | Path | None=None)",
+          "summary": ""
+        },
+        {
+          "name": "_resolve_config.record",
+          "kind": "function",
+          "line": 190,
+          "end_line": 196,
+          "signature": "def record(values, source, prefix='')",
+          "summary": ""
+        },
+        {
+          "name": "explain_config",
+          "kind": "function",
+          "line": 246,
+          "end_line": 256,
+          "signature": "def explain_config(project: str | Path | None=None)",
+          "summary": "Masked effective values and leaf origins from the same resolver as runtime."
+        },
+        {
           "name": "mask_secrets",
           "kind": "function",
-          "line": 207,
-          "end_line": 214,
+          "line": 259,
+          "end_line": 266,
           "signature": "def mask_secrets(value: Any)",
           "summary": "Recursively hide api keys (v0.1 only masked a key literally ending in `api_key`)."
         },
         {
           "name": "write_config",
           "kind": "function",
-          "line": 217,
-          "end_line": 235,
+          "line": 269,
+          "end_line": 287,
           "signature": "def write_config(path: Path, values: dict[str, Any], *, merge: bool=True, validate: bool=True)",
           "summary": "Validate BEFORE touching the file, write atomically, keep it private (it may hold an api_key)."
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/diagnostics.py",
+      "sha256": "30b2863a3a683c940bcee91afbd57ddad4d0adabab7cfdffeafa72687aff949a",
+      "bytes": 3196,
+      "lines": 62,
+      "summary": "Read-only readiness checks; never starts Docker, a subprocess or a model.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.task",
+        "atomic_flow.config",
+        "datetime",
+        "json",
+        "os",
+        "pathlib",
+        "shutil"
+      ],
+      "symbols": [
+        {
+          "name": "offline_diagnostics",
+          "kind": "function",
+          "line": 13,
+          "end_line": 62,
+          "signature": "def offline_diagnostics(project: Path, config: AtomicConfig)",
+          "summary": ""
         }
       ]
     },
@@ -5627,9 +5888,9 @@
     },
     {
       "path": "src/atomic_flow/llm/history.py",
-      "sha256": "42908ab42663612315263ecf6c8779a4b36209d1e3ff5b5ac71bf1e38f4a7491",
-      "bytes": 4665,
-      "lines": 92,
+      "sha256": "f83fc861aa45641826413b852d79c28d4874bea9487a482b86477d215a09c4ec",
+      "bytes": 6863,
+      "lines": 129,
       "summary": "Deterministic history admission for atomic-flow's text/JSON tool protocol.",
       "imports": [
         "__future__",
@@ -5639,70 +5900,87 @@
         "atomic_flow.llm.request_budget",
         "collections",
         "hashlib",
-        "json"
+        "json",
+        "re"
       ],
       "symbols": [
         {
           "name": "wire_bytes",
           "kind": "function",
-          "line": 18,
-          "end_line": 19,
+          "line": 19,
+          "end_line": 20,
           "signature": "def wire_bytes(messages: list[dict[str, str]])",
           "summary": ""
         },
         {
           "name": "RequestHistory",
           "kind": "class",
-          "line": 22,
-          "end_line": 92,
+          "line": 23,
+          "end_line": 129,
           "signature": "class RequestHistory",
           "summary": ""
         },
         {
           "name": "RequestHistory.__init__",
           "kind": "function",
-          "line": 23,
-          "end_line": 35,
+          "line": 24,
+          "end_line": 38,
           "signature": "def __init__(self, settings: ConversationConfig, backend_config: BackendConfig | None=None, *, output_reserve_tokens: int | None=None, tool_schemas: list[dict] | None=None, token_counter: TokenCounter | None=None)",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory.pressure",
+          "kind": "function",
+          "line": 40,
+          "end_line": 46,
+          "signature": "def pressure(self, admitted: RequestAdmission)",
+          "summary": ""
+        },
+        {
+          "name": "RequestHistory.breakdown",
+          "kind": "function",
+          "line": 49,
+          "end_line": 67,
+          "signature": "def breakdown(messages: list[dict[str, str]], admitted: RequestAdmission)",
           "summary": ""
         },
         {
           "name": "RequestHistory.check_tool",
           "kind": "function",
-          "line": 37,
-          "end_line": 42,
+          "line": 69,
+          "end_line": 74,
           "signature": "def check_tool(self, parsed: dict, revision: int)",
           "summary": ""
         },
         {
           "name": "RequestHistory.append_result",
           "kind": "function",
-          "line": 44,
-          "end_line": 55,
+          "line": 76,
+          "end_line": 87,
           "signature": "def append_result(self, messages: list[dict[str, str]], result: dict)",
           "summary": ""
         },
         {
           "name": "RequestHistory.prepare",
           "kind": "function",
-          "line": 57,
-          "end_line": 87,
+          "line": 89,
+          "end_line": 121,
           "signature": "def prepare(self, messages: list[dict[str, str]])",
           "summary": ""
         },
         {
           "name": "RequestHistory.prepare.admission",
           "kind": "function",
-          "line": 58,
-          "end_line": 61,
+          "line": 90,
+          "end_line": 93,
           "signature": "def admission()",
           "summary": ""
         },
         {
           "name": "RequestHistory.stats",
           "kind": "function",
-          "line": 89,
-          "end_line": 92,
+          "line": 123,
+          "end_line": 129,
           "signature": "def stats(self)",
           "summary": ""
         }
@@ -5754,9 +6032,9 @@
     },
     {
       "path": "src/atomic_flow/llm/orchestrator.py",
-      "sha256": "fde81e395b845fbb10fc24aaefe5ca6fcc3959405e49523d111b5acd9f775044",
-      "bytes": 36934,
-      "lines": 667,
+      "sha256": "cd9edde1b909c7a0f1dc1fc9bcc403afc68dcd13b18273f1aaeac8787ab28606",
+      "bytes": 39177,
+      "lines": 698,
       "summary": "Simple, medium and hard request flows with per-request audit artifacts.",
       "imports": [
         "__future__",
@@ -5784,6 +6062,7 @@
         "copy",
         "dataclasses",
         "datetime",
+        "hashlib",
         "json",
         "logging",
         "os",
@@ -5799,256 +6078,264 @@
         {
           "name": "_looks_like_action",
           "kind": "function",
-          "line": 57,
-          "end_line": 59,
+          "line": 58,
+          "end_line": 60,
           "signature": "def _looks_like_action(query: str)",
           "summary": "Deterministic action detector used as a floor for the LLM-based Parser."
         },
         {
           "name": "project_lock",
           "kind": "function",
-          "line": 62,
-          "end_line": 66,
+          "line": 63,
+          "end_line": 67,
           "signature": "def project_lock(project: Path)",
           "summary": "Return the lock shared by refreshes for one project."
         },
         {
           "name": "choose_mode",
           "kind": "function",
-          "line": 69,
-          "end_line": 85,
+          "line": 70,
+          "end_line": 86,
           "signature": "def choose_mode(query: str, configured_mode: str, *, explicit_mode: str | None=None, auto_mode: bool=True, file_scope: str | None=None)",
           "summary": "Choose an initial mode before asking the user to approve a costly hard run."
         },
         {
           "name": "parse_json",
           "kind": "function",
-          "line": 90,
-          "end_line": 112,
+          "line": 91,
+          "end_line": 113,
           "signature": "def parse_json(content: str, schema: type[M])",
           "summary": ""
         },
         {
           "name": "render_user",
           "kind": "function",
-          "line": 115,
-          "end_line": 123,
+          "line": 116,
+          "end_line": 124,
           "signature": "def render_user(query: str, role: str, data: dict[str, Any], context: str | None)",
           "summary": "Code goes in as raw text. Inside a JSON string every newline/quote is escaped, which inflates"
         },
         {
           "name": "_Aliases",
           "kind": "class",
-          "line": 126,
-          "end_line": 143,
+          "line": 127,
+          "end_line": 144,
           "signature": "class _Aliases",
           "summary": "Short ids (n12) instead of 80-character node ids: fewer tokens, far fewer mis-copied citations."
         },
         {
           "name": "_Aliases.__init__",
           "kind": "function",
-          "line": 129,
-          "end_line": 132,
+          "line": 130,
+          "end_line": 133,
           "signature": "def __init__(self, nodes: list[TreeNode])",
           "summary": ""
         },
         {
           "name": "_Aliases.resolve",
           "kind": "function",
-          "line": 134,
-          "end_line": 143,
+          "line": 135,
+          "end_line": 144,
           "signature": "def resolve(self, ref: Any)",
           "summary": ""
         },
         {
           "name": "normalize_scope",
           "kind": "function",
-          "line": 146,
-          "end_line": 150,
+          "line": 147,
+          "end_line": 151,
           "signature": "def normalize_scope(scope: str)",
           "summary": ""
         },
         {
           "name": "scope_ids",
           "kind": "function",
-          "line": 153,
-          "end_line": 159,
+          "line": 154,
+          "end_line": 160,
           "signature": "def scope_ids(nodes: list[TreeNode], scope: str)",
           "summary": ""
         },
         {
           "name": "_get_index",
           "kind": "function",
-          "line": 162,
-          "end_line": 173,
+          "line": 163,
+          "end_line": 174,
           "signature": "def _get_index(project: Path, tree: dict, nodes: list[TreeNode])",
           "summary": ""
         },
         {
           "name": "_Run",
           "kind": "class",
-          "line": 178,
-          "end_line": 390,
+          "line": 179,
+          "end_line": 420,
           "signature": "class _Run",
           "summary": ""
         },
         {
           "name": "_Run.__init__",
           "kind": "function",
-          "line": 179,
-          "end_line": 202,
+          "line": 180,
+          "end_line": 205,
           "signature": "def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str, artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None, conversation=None)",
           "summary": ""
         },
         {
           "name": "_Run.system",
           "kind": "function",
-          "line": 204,
-          "end_line": 209,
+          "line": 207,
+          "end_line": 212,
           "signature": "def system(self, base: str)",
           "summary": ""
         },
         {
           "name": "_Run.event",
           "kind": "function",
-          "line": 211,
-          "end_line": 216,
+          "line": 214,
+          "end_line": 219,
           "signature": "def event(self, kind: str, payload: dict, *, call_id=None, outcome=None)",
           "summary": ""
         },
         {
           "name": "_Run.chat",
           "kind": "function",
-          "line": 218,
-          "end_line": 241,
+          "line": 221,
+          "end_line": 258,
           "signature": "def chat(self, messages: list[dict[str, str]], role: str)",
+          "summary": ""
+        },
+        {
+          "name": "_Run.usage_report",
+          "kind": "function",
+          "line": 260,
+          "end_line": 271,
+          "signature": "def usage_report(self)",
           "summary": ""
         },
         {
           "name": "_Run.write",
           "kind": "function",
-          "line": 243,
-          "end_line": 245,
+          "line": 273,
+          "end_line": 275,
           "signature": "def write(self, name: str, content: str)",
           "summary": ""
         },
         {
           "name": "_Run.write_json",
           "kind": "function",
-          "line": 247,
-          "end_line": 248,
+          "line": 277,
+          "end_line": 278,
           "signature": "def write_json(self, name: str, data: object)",
           "summary": ""
         },
         {
           "name": "_Run._account",
           "kind": "function",
-          "line": 250,
-          "end_line": 257,
+          "line": 280,
+          "end_line": 287,
           "signature": "def _account(self, response: ChatResult)",
           "summary": ""
         },
         {
           "name": "_Run.invoke",
           "kind": "function",
-          "line": 259,
-          "end_line": 263,
+          "line": 289,
+          "end_line": 293,
           "signature": "def invoke(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_single",
           "kind": "function",
-          "line": 265,
-          "end_line": 293,
+          "line": 295,
+          "end_line": 323,
           "signature": "def _invoke_single(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_with_tools",
           "kind": "function",
-          "line": 295,
-          "end_line": 390,
+          "line": 325,
+          "end_line": 420,
           "signature": "def _invoke_with_tools(self, role: str, schema: type[M], data: dict[str, Any], context: str | None, tool_names: list[str])",
           "summary": ""
         },
         {
           "name": "_Attempt",
           "kind": "class",
-          "line": 394,
-          "end_line": 404,
+          "line": 424,
+          "end_line": 434,
           "signature": "class _Attempt",
           "summary": ""
         },
         {
           "name": "_Attempt.score",
           "kind": "function",
-          "line": 403,
-          "end_line": 404,
+          "line": 433,
+          "end_line": 434,
           "signature": "def score(self)",
           "summary": ""
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 407,
-          "end_line": 667,
+          "line": 437,
+          "end_line": 698,
           "signature": "class Orchestrator",
           "summary": ""
         },
         {
           "name": "Orchestrator.__init__",
           "kind": "function",
-          "line": 408,
-          "end_line": 418,
+          "line": 438,
+          "end_line": 448,
           "signature": "def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend, approval_callback=None, *, settings_project: str | Path | None=None, cancel_check=None, question_callback=None, private_workspace=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator.answer",
           "kind": "function",
-          "line": 420,
-          "end_line": 458,
+          "line": 450,
+          "end_line": 488,
           "signature": "def answer(self, query: str, *, mode: str | None=None, budget_tokens: int | None=None, role_prompts: dict[str, str] | None=None, request_id: str | None=None, file_scope: str | None=None, retrieval_query: str | None=None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer",
           "kind": "function",
-          "line": 461,
-          "end_line": 667,
+          "line": 491,
+          "end_line": 698,
           "signature": "def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str, limit: int, file_scope: str | None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.view",
           "kind": "function",
-          "line": 511,
-          "end_line": 513,
+          "line": 542,
+          "end_line": 544,
           "signature": "def view(pairs: list[tuple[TreeNode, float]])",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.reparse",
           "kind": "function",
-          "line": 515,
-          "end_line": 526,
+          "line": 546,
+          "end_line": 557,
           "signature": "def reparse(extra: dict[str, Any] | None=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.build_context",
           "kind": "function",
-          "line": 539,
-          "end_line": 548,
+          "line": 570,
+          "end_line": 579,
           "signature": "def build_context()",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.sync_context",
           "kind": "function",
-          "line": 553,
-          "end_line": 567,
+          "line": 584,
+          "end_line": 598,
           "signature": "def sync_context()",
           "summary": ""
         }
@@ -6177,9 +6464,9 @@
     },
     {
       "path": "src/atomic_flow/llm/schemas.py",
-      "sha256": "2b663eafc2f28099b1d5c68aa0bbff47f06bad3c0549793ae53566836c715253",
-      "bytes": 4397,
-      "lines": 118,
+      "sha256": "b6c3d7b9498b819726db86df66fffe713b74e2fba33e6abf37a1ad715d18f1c1",
+      "bytes": 4454,
+      "lines": 119,
       "summary": "Validated data exchanged between the LLM roles.",
       "imports": [
         "__future__",
@@ -6279,7 +6566,7 @@
           "name": "AnswerResult",
           "kind": "class",
           "line": 92,
-          "end_line": 118,
+          "end_line": 119,
           "signature": "class AnswerResult",
           "summary": ""
         }
@@ -7596,6 +7883,146 @@
           "line": 72,
           "end_line": 74,
           "signature": "def check()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_context_usage_batch.py",
+      "sha256": "7fb96dee8ca2132e4803a8a2f9df5d0d730e272e4dcd2e75c0791e2c9b31a66b",
+      "bytes": 7927,
+      "lines": 150,
+      "summary": "",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.context",
+        "atomic_flow.agents.loop",
+        "atomic_flow.agents.policy",
+        "atomic_flow.agents.tools",
+        "atomic_flow.backends.anthropic",
+        "atomic_flow.backends.base",
+        "atomic_flow.backends.openai_compatible",
+        "atomic_flow.budget",
+        "atomic_flow.config",
+        "atomic_flow.llm.history",
+        "atomic_flow.llm.orchestrator",
+        "atomic_flow.llm.prompts",
+        "atomic_flow.tree.builder",
+        "atomic_flow.tree.node",
+        "json",
+        "pytest"
+      ],
+      "symbols": [
+        {
+          "name": "test_near_limit_compacts_old_results_before_hard_limit",
+          "kind": "function",
+          "line": 23,
+          "end_line": 34,
+          "signature": "def test_near_limit_compacts_old_results_before_hard_limit()",
+          "summary": ""
+        },
+        {
+          "name": "test_context_byte_partition_and_unknown_model_limits_remain_explicit",
+          "kind": "function",
+          "line": 37,
+          "end_line": 49,
+          "signature": "def test_context_byte_partition_and_unknown_model_limits_remain_explicit()",
+          "summary": ""
+        },
+        {
+          "name": "test_openai_usage_cache_and_duplicated_proxy_cost_are_not_double_counted",
+          "kind": "function",
+          "line": 52,
+          "end_line": 62,
+          "signature": "def test_openai_usage_cache_and_duplicated_proxy_cost_are_not_double_counted(monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate",
+          "kind": "function",
+          "line": 65,
+          "end_line": 71,
+          "signature": "def test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate(monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies",
+          "kind": "function",
+          "line": 74,
+          "end_line": 95,
+          "signature": "def test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies.Backend",
+          "kind": "class",
+          "line": 75,
+          "end_line": 84,
+          "signature": "class Backend",
+          "summary": ""
+        },
+        {
+          "name": "test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies.Backend.chat",
+          "kind": "function",
+          "line": 80,
+          "end_line": 84,
+          "signature": "def chat(self, *a, **kw)",
+          "summary": ""
+        },
+        {
+          "name": "ctx",
+          "kind": "function",
+          "line": 98,
+          "end_line": 99,
+          "signature": "def ctx(root)",
+          "summary": ""
+        },
+        {
+          "name": "batch",
+          "kind": "function",
+          "line": 102,
+          "end_line": 104,
+          "signature": "def batch(context, requests, allowed=('read_many', 'read_file', 'find_files'))",
+          "summary": ""
+        },
+        {
+          "name": "test_parallel_read_merges_coverage_and_keeps_child_audit",
+          "kind": "function",
+          "line": 107,
+          "end_line": 114,
+          "signature": "def test_parallel_read_merges_coverage_and_keeps_child_audit(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_batch_preflight_rejects_disallowed_child_without_starting_any",
+          "kind": "function",
+          "line": 118,
+          "end_line": 123,
+          "signature": "def test_batch_preflight_rejects_disallowed_child_without_starting_any(tmp_path, tool)",
+          "summary": ""
+        },
+        {
+          "name": "test_parallel_feature_off_by_default_and_cannot_be_enabled_by_untrusted_project",
+          "kind": "function",
+          "line": 126,
+          "end_line": 133,
+          "signature": "def test_parallel_feature_off_by_default_and_cannot_be_enabled_by_untrusted_project(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_batch_never_prompts_or_weakens_inner_forbid",
+          "kind": "function",
+          "line": 136,
+          "end_line": 142,
+          "signature": "def test_batch_never_prompts_or_weakens_inner_forbid(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_oversized_batch_does_not_mark_unreturned_source_as_read",
+          "kind": "function",
+          "line": 145,
+          "end_line": 150,
+          "signature": "def test_oversized_batch_does_not_mark_unreturned_source_as_read(tmp_path)",
           "summary": ""
         }
       ]
@@ -9298,6 +9725,115 @@
       ]
     },
     {
+      "path": "tests/test_runtime_discovery.py",
+      "sha256": "cf1895e5f604dc2882be8b45aec8efbdf74e524272136dc45fc761b10ebc63d1",
+      "bytes": 7229,
+      "lines": 140,
+      "summary": "",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.context",
+        "atomic_flow.agents.loop",
+        "atomic_flow.agents.policy",
+        "atomic_flow.agents.source",
+        "atomic_flow.agents.tools",
+        "atomic_flow.agents.tools.find_files",
+        "atomic_flow.agents.tools.read_file",
+        "atomic_flow.cli",
+        "atomic_flow.config",
+        "atomic_flow.diagnostics",
+        "atomic_flow.tree.builder",
+        "atomic_flow.tree.node",
+        "datetime",
+        "json",
+        "pydantic",
+        "pytest",
+        "yaml"
+      ],
+      "symbols": [
+        {
+          "name": "context",
+          "kind": "function",
+          "line": 24,
+          "end_line": 26,
+          "signature": "def context(root)",
+          "summary": ""
+        },
+        {
+          "name": "test_glob_whole_path_semantics",
+          "kind": "function",
+          "line": 34,
+          "end_line": 35,
+          "signature": "def test_glob_whole_path_semantics(path, pattern, expected)",
+          "summary": ""
+        },
+        {
+          "name": "test_file_discovery_pagination_ignores_and_policy",
+          "kind": "function",
+          "line": 38,
+          "end_line": 49,
+          "signature": "def test_file_discovery_pagination_ignores_and_policy(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_glob_rejects_escaping_patterns",
+          "kind": "function",
+          "line": 53,
+          "end_line": 55,
+          "signature": "def test_glob_rejects_escaping_patterns(pattern)",
+          "summary": ""
+        },
+        {
+          "name": "test_line_reads_accumulate_actual_file_coverage_and_reject_stale_hash",
+          "kind": "function",
+          "line": 58,
+          "end_line": 76,
+          "signature": "def test_line_reads_accumulate_actual_file_coverage_and_reject_stale_hash(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_line_ranges_keep_redaction_and_empty_out_of_range_is_not_full_read",
+          "kind": "function",
+          "line": 79,
+          "end_line": 88,
+          "signature": "def test_line_ranges_keep_redaction_and_empty_out_of_range_is_not_full_read(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_policy_explanation_matches_decision_without_executing_and_lints_conflict",
+          "kind": "function",
+          "line": 91,
+          "end_line": 98,
+          "signature": "def test_policy_explanation_matches_decision_without_executing_and_lints_conflict()",
+          "summary": ""
+        },
+        {
+          "name": "test_effective_config_uses_runtime_resolver_and_masks_credentials",
+          "kind": "function",
+          "line": 101,
+          "end_line": 116,
+          "signature": "def test_effective_config_uses_runtime_resolver_and_masks_credentials(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_offline_doctor_detects_unsettled_hold_and_corrupt_task",
+          "kind": "function",
+          "line": 119,
+          "end_line": 131,
+          "signature": "def test_offline_doctor_detects_unsettled_hold_and_corrupt_task(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_offline_cli_routes_work_without_backend",
+          "kind": "function",
+          "line": 134,
+          "end_line": 140,
+          "signature": "def test_offline_cli_routes_work_without_backend(tmp_path, capsys)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_sessions_migrations.py",
       "sha256": "2412a92cd419b9f66f09a454ca9ccc7b35759d515333edbf0504bdf2499d9fc3",
       "bytes": 6567,
@@ -10971,6 +11507,18 @@
       "sha256": "a33d3b5f0ed7d4e26d56c20df099dc560445af7d23c0a0b3d0a9ddad7919c843",
       "bytes": 2157,
       "lines": 72
+    },
+    {
+      "path": "validation/step8-windows-final.txt",
+      "sha256": "47d75635f098f5db269502c474e46de73bc2fa3fc1e3adf4342211e35e3cf65f",
+      "bytes": 1015,
+      "lines": 12
+    },
+    {
+      "path": "validation/step8-windows.txt",
+      "sha256": "e25447e63ed53b373629d34f376fb267c8c7519ff1c7ff1686c66636b5ec270a",
+      "bytes": 6210,
+      "lines": 99
     }
   ]
 }
