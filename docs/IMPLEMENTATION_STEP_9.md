@@ -50,5 +50,8 @@ schema admission, durable spend/unknown failure, host-only pairing, malformed ar
 Kaggle refusal. Полный Windows suite: **344 passed, 13 skipped**;
 `validation/step9-windows.txt`. Changed-code Ruff, compileall PASS.
 Нет live provider native acceptance или измерения task quality этого transport.
+Runtime `9272c1d17f2b5eb07cb915fc222cc773137b7cad`: push CI `39789172874` и PR CI
+`39789178362` PASS, Python 3.11/3.12; Docker **334 CPU + 17 extra + 6 real Docker passed**,
+historical calibration PASS. Evidence: `validation/ci-step9-20261022/`.
 Native token streaming, несколько native calls на ответ и сетевой cancel — отдельные
 кандидаты, этим пакетом не объявляются реализованными.

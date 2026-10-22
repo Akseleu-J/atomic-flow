@@ -31,7 +31,7 @@ class Decision:
     source: str = "default"
 
 
-READ_ONLY_TOOLS = {"read_node", "find_callers", "search_tree", "search_text", "read_result", "read_file", "find_files", "read_many"}
+READ_ONLY_TOOLS = {"read_node", "find_callers", "search_tree", "search_text", "read_result", "read_file", "find_files", "read_many", "tool_catalog"}
 
 
 class PolicyEngine:

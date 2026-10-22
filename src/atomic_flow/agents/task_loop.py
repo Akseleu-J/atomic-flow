@@ -141,6 +141,14 @@ class TaskRunner:
         result = self._resume_steps(task)
         if result.status == "running" and result.current_index == len(result.steps):
             try:
+                from atomic_flow.agents.completion import assess_completion
+                result.completion_report = assess_completion(result, self.changeset, self.config, self.cancel_check)
+                save(result)
+                if not result.completion_report["ready_to_publish"]:
+                    result.status = "paused"
+                    result.error = "Final host checks did not pass; workspace retained, nothing published. Inspect completion_report."
+                    save(result)
+                    return result
                 self.changeset.publish(cancel_check=self.cancel_check, finalize=lambda: save_tree(
                     self.project, build_tree(self.project, self.config.tree.ignore,
                                              respect_gitignore=self.config.tree.respect_gitignore)))
@@ -329,6 +337,8 @@ class TaskRunner:
             ):
                 raise StepFailure(step.index, f"command failed or missing exit_code: {summary.get('exit_code')}")
 
+        if getattr(result, "verdict", "unverified") in {"wrong_answer", "needs_retry", "needs_more_context"}:
+            raise StepFailure(step.index, f"Unresolved step critique: {result.verdict}")
         if (step.verify_with == "py_compile" or MUTATING_TOOLS.intersection(step.tools_needed)) and not edits:
             raise StepFailure(step.index, "step requires a verified edit, but no edit was applied")
         if "run_command" in step.tools_needed and not any(call.get("tool") == "run_command" for call in calls):

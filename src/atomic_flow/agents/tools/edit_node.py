@@ -100,9 +100,11 @@ class EditNodeTool(Tool):
             return {"status": "rolled_back" if restored else "rollback_failed", "reason": str(exc),
                     "checks": verdict.checks if verdict else [], "index_refresh_error": refresh_error,
                     "verification": verification,
-                    "test_output": verdict.test_output[:2000] if verdict else ""}
+                    "test_output": verdict.test_output[:2000] if verdict else "",
+                    "diagnostics": verdict.diagnostics if verdict else [],
+                    "diagnostic_source_hash": verdict.source_hash if verdict else ""}
         return {"status": "applied", "edit_id": record.edit_id, "path": node.path,
                 "symbol": node.symbol, "old_lines": f"{node.start_line}-{node.end_line}",
                 "new_lines_count": len(new_body), "checks": verdict.checks,
-                "message": verdict.message, "index_revision": ctx.revision,
+                "message": verdict.message, "index_revision": ctx.revision, "diagnostics": verdict.diagnostics,
                 "content_hash": ctx.file_hashes[node.path], "undo_hint": f"atomic undo {record.edit_id}"}
