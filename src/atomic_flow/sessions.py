@@ -27,6 +27,7 @@ MAX_SESSION_BYTES = 64 * 1024 * 1024
 EVENT_TYPES = frozenset({
     "session_created", "user_input", "model_request", "model_response", "model_failed",
     "tool_request", "tool_result", "question", "answer", "completed", "failed", "tail_recovered",
+    "steering_applied", "response_discarded",
 })
 _SECRET_KEY = re.compile(r"(?i)(?:password|passwd|secret|authorization|api[_-]?key|(?:^|_)token(?:$|_))")
 
@@ -122,7 +123,7 @@ class SessionJournal:
             raise StateError("invalid session payload call_id")
         if call_id is not None and (not isinstance(call_id, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", call_id)):
             raise StateError("invalid session call_id")
-        if outcome is not None and outcome not in ("success", "error", "denied", "cancelled", "unknown", "pending"):
+        if outcome is not None and outcome not in ("success", "error", "denied", "cancelled", "unknown", "pending", "refused", "not_sent"):
             raise StateError("invalid session outcome")
         event = {"schema_version": SCHEMA_VERSION, "session_id": self.session_id,
                  "event_id": uuid.uuid4().hex, "sequence": sequence, "timestamp": time.time(),

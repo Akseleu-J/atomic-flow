@@ -1,28 +1,40 @@
 # atomic-flow — рабочая карта проекта
 
-Обновлено **22 октября 2026**. Исходная база:
+Обновлено **23 октября 2026**. Исходная база:
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–10 закоммичены;
-последний проверенный runtime-коммит — `e9c50bfc7e62cf187c2203fa1b10c56aed1e4f0a`.
+Пакеты 1–11 реализованы; пакет 11 локально проверен и подготовлен к фиксации.
+Последний runtime-коммит, подтверждённый Docker artifact, — `e9c50bfc7e62cf187c2203fa1b10c56aed1e4f0a`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
 ## Локальные исправления поверх HEAD — актуальный статус
 
+22–23 октября: пакет 11 — bounded version 1 events/SDK, API SSE controls/disconnect,
+CLI JSONL, boundary-safe steering, cancellable local HTTP wait и outcome-aware retry.
+Обычный ask теперь имеет durable per-call reservations/settlement без aggregate
+double counting. Отмена после отправки оставляет unknown charge; fully received
+response учитывается до cancel. Remote inference не обещаем остановить.
+`IMPLEMENTATION_STEP_11.md`, `src/atomic_flow/runtime.py`, `sdk.py`, `tests/test_run_control.py`.
+Каталог **35 scoped / 27 planned**; следующие требования — plan/dialogue/memory,
+пакет 12 в `REMAINING_IMPLEMENTATION.md`. Windows **391 passed / 13 skipped**,
+Ruff/compileall PASS, `validation/step11-windows-final.txt`; Docker CI ещё не выполнен
+для этого пакета. Проверки scripted, без внешних paid model calls.
+Stage 4 multi-repository edit quality остаётся открытым.
+
 22 октября: пакет 10 — lazy tool catalog/host factories, data-only provenance,
 revision-bound diagnostics и final host completion gate перед публикацией Task.
 `IMPLEMENTATION_STEP_10.md`; Windows **363 passed, 13 skipped**, Ruff/compileall PASS.
-Каталог: **29 scoped / 33 planned**, `CANDIDATE_STATUS.json`. User-approved scope
+На момент пакета 10: **29 scoped / 33 planned**, `CANDIDATE_STATUS.json`. User-approved scope
 остаётся весь оставшийся каталог, но planned пункты не объявляются реализованными.
 Платные model calls не использованы; это scripted/CPU проверки, не task quality.
 Docker artifact CI `39793671877` подтверждает точный source `e9c50bf`: **353 CPU +
 17 extra + 6 real Docker passed**, calibration PASS; `validation/ci-step10-20261022/`.
 Run conclusion success; API jobs-list в этот момент возвращал queued, поэтому
 опора — скачанные tested-commit/results/logs, не один status badge.
-Продолжение всех 33 planned требований с зависимостями и acceptance gates:
-`REMAINING_IMPLEMENTATION.md`; следующий пакет — controls/events/cancel/SDK.
+Продолжение оставшихся требований с зависимостями и acceptance gates:
+`REMAINING_IMPLEMENTATION.md`; пакет controls/events/cancel/SDK описан выше.
 
 22 октября: пакет 9 — native function transport для opt-in OpenAI-compatible
 backend, один call/ответ, IDs и host-owned pairing, общий dispatcher и budgets;

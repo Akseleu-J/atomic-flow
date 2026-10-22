@@ -65,8 +65,9 @@ Read/edit tools reject stale source and symlink/junction paths. Edits refresh th
 the exact expected current file hash; older backups without that metadata are not automatically restored.
 
 `atomic task --cancel TASK_ID` signals the running worker without racing its task JSON saves.
-Cancellation stops managed checks and is observed around model calls and publication. An in-flight synchronous
-model call completes or times out before cancellation is observed. Simultaneous runners for the same task are rejected.
+Cancellation stops managed checks and interrupts local waiting for built-in HTTP model adapters.
+Remote inference may continue: an unknown charge retains its reservation and blocks replay.
+A fully received response is accounted before cancellation. Simultaneous runners for the same task are rejected.
 
 Planning, replanning and repair calls share durable task budget events. `--dry-run` saves
 the plan and planning cost. A budget pause restores the current step checkpoint; known-cost
@@ -89,3 +90,28 @@ actual read coverage, bounded text search, hash-bound file operations, layered t
 explicit user questions, stored result pages and versioned session/task observations.
 Use `atomic session list|show|export|recover-tail` to inspect journals without replaying actions.
 See [package 7](docs/IMPLEMENTATION_STEP_7.md) for usage, validation and limits.
+
+## Live events and Python SDK
+
+`atomic ask "Explain the refund rule" --mode simple --events` emits version 1 JSONL
+observations and a terminal result/error. Ctrl-C requests cancellation. Slow consumers
+receive explicit gap counts; oversized payloads are marked omitted. These are execution
+events, not provider token deltas.
+
+```python
+from atomic_flow.sdk import start_answer
+
+handle = start_answer(config, project, backend, "Explain the refund rule", mode="simple")
+for event in handle.events():
+    print(event.model_dump_json())
+result = handle.result()
+```
+
+Another thread can call `handle.steer("Answer briefly")` or `handle.cancel()`.
+Guidance applies at safe boundaries and cannot grant permissions or rewrite an action
+already in progress. Host-supplied Python backends/callbacks must cooperate with cancellation.
+
+The optional API exposes `POST /v1/runs`, `GET /v1/runs/{id}/events` (SSE),
+`POST /v1/runs/{id}/control` and `GET /v1/runs/{id}`. Existing API-key/project-root
+checks apply; stream disconnect requests cancellation. Handles are bounded and ephemeral,
+not durable jobs or executable session replay. See [controls, SDK and limits](docs/IMPLEMENTATION_STEP_11.md).

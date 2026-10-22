@@ -1,0 +1,48 @@
+....................................sssss............................... [ 17%]
+.s.........s.................s......ss..............................s... [ 35%]
+...........................s............................................ [ 53%]
+....................F.......................................s........... [ 71%]
+........................................................................ [ 89%]
+............................................                             [100%]
+================================== FAILURES ===================================
+____________ test_discarded_native_call_id_cannot_execute_on_reuse ____________
+
+project = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-step11-final3/test_discarded_native_call_id_0/proj')
+config = AtomicConfig(mode='medium', context_budget_tokens=8000, max_attempts=3, auto_mode=True, default_backend='auto', tree=T...max_same_tool_call=3, compact_at_ratio=0.85), experimental=ExperimentalConfig(parallel_reads=False, native_tools=True))
+
+    def test_discarded_native_call_id_cannot_execute_on_reuse(project, config):
+        from atomic_flow.backends.base import NativeToolCall
+        from atomic_flow.llm.orchestrator import Orchestrator
+        control = RunControl()
+    
+        class Reusing:
+            name = "native-mock"
+            config = BackendConfig(type="openai-compatible", model="mock", tool_protocol="native",
+                                   price_in_per_mtok=1, price_out_per_mtok=1)
+            calls = 0
+    
+            def chat_tools(self, messages, **kw):
+                self.calls += 1
+                if self.calls == 1:
+                    control.submit(ControlMessage(action="steer", text="reconsider"))
+                return ChatResult("", cost_usd=0.001, tool_calls=[NativeToolCall("reused", "read_file", '{"path":"invoice_service.py"}')])
+    
+        config.experimental.native_tools = True
+        model = Reusing()
+        with pytest.raises(ResponseFormatError, match="ID was repeated"):
+            Orchestrator(config, project, model, control=control).answer("refund", mode="simple", request_id="reuse")
+        snapshot = SessionJournal.open("reuse").read()
+>       assert model.calls == 2 and not any(event["event_type"] == "tool_request" for event in snapshot.events)
+E       assert (0 == 2)
+E        +  where 0 = <test_run_control.test_discarded_native_call_id_cannot_execute_on_reuse.<locals>.Reusing object at 0x0000023B3E104F80>.calls
+
+tests\test_run_control.py:552: AssertionError
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_run_control.py::test_discarded_native_call_id_cannot_execute_on_reuse
+1 failed, 390 passed, 13 skipped, 1 warning in 11058.73s (3:04:18)

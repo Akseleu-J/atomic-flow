@@ -80,6 +80,7 @@ def _parser() -> argparse.ArgumentParser:
                      help="Dry-run: never call the Parser (zero model calls)")
     ask.add_argument("--explain", action="store_true")
     ask.add_argument("--json", action="store_true")
+    ask.add_argument("--events", action="store_true", help="Version 1 JSONL observations and terminal result; Ctrl-C requests cancellation")
 
     task_p = cmd.add_parser("task", help="Run a multi-step task")
     task_p.add_argument("query", nargs="?", default="")
@@ -427,6 +428,21 @@ def cmd_ask(args) -> int:
     approval_callback = _make_approval_callback(
         args.yes or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
     )
+    if args.events:
+        from atomic_flow.sdk import start_answer
+        explicit_approval = args.yes or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
+        handle = start_answer(config, project, make_backend(config, args.backend, args.model), args.query,
+                              approval_callback=approval_callback if explicit_approval else None, mode=mode, budget_tokens=args.budget,
+                              role_prompts=prompts, file_scope=args.file, approve_edits=args.approve_edits)
+        try:
+            for event in handle.events():
+                print(event.model_dump_json(), flush=True)
+        except KeyboardInterrupt:
+            if not handle.done:
+                handle.cancel()
+            for event in handle.events():
+                print(event.model_dump_json(), flush=True)
+        return 0 if handle.error is None else 1
     result = Orchestrator(config, project, make_backend(config, args.backend, args.model),
                           approval_callback=approval_callback, question_callback=_ask_user_question).answer(
         args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file,

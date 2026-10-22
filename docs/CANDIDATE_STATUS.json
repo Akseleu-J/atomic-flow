@@ -19,20 +19,20 @@
     {
       "id": 3,
       "candidate": "Поток событий выполнения",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 11
     },
     {
       "id": 4,
       "candidate": "Отмена сетевого/model call",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 11
     },
     {
       "id": 5,
       "candidate": "Уточнения пользователя во время работы",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 11
     },
     {
       "id": 6,
@@ -49,8 +49,8 @@
     {
       "id": 8,
       "candidate": "Политика retry по типу вызова и исходу",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 11
     },
     {
       "id": 9,
@@ -319,8 +319,8 @@
     {
       "id": 53,
       "candidate": "Headless SDK и стабильный event protocol",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 11
     },
     {
       "id": 54,
@@ -337,8 +337,8 @@
     {
       "id": 56,
       "candidate": "Единая трасса выполнения",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 11
     },
     {
       "id": 57,

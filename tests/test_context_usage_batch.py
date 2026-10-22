@@ -46,7 +46,7 @@ def test_context_byte_partition_and_unknown_model_limits_remain_explicit():
     assert parts["source"] and parts["tool_results"] and parts["system_and_tools"]
     caps = backend_capabilities(BackendConfig(type="kaggle"))
     assert not caps["native_tool_calls"] and not caps["model_capabilities_verified"]
-    assert caps["context_window_tokens"] is None and caps["cancellation"] == "timeout_only"
+    assert caps["context_window_tokens"] is None and caps["cancellation"] == "local_wait_only_remote_outcome_unknown"
 
 
 def test_openai_usage_cache_and_duplicated_proxy_cost_are_not_double_counted(monkeypatch):

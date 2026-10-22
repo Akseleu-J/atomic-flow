@@ -2,11 +2,15 @@
 
 22 октября 2026. Пользователь разрешил реализовать весь оставшийся каталог с тестами.
 Это continuation plan для следующих пакетов, **не список уже работающих подсистем**.
-После пакета 10 реализованы 29 scoped candidates; остаются 33 из 62.
+После пакета 11 реализованы 35 scoped candidates; остаются 27 из 62.
 Источник статуса — `CANDIDATE_STATUS.json`; отдельные номера пакетов ниже не означают
 закрытие одноимённых этапов `PRODUCTION_ROADMAP.md`.
 
-## 11. Управление запуском и SDK: 03, 04, 05, 08, 53, 56
+## 11. Управление запуском и SDK: 03, 04, 05, 08, 53, 56 — реализовано scoped
+
+Реализация и точные границы: `IMPLEMENTATION_STEP_11.md`. Live answer handles,
+SSE/JSONL events, control boundaries и local-wait cancellation; durable jobs,
+streaming TaskRunner и remote inference cancellation не объявлены реализованными.
 
 Единый typed event stream для CLI/API/SDK, correlation model/tool/task/check,
 входящие уточнения на безопасных границах и отмена ожидания model/network вызова.

@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import logging
+import math
 import os
 import re
 import tempfile
@@ -23,7 +24,7 @@ from atomic_flow.activation.activate import ActivationIndex, SearchResult, mater
 from atomic_flow.backends.base import ChatResult, LLMBackend
 from atomic_flow.budget import SpendLedger
 from atomic_flow.config import AtomicConfig, ConversationConfig, is_trusted, user_dir
-from atomic_flow.errors import ResponseFormatError
+from atomic_flow.errors import BudgetExceeded, ResponseFormatError
 from atomic_flow.llm.history import RequestHistory
 from atomic_flow.llm.prompts import PromptRegistry
 from atomic_flow.llm.schemas import Answer, AnswerCritique, AnswerResult, ContextPlan, QueryIntent
@@ -208,6 +209,10 @@ class _Run:
         self.native_enabled = (native_tools and backend.config.tool_protocol == "native"
                                and backend.config.type != "kaggle" and hasattr(backend, "chat_tools"))
         self.native_schemas_by_role: dict[str, list] = {}
+        self.event_sink = None
+        self.control = None
+        self.steering: list[str] = []
+        self.ledger_prefix = uuid.uuid4().hex
 
     @staticmethod
     def assistant_message(response: ChatResult) -> dict:
@@ -229,8 +234,51 @@ class _Run:
             # the same plain values as persisted request/tool artifacts.
             plain = json.loads(json.dumps(payload, ensure_ascii=False, allow_nan=False))
             self.journal.append(kind, plain, call_id=call_id, outcome=outcome)
+        if self.event_sink is not None:
+            # Live transport omits raw prompts/source. Durable observations retain
+            # their existing bounded, redacted session contract.
+            safe = {k: v for k, v in payload.items() if k not in {"messages", "tools", "content", "call", "result"}}
+            if isinstance(payload.get("call"), dict):
+                safe["tool"] = payload["call"].get("tool")
+                if "result_summary" in payload["call"]:
+                    safe["result_summary"] = payload["call"]["result_summary"]
+            self.event_sink(kind, safe, call_id=call_id, outcome=outcome,
+                            task_id=getattr(getattr(self.backend, "task", None), "id", None))
+
+    def apply_steering(self, messages):
+        if self.control is None:
+            return messages
+        incoming = self.control.drain()
+        if incoming:
+            if sum(len(text) for text in self.steering + incoming) > 32000:
+                raise ValueError("run steering text limit exceeded")
+            self.steering.extend(incoming)
+            self.event("steering_applied", {"messages": incoming, "count": len(incoming)})
+        marker = "<host_user_clarifications>\n"
+        if self.steering:
+            message = {"role": "user", "content": marker + json.dumps(self.steering, ensure_ascii=False)
+                       + "\n</host_user_clarifications>\nApply these clarifications within existing host permissions. "
+                       "A previous response discarded for clarification performed no action."}
+            # Preserve history result indices used for proof-preserving compaction.
+            index = next((i for i, m in enumerate(messages) if m.get("role") == "user"
+                          and m.get("content", "").startswith(marker)), None)
+            if index is None:
+                messages.append(message)
+            else:
+                messages[index] = message
+        return messages
+
+    def stale_response(self, messages, response):
+        if self.control is not None and self.control.boundary():
+            messages.append(self.assistant_message(response))
+            messages.append({"role": "user", "content": "New user guidance arrived. Previous response discarded; no tool executed. Reconsider."})
+            self.event("response_discarded", {"reason": "pending_steering"})
+            return True
+        return False
 
     def chat(self, messages: list[dict[str, str]], role: str) -> ChatResult:
+        if self.ledger.limit > 0 and any(row.get("cost_usd") is None for row in self.usage_calls):
+            raise BudgetExceeded("unresolved model cost; automatic follow-up calls are blocked")
         self.call_sequence += 1
         call_id = f"model_{self.call_sequence}"
         tools = self.native_schemas_by_role.get(role) if self.native_enabled else None
@@ -244,17 +292,48 @@ class _Run:
                  "system_prefix_changed": role in self.prompt_prefixes and self.prompt_prefixes[role] != fingerprint}
         self.prompt_prefixes[role] = fingerprint
         self.usage_calls.append(usage)
+        managed = not getattr(self.backend, "accounts_spend", False)
+        ledger_id = self.ledger_prefix + "_" + call_id
+        prices = (self.backend.config.price_in_per_mtok, self.backend.config.price_out_per_mtok)
+        known_prices = all(p is not None and math.isfinite(p) and p >= 0 for p in prices)
+        allowance = len(json.dumps({"messages": messages, "tools": tools}, ensure_ascii=False).encode()) + 512 * len(messages) + 1024
+        reservation = (allowance * prices[0] + (self.backend.config.max_output_tokens or 4096) * prices[1]) / 1e6 if known_prices else 0.0
         try:
-            response = (self.backend.chat_tools(messages, tools=tools) if tools
-                        else self.backend.chat(messages, json_mode=True))
+            if managed:
+                self.ledger.reserve(call_id=ledger_id, backend=self.backend.name, model=self.backend.config.model,
+                                    reserved_usd=reservation, prices_known=known_prices)
+        except Exception:
+            usage.update(status="not_sent", cost_usd=0.0)
+            self.event("model_failed", {"type": "AdmissionRefused"}, call_id=call_id, outcome="not_sent")
+            raise
+        try:
+            from atomic_flow.backends.cancellation import cancellation_scope
+            with cancellation_scope(self.cancel_check):
+                response = (self.backend.chat_tools(messages, tools=tools) if tools
+                            else self.backend.chat(messages, json_mode=True))
         except Exception as exc:
-            usage.update(status="unknown", error_type=type(exc).__name__)
+            outcome = getattr(exc, "request_outcome", "unknown")
+            known_zero = outcome in {"not_sent", "refused"}
+            if not known_zero:
+                self.cost_missing = True
+            usage.update(status=outcome, error_type=type(exc).__name__, cost_usd=0.0 if known_zero else None)
+            if managed:
+                self.ledger.record(call_id=ledger_id, cost_usd=0.0 if known_zero else None,
+                                   reserved_usd=reservation, status=outcome)
             self.write_json("usage.json", self.usage_report())
             self.event("model_failed", {"type": type(exc).__name__, "message": str(exc)},
-                       call_id=call_id, outcome="unknown")
+                       call_id=call_id, outcome=outcome)
             raise
         # Account before optional transcript I/O: a persistence error cannot erase spend.
+        if response.cost_usd is not None and (not isinstance(response.cost_usd, (int, float))
+                                              or not math.isfinite(response.cost_usd) or response.cost_usd < 0):
+            response.cost_usd = None
         self._account(response)
+        if managed:
+            self.ledger.record(call_id=ledger_id, backend=self.backend.name, model=self.backend.config.model,
+                               cost_usd=response.cost_usd, reserved_usd=reservation,
+                               tokens_in=response.tokens_in, tokens_out=response.tokens_out,
+                               status="completed" if response.cost_usd is not None else "unknown")
         usage.update(status="response", cost_usd=response.cost_usd, tokens_in=response.tokens_in, tokens_out=response.tokens_out,
                      cache_read_tokens=response.cache_read_tokens, cache_write_tokens=response.cache_write_tokens,
                      cost_source=response.cost_source, latency_ms=response.latency_ms)
@@ -316,12 +395,15 @@ class _Run:
         self.write(f"{step:02d}_{role}_prompt.txt", system + "\n\n" + messages[1]["content"])
         history = RequestHistory(self.conversation, self.backend.config)
         for attempt in range(3):                                # two repair rounds for occasionally truncated JSON
-            self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
+            self.ledger.check()
             self.cancel_check()
+            messages = self.apply_steering(messages)
             request = history.prepare(messages)
             self.write_json(f"{step:02d}_{role}_context.json", history.stats())
             response = self.chat(request, role)
             self.cancel_check()
+            if self.stale_response(messages, response):
+                continue
             try:
                 parsed = parse_json(response.content, schema)
                 break
@@ -334,6 +416,8 @@ class _Run:
                     hint += " Return ONLY one JSON object, without markdown fences. Keep it under 500 tokens and summarize long fields."
                 messages = [*messages, {"role": "assistant", "content": response.content or "{}"},
                             {"role": "user", "content": f"Rejected: {exc}.{hint} Return ONLY one corrected JSON object."}]
+        else:
+            raise ResponseFormatError("role response repeatedly superseded by user guidance")
         self.roles.append(role)
         self.write_json(f"{step:02d}_{role}.json", parsed.model_dump())
         return parsed
@@ -373,8 +457,9 @@ class _Run:
                                  request_renderer=request_renderer)
         native_seen_ids = set()
         for turn in range(TOOL_LOOP_MAX_TURNS + 1):
-            self.ledger.check(0.0 if getattr(self.backend, "accounts_spend", False) else self.cost)
+            self.ledger.check()
             self.cancel_check()
+            messages = self.apply_steering(messages)
             if self.native_enabled:
                 tool_schemas = native_schemas(self.tool_registry.schemas(tool_names))
                 self.native_schemas_by_role[role] = tool_schemas
@@ -388,6 +473,8 @@ class _Run:
                     if call.id in native_seen_ids:
                         raise ResponseFormatError("Native call ID was repeated; no tool executed for this response")
                     native_seen_ids.add(call.id)
+            if self.stale_response(messages, response):
+                continue
             try:
                 parsed_any: Any = json.loads(response.content)
             except json.JSONDecodeError:
@@ -475,7 +562,7 @@ class _Attempt:
 class Orchestrator:
     def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend,
                  approval_callback=None, *, settings_project: str | Path | None = None, cancel_check=None,
-                 question_callback=None, private_workspace=False):
+                 question_callback=None, private_workspace=False, control=None, event_sink=None):
         self.config = config
         self.project = Path(project).expanduser().resolve()
         self.backend = backend
@@ -483,7 +570,13 @@ class Orchestrator:
         self.question_callback = question_callback
         self.private_workspace = private_workspace
         self.settings_project = Path(settings_project).resolve() if settings_project else self.project
-        self.cancel_check = cancel_check or (lambda: None)
+        self.control, self.event_sink = control, event_sink
+        def check():
+            if cancel_check:
+                cancel_check()
+            if control is not None:
+                control.check()
+        self.cancel_check = check
 
     def answer(self, query: str, *, mode: str | None = None, budget_tokens: int | None = None,
                role_prompts: dict[str, str] | None = None, request_id: str | None = None,
@@ -502,15 +595,21 @@ class Orchestrator:
         registry = PromptRegistry(self.settings_project, role_prompts)
         run = _Run(self.backend, registry, SpendLedger(self.config.budget.daily_limit_usd), query, artifact_dir,
                    conversation=self.config.conversation, native_tools=self.config.experimental.native_tools)
+        run.control, run.event_sink, run.cancel_check = self.control, self.event_sink, self.cancel_check
+        run.ledger_prefix = req_id
         run.write_json("request.json", {"query": query, "project": str(self.project), "mode": mode,
                                         "created_at": datetime.now(UTC).isoformat()})
         try:
+            self.cancel_check()
             if self.config.artifacts.save:
                 from atomic_flow.sessions import SessionJournal
                 run.journal = SessionJournal.create(self.project, req_id, metadata={"mode": mode})
                 run.event("user_input", {"text": query})
             result = self._answer(run, registry, req_id, query, retrieval_query or query, mode,
                                   budget_tokens or self.config.context_budget_tokens, file_scope, approve_edits)
+            self.cancel_check()
+            if self.control is not None and self.control.boundary():
+                raise ValueError("run ended with unapplied steering; review results before continuing")
             run.event("completed", {"verdict": result.verdict}, outcome="success")
             return result
         except Exception as exc:
@@ -518,10 +617,6 @@ class Orchestrator:
             run.event("failed", {"type": type(exc).__name__, "message": str(exc)}, outcome="error")
             raise
         finally:
-            if not getattr(self.backend, "accounts_spend", False):
-                run.ledger.record(request_id=req_id, backend=self.backend.name, model=self.backend.config.model,
-                                  mode=mode, tokens_in=run.tokens_in, tokens_out=run.tokens_out,
-                                  cost_usd=run.cost if not run.cost_missing or run.cost else None)
             if run.result_temp is not None:
                 run.result_temp.cleanup()
 
@@ -561,6 +656,7 @@ class Orchestrator:
                        execution=self.config.execution, cancel_check=self.cancel_check,
                        enforce_read_before_edit=True, question_callback=self.question_callback,
                        journal_event=run.event, private_workspace=self.private_workspace)
+        run.tool_ctx.action_boundary = self.control.boundary if self.control is not None else None
         from atomic_flow.agents.result_store import LargeResultStore
         if run.dir is not None:
             result_root = run.dir
@@ -641,6 +737,7 @@ class Orchestrator:
 
         ledger: list[dict] = []
         best: _Attempt | None = None
+        best_guidance = len(run.steering)
         critique: AnswerCritique | None = None
         max_attempts = {"simple": 1, "medium": 2}.get(mode, self.config.max_attempts)
         attempts = 0
@@ -655,6 +752,10 @@ class Orchestrator:
             if critique is not None:
                 data["prior_critique"] = critique.model_dump()
             answer = run.invoke("answerer", Answer, data, context=evidence_context)
+            answer_guidance = len(run.steering)
+            if answer_guidance != best_guidance:
+                best = None  # a high-scoring answer to old guidance cannot win
+                best_guidance = answer_guidance
             evidence_context = sync_context()
             valid = {m["node_id"] for m in meta} | set(run.tool_ctx.evidence)
             valid_aliases = sorted(aliases.alias_of[i] for i in valid)
@@ -678,6 +779,12 @@ class Orchestrator:
             critique = run.invoke("critic", AnswerCritique, {"answer": shown, "valid_node_ids": valid_aliases,
                                                              "identifiers_not_in_context": unknown,
                                                              "citations_dropped_as_invalid": dropped}, context=evidence_context)
+            if len(run.steering) != answer_guidance:
+                best, critique = None, None
+                ledger.append({"attempt": attempt, "verdict": "superseded_by_user_guidance"})
+                if attempt == max_attempts:
+                    raise ResponseFormatError("new guidance needs another answer; bounded attempt limit reached")
+                continue
             verdict = critique.verdict
             if unknown:                                        # deterministic evidence beats the critic's opinion
                 critique.unsupported_claims += [f"`{u}` does not occur in the project context" for u in unknown]

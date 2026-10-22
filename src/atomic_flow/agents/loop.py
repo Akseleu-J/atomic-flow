@@ -131,6 +131,8 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         try:
             check_deadline()
             implementation = registry.get(name)  # Only after role/arguments/edit/policy/approval gates.
+            if ctx.action_boundary is not None and ctx.action_boundary():
+                return finish({"error": "new user guidance pending; reconsider tool arguments before execution"}, "denied")
             result = implementation.run(args, ctx)
         finally:
             ctx.cancel_check = original_check

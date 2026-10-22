@@ -130,9 +130,20 @@ class TaskBudgetBackend:
             self.ledger.record(task_id=self.task.id, call_id=event["id"], cost_usd=0.0, status="not_sent")
             raise
         try:
-            response = (self.backend.chat_tools(messages, tools=native_tools, model=model) if native_tools
-                        else self.backend.chat(messages, json_mode=json_mode, model=model))
+            from atomic_flow.backends.cancellation import cancellation_scope
+            with cancellation_scope(self.cancel_check):
+                response = (self.backend.chat_tools(messages, tools=native_tools, model=model) if native_tools
+                            else self.backend.chat(messages, json_mode=json_mode, model=model))
         except Exception as exc:
+            outcome = getattr(exc, "request_outcome", "unknown")
+            if outcome in {"not_sent", "refused"}:
+                event.update(status="completed", cost_usd=0.0, not_sent=outcome == "not_sent", request_outcome=outcome)
+                save(self.task)
+                self.ledger.record(task_id=self.task.id, call_id=event["id"], cost_usd=0.0, status=outcome)
+                if self.journal:
+                    self.journal.append("model_failed", {"phase": self.phase, "error_type": type(exc).__name__},
+                                        call_id=event["id"], outcome=outcome)
+                raise
             event["status"] = "unknown"
             event["error_type"] = type(exc).__name__  # never store secrets from backend error text
             save(self.task)
@@ -141,6 +152,9 @@ class TaskBudgetBackend:
             if self.journal:
                 self.journal.append("model_failed", {"phase": self.phase, "error_type": type(exc).__name__},
                                     call_id=event["id"], outcome="unknown")
+            from atomic_flow.agents.execution import TaskCancelled
+            if isinstance(exc, TaskCancelled):
+                raise
             raise BudgetExceeded("model request failed; charge is unknown, automatic retries are blocked") from exc
         cost = response.cost_usd
         if cost is None and known_prices and prices == (0, 0):
