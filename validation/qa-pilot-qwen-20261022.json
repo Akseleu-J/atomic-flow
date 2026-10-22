@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "suite": "paired-fixture-qa-v1",
+  "kind": "read_only_qa_pilot",
+  "created_at": "2026-10-22T05:17:32.113593+00:00",
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "backend": "kaggle",
+  "case_ids": [
+    "invoice-subtotal",
+    "refund-call-chain",
+    "checkout-composition",
+    "unanswerable-payout",
+    "russian-discount",
+    "sourcing-pipeline",
+    "ru-shipping",
+    "multi-checkout-flow"
+  ],
+  "limits": {
+    "max_calls": 64,
+    "per_trial_calls": 8,
+    "max_reported_cost_usd": 0.5,
+    "max_output_tokens": 2048
+  },
+  "disclosure": "Known project fixtures; single repeat; heuristic regex/citation/identifier grading. Baseline receives all fixture source and node IDs, atomic receives retrieved context. No code-edit success or production readiness measured. Cost threshold can overshoot by one call; attempted chat calls exclude HTTP parameter-negotiation requests.",
+  "results": [
+    {
+      "case_id": "invoice-subtotal",
+      "strategy": "full_context",
+      "passed": false,
+      "error_type": "HTTPStatusError",
+      "wall_seconds": 0.922,
+      "calls": [
+        {
+          "attempt": 1,
+          "cost_usd": null,
+          "status": "error",
+          "error_type": "HTTPStatusError",
+          "wall_seconds": 0.922
+        }
+      ]
+    }
+  ],
+  "corpus_sha256": "9e3818040fa438bb8903b1d64f6e808fea580111b56e81a73078062ecb3d7526",
+  "cases_sha256": "2ce24fba52d8159243abb177249ba2c2a3016f7b70bcaa8371f4b1f7640eac3e",
+  "summary": {
+    "full_context": {
+      "trials": 1,
+      "passed": 0,
+      "pass_rate": 0.0,
+      "chat_calls": 1,
+      "failed_calls": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "reported_cost_usd": null,
+      "cost_per_success_usd": null,
+      "wall_seconds": 0.922
+    },
+    "atomic_medium": {
+      "trials": 0,
+      "passed": 0,
+      "pass_rate": null,
+      "chat_calls": 0,
+      "failed_calls": 0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "reported_cost_usd": 0,
+      "cost_per_success_usd": null,
+      "wall_seconds": 0
+    }
+  },
+  "stopped_early": true
+}

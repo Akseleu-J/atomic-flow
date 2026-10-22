@@ -1,25 +1,33 @@
 {
-  "source_commit": "0bae3ade4124e3772f20160aa3c8b0c565c497a3",
+  "source_commit": "bb20e1646f4f1bc20c5815db21dfe42264b3eda6",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    "docs/IMPLEMENTATION_STEP_7.md",
+    ".gitattributes",
+    ".github/workflows/checks.yml",
+    "AGENTS.md",
+    "benchmarks/pilot/checks.py",
+    "benchmarks/pilot/tasks.json",
+    "docs/EVALUATION_PILOT.md",
     "docs/PROJECT_CONTEXT.md",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/compile.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/container-boundaries.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/dependencies.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/docker-build.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/docker-info.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/docker-version.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/pytest-extra.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/pytest.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/python-version.txt",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/results.json",
-    "docs/validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/tested-commit.txt"
+    "docs/project-index.json",
+    "src/atomic_flow/evaluation.py",
+    "src/atomic_flow/qa_evaluation.py",
+    "tests/test_evaluation.py",
+    "tools/evaluate_qa.py",
+    "tools/evaluate_tasks.py",
+    "validation/pilot-calibration-local.json",
+    "validation/pilot-tests-windows.txt",
+    "validation/qa-pilot-evaluator-used.py.txt",
+    "validation/qa-pilot-gemini-20261022.json",
+    "validation/qa-pilot-gemini-quota-20261022.json",
+    "validation/qa-pilot-provenance-20261022.json",
+    "validation/qa-pilot-quota-20261022.json",
+    "validation/qa-pilot-qwen-20261022.json"
   ],
-  "file_count": 256,
-  "python_file_count": 125,
-  "symbol_count": 923,
+  "file_count": 273,
+  "python_file_count": 131,
+  "symbol_count": 960,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -47,10 +55,16 @@
       "lines": 12
     },
     {
+      "path": ".gitattributes",
+      "sha256": "ffaaa0342eb45b91e66f82d692e30c7516696236a2e3bfeae2a81fea762cf061",
+      "bytes": 127,
+      "lines": 3
+    },
+    {
       "path": ".github/workflows/checks.yml",
-      "sha256": "2c219095e47d77aeb6218951567be5d2ad9b1b7b08092524f41e3a8230dce649",
-      "bytes": 2219,
-      "lines": 67
+      "sha256": "b29cead2af4763182e0d0d18159bd1e5c9e6bc099a98a668a03e7639210f28e0",
+      "bytes": 2449,
+      "lines": 70
     },
     {
       "path": ".gitignore",
@@ -60,9 +74,9 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "1dbaf85cf2433750620212f59e2cd55bf21662996916a22379d091b236ae9667",
-      "bytes": 2366,
-      "lines": 14
+      "sha256": "9183d8bf00dc4ef45770d76f101d839efb17ba23a11e7ff5d201daf038cd70e8",
+      "bytes": 2627,
+      "lines": 15
     },
     {
       "path": "LICENSE",
@@ -225,10 +239,104 @@
       ]
     },
     {
+      "path": "benchmarks/pilot/checks.py",
+      "sha256": "d7c03524ad3f88900aeefc2d93c306af466cc927b5bc420955b64a1028a2e4c3",
+      "bytes": 5642,
+      "lines": 132,
+      "summary": "Private-to-the-run behavioral checks; never copied into the agent workspace.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.context",
+        "atomic_flow.agents.policy",
+        "atomic_flow.agents.source",
+        "atomic_flow.agents.task",
+        "atomic_flow.agents.tools.ask_user",
+        "atomic_flow.agents.tools.file_ops",
+        "atomic_flow.agents.tools.read_node",
+        "atomic_flow.agents.undo",
+        "atomic_flow.tree.builder",
+        "atomic_flow.tree.node",
+        "json",
+        "os",
+        "pathlib",
+        "tempfile"
+      ],
+      "symbols": [
+        {
+          "name": "full_file_pages",
+          "kind": "function",
+          "line": 10,
+          "end_line": 34,
+          "signature": "def full_file_pages(root)",
+          "summary": ""
+        },
+        {
+          "name": "deny_priority",
+          "kind": "function",
+          "line": 37,
+          "end_line": 43,
+          "signature": "def deny_priority(root)",
+          "summary": ""
+        },
+        {
+          "name": "corrupt_policy",
+          "kind": "function",
+          "line": 46,
+          "end_line": 53,
+          "signature": "def corrupt_policy(root)",
+          "summary": ""
+        },
+        {
+          "name": "task_versions",
+          "kind": "function",
+          "line": 56,
+          "end_line": 77,
+          "signature": "def task_versions(root)",
+          "summary": ""
+        },
+        {
+          "name": "unique_patch",
+          "kind": "function",
+          "line": 80,
+          "end_line": 104,
+          "signature": "def unique_patch(root)",
+          "summary": ""
+        },
+        {
+          "name": "explicit_question",
+          "kind": "function",
+          "line": 107,
+          "end_line": 121,
+          "signature": "def explicit_question(root)",
+          "summary": ""
+        },
+        {
+          "name": "verify",
+          "kind": "function",
+          "line": 128,
+          "end_line": 132,
+          "signature": "def verify(check_id)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "benchmarks/pilot/tasks.json",
+      "sha256": "26fc6659c1347bbdaed499ddb97760ae4bfc6768cd80c1e718486ab2e6c33591",
+      "bytes": 6517,
+      "lines": 22
+    },
+    {
       "path": "docs/ARCHITECTURE_REFERENCE_REVIEW.md",
       "sha256": "430707f3d1d28e4957eef6f5557b38df1258dc809d5c5a2112ab594d69797c9d",
       "bytes": 6585,
       "lines": 96
+    },
+    {
+      "path": "docs/EVALUATION_PILOT.md",
+      "sha256": "c38109aba59e123741b9d7cff9067cac97979156b33bfe3f01f92e7ad21c0dde",
+      "bytes": 11775,
+      "lines": 129
     },
     {
       "path": "docs/EXECUTION.md",
@@ -280,9 +388,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "5d2f849e1c0f2f9a0c5ca093b5ec223fe8ba57621c01c10d56af86ad95807fae",
-      "bytes": 37574,
-      "lines": 383
+      "sha256": "a2a1f1a9c383cbb4206dd8485cdf12ff51884bea19c4afe52c5457b7be40187c",
+      "bytes": 38355,
+      "lines": 391
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -304,9 +412,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "e61157175919c9f546b699e68c4633bca97356dacd4d66ab448063c2ff0ebd4e",
-      "bytes": 334965,
-      "lines": 10380
+      "sha256": "f20b9bc3f428a6e189d17ba2fc59793accabaf9833e56100772c08d5df020799",
+      "bytes": 352140,
+      "lines": 10902
     },
     {
       "path": "docs/prompts.md",
@@ -5334,6 +5442,70 @@
       ]
     },
     {
+      "path": "src/atomic_flow/evaluation.py",
+      "sha256": "a427807d4cf024c7f55597365a2440c786ab3fcc4b7e5838d9222dffff24967f",
+      "bytes": 6607,
+      "lines": 130,
+      "summary": "Historical task calibration. No model calls; Docker execution by default.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.execution",
+        "atomic_flow.config",
+        "datetime",
+        "hashlib",
+        "io",
+        "json",
+        "pathlib",
+        "re",
+        "subprocess",
+        "tarfile",
+        "tempfile",
+        "time"
+      ],
+      "symbols": [
+        {
+          "name": "load_suite",
+          "kind": "function",
+          "line": 19,
+          "end_line": 35,
+          "signature": "def load_suite(path: Path)",
+          "summary": ""
+        },
+        {
+          "name": "_relative_path",
+          "kind": "function",
+          "line": 38,
+          "end_line": 42,
+          "signature": "def _relative_path(name: str)",
+          "summary": ""
+        },
+        {
+          "name": "export_snapshot",
+          "kind": "function",
+          "line": 45,
+          "end_line": 68,
+          "signature": "def export_snapshot(repository: Path, commit: str, destination: Path)",
+          "summary": "Export tracked regular files only, without Git history or worktree changes."
+        },
+        {
+          "name": "check_snapshot",
+          "kind": "function",
+          "line": 71,
+          "end_line": 105,
+          "signature": "def check_snapshot(workspace: Path, checker_source: str, check_id: str, execution: ExecutionConfig)",
+          "summary": ""
+        },
+        {
+          "name": "calibrate",
+          "kind": "function",
+          "line": 108,
+          "end_line": 130,
+          "signature": "def calibrate(repository: Path, manifest: Path, *, execution: ExecutionConfig | None=None)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/kaggle/__init__.py",
       "sha256": "33ff6f1b2ae3966cfa049ab0eb3c1a2cc130a193cc556c5f910a0314e432a9f1",
       "bytes": 53,
@@ -6170,6 +6342,79 @@
           "line": 7,
           "end_line": 32,
           "signature": "def exclusive_file(path: Path, *, blocking=False, busy_message='resource is already locked')",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/qa_evaluation.py",
+      "sha256": "97186d2237f7eb89b23406be7f32474b162abb9cc1483461b0156172e5a0f6ca",
+      "bytes": 9940,
+      "lines": 164,
+      "summary": "Small, paired code-QA evaluation; no execution of fixture or model-written code.",
+      "imports": [
+        "__future__",
+        "atomic_flow.benchmarking",
+        "atomic_flow.config",
+        "atomic_flow.errors",
+        "atomic_flow.llm.orchestrator",
+        "atomic_flow.llm.schemas",
+        "atomic_flow.llm.verify",
+        "datetime",
+        "hashlib",
+        "json",
+        "math",
+        "pathlib",
+        "time",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "CallMeter",
+          "kind": "class",
+          "line": 20,
+          "end_line": 59,
+          "signature": "class CallMeter",
+          "summary": "Bound attempted chat calls, recording failures and usage before answer parsing."
+        },
+        {
+          "name": "CallMeter.__init__",
+          "kind": "function",
+          "line": 23,
+          "end_line": 35,
+          "signature": "def __init__(self, backend, *, max_calls=64, max_reported_cost=0.5, per_trial_calls=8)",
+          "summary": ""
+        },
+        {
+          "name": "CallMeter.chat",
+          "kind": "function",
+          "line": 37,
+          "end_line": 59,
+          "signature": "def chat(self, messages, *, json_mode=False, model=None)",
+          "summary": ""
+        },
+        {
+          "name": "summarize",
+          "kind": "function",
+          "line": 62,
+          "end_line": 71,
+          "signature": "def summarize(rows: list[dict])",
+          "summary": ""
+        },
+        {
+          "name": "run_qa_comparison",
+          "kind": "function",
+          "line": 74,
+          "end_line": 164,
+          "signature": "def run_qa_comparison(backend, config: AtomicConfig, *, case_ids: list[str], output: Path, max_calls=64, max_reported_cost=0.5, per_trial_calls=8)",
+          "summary": "Compare current atomic medium mode to a one-shot, full-fixture-context baseline."
+        },
+        {
+          "name": "run_qa_comparison.checkpoint",
+          "kind": "function",
+          "line": 104,
+          "end_line": 116,
+          "signature": "def checkpoint()",
           "summary": ""
         }
       ]
@@ -7413,6 +7658,165 @@
           "line": 41,
           "end_line": 47,
           "signature": "def test_undo_last_works_from_a_new_stack(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_evaluation.py",
+      "sha256": "7c63a827fb4594ae25edde26904c9fd6e700a208815069953f76f4cb87c909ff",
+      "bytes": 5198,
+      "lines": 117,
+      "summary": "",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.execution",
+        "atomic_flow.backends.base",
+        "atomic_flow.config",
+        "atomic_flow.errors",
+        "atomic_flow.evaluation",
+        "atomic_flow.qa_evaluation",
+        "io",
+        "json",
+        "pytest",
+        "tarfile",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "test_manifest_rejects_traversal_and_duplicate_ids",
+          "kind": "function",
+          "line": 18,
+          "end_line": 29,
+          "signature": "def test_manifest_rejects_traversal_and_duplicate_ids(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_archive_rejects_unsafe_members_before_writing",
+          "kind": "function",
+          "line": 33,
+          "end_line": 46,
+          "signature": "def test_archive_rejects_unsafe_members_before_writing(tmp_path, monkeypatch, name, link)",
+          "summary": ""
+        },
+        {
+          "name": "test_missing_engine_is_unavailable_and_never_passes",
+          "kind": "function",
+          "line": 49,
+          "end_line": 53,
+          "signature": "def test_missing_engine_is_unavailable_and_never_passes(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_missing_engine_is_unavailable_and_never_passes.unavailable",
+          "kind": "function",
+          "line": 50,
+          "end_line": 51,
+          "signature": "def unavailable(*a, **kw)",
+          "summary": ""
+        },
+        {
+          "name": "test_bad_exit_or_dependency_failure_is_not_a_calibrated_result",
+          "kind": "function",
+          "line": 61,
+          "end_line": 63,
+          "signature": "def test_bad_exit_or_dependency_failure_is_not_a_calibrated_result(tmp_path, monkeypatch, output, code, status)",
+          "summary": ""
+        },
+        {
+          "name": "Backend",
+          "kind": "class",
+          "line": 66,
+          "end_line": 71,
+          "signature": "class Backend",
+          "summary": ""
+        },
+        {
+          "name": "Backend.chat",
+          "kind": "function",
+          "line": 70,
+          "end_line": 71,
+          "signature": "def chat(self, *a, **kw)",
+          "summary": ""
+        },
+        {
+          "name": "test_meter_counts_usage_before_parsing_and_enforces_call_cap",
+          "kind": "function",
+          "line": 74,
+          "end_line": 81,
+          "signature": "def test_meter_counts_usage_before_parsing_and_enforces_call_cap()",
+          "summary": ""
+        },
+        {
+          "name": "test_unknown_error_cost_blocks_further_calls_and_summary_is_unknown",
+          "kind": "function",
+          "line": 84,
+          "end_line": 94,
+          "signature": "def test_unknown_error_cost_blocks_further_calls_and_summary_is_unknown()",
+          "summary": ""
+        },
+        {
+          "name": "test_unknown_error_cost_blocks_further_calls_and_summary_is_unknown.Broken",
+          "kind": "class",
+          "line": 85,
+          "end_line": 87,
+          "signature": "class Broken",
+          "summary": ""
+        },
+        {
+          "name": "test_unknown_error_cost_blocks_further_calls_and_summary_is_unknown.Broken.chat",
+          "kind": "function",
+          "line": 86,
+          "end_line": 87,
+          "signature": "def chat(self, *a, **kw)",
+          "summary": ""
+        },
+        {
+          "name": "test_paired_report_preserves_cost_of_failed_parse_and_checkpoints_both_trials",
+          "kind": "function",
+          "line": 97,
+          "end_line": 117,
+          "signature": "def test_paired_report_preserves_cost_of_failed_parse_and_checkpoints_both_trials(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_paired_report_preserves_cost_of_failed_parse_and_checkpoints_both_trials.AnswerBackend",
+          "kind": "class",
+          "line": 98,
+          "end_line": 101,
+          "signature": "class AnswerBackend",
+          "summary": ""
+        },
+        {
+          "name": "test_paired_report_preserves_cost_of_failed_parse_and_checkpoints_both_trials.AnswerBackend.chat",
+          "kind": "function",
+          "line": 99,
+          "end_line": 101,
+          "signature": "def chat(self, *a, **kw)",
+          "summary": ""
+        },
+        {
+          "name": "test_paired_report_preserves_cost_of_failed_parse_and_checkpoints_both_trials.BrokenAtomic",
+          "kind": "class",
+          "line": 103,
+          "end_line": 109,
+          "signature": "class BrokenAtomic",
+          "summary": ""
+        },
+        {
+          "name": "test_paired_report_preserves_cost_of_failed_parse_and_checkpoints_both_trials.BrokenAtomic.__init__",
+          "kind": "function",
+          "line": 104,
+          "end_line": 105,
+          "signature": "def __init__(self, config, project, backend)",
+          "summary": ""
+        },
+        {
+          "name": "test_paired_report_preserves_cost_of_failed_parse_and_checkpoints_both_trials.BrokenAtomic.answer",
+          "kind": "function",
+          "line": 107,
+          "end_line": 109,
+          "signature": "def answer(self, *a, **kw)",
           "summary": ""
         }
       ]
@@ -10371,6 +10775,57 @@
       ]
     },
     {
+      "path": "tools/evaluate_qa.py",
+      "sha256": "a6d4e0ac03c606c177fc822dbb3dc06289194ad4850dcea3325b8d7513f0f339",
+      "bytes": 2215,
+      "lines": 44,
+      "summary": "Run a paired, read-only QA pilot using process-local Kaggle Model Proxy credentials.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "atomic_flow.backends.router",
+        "atomic_flow.config",
+        "atomic_flow.qa_evaluation",
+        "json",
+        "pathlib"
+      ],
+      "symbols": [
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 16,
+          "end_line": 40,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/evaluate_tasks.py",
+      "sha256": "c35431c77d107b7300812aebe4a13fc4c1544cfe2e9bc8fb6bf522c962a15112",
+      "bytes": 1186,
+      "lines": 27,
+      "summary": "Calibrate the historical task graders; never calls a model.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "atomic_flow.config",
+        "atomic_flow.evaluation",
+        "json",
+        "pathlib"
+      ],
+      "symbols": [
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 12,
+          "end_line": 23,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tools/update_project_index.py",
       "sha256": "e0b847eddf29f9ac6fe3d474b2034f76f90426dd58a35b2acc25784bd7b54e18",
       "bytes": 4139,
@@ -10402,6 +10857,54 @@
           "summary": ""
         }
       ]
+    },
+    {
+      "path": "validation/pilot-calibration-local.json",
+      "sha256": "3507b9eabbd1a3719386961ba60b8ed7e332fc327c01377e9f456906ee1388dc",
+      "bytes": 5715,
+      "lines": 190
+    },
+    {
+      "path": "validation/pilot-tests-windows.txt",
+      "sha256": "f48de1b7c356b78517f6bdb64e329d9e8bccacc2193a119c4d07d043a032ed04",
+      "bytes": 1015,
+      "lines": 12
+    },
+    {
+      "path": "validation/qa-pilot-evaluator-used.py.txt",
+      "sha256": "8365267ab9cb397d8aad0a487abb0dfa6c66e07ace7a78b43d41856b3407f187",
+      "bytes": 9278,
+      "lines": 151
+    },
+    {
+      "path": "validation/qa-pilot-gemini-20261022.json",
+      "sha256": "f6a09cb99ee002a7e7d46124d86043669372d6114c9464ed58a23404c1b89b26",
+      "bytes": 27644,
+      "lines": 726
+    },
+    {
+      "path": "validation/qa-pilot-gemini-quota-20261022.json",
+      "sha256": "f65422a6133a7865f0d99ee06e91164f16e1d82d248147e137cd73ba3518613c",
+      "bytes": 552,
+      "lines": 26
+    },
+    {
+      "path": "validation/qa-pilot-provenance-20261022.json",
+      "sha256": "54e450c8d79a482e4ff980ca535ac797cd9c94f92976db60de6894735298f874",
+      "bytes": 10562,
+      "lines": 96
+    },
+    {
+      "path": "validation/qa-pilot-quota-20261022.json",
+      "sha256": "153e17fbf86ef982eb88902c21554c566d794fb45c54970e3ccac677bfedf8dc",
+      "bytes": 518,
+      "lines": 26
+    },
+    {
+      "path": "validation/qa-pilot-qwen-20261022.json",
+      "sha256": "a33d3b5f0ed7d4e26d56c20df099dc560445af7d23c0a0b3d0a9ddad7919c843",
+      "bytes": 2157,
+      "lines": 72
     }
   ]
 }
