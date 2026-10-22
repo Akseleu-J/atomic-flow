@@ -4,8 +4,8 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–11 реализованы; пакет 11 локально проверен и подготовлен к фиксации.
-Последний runtime-коммит, подтверждённый Docker artifact, — `e9c50bfc7e62cf187c2203fa1b10c56aed1e4f0a`.
+Пакеты 1–11 закоммичены.
+Последний runtime-коммит, подтверждённый Docker artifact, — `39e359aa85bd32d931800b5acde6380c40cc1166`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -19,8 +19,11 @@ response учитывается до cancel. Remote inference не обещае�
 `IMPLEMENTATION_STEP_11.md`, `src/atomic_flow/runtime.py`, `sdk.py`, `tests/test_run_control.py`.
 Каталог **35 scoped / 27 planned**; следующие требования — plan/dialogue/memory,
 пакет 12 в `REMAINING_IMPLEMENTATION.md`. Windows **391 passed / 13 skipped**,
-Ruff/compileall PASS, `validation/step11-windows-final.txt`; Docker CI ещё не выполнен
-для этого пакета. Проверки scripted, без внешних paid model calls.
+Ruff/compileall PASS, `validation/step11-windows-final.txt`. CI push `39862268360`
+и PR `39862274999` PASS на точном source `39e359a`: Python 3.11/3.12,
+**381 CPU + 17 extra + 6 real Docker passed**, historical calibration PASS.
+Скачанные tested-commit/results/logs и SHA-256 manifest — `validation/ci-step11-20261023/`.
+Проверки scripted, без внешних paid model calls.
 Stage 4 multi-repository edit quality остаётся открытым.
 
 22 октября: пакет 10 — lazy tool catalog/host factories, data-only provenance,

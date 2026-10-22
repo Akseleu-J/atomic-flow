@@ -132,5 +132,16 @@ Ruff changed files и compileall PASS. Raw final log: `validation/step11-windows
 Предыдущий failed log сохранён как `step11-windows-before-fixture-fix.txt`: runtime
 верно отклонил повтор ID, но тест проверял счётчик исходного mock вместо его копии;
 fixture исправлен до финального полного PASS. Его wall time не является benchmark.
-Linux/Docker результат добавляется после CI, не выводится из Windows тестов. Stage 4
-independent multi-repository edit evaluation остаётся открытым.
+CI для runtime **`39e359aa85bd32d931800b5acde6380c40cc1166`**:
+push [39862268360](https://github.com/Akseleu-J/atomic-flow/actions/runs/39862268360)
+и PR [39862274999](https://github.com/Akseleu-J/atomic-flow/actions/runs/39862274999)
+завершены success. Python 3.11/3.12 PASS. Скачанный Docker-job artifact подтверждает
+**381 CPU passed / 6 skipped + 17 extra passed + 6 real Docker passed**,
+compile PASS и calibrated=true для прежних шести historical changes; model_calls=0.
+Image: `sha256:d36468372521b3c52a12f08ddf0388a26a07124d45fc68a9cec67bbc7a12fce8`.
+Evidence: `validation/ci-step11-20261023/`; manifest содержит SHA-256 всех 12
+исходных artifact files и 6 ключевых Git source blobs. Bytes логов не нормализованы.
+CI проверяет новый runtime и прежние реальные container boundaries; сетевые
+отмены используют fault injection, не реальный model provider.
+
+Stage 4 independent multi-repository edit evaluation остаётся открытым.
