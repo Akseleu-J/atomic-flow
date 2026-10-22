@@ -63,6 +63,10 @@ byte partition, cache usage и дублированная цена, неизве
 injection-тестом: default path снова вызывает `default_registry()` без kwargs,
 opt-in path передаёт flag. Полный повтор PASS. Changed-code Ruff/compileall/diff PASS.
 Новая `.github/workflows/checks.yml` включает push на `experimental`.
+Runtime `ea60439800bccecd1c5c5918fc3777492237b3a7`: push CI `39786981570` и
+PR CI `39786986720` PASS. Python 3.11/3.12; Docker job **324 CPU + 17 extra + 6
+real Docker passed**, historical calibration PASS. Artifact сохранён в
+`validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/`.
 
 Актуальный статус всех 62 кандидатов — `docs/CANDIDATE_STATUS.json`: 24 scoped
 implementations в пакетах 7/8, 38 запланированы. Это tracking требований, не заявление

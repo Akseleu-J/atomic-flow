@@ -11,12 +11,19 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 
 ## Локальные исправления поверх HEAD — актуальный статус
 
+22 октября: пакет 9 — native function transport для opt-in OpenAI-compatible
+backend, один call/ответ, IDs и host-owned pairing, общий dispatcher и budgets;
+Kaggle сохраняет text-JSON. `IMPLEMENTATION_STEP_9.md`. Windows **344 passed,
+13 skipped**, Ruff/compileall PASS. Только scripted HTTP, не live paid models.
+
 22 октября: пакет 8 реализован, `IMPLEMENTATION_STEP_8.md`: find_files, line-range read,
 parallel reads opt-in, policy explain/lint, effective config origins, expanded offline doctor,
 proactive history pressure/byte breakdown, backend capabilities, per-role usage/cache diagnostics.
 Пользователь разрешил продолжить остальные пункты каталога с тестами. Весь каталог
 ещё не закрыт: 24 scoped / 38 planned, `CANDIDATE_STATUS.json`. Windows: **334 passed,
 13 skipped**, changed-code Ruff/compileall PASS; `validation/step8-windows-final.txt`.
+CI `ea60439` PASS: push `39786981570`, PR `39786986720`; Docker **324 CPU + 17 extra
++ 6 real Docker**, calibration PASS. Evidence `validation/ci-step8-20261022/`.
 
 22 октября: начат evaluation gate, `EVALUATION_PILOT.md`. Калибровка 6 известных
 исторических изменений (12 RU/EN формулировок): base 6 FAIL / gold 6 PASS локально,

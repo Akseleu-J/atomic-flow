@@ -57,6 +57,7 @@ class BackendConfig(BaseModel):
     message_framing_tokens: int = Field(default=8, ge=0, le=10_000)
     price_in_per_mtok: float | None = Field(default=None, ge=0)  # lets budget enforcement work without provider cost
     price_out_per_mtok: float | None = Field(default=None, ge=0)
+    tool_protocol: Literal["text_json", "native"] = "text_json"
 
     @field_validator("base_url")
     @classmethod
@@ -114,6 +115,7 @@ class ConversationConfig(BaseModel):
 class ExperimentalConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     parallel_reads: bool = False
+    native_tools: bool = False
 
 
 class AtomicConfig(BaseModel):

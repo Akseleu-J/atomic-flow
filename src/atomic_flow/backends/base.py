@@ -2,10 +2,26 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Protocol
 
 from atomic_flow.config import BackendConfig
+
+
+@dataclass(frozen=True)
+class NativeToolCall:
+    id: str
+    name: str
+    arguments: str
+
+    def __post_init__(self):
+        if not isinstance(self.id, str) or not 1 <= len(self.id) <= 200 or not isinstance(self.name, str) or not 1 <= len(self.name) <= 100:
+            raise ValueError("Invalid native tool call identity")
+        if not isinstance(self.arguments, str) or len(self.arguments.encode()) > 1_000_000:
+            raise ValueError("Native tool arguments must be bounded JSON text")
+
+    def wire(self) -> dict:
+        return {"id": self.id, "type": "function", "function": {"name": self.name, "arguments": self.arguments}}
 
 
 @dataclass
@@ -19,13 +35,15 @@ class ChatResult:
     cache_read_tokens: int | None = None
     cache_write_tokens: int | None = None
     cost_source: str = "unspecified"
+    tool_calls: list[NativeToolCall] = field(default_factory=list)
 
 
 def backend_capabilities(config: BackendConfig) -> dict:
     """Describe implemented transport, without guessing a remote model's support."""
     kind = config.type or config.name
-    return {"backend_type": kind, "model": config.model, "tool_transport": "text_json",
-            "native_tool_calls": False, "streaming": False, "json_schema": False,
+    return {"backend_type": kind, "model": config.model, "tool_transport": config.tool_protocol,
+            "native_tool_calls": "opt_in_adapter" if kind == "openai-compatible" else False,
+            "native_requires_experimental_flag": True, "streaming": False, "json_schema": False,
             "json_object": "negotiated" if kind == "openai-compatible" else False,
             "cancellation": "timeout_only", "timeout_seconds": config.timeout_seconds,
             "context_window_tokens": config.context_window_tokens, "max_input_tokens": config.max_input_tokens,
