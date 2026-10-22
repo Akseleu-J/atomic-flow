@@ -11,7 +11,9 @@
 
 22 октября: начат evaluation gate, `EVALUATION_PILOT.md`. Калибровка 6 известных
 исторических изменений (12 RU/EN формулировок): base 6 FAIL / gold 6 PASS локально,
-0 model calls; Docker calibration добавлена в CI. Парный live read-only QA на
+0 model calls; Docker calibration PASS на `1fe4abe`, push CI `39727907865` и PR CI
+`39727911516` PASS (Python 3.11/3.12, 292 CPU + 17 extra + 6 real Docker passed).
+Evidence: `validation/ci-evaluation-20261022/`. Парный live read-only QA на
 Kaggle №2/Gemini Flash Lite: atomic medium 7/8, full-context 6/8 по heuristic grader;
 26 против 8 chat calls, общий расход бесплатной квоты 0.079881075 USD equivalent.
 Есть abstention/citation ограничения grader и provenance/OneDrive оговорки; читать отчёт.

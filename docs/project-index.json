@@ -1,31 +1,25 @@
 {
-  "source_commit": "bb20e1646f4f1bc20c5815db21dfe42264b3eda6",
+  "source_commit": "1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
     ".gitattributes",
-    ".github/workflows/checks.yml",
-    "AGENTS.md",
-    "benchmarks/pilot/checks.py",
-    "benchmarks/pilot/tasks.json",
     "docs/EVALUATION_PILOT.md",
     "docs/PROJECT_CONTEXT.md",
-    "docs/project-index.json",
-    "src/atomic_flow/evaluation.py",
-    "src/atomic_flow/qa_evaluation.py",
-    "tests/test_evaluation.py",
-    "tools/evaluate_qa.py",
-    "tools/evaluate_tasks.py",
-    "validation/pilot-calibration-local.json",
-    "validation/pilot-tests-windows.txt",
-    "validation/qa-pilot-evaluator-used.py.txt",
-    "validation/qa-pilot-gemini-20261022.json",
-    "validation/qa-pilot-gemini-quota-20261022.json",
-    "validation/qa-pilot-provenance-20261022.json",
-    "validation/qa-pilot-quota-20261022.json",
-    "validation/qa-pilot-qwen-20261022.json"
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/compile.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/container-boundaries.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/dependencies.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-build.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-info.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-version.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/pytest-extra.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/pytest.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/python-version.txt",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/results.json",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/task-calibration.json",
+    "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/tested-commit.txt"
   ],
-  "file_count": 273,
+  "file_count": 285,
   "python_file_count": 131,
   "symbol_count": 960,
   "missing_absolute_internal_imports": [],
@@ -56,8 +50,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "ffaaa0342eb45b91e66f82d692e30c7516696236a2e3bfeae2a81fea762cf061",
-      "bytes": 127,
+      "sha256": "d2be6cf78618107b21f8bfd57efb36235431e8273f66f87bdc46570391c4f202",
+      "bytes": 148,
       "lines": 3
     },
     {
@@ -334,9 +328,9 @@
     },
     {
       "path": "docs/EVALUATION_PILOT.md",
-      "sha256": "c38109aba59e123741b9d7cff9067cac97979156b33bfe3f01f92e7ad21c0dde",
-      "bytes": 11775,
-      "lines": 129
+      "sha256": "1367c53b24f5aa988e9dfc1296b79a872ceb87fca53a60815b7b94c16a15fd5b",
+      "bytes": 12292,
+      "lines": 134
     },
     {
       "path": "docs/EXECUTION.md",
@@ -388,9 +382,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "a2a1f1a9c383cbb4206dd8485cdf12ff51884bea19c4afe52c5457b7be40187c",
-      "bytes": 38355,
-      "lines": 391
+      "sha256": "a0998674ea3f8df52a78f5f0df6070eeb6e903cebad6d4c2962aae3865d47eaa",
+      "bytes": 38511,
+      "lines": 393
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -412,9 +406,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "f20b9bc3f428a6e189d17ba2fc59793accabaf9833e56100772c08d5df020799",
-      "bytes": 352140,
-      "lines": 10902
+      "sha256": "5582a2a4ca492c67292512248ad0f45ea83865e6f67f72d6603413825f3c21b1",
+      "bytes": 352367,
+      "lines": 10910
     },
     {
       "path": "docs/prompts.md",
@@ -10857,6 +10851,78 @@
           "summary": ""
         }
       ]
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/container-boundaries.txt",
+      "sha256": "ff646a19b384bb9cbd09f63b5de9298f147e44c1af4bd50026b9a82719c450e0",
+      "bytes": 98,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/dependencies.txt",
+      "sha256": "1a4c2047b34fbe0afb60e8b0f335acaf25764add51efab46051beec5029c83e3",
+      "bytes": 536,
+      "lines": 28
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-build.txt",
+      "sha256": "b19e4d703eb565975391148833bea4efda2ac2f9c7ef9a75622d3a6c486f88c7",
+      "bytes": 12962,
+      "lines": 173
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-info.txt",
+      "sha256": "7d47c521a44f5e42cb48067204f1cb371beedc0a4a76f1cd40c638e5fd21635c",
+      "bytes": 1490,
+      "lines": 61
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/docker-version.txt",
+      "sha256": "8402d8b7679b4087fa4fb62264e49054f974146c5d134195d8b7a341747ab4ed",
+      "bytes": 769,
+      "lines": 27
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/pytest-extra.txt",
+      "sha256": "c3788640522b7a73a8a63ce1a35822e59814788116a50e7dc72a1c192363d3f2",
+      "bytes": 99,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/pytest.txt",
+      "sha256": "0131ccd44e7ea767bb93dc400675000ea987df65f772d64b324b8ebaffee8515",
+      "bytes": 952,
+      "lines": 12
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+      "bytes": 15,
+      "lines": 1
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/results.json",
+      "sha256": "0a4cd66c5399b3e2bd0167ee35e9bbf219346d12050ff7f959de14fe4f5f815b",
+      "bytes": 354,
+      "lines": 11
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/task-calibration.json",
+      "sha256": "ccc62e9ffa8f99aa98e5e407ec1d7552801ee9e91d6390a3b64cf4fb6b4a03e4",
+      "bytes": 5504,
+      "lines": 190
+    },
+    {
+      "path": "validation/ci-evaluation-20261022/validation-1fe4abe91df152d3b5a46bfc5c5d2b27c9cfe7e7/tested-commit.txt",
+      "sha256": "bad66dca924067d0201724408a0b62a792f96e29ed3f448e1191768f6b6ed01c",
+      "bytes": 41,
+      "lines": 1
     },
     {
       "path": "validation/pilot-calibration-local.json",
