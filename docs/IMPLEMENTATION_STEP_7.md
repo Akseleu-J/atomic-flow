@@ -106,6 +106,15 @@ task использует свой настроенный default. Это зна
 Windows Python 3.12, полный объединённый suite: **292 passed, 13 skipped**, 65.83 s,
 `validation/step7-full.txt`. Ruff затронутых runtime-модулей и интеграционных тестов,
 compileall и diff whitespace checks прошли. `atomic session --help` smoke прошёл.
-Remote Linux/Docker CI фиксируется после завершения.
+Runtime-коммит: `0bae3ade4124e3772f20160aa3c8b0c565c497a3`.
+Push CI [39723522714](https://github.com/Akseleu-J/atomic-flow/actions/runs/39723522714)
+и PR CI [39723526172](https://github.com/Akseleu-J/atomic-flow/actions/runs/39723526172)
+прошли: Python 3.11/3.12, Real Docker acceptance.
+Docker job: **282 passed, 6 skipped** CPU, **17 passed** root-level tests,
+**6 passed** настоящих контейнерных проверок. `container=PASS`, model_calls=0.
+Источник, image ID, версии и логи:
+`validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/`.
+В экспортированных текстовых логах нормализованы trailing whitespace/final newlines;
+идентичность source/image и JSON results сохранена.
 `validation/step7-full-initial.txt` и `step7-integration-repairs.txt` сохраняют ранние
 интеграционные прогоны с ошибками; это не PASS evidence.
