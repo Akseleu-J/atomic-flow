@@ -89,3 +89,12 @@ Docker acceptance case проверяют:
 Общий Windows suite **363 passed, 13 skipped**, `validation/step10-windows.txt`.
 Changed-code Ruff/compileall PASS. Изменение CLI rendering отчёта проверено отдельно
 после общего прогона. Новые model calls отсутствуют; scripted backends/HTTP only.
+
+Runtime `e9c50bfc7e62cf187c2203fa1b10c56aed1e4f0a`: скачанный artifact push CI
+`39793671877` содержит совпадающий `tested-commit.txt`, `results.json` с container PASS,
+**353 CPU + 17 extra + 6 real Docker passed** и calibration PASS. Evidence сохранён
+в `validation/ci-step10-20261022/validation-e9c50bfc7e62cf187c2203fa1b10c56aed1e4f0a/`.
+Проверка done-task completion_report добавлена в настоящий Docker acceptance case.
+Общий run conclusion был success при stale queued jobs-list; утверждение об исполнении
+основано на скачанных SHA/logs/results. Отдельная job-list не использована как proof.
+План оставшихся 33 требований — `REMAINING_IMPLEMENTATION.md`.
