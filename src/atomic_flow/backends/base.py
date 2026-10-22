@@ -45,7 +45,7 @@ def backend_capabilities(config: BackendConfig) -> dict:
             "native_tool_calls": "opt_in_adapter" if kind == "openai-compatible" else False,
             "native_requires_experimental_flag": True, "streaming": False, "json_schema": False,
             "json_object": "negotiated" if kind == "openai-compatible" else False,
-            "cancellation": "timeout_only", "timeout_seconds": config.timeout_seconds,
+            "cancellation": "local_wait_only_remote_outcome_unknown", "timeout_seconds": config.timeout_seconds,
             "context_window_tokens": config.context_window_tokens, "max_input_tokens": config.max_input_tokens,
             "max_output_tokens": config.max_output_tokens, "model_capabilities_verified": False,
             "cache_usage": "provider_reported_only", "cache_hits_guaranteed": False}

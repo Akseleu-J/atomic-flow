@@ -37,6 +37,7 @@ class ToolContext:
     reads: list[dict[str, Any]] = field(default_factory=list)
     question_callback: Callable[[dict[str, Any]], str | None] | None = None
     journal_event: Callable[..., Any] | None = None
+    action_boundary: Callable[[], bool] | None = None
     result_store: Any = None
     private_workspace: bool = False
     active_allowed_tools: tuple[str, ...] = ()

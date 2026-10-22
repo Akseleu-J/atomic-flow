@@ -1,8 +1,8 @@
 """FastAPI endpoints for native clients and the OpenAI chat-completions shim."""
 
-from __future__ import annotations
-
+import asyncio
 import hmac
+import json
 import os
 import threading
 import time
@@ -16,6 +16,7 @@ from atomic_flow.config import load_config
 from atomic_flow.errors import AtomicFlowError, BackendError, BudgetExceeded, ConfigurationError, TreeError
 from atomic_flow.llm.orchestrator import Orchestrator, choose_mode
 from atomic_flow.llm.prompts import PromptRegistry
+from atomic_flow.runtime import ControlMessage
 
 Mode = Literal["simple", "medium", "hard"]
 PLACEHOLDER_KEYS = {"replace-with-a-long-random-value", "changeme", "secret", "password"}
@@ -59,7 +60,7 @@ def split_conversation(turns: list[tuple[str, str]]) -> tuple[str | None, str]:
 def create_app():
     try:
         from fastapi import FastAPI, HTTPException, Request
-        from starlette.responses import JSONResponse
+        from starlette.responses import JSONResponse, StreamingResponse
     except ImportError as exc:
         raise RuntimeError("Install the API extra with `pip install atomic-flow[api]`.") from exc
 
@@ -72,6 +73,9 @@ def create_app():
                   redoc_url=None if server_key else "/redoc",
                   openapi_url=None if server_key else "/openapi.json")
     slots = threading.BoundedSemaphore(int(os.getenv("ATOMIC_FLOW_MAX_CONCURRENCY", "4")))
+    runs = {}
+    runs_lock = threading.Lock()
+    streaming = set()
 
     def configured_project_root() -> Path:
         return Path(os.getenv("ATOMIC_FLOW_PROJECT_ROOT", Path.cwd())).expanduser().resolve()
@@ -99,7 +103,7 @@ def create_app():
     def models():
         return {"object": "list", "data": [{"id": f"atomic-{m}", "object": "model", "owned_by": "atomic_flow"} for m in ("simple", "medium", "hard")]}
 
-    def run_answer(request: AnswerRequest) -> dict:
+    def prepare(request: AnswerRequest):
         project = Path(request.project).expanduser().resolve()
         if not project.is_relative_to(configured_project_root()):
             raise HTTPException(403, detail={"error": "project_outside_root", "message": "Project must be inside ATOMIC_FLOW_PROJECT_ROOT."})
@@ -116,6 +120,14 @@ def create_app():
                                                  "message": "Hard mode with built-in prompts requires explicit acknowledgment.",
                                                  "action": "Set acknowledge_default_prompts=true or provide custom prompts for every role.",
                                                  "max_calls": 2 + config.max_attempts * 3})
+            return project, config, mode
+        except (AtomicFlowError, ValueError) as exc:
+            status = next((code for cls, code in STATUS_FOR.items() if isinstance(exc, cls)), 400)
+            raise HTTPException(status, detail={"error": type(exc).__name__.lower(), "message": str(exc)}) from exc
+
+    def run_answer(request: AnswerRequest) -> dict:
+        project, config, mode = prepare(request)
+        try:
             if not slots.acquire(blocking=False):
                 raise HTTPException(429, detail={"error": "busy", "message": "Too many concurrent requests."})
             try:
@@ -132,6 +144,100 @@ def create_app():
     @app.post("/v1/answer")
     def answer(request: AnswerRequest):
         return run_answer(request)
+
+    def find_run(run_id):
+        with runs_lock:
+            handle = runs.get(run_id)
+            if handle is None or (handle.finished_at is not None and time.monotonic() - handle.finished_at > 600):
+                runs.pop(run_id, None)
+                raise HTTPException(404, detail={"error": "run_not_found"})
+            return handle
+
+    @app.post("/v1/runs", status_code=202)
+    def start_run(request: AnswerRequest):
+        from atomic_flow.sdk import start_answer
+        project, config, mode = prepare(request)
+        with runs_lock:
+            expired = [key for key, value in runs.items() if value.finished_at is not None
+                       and time.monotonic() - value.finished_at > 600]
+            for key in expired:
+                runs.pop(key)
+            if len(runs) >= 32:
+                oldest = next((key for key, value in runs.items() if value.done and key not in streaming), None)
+                if oldest:
+                    runs.pop(oldest)
+                else:
+                    raise HTTPException(429, detail={"error": "run_retention_full"})
+            if not slots.acquire(blocking=False):
+                raise HTTPException(429, detail={"error": "busy"})
+            try:
+                backend = make_backend(config, request.backend, request.model)
+                handle = start_answer(config, project, backend, request.query, mode=mode,
+                                      budget_tokens=request.budget_tokens, role_prompts=request.role_prompts,
+                                      retrieval_query=request.retrieval_query, on_finished=slots.release)
+            except Exception as exc:
+                slots.release()
+                raise HTTPException(400, detail={"error": type(exc).__name__.lower()}) from exc
+            runs[handle.run_id] = handle
+        return {"version": 1, "run_id": handle.run_id, "events_url": f"/v1/runs/{handle.run_id}/events",
+                "control_url": f"/v1/runs/{handle.run_id}/control", "result_url": f"/v1/runs/{handle.run_id}"}
+
+    @app.post("/v1/runs/{run_id}/control")
+    def control_run(run_id: str, message: ControlMessage):
+        handle = find_run(run_id)
+        try:
+            handle.control.submit(message)
+        except ValueError as exc:
+            raise HTTPException(409, detail={"error": "control_rejected", "message": str(exc)}) from exc
+        return {"version": 1, "run_id": run_id, "status": "accepted", "applied": False}
+
+    @app.get("/v1/runs/{run_id}")
+    def run_result(run_id: str):
+        from atomic_flow.sessions import _clean
+        handle = find_run(run_id)
+        if not handle.done:
+            return JSONResponse(status_code=202, content={"version": 1, "run_id": run_id, "status": "running"})
+        if handle.error:
+            return {"version": 1, "run_id": run_id, "error": handle.error.model_dump()}
+        return {"version": 1, "run_id": run_id, "result": _clean(handle.result().model_dump())}
+
+    @app.get("/v1/runs/{run_id}/events")
+    async def run_events(run_id: str, request: Request):
+        handle = find_run(run_id)
+        with runs_lock:
+            if run_id in streaming:
+                raise HTTPException(409, detail={"error": "single_event_consumer"})
+            streaming.add(run_id)
+
+        async def events():
+            try:
+                while True:
+                    if await request.is_disconnected():
+                        break
+                    event = await asyncio.to_thread(handle.buffer.next, 0.1)
+                    if event is None:
+                        if handle.buffer.terminal is not None:
+                            # A reconnect after consumption gets the retained
+                            # terminal, never replays model or tool calls.
+                            event = handle.buffer.terminal
+                        else:
+                            yield ": keepalive\n\n"
+                            continue
+                    yield "id: " + str(event.sequence) + "\nevent: " + event.kind + "\ndata: " + json.dumps(
+                        event.model_dump(), ensure_ascii=False) + "\n\n"
+                    if event.kind in {"run_completed", "run_cancelled", "run_failed"}:
+                        break
+            finally:
+                with runs_lock:
+                    streaming.discard(run_id)
+                if not handle.done:
+                    try:
+                        handle.cancel()
+                    except ValueError:
+                        pass  # completion raced disconnect
+
+        return StreamingResponse(events(), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})
 
     @app.post("/v1/chat/completions")
     def chat(request: ChatRequest):
