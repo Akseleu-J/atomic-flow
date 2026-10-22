@@ -1,0 +1,3 @@
+# Preserve evidence bytes: provenance hashes refer to the actual captured files.
+validation/** -text
+benchmarks/pilot/** -text

@@ -44,6 +44,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+          fetch-depth: 0 # Historical replay uses pinned base/gold commits.
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
@@ -57,6 +58,8 @@ jobs:
           docker version > colab-results/docker-version.txt
       - name: CPU checks, image build and real container tests
         run: python tools/colab_validate.py --require-docker
+      - name: Calibrate historical task graders in containers
+        run: python tools/evaluate_tasks.py --output colab-results/task-calibration.json
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

@@ -9,6 +9,14 @@
 
 ## Локальные исправления поверх HEAD — актуальный статус
 
+22 октября: начат evaluation gate, `EVALUATION_PILOT.md`. Калибровка 6 известных
+исторических изменений (12 RU/EN формулировок): base 6 FAIL / gold 6 PASS локально,
+0 model calls; Docker calibration добавлена в CI. Парный live read-only QA на
+Kaggle №2/Gemini Flash Lite: atomic medium 7/8, full-context 6/8 по heuristic grader;
+26 против 8 chat calls, общий расход бесплатной квоты 0.079881075 USD equivalent.
+Есть abstention/citation ограничения grader и provenance/OneDrive оговорки; читать отчёт.
+Живые edit-задачи и multi-repository качество ещё не измерены; Stage 4 открыт.
+
 22 октября: пакет 7 — пользователь подтвердил первые 12 кандидатов. Шесть субагентов
 реализовали пакеты; основной агент интегрировал их в tools, task/planner, CLI и Orchestrator.
 `IMPLEMENTATION_STEP_7.md` содержит scope, команды и границы. Общий Windows suite:
