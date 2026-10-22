@@ -2,8 +2,8 @@
 
 Обновлено **22 октября 2026**. Исходная база:
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
-Рабочая ветка `codex/execution-safety-ci`, draft PR №1. Пакеты 1–6 закоммичены;
-последний проверенный runtime-коммит — `ac36bdc044753ea47f05656ffeb3fd542e095ae6`.
+Рабочая ветка `codex/execution-safety-ci`, draft PR №1. Пакеты 1–7 закоммичены;
+последний проверенный runtime-коммит — `0bae3ade4124e3772f20160aa3c8b0c565c497a3`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -13,7 +13,10 @@
 реализовали пакеты; основной агент интегрировал их в tools, task/planner, CLI и Orchestrator.
 `IMPLEMENTATION_STEP_7.md` содержит scope, команды и границы. Общий Windows suite:
 **292 passed, 13 skipped**, Ruff/compileall/CLI smoke PASS; `validation/step7-full.txt`.
-Linux/Docker CI фиксируется после завершения. Остальные 50 пунктов не закрыты.
+Push CI `39723522714` и PR CI `39723526172` PASS: Python 3.11/3.12;
+Docker job **282 CPU + 17 root + 6 real Docker passed**. Evidence:
+`validation/ci-first12-20261022/validation-0bae3ade4124e3772f20160aa3c8b0c565c497a3/`.
+Остальные 50 пунктов не закрыты. Реальное качество задач и стоимость успеха не измерены.
 
 22 октября: расширенный **аналитический каталог**, не новый implementation package:
 `REFERENCE_OPPORTUNITIES.md` — 62 кандидата из обзора документации, полного каталога
