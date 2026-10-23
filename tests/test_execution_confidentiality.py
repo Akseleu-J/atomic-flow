@@ -116,6 +116,14 @@ def test_installed_pytest_preserves_project_imports(tmp_path):
     assert "1 passed" in result.stdout
 
 
+def test_trusted_checker_preserves_selected_matching_tests(tmp_path):
+    (tmp_path / "test_selected.py").write_text("def test_selected():\n    assert True\n")
+    (tmp_path / "test_unrelated.py").write_text("def test_unrelated():\n    assert False\n")
+    result = run_python(["-m", "pytest", "-q", "test_selected.py"], tmp_path, config=ExecutionConfig(mode="local"))
+    assert result.returncode == 0 and "1 passed" in result.stdout
+    assert "test_unrelated" not in result.stdout
+
+
 def test_final_pytest_gate_rejects_shadowing_and_zero_collection(tmp_path):
     project = tmp_path / "project"
     project.mkdir()

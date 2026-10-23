@@ -62,6 +62,8 @@ SDK typed failure. Автоматический reconciliation/clear не доб
 isolated Python `-I` bootstrap. Установленный checker импортируется до включения
 project imports; root `pytest.py`, `ruff.py`, `mypy.py` не заменяет package.
 Pytest получает workspace target, затем доступны необходимые imports test modules.
+Явные positional matching-test targets сохраняются: launcher не добавляет root
+к выбранным tests, а без targets pytest использует cwd по своему обычному правилу.
 Host plugin читает итоговый testscollected; exit 0 без collection превращается
 в exit 5. Одинаковый путь используется в local/Docker, run_command и final completion.
 
@@ -155,3 +157,5 @@ read → repair → apply и прежняя memory authority regression: **36 pa
 `validation/step17-preflight-final-windows.txt`. Промежуточные четыре assertion
 failures при изменении CreateFileTool return/exception устранены сохранением API;
 лог `step17-preflight-recheck-windows.txt` оставлен отдельно.
+Дополнительная проверка trusted checker/matching-test targets и task final gates:
+**39 passed / 1 Docker-only skipped**, `validation/step17-checker-final-windows.txt`.
