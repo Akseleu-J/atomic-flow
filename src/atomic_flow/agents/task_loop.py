@@ -17,7 +17,7 @@ from atomic_flow.errors import BudgetExceeded
 from atomic_flow.llm.orchestrator import Orchestrator
 from atomic_flow.tree.builder import build_tree, save_tree
 
-MUTATING_TOOLS = {"edit_node", "patch_file", "create_file", "delete_file", "move_file"}
+MUTATING_TOOLS = {"edit_node", "patch_file", "create_file", "delete_file", "move_file", "notebook_edit"}
 
 
 @dataclass
@@ -416,10 +416,14 @@ class TaskRunner:
             if summary.get("outcome") != "success":
                 raise StepFailure(step.index, f"{call.get('tool')}: missing successful tool outcome")
             if call.get("tool") in MUTATING_TOOLS:
+                if call.get("tool") == "notebook_edit" and summary.get("status") == "preview":
+                    continue
                 if summary.get("status") != "applied" or not summary.get("checks"):
                     raise StepFailure(step.index, "edit lacks applied status and syntax verification")
                 if call.get("tool") == "edit_node" and "syntax" not in summary.get("checks", []):
                     raise StepFailure(step.index, "edit lacks syntax verification")
+                if call.get("tool") == "notebook_edit" and summary.get("verification", {}).get("notebook_schema") != "passed":
+                    raise StepFailure(step.index, "notebook edit lacks host structural verification")
                 edits.append(summary)
                 last_edit = i
             if call.get("tool") == "run_command" and (

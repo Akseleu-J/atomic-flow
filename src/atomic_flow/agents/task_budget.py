@@ -8,9 +8,11 @@ from __future__ import annotations
 import copy
 import json
 import math
+import threading
 import time
 import uuid
 from collections.abc import Callable
+from contextlib import contextmanager
 from pathlib import Path
 
 from atomic_flow.agents.task import Task, save
@@ -36,6 +38,7 @@ class TaskBudgetBackend:
     accounts_spend = True
 
     def __init__(self, backend, task: Task, config: AtomicConfig, cancel_check: Callable[[], None], *, phase="step"):
+        self._call_lock = threading.RLock()
         self.backend = copy.copy(backend)
         self.task, self.settings, self.cancel_check, self.phase = task, config, cancel_check, phase
         original = getattr(backend, "config", BackendConfig())
@@ -69,12 +72,32 @@ class TaskBudgetBackend:
     def chat(self, messages, *, json_mode=False, model=None):
         return self._chat(messages, json_mode=json_mode, model=model)
 
+    @contextmanager
+    def call_scope(self):
+        """Serialize the same parent's accounting and optional worker handoffs.
+
+        Cancellation remains cooperative while another call owns the instance.
+        Separate task runners still require the existing OS-held task lease.
+        Shallow copies retain this lock and task; creating a new backend/Task is
+        never an authorized way to acquire an independent worker budget.
+        """
+        while not self._call_lock.acquire(timeout=0.025):
+            self.cancel_check()
+        try:
+            yield
+        finally:
+            self._call_lock.release()
+
     def chat_tools(self, messages, *, tools, model=None):
         if not self.settings.experimental.native_tools or not hasattr(self.backend, "chat_tools"):
             raise BackendError("Native tools are disabled or unavailable")
         return self._chat(messages, model=model, native_tools=tools)
 
     def _chat(self, messages, *, json_mode=False, model=None, native_tools=None):
+        with self.call_scope():
+            return self._chat_locked(messages, json_mode=json_mode, model=model, native_tools=native_tools)
+
+    def _chat_locked(self, messages, *, json_mode=False, model=None, native_tools=None):
         self.cancel_check()
         if self.backend is None:
             raise BackendError("No model backend configured")

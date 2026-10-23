@@ -86,6 +86,9 @@ class TreeConfig(BaseModel):
     ignore: list[str] = Field(default_factory=lambda: list(DEFAULT_IGNORE))
     respect_gitignore: bool = True
     auto_refresh: bool = True                                   # re-index changed files before every question
+    watch_external: bool = False
+    watch_interval_seconds: float = Field(default=0.25, ge=0.1, le=10)
+    watch_debounce_seconds: float = Field(default=0.2, ge=0, le=5)
 
 
 class TaskConfig(BaseModel):

@@ -11,7 +11,7 @@ from atomic_flow.tree.builder import _Ignore
 from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES, SOURCE_SUFFIXES
 
 
-def admitted_path(ctx, rel: str, *, existing: bool = False):
+def admitted_path(ctx, rel: str, *, existing: bool = False, notebook: bool = False):
     # Reject OS aliases, alternate data streams, hidden/private files and paths
     # which the project's index intentionally excludes.
     if not rel or "\\" in rel or ":" in rel or rel != PurePosixPath(rel).as_posix():
@@ -30,7 +30,7 @@ def admitted_path(ctx, rel: str, *, existing: bool = False):
     if any(fnmatch.fnmatch(part.lower(), pattern) for part in parts
            for pattern in ("credentials*", "secrets*", "*private_key*", "*.pem", "*.key", "*.enc", "*.p12", "*.pfx")):
         raise SourceConflict("credential/private paths are not source")
-    if path.suffix.lower() not in SOURCE_SUFFIXES:
+    if (path.suffix.lower() != ".ipynb" if notebook else path.suffix.lower() not in SOURCE_SUFFIXES):
         raise SourceConflict("file type is not supported by the source index")
     if path.exists():
         info = path.stat()

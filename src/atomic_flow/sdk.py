@@ -33,7 +33,8 @@ class AnswerHandle:
     This is a live handle, not a durable job or a replayable session.
     """
     def __init__(self, config, project: str | Path, backend, query: str, *, capacity=128,
-                 approval_callback=None, question_callback=None, on_finished=None, **answer_options):
+                 approval_callback=None, question_callback=None, on_finished=None, workspace_session=None, lsp_client=None,
+                 documentation_client=None, hooks=None, tool_registry=None, role_tools=None, **answer_options):
         if not _RUN_SLOTS.acquire(blocking=False):
             raise ValueError("SDK run capacity reached")
         try:
@@ -51,7 +52,8 @@ class AnswerHandle:
                     self.buffer.emit("run_started", {"project": str(Path(project).resolve())})
                     self._result = Orchestrator(config, project, backend, control=self.control,
                                                 event_sink=self.buffer.emit, approval_callback=approval_callback,
-                                                question_callback=question_callback).answer(
+                                                question_callback=question_callback, workspace_session=workspace_session, lsp_client=lsp_client,
+                                                documentation_client=documentation_client, hooks=hooks, tool_registry=tool_registry, role_tools=role_tools).answer(
                         query, request_id=self.run_id, **answer_options)
                     self.control.finish()
                     self.buffer.emit("run_completed", {"result": self._result.model_dump()}, outcome="success", terminal=True)
@@ -155,3 +157,66 @@ def connect_worker(project: str | Path, url: str, *, broker, grant_id: str, allo
     """No network on construction; each operation resolves a scoped host grant."""
     from atomic_flow.remote import RemoteExecutor, ScopedWorkerTransport
     return RemoteExecutor(ScopedWorkerTransport(Path(project), url, broker, grant_id, allow_loopback_http))
+
+
+def notebook(project: str | Path, path: str, **options):
+    from atomic_flow.notebooks import NotebookDocument
+    return NotebookDocument.load(Path(project), path, **options)
+
+
+def workspace(workspace_id="default"):
+    from atomic_flow.workspace import WorkspaceRegistry
+    return WorkspaceRegistry(workspace_id)
+
+
+def watch(project: str | Path, **options):
+    from atomic_flow.watching import SourceWatcher
+    return SourceWatcher(Path(project), **options)
+
+
+def open_lsp(project: str | Path, command: list[str], *, approved=False, **options):
+    """Explicit host executable approval; use as context manager to start/close."""
+    from atomic_flow.lsp import LSPClient
+    return LSPClient(Path(project), command, approved=approved, **options)
+
+
+def documentation(allowed_hosts, *, approved=False, **options):
+    from atomic_flow.documentation import DocumentationClient
+    return DocumentationClient(allowed_hosts, approved=approved, **options)
+
+
+def components():
+    """Host-owned builtins, deferred until requested; no project import paths."""
+    from importlib import import_module
+
+    from atomic_flow.extensions import OptionalComponents
+    catalog = OptionalComponents()
+    for name, module, symbol in (("api", "atomic_flow.api.server", "create_app"),
+        ("lsp", "atomic_flow.lsp", "LSPClient"), ("mcp", "atomic_flow.integrations.mcp", "MCPClient"),
+        ("ide", "atomic_flow.integrations.ide", "create_ide_bridge"),
+        ("documentation", "atomic_flow.documentation", "DocumentationClient"), ("workers", "atomic_flow.workers", "WorkerCoordinator")):
+        catalog.register(name, lambda module=module, symbol=symbol: getattr(import_module(module), symbol), approved=True)
+    return catalog
+
+
+def worker_coordinator(project, parent_budget_backend, **options):
+    from atomic_flow.workers import WorkerCoordinator
+    return WorkerCoordinator(project, parent_budget_backend, **options)
+
+
+def open_mcp(project, command, *, approved=False, **options):
+    """Explicit trusted stdio process; context manager owns start and shutdown."""
+    from atomic_flow.integrations.mcp import MCPClient
+    return MCPClient(Path(project), command, approved=approved, **options)
+
+
+def ide_bridge(project, *, token, allowed_origins, **options):
+    """Return an unstarted, authenticated read-only loopback HTTP server."""
+    from atomic_flow.integrations.ide import create_ide_bridge
+    return create_ide_bridge(Path(project), token=token, allowed_origins=allowed_origins, **options)
+
+
+def execute_workflow(definition, registry, context, *, expected_digest, approved=False, allowed_tools, role=""):
+    from atomic_flow.workflows import run_workflow
+    return run_workflow(definition, registry, context, allowed_tools=allowed_tools, role=role,
+                        expected_digest=expected_digest, approved=approved)

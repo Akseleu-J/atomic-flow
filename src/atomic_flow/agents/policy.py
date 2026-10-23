@@ -31,7 +31,8 @@ class Decision:
     source: str = "default"
 
 
-READ_ONLY_TOOLS = {"read_node", "find_callers", "search_tree", "search_text", "read_result", "read_file", "find_files", "read_many", "tool_catalog"}
+READ_ONLY_TOOLS = {"read_node", "find_callers", "search_tree", "search_text", "read_result", "read_file", "find_files", "read_many", "tool_catalog",
+                   "notebook_read", "workspace_read", "lsp_definition", "lsp_references", "lsp_diagnostics", "docs_fetch", "docs_search"}
 
 
 class PolicyEngine:

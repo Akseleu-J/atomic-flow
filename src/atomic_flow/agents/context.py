@@ -44,6 +44,12 @@ class ToolContext:
     active_allowed_tools: tuple[str, ...] = ()
     active_role: str = ""
     active_registry: Any = None
+    workspace_session: Any = None
+    lsp_client: Any = None
+    documentation_client: Any = None
+    hooks: Any = None
+    source_watcher: Any = None
+    invalidated_paths: set[str] = field(default_factory=set)
 
     def record_read(self, path: str, content_hash: str, view: str, offset: int, end: int,
                     total: int, node_id: str | None = None, source_complete: bool = False) -> dict[str, Any]:
@@ -103,6 +109,39 @@ class ToolContext:
 
         return read_checked(self.project_root, rel, self.file_hashes.get(rel, ""))
 
+    def invalidate_sources(self, paths) -> None:
+        affected = set(paths)
+        if not affected:
+            return
+        if ".gitignore" in affected:
+            affected |= set(self.file_hashes)
+        self.invalidated_paths.update(affected)
+        for path in affected:
+            self.file_hashes.pop(path, None)
+        self.reads = [r for r in self.reads if r["path"] not in affected]
+        self.evidence = {nid: text for nid, text in self.evidence.items()
+                         if nid in self.nodes_by_id and self.nodes_by_id[nid].path not in affected}
+        self.sources.clear()
+        self.revision += 1
+
+    def sync_external_changes(self) -> bool:
+        if self.source_watcher is None:
+            return True
+        event = self.source_watcher.poll()
+        if event is None:
+            return True
+        self.invalidate_sources(set(event.paths) - self.invalidated_paths)
+        if not event.ready:
+            return False
+        self.refresh()
+        try:
+            self.source_watcher.acknowledge(event)
+        except OSError:
+            self.invalidate_sources(event.paths)
+            raise
+        self.invalidated_paths.clear()
+        return True
+
     def refresh(self) -> None:
         """Reparse after a verified edit; preserve aliases, never recycle removed ids."""
         from atomic_flow.activation.activate import ActivationIndex
@@ -119,6 +158,20 @@ class ToolContext:
                 next_alias += 1
         old_hashes = self.file_hashes.copy()
         self.file_hashes = {n.path: n.content_hash for n in fresh.values() if n.kind == "file"}
+        # Dedicated notebook reads track source-only views. Never index raw JSON
+        # outputs as generic source, but preserve only still-current notebook proof.
+        from atomic_flow.agents.source import digest
+        from atomic_flow.agents.tools.file_paths import admitted_path
+        for path in old_hashes:
+            if path.lower().endswith(".ipynb"):
+                try:
+                    with admitted_path(self, path, existing=True, notebook=True).open("rb") as handle:
+                        data = handle.read(1_000_001)
+                    if len(data) > 1_000_000:
+                        continue
+                    self.file_hashes[path] = digest(data)
+                except OSError:
+                    pass
         self.reads = [r for r in self.reads if self.file_hashes.get(r["path"]) == r["content_hash"]
                       and (r["node_id"] is None or r["node_id"] in fresh)]
         self.evidence = {nid: text for nid, text in self.evidence.items() if nid in fresh

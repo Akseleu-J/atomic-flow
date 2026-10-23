@@ -572,13 +572,17 @@ class _Attempt:
 class Orchestrator:
     def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend,
                  approval_callback=None, *, settings_project: str | Path | None = None, cancel_check=None,
-                 question_callback=None, private_workspace=False, control=None, event_sink=None, mutation_scope=None):
+                 question_callback=None, private_workspace=False, control=None, event_sink=None, mutation_scope=None,
+                 workspace_session=None, lsp_client=None, documentation_client=None, hooks=None, tool_registry=None, role_tools=None):
         self.config = config
         self.project = Path(project).expanduser().resolve()
         self.backend = backend
         self.approval_callback = approval_callback
         self.question_callback = question_callback
         self.private_workspace = private_workspace
+        self.workspace_session, self.lsp_client = workspace_session, lsp_client
+        self.documentation_client, self.hooks = documentation_client, hooks
+        self.tool_registry, self.role_tools = tool_registry, role_tools
         self.mutation_scope = frozenset(mutation_scope) if mutation_scope is not None else None
         self.settings_project = Path(settings_project).resolve() if settings_project else self.project
         self.control, self.event_sink = control, event_sink
@@ -618,6 +622,8 @@ class Orchestrator:
                                         "created_at": datetime.now(UTC).isoformat()})
         try:
             self.cancel_check()
+            if self.hooks is not None:
+                self.hooks.lifecycle("run_start", {"request_id": req_id, "project": str(self.project), "mode": mode}, cancel_check=self.cancel_check)
             if self.config.artifacts.save:
                 from atomic_flow.sessions import SessionJournal
                 run.journal = SessionJournal.create(self.project, req_id, metadata={"mode": mode})
@@ -630,12 +636,21 @@ class Orchestrator:
             self.cancel_check()
             if self.control is not None and self.control.boundary():
                 raise ValueError("run ended with unapplied steering; review results before continuing")
+            if self.hooks is not None:
+                self.hooks.lifecycle("run_end", {"request_id": req_id, "verdict": result.verdict,
+                    "tool_calls": len(run.tool_calls)}, cancel_check=self.cancel_check)
             run.event("completed", {"verdict": result.verdict}, outcome="success")
             if not self.private_workspace:
                 checkpoint_run(run, result, self.settings_project, query)
                 run.write_json("meta.json", result.model_dump())
             return result
         except Exception as exc:
+            if self.hooks is not None:
+                try:
+                    self.hooks.lifecycle("run_error", {"request_id": req_id, "error_type": type(exc).__name__,
+                        "effects_may_have_occurred": bool(run.tool_calls)})
+                except Exception:
+                    run.event("hook_failed", {"event": "run_error", "effects_may_have_occurred": bool(run.tool_calls)}, outcome="error")
             run.write_json("error.json", {"type": type(exc).__name__, "message": str(exc), "roles_done": run.roles})
             run.event("failed", {"type": type(exc).__name__, "message": str(exc)}, outcome="error")
             raise
@@ -668,7 +683,7 @@ class Orchestrator:
         trusted = is_trusted(self.settings_project)
         policy = PolicyEngine.load(self.settings_project, user_path=user_dir() / "policy.yaml",
                                    project_trusted=trusted)
-        run.tool_registry = (default_registry(enable_parallel_reads=True)
+        run.tool_registry = self.tool_registry or (default_registry(enable_parallel_reads=True)
                              if self.config.experimental.parallel_reads else default_registry())
         run.tool_ctx = ToolContext(project_root=self.project, nodes_by_id=by_id,
                        aliases=aliases.alias_of, alias_to_id=aliases.id_of, index=index,
@@ -681,6 +696,14 @@ class Orchestrator:
                        journal_event=run.event, private_workspace=self.private_workspace)
         run.tool_ctx.action_boundary = self.control.boundary if self.control is not None else None
         run.tool_ctx.mutation_scope = self.mutation_scope
+        run.tool_ctx.workspace_session, run.tool_ctx.lsp_client = self.workspace_session, self.lsp_client
+        run.tool_ctx.documentation_client, run.tool_ctx.hooks = self.documentation_client, self.hooks
+        if self.config.tree.watch_external:
+            from atomic_flow.watching import SourceWatcher
+            run.tool_ctx.source_watcher = SourceWatcher(self.project, interval=self.config.tree.watch_interval_seconds,
+                debounce=self.config.tree.watch_debounce_seconds, cancel_check=self.cancel_check,
+                tree_ignore=self.config.tree.ignore, respect_gitignore=self.config.tree.respect_gitignore,
+                private_workspace=self.private_workspace)
         from atomic_flow.agents.result_store import LargeResultStore
         if run.dir is not None:
             result_root = run.dir
@@ -688,7 +711,7 @@ class Orchestrator:
             run.result_temp = tempfile.TemporaryDirectory(prefix="atomic-results-")
             result_root = Path(run.result_temp.name)
         run.tool_ctx.result_store = LargeResultStore(result_root)
-        run.role_tools = ROLE_TOOLS
+        run.role_tools = self.role_tools if self.role_tools is not None else ROLE_TOOLS
         run.cancel_check = self.cancel_check
         scope = scope_ids(nodes, file_scope) if file_scope else None
         search: SearchResult = index.search(rq, limit=80, scope=scope)
