@@ -5,7 +5,7 @@ import copy
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import Field, StrictInt, model_validator
 
 from atomic_flow.backends.base import LLMBackend
 from atomic_flow.config import BackendConfig, is_trusted
@@ -32,7 +32,8 @@ def _chat(backend, messages):
 VerifyMethod = Literal["py_compile", "pytest", "none"]
 
 
-class PlanStep(BaseModel):
+class PlanStep(StrictModel):
+    depends_on: list[StrictInt] | None = Field(default=None, description="Zero-based step indexes; null means previous step, [] means independent.")
     description: str = Field(min_length=5, max_length=500,
                              description="One sentence describing the concrete change.")
     tools_needed: list[str] = Field(default_factory=list,
@@ -49,6 +50,13 @@ class Plan(StrictModel):
     steps: list[PlanStep] = Field(min_length=1, max_length=12)
     rationale: str = Field(default="", max_length=1000)
 
+    @model_validator(mode="after")
+    def dependency_graph(self):
+        from atomic_flow.agents.task import Step, validate_dependencies
+        validate_dependencies([Step(i, p.description, depends_on=(p.depends_on if p.depends_on is not None else ([i - 1] if i else [])))
+                               for i, p in enumerate(self.steps)])
+        return self
+
 
 PLANNER_PROMPT = """\
 You are the PLANNER. Break the developer's task into 2-12 concrete, verifiable steps.
@@ -61,7 +69,8 @@ RULES
       type hints, comments, formatting, imports.
     * `pytest` — ONLY when the step changes logic AND the project has matching tests.
     * `none` — for pure report/summary steps.
-- Steps execute sequentially. Step N sees the state produced by step N-1.
+- Steps execute one at a time. depends_on lists zero-based prerequisite step indexes.
+  Omit it for the previous step prerequisite; [] explicitly marks independent work.
 - Prefer smaller steps: one function per step, one rename per step.
 - If a task is too broad ("refactor everything"), narrow it and state the narrowing
   in `rationale`.

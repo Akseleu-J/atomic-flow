@@ -68,7 +68,8 @@ def test_create_publishes_verified_changes_with_task_journal(tmp_path):
         "critic": {"verdict": "ok", "citation_coverage": 1, "feedback": ""},
     })
     task = TaskRunner(AtomicConfig(), root, backend, approval_callback=lambda *a: True).run_plan(
-        "add sample module", Plan(steps=[PlanStep(description="Create sample module", tools_needed=["create_file"])]))
+        "add sample module", Plan(steps=[PlanStep(description="Create sample module", tools_needed=["create_file"])]),
+        allowed_paths=["sample.py", "created.py"])
     assert task.status == "done", task.error
     assert (root / "created.py").read_text() == "VALUE = 7\n"
     journal = SessionJournal.open(task.id).read()

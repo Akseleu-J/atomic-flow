@@ -4,7 +4,7 @@ from conftest import ScriptedBackend
 
 from atomic_flow.agents.changeset import ChangeSet
 from atomic_flow.agents.planner import Plan, PlanStep
-from atomic_flow.agents.task import Step, Task
+from atomic_flow.agents.task import Step, Task, save
 from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.config import AtomicConfig
 from atomic_flow.tree.builder import build_tree, save_tree
@@ -44,7 +44,7 @@ def test_multistep_task_publishes_all_or_none(tmp_path, second_ok):
         "update both functions", Plan(steps=[PlanStep(description=f"Update {name} function", tools_needed=["edit_node"])
                                             for name in ("a", "b")]),
     )
-    assert task.status == ("done" if second_ok else "failed")
+    assert task.status == ("done" if second_ok else "failed"), task.error
     expected = "return 2" if second_ok else "return 1"
     assert all(expected in (root / f"{name}.py").read_text() for name in ("a", "b"))
     assert task.changeset_id
@@ -58,10 +58,13 @@ def test_resume_conflict_sends_no_model_request(tmp_path):
     change = ChangeSet.create(root)
     task = Task.new("resume", root, [Step(0, "update a")])
     task.changeset_id = change.id
+    save(task)
+    runner = TaskRunner(AtomicConfig(), root, ScriptedBackend({}))
+    task = runner.approve(task, runner.review(task)["digest"])
     (root / "a.py").write_text("user\n", encoding="utf-8")
     backend = ScriptedBackend({})
-    result = TaskRunner(AtomicConfig(), root, backend).resume(task)
-    assert result.status == "failed"
+    result = runner.resume(task)
+    assert result.status == "paused"
     assert "changed" in result.error
     assert not backend.calls
     assert (root / "a.py").read_text() == "user\n"
@@ -72,7 +75,7 @@ def test_legacy_checkpoint_is_not_silently_replayed(tmp_path):
     task.current_index = 1
     backend = ScriptedBackend({})
     result = TaskRunner(AtomicConfig(), tmp_path, backend).resume(task)
-    assert result.status == "failed" and "legacy" in result.error
+    assert result.status == "paused" and "approval required" in result.error
     assert not backend.calls
 
 
@@ -84,7 +87,11 @@ def test_interrupted_step_requires_review(tmp_path):
     task.changeset_id = change.id
     backend = ScriptedBackend({})
     result = TaskRunner(AtomicConfig(), root, backend).resume(task)
-    assert result.status == "failed" and "interrupted" in result.error
+    assert result.status == "paused" and "approval required" in result.error
+    from atomic_flow.agents.changeset import ChangeSetConflict
+    with pytest.raises(ChangeSetConflict, match="side effects"):
+        runner = TaskRunner(AtomicConfig(), root, backend)
+        runner.approve(result, runner.review(result)["digest"])
     assert not backend.calls
 
 

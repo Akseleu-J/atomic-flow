@@ -111,3 +111,35 @@ class AnswerHandle:
 
 def start_answer(config, project: str | Path, backend, query: str, **options) -> AnswerHandle:
     return AnswerHandle(config, project, backend, query, **options)
+
+
+def resume_answer(config, project: str | Path, backend, session_id: str, query: str, **options) -> AnswerHandle:
+    """Start a fresh request from checked advisory state, never replay actions."""
+    return start_answer(config, project, backend, query, resume_from=session_id, **options)
+
+
+def _saved_task(task_id):
+    from atomic_flow.agents.task import load
+    from atomic_flow.agents.task_loop import TaskRunner
+    from atomic_flow.config import load_config
+    task = load(task_id)
+    return task, TaskRunner(load_config(task.project), Path(task.project), None)
+
+
+def review_task(task_id: str, *, allowed_paths: list[str] | None = None) -> dict:
+    """Offline plan/scope digest; does not configure or call a model."""
+    task, runner = _saved_task(task_id)
+    return runner.review(task, allowed_paths=allowed_paths)
+
+
+def approve_task(task_id: str, expected_digest: str, *, allowed_paths: list[str] | None = None):
+    """Explicit host approval for exactly the reviewed digest, without execution."""
+    task, runner = _saved_task(task_id)
+    return runner.approve(task, expected_digest, allowed_paths=allowed_paths)
+
+
+def revise_task(task_id: str, plan):
+    from atomic_flow.agents.planner import Plan
+    task, runner = _saved_task(task_id)
+    parsed = plan if isinstance(plan, Plan) else Plan.model_validate(plan)
+    return runner.revise(task, parsed)

@@ -43,8 +43,8 @@
     {
       "id": 7,
       "candidate": "Отдельное состояние plan/review/execute",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 12
     },
     {
       "id": 8,
@@ -67,8 +67,8 @@
     {
       "id": 11,
       "candidate": "Структурированное состояние после сжатия",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 12
     },
     {
       "id": 12,
@@ -103,14 +103,14 @@
     {
       "id": 17,
       "candidate": "Память проекта и пользователя между сессиями",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 12
     },
     {
       "id": 18,
       "candidate": "Выборочная загрузка памяти вместо всей папки",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 12
     },
     {
       "id": 19,
@@ -235,8 +235,8 @@
     {
       "id": 39,
       "candidate": "Resume, fork и экспорт именно диалога",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 12
     },
     {
       "id": 40,
@@ -247,8 +247,8 @@
     {
       "id": 41,
       "candidate": "Пользовательский rewind к контрольной точке",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 12
     },
     {
       "id": 42,
@@ -265,8 +265,8 @@
     {
       "id": 44,
       "candidate": "Зависимости задач и обработка blocked",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 12
     },
     {
       "id": 45,

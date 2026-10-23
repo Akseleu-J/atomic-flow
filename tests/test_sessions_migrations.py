@@ -22,15 +22,15 @@ def test_legacy_task_load_migrates_without_rewriting_and_roundtrips(tmp_path):
     before = path.read_bytes()
     migrated = load(task.id)
     assert path.read_bytes() == before
-    assert migrated.schema_version == 1 and migrated.budget_events == []
+    assert migrated.schema_version == 2 and migrated.budget_events == []
     assert migrated.steps[0].request_id == "original-request"
     save(migrated)
-    assert json.loads(path.read_text())["schema_version"] == 1
+    assert json.loads(path.read_text())["schema_version"] == 2
     assert load(task.id) == migrated
 
 
 @pytest.mark.parametrize("change", [
-    {"schema_version": 2}, {"schema_version": True}, {"budget_spent": float("nan")},
+    {"schema_version": 3}, {"schema_version": True}, {"budget_spent": float("nan")},
     {"steps": [{}]}, {"status": "invented"}, {"current_index": -1},
     {"budget_events": [None]}, {"unexpected_field": "value"},
 ])

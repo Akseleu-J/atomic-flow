@@ -34,6 +34,9 @@ class AnswerRequest(BaseModel):
     role_prompts: dict[str, str] = Field(default_factory=dict)
     acknowledge_default_prompts: bool = False
     retrieval_query: str | None = Field(default=None, max_length=50_000)
+    resume_from: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    memory_ids: list[str] = Field(default_factory=list, max_length=10)
+    memory_query: str | None = Field(default=None, min_length=1, max_length=1000)
 
 
 class ChatRequest(BaseModel):
@@ -134,7 +137,8 @@ def create_app():
                 backend = make_backend(config, request.backend, request.model)
                 return Orchestrator(config, project, backend).answer(
                     request.query, mode=mode, budget_tokens=request.budget_tokens, role_prompts=request.role_prompts,
-                    retrieval_query=request.retrieval_query).model_dump()
+                    retrieval_query=request.retrieval_query, resume_from=request.resume_from,
+                    memory_ids=request.memory_ids, memory_query=request.memory_query).model_dump()
             finally:
                 slots.release()
         except (AtomicFlowError, ValueError) as exc:
@@ -174,7 +178,9 @@ def create_app():
                 backend = make_backend(config, request.backend, request.model)
                 handle = start_answer(config, project, backend, request.query, mode=mode,
                                       budget_tokens=request.budget_tokens, role_prompts=request.role_prompts,
-                                      retrieval_query=request.retrieval_query, on_finished=slots.release)
+                                      retrieval_query=request.retrieval_query, on_finished=slots.release,
+                                      resume_from=request.resume_from, memory_ids=request.memory_ids,
+                                      memory_query=request.memory_query)
             except Exception as exc:
                 slots.release()
                 raise HTTPException(400, detail={"error": type(exc).__name__.lower()}) from exc

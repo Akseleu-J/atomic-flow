@@ -81,6 +81,9 @@ def _parser() -> argparse.ArgumentParser:
     ask.add_argument("--explain", action="store_true")
     ask.add_argument("--json", action="store_true")
     ask.add_argument("--events", action="store_true", help="Version 1 JSONL observations and terminal result; Ctrl-C requests cancellation")
+    ask.add_argument("--resume-session", metavar="SESSION_ID", help="Use a checked data-only continuation; never replay actions")
+    ask.add_argument("--memory-id", action="append", default=[], help="Explicitly select project memory by id")
+    ask.add_argument("--memory-query", help="Opt in to bounded project memory selection")
 
     task_p = cmd.add_parser("task", help="Run a multi-step task")
     task_p.add_argument("query", nargs="?", default="")
@@ -94,6 +97,12 @@ def _parser() -> argparse.ArgumentParser:
     task_p.add_argument("--resume", metavar="TASK_ID")
     task_p.add_argument("--recover", metavar="TASK_ID", help="Recover an interrupted publication offline; never calls a model")
     task_p.add_argument("--cancel", metavar="TASK_ID")
+    task_p.add_argument("--review", metavar="TASK_ID", help="Offline plan and source-bound approval digest")
+    task_p.add_argument("--revise", metavar="TASK_ID", help="Replace an unexecuted plan from --plan-file")
+    task_p.add_argument("--plan-file", type=Path, help="JSON Plan for an explicit revision; never executed as code")
+    task_p.add_argument("--approve", metavar="TASK_ID", help="Approve exactly --plan-digest without starting execution")
+    task_p.add_argument("--plan-digest", help="Digest from the reviewed plan and source manifest")
+    task_p.add_argument("--scope-path", action="append", default=None, help="Exact approved relative path, repeatable; can name a new file")
 
     undo = cmd.add_parser("undo", help="Restore a previous approved edit")
     undo.add_argument("edit_id", nargs="?", default="last")
@@ -148,6 +157,61 @@ def _parser() -> argparse.ArgumentParser:
     export.add_argument("session_id")
     export.add_argument("destination", type=Path)
     ss.add_parser("recover-tail", help="Explicitly discard only an interrupted final record").add_argument("session_id")
+    sf = ss.add_parser("fork", help="Fork checked conversation state, never replay actions")
+    sf.add_argument("session_id")
+    sf.add_argument("--project", default=".")
+    sf.add_argument("--id", dest="new_session_id")
+    sf.add_argument("--query", required=True)
+    sr = ss.add_parser("resume", help="Continue with fresh source reads and a new request")
+    sr.add_argument("session_id")
+    sr.add_argument("query")
+    sr.add_argument("--project", default=".")
+    sr.add_argument("--mode", choices=["simple", "medium", "hard"], default="simple")
+    sr.add_argument("--backend", default="auto")
+    sr.add_argument("--model")
+    sr.add_argument("--yes", action="store_true")
+    sr.add_argument("--json", action="store_true")
+    sc = ss.add_parser("checkpoint", help="Explicitly record reviewed dialogue state for an older session")
+    sc.add_argument("session_id")
+    sc.add_argument("--project", default=".")
+    sc.add_argument("--goal", required=True)
+    sc.add_argument("--source-path", action="append", default=[])
+    sc.add_argument("--mutation-path", action="append", default=[])
+    sc.add_argument("--constraint", action="append", default=[])
+    sc.add_argument("--decision", action="append", default=[])
+    sc.add_argument("--open-question", action="append", default=[])
+
+    memory = cmd.add_parser("memory", help="Explicit project memory CRUD; observations never grant authority")
+    ms = memory.add_subparsers(dest="memory_action", required=True)
+    for action in ("list", "select", "add", "update", "delete"):
+        sub = ms.add_parser(action)
+        sub.add_argument("--project", default=".")
+        if action in {"update", "delete"}:
+            sub.add_argument("memory_id")
+        if action in {"add", "update"}:
+            sub.add_argument("content")
+            sub.add_argument("--origin", default="user")
+            sub.add_argument("--category", default=None)
+        if action in {"add", "update", "delete"}:
+            sub.add_argument("--yes", action="store_true", help="Explicitly authorize this product-memory write/delete")
+        if action == "select":
+            sub.add_argument("--id", action="append", default=None, dest="memory_ids")
+            sub.add_argument("--query", default=None)
+
+    rewind = cmd.add_parser("rewind", help="Preview and conflict-check a named explicit source snapshot")
+    rw = rewind.add_subparsers(dest="rewind_action", required=True)
+    for action in ("snapshot", "preview", "apply", "recover"):
+        sub = rw.add_parser(action)
+        sub.add_argument("--project", default=".")
+        if action == "snapshot":
+            sub.add_argument("name")
+            sub.add_argument("paths", nargs="+")
+            sub.add_argument("--session-id")
+        else:
+            sub.add_argument("reference", help="Snapshot id, or restore id for recover")
+        if action in {"apply", "recover"}:
+            sub.add_argument("--preview-token", required=True)
+            sub.add_argument("--yes", action="store_true", help="Apply the reviewed hash-bound preview")
 
     kaggle = cmd.add_parser("kaggle", help="Manage Kaggle Model Proxy credentials and quota")
     ks = kaggle.add_subparsers(dest="kaggle_action", required=True)
@@ -433,7 +497,8 @@ def cmd_ask(args) -> int:
         explicit_approval = args.yes or os.getenv("ATOMIC_FLOW_ALLOW_EDITS", "").lower() in {"1", "true", "yes"}
         handle = start_answer(config, project, make_backend(config, args.backend, args.model), args.query,
                               approval_callback=approval_callback if explicit_approval else None, mode=mode, budget_tokens=args.budget,
-                              role_prompts=prompts, file_scope=args.file, approve_edits=args.approve_edits)
+                              role_prompts=prompts, file_scope=args.file, approve_edits=args.approve_edits,
+                              resume_from=args.resume_session, memory_ids=args.memory_id, memory_query=args.memory_query)
         try:
             for event in handle.events():
                 print(event.model_dump_json(), flush=True)
@@ -446,7 +511,8 @@ def cmd_ask(args) -> int:
     result = Orchestrator(config, project, make_backend(config, args.backend, args.model),
                           approval_callback=approval_callback, question_callback=_ask_user_question).answer(
         args.query, mode=mode, budget_tokens=args.budget, role_prompts=prompts, file_scope=args.file,
-        approve_edits=args.approve_edits)
+        approve_edits=args.approve_edits, resume_from=args.resume_session,
+        memory_ids=args.memory_id, memory_query=args.memory_query)
     if args.json:
         print(result.model_dump_json(indent=2))
         return 0
@@ -467,6 +533,28 @@ def cmd_task(args) -> int:
     from atomic_flow.agents.changeset import ChangeSet
     from atomic_flow.agents.task import list_tasks, load, save
     from atomic_flow.agents.task_loop import TaskRunner
+
+    actions = ("recover", "task_list", "show", "cancel", "resume", "review", "revise", "approve")
+    if sum(bool(getattr(args, name, None)) for name in actions) > 1:
+        raise ValueError("choose one task operation per invocation")
+    reviewed_task = getattr(args, "review", None) or getattr(args, "revise", None) or getattr(args, "approve", None)
+    if reviewed_task:
+        from atomic_flow.agents.planner import Plan
+        task = load(reviewed_task)
+        runner = TaskRunner(load_config(task.project), Path(task.project), None)
+        if args.revise:
+            if args.plan_file is None or args.plan_file.stat().st_size > 65536:
+                raise ValueError("--revise requires a JSON --plan-file of at most 64 KiB")
+            task = runner.revise(task, Plan.model_validate_json(args.plan_file.read_text(encoding="utf-8")))
+        if args.approve:
+            if not args.plan_digest:
+                raise ValueError("--approve requires --plan-digest from a reviewed plan")
+            task = runner.approve(task, args.plan_digest, allowed_paths=args.scope_path)
+            print(json.dumps({"task_id": task.id, "status": task.status, "approved_digest": task.plan_approval["digest"],
+                              "execution_started": False}, ensure_ascii=False, indent=2))
+            return 0
+        print(json.dumps(runner.review(task, allowed_paths=args.scope_path), ensure_ascii=False, indent=2))
+        return 0
 
     if args.recover:
         from atomic_flow.agents.control import task_lease
@@ -569,11 +657,15 @@ def cmd_task(args) -> int:
     print()
     if args.dry_run:
         print(f"plan saved: {task.id}; planning model calls are included in its budget")
+        print(json.dumps(runner.review(task, allowed_paths=args.scope_path), ensure_ascii=False, indent=2))
         return 0
+    review = runner.review(task, allowed_paths=args.scope_path)
+    print(f"review digest: {review['digest']}; allowed files: {len(review['allowed_paths'])}")
     if not args.yes:
         if input("Proceed? [y/N]: ").strip().lower() not in {"y", "yes"}:
             print(f"execution not started; plan saved: {task.id}")
             return 1
+    task = runner.approve(task, review["digest"], allowed_paths=review["allowed_paths"])
     task = runner.resume(task)
     _print_task(task)
     return 0 if task.status == "done" else 1
@@ -606,9 +698,11 @@ def _print_task(task, verbose: bool = False) -> None:
             print(f"workspace: {user_dir() / 'changesets' / task.changeset_id / 'workspace'}")
     print("steps:")
     for step in task.steps:
-        mark = {"done": "✓", "failed": "✗", "running": "→", "pending": "·"}[step.status]
+        mark = {"done": "✓", "failed": "✗", "running": "→", "pending": "·", "blocked": "!", "superseded": "-"}[step.status]
         suffix = f"  -- {step.result_summary[:120]}" if step.result_summary else ""
         print(f"  [{mark}] {step.index + 1}. {step.description}{suffix}")
+        if getattr(step, "blocked_reason", ""):
+            print(f"      blocked: {step.blocked_reason}")
     if task.error:
         print(f"error: {task.error}")
 
@@ -861,6 +955,29 @@ def cmd_session(args) -> int:
 
     from atomic_flow.sessions import SessionJournal, list_sessions
 
+    if args.session_action == "resume":
+        options = ["ask", args.query, "--project", args.project, "--mode", args.mode,
+                   "--backend", args.backend, "--resume-session", args.session_id]
+        if args.model:
+            options.extend(["--model", args.model])
+        if args.yes:
+            options.append("--yes")
+        if args.json:
+            options.append("--json")
+        return cmd_ask(_parser().parse_args(options))
+    if args.session_action in {"fork", "checkpoint"}:
+        from atomic_flow.dialogue import fork_session, record_dialogue_state
+        project = Path(args.project).expanduser().resolve()
+        if args.session_action == "fork":
+            child = fork_session(args.session_id, project, args.query, session_id=args.new_session_id)
+            data = {"session_id": child.session_id, "execution_performed": False}
+        else:
+            data = record_dialogue_state(args.session_id, project, goal=args.goal, constraints=args.constraint,
+                                         decisions=args.decision, open_questions=args.open_question,
+                                         source_paths=args.source_path, mutation_paths=args.mutation_path)
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+
     if args.session_action == "list":
         data = list_sessions()
     else:
@@ -876,7 +993,41 @@ def cmd_session(args) -> int:
     return 0
 
 
-HANDLERS = {"policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
+def cmd_memory(args) -> int:
+    from atomic_flow.memory import MemoryStore
+    store = MemoryStore(Path(args.project).expanduser().resolve())
+    if args.memory_action == "list":
+        data = store.list()
+    elif args.memory_action == "select":
+        data = store.select(ids=args.memory_ids, query=args.query)
+    elif args.memory_action == "add":
+        data = store.add(args.content, approved=args.yes, origin=args.origin, category=args.category or "note")
+    elif args.memory_action == "update":
+        data = store.update(args.memory_id, args.content, approved=args.yes, origin=args.origin, category=args.category)
+    else:
+        store.delete(args.memory_id, approved=args.yes)
+        data = {"deleted": args.memory_id}
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_rewind(args) -> int:
+    from atomic_flow.rewind import apply_rewind, create_snapshot, preview_rewind, recover_rewind
+    project = Path(args.project).expanduser().resolve()
+    if args.rewind_action == "snapshot":
+        data = create_snapshot(project, args.name, args.paths, session_id=args.session_id)
+    elif args.rewind_action == "preview":
+        data = preview_rewind(project, args.reference)
+    else:
+        if not args.yes:
+            raise ValueError("restoring source requires --yes and the reviewed --preview-token")
+        action = apply_rewind if args.rewind_action == "apply" else recover_rewind
+        data = action(project, args.reference, args.preview_token)
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+    return 0
+
+
+HANDLERS = {"memory": cmd_memory, "rewind": cmd_rewind, "policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
             "benchmark": cmd_benchmark}
 

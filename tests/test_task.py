@@ -46,6 +46,7 @@ def test_task_runner_marks_done(monkeypatch, isolated_home, tmp_path):
     from atomic_flow.agents import task_loop
     # The final host gate independently reruns declared task checks.
     (tmp_path / "test_completion.py").write_text("def test_final_state():\n    assert True\n")
+    (tmp_path / "x.py").write_text("X = 1\n")
 
     class R:
         def __init__(self, calls):
@@ -54,7 +55,7 @@ def test_task_runner_marks_done(monkeypatch, isolated_home, tmp_path):
             self.cost_usd = 0.01
 
     responses = [
-        R([{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py"}}]),
+        R([{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py", "content_hash": digest((tmp_path / "x.py").read_bytes())}}]),
         R([{"tool": "run_command", "args": {"command": "pytest"},
             "result_summary": {"outcome": "success", "exit_code": 0}}]),
     ]
@@ -108,6 +109,7 @@ def test_task_runner_stops_on_failed_edit(monkeypatch, isolated_home, tmp_path):
 def test_task_runner_resume_continues_from_checkpoint(monkeypatch, isolated_home, tmp_path):
     from atomic_flow.agents import task_loop
     from atomic_flow.agents.changeset import ChangeSet
+    (tmp_path / "x.py").write_text("X = 1\n")
 
     class R:
         def __init__(self, calls):
@@ -124,7 +126,7 @@ def test_task_runner_resume_continues_from_checkpoint(monkeypatch, isolated_home
         def answer(self, *a, **kw):
             calls_made.append(kw.get("mode"))
             return R([{"tool": "edit_node",
-                       "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py"}}])
+                       "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py", "content_hash": digest((tmp_path / "x.py").read_bytes())}}])
 
     monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
 
@@ -141,6 +143,7 @@ def test_task_runner_resume_continues_from_checkpoint(monkeypatch, isolated_home
     save(task)
 
     runner = TaskRunner(config=None, project=tmp_path, backend=None)
+    task = runner.approve(task, runner.review(task)["digest"])
     result = runner.resume(task)
     assert result.status == "done"
     assert len(calls_made) == 1
@@ -149,6 +152,7 @@ def test_task_runner_resume_continues_from_checkpoint(monkeypatch, isolated_home
 
 def test_replan_appends_steps_on_failure(monkeypatch, isolated_home, tmp_path):
     from atomic_flow.agents import task_loop
+    (tmp_path / "x.py").write_text("X = 1\n")
 
     class R:
         def __init__(self, calls):
@@ -158,7 +162,7 @@ def test_replan_appends_steps_on_failure(monkeypatch, isolated_home, tmp_path):
 
     responses = [
         R([{"tool": "edit_node", "result_summary": {"status": "rolled_back", "reason": "syntax"}}]),
-        R([{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py"}}]),
+        R([{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py", "content_hash": digest((tmp_path / "x.py").read_bytes())}}]),
     ]
 
     class FakeOrch:
@@ -176,10 +180,14 @@ def test_replan_appends_steps_on_failure(monkeypatch, isolated_home, tmp_path):
     plan = Plan(steps=[PlanStep(description="initial attempt", verify_with="py_compile")])
     runner = task_loop.TaskRunner(config=None, project=tmp_path, backend=None)
     task = runner.run_plan("do", plan)
+    assert task.status == "paused" and not task.plan_approval
+    assert len(responses) == 1  # The new plan cannot run before host approval.
+    task = runner.approve(task, runner.review(task)["digest"])
+    task = runner.resume(task)
     assert task.status == "done"
     assert task.replan_count == 1
     assert len(task.steps) == 2
-    assert task.steps[0].status == "failed"
+    assert task.steps[0].status == "superseded"
     assert task.steps[1].status == "done"
 
 

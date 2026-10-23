@@ -14,15 +14,16 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dic
     report = {"schema_version": 1, "ready_to_publish": False, "checked_at": time.time(),
               "checks": [], "diagnostics": [], "tests": "not_run", "model_calls": 0}
     cancel_check()
-    if not task.steps or task.current_index != len(task.steps) or task.steps[-1].status != "done":
+    if not task.steps or task.current_index != len(task.steps) or not any(s.status == "done" for s in task.steps):
         report["checks"].append({"name": "completed_steps", "status": "failed"})
         return report
-    unresolved = [s.index for s in task.steps if s.status != "done"]
+    unresolved = [s.index for s in task.steps if s.status not in {"done", "superseded"}]
     running = [s.index for s in task.steps if s.status == "running"]
-    if running or (unresolved and not task.replan_count):
+    if running or unresolved:
         report["checks"].append({"name": "completed_steps", "status": "failed", "unresolved": unresolved})
         return report
-    report["checks"].append({"name": "completed_steps", "status": "passed", "superseded_by_replanning": unresolved})
+    report["checks"].append({"name": "completed_steps", "status": "passed",
+                             "superseded_by_replanning": [s.index for s in task.steps if s.status == "superseded"]})
     try:
         changeset.check_original()
         manifest = changeset.validate_workspace()

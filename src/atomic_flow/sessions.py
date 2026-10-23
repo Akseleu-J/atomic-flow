@@ -27,7 +27,8 @@ MAX_SESSION_BYTES = 64 * 1024 * 1024
 EVENT_TYPES = frozenset({
     "session_created", "user_input", "model_request", "model_response", "model_failed",
     "tool_request", "tool_result", "question", "answer", "completed", "failed", "tail_recovered",
-    "steering_applied", "response_discarded",
+    "steering_applied", "response_discarded", "context_summary", "continuation",
+    "dialogue_state", "snapshot_created", "rewind_applied", "fork_created",
 })
 _SECRET_KEY = re.compile(r"(?i)(?:password|passwd|secret|authorization|api[_-]?key|(?:^|_)token(?:$|_))")
 
@@ -80,6 +81,37 @@ class SessionSnapshot:
             elif event["event_type"] in ("model_response", "model_failed", "tool_result"):
                 pending.pop(call_id, None)
         return sorted(pending)
+
+    @property
+    def unresolved_call_ids(self) -> list[str]:
+        """Closed transport observations do not establish settled charges/effects."""
+        unresolved = set(self.pending_call_ids)
+        for event in self.events:
+            call_id = event.get("call_id") or event["payload"].get("call_id")
+            if call_id is None:
+                continue
+            kind, outcome = event["event_type"], event.get("outcome")
+            if kind == "model_failed" and outcome not in {"not_sent", "refused"}:
+                unresolved.add(call_id)
+            if kind == "model_response":
+                cost = event["payload"].get("cost_usd")
+                if type(cost) not in (int, float) or not math.isfinite(cost) or cost < 0:
+                    unresolved.add(call_id)
+            if kind == "tool_result":
+                payload = event["payload"]
+                call = payload.get("call")
+                compact = call.get("result_summary") if isinstance(call, dict) else None
+                results = [item for item in (payload.get("result"), compact) if isinstance(item, dict)]
+                uncertain_effects = any(
+                    item.get("status") == "rollback_failed"
+                    or (item.get("side_effects_may_have_occurred") is not None
+                        and item.get("side_effects_may_have_occurred") is not False)
+                    or item.get("outcome") in ("unknown", "pending")
+                    for item in results
+                )
+                if outcome in {"unknown", "pending"} or uncertain_effects:
+                    unresolved.add(call_id)
+        return sorted(unresolved)
 
 
 class SessionJournal:
@@ -136,9 +168,12 @@ class SessionJournal:
             raise StateError(f"session event exceeds {MAX_EVENT_BYTES} bytes; store a bounded summary/reference")
         return event
 
-    def append(self, event_type: str, payload: dict, *, call_id: str | None = None, outcome: str | None = None) -> dict:
+    def append(self, event_type: str, payload: dict, *, call_id: str | None = None, outcome: str | None = None,
+               expected_sequence: int | None = None) -> dict:
         with self._lease():
             snapshot = self.read()
+            if expected_sequence is not None and len(snapshot.events) != expected_sequence:
+                raise StateError("session changed before host checkpoint; inspect the latest observations")
             if snapshot.incomplete_tail:
                 raise StateError("session has an interrupted tail; inspect it and call recover_tail() before appending; never replay pending calls")
             event = self._event(len(snapshot.events) + 1, event_type, payload, call_id, outcome)
@@ -221,6 +256,7 @@ class SessionJournal:
         data = {"schema_version": SCHEMA_VERSION, "session_id": self.session_id,
                 "events": snapshot.events, "incomplete_tail": snapshot.incomplete_tail,
                 "tail_bytes": snapshot.tail_bytes, "pending_call_ids": snapshot.pending_call_ids,
+                "unresolved_call_ids": snapshot.unresolved_call_ids,
                 "replay_supported": False}
         with destination.open("x", encoding="utf-8") as handle:
             json.dump(data, handle, ensure_ascii=False, indent=2, allow_nan=False)

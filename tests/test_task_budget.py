@@ -85,10 +85,11 @@ def test_call_limit_survives_resume_and_counts_planner(tmp_path):
     runner = TaskRunner(cfg, project, backend)
     task = runner.prepare("report sample", candidates=[], n_files=1)
     assert task.plan_ready
+    task = runner.approve(task, runner.review(task)["digest"])
     task = runner.resume(task)
     assert task.status == "paused" and "call limit" in task.error
     assert len(backend.calls) == 1
-    assert task.steps[0].status == "pending"
+    assert task.steps[0].status == "pending", task.steps[0].result_summary
     task = TaskRunner(cfg, project, backend).resume(task)
     assert task.status == "paused" and len(backend.calls) == 1
 
@@ -173,8 +174,12 @@ def test_replanner_calls_share_task_spend_and_daily_ledger(tmp_path):
         ],
         "critic": {"verdict": "ok"},
     })
-    task = TaskRunner(AtomicConfig(), project, backend, approval_callback=lambda *a: True).run_plan(
+    runner = TaskRunner(AtomicConfig(), project, backend, approval_callback=lambda *a: True)
+    task = runner.run_plan(
         "update sample", Plan(steps=[PlanStep(description="Update sample", verify_with="py_compile")]))
+    assert task.status == "paused" and not task.plan_approval
+    task = runner.approve(task, runner.review(task)["digest"])
+    task = runner.resume(task)
     assert task.status == "done", task.error
     assert task.replan_count == 1
     assert any(event["phase"] == "replan" for event in task.budget_events)

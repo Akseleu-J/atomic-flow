@@ -115,3 +115,25 @@ The optional API exposes `POST /v1/runs`, `GET /v1/runs/{id}/events` (SSE),
 `POST /v1/runs/{id}/control` and `GET /v1/runs/{id}`. Existing API-key/project-root
 checks apply; stream disconnect requests cancellation. Handles are bounded and ephemeral,
 not durable jobs or executable session replay. See [controls, SDK and limits](docs/IMPLEMENTATION_STEP_11.md).
+
+## Reviewed plans, memory and continuation
+
+Task plans now require source/scope-bound approval. Use `atomic task --review TASK_ID`,
+then `--approve TASK_ID --plan-digest DIGEST` with the same exact `--scope-path` selection.
+New files must be named in that scope. Revisions/replans invalidate approval; `--resume`
+does not silently grant it. Steps support validated dependencies and saved blocked reasons.
+Older saved tasks migrate to schema 2 without execution permission.
+
+Project memory is explicit: `atomic memory add "Keep API stable" --project . --yes`,
+then `atomic ask "Explain refund" --memory-id MEMORY_ID`. No selection means no memory
+read. Memory/summary text never grants edit permission or source-read coverage.
+
+`atomic session resume SESSION_ID "Follow-up question" --project .` starts a new request
+from checked advisory state. `session fork ... --query "Another case"` creates a new branch
+without replaying calls. Changed sources, unresolved effects/charges or corrupt state block
+continuation. SDK `resume_answer` and API `resume_from` use the same checks.
+
+For source restoration, explicitly capture paths with `atomic rewind snapshot NAME a.py new.py`,
+inspect `rewind preview SNAPSHOT_ID`, then apply with its `--preview-token TOKEN --yes`.
+Conflicting edits refuse restoration; interrupted multi-file restores have an explicit recovery
+path. Rewind does not reverse spending or external actions. See [package 12 and commands](docs/IMPLEMENTATION_STEP_12.md).
