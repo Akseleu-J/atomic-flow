@@ -165,7 +165,18 @@ create/delete/move, crash-between-write-and-journal и editor change во вре
 
 Проверки используют scripted модели и локальные fault fixtures, без paid API calls.
 Windows final: **490 passed / 16 skipped**, changed-code Ruff и compileall PASS;
-`validation/step12-windows-final.txt`. Linux/Docker результат добавляется отдельно после CI.
+`validation/step12-windows-final.txt`.
+
+CI runtime **`394aedcdae2ed8b06cf2b82a894780f5d22b3ceb`**:
+push [39889275052](https://github.com/Akseleu-J/atomic-flow/actions/runs/39889275052)
+и PR [39889279922](https://github.com/Akseleu-J/atomic-flow/actions/runs/39889279922)
+завершены success; Python 3.11/3.12 PASS. Docker-job artifact подтверждает
+**483 CPU passed / 6 skipped, 17 extra passed, 6 real Docker passed** и compile PASS.
+Прежняя калибровка шести historical changes calibrated=true, model_calls=0;
+это не новая оценка task quality. Image:
+`sha256:994242129def0f068a5dd4bea801dcf959cb419f4c77d3efbfb1debf84a8f183`.
+Evidence `validation/ci-step12-20261023/`: исходные bytes 12 artifact files и SHA-256
+manifest, а также hashes всех 29 изменённых source/test Git blobs.
 Из первой интеграции сохранён failed log: cancel-priority и explicit new-path fixture
 исправлены; Windows taskkill timeout отдельно повторно PASS без ослабления таймаутов.
 Windows local execution остаётся best effort; гарантии контейнерных границ проверяются

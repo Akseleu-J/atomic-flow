@@ -4,8 +4,8 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–11 закоммичены; пакет 12 интегрирован и локально проверен.
-Последний runtime-коммит, подтверждённый Docker artifact, — `39e359aa85bd32d931800b5acde6380c40cc1166`.
+Пакеты 1–12 закоммичены.
+Последний runtime-коммит, подтверждённый Docker artifact, — `394aedcdae2ed8b06cf2b82a894780f5d22b3ceb`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -21,7 +21,11 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 execution; общие production и multi-repository quality gates остаются открыты.
 Windows **490 passed / 16 skipped**, Ruff/compileall PASS;
 `validation/step12-windows-final.txt`. 16 skip включают Docker-only и Windows platform/
-symlink ограничения. Новые model calls scripted; Linux/Docker CI пакета 12 ещё ожидается.
+symlink ограничения. Новые model calls scripted. CI push `39889275052` и PR
+`39889279922` PASS на точном source `394aedc`: Python 3.11/3.12;
+**483 CPU + 17 extra + 6 real Docker passed**, calibration PASS, model_calls=0.
+Скачанные tested-commit/results/logs и manifest всех 12 artifact files / 29 source
+blobs — `validation/ci-step12-20261023/`.
 
 22–23 октября: пакет 11 — bounded version 1 events/SDK, API SSE controls/disconnect,
 CLI JSONL, boundary-safe steering, cancellable local HTTP wait и outcome-aware retry.
