@@ -94,12 +94,23 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         return finish({"error": "invalid tool arguments", "details": exc.errors(include_url=False, include_context=False)[:3]})
     if "write" in contract.effects and not ctx.edits_enabled:
         return finish({"error": "edits disabled", "hint": "enable edits explicitly for this request"}, "denied")
+    invoked = False
     try:
         policy_args = args.model_dump()
         if "node_id" in policy_args:
             node_id = ctx.alias_to_id.get(policy_args["node_id"], policy_args["node_id"])
             if node := ctx.nodes_by_id.get(node_id):
                 policy_args["path"] = node.path
+        if "write" in contract.effects and ctx.mutation_scope is not None:
+            from atomic_flow.agents.source import confined_path
+            if name not in {"edit_node", "patch_file", "create_file", "delete_file", "move_file"}:
+                return finish({"error": "write tool has no host-defined path contract for this approved plan"}, "denied")
+            paths = [policy_args.get("path")]
+            if name == "move_file":
+                paths.append(policy_args.get("destination"))
+            if any(not isinstance(path, str) or confined_path(ctx.project_root, path).relative_to(
+                    ctx.project_root.resolve()).as_posix() not in ctx.mutation_scope for path in paths):
+                return finish({"error": "mutation path is outside the approved plan scope"}, "denied")
         decision = (ctx.policy or PolicyEngine()).decide(name, policy_args, project_trusted=ctx.trusted)
         record["policy_action"] = decision.action
         record["policy_source"] = decision.source
@@ -133,6 +144,7 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
             implementation = registry.get(name)  # Only after role/arguments/edit/policy/approval gates.
             if ctx.action_boundary is not None and ctx.action_boundary():
                 return finish({"error": "new user guidance pending; reconsider tool arguments before execution"}, "denied")
+            invoked = True
             result = implementation.run(args, ctx)
         finally:
             ctx.cancel_check = original_check
@@ -160,6 +172,8 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         if isinstance(exc, TaskCancelled):
             raise
         result = {"error": f"{type(exc).__name__}: {exc}"}
+        if invoked and set(contract.effects) & {"write", "execute"}:
+            result["side_effects_may_have_occurred"] = True
     return finish(result)
 
 

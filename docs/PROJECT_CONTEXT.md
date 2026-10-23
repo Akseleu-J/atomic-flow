@@ -4,12 +4,24 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–11 закоммичены.
+Пакеты 1–11 закоммичены; пакет 12 интегрирован и локально проверен.
 Последний runtime-коммит, подтверждённый Docker artifact, — `39e359aa85bd32d931800b5acde6380c40cc1166`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
 ## Локальные исправления поверх HEAD — актуальный статус
+
+23 октября: пакет 12 — review/revise/approve по plan/source/scope digest, task schema 2,
+зависимости/blocked steps, structured summary, explicit project memory CRUD/selection,
+новые запросы resume/fork без action replay и preview-bound recoverable source rewind.
+Три субагента реализовали независимые блоки, основной агент соединил CLI/SDK/API/runtime.
+`IMPLEMENTATION_STEP_12.md`; каталог **42 scoped / 20 planned**. Будущая версия,
+неизвестные charges/effects, stale source/approval блокируют соответствующее продолжение.
+Сводка/память не дают permissions/read evidence. Следующий пакет 13 — jobs/credentials/
+execution; общие production и multi-repository quality gates остаются открыты.
+Windows **490 passed / 16 skipped**, Ruff/compileall PASS;
+`validation/step12-windows-final.txt`. 16 skip включают Docker-only и Windows platform/
+symlink ограничения. Новые model calls scripted; Linux/Docker CI пакета 12 ещё ожидается.
 
 22–23 октября: пакет 11 — bounded version 1 events/SDK, API SSE controls/disconnect,
 CLI JSONL, boundary-safe steering, cancellable local HTTP wait и outcome-aware retry.
@@ -17,8 +29,8 @@ CLI JSONL, boundary-safe steering, cancellable local HTTP wait и outcome-aware 
 double counting. Отмена после отправки оставляет unknown charge; fully received
 response учитывается до cancel. Remote inference не обещаем остановить.
 `IMPLEMENTATION_STEP_11.md`, `src/atomic_flow/runtime.py`, `sdk.py`, `tests/test_run_control.py`.
-Каталог **35 scoped / 27 planned**; следующие требования — plan/dialogue/memory,
-пакет 12 в `REMAINING_IMPLEMENTATION.md`. Windows **391 passed / 13 skipped**,
+На момент пакета 11: **35 scoped / 27 planned**; продолжение требований —
+`REMAINING_IMPLEMENTATION.md`. Windows **391 passed / 13 skipped**,
 Ruff/compileall PASS, `validation/step11-windows-final.txt`. CI push `39862268360`
 и PR `39862274999` PASS на точном source `39e359a`: Python 3.11/3.12,
 **381 CPU + 17 extra + 6 real Docker passed**, historical calibration PASS.

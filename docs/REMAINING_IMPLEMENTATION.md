@@ -2,7 +2,7 @@
 
 22 октября 2026. Пользователь разрешил реализовать весь оставшийся каталог с тестами.
 Это continuation plan для следующих пакетов, **не список уже работающих подсистем**.
-После пакета 11 реализованы 35 scoped candidates; остаются 27 из 62.
+После пакета 12 реализованы 42 scoped candidates; остаются 20 из 62.
 Источник статуса — `CANDIDATE_STATUS.json`; отдельные номера пакетов ниже не означают
 закрытие одноимённых этапов `PRODUCTION_ROADMAP.md`.
 
@@ -22,7 +22,12 @@ Acceptance: отмена во время DNS/connect/read/backoff и после 
 bounded events/backpressure, сохранение terminal event, API auth/disconnect,
 уточнение до/после mutation, отсутствие неучтённых retries и lost charges.
 
-## 12. План, диалог и память: 07, 11, 17, 18, 39, 41, 44
+## 12. План, диалог и память: 07, 11, 17, 18, 39, 41, 44 — реализовано scoped
+
+Реализация/границы: `IMPLEMENTATION_STEP_12.md`. Plan review и source/path authority,
+blocked DAG steps, host summary/project memory, checked advisory resume/fork и source
+snapshot rewind. Полный executable replay, global/model-written memory, rollback
+расходов/внешних эффектов и HTTP write APIs не объявлены реализованными.
 
 План review/revise/approve с hash-bound областью файлов; смена плана/replan
 инвалидирует прежнее одобрение. Зависимости и blocked причины сохраняются явно.

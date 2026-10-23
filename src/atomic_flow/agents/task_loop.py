@@ -8,6 +8,7 @@ from pathlib import Path
 from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
 from atomic_flow.agents.control import check_cancel, task_lease
 from atomic_flow.agents.execution import TaskCancelled, run_python
+from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
 from atomic_flow.agents.planner import Plan, plan_task, replan_task
 from atomic_flow.agents.task import Step, Task, load, save
 from atomic_flow.agents.task_budget import TaskBudgetBackend, check_accounting
@@ -37,10 +38,51 @@ class TaskRunner:
         self.task_backend = backend
 
     @staticmethod
-    def _steps(plan: Plan) -> list[Step]:
-        return [Step(index=i, description=p.description, tools_needed=list(p.tools_needed),
-                     expected_outcome=p.expected_outcome, verify_with=p.verify_with)
+    def _steps(plan: Plan, offset: int = 0) -> list[Step]:
+        return [Step(index=offset + i, description=p.description, tools_needed=list(p.tools_needed),
+                     expected_outcome=p.expected_outcome, verify_with=p.verify_with,
+                     depends_on=[offset + d for d in (p.depends_on if p.depends_on is not None else ([i - 1] if i else []))])
                 for i, p in enumerate(plan.steps)]
+
+    def review(self, task: Task, *, allowed_paths: list[str] | None = None) -> dict:
+        with task_lease(task.id):
+            task = load(task.id)
+            return review_payload(task, self.project, allowed_paths)
+
+    def approve(self, task: Task, expected_digest: str, *, allowed_paths: list[str] | None = None) -> Task:
+        with task_lease(task.id):
+            task = load(task.id)
+            self._editable_plan(task)
+            review = review_payload(task, self.project, allowed_paths)
+            if review["digest"] != expected_digest:
+                raise ChangeSetConflict("review digest changed; inspect the current plan, scope and source before approving")
+            task.plan_approval = review
+            task.error = "plan approved; execution not started"
+            save(task)
+            return task
+
+    def revise(self, task: Task, plan: Plan) -> Task:
+        with task_lease(task.id):
+            task = load(task.id)
+            self._editable_plan(task)
+            completed = [s for s in task.steps if s.status == "done"]
+            if completed or task.changeset_id:
+                for step in task.steps:
+                    if step.status != "done":
+                        step.status = "superseded"
+                task.steps.extend(self._steps(plan, max((s.index for s in task.steps), default=-1) + 1))
+            else:
+                task.steps = self._steps(plan)
+            task.rationale, task.plan_ready, task.plan_approval = plan.rationale, True, {}
+            task.current_index = next((i for i, s in enumerate(task.steps) if s.status == "pending"), len(task.steps))
+            task.status, task.error, task.completion_report = "paused", "revised plan requires review and approval", {}
+            save(task)
+            return task
+
+    @staticmethod
+    def _editable_plan(task):
+        if task.status in {"done", "failed"} or any(s.status == "running" for s in task.steps):
+            raise ChangeSetConflict("active/interrupted side effects or a closed task require recovery, not plan reset")
 
     def prepare(self, query: str, *, candidates: list[str], n_files: int) -> Task:
         """Persist a task before planning, including rejected/repaired planner responses."""
@@ -58,7 +100,7 @@ class TaskRunner:
                 task.rationale = plan.rationale
                 task.plan_ready = True
                 task.status = "paused"
-                task.error = "plan ready; execution not started"
+                task.error = "plan ready; review and approval required before execution"
             except BudgetExceeded as exc:
                 task.status, task.error = "paused", str(exc)
             except TaskCancelled as exc:
@@ -68,10 +110,12 @@ class TaskRunner:
             save(task)
         return task
 
-    def run_plan(self, query: str, plan: Plan) -> Task:
+    def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None = None) -> Task:
         steps = self._steps(plan)
         task = Task.new(query=query, project=self.project, steps=steps, rationale=plan.rationale)
         save(task)
+        review = self.review(task, allowed_paths=allowed_paths)
+        task = self.approve(task, review["digest"], allowed_paths=allowed_paths)
         return self.resume(task)
 
     def resume(self, task: Task) -> Task:
@@ -86,9 +130,21 @@ class TaskRunner:
             self.cancel_check = lambda: check_cancel(task.id)
             self.task_backend = TaskBudgetBackend(self.backend, task, self.config, self.cancel_check)
             try:
+                self.cancel_check()
                 check_accounting(task)
                 if not task.plan_ready:
                     raise BudgetExceeded("planning incomplete; review costs and start a new task")
+                # Published checkpoints may only be verified, never replayed; they
+                # do not need a new execution authorization for legacy migration.
+                recovery_only = (task.changeset_id and ChangeSet.open(self.project, task.changeset_id).state["status"]
+                                 in {"published", "publishing", "recovery_conflict"})
+                if not recovery_only:
+                    try:
+                        require_approval(task, self.project)
+                    except ChangeSetConflict as exc:
+                        task.status, task.error = "paused", str(exc)
+                        save(task)
+                        return task
                 return self._resume_locked(task)
             except BudgetExceeded as exc:
                 task.status, task.error = "paused", str(exc)
@@ -149,6 +205,7 @@ class TaskRunner:
                     result.error = "Final host checks did not pass; workspace retained, nothing published. Inspect completion_report."
                     save(result)
                     return result
+                require_scope(result, self.changeset)
                 self.changeset.publish(cancel_check=self.cancel_check, finalize=lambda: save_tree(
                     self.project, build_tree(self.project, self.config.tree.ignore,
                                              respect_gitignore=self.config.tree.respect_gitignore)))
@@ -178,7 +235,26 @@ class TaskRunner:
                 task.error = "task budget exhausted before next step"
                 save(task)
                 return task
-            step = task.steps[task.current_index]
+            by_id = {s.index: s for s in task.steps}
+            runnable = []
+            for candidate in task.steps:
+                if candidate.status not in {"pending", "blocked"}:
+                    continue
+                blocked = [d for d in candidate.depends_on if by_id[d].status != "done"]
+                candidate.blocked_reason = ("prerequisites not done: " + ", ".join(map(str, blocked))) if blocked else ""
+                candidate.status = "blocked" if blocked else "pending"
+                if not blocked:
+                    runnable.append(candidate)
+            if not runnable:
+                unresolved = [s for s in task.steps if s.status not in {"done", "superseded"}]
+                if unresolved:
+                    task.status, task.error = "paused", "blocked work remains; review prerequisites or revise the plan"
+                else:
+                    task.current_index = len(task.steps)
+                save(task)
+                return task
+            step = runnable[0]
+            task.current_index = task.steps.index(step)
             step.status = "running"
             step.started_at = time.time()
             save(task)
@@ -186,11 +262,12 @@ class TaskRunner:
             try:
                 checkpoint = self.changeset.checkpoint()
                 self._execute_step(task, step)
+                require_scope(task, self.changeset)
                 self.cancel_check()
                 step.status = "done"
                 step.result_summary = step.result_summary or "ok"
                 step.finished_at = time.time()
-                task.current_index += 1
+                task.current_index = 0
                 save(task)
                 continue
             except Exception as exc:
@@ -210,6 +287,10 @@ class TaskRunner:
                     save(task)
                     return task
                 save(task)
+                if isinstance(exc, ChangeSetConflict):
+                    task.status, task.error = "failed", step.result_summary
+                    save(task)
+                    return task
                 if isinstance(exc, BudgetExceeded):
                     step.status = "pending"
                     step.started_at = step.finished_at = None
@@ -218,6 +299,14 @@ class TaskRunner:
                     return task
                 if isinstance(exc, TaskCancelled):
                     raise
+
+            # Finish other independently authorized work before replanning a
+            # failed dependency. Blocked descendants remain explicit in state.
+            if any(s.status in {"pending", "blocked"} and all(
+                    next(d for d in task.steps if d.index == dep).status == "done" for dep in s.depends_on)
+                   for s in task.steps):
+                task.current_index = 0
+                continue
 
             if self.config is not None and self.config.task.max_budget_usd > 0 \
                     and task.budget_spent >= self.config.task.max_budget_usd \
@@ -266,20 +355,18 @@ class TaskRunner:
                 save(task)
                 return task
 
-            base_index = len(task.steps)
-            for i, p in enumerate(new_plan.steps):
-                task.steps.append(
-                    Step(
-                        index=base_index + i,
-                        description=p.description,
-                        tools_needed=list(p.tools_needed),
-                        expected_outcome=p.expected_outcome,
-                        verify_with=p.verify_with,
-                    )
-                )
+            base_index = max(s.index for s in task.steps) + 1
+            for previous in task.steps:
+                if previous.status != "done":
+                    previous.status = "superseded"
+            task.steps.extend(self._steps(new_plan, base_index))
+            task.rationale = new_plan.rationale
             task.replan_count += 1
-            task.current_index = base_index
+            task.current_index = len(task.steps) - len(new_plan.steps)
+            task.plan_approval = {}
+            task.status, task.error = "paused", "replanned work requires fresh plan review and approval"
             save(task)
+            return task
 
         # Completion is recorded only after publishing the workspace successfully.
         save(task)
@@ -292,7 +379,8 @@ class TaskRunner:
             self.task_backend.phase = "step"
         orch = Orchestrator(self.config, workspace, self.task_backend, approval_callback=self.approval_callback,
                             settings_project=self.project, cancel_check=self.cancel_check,
-                            question_callback=self.question_callback, private_workspace=self.changeset is not None)
+                            question_callback=self.question_callback, private_workspace=self.changeset is not None,
+                            mutation_scope=require_approval(task, self.project))
         result = orch.answer(subquery, mode="medium", approve_edits=True)
         step.request_id = result.ledger_id
         if self.changeset:
@@ -306,6 +394,8 @@ class TaskRunner:
                     else:
                         edits[summary["path"]] = summary.get("content_hash")
             for path, expected_hash in edits.items():
+                if path not in require_approval(task, self.project):
+                    raise ChangeSetConflict("mutation path exceeds reviewed plan scope")
                 self.changeset.track(path, expected_hash)
         self._verify_step(step, result)
 

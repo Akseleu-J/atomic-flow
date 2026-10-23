@@ -19,7 +19,7 @@ from typing import Literal
 from atomic_flow.config import user_dir
 from atomic_flow.state import TASK_SCHEMA_VERSION, StateError, migrate_task
 
-StepStatus = Literal["pending", "running", "done", "failed"]
+StepStatus = Literal["pending", "running", "done", "failed", "blocked", "superseded"]
 TaskStatus = Literal["running", "paused", "done", "failed"]
 
 
@@ -35,6 +35,8 @@ class Step:
     started_at: float | None = None
     finished_at: float | None = None
     request_id: str = ""
+    depends_on: list[int] = field(default_factory=list)
+    blocked_reason: str = ""
 
 
 @dataclass
@@ -57,6 +59,7 @@ class Task:
     budget_events: list[dict] = field(default_factory=list)
     schema_version: int = TASK_SCHEMA_VERSION
     completion_report: dict = field(default_factory=dict)
+    plan_approval: dict = field(default_factory=dict)
 
     @classmethod
     def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> Task:
@@ -137,8 +140,10 @@ def _decode(raw: object, task_id: str) -> Task:
     if "budget_events" in data and (not isinstance(data["budget_events"], list)
                                      or any(not isinstance(e, dict) for e in data["budget_events"])):
         raise StateError("invalid task state: budget_events must be a list of objects")
-    if "completion_report" in data and not isinstance(data["completion_report"], dict):
-        raise StateError("invalid task state: completion_report must be an object")
+    for name in ("completion_report", "plan_approval"):
+        if name in data and not isinstance(data[name], dict):
+            raise StateError(f"invalid task state: {name} must be an object")
+    _validate_approval(data.get("plan_approval", {}))
     raw_steps = data.pop("steps", [])
     if not isinstance(raw_steps, list):
         raise StateError("invalid task state: steps must be a list")
@@ -146,13 +151,16 @@ def _decode(raw: object, task_id: str) -> Task:
     for raw_step in raw_steps:
         if not isinstance(raw_step, dict):
             raise StateError("invalid task step: expected an object")
-        for name in ("description", "expected_outcome", "verify_with", "result_summary", "request_id"):
+        for name in ("description", "expected_outcome", "verify_with", "result_summary", "request_id", "blocked_reason"):
             if name in raw_step and not isinstance(raw_step[name], str):
                 raise StateError(f"invalid task step: {name} must be text")
         if type(raw_step.get("index")) is not int or raw_step["index"] < 0:
             raise StateError("invalid task step index")
-        if raw_step.get("status", "pending") not in ("pending", "running", "done", "failed"):
+        if raw_step.get("status", "pending") not in ("pending", "running", "done", "failed", "blocked", "superseded"):
             raise StateError("invalid task step status")
+        dependencies = raw_step.get("depends_on", [])
+        if not isinstance(dependencies, list) or any(type(d) is not int or d < 0 for d in dependencies):
+            raise StateError("invalid task step dependencies")
         tools = raw_step.get("tools_needed", [])
         if not isinstance(tools, list) or any(not isinstance(tool, str) for tool in tools):
             raise StateError("invalid task step tools_needed")
@@ -164,10 +172,67 @@ def _decode(raw: object, task_id: str) -> Task:
             steps.append(Step(**raw_step))
         except TypeError as exc:
             raise StateError("invalid task step fields; inspect saved state before resuming") from exc
+    validate_dependencies(steps)
     try:
         return Task(steps=steps, **data)
     except TypeError as exc:
         raise StateError("invalid task fields; inspect saved state before resuming") from exc
+
+
+def validate_dependencies(steps: list[Step]) -> None:
+    by_id = {s.index: s for s in steps}
+    if len(by_id) != len(steps):
+        raise StateError("duplicate task step index")
+    dependents = {s.index: [] for s in steps}
+    remaining = {}
+    for step in steps:
+        if len(set(step.depends_on)) != len(step.depends_on):
+            raise StateError("duplicate task step dependency")
+        for dependency in step.depends_on:
+            if type(dependency) is not int or dependency < 0:
+                raise StateError("invalid task step dependency index")
+            if dependency not in by_id:
+                raise StateError("missing task step dependency")
+            if dependency == step.index:
+                raise StateError("self-referencing task step dependency")
+            dependents[dependency].append(step.index)
+        remaining[step.index] = len(step.depends_on)
+    ready = [index for index, count in remaining.items() if not count]
+    visited = 0
+    while ready:
+        index = ready.pop()
+        visited += 1
+        for dependent in dependents[index]:
+            remaining[dependent] -= 1
+            if not remaining[dependent]:
+                ready.append(dependent)
+    if visited != len(steps):
+        raise StateError("cyclic task step dependencies")
+
+
+def _validate_approval(approval: dict) -> None:
+    if not approval:
+        return
+    required = {"schema_version", "task_id", "project", "plan", "source_manifest", "allowed_paths",
+                "scope_hashes", "workspace_manifest", "digest"}
+    if set(approval) != required or type(approval["schema_version"]) is not int or approval["schema_version"] != 1:
+        raise StateError("invalid task plan approval fields/version")
+    if (any(not isinstance(approval[key], str) for key in ("task_id", "project", "digest"))
+            or not re.fullmatch(r"[a-f0-9]{64}", approval["digest"])
+            or not isinstance(approval["plan"], dict)
+            or not isinstance(approval["allowed_paths"], list)
+            or any(not isinstance(path, str) for path in approval["allowed_paths"])):
+        raise StateError("invalid task plan approval structure")
+    for name in ("source_manifest", "scope_hashes", "workspace_manifest"):
+        manifest = approval[name]
+        if manifest is None and name == "workspace_manifest":
+            continue
+        if not isinstance(manifest, dict):
+            raise StateError("invalid task plan approval manifest")
+        for path, value in manifest.items():
+            if (not isinstance(path, str) or (value is None and name != "scope_hashes")
+                    or (value is not None and (not isinstance(value, str) or not re.fullmatch(r"[a-f0-9]{40}", value)))):
+                raise StateError("invalid task plan approval content hash")
 
 
 def _validate_id(task_id: str):
