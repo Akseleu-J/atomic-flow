@@ -71,7 +71,9 @@ if tool == 'pytest':
             self.collected = session.testscollected
     collection = Collection()
     sys.path.insert(0, os.getcwd())
-    targets = arguments if '--' in arguments else [*arguments, os.getcwd()]
+    # pytest already defaults to cwd when no target is supplied. Appending cwd
+    # would silently widen explicit matching-test selections to the whole repo.
+    targets = arguments or [os.getcwd()]
     code = int(pytest.main(targets, plugins=[collection]))
     raise SystemExit(5 if code == 0 and collection.collected == 0 else code)
 importlib.import_module(tool)

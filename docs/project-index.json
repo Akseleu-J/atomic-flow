@@ -1,30 +1,16 @@
 {
-  "source_commit": "a0a4de5ab9adae174854a1a7de56a556f4b5a3d9",
+  "source_commit": "f6ddfdba7bb4b69d7701eeb3f9a72315ecc80d0c",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
     "docs/IMPLEMENTATION_STEP_17.md",
-    "docs/PROJECT_CONTEXT.md",
-    "src/atomic_flow/agents/tools/file_ops.py",
-    "tests/test_unresolved_effects.py",
-    "validation/ci-step17-before-fix-20261023/evidence-manifest.json",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/compile.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/container-boundaries.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/dependencies.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-build.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-info.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-version.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest-extra.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/python-version.txt",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/results.json",
-    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/tested-commit.txt",
-    "validation/step17-preflight-final-windows.txt",
-    "validation/step17-preflight-recheck-windows.txt"
+    "src/atomic_flow/agents/execution.py",
+    "tests/test_execution_confidentiality.py",
+    "validation/step17-checker-final-windows.txt"
   ],
-  "file_count": 507,
+  "file_count": 508,
   "python_file_count": 209,
-  "symbol_count": 2132,
+  "symbol_count": 2133,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -409,9 +395,9 @@
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_17.md",
-      "sha256": "40f17cb21ae391b3d7e053c450862229f172e4c43bb1c344c23b9df9dc296177",
-      "bytes": 13699,
-      "lines": 157
+      "sha256": "e3f4f8fc18afc831bab5c90c4dc53bb8e4ed1ac816875294215153dc6af9bf4e",
+      "bytes": 14126,
+      "lines": 161
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_2.md",
@@ -493,9 +479,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "56ba962d4861e09ba2f298355d79b4cb3137a1c0ce0e2c3d16545789ec4dd1cc",
-      "bytes": 752109,
-      "lines": 22915
+      "sha256": "647f651c87ba90aeff2fbf2316929fe9dfc7d588b9dd5e68df4d446fce8d03f6",
+      "bytes": 755941,
+      "lines": 22985
     },
     {
       "path": "docs/prompts.md",
@@ -2115,9 +2101,9 @@
     },
     {
       "path": "src/atomic_flow/agents/execution.py",
-      "sha256": "34e4c5d245619ce2ad0396e5f68b09ef581ad3b4a5fca1fde1b7a0bd0d15652f",
-      "bytes": 12419,
-      "lines": 274,
+      "sha256": "d7138572d1e6db2ffa577e39df837aaf61eb6516f5242599a7f214ebade8d885",
+      "bytes": 12543,
+      "lines": 276,
       "summary": "Bounded command execution. Local mode is explicitly NOT a security sandbox.",
       "imports": [
         "__future__",
@@ -2174,72 +2160,72 @@
         {
           "name": "_trusted_checker_args",
           "kind": "function",
-          "line": 83,
-          "end_line": 86,
+          "line": 85,
+          "end_line": 88,
           "signature": "def _trusted_checker_args(args: list[str])",
           "summary": ""
         },
         {
           "name": "execution_profile",
           "kind": "function",
-          "line": 89,
-          "end_line": 93,
+          "line": 91,
+          "end_line": 95,
           "signature": "def execution_profile(name: str)",
           "summary": ""
         },
         {
           "name": "clean_environment",
           "kind": "function",
-          "line": 96,
-          "end_line": 103,
+          "line": 98,
+          "end_line": 105,
           "signature": "def clean_environment(home: Path)",
           "summary": ""
         },
         {
           "name": "container_identity",
           "kind": "function",
-          "line": 106,
-          "end_line": 112,
+          "line": 108,
+          "end_line": 114,
           "signature": "def container_identity()",
           "summary": "Keep private Unix workspaces accessible without chmod or running as root."
         },
         {
           "name": "docker_command",
           "kind": "function",
-          "line": 115,
-          "end_line": 130,
+          "line": 117,
+          "end_line": 132,
           "signature": "def docker_command(engine: str, image: str, workspace: Path, name: str, args: list[str], *, profile: str='checks', container_id_file: Path | None=None)",
           "summary": ""
         },
         {
           "name": "_kill_tree",
           "kind": "function",
-          "line": 133,
-          "end_line": 154,
+          "line": 135,
+          "end_line": 156,
           "signature": "def _kill_tree(proc: subprocess.Popen)",
           "summary": ""
         },
         {
           "name": "_remove_container",
           "kind": "function",
-          "line": 157,
-          "end_line": 170,
+          "line": 159,
+          "end_line": 172,
           "signature": "def _remove_container(engine: str, identity: str, home: Path)",
           "summary": "Stop an owned container or prove absence; daemon failure is not absence."
         },
         {
           "name": "run_python",
           "kind": "function",
-          "line": 173,
-          "end_line": 274,
+          "line": 175,
+          "end_line": 276,
           "signature": "def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None=None, timeout: float=120, cancel_check: Callable[[], None] | None=None, output_callback: Callable[[str, bytes], None] | None=None, container_name: str | None=None, container_id_file: Path | None=None)",
           "summary": "Execute Python arguments; docker mode fails closed without an engine/image."
         },
         {
           "name": "run_python.drain",
           "kind": "function",
-          "line": 211,
-          "end_line": 225,
+          "line": 213,
+          "end_line": 227,
           "signature": "def drain(stream, tail, index)",
           "summary": ""
         }
@@ -14591,9 +14577,9 @@
     },
     {
       "path": "tests/test_execution_confidentiality.py",
-      "sha256": "002293b44fe5c30360a35587e133bd2a26fe7d06b9e1cf51d1053991c4ea1607",
-      "bytes": 7901,
-      "lines": 150,
+      "sha256": "5e8b80ba898dceef9f999f172b838459e6d4e038687cde386c2c134685098886",
+      "bytes": 8387,
+      "lines": 158,
       "summary": "Regressions for private execution inputs and checker identity/output gates.",
       "imports": [
         "__future__",
@@ -14679,26 +14665,34 @@
           "summary": ""
         },
         {
-          "name": "test_final_pytest_gate_rejects_shadowing_and_zero_collection",
+          "name": "test_trusted_checker_preserves_selected_matching_tests",
           "kind": "function",
           "line": 119,
-          "end_line": 133,
+          "end_line": 124,
+          "signature": "def test_trusted_checker_preserves_selected_matching_tests(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_final_pytest_gate_rejects_shadowing_and_zero_collection",
+          "kind": "function",
+          "line": 127,
+          "end_line": 141,
           "signature": "def test_final_pytest_gate_rejects_shadowing_and_zero_collection(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_docker_quality_launch_uses_isolated_installed_checker",
           "kind": "function",
-          "line": 136,
-          "end_line": 140,
+          "line": 144,
+          "end_line": 148,
           "signature": "def test_docker_quality_launch_uses_isolated_installed_checker(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_real_docker_checker_rejects_shadow_module_and_protects_output",
           "kind": "function",
-          "line": 144,
-          "end_line": 150,
+          "line": 152,
+          "end_line": 158,
           "signature": "def test_real_docker_checker_rejects_shadow_module_and_protects_output(tmp_path)",
           "summary": ""
         }
@@ -22926,6 +22920,12 @@
       "sha256": "169c4ffc1e85b9de073f1442159fea1db4e9c174680ce05123bed74643b25bf1",
       "bytes": 4568,
       "lines": 156
+    },
+    {
+      "path": "validation/step17-checker-final-windows.txt",
+      "sha256": "8bc49af5c9cb3bc086b85f798df4ceefc7867983fcd00816d1c5196f2307102d",
+      "bytes": 113,
+      "lines": 2
     },
     {
       "path": "validation/step17-final-windows.txt",
