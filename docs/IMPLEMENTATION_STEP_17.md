@@ -174,3 +174,13 @@ preflight. Dispatcher фиксирует `effect_not_started`, не устана
 contracts и execution privacy), **54 passed / 1 skipped** (post-edit checks/task
 publication), отдельные logs `step17-contracts-final-windows.txt` и
 `step17-verification-final-windows.txt`. Повторный exact-source CI ожидается.
+
+
+Финальный runtime **`78f0df5c2abf18fc4b0035030a92178335134e04`**: push CI `39970683119` и PR CI `39970691727`
+PASS, Python 3.11/3.12. Скачанный exact-source artifact: **792 CPU passed / 11 skipped, 17 extra passed, 26 execution acceptance passed**
+(10 real Docker checks, 16 supporting CPU/local jobs); compile и historical
+six-change grader calibration PASS, model_calls=0. Image ID:
+`sha256:06fd74d44e2ba0d9d4b0835424c0921378e50f990695e82c0b79a91ff46e6b47`.
+`validation/ci-step17-20261023/evidence-manifest.json` связывает исходные
+**12 artifact files** и **31 changed source/test/tool Git blobs** с tested commit.
+Это проверка конкретных R01–R07 regressions, а не production/live-edit acceptance.
