@@ -11,6 +11,14 @@ class SourceConflict(OSError):
     pass
 
 
+class SourcePreconditionFailed(SourceConflict):
+    """Trusted tool preflight failed before every mutation/execution boundary.
+
+    Only raise in a host-owned preflight block, never from action/rollback code.
+    Remains a SourceConflict for callers of the direct source tool API.
+    """
+
+
 def digest(data: bytes) -> str:
     return hashlib.sha1(data).hexdigest()
 

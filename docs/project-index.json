@@ -1,16 +1,36 @@
 {
-  "source_commit": "f6ddfdba7bb4b69d7701eeb3f9a72315ecc80d0c",
+  "source_commit": "d86a43971d82fb5870f2b3b7400d1c6d909fc5be",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
     "docs/IMPLEMENTATION_STEP_17.md",
     "src/atomic_flow/agents/execution.py",
+    "src/atomic_flow/agents/loop.py",
+    "src/atomic_flow/agents/result.py",
+    "src/atomic_flow/agents/source.py",
+    "src/atomic_flow/agents/tools/edit_node.py",
+    "src/atomic_flow/agents/tools/file_ops.py",
+    "src/atomic_flow/agents/tools/run_command.py",
+    "src/atomic_flow/agents/verify.py",
     "tests/test_execution_confidentiality.py",
-    "validation/step17-checker-final-windows.txt"
+    "validation/ci-step17-intermediate-20261023/evidence-manifest.json",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/compile.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/container-boundaries.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/dependencies.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-build.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-info.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-version.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/pytest-extra.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/pytest.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/python-version.txt",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/results.json",
+    "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/tested-commit.txt",
+    "validation/step17-contracts-final-windows.txt",
+    "validation/step17-verification-final-windows.txt"
   ],
-  "file_count": 508,
+  "file_count": 522,
   "python_file_count": 209,
-  "symbol_count": 2133,
+  "symbol_count": 2136,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -395,9 +415,9 @@
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_17.md",
-      "sha256": "e3f4f8fc18afc831bab5c90c4dc53bb8e4ed1ac816875294215153dc6af9bf4e",
-      "bytes": 14126,
-      "lines": 161
+      "sha256": "7491bcccb7142178f2d832966dee46c4005857dab7ee23864a9f8fa734625a66",
+      "bytes": 15551,
+      "lines": 176
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_2.md",
@@ -479,8 +499,8 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "647f651c87ba90aeff2fbf2316929fe9dfc7d588b9dd5e68df4d446fce8d03f6",
-      "bytes": 755941,
+      "sha256": "0401367753ec2a39080ce770e651dceb6792b1bccc86d5379c1f79d38b2b0ff6",
+      "bytes": 754991,
       "lines": 22985
     },
     {
@@ -2101,15 +2121,17 @@
     },
     {
       "path": "src/atomic_flow/agents/execution.py",
-      "sha256": "d7138572d1e6db2ffa577e39df837aaf61eb6516f5242599a7f214ebade8d885",
-      "bytes": 12543,
-      "lines": 276,
+      "sha256": "b68fb33b87da3b968f9de201234e1ce75820dfdc60b195b0b12720cbcbf58e20",
+      "bytes": 13020,
+      "lines": 292,
       "summary": "Bounded command execution. Local mode is explicitly NOT a security sandbox.",
       "imports": [
         "__future__",
+        "atomic_flow.agents.changeset",
         "atomic_flow.config",
         "atomic_flow.output",
         "collections.abc",
+        "contextlib",
         "dataclasses",
         "os",
         "pathlib",
@@ -2128,104 +2150,112 @@
         {
           "name": "ExecutionUnavailable",
           "kind": "class",
-          "line": 23,
-          "end_line": 24,
+          "line": 24,
+          "end_line": 25,
           "signature": "class ExecutionUnavailable",
           "summary": ""
         },
         {
           "name": "TaskCancelled",
           "kind": "class",
-          "line": 27,
-          "end_line": 28,
+          "line": 28,
+          "end_line": 29,
           "signature": "class TaskCancelled",
           "summary": ""
         },
         {
           "name": "CommandResult",
           "kind": "class",
-          "line": 32,
-          "end_line": 38,
+          "line": 33,
+          "end_line": 39,
           "signature": "class CommandResult",
           "summary": ""
         },
         {
           "name": "ExecutionProfile",
           "kind": "class",
-          "line": 42,
-          "end_line": 50,
+          "line": 43,
+          "end_line": 51,
           "signature": "class ExecutionProfile",
           "summary": "Host-defined Docker bounds; repository configuration can only select a name."
         },
         {
           "name": "_trusted_checker_args",
           "kind": "function",
-          "line": 85,
-          "end_line": 88,
+          "line": 86,
+          "end_line": 89,
           "signature": "def _trusted_checker_args(args: list[str])",
           "summary": ""
         },
         {
           "name": "execution_profile",
           "kind": "function",
-          "line": 91,
-          "end_line": 95,
+          "line": 92,
+          "end_line": 96,
           "signature": "def execution_profile(name: str)",
           "summary": ""
         },
         {
+          "name": "checked_workspace",
+          "kind": "function",
+          "line": 100,
+          "end_line": 111,
+          "signature": "def checked_workspace(project: Path, *, private_workspace=False)",
+          "summary": "Model-facing checks use admitted copies; never publish writes by tests."
+        },
+        {
           "name": "clean_environment",
           "kind": "function",
-          "line": 98,
-          "end_line": 105,
+          "line": 114,
+          "end_line": 121,
           "signature": "def clean_environment(home: Path)",
           "summary": ""
         },
         {
           "name": "container_identity",
           "kind": "function",
-          "line": 108,
-          "end_line": 114,
+          "line": 124,
+          "end_line": 130,
           "signature": "def container_identity()",
           "summary": "Keep private Unix workspaces accessible without chmod or running as root."
         },
         {
           "name": "docker_command",
           "kind": "function",
-          "line": 117,
-          "end_line": 132,
+          "line": 133,
+          "end_line": 148,
           "signature": "def docker_command(engine: str, image: str, workspace: Path, name: str, args: list[str], *, profile: str='checks', container_id_file: Path | None=None)",
           "summary": ""
         },
         {
           "name": "_kill_tree",
           "kind": "function",
-          "line": 135,
-          "end_line": 156,
+          "line": 151,
+          "end_line": 172,
           "signature": "def _kill_tree(proc: subprocess.Popen)",
           "summary": ""
         },
         {
           "name": "_remove_container",
           "kind": "function",
-          "line": 159,
-          "end_line": 172,
+          "line": 175,
+          "end_line": 188,
           "signature": "def _remove_container(engine: str, identity: str, home: Path)",
           "summary": "Stop an owned container or prove absence; daemon failure is not absence."
         },
         {
           "name": "run_python",
           "kind": "function",
-          "line": 175,
-          "end_line": 276,
+          "line": 191,
+          "end_line": 292,
           "signature": "def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None=None, timeout: float=120, cancel_check: Callable[[], None] | None=None, output_callback: Callable[[str, bytes], None] | None=None, container_name: str | None=None, container_id_file: Path | None=None)",
           "summary": "Execute Python arguments; docker mode fails closed without an engine/image."
         },
         {
           "name": "run_python.drain",
           "kind": "function",
-          "line": 213,
-          "end_line": 227,
+          "line": 229,
+          "end_line": 243,
           "signature": "def drain(stream, tail, index)",
           "summary": ""
         }
@@ -2308,9 +2338,9 @@
     },
     {
       "path": "src/atomic_flow/agents/loop.py",
-      "sha256": "ae7cd36c2173c30c10afd0bafebf5379dd54efbf5c1a7121b0a33dc59d133219",
-      "bytes": 13352,
-      "lines": 239,
+      "sha256": "0355490cc6b10d97601dd7ba52b9169d46f1c7705fa56dfe3f0ac52d2c96b35d",
+      "bytes": 13530,
+      "lines": 242,
       "summary": "Tool-use loop for text-only model backends.",
       "imports": [
         "__future__",
@@ -2351,7 +2381,7 @@
           "name": "execute_tool",
           "kind": "function",
           "line": 70,
-          "end_line": 225,
+          "end_line": 228,
           "signature": "def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContext, *, allowed_tools: list[str] | tuple[str, ...], role: str='')",
           "summary": "Validate, authorize and audit every outcome, including early rejections."
         },
@@ -2374,8 +2404,8 @@
         {
           "name": "_contract_error",
           "kind": "function",
-          "line": 228,
-          "end_line": 239,
+          "line": 231,
+          "end_line": 242,
           "signature": "def _contract_error(result: Any, message: str, effects: tuple[str, ...])",
           "summary": "Retain mutation proof when a completed tool violates its return contract."
         }
@@ -2652,9 +2682,9 @@
     },
     {
       "path": "src/atomic_flow/agents/result.py",
-      "sha256": "2139fa01ed150c05584eaae52e8f2aab70b65b2c75d56a4428da36f605835faf",
-      "bytes": 3601,
-      "lines": 68,
+      "sha256": "383371229c820ab2096d4df0041078ad9a03a5ec33d06ee8c33b95e5aca6c60f",
+      "bytes": 3635,
+      "lines": 69,
       "summary": "Host-owned tool outcomes, independent of model wording and provider protocol.",
       "imports": [
         "__future__",
@@ -2666,7 +2696,7 @@
           "name": "ToolResult",
           "kind": "class",
           "line": 11,
-          "end_line": 68,
+          "end_line": 69,
           "signature": "class ToolResult",
           "summary": ""
         },
@@ -2690,7 +2720,7 @@
           "name": "ToolResult.summary",
           "kind": "function",
           "line": 54,
-          "end_line": 68,
+          "end_line": 69,
           "signature": "def summary(self)",
           "summary": "Keep proof and failure fields; do not copy source bodies into meta.json."
         }
@@ -2777,9 +2807,9 @@
     },
     {
       "path": "src/atomic_flow/agents/source.py",
-      "sha256": "22a901156490a3e2b0805b4031b838304e44f0a4478446f24e0428c813de159d",
-      "bytes": 1953,
-      "lines": 60,
+      "sha256": "d340975928e64edd36a86f1d06765c40269b33ae25c9b0d42cfc22837f923911",
+      "bytes": 2244,
+      "lines": 68,
       "summary": "Confined, revision-checked source I/O shared by tools and undo.",
       "imports": [
         "__future__",
@@ -2798,42 +2828,50 @@
           "summary": ""
         },
         {
+          "name": "SourcePreconditionFailed",
+          "kind": "class",
+          "line": 14,
+          "end_line": 19,
+          "signature": "class SourcePreconditionFailed",
+          "summary": "Trusted tool preflight failed before every mutation/execution boundary."
+        },
+        {
           "name": "digest",
           "kind": "function",
-          "line": 14,
-          "end_line": 15,
+          "line": 22,
+          "end_line": 23,
           "signature": "def digest(data: bytes)",
           "summary": ""
         },
         {
           "name": "confined_path",
           "kind": "function",
-          "line": 18,
-          "end_line": 31,
+          "line": 26,
+          "end_line": 39,
           "signature": "def confined_path(root: Path, rel: str)",
           "summary": ""
         },
         {
           "name": "read_checked",
           "kind": "function",
-          "line": 34,
-          "end_line": 38,
+          "line": 42,
+          "end_line": 46,
           "signature": "def read_checked(root: Path, rel: str, expected: str)",
           "summary": ""
         },
         {
           "name": "replace_checked",
           "kind": "function",
-          "line": 41,
-          "end_line": 60,
+          "line": 49,
+          "end_line": 68,
           "signature": "def replace_checked(root: Path, rel: str, data: bytes, expected: str | None)",
           "summary": ""
         },
         {
           "name": "replace_checked.check",
           "kind": "function",
-          "line": 44,
-          "end_line": 47,
+          "line": 52,
+          "end_line": 55,
           "signature": "def check()",
           "summary": ""
         }
@@ -3378,9 +3416,9 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/edit_node.py",
-      "sha256": "c5823edf951bf6548832e1c8e302aa09037c9dd1249602344c87c69a1a98aafe",
-      "bytes": 6203,
-      "lines": 110,
+      "sha256": "5aefd8cc15de5a29d9cb79b34c417ee2e308b5d51ff196eaf9a57a2244e37e26",
+      "bytes": 6279,
+      "lines": 111,
       "summary": "edit_node: replace a function or class with explicit edit approval.",
       "imports": [
         "__future__",
@@ -3407,7 +3445,7 @@
           "name": "EditNodeTool",
           "kind": "class",
           "line": 22,
-          "end_line": 110,
+          "end_line": 111,
           "signature": "class EditNodeTool",
           "summary": ""
         },
@@ -3415,7 +3453,7 @@
           "name": "EditNodeTool.run",
           "kind": "function",
           "line": 32,
-          "end_line": 110,
+          "end_line": 111,
           "signature": "def run(self, args: EditNodeArgs, ctx: ToolContext)",
           "summary": ""
         }
@@ -3423,9 +3461,9 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/file_ops.py",
-      "sha256": "3c8f829be94596571c420624c2a811efd315cfe60e59a0516fe2f7fd15774612",
-      "bytes": 10163,
-      "lines": 207,
+      "sha256": "4ca667a1951e9d16afe8b2fcbee5d7fbcd897dbad7fe3184913c0c5691f1b2cf",
+      "bytes": 10625,
+      "lines": 213,
       "summary": "Small hash-bound patches and explicit source-file lifecycle operations.",
       "imports": [
         "__future__",
@@ -3500,71 +3538,71 @@
           "name": "_mutate",
           "kind": "function",
           "line": 58,
-          "end_line": 129,
+          "end_line": 131,
           "signature": "def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None], *, after_modes=None)",
           "summary": ""
         },
         {
           "name": "PatchFileTool",
           "kind": "class",
-          "line": 132,
-          "end_line": 155,
+          "line": 134,
+          "end_line": 157,
           "signature": "class PatchFileTool",
           "summary": ""
         },
         {
           "name": "PatchFileTool.run",
           "kind": "function",
-          "line": 138,
-          "end_line": 155,
+          "line": 140,
+          "end_line": 157,
           "signature": "def run(self, args: PatchFileArgs, ctx)",
           "summary": ""
         },
         {
           "name": "CreateFileTool",
           "kind": "class",
-          "line": 158,
-          "end_line": 170,
+          "line": 160,
+          "end_line": 176,
           "signature": "class CreateFileTool",
           "summary": ""
         },
         {
           "name": "CreateFileTool.run",
           "kind": "function",
-          "line": 164,
-          "end_line": 170,
+          "line": 166,
+          "end_line": 176,
           "signature": "def run(self, args: CreateFileArgs, ctx)",
           "summary": ""
         },
         {
           "name": "DeleteFileTool",
           "kind": "class",
-          "line": 173,
-          "end_line": 186,
+          "line": 179,
+          "end_line": 192,
           "signature": "class DeleteFileTool",
           "summary": ""
         },
         {
           "name": "DeleteFileTool.run",
           "kind": "function",
-          "line": 179,
-          "end_line": 186,
+          "line": 185,
+          "end_line": 192,
           "signature": "def run(self, args: DeleteFileArgs, ctx)",
           "summary": ""
         },
         {
           "name": "MoveFileTool",
           "kind": "class",
-          "line": 189,
-          "end_line": 207,
+          "line": 195,
+          "end_line": 213,
           "signature": "class MoveFileTool",
           "summary": ""
         },
         {
           "name": "MoveFileTool.run",
           "kind": "function",
-          "line": 195,
-          "end_line": 207,
+          "line": 201,
+          "end_line": 213,
           "signature": "def run(self, args: MoveFileArgs, ctx)",
           "summary": ""
         }
@@ -4099,14 +4137,13 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/run_command.py",
-      "sha256": "a1793591ed6e51587776cdc771bf0523283db05e522c1a35bafe377f938a0803",
-      "bytes": 3028,
-      "lines": 66,
+      "sha256": "b381e83cf3bb9cc1b9fe22907157df2234217f206f9f952e219f7398c4f5e102",
+      "bytes": 2613,
+      "lines": 55,
       "summary": "run_command: execute a fixed set of project quality tools without a shell.",
       "imports": [
         "__future__",
         "atomic_flow.agents.base",
-        "atomic_flow.agents.changeset",
         "atomic_flow.agents.context",
         "atomic_flow.agents.diagnostics",
         "atomic_flow.agents.execution",
@@ -4127,7 +4164,7 @@
           "name": "RunCommandTool",
           "kind": "class",
           "line": 26,
-          "end_line": 66,
+          "end_line": 55,
           "signature": "class RunCommandTool",
           "summary": ""
         },
@@ -4135,7 +4172,7 @@
           "name": "RunCommandTool.run",
           "kind": "function",
           "line": 34,
-          "end_line": 66,
+          "end_line": 55,
           "signature": "def run(self, args: RunCommandArgs, ctx: ToolContext)",
           "summary": ""
         }
@@ -4412,9 +4449,9 @@
     },
     {
       "path": "src/atomic_flow/agents/verify.py",
-      "sha256": "fbd3fb67881aacdb56d8be345208210b8fe527d13877397645583ac2e75d1596",
-      "bytes": 3627,
-      "lines": 73,
+      "sha256": "bc134576464029c8f5d0c12a2e397eebc40576875cd5e2a63830186cfc02cfc7",
+      "bytes": 3779,
+      "lines": 74,
       "summary": "Post-edit verification for Python source files.",
       "imports": [
         "__future__",
@@ -4448,8 +4485,8 @@
           "name": "verify_edit",
           "kind": "function",
           "line": 37,
-          "end_line": 73,
-          "signature": "def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool=True, timeout_seconds: int=120, execution: ExecutionConfig | None=None, cancel_check: Callable[[], None] | None=None)",
+          "end_line": 74,
+          "signature": "def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool=True, timeout_seconds: int=120, execution: ExecutionConfig | None=None, cancel_check: Callable[[], None] | None=None, private_workspace: bool=False)",
           "summary": ""
         }
       ]
@@ -14577,9 +14614,9 @@
     },
     {
       "path": "tests/test_execution_confidentiality.py",
-      "sha256": "5e8b80ba898dceef9f999f172b838459e6d4e038687cde386c2c134685098886",
-      "bytes": 8387,
-      "lines": 158,
+      "sha256": "f2741ca333a938cd7870be6b1fd6651fa014dee5647ed1227b479ae18dffd295",
+      "bytes": 9214,
+      "lines": 173,
       "summary": "Regressions for private execution inputs and checker identity/output gates.",
       "imports": [
         "__future__",
@@ -14591,6 +14628,7 @@
         "atomic_flow.agents.task",
         "atomic_flow.agents.tools.file_paths",
         "atomic_flow.agents.tools.run_command",
+        "atomic_flow.agents.verify",
         "atomic_flow.config",
         "atomic_flow.jobs",
         "atomic_flow.output",
@@ -14603,96 +14641,104 @@
         {
           "name": "_completed_task",
           "kind": "function",
-          "line": 25,
-          "end_line": 28,
+          "line": 26,
+          "end_line": 29,
           "signature": "def _completed_task(project)",
           "summary": ""
         },
         {
           "name": "test_execution_snapshot_excludes_private_inputs_but_keeps_build_artifacts",
           "kind": "function",
-          "line": 31,
-          "end_line": 53,
+          "line": 32,
+          "end_line": 54,
           "signature": "def test_execution_snapshot_excludes_private_inputs_but_keeps_build_artifacts(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_command_output_and_diagnostics_redact_recognized_canaries",
           "kind": "function",
-          "line": 56,
-          "end_line": 69,
+          "line": 57,
+          "end_line": 70,
           "signature": "def test_command_output_and_diagnostics_redact_recognized_canaries(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_run_python_redacts_stdout_and_stderr",
           "kind": "function",
-          "line": 72,
-          "end_line": 77,
+          "line": 73,
+          "end_line": 78,
           "signature": "def test_run_python_redacts_stdout_and_stderr(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner",
           "kind": "function",
-          "line": 80,
-          "end_line": 90,
+          "line": 81,
+          "end_line": 91,
           "signature": "def test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_direct_edit_matching_checks_also_exclude_private_inputs",
+          "kind": "function",
+          "line": 94,
+          "end_line": 105,
+          "signature": "def test_direct_edit_matching_checks_also_exclude_private_inputs(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_final_report_redacts_even_an_injected_executor_result",
           "kind": "function",
-          "line": 93,
-          "end_line": 97,
+          "line": 108,
+          "end_line": 112,
           "signature": "def test_final_report_redacts_even_an_injected_executor_result(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_installed_checker_cannot_be_replaced_by_project_module",
           "kind": "function",
-          "line": 101,
-          "end_line": 107,
+          "line": 116,
+          "end_line": 122,
           "signature": "def test_installed_checker_cannot_be_replaced_by_project_module(tmp_path, checker, arguments)",
           "summary": ""
         },
         {
           "name": "test_installed_pytest_preserves_project_imports",
           "kind": "function",
-          "line": 110,
-          "end_line": 116,
+          "line": 125,
+          "end_line": 131,
           "signature": "def test_installed_pytest_preserves_project_imports(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_trusted_checker_preserves_selected_matching_tests",
           "kind": "function",
-          "line": 119,
-          "end_line": 124,
+          "line": 134,
+          "end_line": 139,
           "signature": "def test_trusted_checker_preserves_selected_matching_tests(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_final_pytest_gate_rejects_shadowing_and_zero_collection",
           "kind": "function",
-          "line": 127,
-          "end_line": 141,
+          "line": 142,
+          "end_line": 156,
           "signature": "def test_final_pytest_gate_rejects_shadowing_and_zero_collection(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_docker_quality_launch_uses_isolated_installed_checker",
           "kind": "function",
-          "line": 144,
-          "end_line": 148,
+          "line": 159,
+          "end_line": 163,
           "signature": "def test_docker_quality_launch_uses_isolated_installed_checker(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_real_docker_checker_rejects_shadow_module_and_protects_output",
           "kind": "function",
-          "line": 152,
-          "end_line": 158,
+          "line": 167,
+          "end_line": 173,
           "signature": "def test_real_docker_checker_rejects_shadow_module_and_protects_output(tmp_path)",
           "summary": ""
         }
@@ -22604,6 +22650,78 @@
       "lines": 1
     },
     {
+      "path": "validation/ci-step17-intermediate-20261023/evidence-manifest.json",
+      "sha256": "0f7415aea2a624632324ab0ac50587d9d477b965993cabaccf5d094a120272ba",
+      "bytes": 3222,
+      "lines": 63
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/container-boundaries.txt",
+      "sha256": "f9eb7f0cb92561706b52bf42b069e43f7525dc1a060756570dee39a97a74e69f",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/dependencies.txt",
+      "sha256": "8e44f0af290d7aed03638abd56131a218ddbfcb8d2f98faf7c8597c4e36f99a7",
+      "bytes": 536,
+      "lines": 28
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-build.txt",
+      "sha256": "302604e4e4764e2499fd6b406731d86de4ca258a3f2c4fa7437444fb2aec9fcc",
+      "bytes": 12596,
+      "lines": 167
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-info.txt",
+      "sha256": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f",
+      "bytes": 1491,
+      "lines": 61
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098",
+      "bytes": 769,
+      "lines": 27
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/pytest-extra.txt",
+      "sha256": "05f0c6f8a7918aee199f9622e29aae29357785ab3b2b8a549a713423a2946786",
+      "bytes": 99,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/pytest.txt",
+      "sha256": "d62797ca09e67fa6007c1379e6ec44bb59490a85fa91f62a86fb0737894445f5",
+      "bytes": 2353,
+      "lines": 34
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+      "bytes": 15,
+      "lines": 1
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/results.json",
+      "sha256": "e9b2dc66e2179e4916e12dd8ca60a30e178d685a2bd9e498fe0174e33c0b2497",
+      "bytes": 355,
+      "lines": 11
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/tested-commit.txt",
+      "sha256": "a6725eef860c49f4a07799031652a6a7af7dd347e04286c040695a0033e842e4",
+      "bytes": 41,
+      "lines": 1
+    },
+    {
       "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/compile.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
@@ -22928,6 +23046,12 @@
       "lines": 2
     },
     {
+      "path": "validation/step17-contracts-final-windows.txt",
+      "sha256": "400f5e8155f5aac998809851aec784734a0f8f450886bca2f9ba372bca8d4e6f",
+      "bytes": 770,
+      "lines": 9
+    },
+    {
       "path": "validation/step17-final-windows.txt",
       "sha256": "2f9d84242be3eaa7f090ee9beaea02669c3780c63eb63aa7cd9db598bbf3111c",
       "bytes": 770,
@@ -22962,6 +23086,12 @@
       "sha256": "51a19aeead0c03abe3c8a689494ef18f23f46e264eab75929795c23f6a556bd6",
       "bytes": 6075,
       "lines": 71
+    },
+    {
+      "path": "validation/step17-verification-final-windows.txt",
+      "sha256": "702cc0839b6566ac0abac648a9cf25f121480738051d02a42c09009db300c266",
+      "bytes": 113,
+      "lines": 2
     },
     {
       "path": "validation/step8-windows-final.txt",

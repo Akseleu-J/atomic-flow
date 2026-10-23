@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from atomic_flow.agents.diagnostics import syntax_diagnostic
-from atomic_flow.agents.execution import run_python
+from atomic_flow.agents.execution import checked_workspace, run_python
 from atomic_flow.agents.source import confined_path, digest
 from atomic_flow.config import ExecutionConfig
 from atomic_flow.tree.defaults import MAX_FILE_BYTES
@@ -36,7 +36,7 @@ def _matching_tests(project_root: Path, rel_path: str) -> list[str]:
 
 def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
                 timeout_seconds: int = 120, execution: ExecutionConfig | None = None,
-                cancel_check: Callable[[], None] | None = None) -> VerificationResult:
+                cancel_check: Callable[[], None] | None = None, private_workspace: bool = False) -> VerificationResult:
     if cancel_check:
         cancel_check()
     try:
@@ -61,8 +61,9 @@ def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
     test_files = _matching_tests(project_root, rel_path)
     if not test_files:
         return VerificationResult(ok=True, checks=["syntax"], message="compile OK; no matching tests", source_hash=source_hash)
-    result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *test_files],
-                        project_root, config=execution, timeout=timeout_seconds, cancel_check=cancel_check)
+    with checked_workspace(project_root, private_workspace=private_workspace) as check_root:
+        result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *test_files],
+                            check_root, config=execution, timeout=timeout_seconds, cancel_check=cancel_check)
     if result.timed_out:
         return VerificationResult(ok=False, checks=["syntax", "pytest"],
                                   message=f"pytest timed out after {timeout_seconds}s", source_hash=source_hash)

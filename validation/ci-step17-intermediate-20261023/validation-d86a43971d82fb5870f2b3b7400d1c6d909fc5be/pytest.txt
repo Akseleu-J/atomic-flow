@@ -1,0 +1,34 @@
+...........................................sssss........................ [  8%]
+........................................................................ [ 17%]
+.................................s............ss.....s...........F...... [ 26%]
+........................................................................ [ 35%]
+..............s......................................................... [ 44%]
+........................................................................ [ 53%]
+........................................................................ [ 62%]
+.............s.......................................................... [ 71%]
+........................................................................ [ 80%]
+........................................................................ [ 89%]
+........................................................................ [ 98%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+__________ test_stale_patch_and_disabled_mutations_leave_bytes_alone ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_stale_patch_and_disabled_0')
+
+    def test_stale_patch_and_disabled_mutations_leave_bytes_alone(tmp_path):
+        ctx = context(tmp_path)
+        (ctx.project_root / "a.py").write_text("user = 5\n", encoding="utf-8")
+>       with pytest.raises(SourceConflict):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE SourceConflict
+
+tests/test_file_operations.py:117: Failed
+=============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_file_operations.py::test_stale_patch_and_disabled_mutations_leave_bytes_alone - Failed: DID NOT RAISE SourceConflict
+1 failed, 790 passed, 11 skipped, 1 warning in 40.94s
