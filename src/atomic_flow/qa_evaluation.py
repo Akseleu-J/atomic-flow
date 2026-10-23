@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
+import os
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -11,63 +11,27 @@ from types import SimpleNamespace
 
 from atomic_flow.benchmarking import _evaluate, benchmark_cases, fixture_project
 from atomic_flow.config import AtomicConfig
-from atomic_flow.errors import BudgetExceeded
+from atomic_flow.evaluation_meter import EvaluationMeter, usage_summary
 from atomic_flow.llm.orchestrator import Orchestrator, parse_json
 from atomic_flow.llm.schemas import Answer
 from atomic_flow.llm.verify import unknown_identifiers
+from atomic_flow.qa_rubric import RUBRIC_VERSION
 
 
-class CallMeter:
+class CallMeter(EvaluationMeter):
     """Bound attempted chat calls, recording failures and usage before answer parsing."""
 
     def __init__(self, backend, *, max_calls=64, max_reported_cost=0.5, per_trial_calls=8):
-        if max_calls < 1 or per_trial_calls < 1 or not math.isfinite(max_reported_cost) or max_reported_cost <= 0:
-            raise ValueError("Positive finite evaluation limits required")
-        if backend.config.max_retries != 0:
-            raise ValueError("Evaluation requires max_retries=0")
-        self.backend = backend
-        self.config = backend.config
-        self.name = backend.name
-        self.max_calls = max_calls
-        self.max_reported_cost = max_reported_cost
-        self.per_trial_calls = per_trial_calls
-        self.calls = []
-        self.trial_start = 0
-
-    def chat(self, messages, *, json_mode=False, model=None):
-        if len(self.calls) >= self.max_calls or len(self.calls) - self.trial_start >= self.per_trial_calls:
-            raise BudgetExceeded("Evaluation chat-call cap reached")
-        if any(row.get("cost_usd") is None for row in self.calls):
-            raise BudgetExceeded("Unknown previous evaluation spend; stopping further calls")
-        if sum(row["cost_usd"] for row in self.calls) >= self.max_reported_cost:
-            raise BudgetExceeded("Reported evaluation cost threshold reached")
-        row = {"attempt": len(self.calls) + 1, "cost_usd": None, "status": "in_flight"}
-        self.calls.append(row)
-        start = time.monotonic()
-        try:
-            result = self.backend.chat(messages, json_mode=json_mode, model=model)
-            row.update(status="response", tokens_in=result.tokens_in, tokens_out=result.tokens_out,
-                       cost_usd=result.cost_usd, truncated=result.truncated)
-            if result.cost_usd is not None and (not math.isfinite(result.cost_usd) or result.cost_usd < 0):
-                row["cost_usd"] = None
-                raise ValueError("Invalid reported cost")
-            return result
-        except Exception as exc:
-            row.update(status="error", error_type=type(exc).__name__)
-            raise
-        finally:
-            row["wall_seconds"] = round(time.monotonic() - start, 3)
+        super().__init__(backend, max_calls=max_calls, max_reported_cost=max_reported_cost, per_trial_calls=per_trial_calls)
 
 
 def summarize(rows: list[dict]) -> dict:
     calls = [call for row in rows for call in row["calls"]]
     passed = sum(row["passed"] for row in rows)
-    cost = sum(call["cost_usd"] for call in calls) if all(call.get("cost_usd") is not None for call in calls) else None
+    measured = usage_summary(calls)
+    cost = measured["reported_cost_usd"]
     return {"trials": len(rows), "passed": passed, "pass_rate": passed / len(rows) if rows else None,
-            "chat_calls": len(calls), "failed_calls": sum(call["status"] == "error" for call in calls),
-            "tokens_in": sum(call.get("tokens_in", 0) for call in calls),
-            "tokens_out": sum(call.get("tokens_out", 0) for call in calls),
-            "reported_cost_usd": cost, "cost_per_success_usd": cost / passed if passed and cost is not None else None,
+            **measured, "cost_per_success_usd": cost / passed if passed and cost is not None else None,
             "wall_seconds": round(sum(row["wall_seconds"] for row in rows), 3)}
 
 
@@ -85,11 +49,12 @@ def run_qa_comparison(backend, config: AtomicConfig, *, case_ids: list[str], out
     meter = CallMeter(backend, max_calls=max_calls, max_reported_cost=max_reported_cost, per_trial_calls=per_trial_calls)
     rows = []
     report = {"schema_version": 1, "suite": "paired-fixture-qa-v1", "kind": "read_only_qa_pilot",
+              "rubric_version": RUBRIC_VERSION,
               "created_at": datetime.now(UTC).isoformat(), "model": backend.config.model,
               "backend": backend.name, "case_ids": case_ids,
               "limits": {"max_calls": max_calls, "per_trial_calls": per_trial_calls,
                          "max_reported_cost_usd": max_reported_cost, "max_output_tokens": backend.config.max_output_tokens},
-              "disclosure": "Known project fixtures; single repeat; heuristic regex/citation/identifier grading. "
+              "disclosure": "Known project fixtures; single repeat; finite calibrated answer forms; novel wording needs independent review. "
                             "Baseline receives all fixture source and node IDs, atomic receives retrieved context. "
                             "No code-edit success or production readiness measured. Cost threshold can overshoot by one call; "
                             "attempted chat calls exclude HTTP parameter-negotiation requests.",
@@ -100,6 +65,8 @@ def run_qa_comparison(backend, config: AtomicConfig, *, case_ids: list[str], out
         for path in sorted(package.rglob("*.py")) if "__pycache__" not in path.parts
     }
     output.parent.mkdir(parents=True, exist_ok=True)
+    if output.with_name(output.name + ".attempts.json").exists():
+        raise ValueError("evaluation attempt ledger already exists; choose a fresh output path")
 
     def checkpoint():
         report["summary"] = {strategy: summarize([r for r in rows if r["strategy"] == strategy])
@@ -114,6 +81,17 @@ def run_qa_comparison(backend, config: AtomicConfig, *, case_ids: list[str], out
                 if attempt == 4:
                     raise
                 time.sleep(0.05 * 2 ** attempt)
+
+    def attempt_checkpoint(calls):
+        attempt_path = output.with_name(output.name + ".attempts.json")
+        temporary = attempt_path.with_suffix(".tmp")
+        with temporary.open("w", encoding="utf-8") as handle:
+            json.dump({"schema_version": 1, "calls": calls, **usage_summary(calls)}, handle, allow_nan=False)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(attempt_path)
+
+    meter.on_update = attempt_checkpoint
 
     with fixture_project() as (project, nodes):
         parts = ["Node IDs for citations:\n" + "\n".join(n.node_id for n in nodes)]

@@ -1,0 +1,60 @@
+import json
+import os
+import tempfile
+from pathlib import Path
+
+from atomic_flow.activation.redact import redact
+from atomic_flow.agents.base import ToolRegistry
+from atomic_flow.agents.changeset import ChangeSet
+from atomic_flow.agents.context import ToolContext
+from atomic_flow.agents.completion import assess_completion
+from atomic_flow.agents.loop import execute_tool
+from atomic_flow.agents.task import Task, Step
+from atomic_flow.agents.tools.file_paths import admitted_path
+from atomic_flow.agents.tools.run_command import RunCommandTool
+from atomic_flow.config import AtomicConfig, ExecutionConfig
+
+
+with tempfile.TemporaryDirectory(prefix='critic-safety-', dir=Path(__file__).parent) as directory:
+    base = Path(directory).resolve()
+    os.environ['ATOMIC_FLOW_HOME'] = str(base / 'home')
+    project = base / 'project'
+    project.mkdir()
+    fake = 'sk-' + 'CRITICFAKE' * 4
+    (project / 'credentials.json').write_text(json.dumps({'value': fake}))
+    (project / '.gitignore').write_text('credentials.json\n')
+    (project / 'test_print.py').write_text('from pathlib import Path\ndef test_print():\n    assert False, Path("credentials.json").read_text()\n')
+    ctx = ToolContext(project_root=project, nodes_by_id={}, execution=ExecutionConfig(mode='local'))
+    denied = False
+    try:
+        admitted_path(ctx, 'credentials.json', existing=True)
+    except OSError:
+        denied = True
+    change = ChangeSet.create(project)
+    registry = ToolRegistry()
+    registry.register(RunCommandTool())
+    payload, record = execute_tool({'tool': 'run_command', 'args': {'command': 'pytest'}}, registry, ctx,
+                                   allowed_tools=['run_command'], role='answerer')
+    print(json.dumps({'case': 'source-secret-via-check-output', 'source_read_denied': denied,
+                      'ignored_credential_copied': (change.workspace / 'credentials.json').exists(),
+                      'raw_fake_credential_in_tool_result': fake in json.dumps(payload),
+                      'redactor_would_have_masked': fake not in redact(fake),
+                      'command_exit_code': payload.get('exit_code')}))
+
+    (project / 'pytest.py').write_text('print("SHADOWED_PYTEST_MODULE")\n')
+    payload, _ = execute_tool({'tool': 'run_command', 'args': {'command': 'pytest'}}, registry, ctx,
+                              allowed_tools=['run_command'], role='answerer')
+    print(json.dumps({'case': 'fixed-quality-tool-shadowing', 'command_exit_code': payload.get('exit_code'),
+                      'verification': payload.get('verification'),
+                      'shadowed_module_ran': 'SHADOWED_PYTEST_MODULE' in payload.get('stdout', '')}))
+    shadow_change = ChangeSet.create(project)
+    task = Task.new('Check project tests', project, [Step(index=0, description='Check tests', verify_with='pytest', status='done')])
+    task.current_index = 1
+    cfg = AtomicConfig()
+    cfg.execution.mode = 'local'
+    cfg.task.final_check = 'pytest'
+    completion = assess_completion(task, shadow_change, cfg)
+    print(json.dumps({'case': 'host-completion-shadowing', 'ready_to_publish': completion['ready_to_publish'],
+                      'tests': completion['tests'], 'test_exit_code': completion.get('test_exit_code'),
+                      'shadowed_module_ran': 'SHADOWED_PYTEST_MODULE' in completion.get('test_output_tail', '')}))
+

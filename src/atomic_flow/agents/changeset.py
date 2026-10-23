@@ -17,6 +17,7 @@ from pathlib import Path
 
 from atomic_flow.agents.source import SourceConflict, confined_path, digest, replace_checked
 from atomic_flow.config import user_dir
+from atomic_flow.execution_inputs import private_credential_path
 from atomic_flow.tree.defaults import DEFAULT_IGNORE
 
 
@@ -97,6 +98,7 @@ def _files(root: Path, excluded: Path | None = None) -> dict[str, str]:
     for current, dirs, names in os.walk(root, followlinks=False):
         folder = Path(current)
         dirs[:] = sorted(name for name in dirs if not ignored(name)
+                         and not private_credential_path((folder / name).relative_to(root).as_posix())
                          and (not name.startswith(".") or name == ".github")
                          and (excluded is None or (folder / name).resolve() != excluded))
         for name in sorted(names):
@@ -108,6 +110,8 @@ def _files(root: Path, excluded: Path | None = None) -> dict[str, str]:
                 continue
             path = folder / name
             rel = path.relative_to(root).as_posix()
+            if private_credential_path(rel):
+                continue
             files[rel] = digest(confined_path(root, rel).read_bytes())
         # os.walk would silently ignore symlink directories unless checked here.
         for name in dirs:

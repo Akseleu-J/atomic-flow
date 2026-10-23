@@ -7,6 +7,7 @@ from pathlib import Path
 
 from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
 from atomic_flow.agents.control import check_cancel, task_lease
+from atomic_flow.agents.effects import UnresolvedEffects
 from atomic_flow.agents.execution import TaskCancelled, run_python
 from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
 from atomic_flow.agents.planner import Plan, plan_task, replan_task
@@ -84,6 +85,26 @@ class TaskRunner:
         if task.status in {"done", "failed"} or any(s.status == "running" for s in task.steps):
             raise ChangeSetConflict("active/interrupted side effects or a closed task require recovery, not plan reset")
 
+    @staticmethod
+    def _check_effects(task):
+        from atomic_flow.sessions import SessionJournal
+        journal = SessionJournal(task.id)
+        if journal.path.exists():
+            snapshot = journal.read()
+            if snapshot.incomplete_tail or snapshot.unresolved_call_ids:
+                raise UnresolvedEffects("task has unresolved calls or effects; inspect external state before resuming")
+
+    def _hold_effects(self, task):
+        from uuid import uuid4
+
+        from atomic_flow.sessions import SessionJournal
+        journal = SessionJournal(task.id)
+        if not journal.path.exists():
+            journal = SessionJournal.create(self.project, task.id, metadata={"kind": "task"})
+            journal.append("user_input", {"text": task.query})
+        journal.append("tool_effect_unknown", {"reason": "step interrupted with unresolved effects",
+                       "step": task.current_index}, call_id="effect_" + uuid4().hex, outcome="unknown")
+
     def prepare(self, query: str, *, candidates: list[str], n_files: int) -> Task:
         """Persist a task before planning, including rejected/repaired planner responses."""
         task = Task.new(query, self.project, [])
@@ -128,10 +149,11 @@ class TaskRunner:
             if task.status in {"done", "failed"}:
                 return task
             self.cancel_check = lambda: check_cancel(task.id)
-            self.task_backend = TaskBudgetBackend(self.backend, task, self.config, self.cancel_check)
             try:
+                check_accounting(task)  # Preserve precise charge diagnostics before effect-journal checks.
+                self._check_effects(task)
+                self.task_backend = TaskBudgetBackend(self.backend, task, self.config, self.cancel_check)
                 self.cancel_check()
-                check_accounting(task)
                 if not task.plan_ready:
                     raise BudgetExceeded("planning incomplete; review costs and start a new task")
                 # Published checkpoints may only be verified, never replayed; they
@@ -146,7 +168,7 @@ class TaskRunner:
                         save(task)
                         return task
                 return self._resume_locked(task)
-            except BudgetExceeded as exc:
+            except (BudgetExceeded, UnresolvedEffects) as exc:
                 task.status, task.error = "paused", str(exc)
                 save(task)
                 return task
@@ -197,6 +219,7 @@ class TaskRunner:
         result = self._resume_steps(task)
         if result.status == "running" and result.current_index == len(result.steps):
             try:
+                self._check_effects(result)
                 from atomic_flow.agents.completion import assess_completion
                 result.completion_report = assess_completion(result, self.changeset, self.config, self.cancel_check)
                 save(result)
@@ -212,6 +235,8 @@ class TaskRunner:
                 result.status = "done"
                 result.finished_at = time.time()
                 result.error = ""
+            except UnresolvedEffects as exc:
+                result.status, result.error = "paused", str(exc)
             except TaskCancelled:
                 raise
             except (OSError, ValueError) as exc:
@@ -246,6 +271,9 @@ class TaskRunner:
                 if not blocked:
                     runnable.append(candidate)
             if not runnable:
+                failed = next((s for s in task.steps if s.status == "failed"), None)
+                if failed is not None:
+                    return self._replan_failed_step(task, failed)
                 unresolved = [s for s in task.steps if s.status not in {"done", "superseded"}]
                 if unresolved:
                     task.status, task.error = "paused", "blocked work remains; review prerequisites or revise the plan"
@@ -274,6 +302,8 @@ class TaskRunner:
                 step.status = "failed"
                 step.result_summary = f"{type(exc).__name__}: {exc}"[:500]
                 step.finished_at = time.time()
+                if isinstance(exc, UnresolvedEffects):
+                    self._hold_effects(task)  # Durable even when optional artifacts are disabled.
                 try:
                     if checkpoint is None:
                         raise ChangeSetConflict(f"checkpoint failed: {exc}")
@@ -287,6 +317,10 @@ class TaskRunner:
                     save(task)
                     return task
                 save(task)
+                if isinstance(exc, UnresolvedEffects):
+                    task.status, task.error = "paused", str(exc)
+                    save(task)
+                    return task
                 if isinstance(exc, ChangeSetConflict):
                     task.status, task.error = "failed", step.result_summary
                     save(task)
@@ -308,69 +342,75 @@ class TaskRunner:
                 task.current_index = 0
                 continue
 
-            if self.config is not None and self.config.task.max_budget_usd > 0 \
-                    and task.budget_spent >= self.config.task.max_budget_usd \
-                    and self.config.task.fail_on_budget_exceeded:
-                task.status = "paused"
-                task.error = f"budget exceeded: ${task.budget_spent:.4f} >= ${self.config.task.max_budget_usd:.4f}"
-                save(task)
-                return task
-
-            max_replans = self.config.task.max_replans if self.config is not None else 2
-            if task.replan_count >= max_replans:
-                task.status = "failed"
-                task.error = step.result_summary
-                save(task)
-                return task
-
-            try:
-                self.cancel_check()
-                self.task_backend.phase = "replan"
-                new_plan = replan_task(
-                    task.query,
-                    completed=[f"{s.index + 1}. {s.description}" for s in task.steps if s.status == "done"],
-                    failed_description=step.description,
-                    verify_with=step.verify_with,
-                    error=step.result_summary,
-                    remaining=[f"{s.index + 1}. {s.description}" for s in task.steps[task.current_index + 1:]],
-                    project_root=self.changeset.workspace,
-                    backend=self.task_backend,
-                    settings_project=self.project,
-                )
-            except BudgetExceeded as exc:
-                task.status, task.error = "paused", str(exc)
-                save(task)
-                return task
-            except TaskCancelled:
-                raise
-            except Exception as exc:
-                task.status = "failed"
-                task.error = step.result_summary if self.backend is None or not hasattr(self.backend, "chat") else f"replan failed: {exc}"
-                save(task)
-                return task
-
-            if len(new_plan.steps) == 1 and new_plan.steps[0].description.startswith("STOP:"):
-                task.status = "failed"
-                task.error = step.result_summary or new_plan.steps[0].description
-                save(task)
-                return task
-
-            base_index = max(s.index for s in task.steps) + 1
-            for previous in task.steps:
-                if previous.status != "done":
-                    previous.status = "superseded"
-            task.steps.extend(self._steps(new_plan, base_index))
-            task.rationale = new_plan.rationale
-            task.replan_count += 1
-            task.current_index = len(task.steps) - len(new_plan.steps)
-            task.plan_approval = {}
-            task.status, task.error = "paused", "replanned work requires fresh plan review and approval"
-            save(task)
-            return task
+            return self._replan_failed_step(task, step)
 
         # Completion is recorded only after publishing the workspace successfully.
         save(task)
         return task
+
+    def _replan_failed_step(self, task: Task, step: Step) -> Task:
+        """Replan only after all independently runnable work has drained."""
+        if self.config is not None and self.config.task.max_budget_usd > 0 \
+                and task.budget_spent >= self.config.task.max_budget_usd \
+                and self.config.task.fail_on_budget_exceeded:
+            task.status = "paused"
+            task.error = f"budget exceeded: ${task.budget_spent:.4f} >= ${self.config.task.max_budget_usd:.4f}"
+            save(task)
+            return task
+
+        max_replans = self.config.task.max_replans if self.config is not None else 2
+        if task.replan_count >= max_replans:
+            task.status = "failed"
+            task.error = step.result_summary
+            save(task)
+            return task
+
+        try:
+            self.cancel_check()
+            self.task_backend.phase = "replan"
+            new_plan = replan_task(
+                task.query,
+                completed=[f"{s.index + 1}. {s.description}" for s in task.steps if s.status == "done"],
+                failed_description=step.description,
+                verify_with=step.verify_with,
+                error=step.result_summary,
+                remaining=[f"{s.index + 1}. {s.description}" for s in task.steps
+                               if s.index != step.index and s.status not in {"done", "superseded"}],
+                project_root=self.changeset.workspace,
+                backend=self.task_backend,
+                settings_project=self.project,
+            )
+        except BudgetExceeded as exc:
+            task.status, task.error = "paused", str(exc)
+            save(task)
+            return task
+        except TaskCancelled:
+            raise
+        except Exception as exc:
+            task.status = "failed"
+            task.error = step.result_summary if self.backend is None or not hasattr(self.backend, "chat") else f"replan failed: {exc}"
+            save(task)
+            return task
+
+        if len(new_plan.steps) == 1 and new_plan.steps[0].description.startswith("STOP:"):
+            task.status = "failed"
+            task.error = step.result_summary or new_plan.steps[0].description
+            save(task)
+            return task
+
+        base_index = max(s.index for s in task.steps) + 1
+        for previous in task.steps:
+            if previous.status != "done":
+                previous.status = "superseded"
+        task.steps.extend(self._steps(new_plan, base_index))
+        task.rationale = new_plan.rationale
+        task.replan_count += 1
+        task.current_index = len(task.steps) - len(new_plan.steps)
+        task.plan_approval = {}
+        task.status, task.error = "paused", "replanned work requires fresh plan review and approval"
+        save(task)
+        return task
+
 
     def _execute_step(self, task: Task, step: Step) -> None:
         subquery = f"[Step {step.index + 1}/{len(task.steps)}] {step.description}"

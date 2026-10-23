@@ -78,24 +78,36 @@ def test_invalid_dependency_graphs_rejected(dependencies):
         Plan(steps=[PlanStep(description="Check source", depends_on=d) for d in dependencies])
 
 
-def test_independent_work_runs_while_failed_descendants_remain_blocked(tmp_path, monkeypatch):
+def test_independent_work_finishes_before_failed_dependency_is_replanned(tmp_path, monkeypatch):
     plan = Plan(steps=[PlanStep(description="First source check", verify_with="none", depends_on=[]),
                        PlanStep(description="Dependent source check", verify_with="none", depends_on=[0]),
                        PlanStep(description="Independent source check", verify_with="none", depends_on=[])])
     task, runner = staged(tmp_path, plan)
     seen = []
+    replans = []
     def execute(task, step):
         seen.append(step.index)
         if step.index == 0:
             raise StepFailure(step.index, "prerequisite failed")
     monkeypatch.setattr(runner, "_execute_step", execute)
+    def replan(*args, **kwargs):
+        replans.append(kwargs)
+        assert seen == [0, 2]
+        return Plan(steps=[PlanStep(description="Repair failed dependency", verify_with="none")])
+    monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", replan)
     task = runner.approve(task, runner.review(task)["digest"])
     result = runner.resume(task)
     assert seen == [0, 2] and result.status == "paused"
     persisted = load(result.id)
-    assert persisted.steps[1].status == "blocked" and "0" in persisted.steps[1].blocked_reason
+    assert persisted.steps[0].status == persisted.steps[1].status == "superseded"
     assert persisted.steps[2].status == "done"
+    assert len(replans) == 1 and result.replan_count == 1
+    assert replans[0]["remaining"] == ["2. Dependent source check"]
+    assert replans[0]["completed"] == ["3. Independent source check"]
+    assert persisted.steps[3].status == "pending" and not persisted.plan_approval
     assert not persisted.completion_report.get("ready_to_publish")
+    monkeypatch.setattr(runner, "_execute_step", lambda *args: pytest.fail("unapproved replanned work"))
+    assert runner.resume(persisted).status == "paused"
 
 
 def test_replanned_work_pauses_before_any_new_execution(tmp_path, monkeypatch):

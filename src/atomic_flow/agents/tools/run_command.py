@@ -9,6 +9,7 @@ from atomic_flow.agents.base import Tool
 from atomic_flow.agents.context import ToolContext
 from atomic_flow.agents.diagnostics import quality_diagnostics
 from atomic_flow.agents.execution import run_python
+from atomic_flow.output import sanitize_output
 
 ALLOWED = {
     "pytest": ["pytest"],
@@ -31,6 +32,7 @@ class RunCommandTool(Tool):
     args_schema = RunCommandArgs
 
     def run(self, args: RunCommandArgs, ctx: ToolContext) -> dict[str, Any]:
+        from atomic_flow.agents.changeset import ChangeSet
         command_parts = ALLOWED.get(args.command)
         if command_parts is None:
             return {"error": f"command not allowed: {args.command}"}
@@ -41,9 +43,24 @@ class RunCommandTool(Tool):
             if not target_path.is_relative_to(project_root):
                 return {"error": "target escapes project root"}
             cmd.extend(["--", target_path.relative_to(project_root).as_posix()])
-        result = run_python(cmd, ctx.project_root, config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
+        # Model-invoked checks never mount the original checkout (which can
+        # contain credentials excluded by source admission). TaskRunner already
+        # supplies a private snapshot; ordinary ask gets an ephemeral changeset.
+        snapshot = None
+        check_root = ctx.project_root
+        try:
+            if not ctx.private_workspace:
+                ctx.cancel_check()
+                snapshot = ChangeSet.create(ctx.project_root)
+                check_root = snapshot.workspace
+            result = run_python(cmd, check_root, config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
+            if snapshot is not None:
+                snapshot.check_original()
+        finally:
+            if snapshot is not None:
+                snapshot.abort()  # Retain owned journal for inspection, never publish check writes.
         if result.timed_out:
             return {"command": args.command, "error": "command timed out after 120 seconds"}
-        return {"command": args.command, "exit_code": result.returncode,
+        return sanitize_output({"command": args.command, "exit_code": result.returncode,
                 "stdout": result.stdout[-4000:], "stderr": result.stderr[-2000:], "index_revision": ctx.revision,
-                **quality_diagnostics(args.command, result.stdout + "\n" + result.stderr, ctx.project_root, dict(ctx.file_hashes))}
+                **quality_diagnostics(args.command, result.stdout + "\n" + result.stderr, check_root, dict(ctx.file_hashes))})

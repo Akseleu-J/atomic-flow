@@ -75,6 +75,7 @@ def main():
                            "tests/test_container_integration.py",
                            "tests/test_execution_profiles.py::test_real_read_only_workspace_profile",
                            "tests/test_remote_execution.py::test_real_remote_protocol_docker_job_and_cancel",
+                           "tests/test_execution_confidentiality.py::test_real_docker_checker_rejects_shadow_module_and_protects_output",
                            "tests/test_jobs.py"], env=env)
                 results["container"] = "PASS" if code == 0 else "FAIL"
             else:

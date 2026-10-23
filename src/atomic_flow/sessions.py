@@ -26,7 +26,7 @@ MAX_EVENT_BYTES = 256 * 1024
 MAX_SESSION_BYTES = 64 * 1024 * 1024
 EVENT_TYPES = frozenset({
     "session_created", "user_input", "model_request", "model_response", "model_failed",
-    "tool_request", "tool_result", "question", "answer", "completed", "failed", "tail_recovered",
+    "tool_request", "tool_result", "tool_effect_unknown", "question", "answer", "completed", "failed", "tail_recovered",
     "steering_applied", "response_discarded", "context_summary", "continuation",
     "dialogue_state", "snapshot_created", "rewind_applied", "fork_created",
 })
@@ -91,6 +91,8 @@ class SessionSnapshot:
             if call_id is None:
                 continue
             kind, outcome = event["event_type"], event.get("outcome")
+            if kind == "tool_effect_unknown":
+                unresolved.add(call_id)
             if kind == "model_failed" and outcome not in {"not_sent", "refused"}:
                 unresolved.add(call_id)
             if kind == "model_response":

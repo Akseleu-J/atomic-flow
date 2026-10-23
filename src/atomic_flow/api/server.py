@@ -11,6 +11,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from atomic_flow.agents.effects import UnresolvedEffects
 from atomic_flow.backends.router import make_backend
 from atomic_flow.config import load_config
 from atomic_flow.errors import AtomicFlowError, BackendError, BudgetExceeded, ConfigurationError, TreeError
@@ -20,7 +21,7 @@ from atomic_flow.runtime import ControlMessage
 
 Mode = Literal["simple", "medium", "hard"]
 PLACEHOLDER_KEYS = {"replace-with-a-long-random-value", "changeme", "secret", "password"}
-STATUS_FOR = {BackendError: 502, BudgetExceeded: 429, TreeError: 409, ConfigurationError: 400}
+STATUS_FOR = {UnresolvedEffects: 409, BackendError: 502, BudgetExceeded: 429, TreeError: 409, ConfigurationError: 400}
 
 
 class AnswerRequest(BaseModel):

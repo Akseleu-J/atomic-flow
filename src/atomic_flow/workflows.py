@@ -91,34 +91,47 @@ def run_workflow(workflow: Workflow | dict, registry, ctx, *, allowed_tools: lis
         if "write" in spec.contract.effects and not ctx.edits_enabled:
             raise PermissionError("workflow requires explicitly enabled edits")
     outcomes = []
-    effects = False
+    completed_effects = []
+    uncertain_effects = False
+
+    def effect_report():
+        has_effects = bool(completed_effects) or uncertain_effects
+        return {"completed_effects": list(completed_effects), "uncertain_effects": uncertain_effects,
+                "has_effects": has_effects, "side_effects_may_have_occurred": has_effects}
+
     for step in definition.steps:
-        ctx.cancel_check()
         call_id = "workflow_" + uuid.uuid4().hex
         call = {"tool": step.tool, "args": step.args}
-        if ctx.journal_event is not None:
-            ctx.journal_event("tool_request", {"role": role, "call": call, "workflow_digest": digest,
-                                               "workflow_step": step.id}, call_id=call_id)
+        effectful = bool(set(registry.specification(step.tool).contract.effects) & {"write", "execute"})
+        dispatched = False
+        result = None
         try:
+            ctx.cancel_check()
+            if ctx.journal_event is not None:
+                ctx.journal_event("tool_request", {"role": role, "call": call, "workflow_digest": digest,
+                                                   "workflow_step": step.id}, call_id=call_id)
+            dispatched = True
             result, record = execute_tool(call, registry, ctx, allowed_tools=allowed_tools, role=role)
+            uncertain = bool(result.get("side_effects_may_have_occurred"))
+            uncertain_effects = uncertain_effects or uncertain
+            if effectful and result.get("outcome") == "success" and not uncertain:
+                completed_effects.append(step.id)
+            # Reports retain audit proof, never unrestricted source/result bodies.
+            entry = _bounded_outcome(step, result, record)
+            outcomes.append(entry)
+            if ctx.journal_event is not None:
+                ctx.journal_event("tool_result", {"role": role, "call": record, "result": entry["result"],
+                    "workflow_digest": digest, "workflow_step": step.id}, call_id=call_id, outcome=result.get("outcome"))
         except Exception as exc:
             # Preserve completed outcomes and leave durable intent unresolved.
             # Cancellation after send/write cannot safely be treated as no-op.
-            spec = registry.specification(step.tool)
+            uncertain_effects = uncertain_effects or (dispatched and effectful and result is None)
             exc.workflow_report = {"name": definition.name, "digest": digest, "status": "interrupted",
                 "steps": outcomes, "pending_step": step.id, "pending_call_id": call_id,
-                "side_effects_may_have_occurred": effects or bool(set(spec.contract.effects) & {"write", "execute"}),
-                "replay_performed": False}
+                **effect_report(), "replay_performed": False}
             raise
-        # Reports retain audit proof, never unrestricted source/result bodies.
-        effects = effects or bool(result.get("side_effects_may_have_occurred"))
-        entry = _bounded_outcome(step, result, record)
-        outcomes.append(entry)
-        if ctx.journal_event is not None:
-            ctx.journal_event("tool_result", {"role": role, "call": record, "result": entry["result"],
-                "workflow_digest": digest, "workflow_step": step.id}, call_id=call_id, outcome=result.get("outcome"))
         if result.get("outcome") != "success":
             return {"name": definition.name, "digest": digest, "status": "stopped", "steps": outcomes,
-                    "side_effects_may_have_occurred": effects, "replay_performed": False}
+                    **effect_report(), "replay_performed": False}
     return {"name": definition.name, "digest": digest, "status": "completed", "steps": outcomes,
-            "side_effects_may_have_occurred": effects, "replay_performed": False}
+            **effect_report(), "replay_performed": False}

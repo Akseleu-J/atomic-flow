@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import tempfile
+import time
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
@@ -17,13 +19,11 @@ from atomic_flow.activation.activate import ActivationIndex
 from atomic_flow.backends.router import make_backend
 from atomic_flow.config import AtomicConfig, user_dir
 from atomic_flow.errors import BudgetExceeded, ConfigurationError
+from atomic_flow.evaluation_meter import EvaluationMeter, usage_summary
 from atomic_flow.llm.orchestrator import Orchestrator
+from atomic_flow.qa_rubric import RUBRIC_VERSION, grade_propositions
 from atomic_flow.tree.builder import build_tree, save_tree
 from atomic_flow.tree.node import TreeNode
-
-ABSTAIN_RE = re.compile(r"(?i)(not (shown|present|defined|found|visible|included)|no (information|evidence|code)|"
-                        r"cannot (determine|find|tell)|can't (determine|find|tell)|does not (show|contain|define)|"
-                        r"doesn't (show|contain|define)|нет информации|не (найден|показан|определ))")
 
 
 def benchmark_root() -> Path:
@@ -76,27 +76,40 @@ def _evaluate(case: dict[str, Any], answer, target_ids: list[str]) -> dict[str, 
     min_required = case.get("min_citations", len(target_ids))
     citation_hit = hits >= min_required
     citation_strict = hits == len(target_ids)
-    abstained = None
-    if case.get("must_abstain"):
-        abstained = (
-            answer.confidence == "low"
-            or bool(answer.missing_context)
-            or bool(ABSTAIN_RE.search(text))
-        ) and answer.confidence != "high"
+    semantic = grade_propositions(case, text)
     unknown_identifiers = getattr(answer, "unknown_identifiers", [])
-    passed = (citation_hit and all(checks.values()) and all(forbidden.values())
-              and (abstained is not False) and not unknown_identifiers)
+    # Legacy keyword checks remain diagnostics; bilingual proposition checks own
+    # automatic success. Valid IDs establish citation identity, not entailment.
+    passed = (citation_hit and all(forbidden.values()) and semantic["semantic_status"] == "matched"
+              and not unknown_identifiers)
     return {"citation_hit": citation_hit, "citation_strict": citation_strict, "required_patterns": checks, "forbidden_patterns": forbidden,
-            "abstained": abstained, "grounded": not unknown_identifiers, "passed": passed}
+            "rubric_version": RUBRIC_VERSION, "grading_scope": "finite_calibrated_fixture_answers; other wording requires independent review",
+            **semantic, "identifier_grounded": not unknown_identifiers,
+            "grounded": not unknown_identifiers, "passed": passed}
 
 
 def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str | None = None, budget_tokens: int = 5000,
                   limit: int | None = None, output: str | Path | None = None, backend_name: str = "auto",
                   repeats: int = 1) -> dict[str, Any]:
     cases = benchmark_cases()[:limit]
-    if not cases:
+    if not cases or type(repeats) is not int or repeats < 1:
         raise ValueError("The benchmark case list is empty.")
+    target = Path(output).expanduser() if output else user_dir() / "benchmarks" / "runs" / f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    attempt_path = target.with_name(target.name + ".attempts.json")
+    if attempt_path.exists():
+        raise ValueError("evaluation attempt ledger already exists; choose a fresh output path (no automatic replay)")
+    def checkpoint(calls):
+        temporary = attempt_path.with_suffix(".tmp")
+        with temporary.open("w", encoding="utf-8") as handle:
+            json.dump({"schema_version": 1, "calls": calls, **usage_summary(calls)}, handle, allow_nan=False)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(attempt_path)
     backend = make_backend(config, backend_name, model)
+    # Hidden transport retries would make the observed attempt count incomplete.
+    backend.config = backend.config.model_copy(update={"max_retries": 0})
+    meter = EvaluationMeter(backend, on_update=checkpoint)
     results: list[dict[str, Any]] = []
     with fixture_project() as (project, nodes):
         known = {n.node_id for n in nodes}
@@ -106,24 +119,32 @@ def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str |
             if missing:
                 raise ValueError(f"Benchmark case {case['id']} points to missing node(s): {missing}")
             for repeat in range(repeats):
+                meter.trial_start = len(meter.calls)
+                started = time.monotonic()
                 try:
                     case_mode = mode or case.get("mode", "medium")  # CLI --mode forces, else per-case
-                    answer = Orchestrator(config, project, backend).answer(case["query"], mode=case_mode, budget_tokens=budget_tokens)
+                    answer = Orchestrator(config, project, meter).answer(case["query"], mode=case_mode, budget_tokens=budget_tokens)
                     result = {"case_id": case["id"], "repeat": repeat, "mode": case_mode, "text": answer.text,
                               "expected_nodes": targets, "cited": [c.node_id for c in answer.citations],
                               "verdict": answer.verdict, "confidence": answer.confidence, "grounding": answer.grounding,
-                              "tokens_in": answer.tokens_in, "tokens_out": answer.tokens_out, "cost_usd": answer.cost_usd,
                               "latency_ms": answer.latency_ms, "request_id": answer.ledger_id,
                               **_evaluate(case, answer, targets)}
-                except (ConfigurationError, BudgetExceeded):
-                    raise                                     # an expired key fails EVERY case: stop, don't burn 9 error rows
                 except Exception as exc:  # noqa: BLE001 - one flaky case must not hide the rest
                     result = {"case_id": case["id"], "repeat": repeat, "mode": mode, "passed": False,
-                              "error": f"{type(exc).__name__}: {exc}"}
+                              "error_type": type(exc).__name__}
+                calls = [dict(call) for call in meter.calls[meter.trial_start:]]
+                measured = usage_summary(calls)
+                result.update(calls=calls, **measured, cost_usd=measured["reported_cost_usd"],
+                              wall_seconds=round(time.monotonic() - started, 3))
                 results.append(result)
+                if not measured["cost_complete"] or result.get("error_type") in {ConfigurationError.__name__, BudgetExceeded.__name__}:
+                    break
+            if results and (not results[-1]["cost_complete"] or results[-1].get("error_type") in
+                            {ConfigurationError.__name__, BudgetExceeded.__name__}):
+                break
     total = len(results)
     passed = sum(bool(r["passed"]) for r in results)
-    costs = [r["cost_usd"] for r in results if r.get("cost_usd") is not None]
+    measured = usage_summary(meter.calls)
     per_case: dict[str, list[bool]] = {}
     for r in results:
         per_case.setdefault(r["case_id"], []).append(bool(r["passed"]))
@@ -131,15 +152,18 @@ def run_benchmark(config: AtomicConfig, *, model: str | None = None, mode: str |
         "suite": "atomic-flow-grounded-code-qa", "created_at": datetime.now(UTC).isoformat(),
         "model": model or getattr(backend.config, "model", "unknown"), "backend": backend.name, "mode": mode,
         "budget_tokens": budget_tokens, "repeats": repeats,
+        "rubric_version": RUBRIC_VERSION,
+        "accounting_scope": "observed_backend_calls; transport retries disabled; HTTP parameter negotiation excluded; no ledger charges added",
+        "stopped_early": total < len(cases) * repeats,
         "summary": {
             "passed": passed, "strict_passed": sum(bool(r.get("citation_strict")) and bool(r["passed"]) for r in results),
             "total": total, "pass_rate": passed / total,
             "flaky_cases": sorted(c for c, v in per_case.items() if 0 < sum(v) < len(v)),
             "average_latency_ms": round(mean(r["latency_ms"] for r in results if "latency_ms" in r), 2) if any("latency_ms" in r for r in results) else None,
-            "tokens_in": sum(r.get("tokens_in", 0) for r in results), "tokens_out": sum(r.get("tokens_out", 0) for r in results),
-            "cost_usd": round(sum(costs), 8) if len(costs) == len([r for r in results if "error" not in r]) and costs else None},
+            **measured, "cost_usd": measured["reported_cost_usd"],
+            "cost_per_success_usd": measured["reported_cost_usd"] / passed if passed and measured["cost_complete"] else None},
         "results": results}
-    target = Path(output).expanduser() if output else user_dir() / "benchmarks" / "runs" / f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+    report["attempt_ledger"] = str(attempt_path.resolve())
     report["output"] = str(target.resolve())
     target.parent.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".tmp")

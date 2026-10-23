@@ -18,6 +18,7 @@ from pydantic import ValidationError
 
 from atomic_flow.agents.base import ToolRegistry
 from atomic_flow.agents.context import ToolContext
+from atomic_flow.agents.effects import UnresolvedEffects
 from atomic_flow.agents.policy import PolicyEngine
 from atomic_flow.agents.result import Outcome, ToolResult
 
@@ -78,6 +79,8 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
 
     def finish(payload: Any, outcome: Outcome | None = None):
         nonlocal hook_finished
+        from atomic_flow.output import sanitize_output
+        payload = sanitize_output(payload)
         if invoked and ctx.hooks is not None and not hook_finished:
             hook_finished = True
             try:
@@ -85,6 +88,8 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
             except Exception as exc:
                 from atomic_flow.agents.execution import TaskCancelled
                 if isinstance(exc, TaskCancelled):
+                    if set(contract.effects) & {"write", "execute"}:
+                        ctx.mark_unresolved_effect(name)
                     if read_snapshot is not None:
                         ctx.reads = read_snapshot
                     raise
@@ -93,12 +98,18 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         if outcome is None and name == "ask_user" and isinstance(payload, dict) and payload.get("outcome") in {"success", "error", "denied"}:
             outcome = payload["outcome"]
         result = ToolResult.from_payload(payload, outcome=outcome)
+        model_payload = result.model_payload()
+        if invoked and (model_payload.get("side_effects_may_have_occurred")
+                        or model_payload.get("status") == "rollback_failed"
+                        or result.outcome in {"unknown", "pending"}):
+            ctx.mark_unresolved_effect(name)
         if read_snapshot is not None and result.outcome != "success":
             ctx.reads = read_snapshot
         provenance = {"origin": "tool_result", "tool": name, "role": role,
                       "trust": "data_only", "index_revision": ctx.revision}
         record["result_summary"] = {**result.summary(), "provenance": provenance}
-        return {**result.model_payload(), "provenance": provenance}, record
+        record.update(sanitize_output(record))
+        return {**model_payload, "provenance": provenance}, record
 
     try:
         if not ctx.sync_external_changes():
@@ -113,6 +124,8 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         return finish({"error": f"unknown tool: {name}"})
     contract = tool.host_contract()
     record["contract"] = asdict(contract)
+    if set(contract.effects) & {"write", "execute", "interact"}:
+        ctx.effects_state.require_clear()  # Before policy callbacks or lazy factory.
     try:
         args = tool.args_schema.model_validate(parsed.get("args", {}))
     except ValidationError as exc:
@@ -199,8 +212,12 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
     except Exception as exc:  # noqa: BLE001 - a broken tool must not kill the run
         from atomic_flow.agents.execution import TaskCancelled
         if isinstance(exc, TaskCancelled):
+            if invoked and set(contract.effects) & {"write", "execute"}:
+                ctx.mark_unresolved_effect(name)
             if read_snapshot is not None:
                 ctx.reads = read_snapshot
+            raise
+        if isinstance(exc, UnresolvedEffects):
             raise
         result = {"error": f"{type(exc).__name__}: {exc}"}
         if invoked and set(contract.effects) & {"write", "execute"}:

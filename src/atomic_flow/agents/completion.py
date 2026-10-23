@@ -8,6 +8,7 @@ import time
 from atomic_flow.agents.diagnostics import syntax_diagnostic
 from atomic_flow.agents.execution import ExecutionUnavailable, run_python
 from atomic_flow.agents.source import confined_path, digest
+from atomic_flow.output import sanitize_output
 
 
 def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dict:
@@ -52,7 +53,7 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dic
             try:
                 compile(data, path, "exec", dont_inherit=True)
             except SyntaxError as exc:
-                report["diagnostics"].append(syntax_diagnostic(path, data, exc))
+                report["diagnostics"].append(sanitize_output(syntax_diagnostic(path, data, exc)))
         report["checks"].append({"name": "final_python_syntax", "status": "failed" if report["diagnostics"] else "passed",
                                  "scope": "Changed surviving Python files only"})
         if report["diagnostics"]:
@@ -63,7 +64,7 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dic
             report["tests"] = "passed" if result.returncode == 0 and not result.timed_out else "failed"
             report["test_exit_code"] = result.returncode
             report["test_timed_out"] = result.timed_out
-            report["test_output_tail"] = (result.stdout + result.stderr)[-3000:]
+            report["test_output_tail"] = sanitize_output((result.stdout + result.stderr)[-3000:])
             if report["tests"] != "passed":
                 return report
         cancel_check()

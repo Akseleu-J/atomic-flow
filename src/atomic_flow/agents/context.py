@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from atomic_flow.agents.effects import EffectState, UnresolvedEffects
 from atomic_flow.config import ExecutionConfig
 from atomic_flow.tree.node import TreeNode
 
@@ -50,6 +51,16 @@ class ToolContext:
     hooks: Any = None
     source_watcher: Any = None
     invalidated_paths: set[str] = field(default_factory=set)
+    effects_state: EffectState = field(default_factory=EffectState)
+
+    def mark_unresolved_effect(self, tool: str) -> None:
+        observation = self.effects_state.mark(tool)
+        if observation is not None and self.journal_event is not None:
+            try:
+                self.journal_event("tool_effect_unknown", observation,
+                                   call_id=observation["effect_id"], outcome="unknown")
+            except Exception:
+                raise UnresolvedEffects("unresolved tool effects; safety journal unavailable, no automatic retry") from None
 
     def record_read(self, path: str, content_hash: str, view: str, offset: int, end: int,
                     total: int, node_id: str | None = None, source_complete: bool = False) -> dict[str, Any]:

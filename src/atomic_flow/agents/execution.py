@@ -17,6 +17,7 @@ from pathlib import Path
 from types import MappingProxyType
 
 from atomic_flow.config import ExecutionConfig
+from atomic_flow.output import sanitize_output
 
 
 class ExecutionUnavailable(RuntimeError):
@@ -53,6 +54,36 @@ EXECUTION_PROFILES = MappingProxyType({
     "checks": ExecutionProfile("checks", False, 128, "1g", 2, "128m"),
     "read-only": ExecutionProfile("read-only", True, 64, "512m", 1, "64m"),
 })
+
+
+# -I removes cwd/PYTHONPATH/user-site from checker discovery. Import the installed
+# package before permitting project imports required by pytest's test modules.
+# Source tests/plugins still execute project code: this is launcher integrity,
+# not a claim that hostile tests cannot lie or mutate their own interpreter.
+_CHECKER_BOOTSTRAP = """
+import importlib, os, runpy, sys
+tool, arguments = sys.argv[1], sys.argv[2:]
+if tool == 'pytest':
+    import pytest
+    class Collection:
+        collected = 0
+        def pytest_sessionfinish(self, session, exitstatus):
+            self.collected = session.testscollected
+    collection = Collection()
+    sys.path.insert(0, os.getcwd())
+    targets = arguments if '--' in arguments else [*arguments, os.getcwd()]
+    code = int(pytest.main(targets, plugins=[collection]))
+    raise SystemExit(5 if code == 0 and collection.collected == 0 else code)
+importlib.import_module(tool)
+sys.argv = [tool, *arguments]
+runpy.run_module(tool, run_name='__main__', alter_sys=True)
+"""
+
+
+def _trusted_checker_args(args: list[str]) -> list[str]:
+    if len(args) >= 2 and args[0] == "-m" and args[1] in {"pytest", "ruff", "mypy"}:
+        return ["-I", "-c", _CHECKER_BOOTSTRAP, args[1], *args[2:]]
+    return args
 
 
 def execution_profile(name: str) -> ExecutionProfile:
@@ -96,7 +127,7 @@ def docker_command(engine: str, image: str, workspace: Path, name: str, args: li
             f"--tmpfs=/tmp:rw,noexec,nosuid,size={bounds.tmpfs_size},mode=1777", "--workdir=/workspace",
             "--mount", mount,
             "--env=HOME=/tmp", "--env=PYTHONDONTWRITEBYTECODE=1",
-            "--env=PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", "--", image, "python", *args]
+            "--env=PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", "--", image, "python", *_trusted_checker_args(args)]
 
 
 def _kill_tree(proc: subprocess.Popen):
@@ -172,7 +203,7 @@ def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None
             raise ExecutionUnavailable("Docker unavailable; no local fallback. See docs/EXECUTION.md.")
         cmd = docker_command(engine, config.image, project, name, args, profile=config.profile, container_id_file=container_id_file)
     else:
-        cmd = [sys.executable, *args]
+        cmd = [sys.executable, *_trusted_checker_args(args)]
     tails = [bytearray(), bytearray()]
     truncated = [False, False]
     collection_failed = threading.Event()
@@ -238,6 +269,6 @@ def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None
                     raise ExecutionUnavailable("Container cleanup could not be confirmed; execution effects remain unknown") from None
         if collection_failed.is_set() or any(reader.is_alive() for reader in readers):
             raise ExecutionUnavailable("Output collection failed; execution stopped")
-        return CommandResult(proc.returncode, tails[0].decode("utf-8", errors="replace"),
-                             tails[1].decode("utf-8", errors="replace"), timed_out,
+        return CommandResult(proc.returncode, sanitize_output(tails[0].decode("utf-8", errors="replace")),
+                             sanitize_output(tails[1].decode("utf-8", errors="replace")), timed_out,
                              truncated[0], truncated[1])
