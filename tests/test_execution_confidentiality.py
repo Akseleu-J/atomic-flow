@@ -14,6 +14,7 @@ from atomic_flow.agents.source import SourceConflict, digest
 from atomic_flow.agents.task import Step, Task
 from atomic_flow.agents.tools.file_paths import admitted_path
 from atomic_flow.agents.tools.run_command import RunCommandArgs, RunCommandTool
+from atomic_flow.agents.verify import verify_edit
 from atomic_flow.config import AtomicConfig, ExecutionConfig
 from atomic_flow.jobs import _snapshot_hashes
 from atomic_flow.output import sanitize_output
@@ -88,6 +89,20 @@ def test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner(
     assert result["exit_code"] == 0, result
     assert not (tmp_path / "check_side_effect.txt").exists()
     assert "arbitrary-secret" not in json.dumps(result)
+
+
+def test_direct_edit_matching_checks_also_exclude_private_inputs(tmp_path):
+    (tmp_path / "credentials.json").write_text('"arbitrary-private-value"')
+    (tmp_path / "a.py").write_text("VALUE = 42\n")
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests/test_a.py").write_text(
+        'from pathlib import Path\nfrom a import VALUE\ndef test_value():\n'
+        '    assert VALUE == 42 and not Path("credentials.json").exists()\n'
+        '    Path("unpublished.txt").write_text("test side effect")\n')
+    result = verify_edit(tmp_path, "a.py", execution=ExecutionConfig(mode="local"))
+    assert result.ok, result.test_output
+    assert not (tmp_path / "unpublished.txt").exists()
+    assert (tmp_path / "credentials.json").read_text() == '"arbitrary-private-value"'
 
 
 def test_final_report_redacts_even_an_injected_executor_result(tmp_path, monkeypatch):

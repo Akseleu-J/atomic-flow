@@ -8,8 +8,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from atomic_flow.agents import file_transaction
 from atomic_flow.agents.base import Tool, ToolContract
-from atomic_flow.agents.execution import TaskCancelled, run_python
-from atomic_flow.agents.source import SourceConflict, digest, read_checked
+from atomic_flow.agents.execution import TaskCancelled, checked_workspace, run_python
+from atomic_flow.agents.source import SourceConflict, SourcePreconditionFailed, digest, read_checked
 from atomic_flow.agents.tools.file_paths import admitted_path, text_bytes
 from atomic_flow.agents.verify import _matching_tests, verify_edit
 
@@ -74,7 +74,8 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
         for path, data in after.items():
             if data is None:
                 continue
-            verdict = verify_edit(ctx.project_root, path, execution=ctx.execution, cancel_check=ctx.cancel_check)
+            verdict = verify_edit(ctx.project_root, path, execution=ctx.execution, cancel_check=ctx.cancel_check,
+                                  private_workspace=ctx.private_workspace)
             diagnostics.extend(verdict.diagnostics)
             for check in verdict.checks:
                 if check != "skip":
@@ -89,8 +90,9 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
         removed_tests = sorted({test for path, data in after.items() if data is None
                                 for test in _matching_tests(ctx.project_root, path)} - tested)
         if removed_tests:
-            result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *removed_tests], ctx.project_root,
-                                config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
+            with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace) as check_root:
+                result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *removed_tests], check_root,
+                                    config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
             checks.append("pytest")
             verification["pytest"] = "passed" if result.returncode == 0 and not result.timed_out else "failed"
             if verification["pytest"] != "passed":
@@ -151,7 +153,7 @@ class PatchFileTool(Tool):
         except (OSError, UnicodeError) as exc:
             # Only this preflight is known to precede every write/execute.
             # Do not classify exceptions after _mutate as safe refusals.
-            return {"error": str(exc)}
+            raise SourcePreconditionFailed(str(exc)) from None
         return _mutate(ctx, {args.path: original}, {args.path: updated})
 
 
@@ -164,10 +166,14 @@ class CreateFileTool(Tool):
     def run(self, args: CreateFileArgs, ctx) -> dict[str, Any]:
         if not ctx.edits_enabled:
             return {"error": "edits disabled"}
-        target = admitted_path(ctx, args.path)
-        if target.exists():
-            return {"error": "destination already exists"}
-        return _mutate(ctx, {args.path: None}, {args.path: text_bytes(args.content)})
+        try:
+            target = admitted_path(ctx, args.path)
+            if target.exists():
+                return {"error": "destination already exists"}
+            data = text_bytes(args.content)
+        except (OSError, UnicodeError) as exc:
+            raise SourcePreconditionFailed(str(exc)) from None
+        return _mutate(ctx, {args.path: None}, {args.path: data})
 
 
 class DeleteFileTool(Tool):
@@ -182,7 +188,7 @@ class DeleteFileTool(Tool):
         try:
             original = _read(ctx, args.path, args.expected_hash)
         except (OSError, UnicodeError) as exc:
-            return {"error": str(exc)}
+            raise SourcePreconditionFailed(str(exc)) from None
         return _mutate(ctx, {args.path: original}, {args.path: None})
 
 
@@ -202,6 +208,6 @@ class MoveFileTool(Tool):
                 return {"error": "destination must be absent and different from source"}
             mode = stat.S_IMODE(admitted_path(ctx, args.path, existing=True).stat().st_mode)
         except (OSError, UnicodeError) as exc:
-            return {"error": str(exc)}
+            raise SourcePreconditionFailed(str(exc)) from None
         return _mutate(ctx, {args.destination: None, args.path: original}, {args.destination: original, args.path: None},
                        after_modes={args.destination: mode})

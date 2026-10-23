@@ -75,7 +75,8 @@ class EditNodeTool(Tool):
 
         verdict = None
         try:
-            verdict = verify_edit(ctx.project_root, node.path, execution=ctx.execution, cancel_check=ctx.cancel_check)
+            verdict = verify_edit(ctx.project_root, node.path, execution=ctx.execution, cancel_check=ctx.cancel_check,
+                                  private_workspace=ctx.private_workspace)
             if verdict.ok:
                 read_checked(ctx.project_root, node.path, digest(updated))
                 ctx.refresh()

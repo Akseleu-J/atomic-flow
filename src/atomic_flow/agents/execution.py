@@ -12,6 +12,7 @@ import threading
 import time
 import uuid
 from collections.abc import Callable
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -93,6 +94,21 @@ def execution_profile(name: str) -> ExecutionProfile:
         return EXECUTION_PROFILES[name]
     except (KeyError, TypeError):
         raise ExecutionUnavailable("Unknown execution profile") from None
+
+
+@contextmanager
+def checked_workspace(project: Path, *, private_workspace=False):
+    """Model-facing checks use admitted copies; never publish writes by tests."""
+    if private_workspace:
+        yield project
+        return
+    from atomic_flow.agents.changeset import ChangeSet
+    snapshot = ChangeSet.create(project)
+    try:
+        yield snapshot.workspace
+        snapshot.check_original()
+    finally:
+        snapshot.abort()
 
 
 def clean_environment(home: Path) -> dict[str, str]:

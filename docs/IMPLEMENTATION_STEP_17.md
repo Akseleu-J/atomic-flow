@@ -19,6 +19,9 @@ Model-facing `run_command` вне managed task создаёт отдельный
 второй раз. После проверки snapshot закрывается; copy workspace/journal сохраняются
 по существующему retention контракту для inspection. Это добавляет snapshot overhead
 для ordinary ask; resource admission/retention improvement G03 остаётся открытым.
+Тот же `checked_workspace` применяется к matching tests после edit_node/файловых
+правок и удаления/move. Это закрывает исходный checkout и для автоматической
+post-edit проверки, а не только для явного run_command.
 
 `output.sanitize_output` копирует JSON-like данные, применяет распознавание token/
 key forms и маскирует credential-shaped string fields. Границы: decoded command
@@ -159,3 +162,15 @@ failures при изменении CreateFileTool return/exception устран�
 лог `step17-preflight-recheck-windows.txt` оставлен отдельно.
 Дополнительная проверка trusted checker/matching-test targets и task final gates:
 **39 passed / 1 Docker-only skipped**, `validation/step17-checker-final-windows.txt`.
+Повторный CI `39969434678` на `d86a439`: **790 CPU passed / 11 skipped / 1 failed**,
+17 extra и 26 execution acceptance PASS, calibration skipped. Причина — прямой
+PatchFileTool API должен сохранять SourceConflict для stale source. Итоговое решение:
+`SourcePreconditionFailed(SourceConflict)` поднимается только внутри чистого
+preflight. Dispatcher фиксирует `effect_not_started`, не устанавливая uncertainty;
+обычные post-action exceptions по-прежнему блокируют effects. SourceConflict/OSError
+контракт прямых callers сохранён. Raw CI evidence в
+`validation/ci-step17-intermediate-20261023/`.
+Последние affected checks: **73 passed / 4 skipped** (source API/advisory/effect
+contracts и execution privacy), **54 passed / 1 skipped** (post-edit checks/task
+publication), отдельные logs `step17-contracts-final-windows.txt` и
+`step17-verification-final-windows.txt`. Повторный exact-source CI ожидается.

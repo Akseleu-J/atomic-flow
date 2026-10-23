@@ -220,7 +220,10 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         if isinstance(exc, UnresolvedEffects):
             raise
         result = {"error": f"{type(exc).__name__}: {exc}"}
-        if invoked and set(contract.effects) & {"write", "execute"}:
+        from atomic_flow.agents.source import SourcePreconditionFailed
+        if isinstance(exc, SourcePreconditionFailed):
+            result["effect_not_started"] = True
+        elif invoked and set(contract.effects) & {"write", "execute"}:
             result["side_effects_may_have_occurred"] = True
     return finish(result)
 

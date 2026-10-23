@@ -59,6 +59,7 @@ class ToolResult:
             "read_complete", "source_complete", "instruction_sources",
             "provenance",
             "side_effects_may_have_occurred",
+            "effect_not_started",
             "workspace_id", "root_id", "root_generation", "hash_algorithm", "version", "available", "data_only",
         ) if key in self.payload}
         if isinstance(self.payload.get("counts"), dict):
