@@ -1,55 +1,30 @@
 {
-  "source_commit": "00f77b592234ebca98ae5d6716a0ea6902d70b43",
+  "source_commit": "a0a4de5ab9adae174854a1a7de56a556f4b5a3d9",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    "AGENTS.md",
-    "docs/COMPETITIVE_ACCEPTANCE.md",
-    "docs/CRITICAL_REVIEW_2026-10-23.md",
     "docs/IMPLEMENTATION_STEP_17.md",
     "docs/PROJECT_CONTEXT.md",
-    "src/atomic_flow/agents/changeset.py",
-    "src/atomic_flow/agents/completion.py",
-    "src/atomic_flow/agents/context.py",
-    "src/atomic_flow/agents/effects.py",
-    "src/atomic_flow/agents/execution.py",
-    "src/atomic_flow/agents/loop.py",
-    "src/atomic_flow/agents/task_loop.py",
-    "src/atomic_flow/agents/tools/file_paths.py",
-    "src/atomic_flow/agents/tools/run_command.py",
-    "src/atomic_flow/api/server.py",
-    "src/atomic_flow/benchmarking.py",
-    "src/atomic_flow/evaluation_meter.py",
-    "src/atomic_flow/execution_inputs.py",
-    "src/atomic_flow/llm/orchestrator.py",
-    "src/atomic_flow/output.py",
-    "src/atomic_flow/qa_evaluation.py",
-    "src/atomic_flow/qa_rubric.py",
-    "src/atomic_flow/sdk.py",
-    "src/atomic_flow/sessions.py",
-    "src/atomic_flow/workflows.py",
-    "tests/test_evaluation_integrity.py",
-    "tests/test_execution_confidentiality.py",
-    "tests/test_plan_review_dependencies.py",
+    "src/atomic_flow/agents/tools/file_ops.py",
     "tests/test_unresolved_effects.py",
-    "tests/test_workflows.py",
-    "tools/colab_validate.py",
-    "validation/critic-20261023/README.md",
-    "validation/critic-20261023/evaluation.json",
-    "validation/critic-20261023/manifest.json",
-    "validation/critic-20261023/repro_evaluation.py.txt",
-    "validation/critic-20261023/repro_runtime.py.txt",
-    "validation/critic-20261023/repro_safety.py.txt",
-    "validation/critic-20261023/runtime.json",
-    "validation/critic-20261023/safety.jsonl",
-    "validation/step17-final-windows.txt",
-    "validation/step17-regressions-windows.txt",
-    "validation/step17-risk-recheck-windows.txt",
-    "validation/step17-risk-windows.txt"
+    "validation/ci-step17-before-fix-20261023/evidence-manifest.json",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/compile.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/container-boundaries.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/dependencies.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-build.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-info.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-version.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest-extra.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/python-version.txt",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/results.json",
+    "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/tested-commit.txt",
+    "validation/step17-preflight-final-windows.txt",
+    "validation/step17-preflight-recheck-windows.txt"
   ],
-  "file_count": 493,
+  "file_count": 507,
   "python_file_count": 209,
-  "symbol_count": 2131,
+  "symbol_count": 2132,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -434,9 +409,9 @@
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_17.md",
-      "sha256": "7231f3d13500ba18fbeb0a590f82ae09de69ecb5582b35169ad8056aa6101a9e",
-      "bytes": 12457,
-      "lines": 144
+      "sha256": "40f17cb21ae391b3d7e053c450862229f172e4c43bb1c344c23b9df9dc296177",
+      "bytes": 13699,
+      "lines": 157
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_2.md",
@@ -488,9 +463,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "004d5b312cf671c15c868153aea70f5a5fb2d8e023711919e125df5513b451db",
-      "bytes": 54927,
-      "lines": 567
+      "sha256": "ff8e1023318b6f7851d499c8821d664ee8d10aed39840c3585fd7029170e35a9",
+      "bytes": 55581,
+      "lines": 574
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -518,9 +493,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "83b0f1dedf85ba8efabbde72527dfdd18ff7e012d08bcbdf15a85d526563f6e8",
-      "bytes": 718287,
-      "lines": 21897
+      "sha256": "56ba962d4861e09ba2f298355d79b4cb3137a1c0ce0e2c3d16545789ec4dd1cc",
+      "bytes": 752109,
+      "lines": 22915
     },
     {
       "path": "docs/prompts.md",
@@ -3462,9 +3437,9 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/file_ops.py",
-      "sha256": "de39302aac9971ebc449e66ca171608aa1ae4bcb8f34bc94241e02b7f60007a3",
-      "bytes": 9658,
-      "lines": 196,
+      "sha256": "3c8f829be94596571c420624c2a811efd315cfe60e59a0516fe2f7fd15774612",
+      "bytes": 10163,
+      "lines": 207,
       "summary": "Small hash-bound patches and explicit source-file lifecycle operations.",
       "imports": [
         "__future__",
@@ -3547,7 +3522,7 @@
           "name": "PatchFileTool",
           "kind": "class",
           "line": 132,
-          "end_line": 150,
+          "end_line": 155,
           "signature": "class PatchFileTool",
           "summary": ""
         },
@@ -3555,55 +3530,55 @@
           "name": "PatchFileTool.run",
           "kind": "function",
           "line": 138,
-          "end_line": 150,
+          "end_line": 155,
           "signature": "def run(self, args: PatchFileArgs, ctx)",
           "summary": ""
         },
         {
           "name": "CreateFileTool",
           "kind": "class",
-          "line": 153,
-          "end_line": 165,
+          "line": 158,
+          "end_line": 170,
           "signature": "class CreateFileTool",
           "summary": ""
         },
         {
           "name": "CreateFileTool.run",
           "kind": "function",
-          "line": 159,
-          "end_line": 165,
+          "line": 164,
+          "end_line": 170,
           "signature": "def run(self, args: CreateFileArgs, ctx)",
           "summary": ""
         },
         {
           "name": "DeleteFileTool",
           "kind": "class",
-          "line": 168,
-          "end_line": 178,
+          "line": 173,
+          "end_line": 186,
           "signature": "class DeleteFileTool",
           "summary": ""
         },
         {
           "name": "DeleteFileTool.run",
           "kind": "function",
-          "line": 174,
-          "end_line": 178,
+          "line": 179,
+          "end_line": 186,
           "signature": "def run(self, args: DeleteFileArgs, ctx)",
           "summary": ""
         },
         {
           "name": "MoveFileTool",
           "kind": "class",
-          "line": 181,
-          "end_line": 196,
+          "line": 189,
+          "end_line": 207,
           "signature": "class MoveFileTool",
           "summary": ""
         },
         {
           "name": "MoveFileTool.run",
           "kind": "function",
-          "line": 187,
-          "end_line": 196,
+          "line": 195,
+          "end_line": 207,
           "signature": "def run(self, args: MoveFileArgs, ctx)",
           "summary": ""
         }
@@ -20796,9 +20771,9 @@
     },
     {
       "path": "tests/test_unresolved_effects.py",
-      "sha256": "cdb79e0daa8aa01f123d7716b5ef03a5826003e3b67b102f33525a2226e305f5",
-      "bytes": 9937,
-      "lines": 199,
+      "sha256": "76a86101bf698598a9c87499e49d037dc4dd5e91b3b2af2174ac1d718c995fb3",
+      "bytes": 11104,
+      "lines": 217,
       "summary": "Uncertain effects stop host action, independently of model prompts/history.",
       "imports": [
         "atomic_flow",
@@ -20809,8 +20784,11 @@
         "atomic_flow.agents.loop",
         "atomic_flow.agents.planner",
         "atomic_flow.agents.policy",
+        "atomic_flow.agents.source",
         "atomic_flow.agents.task",
         "atomic_flow.agents.task_loop",
+        "atomic_flow.agents.tools",
+        "atomic_flow.agents.undo",
         "atomic_flow.api.server",
         "atomic_flow.backends.base",
         "atomic_flow.config",
@@ -20931,82 +20909,90 @@
           "summary": ""
         },
         {
-          "name": "test_expected_effect_error_is_concise_in_cli_and_api",
+          "name": "test_preflight_read_refusal_does_not_latch_but_can_be_repaired_by_actual_read",
           "kind": "function",
           "line": 114,
           "end_line": 129,
+          "signature": "def test_preflight_read_refusal_does_not_latch_but_can_be_repaired_by_actual_read(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_expected_effect_error_is_concise_in_cli_and_api",
+          "kind": "function",
+          "line": 132,
+          "end_line": 147,
           "signature": "def test_expected_effect_error_is_concise_in_cli_and_api(tmp_path, monkeypatch, capsys)",
           "summary": ""
         },
         {
           "name": "test_expected_effect_error_is_concise_in_cli_and_api.interrupted",
           "kind": "function",
-          "line": 119,
-          "end_line": 120,
+          "line": 137,
+          "end_line": 138,
           "signature": "def interrupted(*a, **kw)",
           "summary": ""
         },
         {
           "name": "test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval",
           "kind": "function",
-          "line": 133,
-          "end_line": 156,
+          "line": 151,
+          "end_line": 174,
           "signature": "def test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval(tmp_path, monkeypatch, artifacts)",
           "summary": ""
         },
         {
           "name": "test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval.execute",
           "kind": "function",
-          "line": 141,
-          "end_line": 143,
+          "line": 159,
+          "end_line": 161,
           "signature": "def execute(task, step)",
           "summary": ""
         },
         {
           "name": "test_same_request_cannot_restart_unresolved_effect_when_artifacts_disabled",
           "kind": "function",
-          "line": 159,
-          "end_line": 172,
+          "line": 177,
+          "end_line": 190,
           "signature": "def test_same_request_cannot_restart_unresolved_effect_when_artifacts_disabled(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_same_request_cannot_restart_unresolved_effect_when_artifacts_disabled.answer",
           "kind": "function",
-          "line": 163,
-          "end_line": 165,
+          "line": 181,
+          "end_line": 183,
           "signature": "def answer(self, run, *args)",
           "summary": ""
         },
         {
           "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary",
           "kind": "function",
-          "line": 175,
-          "end_line": 199,
+          "line": 193,
+          "end_line": 217,
           "signature": "def test_dispatch_result_artifacts_and_provider_history_redact_canary(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary.Output",
           "kind": "class",
-          "line": 178,
-          "end_line": 183,
+          "line": 196,
+          "end_line": 201,
           "signature": "class Output",
           "summary": ""
         },
         {
           "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary.Output.run",
           "kind": "function",
-          "line": 182,
-          "end_line": 183,
+          "line": 200,
+          "end_line": 201,
           "signature": "def run(self, args, ctx)",
           "summary": ""
         },
         {
           "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary.chat",
           "kind": "function",
-          "line": 192,
-          "end_line": 194,
+          "line": 210,
+          "end_line": 212,
           "signature": "def chat(messages, *_)",
           "summary": ""
         }
@@ -22552,6 +22538,78 @@
       "lines": 1
     },
     {
+      "path": "validation/ci-step17-before-fix-20261023/evidence-manifest.json",
+      "sha256": "4b1b34af2a9824a4e33f53a5e2d54c167234443388ff6d4000e75f1d9ef0cbf4",
+      "bytes": 3248,
+      "lines": 63
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/container-boundaries.txt",
+      "sha256": "5156f1f5bdf93513a09faaee78c426136208e1ae2cdb0dac09ee31f17e1a532c",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/dependencies.txt",
+      "sha256": "8e44f0af290d7aed03638abd56131a218ddbfcb8d2f98faf7c8597c4e36f99a7",
+      "bytes": 536,
+      "lines": 28
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-build.txt",
+      "sha256": "489fe1d35c7f215ca82f0c8ece73d21e92172aecf3c7dcf21f28c46ac4530ba5",
+      "bytes": 13233,
+      "lines": 176
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-info.txt",
+      "sha256": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f",
+      "bytes": 1491,
+      "lines": 61
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098",
+      "bytes": 769,
+      "lines": 27
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest-extra.txt",
+      "sha256": "c3788640522b7a73a8a63ce1a35822e59814788116a50e7dc72a1c192363d3f2",
+      "bytes": 99,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest.txt",
+      "sha256": "0b529ae47825fe943ae1148a6bdf9ce3ded8e7d8deddf709922798efcb95022f",
+      "bytes": 5239,
+      "lines": 74
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+      "bytes": 15,
+      "lines": 1
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/results.json",
+      "sha256": "715f25f95be81e346afe2d96a96602e6ff202da4ec8bd4b94d3ee58d94f13e20",
+      "bytes": 355,
+      "lines": 11
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/tested-commit.txt",
+      "sha256": "185ee5c403ec3327dcc7a527e612c1ff43012f6b9298b05fc858274eed6bb9d1",
+      "bytes": 41,
+      "lines": 1
+    },
+    {
       "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/compile.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
@@ -22874,6 +22932,18 @@
       "sha256": "2f9d84242be3eaa7f090ee9beaea02669c3780c63eb63aa7cd9db598bbf3111c",
       "bytes": 770,
       "lines": 9
+    },
+    {
+      "path": "validation/step17-preflight-final-windows.txt",
+      "sha256": "0e21b1f651c349761815e980748330c41260f5aa4e8a79682ed9728e63899ac2",
+      "bytes": 678,
+      "lines": 8
+    },
+    {
+      "path": "validation/step17-preflight-recheck-windows.txt",
+      "sha256": "328ee7fc648edf8a950a35da6f3605a6d5a4190864bb8e02617530eb8eb0c77c",
+      "bytes": 4670,
+      "lines": 82
     },
     {
       "path": "validation/step17-regressions-windows.txt",

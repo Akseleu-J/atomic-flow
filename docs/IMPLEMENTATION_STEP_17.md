@@ -142,3 +142,16 @@ G01 independent live edit evaluation, G02 reproducible release/wheel acceptance,
 G03 масштаб/snapshot admission и capability composition остаются открытыми.
 Исправленные конкретные regressions не доказывают production readiness или
 превосходство над внешними агентами.
+
+Первый push CI `39968031957` на `a0a4de5` показал **788 CPU passed / 11 skipped /
+1 failed**, **17 extra passed**, **26 execution acceptance passed**, compile PASS;
+calibration не запускался из-за общего отказа. Скачанные исходные 11 artifact files
+и hashes — `validation/ci-step17-before-fix-20261023/`. Отказ: pure read-before-edit
+preflight у patch_file выбрасывал исключение, dispatcher консервативно считал его
+неопределённым effect. Теперь Patch/Delete/Move возвращают обычный error только
+из отдельного preflight до `_mutate`; post-mutation exceptions не ослаблены.
+Прямой CreateFileTool contract для private/OS aliases сохранён. Проверены actual
+read → repair → apply и прежняя memory authority regression: **36 passed**,
+`validation/step17-preflight-final-windows.txt`. Промежуточные четыре assertion
+failures при изменении CreateFileTool return/exception устранены сохранением API;
+лог `step17-preflight-recheck-windows.txt` оставлен отдельно.

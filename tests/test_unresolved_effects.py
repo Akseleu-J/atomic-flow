@@ -111,6 +111,24 @@ def test_journal_failure_after_effect_never_becomes_retryable_tool_error(tmp_pat
     assert ctx.effects_state.blocked and invoked == ["first"]
 
 
+def test_preflight_read_refusal_does_not_latch_but_can_be_repaired_by_actual_read(tmp_path):
+    from atomic_flow.agents.source import digest
+    from atomic_flow.agents.tools import default_registry
+    from atomic_flow.agents.undo import UndoStack
+    path = tmp_path / "a.py"
+    path.write_text("A = 1\n")
+    expected = digest(path.read_bytes())
+    ctx = ToolContext(tmp_path, {}, file_hashes={"a.py": expected}, edits_enabled=True, enforce_read_before_edit=True,
+                      undo_stack=UndoStack(tmp_path / "undo"), policy=PolicyEngine(host_rules=[Rule("*", "auto")]))
+    registry = default_registry()
+    call = {"tool": "patch_file", "args": {"path": "a.py", "expected_hash": expected, "old_text": "A = 1", "new_text": "A = 2"}}
+    result, _ = execute_tool(call, registry, ctx, allowed_tools=["patch_file"])
+    assert "read the complete" in result["error"] and not ctx.effects_state.blocked
+    assert path.read_text() == "A = 1\n"
+    execute_tool({"tool": "read_file", "args": {"path": "a.py"}}, registry, ctx, allowed_tools=["read_file"])
+    assert execute_tool(call, registry, ctx, allowed_tools=["patch_file"])[0]["status"] == "applied"
+
+
 def test_expected_effect_error_is_concise_in_cli_and_api(tmp_path, monkeypatch, capsys):
     from fastapi.testclient import TestClient
 

@@ -138,15 +138,20 @@ class PatchFileTool(Tool):
     def run(self, args: PatchFileArgs, ctx) -> dict[str, Any]:
         if not ctx.edits_enabled:
             return {"error": "edits disabled"}
-        original = _read(ctx, args.path, args.expected_hash)
-        text = original.decode("utf-8-sig")
-        if text.count(args.old_text) != 1:
-            return {"error": "old_text must match exactly one fragment; no source changed"}
-        updated = text_bytes(text.replace(args.old_text, args.new_text, 1))
-        if original.startswith(b"\xef\xbb\xbf"):
-            updated = b"\xef\xbb\xbf" + updated
-        if updated == original:
-            return {"error": "patch does not change source"}
+        try:
+            original = _read(ctx, args.path, args.expected_hash)
+            text = original.decode("utf-8-sig")
+            if text.count(args.old_text) != 1:
+                return {"error": "old_text must match exactly one fragment; no source changed"}
+            updated = text_bytes(text.replace(args.old_text, args.new_text, 1))
+            if original.startswith(b"\xef\xbb\xbf"):
+                updated = b"\xef\xbb\xbf" + updated
+            if updated == original:
+                return {"error": "patch does not change source"}
+        except (OSError, UnicodeError) as exc:
+            # Only this preflight is known to precede every write/execute.
+            # Do not classify exceptions after _mutate as safe refusals.
+            return {"error": str(exc)}
         return _mutate(ctx, {args.path: original}, {args.path: updated})
 
 
@@ -174,7 +179,10 @@ class DeleteFileTool(Tool):
     def run(self, args: DeleteFileArgs, ctx) -> dict[str, Any]:
         if not ctx.edits_enabled:
             return {"error": "edits disabled"}
-        original = _read(ctx, args.path, args.expected_hash)
+        try:
+            original = _read(ctx, args.path, args.expected_hash)
+        except (OSError, UnicodeError) as exc:
+            return {"error": str(exc)}
         return _mutate(ctx, {args.path: original}, {args.path: None})
 
 
@@ -187,10 +195,13 @@ class MoveFileTool(Tool):
     def run(self, args: MoveFileArgs, ctx) -> dict[str, Any]:
         if not ctx.edits_enabled:
             return {"error": "edits disabled"}
-        original = _read(ctx, args.path, args.expected_hash)
-        destination = admitted_path(ctx, args.destination)
-        if destination.exists() or destination.resolve() == admitted_path(ctx, args.path).resolve():
-            return {"error": "destination must be absent and different from source"}
-        mode = stat.S_IMODE(admitted_path(ctx, args.path, existing=True).stat().st_mode)
+        try:
+            original = _read(ctx, args.path, args.expected_hash)
+            destination = admitted_path(ctx, args.destination)
+            if destination.exists() or destination.resolve() == admitted_path(ctx, args.path).resolve():
+                return {"error": "destination must be absent and different from source"}
+            mode = stat.S_IMODE(admitted_path(ctx, args.path, existing=True).stat().st_mode)
+        except (OSError, UnicodeError) as exc:
+            return {"error": str(exc)}
         return _mutate(ctx, {args.destination: None, args.path: original}, {args.destination: original, args.path: None},
                        after_modes={args.destination: mode})
