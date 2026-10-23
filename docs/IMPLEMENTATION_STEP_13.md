@@ -148,7 +148,29 @@ Focused Windows regression: **74 passed / 8 skipped**, Ruff/compileall PASS. В 
 первом прогоне 544 passed / 20 skipped / 2 transient failures; raw log сохранён.
 Исправлены Windows helper cleanup fallback и отдельный bounded startup regex worker,
 без увеличения пятисекундного лимита вычисления regex; добавлены regressions.
-Точные финальные Windows/Linux/Docker результаты, tested commit и hashes будут
-зафиксированы после общей проверки. Скрипт `tools/colab_validate.py --require-docker`
-включает новые read-only/remote/job acceptance; model_calls=0. Внешние платные API,
-секреты vault и Codespace/Colab/Kaggle сессии для пакета не требуются.
+Финальный Windows: **548 passed / 20 skipped**, 735.21s,
+`validation/step13-windows-final.txt`. Raw initial failed log остаётся отдельно;
+финальный прогон включает оба новых startup/cleanup regression tests. Ruff,
+compileall и staged whitespace check PASS.
+
+Runtime **`dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0`**, CI push
+[`39923289564`](https://github.com/Akseleu-J/atomic-flow/actions/runs/39923289564) и PR
+[`39923295523`](https://github.com/Akseleu-J/atomic-flow/actions/runs/39923295523)
+completed/success; Python 3.11 и 3.12 PASS. Скачанный Docker artifact подтверждает:
+
+- CPU: **541 passed / 10 skipped**, 28.12s; extra: **17 passed**.
+- Execution acceptance: **25 passed**, 12.52s: **9 настоящих Docker tests** и
+  **16 вспомогательных CPU/local job tests**. Число 25 не выдаётся за 25 Docker tests.
+  Реальные новые сценарии: read-only workspace, HTTP worker submit/status/output/cancel
+  с pinned image и job crash/reconcile cleanup по CID без replay.
+- Compile PASS; historical grader calibration PASS (6 известных исторических изменений,
+  не новая task-quality evaluation); **model_calls=0**, GPU не запрашивался.
+- Image ID: `sha256:16a1faebd1207bda37d77cf05f2139208f2edfc8364753bc03aa747746bbd586`.
+
+Исходные tested-commit/results/logs сохранены в `validation/ci-step13-20261023/`.
+Manifest SHA-256 охватывает **12 artifact files** и **20 изменённых source/test/tool
+Git blobs**; staged bytes сверены с ним. Документирующий commit не меняет runtime.
+Скрипт `tools/colab_validate.py --require-docker` включает новые read-only/remote/job
+acceptance. Внешние платные API, vault model keys и Codespace/Colab/Kaggle сессии
+для пакета не использовались. Внешний cloud endpoint и Stage 4 edit quality остаются
+отдельными открытыми проверками.
