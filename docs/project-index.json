@@ -1,27 +1,39 @@
 {
-  "source_commit": "394aedcdae2ed8b06cf2b82a894780f5d22b3ceb",
+  "source_commit": "55eee8c903e85960ff3cb733126db4d67e6d1333",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    "docs/IMPLEMENTATION_STEP_12.md",
+    "AGENTS.md",
+    "docs/CANDIDATE_STATUS.json",
+    "docs/EXECUTION.md",
+    "docs/IMPLEMENTATION_STEP_13.md",
     "docs/PROJECT_CONTEXT.md",
-    "validation/ci-step12-20261023/evidence-manifest.json",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/compile.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/container-boundaries.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/dependencies.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/docker-build.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/docker-info.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/docker-version.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/pytest-extra.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/pytest.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/python-version.txt",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/results.json",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/task-calibration.json",
-    "validation/ci-step12-20261023/validation-394aedcdae2ed8b06cf2b82a894780f5d22b3ceb/tested-commit.txt"
+    "docs/REMAINING_IMPLEMENTATION.md",
+    "src/atomic_flow/agents/changeset.py",
+    "src/atomic_flow/agents/execution.py",
+    "src/atomic_flow/agents/task_loop.py",
+    "src/atomic_flow/agents/tools/search_text.py",
+    "src/atomic_flow/cli.py",
+    "src/atomic_flow/config.py",
+    "src/atomic_flow/credentials.py",
+    "src/atomic_flow/job_worker.py",
+    "src/atomic_flow/jobs.py",
+    "src/atomic_flow/remote.py",
+    "src/atomic_flow/sdk.py",
+    "tests/test_container_integration.py",
+    "tests/test_execution_profiles.py",
+    "tests/test_file_operations.py",
+    "tests/test_job_cli.py",
+    "tests/test_jobs.py",
+    "tests/test_remote_execution.py",
+    "tests/test_scoped_credentials.py",
+    "tests/test_worktree_workspace.py",
+    "tools/colab_validate.py",
+    "validation/step13-windows-before-integration-fixes.txt"
   ],
-  "file_count": 391,
-  "python_file_count": 158,
-  "symbol_count": 1343,
+  "file_count": 403,
+  "python_file_count": 168,
+  "symbol_count": 1544,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -68,9 +80,9 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "8f42208d448497aefe6a2d798f1cbdc20c9aa89ceb9d19850523f62efcff8cc5",
-      "bytes": 4902,
-      "lines": 20
+      "sha256": "494a56594e15c744b8f1aba0e7d2eb6c2c041613ed26b37e4776bb08b9b3a198",
+      "bytes": 5782,
+      "lines": 21
     },
     {
       "path": "LICENSE",
@@ -328,8 +340,8 @@
     },
     {
       "path": "docs/CANDIDATE_STATUS.json",
-      "sha256": "969fcbcfe995727666df18399f7fa53035039fb3515c399ac2709c94e8934c64",
-      "bytes": 11022,
+      "sha256": "32dcb755c4023a9b5d6a43fcf2a5176034ac91eb04153e917a8f75ceeb7d373f",
+      "bytes": 11076,
       "lines": 380
     },
     {
@@ -340,9 +352,9 @@
     },
     {
       "path": "docs/EXECUTION.md",
-      "sha256": "07554c8e59aca6e122212d4086b340a3984fd5a8cc2c713585e9ca7b3f474491",
-      "bytes": 5580,
-      "lines": 90
+      "sha256": "70d5222cfab23edd48089a0ff3c94e1dd16ed9a3e4be5dcf60ecbadb1756ca8f",
+      "bytes": 6726,
+      "lines": 104
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_1.md",
@@ -367,6 +379,12 @@
       "sha256": "0560977128a63172d60c32f1804fa73f1a2a884f9b5e204d539de07a4a6f5293",
       "bytes": 15941,
       "lines": 188
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_13.md",
+      "sha256": "673b92cba194ae2cc681300e2e11a8cca41d90e4245ac44d2643e4052b3da6ac",
+      "bytes": 12437,
+      "lines": 154
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_2.md",
@@ -418,9 +436,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "211951bd6d42210c61b166a05d7a147a782df16e8a1253bbadf55dd4d34afe7f",
-      "bytes": 44056,
-      "lines": 456
+      "sha256": "fdbd9ecfe140d304c2c3eb84f8cd029c78dee940e9b90052e63d2d0c7c03fc37",
+      "bytes": 45996,
+      "lines": 475
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -436,9 +454,9 @@
     },
     {
       "path": "docs/REMAINING_IMPLEMENTATION.md",
-      "sha256": "f80b7b0581ef57a36448bec5bb69eb96928ecf0eef735fc4c5e9cd98f5a3ffff",
-      "bytes": 7799,
-      "lines": 98
+      "sha256": "a06deecd0ac9a9dc1e1f730c5f80974ebf5c3956b97059de66c9e3b04cf412e3",
+      "bytes": 8251,
+      "lines": 103
     },
     {
       "path": "docs/architecture.md",
@@ -448,9 +466,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "169c862e6d5fc4197cb0462f71e2261e65d92c1e92315a95f87496b6c8d1e42d",
-      "bytes": 495033,
-      "lines": 15088
+      "sha256": "064e6e688073d3711e68d293edd974ef7b175c08a932300991f315910cf57197",
+      "bytes": 498266,
+      "lines": 15143
     },
     {
       "path": "docs/prompts.md",
@@ -1573,9 +1591,9 @@
     },
     {
       "path": "src/atomic_flow/agents/changeset.py",
-      "sha256": "30ee1cd4d0b8a64703a1ba665f19e9473af9799b1fe75312fc4c2f2e2eab2ef7",
-      "bytes": 12864,
-      "lines": 265,
+      "sha256": "0e96a899275a6971a582b305979fbeb39dbe1ad1683954e2da3a830106e75b19",
+      "bytes": 21623,
+      "lines": 429,
       "summary": "Task workspaces and journaled, conflict-checked publication of approved paths.",
       "imports": [
         "__future__",
@@ -1589,150 +1607,207 @@
         "re",
         "shutil",
         "stat",
+        "subprocess",
         "uuid"
       ],
       "symbols": [
         {
           "name": "ChangeSetConflict",
           "kind": "class",
-          "line": 22,
-          "end_line": 23,
+          "line": 23,
+          "end_line": 24,
           "signature": "class ChangeSetConflict",
+          "summary": ""
+        },
+        {
+          "name": "_git",
+          "kind": "function",
+          "line": 30,
+          "end_line": 53,
+          "signature": "def _git(directory: Path, *args: str, data: bytes | None=None)",
+          "summary": "Only built-in plumbing, no user environment, global config, hooks or filters."
+        },
+        {
+          "name": "_plain_path",
+          "kind": "function",
+          "line": 56,
+          "end_line": 59,
+          "signature": "def _plain_path(path: Path)",
+          "summary": ""
+        },
+        {
+          "name": "_snapshot_tree",
+          "kind": "function",
+          "line": 62,
+          "end_line": 90,
+          "signature": "def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str])",
+          "summary": "Create a private snapshot commit without checkout, Git attributes or source config."
+        },
+        {
+          "name": "_snapshot_tree.store",
+          "kind": "function",
+          "line": 78,
+          "end_line": 87,
+          "signature": "def store(node)",
           "summary": ""
         },
         {
           "name": "_files",
           "kind": "function",
-          "line": 29,
-          "end_line": 51,
+          "line": 93,
+          "end_line": 115,
           "signature": "def _files(root: Path, excluded: Path | None=None)",
           "summary": ""
         },
         {
           "name": "_files.ignored",
           "kind": "function",
-          "line": 31,
-          "end_line": 32,
+          "line": 95,
+          "end_line": 96,
           "signature": "def ignored(name)",
           "summary": ""
         },
         {
           "name": "ChangeSet",
           "kind": "class",
-          "line": 54,
-          "end_line": 265,
+          "line": 118,
+          "end_line": 429,
           "signature": "class ChangeSet",
           "summary": ""
         },
         {
           "name": "ChangeSet.__init__",
           "kind": "function",
-          "line": 55,
-          "end_line": 60,
+          "line": 119,
+          "end_line": 124,
           "signature": "def __init__(self, project: Path, directory: Path, state: dict)",
           "summary": ""
         },
         {
           "name": "ChangeSet.create",
           "kind": "function",
-          "line": 63,
-          "end_line": 82,
-          "signature": "def create(cls, project: Path)",
+          "line": 127,
+          "end_line": 160,
+          "signature": "def create(cls, project: Path, *, backend: str='copy')",
+          "summary": ""
+        },
+        {
+          "name": "ChangeSet._create_worktree",
+          "kind": "function",
+          "line": 162,
+          "end_line": 183,
+          "signature": "def _create_worktree(self)",
+          "summary": ""
+        },
+        {
+          "name": "ChangeSet._validate_ownership",
+          "kind": "function",
+          "line": 185,
+          "end_line": 225,
+          "signature": "def _validate_ownership(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.open",
           "kind": "function",
-          "line": 85,
-          "end_line": 92,
+          "line": 228,
+          "end_line": 237,
           "signature": "def open(cls, project: Path, change_id: str)",
           "summary": ""
         },
         {
           "name": "ChangeSet._save",
           "kind": "function",
-          "line": 94,
-          "end_line": 98,
+          "line": 239,
+          "end_line": 243,
           "signature": "def _save(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.check_original",
           "kind": "function",
-          "line": 100,
-          "end_line": 102,
+          "line": 245,
+          "end_line": 248,
           "signature": "def check_original(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.track",
           "kind": "function",
-          "line": 104,
-          "end_line": 114,
+          "line": 250,
+          "end_line": 260,
           "signature": "def track(self, rel: str, expected_hash: str | None | object=_UNSPECIFIED_HASH)",
           "summary": ""
         },
         {
           "name": "ChangeSet.validate_workspace",
           "kind": "function",
-          "line": 116,
-          "end_line": 126,
+          "line": 262,
+          "end_line": 273,
           "signature": "def validate_workspace(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.abort",
           "kind": "function",
-          "line": 128,
-          "end_line": 131,
+          "line": 275,
+          "end_line": 280,
           "signature": "def abort(self)",
           "summary": ""
         },
         {
+          "name": "ChangeSet.cleanup",
+          "kind": "function",
+          "line": 282,
+          "end_line": 293,
+          "signature": "def cleanup(self)",
+          "summary": "Explicitly remove only a verified owned terminal Git workspace; retain journal/objects."
+        },
+        {
           "name": "ChangeSet.checkpoint",
           "kind": "function",
-          "line": 133,
-          "end_line": 143,
+          "line": 295,
+          "end_line": 305,
           "signature": "def checkpoint(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.restore_checkpoint",
           "kind": "function",
-          "line": 145,
-          "end_line": 165,
+          "line": 307,
+          "end_line": 328,
           "signature": "def restore_checkpoint(self, checkpoint: dict)",
           "summary": ""
         },
         {
           "name": "ChangeSet._write_target",
           "kind": "function",
-          "line": 167,
-          "end_line": 180,
+          "line": 330,
+          "end_line": 343,
           "signature": "def _write_target(self, rel: str, data: bytes | None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.publish",
           "kind": "function",
-          "line": 182,
-          "end_line": 227,
+          "line": 345,
+          "end_line": 390,
           "signature": "def publish(self, finalize=None, cancel_check=lambda: None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.recover",
           "kind": "function",
-          "line": 229,
-          "end_line": 261,
+          "line": 392,
+          "end_line": 425,
           "signature": "def recover(self)",
           "summary": "Restore only bytes written by this publication; never overwrite a third version."
         },
         {
           "name": "ChangeSet.verify_published",
           "kind": "function",
-          "line": 263,
-          "end_line": 265,
+          "line": 427,
+          "end_line": 429,
           "signature": "def verify_published(self)",
           "summary": ""
         }
@@ -1913,9 +1988,9 @@
     },
     {
       "path": "src/atomic_flow/agents/execution.py",
-      "sha256": "141f14182c1556ec25fdc4241b06ee74582e67758b0f6b145b45bf2dd0376768",
-      "bytes": 5640,
-      "lines": 141,
+      "sha256": "2f1c712197ee381789a37e4c083d3216cdb47bd8c292900a7e8ac61cae6288ad",
+      "bytes": 11044,
+      "lines": 243,
       "summary": "Bounded command execution. Local mode is explicitly NOT a security sandbox.",
       "imports": [
         "__future__",
@@ -1924,6 +1999,7 @@
         "dataclasses",
         "os",
         "pathlib",
+        "re",
         "shutil",
         "signal",
         "subprocess",
@@ -1931,79 +2007,104 @@
         "tempfile",
         "threading",
         "time",
+        "types",
         "uuid"
       ],
       "symbols": [
         {
           "name": "ExecutionUnavailable",
           "kind": "class",
-          "line": 20,
-          "end_line": 21,
+          "line": 22,
+          "end_line": 23,
           "signature": "class ExecutionUnavailable",
           "summary": ""
         },
         {
           "name": "TaskCancelled",
           "kind": "class",
-          "line": 24,
-          "end_line": 25,
+          "line": 26,
+          "end_line": 27,
           "signature": "class TaskCancelled",
           "summary": ""
         },
         {
           "name": "CommandResult",
           "kind": "class",
-          "line": 29,
-          "end_line": 33,
+          "line": 31,
+          "end_line": 37,
           "signature": "class CommandResult",
+          "summary": ""
+        },
+        {
+          "name": "ExecutionProfile",
+          "kind": "class",
+          "line": 41,
+          "end_line": 49,
+          "signature": "class ExecutionProfile",
+          "summary": "Host-defined Docker bounds; repository configuration can only select a name."
+        },
+        {
+          "name": "execution_profile",
+          "kind": "function",
+          "line": 58,
+          "end_line": 62,
+          "signature": "def execution_profile(name: str)",
           "summary": ""
         },
         {
           "name": "clean_environment",
           "kind": "function",
-          "line": 36,
-          "end_line": 43,
+          "line": 65,
+          "end_line": 72,
           "signature": "def clean_environment(home: Path)",
           "summary": ""
         },
         {
           "name": "container_identity",
           "kind": "function",
-          "line": 46,
-          "end_line": 52,
+          "line": 75,
+          "end_line": 81,
           "signature": "def container_identity()",
           "summary": "Keep private Unix workspaces accessible without chmod or running as root."
         },
         {
           "name": "docker_command",
           "kind": "function",
-          "line": 55,
-          "end_line": 62,
-          "signature": "def docker_command(engine: str, image: str, workspace: Path, name: str, args: list[str])",
+          "line": 84,
+          "end_line": 99,
+          "signature": "def docker_command(engine: str, image: str, workspace: Path, name: str, args: list[str], *, profile: str='checks', container_id_file: Path | None=None)",
           "summary": ""
         },
         {
           "name": "_kill_tree",
           "kind": "function",
-          "line": 65,
-          "end_line": 76,
+          "line": 102,
+          "end_line": 123,
           "signature": "def _kill_tree(proc: subprocess.Popen)",
           "summary": ""
         },
         {
+          "name": "_remove_container",
+          "kind": "function",
+          "line": 126,
+          "end_line": 139,
+          "signature": "def _remove_container(engine: str, identity: str, home: Path)",
+          "summary": "Stop an owned container or prove absence; daemon failure is not absence."
+        },
+        {
           "name": "run_python",
           "kind": "function",
-          "line": 79,
-          "end_line": 141,
-          "signature": "def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None=None, timeout: float=120, cancel_check: Callable[[], None] | None=None)",
+          "line": 142,
+          "end_line": 243,
+          "signature": "def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None=None, timeout: float=120, cancel_check: Callable[[], None] | None=None, output_callback: Callable[[str, bytes], None] | None=None, container_name: str | None=None, container_id_file: Path | None=None)",
           "summary": "Execute Python arguments; docker mode fails closed without an engine/image."
         },
         {
           "name": "run_python.drain",
           "kind": "function",
-          "line": 100,
-          "end_line": 107,
-          "signature": "def drain(stream, tail)",
+          "line": 180,
+          "end_line": 194,
+          "signature": "def drain(stream, tail, index)",
           "summary": ""
         }
       ]
@@ -2811,8 +2912,8 @@
     },
     {
       "path": "src/atomic_flow/agents/task_loop.py",
-      "sha256": "dae4f493777df97108ee2f542072fb96007f79d56902d3c691c7a0e53fe9d37b",
-      "bytes": 24594,
+      "sha256": "cc5b343bfa20b3dfc501772870260b0c9c9466c96c90aa31286f3a9604d6b77c",
+      "bytes": 24638,
       "lines": 467,
       "summary": "TaskRunner: execute a plan step-by-step, verifying each step.",
       "imports": [
@@ -3637,9 +3738,9 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/search_text.py",
-      "sha256": "655e7ae8b1b5e7172885619eb1ed2ae72b0a53c2609ad6a37b01c2a63a7dee64",
-      "bytes": 5951,
-      "lines": 132,
+      "sha256": "388faff1606ebd9c32f4c5e2b218993b98b9818bf67e65785b56364f1c1b1598",
+      "bytes": 6598,
+      "lines": 142,
       "summary": "Bounded literal/regex search over admitted indexed source revisions.",
       "imports": [
         "__future__",
@@ -3674,23 +3775,23 @@
           "name": "_regex_worker",
           "kind": "function",
           "line": 48,
-          "end_line": 52,
+          "end_line": 53,
           "signature": "def _regex_worker(sender, files, query, case_sensitive, offset, maximum)",
           "summary": ""
         },
         {
           "name": "SearchTextTool",
           "kind": "class",
-          "line": 55,
-          "end_line": 132,
+          "line": 56,
+          "end_line": 142,
           "signature": "class SearchTextTool",
           "summary": ""
         },
         {
           "name": "SearchTextTool.run",
           "kind": "function",
-          "line": 62,
-          "end_line": 132,
+          "line": 63,
+          "end_line": 142,
           "signature": "def run(self, args: SearchTextArgs, ctx)",
           "summary": ""
         }
@@ -5637,9 +5738,9 @@
     },
     {
       "path": "src/atomic_flow/cli.py",
-      "sha256": "c54aadde4559873cfe2fd6f99bacf17f3d95061f2670ae2c84ebde6690b4ea94",
-      "bytes": 54283,
-      "lines": 1047,
+      "sha256": "860fbceca74e3a2d7492a16adf72e24e951545518639930a7389f1cd84182bb7",
+      "bytes": 57718,
+      "lines": 1112,
       "summary": "Command line interface. One small handler per command instead of a 300-line `main`.",
       "imports": [
         "__future__",
@@ -5662,11 +5763,13 @@
         "atomic_flow.diagnostics",
         "atomic_flow.dialogue",
         "atomic_flow.errors",
+        "atomic_flow.jobs",
         "atomic_flow.kaggle.credentials",
         "atomic_flow.llm.orchestrator",
         "atomic_flow.llm.prompts",
         "atomic_flow.llm.schemas",
         "atomic_flow.memory",
+        "atomic_flow.remote",
         "atomic_flow.rewind",
         "atomic_flow.sdk",
         "atomic_flow.sessions",
@@ -5689,231 +5792,247 @@
           "name": "_parser",
           "kind": "function",
           "line": 40,
-          "end_line": 258,
+          "end_line": 285,
           "signature": "def _parser()",
           "summary": ""
         },
         {
           "name": "_set_nested",
           "kind": "function",
-          "line": 263,
-          "end_line": 267,
+          "line": 290,
+          "end_line": 294,
           "signature": "def _set_nested(data: dict[str, Any], key: str, value: Any)",
           "summary": ""
         },
         {
           "name": "_get_nested",
           "kind": "function",
-          "line": 270,
-          "end_line": 276,
+          "line": 297,
+          "end_line": 303,
           "signature": "def _get_nested(data: dict[str, Any], key: str)",
           "summary": ""
         },
         {
           "name": "_editor",
           "kind": "function",
-          "line": 279,
-          "end_line": 280,
+          "line": 306,
+          "end_line": 307,
           "signature": "def _editor()",
           "summary": ""
         },
         {
           "name": "_prompts",
           "kind": "function",
-          "line": 283,
-          "end_line": 290,
+          "line": 310,
+          "end_line": 317,
           "signature": "def _prompts(args, project: Path, mode: str)",
           "summary": ""
         },
         {
           "name": "_make_approval_callback",
           "kind": "function",
-          "line": 293,
-          "end_line": 324,
+          "line": 320,
+          "end_line": 351,
           "signature": "def _make_approval_callback(auto_yes: bool)",
           "summary": ""
         },
         {
           "name": "_make_approval_callback.ask",
           "kind": "function",
-          "line": 294,
-          "end_line": 323,
+          "line": 321,
+          "end_line": 350,
           "signature": "def ask(tool: str, args: dict[str, Any], reason: str)",
           "summary": ""
         },
         {
           "name": "_ask_user_question",
           "kind": "function",
-          "line": 327,
-          "end_line": 341,
+          "line": 354,
+          "end_line": 368,
           "signature": "def _ask_user_question(question: dict)",
           "summary": "A specification answer is always explicit; --yes cannot answer it."
         },
         {
           "name": "_edit_prompts",
           "kind": "function",
-          "line": 344,
-          "end_line": 358,
+          "line": 371,
+          "end_line": 385,
           "signature": "def _edit_prompts(project: Path, mode: str)",
           "summary": ""
         },
         {
           "name": "_run_kaggle_cli",
           "kind": "function",
-          "line": 361,
-          "end_line": 376,
+          "line": 388,
+          "end_line": 403,
           "signature": "def _run_kaggle_cli(command: list[str], *, timeout: int=86400, secret_path: Path | None=None)",
           "summary": ""
         },
         {
           "name": "cmd_init",
           "kind": "function",
-          "line": 381,
-          "end_line": 398,
+          "line": 408,
+          "end_line": 425,
           "signature": "def cmd_init(args)",
           "summary": ""
         },
         {
           "name": "cmd_trust",
           "kind": "function",
-          "line": 401,
-          "end_line": 404,
+          "line": 428,
+          "end_line": 431,
           "signature": "def cmd_trust(args)",
           "summary": ""
         },
         {
           "name": "cmd_tree",
           "kind": "function",
-          "line": 407,
-          "end_line": 438,
+          "line": 434,
+          "end_line": 465,
           "signature": "def cmd_tree(args)",
           "summary": ""
         },
         {
           "name": "cmd_ask",
           "kind": "function",
-          "line": 441,
-          "end_line": 529,
+          "line": 468,
+          "end_line": 556,
           "signature": "def cmd_ask(args)",
           "summary": ""
         },
         {
           "name": "cmd_task",
           "kind": "function",
-          "line": 532,
-          "end_line": 671,
+          "line": 559,
+          "end_line": 698,
           "signature": "def cmd_task(args)",
           "summary": ""
         },
         {
           "name": "_print_task",
           "kind": "function",
-          "line": 674,
-          "end_line": 707,
+          "line": 701,
+          "end_line": 734,
           "signature": "def _print_task(task, verbose: bool=False)",
           "summary": ""
         },
         {
           "name": "cmd_undo",
           "kind": "function",
-          "line": 710,
-          "end_line": 719,
+          "line": 737,
+          "end_line": 746,
           "signature": "def cmd_undo(args)",
           "summary": ""
         },
         {
           "name": "cmd_doctor",
           "kind": "function",
-          "line": 722,
-          "end_line": 767,
+          "line": 749,
+          "end_line": 794,
           "signature": "def cmd_doctor(args)",
           "summary": ""
         },
         {
           "name": "cmd_config",
           "kind": "function",
-          "line": 770,
-          "end_line": 795,
+          "line": 797,
+          "end_line": 822,
           "signature": "def cmd_config(args)",
           "summary": ""
         },
         {
           "name": "cmd_policy",
           "kind": "function",
-          "line": 798,
-          "end_line": 815,
+          "line": 825,
+          "end_line": 842,
           "signature": "def cmd_policy(args)",
           "summary": ""
         },
         {
           "name": "cmd_up",
           "kind": "function",
-          "line": 818,
-          "end_line": 830,
+          "line": 845,
+          "end_line": 857,
           "signature": "def cmd_up(args)",
           "summary": ""
         },
         {
           "name": "cmd_status",
           "kind": "function",
-          "line": 833,
-          "end_line": 840,
+          "line": 860,
+          "end_line": 867,
           "signature": "def cmd_status(args)",
           "summary": ""
         },
         {
           "name": "cmd_runs",
           "kind": "function",
-          "line": 843,
-          "end_line": 858,
+          "line": 870,
+          "end_line": 885,
           "signature": "def cmd_runs(args)",
           "summary": ""
         },
         {
           "name": "cmd_kaggle",
           "kind": "function",
-          "line": 861,
-          "end_line": 890,
+          "line": 888,
+          "end_line": 917,
           "signature": "def cmd_kaggle(args)",
           "summary": ""
         },
         {
           "name": "cmd_benchmark",
           "kind": "function",
-          "line": 897,
-          "end_line": 950,
+          "line": 924,
+          "end_line": 977,
           "signature": "def cmd_benchmark(args)",
           "summary": ""
         },
         {
           "name": "cmd_session",
           "kind": "function",
-          "line": 953,
-          "end_line": 993,
+          "line": 980,
+          "end_line": 1020,
           "signature": "def cmd_session(args)",
           "summary": ""
         },
         {
           "name": "cmd_memory",
           "kind": "function",
-          "line": 996,
-          "end_line": 1011,
+          "line": 1023,
+          "end_line": 1038,
           "signature": "def cmd_memory(args)",
           "summary": ""
         },
         {
           "name": "cmd_rewind",
           "kind": "function",
-          "line": 1014,
-          "end_line": 1027,
+          "line": 1041,
+          "end_line": 1054,
           "signature": "def cmd_rewind(args)",
+          "summary": ""
+        },
+        {
+          "name": "cmd_job",
+          "kind": "function",
+          "line": 1057,
+          "end_line": 1078,
+          "signature": "def cmd_job(args)",
+          "summary": ""
+        },
+        {
+          "name": "cmd_worker",
+          "kind": "function",
+          "line": 1081,
+          "end_line": 1092,
+          "signature": "def cmd_worker(args)",
           "summary": ""
         },
         {
           "name": "main",
           "kind": "function",
-          "line": 1035,
-          "end_line": 1043,
+          "line": 1100,
+          "end_line": 1108,
           "signature": "def main(argv: list[str] | None=None)",
           "summary": ""
         }
@@ -5921,9 +6040,9 @@
     },
     {
       "path": "src/atomic_flow/config.py",
-      "sha256": "950daf2fdf16505ceab82be332bf3f5aafcbdf714d2a0645ef19148c4ff0b4b0",
-      "bytes": 13430,
-      "lines": 290,
+      "sha256": "567b4981f68171052992002b21e45bacdc7917c963f57be1825e702f10fe67e7",
+      "bytes": 13551,
+      "lines": 292,
       "summary": "Layered user and project configuration (with a trust gate for project-level files).",
       "imports": [
         "__future__",
@@ -6007,129 +6126,312 @@
           "name": "TaskConfig",
           "kind": "class",
           "line": 91,
-          "end_line": 98,
+          "end_line": 99,
           "signature": "class TaskConfig",
           "summary": ""
         },
         {
           "name": "ExecutionConfig",
           "kind": "class",
-          "line": 101,
-          "end_line": 105,
+          "line": 102,
+          "end_line": 107,
           "signature": "class ExecutionConfig",
           "summary": ""
         },
         {
           "name": "ConversationConfig",
           "kind": "class",
-          "line": 108,
-          "end_line": 113,
+          "line": 110,
+          "end_line": 115,
           "signature": "class ConversationConfig",
           "summary": ""
         },
         {
           "name": "ExperimentalConfig",
           "kind": "class",
-          "line": 116,
-          "end_line": 119,
+          "line": 118,
+          "end_line": 121,
           "signature": "class ExperimentalConfig",
           "summary": ""
         },
         {
           "name": "AtomicConfig",
           "kind": "class",
-          "line": 122,
-          "end_line": 139,
+          "line": 124,
+          "end_line": 141,
           "signature": "class AtomicConfig",
           "summary": ""
         },
         {
           "name": "_read_yaml",
           "kind": "function",
-          "line": 142,
-          "end_line": 151,
+          "line": 144,
+          "end_line": 153,
           "signature": "def _read_yaml(path: Path)",
           "summary": ""
         },
         {
           "name": "_deep_update",
           "kind": "function",
-          "line": 154,
-          "end_line": 159,
+          "line": 156,
+          "end_line": 161,
           "signature": "def _deep_update(target: dict[str, Any], updates: dict[str, Any])",
           "summary": ""
         },
         {
           "name": "_trust_file",
           "kind": "function",
-          "line": 164,
-          "end_line": 165,
+          "line": 166,
+          "end_line": 167,
           "signature": "def _trust_file()",
           "summary": ""
         },
         {
           "name": "is_trusted",
           "kind": "function",
-          "line": 168,
-          "end_line": 173,
+          "line": 170,
+          "end_line": 175,
           "signature": "def is_trusted(project: str | Path)",
           "summary": ""
         },
         {
           "name": "trust_project",
           "kind": "function",
-          "line": 176,
-          "end_line": 181,
+          "line": 178,
+          "end_line": 183,
           "signature": "def trust_project(project: str | Path)",
           "summary": ""
         },
         {
           "name": "load_config",
           "kind": "function",
-          "line": 184,
-          "end_line": 186,
+          "line": 186,
+          "end_line": 188,
           "signature": "def load_config(project: str | Path | None=None)",
           "summary": "defaults < user config < project config (trust-gated) < environment."
         },
         {
           "name": "_resolve_config",
           "kind": "function",
-          "line": 189,
-          "end_line": 246,
+          "line": 191,
+          "end_line": 248,
           "signature": "def _resolve_config(project: str | Path | None=None)",
           "summary": ""
         },
         {
           "name": "_resolve_config.record",
           "kind": "function",
-          "line": 193,
-          "end_line": 199,
+          "line": 195,
+          "end_line": 201,
           "signature": "def record(values, source, prefix='')",
           "summary": ""
         },
         {
           "name": "explain_config",
           "kind": "function",
-          "line": 249,
-          "end_line": 259,
+          "line": 251,
+          "end_line": 261,
           "signature": "def explain_config(project: str | Path | None=None)",
           "summary": "Masked effective values and leaf origins from the same resolver as runtime."
         },
         {
           "name": "mask_secrets",
           "kind": "function",
-          "line": 262,
-          "end_line": 269,
+          "line": 264,
+          "end_line": 271,
           "signature": "def mask_secrets(value: Any)",
           "summary": "Recursively hide api keys (v0.1 only masked a key literally ending in `api_key`)."
         },
         {
           "name": "write_config",
           "kind": "function",
-          "line": 272,
-          "end_line": 290,
+          "line": 274,
+          "end_line": 292,
           "signature": "def write_config(path: Path, values: dict[str, Any], *, merge: bool=True, validate: bool=True)",
           "summary": "Validate BEFORE touching the file, write atomically, keep it private (it may hold an api_key)."
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/credentials.py",
+      "sha256": "2959d44866c948f1d7896892bea662357d622c9a417eaf8172c5e9ee50e261e3",
+      "bytes": 8195,
+      "lines": 195,
+      "summary": "Process-only credential grants for trusted host connector implementations.",
+      "imports": [
+        "__future__",
+        "collections.abc",
+        "dataclasses",
+        "json",
+        "math",
+        "os",
+        "pathlib",
+        "re",
+        "threading",
+        "time",
+        "typing",
+        "uuid"
+      ],
+      "symbols": [
+        {
+          "name": "CredentialDenied",
+          "kind": "class",
+          "line": 23,
+          "end_line": 24,
+          "signature": "class CredentialDenied",
+          "summary": "Grant is missing, revoked, expired or outside the requested scope."
+        },
+        {
+          "name": "CredentialUseError",
+          "kind": "class",
+          "line": 27,
+          "end_line": 28,
+          "signature": "class CredentialUseError",
+          "summary": "A resolver/connector failed; details are suppressed to protect its value."
+        },
+        {
+          "name": "_label",
+          "kind": "function",
+          "line": 31,
+          "end_line": 34,
+          "signature": "def _label(value: str)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialGrant",
+          "kind": "class",
+          "line": 38,
+          "end_line": 48,
+          "signature": "class CredentialGrant",
+          "summary": ""
+        },
+        {
+          "name": "CredentialGrant.metadata",
+          "kind": "function",
+          "line": 46,
+          "end_line": 48,
+          "signature": "def metadata(self)",
+          "summary": "Only non-secret routing and authority metadata; never a resolved value."
+        },
+        {
+          "name": "CredentialValue",
+          "kind": "class",
+          "line": 51,
+          "end_line": 71,
+          "signature": "class CredentialValue",
+          "summary": "Short-lived value view. Do not retain the revealed string in connector code."
+        },
+        {
+          "name": "CredentialValue.__init__",
+          "kind": "function",
+          "line": 56,
+          "end_line": 57,
+          "signature": "def __init__(self, value: str)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialValue.__repr__",
+          "kind": "function",
+          "line": 59,
+          "end_line": 60,
+          "signature": "def __repr__(self)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialValue.__reduce_ex__",
+          "kind": "function",
+          "line": 62,
+          "end_line": 63,
+          "signature": "def __reduce_ex__(self, protocol)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialValue.reveal",
+          "kind": "function",
+          "line": 65,
+          "end_line": 68,
+          "signature": "def reveal(self)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialValue._close",
+          "kind": "function",
+          "line": 70,
+          "end_line": 71,
+          "signature": "def _close(self)",
+          "summary": ""
+        },
+        {
+          "name": "_checked_result",
+          "kind": "function",
+          "line": 74,
+          "end_line": 112,
+          "signature": "def _checked_result(result: Any, secret: str)",
+          "summary": "Return plain bounded JSON data, refusing accidentally returned raw secrets."
+        },
+        {
+          "name": "_checked_result.visit",
+          "kind": "function",
+          "line": 78,
+          "end_line": 102,
+          "signature": "def visit(value, depth=0)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialBroker",
+          "kind": "class",
+          "line": 115,
+          "end_line": 195,
+          "signature": "class CredentialBroker",
+          "summary": "Volatile host grants; process restart revokes all authority by construction."
+        },
+        {
+          "name": "CredentialBroker.__init__",
+          "kind": "function",
+          "line": 124,
+          "end_line": 130,
+          "signature": "def __init__(self, *, resolver: Callable[[str], str | None] | None=None, clock: Callable[[], float]=time.time)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialBroker.__reduce_ex__",
+          "kind": "function",
+          "line": 132,
+          "end_line": 133,
+          "signature": "def __reduce_ex__(self, protocol)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialBroker.grant",
+          "kind": "function",
+          "line": 135,
+          "end_line": 160,
+          "signature": "def grant(self, *, project: str | Path, connector: str, operations: Iterable[str], env_name: str, approved: bool=False, ttl_seconds: float=300)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialBroker.revoke",
+          "kind": "function",
+          "line": 162,
+          "end_line": 166,
+          "signature": "def revoke(self, grant_id: str)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialBroker._scope",
+          "kind": "function",
+          "line": 168,
+          "end_line": 174,
+          "signature": "def _scope(self, grant_id: str, project: str, connector: str, operation: str)",
+          "summary": ""
+        },
+        {
+          "name": "CredentialBroker.use",
+          "kind": "function",
+          "line": 176,
+          "end_line": 195,
+          "signature": "def use(self, grant_id: str, *, project: str | Path, connector: str, operation: str, consumer: Callable[[CredentialValue], Any])",
+          "summary": ""
         }
       ]
     },
@@ -6388,6 +6690,263 @@
           "line": 108,
           "end_line": 130,
           "signature": "def calibrate(repository: Path, manifest: Path, *, execution: ExecutionConfig | None=None)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/job_worker.py",
+      "sha256": "aabd194a20c13c467f0cb9abe0ba49fe75fba80a48022e423593fe2b02e331ff",
+      "bytes": 6035,
+      "lines": 124,
+      "summary": "Trusted detached job worker entry point; never loaded from a project cwd.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.execution",
+        "atomic_flow.config",
+        "atomic_flow.jobs",
+        "atomic_flow.locking",
+        "os",
+        "pathlib",
+        "shutil",
+        "sys",
+        "threading",
+        "time"
+      ],
+      "symbols": [
+        {
+          "name": "run_worker",
+          "kind": "function",
+          "line": 17,
+          "end_line": 109,
+          "signature": "def run_worker(store: JobStore, job_id: str)",
+          "summary": ""
+        },
+        {
+          "name": "run_worker.output",
+          "kind": "function",
+          "line": 37,
+          "end_line": 47,
+          "signature": "def output(stream, chunk)",
+          "summary": ""
+        },
+        {
+          "name": "run_worker.check",
+          "kind": "function",
+          "line": 49,
+          "end_line": 60,
+          "signature": "def check()",
+          "summary": ""
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 112,
+          "end_line": 120,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/jobs.py",
+      "sha256": "42f2b7f180c66a8ac015194201b40b7723a1243f9e04c7b6a0faf7ec9d961f95",
+      "bytes": 23650,
+      "lines": 413,
+      "summary": "Host-owned durable Python jobs. Source snapshots are staging, not a sandbox.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.execution",
+        "atomic_flow.agents.source",
+        "atomic_flow.agents.tools.file_paths",
+        "atomic_flow.config",
+        "atomic_flow.locking",
+        "atomic_flow.tree.defaults",
+        "base64",
+        "fnmatch",
+        "hashlib",
+        "hmac",
+        "io",
+        "json",
+        "math",
+        "os",
+        "pathlib",
+        "re",
+        "shutil",
+        "stat",
+        "subprocess",
+        "sys",
+        "time",
+        "types",
+        "uuid"
+      ],
+      "symbols": [
+        {
+          "name": "JobError",
+          "kind": "class",
+          "line": 37,
+          "end_line": 38,
+          "signature": "class JobError",
+          "summary": "Invalid job, unavailable output, or a failed ownership/integrity gate."
+        },
+        {
+          "name": "_safe",
+          "kind": "function",
+          "line": 41,
+          "end_line": 46,
+          "signature": "def _safe(path: Path, *, regular=False)",
+          "summary": ""
+        },
+        {
+          "name": "_json",
+          "kind": "function",
+          "line": 49,
+          "end_line": 50,
+          "signature": "def _json(value)",
+          "summary": ""
+        },
+        {
+          "name": "_snapshot_hashes",
+          "kind": "function",
+          "line": 53,
+          "end_line": 75,
+          "signature": "def _snapshot_hashes(root: Path, excluded: Path | None=None, *, private_workspace: bool | None=None)",
+          "summary": ""
+        },
+        {
+          "name": "_atomic",
+          "kind": "function",
+          "line": 78,
+          "end_line": 93,
+          "signature": "def _atomic(path: Path, value)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore",
+          "kind": "class",
+          "line": 96,
+          "end_line": 403,
+          "signature": "class JobStore",
+          "summary": "Project-scoped host API; no credentials or model budgets are accepted."
+        },
+        {
+          "name": "JobStore.__init__",
+          "kind": "function",
+          "line": 104,
+          "end_line": 124,
+          "signature": "def __init__(self, project: Path, root: Path | None=None, *, private_workspace: bool=False)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore._directory",
+          "kind": "function",
+          "line": 126,
+          "end_line": 135,
+          "signature": "def _directory(self, job_id)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore._read",
+          "kind": "function",
+          "line": 137,
+          "end_line": 181,
+          "signature": "def _read(self, job_id)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore._lease",
+          "kind": "function",
+          "line": 183,
+          "end_line": 187,
+          "signature": "def _lease(self, job_id)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore._public",
+          "kind": "function",
+          "line": 189,
+          "end_line": 190,
+          "signature": "def _public(self, state)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore._active_count",
+          "kind": "function",
+          "line": 192,
+          "end_line": 229,
+          "signature": "def _active_count(self)",
+          "summary": "Only known metadata depths, never source/workspace recursive globbing."
+        },
+        {
+          "name": "JobStore.start",
+          "kind": "function",
+          "line": 231,
+          "end_line": 302,
+          "signature": "def start(self, args: list[str], *, config: ExecutionConfig | None=None, timeout: float=120, output_bytes: int=1048576, retention_seconds: float=604800)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore.status",
+          "kind": "function",
+          "line": 304,
+          "end_line": 313,
+          "signature": "def status(self, job_id: str)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore.list",
+          "kind": "function",
+          "line": 315,
+          "end_line": 317,
+          "signature": "def list(self)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore.cancel",
+          "kind": "function",
+          "line": 319,
+          "end_line": 324,
+          "signature": "def cancel(self, job_id: str)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore.output",
+          "kind": "function",
+          "line": 326,
+          "end_line": 364,
+          "signature": "def output(self, job_id: str, *, stream: str='stdout', cursor: str | None=None, limit: int=16384)",
+          "summary": ""
+        },
+        {
+          "name": "JobStore.reconcile",
+          "kind": "function",
+          "line": 366,
+          "end_line": 403,
+          "signature": "def reconcile(self, job_id: str | None=None)",
+          "summary": ""
+        },
+        {
+          "name": "_Empty",
+          "kind": "class",
+          "line": 406,
+          "end_line": 413,
+          "signature": "class _Empty",
+          "summary": ""
+        },
+        {
+          "name": "_Empty.__enter__",
+          "kind": "function",
+          "line": 407,
+          "end_line": 410,
+          "signature": "def __enter__(self)",
+          "summary": ""
+        },
+        {
+          "name": "_Empty.__exit__",
+          "kind": "function",
+          "line": 412,
+          "end_line": 413,
+          "signature": "def __exit__(self, *_)",
           "summary": ""
         }
       ]
@@ -7619,6 +8178,412 @@
       ]
     },
     {
+      "path": "src/atomic_flow/remote.py",
+      "sha256": "09d0ba256da00e43a27a4bd177b77e01b2a3590b175fcfff2ae3dabe24897648",
+      "bytes": 24391,
+      "lines": 484,
+      "summary": "Versioned, hash-bound Docker worker protocol; workers are trusted hosts.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.execution",
+        "atomic_flow.agents.source",
+        "atomic_flow.agents.tools.file_paths",
+        "atomic_flow.config",
+        "atomic_flow.jobs",
+        "atomic_flow.locking",
+        "atomic_flow.tree.defaults",
+        "base64",
+        "dataclasses",
+        "fnmatch",
+        "hashlib",
+        "hmac",
+        "http.server",
+        "json",
+        "os",
+        "pathlib",
+        "pydantic",
+        "re",
+        "shutil",
+        "subprocess",
+        "sys",
+        "types",
+        "typing",
+        "urllib",
+        "urllib.parse",
+        "uuid"
+      ],
+      "symbols": [
+        {
+          "name": "canonical",
+          "kind": "function",
+          "line": 39,
+          "end_line": 40,
+          "signature": "def canonical(value)",
+          "summary": ""
+        },
+        {
+          "name": "sha256",
+          "kind": "function",
+          "line": 43,
+          "end_line": 44,
+          "signature": "def sha256(data: bytes)",
+          "summary": ""
+        },
+        {
+          "name": "_hash",
+          "kind": "function",
+          "line": 47,
+          "end_line": 50,
+          "signature": "def _hash(value: str)",
+          "summary": ""
+        },
+        {
+          "name": "_image",
+          "kind": "function",
+          "line": 53,
+          "end_line": 56,
+          "signature": "def _image(value: str)",
+          "summary": ""
+        },
+        {
+          "name": "_source_path",
+          "kind": "function",
+          "line": 59,
+          "end_line": 71,
+          "signature": "def _source_path(rel: str)",
+          "summary": ""
+        },
+        {
+          "name": "BundleFile",
+          "kind": "class",
+          "line": 74,
+          "end_line": 78,
+          "signature": "class BundleFile",
+          "summary": ""
+        },
+        {
+          "name": "SourceBundle",
+          "kind": "class",
+          "line": 81,
+          "end_line": 126,
+          "signature": "class SourceBundle",
+          "summary": ""
+        },
+        {
+          "name": "SourceBundle.checked_files",
+          "kind": "function",
+          "line": 93,
+          "end_line": 118,
+          "signature": "def checked_files(self)",
+          "summary": ""
+        },
+        {
+          "name": "SourceBundle.digest",
+          "kind": "function",
+          "line": 121,
+          "end_line": 122,
+          "signature": "def digest(self)",
+          "summary": ""
+        },
+        {
+          "name": "SourceBundle.source_hash",
+          "kind": "function",
+          "line": 125,
+          "end_line": 126,
+          "signature": "def source_hash(self)",
+          "summary": ""
+        },
+        {
+          "name": "build_bundle",
+          "kind": "function",
+          "line": 129,
+          "end_line": 146,
+          "signature": "def build_bundle(project: Path, paths: list[str], args: list[str], *, image: str, profile='checks', timeout=120, output_bytes=1048576)",
+          "summary": "Explicit source selection only. Never collect credentials or application state."
+        },
+        {
+          "name": "WorkerTransport",
+          "kind": "class",
+          "line": 149,
+          "end_line": 150,
+          "signature": "class WorkerTransport",
+          "summary": ""
+        },
+        {
+          "name": "WorkerTransport.call",
+          "kind": "function",
+          "line": 150,
+          "end_line": 150,
+          "signature": "def call(self, action: str, payload: dict)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteOutcomeUnknown",
+          "kind": "class",
+          "line": 153,
+          "end_line": 154,
+          "signature": "class RemoteOutcomeUnknown",
+          "summary": "A request may have reached the worker. Reconcile by request ID; never replay."
+        },
+        {
+          "name": "HTTPWorkerTransport",
+          "kind": "class",
+          "line": 158,
+          "end_line": 206,
+          "signature": "class HTTPWorkerTransport",
+          "summary": ""
+        },
+        {
+          "name": "HTTPWorkerTransport.__post_init__",
+          "kind": "function",
+          "line": 164,
+          "end_line": 174,
+          "signature": "def __post_init__(self)",
+          "summary": ""
+        },
+        {
+          "name": "HTTPWorkerTransport.call",
+          "kind": "function",
+          "line": 176,
+          "end_line": 206,
+          "signature": "def call(self, action: str, payload: dict)",
+          "summary": ""
+        },
+        {
+          "name": "HTTPWorkerTransport.call.NoRedirect",
+          "kind": "class",
+          "line": 185,
+          "end_line": 187,
+          "signature": "class NoRedirect",
+          "summary": ""
+        },
+        {
+          "name": "HTTPWorkerTransport.call.NoRedirect.redirect_request",
+          "kind": "function",
+          "line": 186,
+          "end_line": 187,
+          "signature": "def redirect_request(self, *args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "ScopedWorkerTransport",
+          "kind": "class",
+          "line": 210,
+          "end_line": 231,
+          "signature": "class ScopedWorkerTransport",
+          "summary": "Resolve a process credential only after each broker operation gate."
+        },
+        {
+          "name": "ScopedWorkerTransport.call",
+          "kind": "function",
+          "line": 218,
+          "end_line": 231,
+          "signature": "def call(self, action: str, payload: dict)",
+          "summary": ""
+        },
+        {
+          "name": "ScopedWorkerTransport.call.perform",
+          "kind": "function",
+          "line": 219,
+          "end_line": 225,
+          "signature": "def perform(value)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteExecutor",
+          "kind": "class",
+          "line": 234,
+          "end_line": 297,
+          "signature": "class RemoteExecutor",
+          "summary": "Transport is swappable; a receipt binds every observation to one request."
+        },
+        {
+          "name": "RemoteExecutor.__init__",
+          "kind": "function",
+          "line": 236,
+          "end_line": 237,
+          "signature": "def __init__(self, transport: WorkerTransport)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteExecutor._check_receipt",
+          "kind": "function",
+          "line": 240,
+          "end_line": 249,
+          "signature": "def _check_receipt(receipt)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteExecutor.submit",
+          "kind": "function",
+          "line": 251,
+          "end_line": 261,
+          "signature": "def submit(self, bundle: SourceBundle)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteExecutor.reconcile",
+          "kind": "function",
+          "line": 263,
+          "end_line": 271,
+          "signature": "def reconcile(self, bundle: SourceBundle)",
+          "summary": "Read the request journal after an uncertain submit, without execution."
+        },
+        {
+          "name": "RemoteExecutor._observe",
+          "kind": "function",
+          "line": 273,
+          "end_line": 288,
+          "signature": "def _observe(self, action: str, receipt: dict, **options)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteExecutor.status",
+          "kind": "function",
+          "line": 290,
+          "end_line": 291,
+          "signature": "def status(self, receipt: dict)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteExecutor.cancel",
+          "kind": "function",
+          "line": 293,
+          "end_line": 294,
+          "signature": "def cancel(self, receipt: dict)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteExecutor.output",
+          "kind": "function",
+          "line": 296,
+          "end_line": 297,
+          "signature": "def output(self, receipt: dict, *, stream='stdout', cursor=None, limit=16384)",
+          "summary": ""
+        },
+        {
+          "name": "_verify_host",
+          "kind": "function",
+          "line": 300,
+          "end_line": 307,
+          "signature": "def _verify_host(image: str)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteWorker",
+          "kind": "class",
+          "line": 310,
+          "end_line": 412,
+          "signature": "class RemoteWorker",
+          "summary": "Single-owner trusted worker, with journaled request deduplication."
+        },
+        {
+          "name": "RemoteWorker.__init__",
+          "kind": "function",
+          "line": 316,
+          "end_line": 325,
+          "signature": "def __init__(self, root: Path, *, image: str, max_requests=32)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteWorker._record",
+          "kind": "function",
+          "line": 327,
+          "end_line": 330,
+          "signature": "def _record(self, request_id)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteWorker._save",
+          "kind": "function",
+          "line": 333,
+          "end_line": 339,
+          "signature": "def _save(path, value)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteWorker._store",
+          "kind": "function",
+          "line": 341,
+          "end_line": 345,
+          "signature": "def _store(self, receipt)",
+          "summary": ""
+        },
+        {
+          "name": "RemoteWorker.call",
+          "kind": "function",
+          "line": 347,
+          "end_line": 412,
+          "signature": "def call(self, action: str, payload: dict)",
+          "summary": ""
+        },
+        {
+          "name": "worker_server",
+          "kind": "function",
+          "line": 415,
+          "end_line": 484,
+          "signature": "def worker_server(worker: RemoteWorker, token: str, *, host='127.0.0.1', port=0)",
+          "summary": "Loopback server for a TLS reverse proxy; never directly expose plain HTTP."
+        },
+        {
+          "name": "worker_server.BoundedServer",
+          "kind": "class",
+          "line": 422,
+          "end_line": 445,
+          "signature": "class BoundedServer",
+          "summary": ""
+        },
+        {
+          "name": "worker_server.BoundedServer.get_request",
+          "kind": "function",
+          "line": 423,
+          "end_line": 426,
+          "signature": "def get_request(self)",
+          "summary": ""
+        },
+        {
+          "name": "worker_server.BoundedServer.process_request",
+          "kind": "function",
+          "line": 428,
+          "end_line": 439,
+          "signature": "def process_request(self, connection, address)",
+          "summary": ""
+        },
+        {
+          "name": "worker_server.BoundedServer.process_request_thread",
+          "kind": "function",
+          "line": 441,
+          "end_line": 445,
+          "signature": "def process_request_thread(self, connection, address)",
+          "summary": ""
+        },
+        {
+          "name": "worker_server.Handler",
+          "kind": "class",
+          "line": 447,
+          "end_line": 480,
+          "signature": "class Handler",
+          "summary": ""
+        },
+        {
+          "name": "worker_server.Handler.log_message",
+          "kind": "function",
+          "line": 448,
+          "end_line": 449,
+          "signature": "def log_message(self, *args)",
+          "summary": ""
+        },
+        {
+          "name": "worker_server.Handler.do_POST",
+          "kind": "function",
+          "line": 451,
+          "end_line": 480,
+          "signature": "def do_POST(self)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/rewind.py",
       "sha256": "9bcd26a6d09620db4f6fa3c5618da3cde599a0acc47531f443fe8725f2110af3",
       "bytes": 14288,
@@ -7892,9 +8857,9 @@
     },
     {
       "path": "src/atomic_flow/sdk.py",
-      "sha256": "6766e874cfe29e5c6e58dee13ef4c51b67d7ca168c534ba02618234a1d08a60a",
-      "bytes": 6209,
-      "lines": 145,
+      "sha256": "79ae1230052c3b799125ee6333d65088be3f9f8b7a02eeaf545a251cd4bfb8d0",
+      "bytes": 6776,
+      "lines": 157,
       "summary": "Small in-process SDK. No API dependencies or implicit network/model selection.",
       "imports": [
         "__future__",
@@ -7903,7 +8868,9 @@
         "atomic_flow.agents.task",
         "atomic_flow.agents.task_loop",
         "atomic_flow.config",
+        "atomic_flow.jobs",
         "atomic_flow.llm.orchestrator",
+        "atomic_flow.remote",
         "atomic_flow.runtime",
         "pathlib",
         "pydantic",
@@ -8031,6 +8998,22 @@
           "end_line": 145,
           "signature": "def revise_task(task_id: str, plan)",
           "summary": ""
+        },
+        {
+          "name": "jobs",
+          "kind": "function",
+          "line": 148,
+          "end_line": 151,
+          "signature": "def jobs(project: str | Path)",
+          "summary": "Offline project-bound durable job store, independent of live answer handles."
+        },
+        {
+          "name": "connect_worker",
+          "kind": "function",
+          "line": 154,
+          "end_line": 157,
+          "signature": "def connect_worker(project: str | Path, url: str, *, broker, grant_id: str, allow_loopback_http=False)",
+          "summary": "No network on construction; each operation resolves a scoped host grant."
         }
       ]
     },
@@ -9565,8 +10548,8 @@
     },
     {
       "path": "tests/test_container_integration.py",
-      "sha256": "eff3eabbc03cb45b9e364a5ef5e518f5d7aa3b8c3a13ef2f8816e5a2f6a85acc",
-      "bytes": 4068,
+      "sha256": "4e947ef6ac9569595a542b3d27d9ba9fb38773df759eff754feebbfe29f2ca61",
+      "bytes": 4088,
       "lines": 86,
       "summary": "Opt-in OS/container acceptance checks; never use a live model or API credentials.",
       "imports": [
@@ -9612,7 +10595,7 @@
           "kind": "function",
           "line": 66,
           "end_line": 68,
-          "signature": "def record(engine, image, workspace, name, args)",
+          "signature": "def record(engine, image, workspace, name, args, **kwargs)",
           "summary": ""
         },
         {
@@ -10392,10 +11375,124 @@
       ]
     },
     {
+      "path": "tests/test_execution_profiles.py",
+      "sha256": "3baa7fb0eccd057121da6a99f78ab481e81e6da5c9a62b36b8205071041717b2",
+      "bytes": 5347,
+      "lines": 119,
+      "summary": "",
+      "imports": [
+        "atomic_flow.agents.execution",
+        "atomic_flow.config",
+        "dataclasses",
+        "os",
+        "pydantic",
+        "pytest",
+        "subprocess"
+      ],
+      "symbols": [
+        {
+          "name": "test_failed_tree_helper_still_kills_owned_parent_and_preserves_uncertainty",
+          "kind": "function",
+          "line": 19,
+          "end_line": 35,
+          "signature": "def test_failed_tree_helper_still_kills_owned_parent_and_preserves_uncertainty(monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_failed_tree_helper_still_kills_owned_parent_and_preserves_uncertainty.Process",
+          "kind": "class",
+          "line": 21,
+          "end_line": 27,
+          "signature": "class Process",
+          "summary": ""
+        },
+        {
+          "name": "test_failed_tree_helper_still_kills_owned_parent_and_preserves_uncertainty.Process.poll",
+          "kind": "function",
+          "line": 24,
+          "end_line": 25,
+          "signature": "def poll(self)",
+          "summary": ""
+        },
+        {
+          "name": "test_failed_tree_helper_still_kills_owned_parent_and_preserves_uncertainty.Process.kill",
+          "kind": "function",
+          "line": 26,
+          "end_line": 27,
+          "signature": "def kill(self)",
+          "summary": ""
+        },
+        {
+          "name": "test_failed_tree_helper_still_kills_owned_parent_and_preserves_uncertainty.helper",
+          "kind": "function",
+          "line": 29,
+          "end_line": 31,
+          "signature": "def helper(command, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_fixed_profiles_and_mount_options",
+          "kind": "function",
+          "line": 38,
+          "end_line": 49,
+          "signature": "def test_fixed_profiles_and_mount_options(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_profile_selection_cannot_supply_bypass",
+          "kind": "function",
+          "line": 52,
+          "end_line": 65,
+          "signature": "def test_profile_selection_cannot_supply_bypass(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_bind_mount_option_injection_and_local_profile_fail_closed",
+          "kind": "function",
+          "line": 68,
+          "end_line": 75,
+          "signature": "def test_bind_mount_option_injection_and_local_profile_fail_closed(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_streaming_has_explicit_tail_truncation_and_full_callback",
+          "kind": "function",
+          "line": 78,
+          "end_line": 86,
+          "signature": "def test_streaming_has_explicit_tail_truncation_and_full_callback(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_collection_failure_stops_process_and_hides_exception",
+          "kind": "function",
+          "line": 89,
+          "end_line": 96,
+          "signature": "def test_collection_failure_stops_process_and_hides_exception(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_collection_failure_stops_process_and_hides_exception.failed_output",
+          "kind": "function",
+          "line": 90,
+          "end_line": 91,
+          "signature": "def failed_output(stream, chunk)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_read_only_workspace_profile",
+          "kind": "function",
+          "line": 100,
+          "end_line": 119,
+          "signature": "def test_real_read_only_workspace_profile(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_file_operations.py",
-      "sha256": "a872ae6074acb1bd4d210b796ef8a74811596da6e5ce5a003e01c75bfedbc4fe",
-      "bytes": 14889,
-      "lines": 297,
+      "sha256": "9860cd805278dddf247803935d66d31853f3d8090e495b0502388259628b3ebd",
+      "bytes": 15891,
+      "lines": 311,
       "summary": "Source search/lifecycle operations and journal publication acceptance tests.",
       "imports": [
         "__future__",
@@ -10419,200 +11516,208 @@
         {
           "name": "context",
           "kind": "function",
-          "line": 30,
-          "end_line": 36,
+          "line": 31,
+          "end_line": 37,
           "signature": "def context(tmp_path, *, edits=True)",
           "summary": ""
         },
         {
           "name": "test_literal_search_reports_current_line_hash_and_redacts",
           "kind": "function",
-          "line": 39,
-          "end_line": 56,
+          "line": 40,
+          "end_line": 57,
           "signature": "def test_literal_search_reports_current_line_hash_and_redacts(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_regex_search_works_and_rejects_bad_pattern",
           "kind": "function",
-          "line": 59,
-          "end_line": 64,
+          "line": 60,
+          "end_line": 65,
           "signature": "def test_regex_search_works_and_rejects_bad_pattern(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_regex_startup_budget_does_not_consume_evaluation_deadline",
+          "kind": "function",
+          "line": 68,
+          "end_line": 78,
+          "signature": "def test_regex_startup_budget_does_not_consume_evaluation_deadline(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_pathological_regex_is_terminated",
           "kind": "function",
-          "line": 67,
-          "end_line": 72,
+          "line": 81,
+          "end_line": 86,
           "signature": "def test_pathological_regex_is_terminated(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_search_skips_stale_source_and_honors_cancellation",
           "kind": "function",
-          "line": 75,
-          "end_line": 84,
+          "line": 89,
+          "end_line": 98,
           "signature": "def test_search_skips_stale_source_and_honors_cancellation(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_search_skips_stale_source_and_honors_cancellation.cancelled",
           "kind": "function",
-          "line": 80,
-          "end_line": 81,
+          "line": 94,
+          "end_line": 95,
           "signature": "def cancelled()",
           "summary": ""
         },
         {
           "name": "test_patch_is_unique_hash_bound_verified_and_undoable",
           "kind": "function",
-          "line": 87,
-          "end_line": 97,
+          "line": 101,
+          "end_line": 111,
           "signature": "def test_patch_is_unique_hash_bound_verified_and_undoable(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_stale_patch_and_disabled_mutations_leave_bytes_alone",
           "kind": "function",
-          "line": 100,
-          "end_line": 108,
+          "line": 114,
+          "end_line": 122,
           "signature": "def test_stale_patch_and_disabled_mutations_leave_bytes_alone(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_syntax_failure_rolls_back_patch_and_creation",
           "kind": "function",
-          "line": 111,
-          "end_line": 118,
+          "line": 125,
+          "end_line": 132,
           "signature": "def test_syntax_failure_rolls_back_patch_and_creation(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_create_delete_move_and_undo_preserve_actual_file_states",
           "kind": "function",
-          "line": 121,
-          "end_line": 139,
+          "line": 135,
+          "end_line": 153,
           "signature": "def test_create_delete_move_and_undo_preserve_actual_file_states(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_private_ignored_or_non_source_paths_are_rejected",
           "kind": "function",
-          "line": 143,
-          "end_line": 146,
+          "line": 157,
+          "end_line": 160,
           "signature": "def test_private_ignored_or_non_source_paths_are_rejected(tmp_path, path)",
           "summary": ""
         },
         {
           "name": "test_gitignore_and_symlink_paths_cannot_be_created",
           "kind": "function",
-          "line": 149,
-          "end_line": 162,
+          "line": 163,
+          "end_line": 176,
           "signature": "def test_gitignore_and_symlink_paths_cannot_be_created(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_verifier_concurrent_change_is_preserved",
           "kind": "function",
-          "line": 165,
-          "end_line": 174,
+          "line": 179,
+          "end_line": 188,
           "signature": "def test_verifier_concurrent_change_is_preserved(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_verifier_concurrent_change_is_preserved.change_during_verify",
           "kind": "function",
-          "line": 168,
-          "end_line": 170,
+          "line": 182,
+          "end_line": 184,
           "signature": "def change_during_verify(root, path, **kwargs)",
           "summary": ""
         },
         {
           "name": "test_old_module_matching_tests_fail_and_roll_back_move",
           "kind": "function",
-          "line": 177,
-          "end_line": 195,
+          "line": 191,
+          "end_line": 209,
           "signature": "def test_old_module_matching_tests_fail_and_roll_back_move(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_old_module_matching_tests_fail_and_roll_back_move.failed_tests",
           "kind": "function",
-          "line": 188,
-          "end_line": 190,
+          "line": 202,
+          "end_line": 204,
           "signature": "def failed_tests(arguments, root, **kwargs)",
           "summary": ""
         },
         {
           "name": "test_cancel_during_multi_path_move_restores_source",
           "kind": "function",
-          "line": 198,
-          "end_line": 209,
+          "line": 212,
+          "end_line": 223,
           "signature": "def test_cancel_during_multi_path_move_restores_source(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_cancel_during_multi_path_move_restores_source.cancel_second_write",
           "kind": "function",
-          "line": 201,
-          "end_line": 205,
+          "line": 215,
+          "end_line": 219,
           "signature": "def cancel_second_write()",
           "summary": ""
         },
         {
           "name": "test_move_recovery_preserves_modes_and_conflicting_destination",
           "kind": "function",
-          "line": 212,
-          "end_line": 223,
+          "line": 226,
+          "end_line": 237,
           "signature": "def test_move_recovery_preserves_modes_and_conflicting_destination(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_changeset_publishes_create_delete_move_and_checkpoint_restores",
           "kind": "function",
-          "line": 226,
-          "end_line": 240,
+          "line": 240,
+          "end_line": 254,
           "signature": "def test_changeset_publishes_create_delete_move_and_checkpoint_restores(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_changeset_explicit_deletion_proof_and_interrupted_create_recovery",
           "kind": "function",
-          "line": 243,
-          "end_line": 262,
+          "line": 257,
+          "end_line": 276,
           "signature": "def test_changeset_explicit_deletion_proof_and_interrupted_create_recovery(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_changeset_explicit_deletion_proof_and_interrupted_create_recovery.interrupted",
           "kind": "function",
-          "line": 253,
-          "end_line": 256,
+          "line": 267,
+          "end_line": 270,
           "signature": "def interrupted(rel, data)",
           "summary": ""
         },
         {
           "name": "test_deleted_executable_undo_preserves_mode",
           "kind": "function",
-          "line": 266,
-          "end_line": 272,
+          "line": 280,
+          "end_line": 286,
           "signature": "def test_deleted_executable_undo_preserves_mode(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_changeset_move_publish_and_deleted_recovery_keep_modes",
           "kind": "function",
-          "line": 276,
-          "end_line": 297,
+          "line": 290,
+          "end_line": 311,
           "signature": "def test_changeset_move_publish_and_deleted_recovery_keep_modes(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_changeset_move_publish_and_deleted_recovery_keep_modes.failed_finalize",
           "kind": "function",
-          "line": 291,
-          "end_line": 293,
+          "line": 305,
+          "end_line": 307,
           "signature": "def failed_finalize()",
           "summary": ""
         }
@@ -10990,6 +12095,235 @@
           "line": 124,
           "end_line": 133,
           "signature": "def test_instruction_symlink_is_never_followed(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_job_cli.py",
+      "sha256": "12d37a4d00ad7b8bef4a6cafba575cf36efb4689bb06d73a011089ad34595851",
+      "bytes": 1307,
+      "lines": 28,
+      "summary": "",
+      "imports": [
+        "atomic_flow.cli",
+        "atomic_flow.sdk",
+        "json",
+        "time"
+      ],
+      "symbols": [
+        {
+          "name": "test_cli_and_sdk_share_durable_job_without_model_backend",
+          "kind": "function",
+          "line": 8,
+          "end_line": 28,
+          "signature": "def test_cli_and_sdk_share_durable_job_without_model_backend(tmp_path, monkeypatch, capsys)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_jobs.py",
+      "sha256": "93fec5df3dd96f05021c4e6294e2d21a1de393ef29312c19373e990d9519b6e5",
+      "bytes": 14162,
+      "lines": 315,
+      "summary": "",
+      "imports": [
+        "atomic_flow.agents.execution",
+        "atomic_flow.config",
+        "atomic_flow.job_worker",
+        "atomic_flow.jobs",
+        "atomic_flow.locking",
+        "base64",
+        "os",
+        "pytest",
+        "subprocess",
+        "time",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "store",
+          "kind": "function",
+          "line": 14,
+          "end_line": 19,
+          "signature": "def store(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "wait",
+          "kind": "function",
+          "line": 22,
+          "end_line": 29,
+          "signature": "def wait(store, identifier, timeout=60)",
+          "summary": ""
+        },
+        {
+          "name": "test_detached_job_snapshot_pages_and_clean_environment",
+          "kind": "function",
+          "line": 32,
+          "end_line": 61,
+          "signature": "def test_detached_job_snapshot_pages_and_clean_environment(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_live_output_then_cancel_is_durable",
+          "kind": "function",
+          "line": 64,
+          "end_line": 80,
+          "signature": "def test_live_output_then_cancel_is_durable(store)",
+          "summary": ""
+        },
+        {
+          "name": "test_timeout_and_output_cap_are_explicit",
+          "kind": "function",
+          "line": 83,
+          "end_line": 91,
+          "signature": "def test_timeout_and_output_cap_are_explicit(store)",
+          "summary": ""
+        },
+        {
+          "name": "test_project_cursor_isolation_and_retention",
+          "kind": "function",
+          "line": 94,
+          "end_line": 111,
+          "signature": "def test_project_cursor_isolation_and_retention(store, tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "queued",
+          "kind": "function",
+          "line": 114,
+          "end_line": 116,
+          "signature": "def queued(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_snapshot_tamper_fails_closed_and_terminal_never_replays",
+          "kind": "function",
+          "line": 119,
+          "end_line": 128,
+          "signature": "def test_snapshot_tamper_fails_closed_and_terminal_never_replays(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_lost_lease_reconcile_does_not_kill_reused_pid_or_replay",
+          "kind": "function",
+          "line": 131,
+          "end_line": 144,
+          "signature": "def test_lost_lease_reconcile_does_not_kill_reused_pid_or_replay(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_queued_startup_grace_and_metadata_tampering",
+          "kind": "function",
+          "line": 147,
+          "end_line": 158,
+          "signature": "def test_queued_startup_grace_and_metadata_tampering(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_storage_and_identifier_guards",
+          "kind": "function",
+          "line": 161,
+          "end_line": 169,
+          "signature": "def test_storage_and_identifier_guards(store)",
+          "summary": ""
+        },
+        {
+          "name": "test_docker_is_default_and_missing_engine_never_falls_back",
+          "kind": "function",
+          "line": 172,
+          "end_line": 180,
+          "signature": "def test_docker_is_default_and_missing_engine_never_falls_back(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_output_exact_bytes_survive_split_utf8",
+          "kind": "function",
+          "line": 183,
+          "end_line": 193,
+          "signature": "def test_output_exact_bytes_survive_split_utf8(store)",
+          "summary": ""
+        },
+        {
+          "name": "test_global_active_admission_covers_projects_and_worker_roots",
+          "kind": "function",
+          "line": 196,
+          "end_line": 205,
+          "signature": "def test_global_active_admission_covers_projects_and_worker_roots(store, tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_snapshot_preparation_failure_has_terminal_journal",
+          "kind": "function",
+          "line": 208,
+          "end_line": 212,
+          "signature": "def test_snapshot_preparation_failure_has_terminal_journal(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_cleanup_failure_after_execution_attempt_keeps_uncertainty",
+          "kind": "function",
+          "line": 215,
+          "end_line": 225,
+          "signature": "def test_cleanup_failure_after_execution_attempt_keeps_uncertainty(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_cleanup_failure_after_execution_attempt_keeps_uncertainty.failed_execution",
+          "kind": "function",
+          "line": 218,
+          "end_line": 219,
+          "signature": "def failed_execution(*args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_reconciliation_uses_immutable_container_id_never_reused_name",
+          "kind": "function",
+          "line": 228,
+          "end_line": 249,
+          "signature": "def test_reconciliation_uses_immutable_container_id_never_reused_name(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_reconciliation_uses_immutable_container_id_never_reused_name.Result",
+          "kind": "class",
+          "line": 237,
+          "end_line": 238,
+          "signature": "class Result",
+          "summary": ""
+        },
+        {
+          "name": "test_private_application_source_needs_explicit_host_flag",
+          "kind": "function",
+          "line": 252,
+          "end_line": 259,
+          "signature": "def test_private_application_source_needs_explicit_host_flag(store)",
+          "summary": ""
+        },
+        {
+          "name": "test_docker_cleanup_failure_is_not_proof_of_absence",
+          "kind": "function",
+          "line": 262,
+          "end_line": 273,
+          "signature": "def test_docker_cleanup_failure_is_not_proof_of_absence(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_docker_jobs_output_cancel_and_crash_reconciliation",
+          "kind": "function",
+          "line": 277,
+          "end_line": 315,
+          "signature": "def test_real_docker_jobs_output_cancel_and_crash_reconciliation(store, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_docker_jobs_output_cancel_and_crash_reconciliation.launch",
+          "kind": "function",
+          "line": 283,
+          "end_line": 287,
+          "signature": "def launch(command, *args, **kwargs)",
           "summary": ""
         }
       ]
@@ -12148,6 +13482,270 @@
       ]
     },
     {
+      "path": "tests/test_remote_execution.py",
+      "sha256": "f9a4df960ab99fef3541fe8675c913d257d3481d195c1864f2a71187a51905cc",
+      "bytes": 13594,
+      "lines": 307,
+      "summary": "",
+      "imports": [
+        "atomic_flow.config",
+        "atomic_flow.credentials",
+        "atomic_flow.remote",
+        "atomic_flow.sdk",
+        "base64",
+        "copy",
+        "json",
+        "os",
+        "pytest",
+        "socket",
+        "subprocess",
+        "threading",
+        "time"
+      ],
+      "symbols": [
+        {
+          "name": "bundle_for",
+          "kind": "function",
+          "line": 31,
+          "end_line": 35,
+          "signature": "def bundle_for(tmp_path, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "FakeJobs",
+          "kind": "class",
+          "line": 38,
+          "end_line": 63,
+          "signature": "class FakeJobs",
+          "summary": ""
+        },
+        {
+          "name": "FakeJobs.__init__",
+          "kind": "function",
+          "line": 41,
+          "end_line": 42,
+          "signature": "def __init__(self, project, root=None, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "FakeJobs.start",
+          "kind": "function",
+          "line": 44,
+          "end_line": 50,
+          "signature": "def start(self, args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "FakeJobs.status",
+          "kind": "function",
+          "line": 52,
+          "end_line": 53,
+          "signature": "def status(self, ident)",
+          "summary": ""
+        },
+        {
+          "name": "FakeJobs.cancel",
+          "kind": "function",
+          "line": 55,
+          "end_line": 57,
+          "signature": "def cancel(self, ident)",
+          "summary": ""
+        },
+        {
+          "name": "FakeJobs.reconcile",
+          "kind": "function",
+          "line": 59,
+          "end_line": 60,
+          "signature": "def reconcile(self, ident)",
+          "summary": ""
+        },
+        {
+          "name": "FakeJobs.output",
+          "kind": "function",
+          "line": 62,
+          "end_line": 63,
+          "signature": "def output(self, ident, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "fake_worker",
+          "kind": "function",
+          "line": 67,
+          "end_line": 71,
+          "signature": "def fake_worker(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_bundle_is_explicit_source_only_and_hash_checked",
+          "kind": "function",
+          "line": 74,
+          "end_line": 86,
+          "signature": "def test_bundle_is_explicit_source_only_and_hash_checked(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_bundle_rejects_duplicate_paths_unsupported_schema_and_mutable_image",
+          "kind": "function",
+          "line": 89,
+          "end_line": 94,
+          "signature": "def test_bundle_rejects_duplicate_paths_unsupported_schema_and_mutable_image(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_request_is_deduplicated_without_reexecution_and_observations_bound",
+          "kind": "function",
+          "line": 97,
+          "end_line": 109,
+          "signature": "def test_request_is_deduplicated_without_reexecution_and_observations_bound(tmp_path, fake_worker)",
+          "summary": ""
+        },
+        {
+          "name": "test_interrupted_submission_is_never_automatically_replayed",
+          "kind": "function",
+          "line": 112,
+          "end_line": 124,
+          "signature": "def test_interrupted_submission_is_never_automatically_replayed(tmp_path, fake_worker, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_interrupted_submission_is_never_automatically_replayed.crash",
+          "kind": "function",
+          "line": 115,
+          "end_line": 117,
+          "signature": "def crash(*args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_worker_refuses_hash_mismatch_and_request_id_substitution",
+          "kind": "function",
+          "line": 127,
+          "end_line": 135,
+          "signature": "def test_worker_refuses_hash_mismatch_and_request_id_substitution(tmp_path, fake_worker)",
+          "summary": ""
+        },
+        {
+          "name": "test_client_detects_substituted_receipt_result_and_source_manifest",
+          "kind": "function",
+          "line": 138,
+          "end_line": 163,
+          "signature": "def test_client_detects_substituted_receipt_result_and_source_manifest(tmp_path, fake_worker)",
+          "summary": ""
+        },
+        {
+          "name": "test_client_detects_substituted_receipt_result_and_source_manifest.Tamper",
+          "kind": "class",
+          "line": 141,
+          "end_line": 154,
+          "signature": "class Tamper",
+          "summary": ""
+        },
+        {
+          "name": "test_client_detects_substituted_receipt_result_and_source_manifest.Tamper.call",
+          "kind": "function",
+          "line": 143,
+          "end_line": 154,
+          "signature": "def call(self, action, payload)",
+          "summary": ""
+        },
+        {
+          "name": "test_lost_or_malformed_submit_ack_is_uncertain_and_lookup_does_not_execute",
+          "kind": "function",
+          "line": 166,
+          "end_line": 179,
+          "signature": "def test_lost_or_malformed_submit_ack_is_uncertain_and_lookup_does_not_execute(tmp_path, fake_worker)",
+          "summary": ""
+        },
+        {
+          "name": "test_lost_or_malformed_submit_ack_is_uncertain_and_lookup_does_not_execute.LostAck",
+          "kind": "class",
+          "line": 168,
+          "end_line": 173,
+          "signature": "class LostAck",
+          "summary": ""
+        },
+        {
+          "name": "test_lost_or_malformed_submit_ack_is_uncertain_and_lookup_does_not_execute.LostAck.call",
+          "kind": "function",
+          "line": 169,
+          "end_line": 173,
+          "signature": "def call(self, action, payload)",
+          "summary": ""
+        },
+        {
+          "name": "test_scoped_transport_preserves_unknown_submit_outcome",
+          "kind": "function",
+          "line": 182,
+          "end_line": 192,
+          "signature": "def test_scoped_transport_preserves_unknown_submit_outcome(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_scoped_transport_preserves_unknown_submit_outcome.lost",
+          "kind": "function",
+          "line": 186,
+          "end_line": 187,
+          "signature": "def lost(*args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_transport_requires_tls_no_embedded_credentials_or_query",
+          "kind": "function",
+          "line": 196,
+          "end_line": 199,
+          "signature": "def test_transport_requires_tls_no_embedded_credentials_or_query(url)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_http_auth_scoped_credentials_revocation_and_bounded_envelopes",
+          "kind": "function",
+          "line": 202,
+          "end_line": 225,
+          "signature": "def test_real_http_auth_scoped_credentials_revocation_and_bounded_envelopes(tmp_path, fake_worker)",
+          "summary": ""
+        },
+        {
+          "name": "test_worker_is_linux_and_image_pinned_even_before_serving",
+          "kind": "function",
+          "line": 228,
+          "end_line": 232,
+          "signature": "def test_worker_is_linux_and_image_pinned_even_before_serving(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_actual_job_snapshot_keeps_private_worker_source_and_never_falls_back",
+          "kind": "function",
+          "line": 235,
+          "end_line": 247,
+          "signature": "def test_actual_job_snapshot_keeps_private_worker_source_and_never_falls_back(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_worker_bounds_connections_before_reading_unauthenticated_headers",
+          "kind": "function",
+          "line": 250,
+          "end_line": 268,
+          "signature": "def test_worker_bounds_connections_before_reading_unauthenticated_headers(fake_worker)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_remote_protocol_docker_job_and_cancel",
+          "kind": "function",
+          "line": 272,
+          "end_line": 307,
+          "signature": "def test_real_remote_protocol_docker_job_and_cancel(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_remote_protocol_docker_job_and_cancel.wait",
+          "kind": "function",
+          "line": 285,
+          "end_line": 292,
+          "signature": "def wait(receipt, terminal)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_request_budget.py",
       "sha256": "2b4132cfa0a7f5c3beaf9d327e70325ef81e6664078c0a449ef4419d3c8f39ea",
       "bytes": 5275,
@@ -12891,6 +14489,137 @@
           "line": 134,
           "end_line": 140,
           "signature": "def test_offline_cli_routes_work_without_backend(tmp_path, capsys)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_scoped_credentials.py",
+      "sha256": "4eebfbde375151dc714b49172fab44dc60bf80a5dcfaa0c0440a8c7187dbf085",
+      "bytes": 6434,
+      "lines": 153,
+      "summary": "",
+      "imports": [
+        "atomic_flow.agents.execution",
+        "atomic_flow.config",
+        "atomic_flow.credentials",
+        "json",
+        "os",
+        "pickle",
+        "pytest",
+        "traceback"
+      ],
+      "symbols": [
+        {
+          "name": "grant",
+          "kind": "function",
+          "line": 13,
+          "end_line": 15,
+          "signature": "def grant(broker, project, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "use",
+          "kind": "function",
+          "line": 18,
+          "end_line": 21,
+          "signature": "def use(broker, authority, project_root, consumer=lambda value: {'accepted': True}, **overrides)",
+          "summary": ""
+        },
+        {
+          "name": "test_scope_gate_precedes_resolver_and_expiry_revocation",
+          "kind": "function",
+          "line": 24,
+          "end_line": 42,
+          "signature": "def test_scope_gate_precedes_resolver_and_expiry_revocation(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_revocation_during_resolution_blocks_connector",
+          "kind": "function",
+          "line": 45,
+          "end_line": 57,
+          "signature": "def test_revocation_during_resolution_blocks_connector(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_revocation_during_resolution_blocks_connector.resolve",
+          "kind": "function",
+          "line": 49,
+          "end_line": 51,
+          "signature": "def resolve(name)",
+          "summary": ""
+        },
+        {
+          "name": "test_approval_exact_scope_and_lifetime_bounds",
+          "kind": "function",
+          "line": 60,
+          "end_line": 72,
+          "signature": "def test_approval_exact_scope_and_lifetime_bounds(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_values_not_serialized_returned_or_retained",
+          "kind": "function",
+          "line": 75,
+          "end_line": 100,
+          "signature": "def test_values_not_serialized_returned_or_retained(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_values_not_serialized_returned_or_retained.connector",
+          "kind": "function",
+          "line": 82,
+          "end_line": 88,
+          "signature": "def connector(value)",
+          "summary": ""
+        },
+        {
+          "name": "test_exception_details_do_not_reach_error_or_traceback",
+          "kind": "function",
+          "line": 103,
+          "end_line": 115,
+          "signature": "def test_exception_details_do_not_reach_error_or_traceback(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_exception_details_do_not_reach_error_or_traceback.broken",
+          "kind": "function",
+          "line": 108,
+          "end_line": 109,
+          "signature": "def broken(value)",
+          "summary": ""
+        },
+        {
+          "name": "test_resolver_failure_and_missing_env_are_sanitized",
+          "kind": "function",
+          "line": 118,
+          "end_line": 127,
+          "signature": "def test_resolver_failure_and_missing_env_are_sanitized(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_resolver_failure_and_missing_env_are_sanitized.broken",
+          "kind": "function",
+          "line": 119,
+          "end_line": 120,
+          "signature": "def broken(name)",
+          "summary": ""
+        },
+        {
+          "name": "test_no_child_environment_injection_or_secret_artifact",
+          "kind": "function",
+          "line": 130,
+          "end_line": 153,
+          "signature": "def test_no_child_environment_injection_or_secret_artifact(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_no_child_environment_injection_or_secret_artifact.trusted_connector",
+          "kind": "function",
+          "line": 137,
+          "end_line": 143,
+          "signature": "def trusted_connector(value)",
           "summary": ""
         }
       ]
@@ -14426,6 +16155,141 @@
       ]
     },
     {
+      "path": "tests/test_worktree_workspace.py",
+      "sha256": "a03ef5747df814d65d62f87c49fce0bb231875670458b1caaf58ccdc0ed53b91",
+      "bytes": 8701,
+      "lines": 188,
+      "summary": "Actual Git worktrees must retain managed snapshot and publication authority boundaries.",
+      "imports": [
+        "atomic_flow.agents.changeset",
+        "pytest",
+        "shutil",
+        "subprocess"
+      ],
+      "symbols": [
+        {
+          "name": "git",
+          "kind": "function",
+          "line": 10,
+          "end_line": 13,
+          "signature": "def git(root, *args)",
+          "summary": ""
+        },
+        {
+          "name": "repository",
+          "kind": "function",
+          "line": 17,
+          "end_line": 28,
+          "signature": "def repository(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_snapshot_dirty_untracked_and_reopen_without_source_git_changes",
+          "kind": "function",
+          "line": 31,
+          "end_line": 46,
+          "signature": "def test_worktree_snapshot_dirty_untracked_and_reopen_without_source_git_changes(repository)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_publication_keeps_hash_approval_and_original_conflict_gates",
+          "kind": "function",
+          "line": 49,
+          "end_line": 59,
+          "signature": "def test_worktree_publication_keeps_hash_approval_and_original_conflict_gates(repository)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_success_publish_and_explicit_terminal_cleanup",
+          "kind": "function",
+          "line": 62,
+          "end_line": 74,
+          "signature": "def test_worktree_success_publish_and_explicit_terminal_cleanup(repository)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_interrupted_publication_recovers_after_reopen",
+          "kind": "function",
+          "line": 77,
+          "end_line": 96,
+          "signature": "def test_worktree_interrupted_publication_recovers_after_reopen(repository, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_interrupted_publication_recovers_after_reopen.crash",
+          "kind": "function",
+          "line": 84,
+          "end_line": 87,
+          "signature": "def crash(name, data)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_abort_removes_only_owned_workspace_and_retains_evidence",
+          "kind": "function",
+          "line": 99,
+          "end_line": 106,
+          "signature": "def test_worktree_abort_removes_only_owned_workspace_and_retains_evidence(repository)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_metadata_substitution_blocks_reopen_and_cleanup",
+          "kind": "function",
+          "line": 109,
+          "end_line": 121,
+          "signature": "def test_worktree_metadata_substitution_blocks_reopen_and_cleanup(repository, tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_registration_substitution_is_not_removed",
+          "kind": "function",
+          "line": 124,
+          "end_line": 130,
+          "signature": "def test_worktree_registration_substitution_is_not_removed(repository, tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_private_git_config_changes_fail_before_execution_cleanup",
+          "kind": "function",
+          "line": 133,
+          "end_line": 141,
+          "signature": "def test_worktree_private_git_config_changes_fail_before_execution_cleanup(repository)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_rejects_submodules_without_checkout",
+          "kind": "function",
+          "line": 144,
+          "end_line": 149,
+          "signature": "def test_worktree_rejects_submodules_without_checkout(repository)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_creation_does_not_inherit_git_template_hooks_or_config",
+          "kind": "function",
+          "line": 152,
+          "end_line": 167,
+          "signature": "def test_worktree_creation_does_not_inherit_git_template_hooks_or_config(repository, tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_rejects_managed_source_symlink",
+          "kind": "function",
+          "line": 170,
+          "end_line": 179,
+          "signature": "def test_worktree_rejects_managed_source_symlink(repository, tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_worktree_rejects_non_repository_and_unknown_backend",
+          "kind": "function",
+          "line": 182,
+          "end_line": 188,
+          "signature": "def test_worktree_rejects_non_repository_and_unknown_backend(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tools/Dockerfile.checks",
       "sha256": "d84238f83b1be8b087bb0dfe0d8167ec51fdb7ca649d1e3e5b1dfa236521c226",
       "bytes": 181,
@@ -14468,9 +16332,9 @@
     },
     {
       "path": "tools/colab_validate.py",
-      "sha256": "62978a09395646b013855bbcac984b67017f57c3111320ae82ac0e515725c6f8",
-      "bytes": 4828,
-      "lines": 90,
+      "sha256": "6bb0120eecad2708b1232e3064d1fc5b9b488e7040799d1a16789695491ab042",
+      "bytes": 5089,
+      "lines": 93,
       "summary": "CPU-only Colab/Linux validation. Never mounts Drive or accesses model credentials.",
       "imports": [
         "__future__",
@@ -14489,7 +16353,7 @@
           "name": "main",
           "kind": "function",
           "line": 15,
-          "end_line": 86,
+          "end_line": 89,
           "signature": "def main()",
           "summary": ""
         },
@@ -15120,6 +16984,12 @@
       "sha256": "59e985bdb2876363892f462a2770b891430e820b1619a18d9afa97fa03a841f6",
       "bytes": 1259,
       "lines": 15
+    },
+    {
+      "path": "validation/step13-windows-before-integration-fixes.txt",
+      "sha256": "d940a3c298229825fbdc0748a017fc8a93c4e488f6a5d71ae63ef8c1f3a2be4f",
+      "bytes": 5417,
+      "lines": 90
     },
     {
       "path": "validation/step8-windows-final.txt",

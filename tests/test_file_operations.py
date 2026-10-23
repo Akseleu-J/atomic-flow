@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import stat
+from types import SimpleNamespace
 
 import pytest
 
@@ -62,6 +63,19 @@ def test_regex_search_works_and_rejects_bad_pattern(tmp_path):
     result = tool.run(SearchTextArgs(query=r"^value\s*=\s*\d+$", regex=True), ctx)
     assert result["results"][0]["line"] == 1
     assert "invalid regex" in tool.run(SearchTextArgs(query="[", regex=True), ctx)["error"]
+
+
+def test_regex_startup_budget_does_not_consume_evaluation_deadline(tmp_path, monkeypatch):
+    ctx = context(tmp_path)
+    ticks = iter([0, 6, 6, 7])
+    polls = iter([False, True, False, True])
+    responses = iter([{"ready": True}, ([{"path": "a.py", "line": 1}], False)])
+    receiver = SimpleNamespace(poll=lambda timeout: next(polls), recv=lambda: next(responses), close=lambda: None)
+    process = SimpleNamespace(start=lambda: None, is_alive=lambda: True, terminate=lambda: None, join=lambda **kw: None)
+    mp = SimpleNamespace(Pipe=lambda **kw: (receiver, SimpleNamespace(close=lambda: None)), Process=lambda **kw: process)
+    monkeypatch.setattr("atomic_flow.agents.tools.search_text.multiprocessing.get_context", lambda name: mp)
+    monkeypatch.setattr("atomic_flow.agents.tools.search_text.time", SimpleNamespace(monotonic=lambda: next(ticks)))
+    assert SearchTextTool().run(SearchTextArgs(query="value", regex=True), ctx)["results"][0]["line"] == 1
 
 
 def test_pathological_regex_is_terminated(tmp_path):

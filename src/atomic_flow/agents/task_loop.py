@@ -185,7 +185,7 @@ class TaskRunner:
             else:
                 if task.current_index:
                     raise ChangeSetConflict("legacy checkpoint has no workspace; cannot safely replay/resume it")
-                self.changeset = ChangeSet.create(self.project)
+                self.changeset = ChangeSet.create(self.project, backend=self.config.task.workspace_backend)
                 task.changeset_id = self.changeset.id
             save_tree(self.changeset.workspace, build_tree(self.changeset.workspace, self.config.tree.ignore,
                       respect_gitignore=self.config.tree.respect_gitignore))

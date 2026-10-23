@@ -2,7 +2,7 @@
 
 22 октября 2026. Пользователь разрешил реализовать весь оставшийся каталог с тестами.
 Это continuation plan для следующих пакетов, **не список уже работающих подсистем**.
-После пакета 12 реализованы 42 scoped candidates; остаются 20 из 62.
+После пакета 13 реализованы 48 scoped candidates; остаются 14 из 62.
 Источник статуса — `CANDIDATE_STATUS.json`; отдельные номера пакетов ниже не означают
 закрытие одноимённых этапов `PRODUCTION_ROADMAP.md`.
 
@@ -41,7 +41,12 @@ Acceptance: stale plan approval, циклы зависимостей, useful wor
 неподдерживаемая версия, corrupted tail, pending effect при fork/resume,
 read-coverage после summary, memory deletion/limits и conflict-before-restore.
 
-## 13. Jobs, credentials и execution: 33, 34, 42, 43, 45, 62
+## 13. Jobs, credentials и execution: 33, 34, 42, 43, 45, 62 — реализовано scoped
+
+Реализация/границы: `IMPLEMENTATION_STEP_13.md`. Durable host jobs и output cursors,
+process-only host credential broker, фиксированные Docker profiles, private Git
+worktree snapshot и remote Linux worker protocol. Remote worker требует доверенного
+Linux/Docker host; внешняя cloud installation и attestation не объявлены выполненными.
 
 Durable jobs с ID/cancel, курсорами вывода, terminal state и crash reconciliation.
 Нельзя выдавать bounded tail за полный лог; при storage cap нужен явный исход.

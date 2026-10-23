@@ -88,3 +88,17 @@ requirement. No local Docker/WSL installation is performed as part of this setup
 Task planning/call accounting and its limits are documented in `IMPLEMENTATION_STEP_5.md`.
 A finite USD budget requires explicit prices; 0/0 is valid only for a confirmed free backend.
 Unknown cost pauses execution; reservations cannot guarantee provider billing.
+# Дополнения пакета 13
+
+`atomic job start --project . -- -m pytest -q` создаёт durable host job с immutable
+source snapshot и bounded prefix output. `job status/output/cancel/reconcile` работают
+без model backend. `output_complete` и `discarded_bytes` нельзя заменять `at_end`:
+последнее относится только к странице текущего retained output. Lost lease не даёт
+разрешения на replay; неизвестные процессы сохраняют admission hold.
+
+Docker profiles `checks` и `read-only` имеют фиксированные mounts/network/resources;
+read-only не поддерживает local mode. `atomic worker --image sha256:...` поднимает
+аутентифицированный loopback Linux/Docker worker для HTTPS reverse proxy. Worker
+bundle/receipt/result hash gates и scoped credential SDK описаны в
+`IMPLEMENTATION_STEP_13.md`. Source snapshots, worktree и remote jobs сами по себе
+не публикуют изменения и не являются новой task approval.

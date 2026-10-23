@@ -143,3 +143,15 @@ def revise_task(task_id: str, plan):
     task, runner = _saved_task(task_id)
     parsed = plan if isinstance(plan, Plan) else Plan.model_validate(plan)
     return runner.revise(task, parsed)
+
+
+def jobs(project: str | Path):
+    """Offline project-bound durable job store, independent of live answer handles."""
+    from atomic_flow.jobs import JobStore
+    return JobStore(Path(project))
+
+
+def connect_worker(project: str | Path, url: str, *, broker, grant_id: str, allow_loopback_http=False):
+    """No network on construction; each operation resolves a scoped host grant."""
+    from atomic_flow.remote import RemoteExecutor, ScopedWorkerTransport
+    return RemoteExecutor(ScopedWorkerTransport(Path(project), url, broker, grant_id, allow_loopback_http))

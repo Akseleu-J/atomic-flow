@@ -1,0 +1,90 @@
+...........................................sssss........................ [ 12%]
+..................s.......s..................Fs.........s.....s.F....... [ 25%]
+........s......ss..............................s.................s...... [ 38%]
+....s...........................................................s....... [ 50%]
+....................................................s................... [ 63%]
+..................................................................s..... [ 76%]
+........................................................................ [ 89%]
+...........................................s..................           [100%]
+================================== FAILURES ===================================
+_________________ test_timeout_and_cancellation_stop_command __________________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/af13win01/test_timeout_and_cancellation_0')
+
+    def test_timeout_and_cancellation_stop_command(tmp_path):
+        cfg = ExecutionConfig(mode="local")
+        start = time.monotonic()
+>       result = run_python(["-c", "import time; time.sleep(30)"], tmp_path, config=cfg, timeout=0.2)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_execution.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\execution.py:211: in run_python
+    _kill_tree(proc)
+src\atomic_flow\agents\execution.py:105: in _kill_tree
+    subprocess.run([str(Path(os.environ["SYSTEMROOT"]) / "System32" / "taskkill.exe"),
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: 1 args: ['C:\\WINDOWS\\System32\\taskkill.exe', '/PID', ...>
+input = None, endtime = 1008655.203, orig_timeout = 10
+
+    def _communicate(self, input, endtime, orig_timeout):
+        # Start reader threads feeding into a list hanging off of this
+        # object, unless they've already been started.
+        if self.stdout and not hasattr(self, "_stdout_buff"):
+            self._stdout_buff = []
+            self.stdout_thread = \
+                    threading.Thread(target=self._readerthread,
+                                     args=(self.stdout, self._stdout_buff))
+            self.stdout_thread.daemon = True
+            self.stdout_thread.start()
+        if self.stderr and not hasattr(self, "_stderr_buff"):
+            self._stderr_buff = []
+            self.stderr_thread = \
+                    threading.Thread(target=self._readerthread,
+                                     args=(self.stderr, self._stderr_buff))
+            self.stderr_thread.daemon = True
+            self.stderr_thread.start()
+    
+        if self.stdin:
+            self._stdin_write(input)
+    
+        # Wait for the reader threads, or time out.  If we time out, the
+        # threads remain reading and the fds left open in case the user
+        # calls communicate again.
+        if self.stdout is not None:
+            self.stdout_thread.join(self._remaining_time(endtime))
+            if self.stdout_thread.is_alive():
+>               raise TimeoutExpired(self.args, orig_timeout)
+E               subprocess.TimeoutExpired: Command '['C:\\WINDOWS\\System32\\taskkill.exe', '/PID', '25888', '/T', '/F']' timed out after 10 seconds
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:1630: TimeoutExpired
+_______________ test_regex_search_works_and_rejects_bad_pattern _______________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/af13win01/test_regex_search_works_and_re0')
+
+    def test_regex_search_works_and_rejects_bad_pattern(tmp_path):
+        ctx = context(tmp_path)
+        tool = SearchTextTool()
+        result = tool.run(SearchTextArgs(query=r"^value\s*=\s*\d+$", regex=True), ctx)
+>       assert result["results"][0]["line"] == 1
+               ^^^^^^^^^^^^^^^^^
+E       KeyError: 'results'
+
+tests\test_file_operations.py:63: KeyError
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_execution.py::test_timeout_and_cancellation_stop_command - ...
+FAILED tests/test_file_operations.py::test_regex_search_works_and_rejects_bad_pattern
+2 failed, 544 passed, 20 skipped, 1 warning in 514.66s (0:08:34)
