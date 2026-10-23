@@ -4,8 +4,8 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–12 закоммичены; пакет 13 подготовлен к Linux/Docker acceptance.
-Последний runtime-коммит, подтверждённый Docker artifact, — `394aedcdae2ed8b06cf2b82a894780f5d22b3ceb`.
+Пакеты 1–13 закоммичены.
+Последний runtime-коммит, подтверждённый Docker artifact, — `dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -26,7 +26,15 @@ timeout и regex spawn deadline; оба isolated recheck PASS. Исправле�
 при helper failure (исход остаётся unknown), helper pipes убраны; startup regex
 ограничен отдельно от прежних 5 секунд evaluation, добавлены regression tests.
 Focused integration recheck **74 passed / 8 skipped**, Ruff/compileall PASS.
-Финальные Windows/Linux/Docker результаты будут добавлены после интеграционной проверки.
+Финальный Windows **548 passed / 20 skipped**, `validation/step13-windows-final.txt`.
+CI push `39923289564` и PR `39923295523` PASS на точном runtime `dea7fa7`, Python
+3.11/3.12. Скачанный artifact: **541 CPU passed / 10 skipped**, **17 extra passed**,
+**25 execution acceptance passed** (9 real Docker, 16 вспомогательных CPU/local jobs),
+compile и historical grader calibration PASS; model_calls=0. Image ID
+`sha256:16a1faebd1207bda37d77cf05f2139208f2edfc8364753bc03aa747746bbd586`.
+`validation/ci-step13-20261023/evidence-manifest.json` связывает все 12 artifact files
+и 20 изменённых source/test/tool Git blobs с tested commit. Raw logs сохранены без
+нормализации. Windows/CPU пропуски не считаются Docker acceptance.
 Следующий пакет 14 — notebooks/LSP/watchers/multiple roots. Stage 4 live multi-repository
 edit quality остаётся открытым; model_calls=0 для нового implementation/validation.
 

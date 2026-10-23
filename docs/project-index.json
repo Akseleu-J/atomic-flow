@@ -1,37 +1,26 @@
 {
-  "source_commit": "55eee8c903e85960ff3cb733126db4d67e6d1333",
+  "source_commit": "dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    "AGENTS.md",
-    "docs/CANDIDATE_STATUS.json",
-    "docs/EXECUTION.md",
     "docs/IMPLEMENTATION_STEP_13.md",
     "docs/PROJECT_CONTEXT.md",
-    "docs/REMAINING_IMPLEMENTATION.md",
-    "src/atomic_flow/agents/changeset.py",
-    "src/atomic_flow/agents/execution.py",
-    "src/atomic_flow/agents/task_loop.py",
-    "src/atomic_flow/agents/tools/search_text.py",
-    "src/atomic_flow/cli.py",
-    "src/atomic_flow/config.py",
-    "src/atomic_flow/credentials.py",
-    "src/atomic_flow/job_worker.py",
-    "src/atomic_flow/jobs.py",
-    "src/atomic_flow/remote.py",
-    "src/atomic_flow/sdk.py",
-    "tests/test_container_integration.py",
-    "tests/test_execution_profiles.py",
-    "tests/test_file_operations.py",
-    "tests/test_job_cli.py",
-    "tests/test_jobs.py",
-    "tests/test_remote_execution.py",
-    "tests/test_scoped_credentials.py",
-    "tests/test_worktree_workspace.py",
-    "tools/colab_validate.py",
-    "validation/step13-windows-before-integration-fixes.txt"
+    "validation/ci-step13-20261023/evidence-manifest.json",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/compile.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/container-boundaries.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/dependencies.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/docker-build.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/docker-info.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/docker-version.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/pytest-extra.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/pytest.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/python-version.txt",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/results.json",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/task-calibration.json",
+    "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/tested-commit.txt",
+    "validation/step13-windows-final.txt"
   ],
-  "file_count": 403,
+  "file_count": 417,
   "python_file_count": 168,
   "symbol_count": 1544,
   "missing_absolute_internal_imports": [],
@@ -382,9 +371,9 @@
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_13.md",
-      "sha256": "673b92cba194ae2cc681300e2e11a8cca41d90e4245ac44d2643e4052b3da6ac",
-      "bytes": 12437,
-      "lines": 154
+      "sha256": "02b1d1750c7887af0c55d535f07158186174144dd3a08946d86feca6564f325c",
+      "bytes": 14124,
+      "lines": 176
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_2.md",
@@ -436,9 +425,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "fdbd9ecfe140d304c2c3eb84f8cd029c78dee940e9b90052e63d2d0c7c03fc37",
-      "bytes": 45996,
-      "lines": 475
+      "sha256": "8d4f0e59af7b50002d3d80467fc76e8a8ed9407fa7ffa4a09ebdf4354ad4b45e",
+      "bytes": 46614,
+      "lines": 483
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -466,9 +455,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "064e6e688073d3711e68d293edd974ef7b175c08a932300991f315910cf57197",
-      "bytes": 498266,
-      "lines": 15143
+      "sha256": "da63c9467a2c09527541263ac9732c399c635f765edd27ace1d3234235f9b3ba",
+      "bytes": 559075,
+      "lines": 17013
     },
     {
       "path": "docs/prompts.md",
@@ -16752,6 +16741,84 @@
       "lines": 1
     },
     {
+      "path": "validation/ci-step13-20261023/evidence-manifest.json",
+      "sha256": "12e9eb21c2dcc2af2b0de14ac507efb8ecb81697d63a73cb898fd7760676a768",
+      "bytes": 6284,
+      "lines": 151
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/container-boundaries.txt",
+      "sha256": "e7c6dc1bc40597bcde9ff537969504f7a8493701a9fc97f5edf4c416bf25db30",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/dependencies.txt",
+      "sha256": "b4881670a9a51b4226ba03c745096f01bc00c59cd72a389b040f6d531c1c7166",
+      "bytes": 536,
+      "lines": 28
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/docker-build.txt",
+      "sha256": "509506112c8726939311947107fb802e46ac3e661de03377c2b4b3a86642deec",
+      "bytes": 12600,
+      "lines": 167
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/docker-info.txt",
+      "sha256": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f",
+      "bytes": 1491,
+      "lines": 61
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098",
+      "bytes": 769,
+      "lines": 27
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/pytest-extra.txt",
+      "sha256": "05f0c6f8a7918aee199f9622e29aae29357785ab3b2b8a549a713423a2946786",
+      "bytes": 99,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/pytest.txt",
+      "sha256": "bd4a53a0e77a1acbb1779c7de69690d4c2f4e79b419b1004b17aa64083b40553",
+      "bytes": 1193,
+      "lines": 15
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+      "bytes": 15,
+      "lines": 1
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/results.json",
+      "sha256": "3b2684341a9ad8f797165b050dbe8744a369ddb9c66e524a536b78ce746dcfb7",
+      "bytes": 355,
+      "lines": 11
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/task-calibration.json",
+      "sha256": "42bf737311dcf3d05c8bc642247e22b56812f8610017babec95ce398093dc2ff",
+      "bytes": 5529,
+      "lines": 191
+    },
+    {
+      "path": "validation/ci-step13-20261023/validation-dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0/tested-commit.txt",
+      "sha256": "7289340ee4410cc028ef0f0c1b957cca86e4ca552156d28a4a724093651a07a6",
+      "bytes": 41,
+      "lines": 1
+    },
+    {
       "path": "validation/ci-step8-20261022/validation-ea60439800bccecd1c5c5918fc3777492237b3a7/compile.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
@@ -16990,6 +17057,12 @@
       "sha256": "d940a3c298229825fbdc0748a017fc8a93c4e488f6a5d71ae63ef8c1f3a2be4f",
       "bytes": 5417,
       "lines": 90
+    },
+    {
+      "path": "validation/step13-windows-final.txt",
+      "sha256": "422f102937ad413e59ad53a28d7ce12de1db7dc600fdc6d7fb71b850ab8c3867",
+      "bytes": 1259,
+      "lines": 15
     },
     {
       "path": "validation/step8-windows-final.txt",
