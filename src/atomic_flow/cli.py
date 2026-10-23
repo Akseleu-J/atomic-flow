@@ -213,6 +213,33 @@ def _parser() -> argparse.ArgumentParser:
             sub.add_argument("--preview-token", required=True)
             sub.add_argument("--yes", action="store_true", help="Apply the reviewed hash-bound preview")
 
+    job = cmd.add_parser("job", help="Durable bounded Python jobs; no model calls or source publication")
+    js = job.add_subparsers(dest="job_action", required=True)
+    for action in ("start", "list", "status", "cancel", "output", "reconcile"):
+        sub = js.add_parser(action)
+        sub.add_argument("--project", default=".")
+        if action in {"status", "cancel", "output"}:
+            sub.add_argument("job_id")
+        if action == "reconcile":
+            sub.add_argument("job_id", nargs="?")
+        if action == "start":
+            sub.add_argument("--mode", choices=["docker", "local"], help="local explicitly permits trusted host execution")
+            sub.add_argument("--profile", choices=["checks", "read-only"])
+            sub.add_argument("--timeout", type=float, default=120)
+            sub.add_argument("--output-bytes", type=int, default=1_048_576)
+            sub.add_argument("--retention-seconds", type=float, default=604800)
+            sub.add_argument("python_args", nargs=argparse.REMAINDER, help="Python arguments after --")
+        if action == "output":
+            sub.add_argument("--stream", choices=["stdout", "stderr"], default="stdout")
+            sub.add_argument("--cursor")
+            sub.add_argument("--limit", type=int, default=16384)
+
+    worker = cmd.add_parser("worker", help="Trusted Linux Docker worker behind a TLS reverse proxy")
+    worker.add_argument("--root", type=Path, default=None)
+    worker.add_argument("--image", required=True, help="Immutable sha256 image ID")
+    worker.add_argument("--token-env", default="ATOMIC_FLOW_WORKER_TOKEN")
+    worker.add_argument("--port", type=int, default=8766)
+
     kaggle = cmd.add_parser("kaggle", help="Manage Kaggle Model Proxy credentials and quota")
     ks = kaggle.add_subparsers(dest="kaggle_action", required=True)
     for name in ("init", "auth"):
@@ -1027,7 +1054,45 @@ def cmd_rewind(args) -> int:
     return 0
 
 
-HANDLERS = {"memory": cmd_memory, "rewind": cmd_rewind, "policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
+def cmd_job(args) -> int:
+    from atomic_flow.jobs import JobStore
+    project = Path(args.project).expanduser().resolve()
+    store = JobStore(project)
+    action = args.job_action
+    if action == "start":
+        config = load_config(project).execution
+        overrides = {key: getattr(args, key) for key in ("mode", "profile") if getattr(args, key) is not None}
+        config = type(config).model_validate({**config.model_dump(), **overrides})
+        python_args = args.python_args[1:] if args.python_args[:1] == ["--"] else args.python_args
+        data = store.start(python_args, config=config, timeout=args.timeout,
+                           output_bytes=args.output_bytes, retention_seconds=args.retention_seconds)
+    elif action == "list":
+        data = store.list()
+    elif action == "reconcile":
+        data = store.reconcile(args.job_id)
+    elif action == "output":
+        data = store.output(args.job_id, stream=args.stream, cursor=args.cursor, limit=args.limit)
+    else:
+        data = getattr(store, action)(args.job_id)
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_worker(args) -> int:
+    from atomic_flow.remote import RemoteWorker, worker_server
+    worker = RemoteWorker(args.root or user_dir() / "remote-worker", image=args.image)
+    server = worker_server(worker, os.environ.get(args.token_env, ""), port=args.port)
+    print(f"Worker bound to 127.0.0.1:{server.server_port}; expose only through an authenticated HTTPS reverse proxy.", flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+    return 0
+
+
+HANDLERS = {"job": cmd_job, "worker": cmd_worker, "memory": cmd_memory, "rewind": cmd_rewind, "policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
             "benchmark": cmd_benchmark}
 

@@ -47,6 +47,7 @@ def _search(files, query, regex, case_sensitive, offset, maximum):
 
 def _regex_worker(sender, files, query, case_sensitive, offset, maximum):
     try:
+        sender.send({"ready": True})
         sender.send(_search(files, query, True, case_sensitive, offset, maximum))
     finally:
         sender.close()
@@ -97,6 +98,15 @@ class SearchTextTool(Tool):
             worker.start()
             sender.close()
             try:
+                # Windows spawn/import startup can be slow on a constrained host.
+                # Bound it separately; the regex itself retains its five-second cap.
+                deadline = time.monotonic() + 15
+                while not receiver.poll(0.05):
+                    ctx.cancel_check()
+                    if time.monotonic() >= deadline or not worker.is_alive():
+                        return {"error": "regex worker startup exceeded its deadline or exited"}
+                if receiver.recv() != {"ready": True}:
+                    return {"error": "invalid regex worker startup response"}
                 deadline = time.monotonic() + 5
                 while not receiver.poll(0.05):
                     ctx.cancel_check()

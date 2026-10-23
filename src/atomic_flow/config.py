@@ -96,12 +96,14 @@ class TaskConfig(BaseModel):
     max_model_calls: int = Field(default=100, ge=1, le=1000)
     default_max_output_tokens: int = Field(default=4096, ge=16, le=200_000)
     final_check: Literal["syntax", "pytest"] = "syntax"
+    workspace_backend: Literal["copy", "git-worktree"] = "copy"
 
 
 class ExecutionConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_default=True)
     mode: Literal["docker", "local"] = Field(default_factory=lambda: os.getenv("ATOMIC_FLOW_EXECUTION_MODE", "docker"))
     image: str = "atomic-flow-checks:local"
+    profile: Literal["checks", "read-only"] = "checks"
     output_bytes: int = Field(default=16384, ge=1024, le=1_000_000)
 
 

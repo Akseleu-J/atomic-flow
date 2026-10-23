@@ -4,12 +4,31 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–12 закоммичены.
+Пакеты 1–12 закоммичены; пакет 13 подготовлен к Linux/Docker acceptance.
 Последний runtime-коммит, подтверждённый Docker artifact, — `394aedcdae2ed8b06cf2b82a894780f5d22b3ceb`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
 ## Локальные исправления поверх HEAD — актуальный статус
+
+23 октября: пакет 13 — durable host jobs с snapshot/cancel/reconcile, потоковым prefix
+output/HMAC cursors/retention и global active admission; fixed checks/read-only Docker
+profiles; process-only project/connector/operation credential grants; private Git
+worktree snapshot backend; сменяемый hash-bound Linux Docker worker protocol и SDK.
+`IMPLEMENTATION_STEP_13.md`; каталог **48 scoped / 14 planned**. Unknown process cleanup
+не освобождает admission slot; durable cleanup только по immutable CID, не PID/name.
+Секреты не попадают в child env; broker callbacks доверенные, не Python sandbox.
+Remote submit uncertainty сохраняется через broker; recovery только journal lookup.
+Worker hashes не являются attestation. Внешний cloud endpoint не развёрнут.
+Начальный полный Windows прогон: 544 passed / 20 skipped / 2 failed; сохранён в
+`validation/step13-windows-before-integration-fixes.txt`. Выявлены transient taskkill
+timeout и regex spawn deadline; оба isolated recheck PASS. Исправлено fallback kill
+при helper failure (исход остаётся unknown), helper pipes убраны; startup regex
+ограничен отдельно от прежних 5 секунд evaluation, добавлены regression tests.
+Focused integration recheck **74 passed / 8 skipped**, Ruff/compileall PASS.
+Финальные Windows/Linux/Docker результаты будут добавлены после интеграционной проверки.
+Следующий пакет 14 — notebooks/LSP/watchers/multiple roots. Stage 4 live multi-repository
+edit quality остаётся открытым; model_calls=0 для нового implementation/validation.
 
 23 октября: пакет 12 — review/revise/approve по plan/source/scope digest, task schema 2,
 зависимости/blocked steps, structured summary, explicit project memory CRUD/selection,
@@ -17,8 +36,8 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 Три субагента реализовали независимые блоки, основной агент соединил CLI/SDK/API/runtime.
 `IMPLEMENTATION_STEP_12.md`; каталог **42 scoped / 20 planned**. Будущая версия,
 неизвестные charges/effects, stale source/approval блокируют соответствующее продолжение.
-Сводка/память не дают permissions/read evidence. Следующий пакет 13 — jobs/credentials/
-execution; общие production и multi-repository quality gates остаются открыты.
+Сводка/память не дают permissions/read evidence. Продолжение jobs/credentials/execution
+описано выше; общие production и multi-repository quality gates остаются открыты.
 Windows **490 passed / 16 skipped**, Ruff/compileall PASS;
 `validation/step12-windows-final.txt`. 16 skip включают Docker-only и Windows platform/
 symlink ограничения. Новые model calls scripted. CI push `39889275052` и PR

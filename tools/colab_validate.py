@@ -72,7 +72,10 @@ def main():
                 env["ATOMIC_FLOW_TEST_DOCKER"] = "1"
                 code = run("container-boundaries", [sys.executable, "-m", "pytest", "-q",
                            "tests/test_execution.py::test_real_container_boundaries",
-                           "tests/test_container_integration.py"], env=env)
+                           "tests/test_container_integration.py",
+                           "tests/test_execution_profiles.py::test_real_read_only_workspace_profile",
+                           "tests/test_remote_execution.py::test_real_remote_protocol_docker_job_and_cancel",
+                           "tests/test_jobs.py"], env=env)
                 results["container"] = "PASS" if code == 0 else "FAIL"
             else:
                 results["container"] = "IMAGE_BUILD_FAILED"

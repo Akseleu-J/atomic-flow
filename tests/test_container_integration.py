@@ -63,9 +63,9 @@ def test_timeout_and_cancel_remove_real_container(tmp_path, monkeypatch, cancell
     names = []
     original = execution.docker_command
 
-    def record(engine, image, workspace, name, args):
+    def record(engine, image, workspace, name, args, **kwargs):
         names.append(name)
-        return original(engine, image, workspace, name, args)
+        return original(engine, image, workspace, name, args, **kwargs)
 
     monkeypatch.setattr(execution, "docker_command", record)
     start = time.monotonic()
