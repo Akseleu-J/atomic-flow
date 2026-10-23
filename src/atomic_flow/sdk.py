@@ -12,6 +12,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
+from atomic_flow.agents.effects import UnresolvedEffects
 from atomic_flow.agents.execution import TaskCancelled
 from atomic_flow.runtime import ControlMessage, EventBuffer, RunControl
 
@@ -61,7 +62,10 @@ class AnswerHandle:
                     self._exception = exc
                     cancelled = isinstance(exc, TaskCancelled)
                     outcome = getattr(exc, "request_outcome", "unknown")
-                    self.error = RunError(code=type(exc).__name__, message="Run cancelled" if cancelled else "Run failed; inspect local session diagnostics",
+                    message = ("Run cancelled" if cancelled else
+                               "Tool effects unresolved; inspect external state before starting new work" if isinstance(exc, UnresolvedEffects) else
+                               "Run failed; inspect local session diagnostics")
+                    self.error = RunError(code=type(exc).__name__, message=message,
                                           request_outcome=outcome if outcome in {"not_sent", "refused", "unknown"} else "unknown")
                     self.buffer.emit("run_cancelled" if cancelled else "run_failed", {"error": self.error.model_dump()},
                                      outcome="cancelled" if cancelled else "error", terminal=True)

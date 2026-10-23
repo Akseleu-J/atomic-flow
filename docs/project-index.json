@@ -1,29 +1,55 @@
 {
-  "source_commit": "58b3dd494ee038f5303386d3e527012150444e34",
+  "source_commit": "00f77b592234ebca98ae5d6716a0ea6902d70b43",
   "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
   "untracked_python_files": [],
   "tracked_changes": [
-    "docs/IMPLEMENTATION_STEP_14.md",
-    "docs/IMPLEMENTATION_STEP_15.md",
-    "docs/IMPLEMENTATION_STEP_16.md",
+    "AGENTS.md",
+    "docs/COMPETITIVE_ACCEPTANCE.md",
+    "docs/CRITICAL_REVIEW_2026-10-23.md",
+    "docs/IMPLEMENTATION_STEP_17.md",
     "docs/PROJECT_CONTEXT.md",
-    "validation/ci-step14-16-20261023/evidence-manifest.json",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/compile.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/container-boundaries.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/dependencies.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/docker-build.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/docker-info.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/docker-version.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/pytest-extra.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/pytest.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/python-version.txt",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/results.json",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/task-calibration.json",
-    "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/tested-commit.txt"
+    "src/atomic_flow/agents/changeset.py",
+    "src/atomic_flow/agents/completion.py",
+    "src/atomic_flow/agents/context.py",
+    "src/atomic_flow/agents/effects.py",
+    "src/atomic_flow/agents/execution.py",
+    "src/atomic_flow/agents/loop.py",
+    "src/atomic_flow/agents/task_loop.py",
+    "src/atomic_flow/agents/tools/file_paths.py",
+    "src/atomic_flow/agents/tools/run_command.py",
+    "src/atomic_flow/api/server.py",
+    "src/atomic_flow/benchmarking.py",
+    "src/atomic_flow/evaluation_meter.py",
+    "src/atomic_flow/execution_inputs.py",
+    "src/atomic_flow/llm/orchestrator.py",
+    "src/atomic_flow/output.py",
+    "src/atomic_flow/qa_evaluation.py",
+    "src/atomic_flow/qa_rubric.py",
+    "src/atomic_flow/sdk.py",
+    "src/atomic_flow/sessions.py",
+    "src/atomic_flow/workflows.py",
+    "tests/test_evaluation_integrity.py",
+    "tests/test_execution_confidentiality.py",
+    "tests/test_plan_review_dependencies.py",
+    "tests/test_unresolved_effects.py",
+    "tests/test_workflows.py",
+    "tools/colab_validate.py",
+    "validation/critic-20261023/README.md",
+    "validation/critic-20261023/evaluation.json",
+    "validation/critic-20261023/manifest.json",
+    "validation/critic-20261023/repro_evaluation.py.txt",
+    "validation/critic-20261023/repro_runtime.py.txt",
+    "validation/critic-20261023/repro_safety.py.txt",
+    "validation/critic-20261023/runtime.json",
+    "validation/critic-20261023/safety.jsonl",
+    "validation/step17-final-windows.txt",
+    "validation/step17-regressions-windows.txt",
+    "validation/step17-risk-recheck-windows.txt",
+    "validation/step17-risk-windows.txt"
   ],
-  "file_count": 470,
-  "python_file_count": 201,
-  "symbol_count": 2040,
+  "file_count": 493,
+  "python_file_count": 209,
+  "symbol_count": 2131,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -70,9 +96,9 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "0c85d2ac00c77afd1ee147361142332ff7ff0be1d9fcbf1203a221e0e3f56514",
-      "bytes": 8204,
-      "lines": 24
+      "sha256": "5c5b7504604873123879c5f541e37ab87abefde74f2115d62c8cfccea03bb76c",
+      "bytes": 9646,
+      "lines": 26
     },
     {
       "path": "LICENSE",
@@ -335,6 +361,18 @@
       "lines": 380
     },
     {
+      "path": "docs/COMPETITIVE_ACCEPTANCE.md",
+      "sha256": "6d5ebc06350f8155881f30e9f15cc3e94f814be5546a7a1e3a93e3338b7a480b",
+      "bytes": 10157,
+      "lines": 115
+    },
+    {
+      "path": "docs/CRITICAL_REVIEW_2026-10-23.md",
+      "sha256": "39531a54000b4525a39e990d9604a03f3c6cfd2fecfbe18377d756fe7a8c1c15",
+      "bytes": 20897,
+      "lines": 239
+    },
+    {
       "path": "docs/EVALUATION_PILOT.md",
       "sha256": "1367c53b24f5aa988e9dfc1296b79a872ceb87fca53a60815b7b94c16a15fd5b",
       "bytes": 12292,
@@ -395,6 +433,12 @@
       "lines": 59
     },
     {
+      "path": "docs/IMPLEMENTATION_STEP_17.md",
+      "sha256": "7231f3d13500ba18fbeb0a590f82ae09de69ecb5582b35169ad8056aa6101a9e",
+      "bytes": 12457,
+      "lines": 144
+    },
+    {
       "path": "docs/IMPLEMENTATION_STEP_2.md",
       "sha256": "90d601937419c2300f81b41ada8958f9c11bebe22dbdb73492a41765ff3f2810",
       "bytes": 11313,
@@ -444,9 +488,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "d8ebe8fb735feb2c5b354084626b03601dc7237c88787a15933e1e69b0b50dbb",
-      "bytes": 51992,
-      "lines": 536
+      "sha256": "004d5b312cf671c15c868153aea70f5a5fb2d8e023711919e125df5513b451db",
+      "bytes": 54927,
+      "lines": 567
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -474,9 +518,9 @@
     },
     {
       "path": "docs/project-index.json",
-      "sha256": "11fa6501239a576d62b3940e885990ea47e871144b90c5bbcab0394cfc3a5c04",
-      "bytes": 715746,
-      "lines": 21862
+      "sha256": "83b0f1dedf85ba8efabbde72527dfdd18ff7e012d08bcbdf15a85d526563f6e8",
+      "bytes": 718287,
+      "lines": 21897
     },
     {
       "path": "docs/prompts.md",
@@ -1599,14 +1643,15 @@
     },
     {
       "path": "src/atomic_flow/agents/changeset.py",
-      "sha256": "0e96a899275a6971a582b305979fbeb39dbe1ad1683954e2da3a830106e75b19",
-      "bytes": 21623,
-      "lines": 429,
+      "sha256": "8b5f28e486e8e14dbb41877a28904c080465d89bf938d0c2218da3f81831416c",
+      "bytes": 21861,
+      "lines": 433,
       "summary": "Task workspaces and journaled, conflict-checked publication of approved paths.",
       "imports": [
         "__future__",
         "atomic_flow.agents.source",
         "atomic_flow.config",
+        "atomic_flow.execution_inputs",
         "atomic_flow.tree.defaults",
         "fnmatch",
         "json",
@@ -1622,200 +1667,200 @@
         {
           "name": "ChangeSetConflict",
           "kind": "class",
-          "line": 23,
-          "end_line": 24,
+          "line": 24,
+          "end_line": 25,
           "signature": "class ChangeSetConflict",
           "summary": ""
         },
         {
           "name": "_git",
           "kind": "function",
-          "line": 30,
-          "end_line": 53,
+          "line": 31,
+          "end_line": 54,
           "signature": "def _git(directory: Path, *args: str, data: bytes | None=None)",
           "summary": "Only built-in plumbing, no user environment, global config, hooks or filters."
         },
         {
           "name": "_plain_path",
           "kind": "function",
-          "line": 56,
-          "end_line": 59,
+          "line": 57,
+          "end_line": 60,
           "signature": "def _plain_path(path: Path)",
           "summary": ""
         },
         {
           "name": "_snapshot_tree",
           "kind": "function",
-          "line": 62,
-          "end_line": 90,
+          "line": 63,
+          "end_line": 91,
           "signature": "def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str])",
           "summary": "Create a private snapshot commit without checkout, Git attributes or source config."
         },
         {
           "name": "_snapshot_tree.store",
           "kind": "function",
-          "line": 78,
-          "end_line": 87,
+          "line": 79,
+          "end_line": 88,
           "signature": "def store(node)",
           "summary": ""
         },
         {
           "name": "_files",
           "kind": "function",
-          "line": 93,
-          "end_line": 115,
+          "line": 94,
+          "end_line": 119,
           "signature": "def _files(root: Path, excluded: Path | None=None)",
           "summary": ""
         },
         {
           "name": "_files.ignored",
           "kind": "function",
-          "line": 95,
-          "end_line": 96,
+          "line": 96,
+          "end_line": 97,
           "signature": "def ignored(name)",
           "summary": ""
         },
         {
           "name": "ChangeSet",
           "kind": "class",
-          "line": 118,
-          "end_line": 429,
+          "line": 122,
+          "end_line": 433,
           "signature": "class ChangeSet",
           "summary": ""
         },
         {
           "name": "ChangeSet.__init__",
           "kind": "function",
-          "line": 119,
-          "end_line": 124,
+          "line": 123,
+          "end_line": 128,
           "signature": "def __init__(self, project: Path, directory: Path, state: dict)",
           "summary": ""
         },
         {
           "name": "ChangeSet.create",
           "kind": "function",
-          "line": 127,
-          "end_line": 160,
+          "line": 131,
+          "end_line": 164,
           "signature": "def create(cls, project: Path, *, backend: str='copy')",
           "summary": ""
         },
         {
           "name": "ChangeSet._create_worktree",
           "kind": "function",
-          "line": 162,
-          "end_line": 183,
+          "line": 166,
+          "end_line": 187,
           "signature": "def _create_worktree(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet._validate_ownership",
           "kind": "function",
-          "line": 185,
-          "end_line": 225,
+          "line": 189,
+          "end_line": 229,
           "signature": "def _validate_ownership(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.open",
           "kind": "function",
-          "line": 228,
-          "end_line": 237,
+          "line": 232,
+          "end_line": 241,
           "signature": "def open(cls, project: Path, change_id: str)",
           "summary": ""
         },
         {
           "name": "ChangeSet._save",
           "kind": "function",
-          "line": 239,
-          "end_line": 243,
+          "line": 243,
+          "end_line": 247,
           "signature": "def _save(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.check_original",
           "kind": "function",
-          "line": 245,
-          "end_line": 248,
+          "line": 249,
+          "end_line": 252,
           "signature": "def check_original(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.track",
           "kind": "function",
-          "line": 250,
-          "end_line": 260,
+          "line": 254,
+          "end_line": 264,
           "signature": "def track(self, rel: str, expected_hash: str | None | object=_UNSPECIFIED_HASH)",
           "summary": ""
         },
         {
           "name": "ChangeSet.validate_workspace",
           "kind": "function",
-          "line": 262,
-          "end_line": 273,
+          "line": 266,
+          "end_line": 277,
           "signature": "def validate_workspace(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.abort",
           "kind": "function",
-          "line": 275,
-          "end_line": 280,
+          "line": 279,
+          "end_line": 284,
           "signature": "def abort(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.cleanup",
           "kind": "function",
-          "line": 282,
-          "end_line": 293,
+          "line": 286,
+          "end_line": 297,
           "signature": "def cleanup(self)",
           "summary": "Explicitly remove only a verified owned terminal Git workspace; retain journal/objects."
         },
         {
           "name": "ChangeSet.checkpoint",
           "kind": "function",
-          "line": 295,
-          "end_line": 305,
+          "line": 299,
+          "end_line": 309,
           "signature": "def checkpoint(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.restore_checkpoint",
           "kind": "function",
-          "line": 307,
-          "end_line": 328,
+          "line": 311,
+          "end_line": 332,
           "signature": "def restore_checkpoint(self, checkpoint: dict)",
           "summary": ""
         },
         {
           "name": "ChangeSet._write_target",
           "kind": "function",
-          "line": 330,
-          "end_line": 343,
+          "line": 334,
+          "end_line": 347,
           "signature": "def _write_target(self, rel: str, data: bytes | None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.publish",
           "kind": "function",
-          "line": 345,
-          "end_line": 390,
+          "line": 349,
+          "end_line": 394,
           "signature": "def publish(self, finalize=None, cancel_check=lambda: None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.recover",
           "kind": "function",
-          "line": 392,
-          "end_line": 425,
+          "line": 396,
+          "end_line": 429,
           "signature": "def recover(self)",
           "summary": "Restore only bytes written by this publication; never overwrite a third version."
         },
         {
           "name": "ChangeSet.verify_published",
           "kind": "function",
-          "line": 427,
-          "end_line": 429,
+          "line": 431,
+          "end_line": 433,
           "signature": "def verify_published(self)",
           "summary": ""
         }
@@ -1823,9 +1868,9 @@
     },
     {
       "path": "src/atomic_flow/agents/completion.py",
-      "sha256": "07bf4a80fe068824f817296bf0ffb5450820579326d03744703de8daa4635671",
-      "bytes": 5006,
-      "lines": 82,
+      "sha256": "49c08f830eefc1491fd11dbdeb1c9a963110f0b0b36d040779c0e1cfccc67479",
+      "bytes": 5087,
+      "lines": 83,
       "summary": "Host completion gate over final workspace, independent of final model prose.",
       "imports": [
         "__future__",
@@ -1833,6 +1878,7 @@
         "atomic_flow.agents.execution",
         "atomic_flow.agents.source",
         "atomic_flow.notebooks",
+        "atomic_flow.output",
         "hashlib",
         "json",
         "time"
@@ -1841,8 +1887,8 @@
         {
           "name": "assess_completion",
           "kind": "function",
-          "line": 13,
-          "end_line": 82,
+          "line": 14,
+          "end_line": 83,
           "signature": "def assess_completion(task, changeset, config, cancel_check=lambda: None)",
           "summary": ""
         }
@@ -1850,13 +1896,14 @@
     },
     {
       "path": "src/atomic_flow/agents/context.py",
-      "sha256": "9eb5ceebfd334d48ef025719ba615757b67632203e7909e060a7fd2d3bb548b6",
-      "bytes": 8918,
-      "lines": 184,
+      "sha256": "aa33fb95fe8ed9e416761c3f225ee7cf76471eb18ca4a246695923e8063e9043",
+      "bytes": 9579,
+      "lines": 195,
       "summary": "Shared state available to tools during one role turn.",
       "imports": [
         "__future__",
         "atomic_flow.activation.activate",
+        "atomic_flow.agents.effects",
         "atomic_flow.agents.source",
         "atomic_flow.agents.tools.file_paths",
         "atomic_flow.config",
@@ -1871,72 +1918,80 @@
         {
           "name": "ToolContext",
           "kind": "class",
-          "line": 14,
-          "end_line": 184,
+          "line": 15,
+          "end_line": 195,
           "signature": "class ToolContext",
           "summary": "Everything a tool needs to run for one request."
         },
         {
+          "name": "ToolContext.mark_unresolved_effect",
+          "kind": "function",
+          "line": 56,
+          "end_line": 63,
+          "signature": "def mark_unresolved_effect(self, tool: str)",
+          "summary": ""
+        },
+        {
           "name": "ToolContext.record_read",
           "kind": "function",
-          "line": 54,
-          "end_line": 81,
+          "line": 65,
+          "end_line": 92,
           "signature": "def record_read(self, path: str, content_hash: str, view: str, offset: int, end: int, total: int, node_id: str | None=None, source_complete: bool=False)",
           "summary": "Record only the redacted characters actually returned by a source tool."
         },
         {
           "name": "ToolContext.read_coverage",
           "kind": "function",
-          "line": 83,
-          "end_line": 88,
+          "line": 94,
+          "end_line": 99,
           "signature": "def read_coverage(self, path: str, content_hash: str, node_id: str | None=None)",
           "summary": ""
         },
         {
           "name": "ToolContext.require_read",
           "kind": "function",
-          "line": 90,
-          "end_line": 92,
+          "line": 101,
+          "end_line": 103,
           "signature": "def require_read(self, path: str, content_hash: str, node_id: str | None=None)",
           "summary": ""
         },
         {
           "name": "ToolContext.__post_init__",
           "kind": "function",
-          "line": 94,
-          "end_line": 105,
+          "line": 105,
+          "end_line": 116,
           "signature": "def __post_init__(self)",
           "summary": ""
         },
         {
           "name": "ToolContext.read_source",
           "kind": "function",
-          "line": 107,
-          "end_line": 110,
+          "line": 118,
+          "end_line": 121,
           "signature": "def read_source(self, rel: str)",
           "summary": ""
         },
         {
           "name": "ToolContext.invalidate_sources",
           "kind": "function",
-          "line": 112,
-          "end_line": 125,
+          "line": 123,
+          "end_line": 136,
           "signature": "def invalidate_sources(self, paths)",
           "summary": ""
         },
         {
           "name": "ToolContext.sync_external_changes",
           "kind": "function",
-          "line": 127,
-          "end_line": 143,
+          "line": 138,
+          "end_line": 154,
           "signature": "def sync_external_changes(self)",
           "summary": ""
         },
         {
           "name": "ToolContext.refresh",
           "kind": "function",
-          "line": 145,
-          "end_line": 184,
+          "line": 156,
+          "end_line": 195,
           "signature": "def refresh(self)",
           "summary": "Reparse after a verified edit; preserve aliases, never recycle removed ids."
         }
@@ -2013,14 +2068,86 @@
       ]
     },
     {
+      "path": "src/atomic_flow/agents/effects.py",
+      "sha256": "e6d77ca1d60d8d1a68f1346c7b89251e0ef383738b5083c458d6ce072c163be2",
+      "bytes": 1318,
+      "lines": 39,
+      "summary": "Host-owned unresolved effect latch, independent of prompt/history state.",
+      "imports": [
+        "__future__",
+        "atomic_flow.errors",
+        "threading",
+        "uuid"
+      ],
+      "symbols": [
+        {
+          "name": "UnresolvedEffects",
+          "kind": "class",
+          "line": 10,
+          "end_line": 11,
+          "signature": "class UnresolvedEffects",
+          "summary": "External effects need host review; neither model retry nor replan is safe."
+        },
+        {
+          "name": "EffectState",
+          "kind": "class",
+          "line": 14,
+          "end_line": 39,
+          "signature": "class EffectState",
+          "summary": ""
+        },
+        {
+          "name": "EffectState.__init__",
+          "kind": "function",
+          "line": 15,
+          "end_line": 17,
+          "signature": "def __init__(self)",
+          "summary": ""
+        },
+        {
+          "name": "EffectState.blocked",
+          "kind": "function",
+          "line": 20,
+          "end_line": 22,
+          "signature": "def blocked(self)",
+          "summary": ""
+        },
+        {
+          "name": "EffectState.mark",
+          "kind": "function",
+          "line": 24,
+          "end_line": 31,
+          "signature": "def mark(self, tool: str)",
+          "summary": "Latch before persistence. Store no arguments, source or exception text."
+        },
+        {
+          "name": "EffectState.observation",
+          "kind": "function",
+          "line": 33,
+          "end_line": 35,
+          "signature": "def observation(self)",
+          "summary": ""
+        },
+        {
+          "name": "EffectState.require_clear",
+          "kind": "function",
+          "line": 37,
+          "end_line": 39,
+          "signature": "def require_clear(self)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/agents/execution.py",
-      "sha256": "2f1c712197ee381789a37e4c083d3216cdb47bd8c292900a7e8ac61cae6288ad",
-      "bytes": 11044,
-      "lines": 243,
+      "sha256": "34e4c5d245619ce2ad0396e5f68b09ef581ad3b4a5fca1fde1b7a0bd0d15652f",
+      "bytes": 12419,
+      "lines": 274,
       "summary": "Bounded command execution. Local mode is explicitly NOT a security sandbox.",
       "imports": [
         "__future__",
         "atomic_flow.config",
+        "atomic_flow.output",
         "collections.abc",
         "dataclasses",
         "os",
@@ -2040,96 +2167,104 @@
         {
           "name": "ExecutionUnavailable",
           "kind": "class",
-          "line": 22,
-          "end_line": 23,
+          "line": 23,
+          "end_line": 24,
           "signature": "class ExecutionUnavailable",
           "summary": ""
         },
         {
           "name": "TaskCancelled",
           "kind": "class",
-          "line": 26,
-          "end_line": 27,
+          "line": 27,
+          "end_line": 28,
           "signature": "class TaskCancelled",
           "summary": ""
         },
         {
           "name": "CommandResult",
           "kind": "class",
-          "line": 31,
-          "end_line": 37,
+          "line": 32,
+          "end_line": 38,
           "signature": "class CommandResult",
           "summary": ""
         },
         {
           "name": "ExecutionProfile",
           "kind": "class",
-          "line": 41,
-          "end_line": 49,
+          "line": 42,
+          "end_line": 50,
           "signature": "class ExecutionProfile",
           "summary": "Host-defined Docker bounds; repository configuration can only select a name."
         },
         {
+          "name": "_trusted_checker_args",
+          "kind": "function",
+          "line": 83,
+          "end_line": 86,
+          "signature": "def _trusted_checker_args(args: list[str])",
+          "summary": ""
+        },
+        {
           "name": "execution_profile",
           "kind": "function",
-          "line": 58,
-          "end_line": 62,
+          "line": 89,
+          "end_line": 93,
           "signature": "def execution_profile(name: str)",
           "summary": ""
         },
         {
           "name": "clean_environment",
           "kind": "function",
-          "line": 65,
-          "end_line": 72,
+          "line": 96,
+          "end_line": 103,
           "signature": "def clean_environment(home: Path)",
           "summary": ""
         },
         {
           "name": "container_identity",
           "kind": "function",
-          "line": 75,
-          "end_line": 81,
+          "line": 106,
+          "end_line": 112,
           "signature": "def container_identity()",
           "summary": "Keep private Unix workspaces accessible without chmod or running as root."
         },
         {
           "name": "docker_command",
           "kind": "function",
-          "line": 84,
-          "end_line": 99,
+          "line": 115,
+          "end_line": 130,
           "signature": "def docker_command(engine: str, image: str, workspace: Path, name: str, args: list[str], *, profile: str='checks', container_id_file: Path | None=None)",
           "summary": ""
         },
         {
           "name": "_kill_tree",
           "kind": "function",
-          "line": 102,
-          "end_line": 123,
+          "line": 133,
+          "end_line": 154,
           "signature": "def _kill_tree(proc: subprocess.Popen)",
           "summary": ""
         },
         {
           "name": "_remove_container",
           "kind": "function",
-          "line": 126,
-          "end_line": 139,
+          "line": 157,
+          "end_line": 170,
           "signature": "def _remove_container(engine: str, identity: str, home: Path)",
           "summary": "Stop an owned container or prove absence; daemon failure is not absence."
         },
         {
           "name": "run_python",
           "kind": "function",
-          "line": 142,
-          "end_line": 243,
+          "line": 173,
+          "end_line": 274,
           "signature": "def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None=None, timeout: float=120, cancel_check: Callable[[], None] | None=None, output_callback: Callable[[str, bytes], None] | None=None, container_name: str | None=None, container_id_file: Path | None=None)",
           "summary": "Execute Python arguments; docker mode fails closed without an engine/image."
         },
         {
           "name": "run_python.drain",
           "kind": "function",
-          "line": 180,
-          "end_line": 194,
+          "line": 211,
+          "end_line": 225,
           "signature": "def drain(stream, tail, index)",
           "summary": ""
         }
@@ -2212,18 +2347,20 @@
     },
     {
       "path": "src/atomic_flow/agents/loop.py",
-      "sha256": "cdf2e0d168e714aada7662f8f63b2ba9d6d1d6e9a0df49ea67b0a05295c1195b",
-      "bytes": 12364,
-      "lines": 222,
+      "sha256": "ae7cd36c2173c30c10afd0bafebf5379dd54efbf5c1a7121b0a33dc59d133219",
+      "bytes": 13352,
+      "lines": 239,
       "summary": "Tool-use loop for text-only model backends.",
       "imports": [
         "__future__",
         "atomic_flow.agents.base",
         "atomic_flow.agents.context",
+        "atomic_flow.agents.effects",
         "atomic_flow.agents.execution",
         "atomic_flow.agents.policy",
         "atomic_flow.agents.result",
         "atomic_flow.agents.source",
+        "atomic_flow.output",
         "copy",
         "dataclasses",
         "hashlib",
@@ -2236,48 +2373,48 @@
         {
           "name": "render_tools_block",
           "kind": "function",
-          "line": 27,
-          "end_line": 56,
+          "line": 28,
+          "end_line": 57,
           "signature": "def render_tools_block(registry: ToolRegistry, names: list[str])",
           "summary": "Render the allowed tool schemas as a compact system-prompt block."
         },
         {
           "name": "looks_like_tool_call",
           "kind": "function",
-          "line": 59,
-          "end_line": 66,
+          "line": 60,
+          "end_line": 67,
           "signature": "def looks_like_tool_call(parsed: Any)",
           "summary": "Return true only for an object with a non-empty tool name and dict args."
         },
         {
           "name": "execute_tool",
           "kind": "function",
-          "line": 69,
-          "end_line": 208,
+          "line": 70,
+          "end_line": 225,
           "signature": "def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContext, *, allowed_tools: list[str] | tuple[str, ...], role: str='')",
           "summary": "Validate, authorize and audit every outcome, including early rejections."
         },
         {
           "name": "execute_tool.finish",
           "kind": "function",
-          "line": 79,
-          "end_line": 101,
+          "line": 80,
+          "end_line": 112,
           "signature": "def finish(payload: Any, outcome: Outcome | None=None)",
           "summary": ""
         },
         {
           "name": "execute_tool.check_deadline",
           "kind": "function",
-          "line": 156,
-          "end_line": 159,
+          "line": 169,
+          "end_line": 172,
           "signature": "def check_deadline()",
           "summary": ""
         },
         {
           "name": "_contract_error",
           "kind": "function",
-          "line": 211,
-          "end_line": 222,
+          "line": 228,
+          "end_line": 239,
           "signature": "def _contract_error(result: Any, message: str, effects: tuple[str, ...])",
           "summary": "Retain mutation proof when a completed tool violates its return contract."
         }
@@ -2957,15 +3094,16 @@
     },
     {
       "path": "src/atomic_flow/agents/task_loop.py",
-      "sha256": "2e2b0ab013f61cebc26439a73d63d383c455332fe0606fc90e66df0965cea1e1",
-      "bytes": 25012,
-      "lines": 471,
+      "sha256": "8e6a5c3912991600144fc659190f51ce8efc96371660709e6441dd8c7026294d",
+      "bytes": 26960,
+      "lines": 511,
       "summary": "TaskRunner: execute a plan step-by-step, verifying each step.",
       "imports": [
         "__future__",
         "atomic_flow.agents.changeset",
         "atomic_flow.agents.completion",
         "atomic_flow.agents.control",
+        "atomic_flow.agents.effects",
         "atomic_flow.agents.execution",
         "atomic_flow.agents.plan_review",
         "atomic_flow.agents.planner",
@@ -2974,137 +3112,163 @@
         "atomic_flow.config",
         "atomic_flow.errors",
         "atomic_flow.llm.orchestrator",
+        "atomic_flow.sessions",
         "atomic_flow.tree.builder",
         "dataclasses",
         "pathlib",
-        "time"
+        "time",
+        "uuid"
       ],
       "symbols": [
         {
           "name": "StepFailure",
           "kind": "class",
-          "line": 24,
-          "end_line": 26,
+          "line": 25,
+          "end_line": 27,
           "signature": "class StepFailure",
           "summary": ""
         },
         {
           "name": "TaskRunner",
           "kind": "class",
-          "line": 29,
-          "end_line": 471,
+          "line": 30,
+          "end_line": 511,
           "signature": "class TaskRunner",
           "summary": ""
         },
         {
           "name": "TaskRunner.__init__",
           "kind": "function",
-          "line": 30,
-          "end_line": 38,
+          "line": 31,
+          "end_line": 39,
           "signature": "def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner._steps",
           "kind": "function",
-          "line": 41,
-          "end_line": 45,
+          "line": 42,
+          "end_line": 46,
           "signature": "def _steps(plan: Plan, offset: int=0)",
           "summary": ""
         },
         {
           "name": "TaskRunner.review",
           "kind": "function",
-          "line": 47,
-          "end_line": 50,
+          "line": 48,
+          "end_line": 51,
           "signature": "def review(self, task: Task, *, allowed_paths: list[str] | None=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner.approve",
           "kind": "function",
-          "line": 52,
-          "end_line": 62,
+          "line": 53,
+          "end_line": 63,
           "signature": "def approve(self, task: Task, expected_digest: str, *, allowed_paths: list[str] | None=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner.revise",
           "kind": "function",
-          "line": 64,
-          "end_line": 80,
+          "line": 65,
+          "end_line": 81,
           "signature": "def revise(self, task: Task, plan: Plan)",
           "summary": ""
         },
         {
           "name": "TaskRunner._editable_plan",
           "kind": "function",
-          "line": 83,
-          "end_line": 85,
+          "line": 84,
+          "end_line": 86,
           "signature": "def _editable_plan(task)",
+          "summary": ""
+        },
+        {
+          "name": "TaskRunner._check_effects",
+          "kind": "function",
+          "line": 89,
+          "end_line": 95,
+          "signature": "def _check_effects(task)",
+          "summary": ""
+        },
+        {
+          "name": "TaskRunner._hold_effects",
+          "kind": "function",
+          "line": 97,
+          "end_line": 106,
+          "signature": "def _hold_effects(self, task)",
           "summary": ""
         },
         {
           "name": "TaskRunner.prepare",
           "kind": "function",
-          "line": 87,
-          "end_line": 111,
+          "line": 108,
+          "end_line": 132,
           "signature": "def prepare(self, query: str, *, candidates: list[str], n_files: int)",
           "summary": "Persist a task before planning, including rejected/repaired planner responses."
         },
         {
           "name": "TaskRunner.prepare.check",
           "kind": "function",
-          "line": 93,
-          "end_line": 94,
+          "line": 114,
+          "end_line": 115,
           "signature": "def check()",
           "summary": ""
         },
         {
           "name": "TaskRunner.run_plan",
           "kind": "function",
-          "line": 113,
-          "end_line": 119,
+          "line": 134,
+          "end_line": 140,
           "signature": "def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner.resume",
           "kind": "function",
-          "line": 121,
-          "end_line": 160,
+          "line": 142,
+          "end_line": 182,
           "signature": "def resume(self, task: Task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._resume_locked",
           "kind": "function",
-          "line": 162,
-          "end_line": 223,
+          "line": 184,
+          "end_line": 248,
           "signature": "def _resume_locked(self, task: Task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._resume_steps",
           "kind": "function",
-          "line": 225,
-          "end_line": 373,
+          "line": 250,
+          "end_line": 349,
           "signature": "def _resume_steps(self, task: Task)",
           "summary": ""
         },
         {
+          "name": "TaskRunner._replan_failed_step",
+          "kind": "function",
+          "line": 351,
+          "end_line": 412,
+          "signature": "def _replan_failed_step(self, task: Task, step: Step)",
+          "summary": "Replan only after all independently runnable work has drained."
+        },
+        {
           "name": "TaskRunner._execute_step",
           "kind": "function",
-          "line": 375,
-          "end_line": 400,
+          "line": 415,
+          "end_line": 440,
           "signature": "def _execute_step(self, task: Task, step: Step)",
           "summary": ""
         },
         {
           "name": "TaskRunner._verify_step",
           "kind": "function",
-          "line": 402,
-          "end_line": 471,
+          "line": 442,
+          "end_line": 511,
           "signature": "def _verify_step(self, step: Step, result)",
           "summary": ""
         }
@@ -3447,17 +3611,17 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/file_paths.py",
-      "sha256": "4d3a4b052a872d09ca0a004714a1890dfa2225c7507f41bfa2efff864bdd98e6",
-      "bytes": 2719,
-      "lines": 50,
+      "sha256": "c38fb6477025cc4a7c77cf1c33c0a981f9be1a4fca3b4c0db5f0fc11ae7b4aac",
+      "bytes": 2619,
+      "lines": 49,
       "summary": "Shared admission rules for bounded source-file tools.",
       "imports": [
         "__future__",
         "atomic_flow.agents.source",
         "atomic_flow.config",
+        "atomic_flow.execution_inputs",
         "atomic_flow.tree.builder",
         "atomic_flow.tree.defaults",
-        "fnmatch",
         "pathlib",
         "stat"
       ],
@@ -3466,15 +3630,15 @@
           "name": "admitted_path",
           "kind": "function",
           "line": 14,
-          "end_line": 43,
+          "end_line": 42,
           "signature": "def admitted_path(ctx, rel: str, *, existing: bool=False, notebook: bool=False)",
           "summary": ""
         },
         {
           "name": "text_bytes",
           "kind": "function",
-          "line": 46,
-          "end_line": 50,
+          "line": 45,
+          "end_line": 49,
           "signature": "def text_bytes(text: str)",
           "summary": ""
         }
@@ -3974,16 +4138,18 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/run_command.py",
-      "sha256": "a5c42fc8bfeb0a97550ddf044dabd85f0f7c9b457a261e7fd8755310e772c1d1",
-      "bytes": 2163,
-      "lines": 49,
+      "sha256": "a1793591ed6e51587776cdc771bf0523283db05e522c1a35bafe377f938a0803",
+      "bytes": 3028,
+      "lines": 66,
       "summary": "run_command: execute a fixed set of project quality tools without a shell.",
       "imports": [
         "__future__",
         "atomic_flow.agents.base",
+        "atomic_flow.agents.changeset",
         "atomic_flow.agents.context",
         "atomic_flow.agents.diagnostics",
         "atomic_flow.agents.execution",
+        "atomic_flow.output",
         "pydantic",
         "typing"
       ],
@@ -3991,24 +4157,24 @@
         {
           "name": "RunCommandArgs",
           "kind": "class",
-          "line": 20,
-          "end_line": 22,
+          "line": 21,
+          "end_line": 23,
           "signature": "class RunCommandArgs",
           "summary": ""
         },
         {
           "name": "RunCommandTool",
           "kind": "class",
-          "line": 25,
-          "end_line": 49,
+          "line": 26,
+          "end_line": 66,
           "signature": "class RunCommandTool",
           "summary": ""
         },
         {
           "name": "RunCommandTool.run",
           "kind": "function",
-          "line": 33,
-          "end_line": 49,
+          "line": 34,
+          "end_line": 66,
           "signature": "def run(self, args: RunCommandArgs, ctx: ToolContext)",
           "summary": ""
         }
@@ -4338,12 +4504,13 @@
     },
     {
       "path": "src/atomic_flow/api/server.py",
-      "sha256": "c384eb976b5092c729b69f8a9bb16558293b604bff6453f83e948b6a7ff10b03",
-      "bytes": 14940,
-      "lines": 275,
+      "sha256": "e3f4fafaa2fcd65cc4d8e5bbdb213d8fc7979c97f30b4d0bac9d76838d4277ae",
+      "bytes": 15022,
+      "lines": 276,
       "summary": "FastAPI endpoints for native clients and the OpenAI chat-completions shim.",
       "imports": [
         "asyncio",
+        "atomic_flow.agents.effects",
         "atomic_flow.backends.router",
         "atomic_flow.config",
         "atomic_flow.errors",
@@ -4367,160 +4534,160 @@
         {
           "name": "AnswerRequest",
           "kind": "class",
-          "line": 26,
-          "end_line": 39,
+          "line": 27,
+          "end_line": 40,
           "signature": "class AnswerRequest",
           "summary": ""
         },
         {
           "name": "ChatRequest",
           "kind": "class",
-          "line": 42,
-          "end_line": 45,
+          "line": 43,
+          "end_line": 46,
           "signature": "class ChatRequest",
           "summary": ""
         },
         {
           "name": "_text",
           "kind": "function",
-          "line": 48,
-          "end_line": 51,
+          "line": 49,
+          "end_line": 52,
           "signature": "def _text(content: Any)",
           "summary": ""
         },
         {
           "name": "split_conversation",
           "kind": "function",
-          "line": 54,
-          "end_line": 60,
+          "line": 55,
+          "end_line": 61,
           "signature": "def split_conversation(turns: list[tuple[str, str]])",
           "summary": "Return (last user message, history before it)."
         },
         {
           "name": "create_app",
           "kind": "function",
-          "line": 63,
-          "end_line": 268,
+          "line": 64,
+          "end_line": 269,
           "signature": "def create_app()",
           "summary": ""
         },
         {
           "name": "create_app.configured_project_root",
           "kind": "function",
-          "line": 83,
-          "end_line": 84,
+          "line": 84,
+          "end_line": 85,
           "signature": "def configured_project_root()",
           "summary": ""
         },
         {
           "name": "create_app.protect_api",
           "kind": "function",
-          "line": 87,
-          "end_line": 99,
+          "line": 88,
+          "end_line": 100,
           "signature": "def protect_api(request: Request, call_next)",
           "summary": ""
         },
         {
           "name": "create_app.health",
           "kind": "function",
-          "line": 102,
-          "end_line": 103,
+          "line": 103,
+          "end_line": 104,
           "signature": "def health()",
           "summary": ""
         },
         {
           "name": "create_app.models",
           "kind": "function",
-          "line": 106,
-          "end_line": 107,
+          "line": 107,
+          "end_line": 108,
           "signature": "def models()",
           "summary": ""
         },
         {
           "name": "create_app.prepare",
           "kind": "function",
-          "line": 109,
-          "end_line": 129,
+          "line": 110,
+          "end_line": 130,
           "signature": "def prepare(request: AnswerRequest)",
           "summary": ""
         },
         {
           "name": "create_app.run_answer",
           "kind": "function",
-          "line": 131,
-          "end_line": 146,
+          "line": 132,
+          "end_line": 147,
           "signature": "def run_answer(request: AnswerRequest)",
           "summary": ""
         },
         {
           "name": "create_app.answer",
           "kind": "function",
-          "line": 149,
-          "end_line": 150,
+          "line": 150,
+          "end_line": 151,
           "signature": "def answer(request: AnswerRequest)",
           "summary": ""
         },
         {
           "name": "create_app.find_run",
           "kind": "function",
-          "line": 152,
-          "end_line": 158,
+          "line": 153,
+          "end_line": 159,
           "signature": "def find_run(run_id)",
           "summary": ""
         },
         {
           "name": "create_app.start_run",
           "kind": "function",
-          "line": 161,
-          "end_line": 189,
+          "line": 162,
+          "end_line": 190,
           "signature": "def start_run(request: AnswerRequest)",
           "summary": ""
         },
         {
           "name": "create_app.control_run",
           "kind": "function",
-          "line": 192,
-          "end_line": 198,
+          "line": 193,
+          "end_line": 199,
           "signature": "def control_run(run_id: str, message: ControlMessage)",
           "summary": ""
         },
         {
           "name": "create_app.run_result",
           "kind": "function",
-          "line": 201,
-          "end_line": 208,
+          "line": 202,
+          "end_line": 209,
           "signature": "def run_result(run_id: str)",
           "summary": ""
         },
         {
           "name": "create_app.run_events",
           "kind": "function",
-          "line": 211,
-          "end_line": 246,
+          "line": 212,
+          "end_line": 247,
           "signature": "def run_events(run_id: str, request: Request)",
           "summary": ""
         },
         {
           "name": "create_app.run_events.events",
           "kind": "function",
-          "line": 218,
-          "end_line": 243,
+          "line": 219,
+          "end_line": 244,
           "signature": "def events()",
           "summary": ""
         },
         {
           "name": "create_app.chat",
           "kind": "function",
-          "line": 249,
-          "end_line": 266,
+          "line": 250,
+          "end_line": 267,
           "signature": "def chat(request: ChatRequest)",
           "summary": ""
         },
         {
           "name": "__getattr__",
           "kind": "function",
-          "line": 271,
-          "end_line": 274,
+          "line": 272,
+          "end_line": 275,
           "signature": "def __getattr__(name)",
           "summary": ""
         }
@@ -5882,9 +6049,9 @@
     },
     {
       "path": "src/atomic_flow/benchmarking.py",
-      "sha256": "1165fc5b655db84b4fa72aeca52f7bebfb86a4427729a6af6e2680314dba4df0",
-      "bytes": 8667,
-      "lines": 148,
+      "sha256": "fe7f879807e5a9c5b332554a5e5b4aa1b1705d7435faf9259836cdffccb3a770",
+      "bytes": 10157,
+      "lines": 172,
       "summary": "Reproducible local evaluation: free retrieval metrics + end-to-end grounded-QA runs.",
       "imports": [
         "__future__",
@@ -5892,18 +6059,22 @@
         "atomic_flow.backends.router",
         "atomic_flow.config",
         "atomic_flow.errors",
+        "atomic_flow.evaluation_meter",
         "atomic_flow.llm.orchestrator",
+        "atomic_flow.qa_rubric",
         "atomic_flow.tree.builder",
         "atomic_flow.tree.node",
         "collections.abc",
         "contextlib",
         "datetime",
         "json",
+        "os",
         "pathlib",
         "re",
         "shutil",
         "statistics",
         "tempfile",
+        "time",
         "typing"
       ],
       "symbols": [
@@ -5943,16 +6114,24 @@
           "name": "_evaluate",
           "kind": "function",
           "line": 70,
-          "end_line": 90,
+          "end_line": 88,
           "signature": "def _evaluate(case: dict[str, Any], answer, target_ids: list[str])",
           "summary": ""
         },
         {
           "name": "run_benchmark",
           "kind": "function",
-          "line": 93,
-          "end_line": 148,
+          "line": 91,
+          "end_line": 172,
           "signature": "def run_benchmark(config: AtomicConfig, *, model: str | None=None, mode: str | None=None, budget_tokens: int=5000, limit: int | None=None, output: str | Path | None=None, backend_name: str='auto', repeats: int=1)",
+          "summary": ""
+        },
+        {
+          "name": "run_benchmark.checkpoint",
+          "kind": "function",
+          "line": 102,
+          "end_line": 108,
+          "signature": "def checkpoint(calls)",
           "summary": ""
         }
       ]
@@ -7173,6 +7352,114 @@
       ]
     },
     {
+      "path": "src/atomic_flow/evaluation_meter.py",
+      "sha256": "3263a7ce3d2095fa68de168c6e5f98a88e011aced31d3145f309f898b16dd0dc",
+      "bytes": 5265,
+      "lines": 98,
+      "summary": "Evaluation-only observation of backend calls, independent of response parsing.",
+      "imports": [
+        "__future__",
+        "atomic_flow.errors",
+        "math",
+        "time"
+      ],
+      "symbols": [
+        {
+          "name": "usage_summary",
+          "kind": "function",
+          "line": 14,
+          "end_line": 24,
+          "signature": "def usage_summary(calls: list[dict])",
+          "summary": ""
+        },
+        {
+          "name": "EvaluationMeter",
+          "kind": "class",
+          "line": 27,
+          "end_line": 98,
+          "signature": "class EvaluationMeter",
+          "summary": "Record responses before parsing; unknown spend blocks subsequent calls."
+        },
+        {
+          "name": "EvaluationMeter.__init__",
+          "kind": "function",
+          "line": 30,
+          "end_line": 42,
+          "signature": "def __init__(self, backend, *, max_calls=None, max_reported_cost=None, per_trial_calls=None, on_update=None)",
+          "summary": ""
+        },
+        {
+          "name": "EvaluationMeter._checkpoint",
+          "kind": "function",
+          "line": 44,
+          "end_line": 46,
+          "signature": "def _checkpoint(self)",
+          "summary": ""
+        },
+        {
+          "name": "EvaluationMeter.__getattr__",
+          "kind": "function",
+          "line": 48,
+          "end_line": 53,
+          "signature": "def __getattr__(self, name)",
+          "summary": ""
+        },
+        {
+          "name": "EvaluationMeter.config",
+          "kind": "function",
+          "line": 56,
+          "end_line": 57,
+          "signature": "def config(self)",
+          "summary": ""
+        },
+        {
+          "name": "EvaluationMeter.config",
+          "kind": "function",
+          "line": 60,
+          "end_line": 61,
+          "signature": "def config(self, value)",
+          "summary": ""
+        },
+        {
+          "name": "EvaluationMeter.chat",
+          "kind": "function",
+          "line": 63,
+          "end_line": 64,
+          "signature": "def chat(self, *args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "EvaluationMeter._call",
+          "kind": "function",
+          "line": 66,
+          "end_line": 98,
+          "signature": "def _call(self, operation, *args, **kwargs)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/execution_inputs.py",
+      "sha256": "3e857fbf131ca8fbfca0b5d77847381740329c65b59421384767d5b989da7acb",
+      "bytes": 575,
+      "lines": 10,
+      "summary": "Private-path exclusion shared by source admission and execution snapshots.",
+      "imports": [
+        "fnmatch",
+        "pathlib"
+      ],
+      "symbols": [
+        {
+          "name": "private_credential_path",
+          "kind": "function",
+          "line": 6,
+          "end_line": 10,
+          "signature": "def private_credential_path(rel: str)",
+          "summary": "Unrelated ignored build inputs survive; credentials never enter by default."
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/extensions.py",
       "sha256": "bc85a56cf9faa3a3a1688762da16dba8c144b202ec903f28e2d4b3b163b6a722",
       "bytes": 9193,
@@ -8379,14 +8666,16 @@
     },
     {
       "path": "src/atomic_flow/llm/orchestrator.py",
-      "sha256": "566af6df14bd81fc56f0aab876019bc53316f15c2d047e5ab398ad038111dc1e",
-      "bytes": 51992,
-      "lines": 890,
+      "sha256": "625da0e570af395756d865c921cba4bfb01ead82c637c590c26e8105ecff55e5",
+      "bytes": 54543,
+      "lines": 929,
       "summary": "Simple, medium and hard request flows with per-request audit artifacts.",
       "imports": [
         "__future__",
         "atomic_flow.activation.activate",
+        "atomic_flow.activation.redact",
         "atomic_flow.agents.context",
+        "atomic_flow.agents.effects",
         "atomic_flow.agents.loop",
         "atomic_flow.agents.policy",
         "atomic_flow.agents.result",
@@ -8405,6 +8694,7 @@
         "atomic_flow.llm.prompts",
         "atomic_flow.llm.schemas",
         "atomic_flow.llm.verify",
+        "atomic_flow.output",
         "atomic_flow.sessions",
         "atomic_flow.tree.builder",
         "atomic_flow.tree.node",
@@ -8519,7 +8809,7 @@
           "name": "_Run",
           "kind": "class",
           "line": 181,
-          "end_line": 555,
+          "end_line": 586,
           "signature": "class _Run",
           "summary": ""
         },
@@ -8527,207 +8817,215 @@
           "name": "_Run.__init__",
           "kind": "function",
           "line": 182,
-          "end_line": 216,
+          "end_line": 219,
           "signature": "def __init__(self, backend: LLMBackend, registry: PromptRegistry, ledger: SpendLedger, query: str, artifact_dir: Path | None, tool_registry=None, tool_ctx=None, role_tools=None, conversation=None, native_tools=False)",
           "summary": ""
         },
         {
           "name": "_Run.assistant_message",
           "kind": "function",
-          "line": 219,
-          "end_line": 223,
+          "line": 222,
+          "end_line": 226,
           "signature": "def assistant_message(response: ChatResult)",
           "summary": ""
         },
         {
           "name": "_Run.system",
           "kind": "function",
-          "line": 225,
-          "end_line": 233,
+          "line": 228,
+          "end_line": 236,
           "signature": "def system(self, base: str)",
           "summary": ""
         },
         {
           "name": "_Run.add_advisory_context",
           "kind": "function",
-          "line": 235,
-          "end_line": 237,
+          "line": 238,
+          "end_line": 240,
           "signature": "def add_advisory_context(self, messages)",
           "summary": ""
         },
         {
           "name": "_Run.event",
           "kind": "function",
-          "line": 239,
-          "end_line": 254,
+          "line": 242,
+          "end_line": 267,
           "signature": "def event(self, kind: str, payload: dict, *, call_id=None, outcome=None)",
           "summary": ""
         },
         {
           "name": "_Run.apply_steering",
           "kind": "function",
-          "line": 256,
-          "end_line": 277,
+          "line": 269,
+          "end_line": 290,
           "signature": "def apply_steering(self, messages)",
           "summary": ""
         },
         {
           "name": "_Run.stale_response",
           "kind": "function",
-          "line": 279,
-          "end_line": 285,
+          "line": 292,
+          "end_line": 298,
           "signature": "def stale_response(self, messages, response)",
           "summary": ""
         },
         {
           "name": "_Run.chat",
           "kind": "function",
-          "line": 287,
-          "end_line": 361,
+          "line": 300,
+          "end_line": 374,
           "signature": "def chat(self, messages: list[dict[str, str]], role: str)",
           "summary": ""
         },
         {
           "name": "_Run.usage_report",
           "kind": "function",
-          "line": 363,
-          "end_line": 374,
+          "line": 376,
+          "end_line": 387,
           "signature": "def usage_report(self)",
           "summary": ""
         },
         {
           "name": "_Run.write",
           "kind": "function",
-          "line": 376,
-          "end_line": 378,
+          "line": 389,
+          "end_line": 392,
           "signature": "def write(self, name: str, content: str)",
           "summary": ""
         },
         {
           "name": "_Run.write_json",
           "kind": "function",
-          "line": 380,
-          "end_line": 381,
+          "line": 394,
+          "end_line": 396,
           "signature": "def write_json(self, name: str, data: object)",
+          "summary": ""
+        },
+        {
+          "name": "_Run.check_effects",
+          "kind": "function",
+          "line": 398,
+          "end_line": 409,
+          "signature": "def check_effects(self)",
           "summary": ""
         },
         {
           "name": "_Run._account",
           "kind": "function",
-          "line": 383,
-          "end_line": 390,
+          "line": 411,
+          "end_line": 418,
           "signature": "def _account(self, response: ChatResult)",
           "summary": ""
         },
         {
           "name": "_Run.invoke",
           "kind": "function",
-          "line": 392,
-          "end_line": 396,
+          "line": 420,
+          "end_line": 425,
           "signature": "def invoke(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_single",
           "kind": "function",
-          "line": 398,
-          "end_line": 432,
+          "line": 427,
+          "end_line": 461,
           "signature": "def _invoke_single(self, role: str, schema: type[M], data: dict[str, Any], context: str | None=None)",
           "summary": ""
         },
         {
           "name": "_Run._invoke_with_tools",
           "kind": "function",
-          "line": 434,
-          "end_line": 555,
+          "line": 463,
+          "end_line": 586,
           "signature": "def _invoke_with_tools(self, role: str, schema: type[M], data: dict[str, Any], context: str | None, tool_names: list[str])",
           "summary": ""
         },
         {
           "name": "_Attempt",
           "kind": "class",
-          "line": 559,
-          "end_line": 569,
+          "line": 590,
+          "end_line": 600,
           "signature": "class _Attempt",
           "summary": ""
         },
         {
           "name": "_Attempt.score",
           "kind": "function",
-          "line": 568,
-          "end_line": 569,
+          "line": 599,
+          "end_line": 600,
           "signature": "def score(self)",
           "summary": ""
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 572,
-          "end_line": 890,
+          "line": 603,
+          "end_line": 929,
           "signature": "class Orchestrator",
           "summary": ""
         },
         {
           "name": "Orchestrator.__init__",
           "kind": "function",
-          "line": 573,
-          "end_line": 594,
+          "line": 604,
+          "end_line": 625,
           "signature": "def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend, approval_callback=None, *, settings_project: str | Path | None=None, cancel_check=None, question_callback=None, private_workspace=False, control=None, event_sink=None, mutation_scope=None, workspace_session=None, lsp_client=None, documentation_client=None, hooks=None, tool_registry=None, role_tools=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator.__init__.check",
           "kind": "function",
-          "line": 589,
-          "end_line": 593,
+          "line": 620,
+          "end_line": 624,
           "signature": "def check()",
           "summary": ""
         },
         {
           "name": "Orchestrator.answer",
           "kind": "function",
-          "line": 596,
-          "end_line": 659,
+          "line": 627,
+          "end_line": 697,
           "signature": "def answer(self, query: str, *, mode: str | None=None, budget_tokens: int | None=None, role_prompts: dict[str, str] | None=None, request_id: str | None=None, file_scope: str | None=None, retrieval_query: str | None=None, approve_edits: bool=False, resume_from: str | None=None, memory_ids: list[str] | None=None, memory_query: str | None=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer",
           "kind": "function",
-          "line": 662,
-          "end_line": 890,
+          "line": 700,
+          "end_line": 929,
           "signature": "def _answer(self, run: _Run, registry: PromptRegistry, req_id: str, query: str, rq: str, mode: str, limit: int, file_scope: str | None, approve_edits: bool=False)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.view",
           "kind": "function",
-          "line": 723,
-          "end_line": 725,
+          "line": 762,
+          "end_line": 764,
           "signature": "def view(pairs: list[tuple[TreeNode, float]])",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.reparse",
           "kind": "function",
-          "line": 727,
-          "end_line": 738,
+          "line": 766,
+          "end_line": 777,
           "signature": "def reparse(extra: dict[str, Any] | None=None)",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.build_context",
           "kind": "function",
-          "line": 751,
-          "end_line": 760,
+          "line": 790,
+          "end_line": 799,
           "signature": "def build_context()",
           "summary": ""
         },
         {
           "name": "Orchestrator._answer.sync_context",
           "kind": "function",
-          "line": 765,
-          "end_line": 779,
+          "line": 804,
+          "end_line": 818,
           "signature": "def sync_context()",
           "summary": ""
         }
@@ -9735,6 +10033,29 @@
       ]
     },
     {
+      "path": "src/atomic_flow/output.py",
+      "sha256": "c1b8e0c8d0c75fa12d643d9359c0c7e5c9c3984a8874c67ef7a6da7e05f4f9bf",
+      "bytes": 1094,
+      "lines": 27,
+      "summary": "One redaction boundary for model-facing and persisted command/tool output.",
+      "imports": [
+        "__future__",
+        "atomic_flow.activation.redact",
+        "re",
+        "typing"
+      ],
+      "symbols": [
+        {
+          "name": "sanitize_output",
+          "kind": "function",
+          "line": 16,
+          "end_line": 27,
+          "signature": "def sanitize_output(value: Any)",
+          "summary": "Copy JSON-like output while masking string values and credential fields."
+        }
+      ]
+    },
+    {
       "path": "src/atomic_flow/project_cli.py",
       "sha256": "302c1427cfd5030041fd55a3010e48cf7fe2fbb2880bc6c81be6d7abe1ed184b",
       "bytes": 12172,
@@ -9819,22 +10140,23 @@
     },
     {
       "path": "src/atomic_flow/qa_evaluation.py",
-      "sha256": "97186d2237f7eb89b23406be7f32474b162abb9cc1483461b0156172e5a0f6ca",
-      "bytes": 9940,
-      "lines": 164,
+      "sha256": "8dba14f5725d87ceb394d1a8cce1ea5a5fff79347ef9614d96f6adbcf5a27480",
+      "bytes": 8550,
+      "lines": 142,
       "summary": "Small, paired code-QA evaluation; no execution of fixture or model-written code.",
       "imports": [
         "__future__",
         "atomic_flow.benchmarking",
         "atomic_flow.config",
-        "atomic_flow.errors",
+        "atomic_flow.evaluation_meter",
         "atomic_flow.llm.orchestrator",
         "atomic_flow.llm.schemas",
         "atomic_flow.llm.verify",
+        "atomic_flow.qa_rubric",
         "datetime",
         "hashlib",
         "json",
-        "math",
+        "os",
         "pathlib",
         "time",
         "types"
@@ -9843,49 +10165,78 @@
         {
           "name": "CallMeter",
           "kind": "class",
-          "line": 20,
-          "end_line": 59,
+          "line": 21,
+          "end_line": 25,
           "signature": "class CallMeter",
           "summary": "Bound attempted chat calls, recording failures and usage before answer parsing."
         },
         {
           "name": "CallMeter.__init__",
           "kind": "function",
-          "line": 23,
-          "end_line": 35,
+          "line": 24,
+          "end_line": 25,
           "signature": "def __init__(self, backend, *, max_calls=64, max_reported_cost=0.5, per_trial_calls=8)",
-          "summary": ""
-        },
-        {
-          "name": "CallMeter.chat",
-          "kind": "function",
-          "line": 37,
-          "end_line": 59,
-          "signature": "def chat(self, messages, *, json_mode=False, model=None)",
           "summary": ""
         },
         {
           "name": "summarize",
           "kind": "function",
-          "line": 62,
-          "end_line": 71,
+          "line": 28,
+          "end_line": 35,
           "signature": "def summarize(rows: list[dict])",
           "summary": ""
         },
         {
           "name": "run_qa_comparison",
           "kind": "function",
-          "line": 74,
-          "end_line": 164,
+          "line": 38,
+          "end_line": 142,
           "signature": "def run_qa_comparison(backend, config: AtomicConfig, *, case_ids: list[str], output: Path, max_calls=64, max_reported_cost=0.5, per_trial_calls=8)",
           "summary": "Compare current atomic medium mode to a one-shot, full-fixture-context baseline."
         },
         {
           "name": "run_qa_comparison.checkpoint",
           "kind": "function",
-          "line": 104,
-          "end_line": 116,
+          "line": 71,
+          "end_line": 83,
           "signature": "def checkpoint()",
+          "summary": ""
+        },
+        {
+          "name": "run_qa_comparison.attempt_checkpoint",
+          "kind": "function",
+          "line": 85,
+          "end_line": 92,
+          "signature": "def attempt_checkpoint(calls)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "src/atomic_flow/qa_rubric.py",
+      "sha256": "f3df0c7e12fad7399238d64f7ceed5f3c58aa7a5dc8f498946069afa8d775411",
+      "bytes": 9324,
+      "lines": 110,
+      "summary": "Frozen v2 fixture propositions, not a general semantic-entailment grader.",
+      "imports": [
+        "__future__",
+        "re"
+      ],
+      "symbols": [
+        {
+          "name": "_normalize",
+          "kind": "function",
+          "line": 55,
+          "end_line": 56,
+          "signature": "def _normalize(text)",
+          "summary": ""
+        },
+        {
+          "name": "grade_propositions",
+          "kind": "function",
+          "line": 87,
+          "end_line": 110,
+          "signature": "def grade_propositions(case: dict, text: str)",
           "summary": ""
         }
       ]
@@ -10570,12 +10921,13 @@
     },
     {
       "path": "src/atomic_flow/sdk.py",
-      "sha256": "215417eb5ca46b99a4f7d9ddb4ff9aef2a269f71fe339e338af94e49fad09606",
-      "bytes": 9969,
-      "lines": 222,
+      "sha256": "e3a15f9d25ff8546a6fe9efec92d4c569466aae400a49f0efc170712db7a1795",
+      "bytes": 10246,
+      "lines": 226,
       "summary": "Small in-process SDK. No API dependencies or implicit network/model selection.",
       "imports": [
         "__future__",
+        "atomic_flow.agents.effects",
         "atomic_flow.agents.execution",
         "atomic_flow.agents.planner",
         "atomic_flow.agents.task",
@@ -10606,216 +10958,216 @@
         {
           "name": "RunError",
           "kind": "class",
-          "line": 21,
-          "end_line": 26,
+          "line": 22,
+          "end_line": 27,
           "signature": "class RunError",
           "summary": ""
         },
         {
           "name": "AnswerHandle",
           "kind": "class",
-          "line": 29,
-          "end_line": 111,
+          "line": 30,
+          "end_line": 115,
           "signature": "class AnswerHandle",
           "summary": "Single-consumer event iterator plus independent retained result/terminal."
         },
         {
           "name": "AnswerHandle.__init__",
           "kind": "function",
-          "line": 35,
-          "end_line": 80,
+          "line": 36,
+          "end_line": 84,
           "signature": "def __init__(self, config, project: str | Path, backend, query: str, *, capacity=128, approval_callback=None, question_callback=None, on_finished=None, workspace_session=None, lsp_client=None, documentation_client=None, hooks=None, tool_registry=None, role_tools=None, **answer_options)",
           "summary": ""
         },
         {
           "name": "AnswerHandle.__init__.work",
           "kind": "function",
-          "line": 49,
-          "end_line": 74,
+          "line": 50,
+          "end_line": 78,
           "signature": "def work()",
           "summary": ""
         },
         {
           "name": "AnswerHandle.done",
           "kind": "function",
-          "line": 83,
-          "end_line": 84,
+          "line": 87,
+          "end_line": 88,
           "signature": "def done(self)",
           "summary": ""
         },
         {
           "name": "AnswerHandle.cancel",
           "kind": "function",
-          "line": 86,
-          "end_line": 87,
+          "line": 90,
+          "end_line": 91,
           "signature": "def cancel(self)",
           "summary": ""
         },
         {
           "name": "AnswerHandle.steer",
           "kind": "function",
-          "line": 89,
-          "end_line": 90,
+          "line": 93,
+          "end_line": 94,
           "signature": "def steer(self, text: str)",
           "summary": ""
         },
         {
           "name": "AnswerHandle.events",
           "kind": "function",
-          "line": 92,
-          "end_line": 104,
+          "line": 96,
+          "end_line": 108,
           "signature": "def events(self)",
           "summary": ""
         },
         {
           "name": "AnswerHandle.result",
           "kind": "function",
-          "line": 106,
-          "end_line": 111,
+          "line": 110,
+          "end_line": 115,
           "signature": "def result(self, timeout: float | None=None)",
           "summary": ""
         },
         {
           "name": "start_answer",
           "kind": "function",
-          "line": 114,
-          "end_line": 115,
+          "line": 118,
+          "end_line": 119,
           "signature": "def start_answer(config, project: str | Path, backend, query: str, **options)",
           "summary": ""
         },
         {
           "name": "resume_answer",
           "kind": "function",
-          "line": 118,
-          "end_line": 120,
+          "line": 122,
+          "end_line": 124,
           "signature": "def resume_answer(config, project: str | Path, backend, session_id: str, query: str, **options)",
           "summary": "Start a fresh request from checked advisory state, never replay actions."
         },
         {
           "name": "_saved_task",
           "kind": "function",
-          "line": 123,
-          "end_line": 128,
+          "line": 127,
+          "end_line": 132,
           "signature": "def _saved_task(task_id)",
           "summary": ""
         },
         {
           "name": "review_task",
           "kind": "function",
-          "line": 131,
-          "end_line": 134,
+          "line": 135,
+          "end_line": 138,
           "signature": "def review_task(task_id: str, *, allowed_paths: list[str] | None=None)",
           "summary": "Offline plan/scope digest; does not configure or call a model."
         },
         {
           "name": "approve_task",
           "kind": "function",
-          "line": 137,
-          "end_line": 140,
+          "line": 141,
+          "end_line": 144,
           "signature": "def approve_task(task_id: str, expected_digest: str, *, allowed_paths: list[str] | None=None)",
           "summary": "Explicit host approval for exactly the reviewed digest, without execution."
         },
         {
           "name": "revise_task",
           "kind": "function",
-          "line": 143,
-          "end_line": 147,
+          "line": 147,
+          "end_line": 151,
           "signature": "def revise_task(task_id: str, plan)",
           "summary": ""
         },
         {
           "name": "jobs",
           "kind": "function",
-          "line": 150,
-          "end_line": 153,
+          "line": 154,
+          "end_line": 157,
           "signature": "def jobs(project: str | Path)",
           "summary": "Offline project-bound durable job store, independent of live answer handles."
         },
         {
           "name": "connect_worker",
           "kind": "function",
-          "line": 156,
-          "end_line": 159,
+          "line": 160,
+          "end_line": 163,
           "signature": "def connect_worker(project: str | Path, url: str, *, broker, grant_id: str, allow_loopback_http=False)",
           "summary": "No network on construction; each operation resolves a scoped host grant."
         },
         {
           "name": "notebook",
           "kind": "function",
-          "line": 162,
-          "end_line": 164,
+          "line": 166,
+          "end_line": 168,
           "signature": "def notebook(project: str | Path, path: str, **options)",
           "summary": ""
         },
         {
           "name": "workspace",
           "kind": "function",
-          "line": 167,
-          "end_line": 169,
+          "line": 171,
+          "end_line": 173,
           "signature": "def workspace(workspace_id='default')",
           "summary": ""
         },
         {
           "name": "watch",
           "kind": "function",
-          "line": 172,
-          "end_line": 174,
+          "line": 176,
+          "end_line": 178,
           "signature": "def watch(project: str | Path, **options)",
           "summary": ""
         },
         {
           "name": "open_lsp",
           "kind": "function",
-          "line": 177,
-          "end_line": 180,
+          "line": 181,
+          "end_line": 184,
           "signature": "def open_lsp(project: str | Path, command: list[str], *, approved=False, **options)",
           "summary": "Explicit host executable approval; use as context manager to start/close."
         },
         {
           "name": "documentation",
           "kind": "function",
-          "line": 183,
-          "end_line": 185,
+          "line": 187,
+          "end_line": 189,
           "signature": "def documentation(allowed_hosts, *, approved=False, **options)",
           "summary": ""
         },
         {
           "name": "components",
           "kind": "function",
-          "line": 188,
-          "end_line": 199,
+          "line": 192,
+          "end_line": 203,
           "signature": "def components()",
           "summary": "Host-owned builtins, deferred until requested; no project import paths."
         },
         {
           "name": "worker_coordinator",
           "kind": "function",
-          "line": 202,
-          "end_line": 204,
+          "line": 206,
+          "end_line": 208,
           "signature": "def worker_coordinator(project, parent_budget_backend, **options)",
           "summary": ""
         },
         {
           "name": "open_mcp",
           "kind": "function",
-          "line": 207,
-          "end_line": 210,
+          "line": 211,
+          "end_line": 214,
           "signature": "def open_mcp(project, command, *, approved=False, **options)",
           "summary": "Explicit trusted stdio process; context manager owns start and shutdown."
         },
         {
           "name": "ide_bridge",
           "kind": "function",
-          "line": 213,
-          "end_line": 216,
+          "line": 217,
+          "end_line": 220,
           "signature": "def ide_bridge(project, *, token, allowed_origins, **options)",
           "summary": "Return an unstarted, authenticated read-only loopback HTTP server."
         },
         {
           "name": "execute_workflow",
           "kind": "function",
-          "line": 219,
-          "end_line": 222,
+          "line": 223,
+          "end_line": 226,
           "signature": "def execute_workflow(definition, registry, context, *, expected_digest, approved=False, allowed_tools, role='')",
           "summary": ""
         }
@@ -10823,9 +11175,9 @@
     },
     {
       "path": "src/atomic_flow/sessions.py",
-      "sha256": "6a911ef9d8ae6119c05643b1f1ab07070a1fa401ae5e39a089dde3c2564284a6",
-      "bytes": 14524,
-      "lines": 289,
+      "sha256": "455209bc6139c74141b5efa08e1ff964bf64f937f1665d826abcde7edda89693",
+      "bytes": 14633,
+      "lines": 291,
       "summary": "Bounded, redacted, append-only session observations, never executable replay.",
       "imports": [
         "__future__",
@@ -10872,7 +11224,7 @@
           "name": "SessionSnapshot",
           "kind": "class",
           "line": 66,
-          "end_line": 114,
+          "end_line": 116,
           "signature": "class SessionSnapshot",
           "summary": ""
         },
@@ -10888,103 +11240,103 @@
           "name": "SessionSnapshot.unresolved_call_ids",
           "kind": "function",
           "line": 86,
-          "end_line": 114,
+          "end_line": 116,
           "signature": "def unresolved_call_ids(self)",
           "summary": "Closed transport observations do not establish settled charges/effects."
         },
         {
           "name": "SessionJournal",
           "kind": "class",
-          "line": 117,
-          "end_line": 264,
+          "line": 119,
+          "end_line": 266,
           "signature": "class SessionJournal",
           "summary": ""
         },
         {
           "name": "SessionJournal.__init__",
           "kind": "function",
-          "line": 118,
-          "end_line": 121,
+          "line": 120,
+          "end_line": 123,
           "signature": "def __init__(self, session_id: str)",
           "summary": ""
         },
         {
           "name": "SessionJournal.create",
           "kind": "function",
-          "line": 124,
-          "end_line": 136,
+          "line": 126,
+          "end_line": 138,
           "signature": "def create(cls, project: Path, session_id: str | None=None, *, metadata: dict | None=None)",
           "summary": ""
         },
         {
           "name": "SessionJournal.open",
           "kind": "function",
-          "line": 139,
-          "end_line": 142,
+          "line": 141,
+          "end_line": 144,
           "signature": "def open(cls, session_id: str)",
           "summary": ""
         },
         {
           "name": "SessionJournal._lease",
           "kind": "function",
-          "line": 144,
-          "end_line": 145,
+          "line": 146,
+          "end_line": 147,
           "signature": "def _lease(self)",
           "summary": ""
         },
         {
           "name": "SessionJournal._event",
           "kind": "function",
-          "line": 147,
-          "end_line": 169,
+          "line": 149,
+          "end_line": 171,
           "signature": "def _event(self, sequence: int, event_type: str, payload: dict, call_id: str | None=None, outcome: str | None=None)",
           "summary": ""
         },
         {
           "name": "SessionJournal.append",
           "kind": "function",
-          "line": 171,
-          "end_line": 187,
+          "line": 173,
+          "end_line": 189,
           "signature": "def append(self, event_type: str, payload: dict, *, call_id: str | None=None, outcome: str | None=None, expected_sequence: int | None=None)",
           "summary": ""
         },
         {
           "name": "SessionJournal.read",
           "kind": "function",
-          "line": 189,
-          "end_line": 206,
+          "line": 191,
+          "end_line": 208,
           "signature": "def read(self)",
           "summary": ""
         },
         {
           "name": "SessionJournal._validate_event",
           "kind": "function",
-          "line": 208,
-          "end_line": 225,
+          "line": 210,
+          "end_line": 227,
           "signature": "def _validate_event(self, event: dict, sequence: int)",
           "summary": ""
         },
         {
           "name": "SessionJournal.recover_tail",
           "kind": "function",
-          "line": 227,
-          "end_line": 249,
+          "line": 229,
+          "end_line": 251,
           "signature": "def recover_tail(self)",
           "summary": "Preserve and remove only uncommitted tail bytes; do not replay effects."
         },
         {
           "name": "SessionJournal.export",
           "kind": "function",
-          "line": 251,
-          "end_line": 264,
+          "line": 253,
+          "end_line": 266,
           "signature": "def export(self, path: Path)",
           "summary": ""
         },
         {
           "name": "list_sessions",
           "kind": "function",
-          "line": 267,
-          "end_line": 289,
+          "line": 269,
+          "end_line": 291,
           "signature": "def list_sessions(*, limit: int=100)",
           "summary": ""
         }
@@ -11884,9 +12236,9 @@
     },
     {
       "path": "src/atomic_flow/workflows.py",
-      "sha256": "ab772352295d10940928d7f25f2da78e9768940e05a9e1ae3fd89e2fde6ae5cc",
-      "bytes": 6378,
-      "lines": 124,
+      "sha256": "d8aa4ebec068bf782e64514b3f9dfacaf14034f15814d041f585b016ce1c7c0d",
+      "bytes": 7016,
+      "lines": 137,
       "summary": "Bounded host-selected static workflows using the ordinary tool dispatcher.",
       "imports": [
         "__future__",
@@ -11959,9 +12311,17 @@
           "name": "run_workflow",
           "kind": "function",
           "line": 71,
-          "end_line": 124,
+          "end_line": 137,
           "signature": "def run_workflow(workflow: Workflow | dict, registry, ctx, *, allowed_tools: list[str] | tuple[str, ...], role: str='', expected_digest: str, approved: bool=False)",
           "summary": "No project auto-discovery, interpolation, resume or action retry."
+        },
+        {
+          "name": "run_workflow.effect_report",
+          "kind": "function",
+          "line": 97,
+          "end_line": 100,
+          "signature": "def effect_report()",
+          "summary": ""
         }
       ]
     },
@@ -13906,6 +14266,171 @@
       ]
     },
     {
+      "path": "tests/test_evaluation_integrity.py",
+      "sha256": "fbaa9fd5e3cdd9299323d007ee981f8024e8c64f84f0655aaeb6118daef72fce",
+      "bytes": 6544,
+      "lines": 135,
+      "summary": "Frozen positive/negative grader calibration and parsing-independent usage.",
+      "imports": [
+        "atomic_flow.backends.base",
+        "atomic_flow.benchmarking",
+        "atomic_flow.config",
+        "atomic_flow.errors",
+        "atomic_flow.evaluation_meter",
+        "atomic_flow.llm.schemas",
+        "atomic_flow.qa_rubric",
+        "json",
+        "pytest",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "grade",
+          "kind": "function",
+          "line": 17,
+          "end_line": 21,
+          "signature": "def grade(case_id, text, *, confidence='high', citations=None)",
+          "summary": ""
+        },
+        {
+          "name": "test_reviewed_complete_answers_calibrate_positive_and_irrelevant_citations_fail",
+          "kind": "function",
+          "line": 25,
+          "end_line": 30,
+          "signature": "def test_reviewed_complete_answers_calibrate_positive_and_irrelevant_citations_fail(case_id)",
+          "summary": ""
+        },
+        {
+          "name": "test_semantic_inversions_and_appended_fabrications_cannot_auto_pass",
+          "kind": "function",
+          "line": 39,
+          "end_line": 40,
+          "signature": "def test_semantic_inversions_and_appended_fabrications_cannot_auto_pass(text)",
+          "summary": ""
+        },
+        {
+          "name": "test_low_confidence_and_partial_disclaimer_are_not_successful_abstentions",
+          "kind": "function",
+          "line": 48,
+          "end_line": 49,
+          "signature": "def test_low_confidence_and_partial_disclaimer_are_not_successful_abstentions(text)",
+          "summary": ""
+        },
+        {
+          "name": "test_calibrated_abstentions_and_uncalibrated_cases_are_explicit",
+          "kind": "function",
+          "line": 52,
+          "end_line": 58,
+          "signature": "def test_calibrated_abstentions_and_uncalibrated_cases_are_explicit()",
+          "summary": ""
+        },
+        {
+          "name": "Backend",
+          "kind": "class",
+          "line": 61,
+          "end_line": 65,
+          "signature": "class Backend",
+          "summary": ""
+        },
+        {
+          "name": "Backend.chat",
+          "kind": "function",
+          "line": 64,
+          "end_line": 65,
+          "signature": "def chat(self, *args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_legacy_report_counts_failed_parse_and_preserves_attempts_before_parsing",
+          "kind": "function",
+          "line": 69,
+          "end_line": 106,
+          "signature": "def test_legacy_report_counts_failed_parse_and_preserves_attempts_before_parsing(tmp_path, monkeypatch, unknown)",
+          "summary": ""
+        },
+        {
+          "name": "test_legacy_report_counts_failed_parse_and_preserves_attempts_before_parsing.broken",
+          "kind": "function",
+          "line": 74,
+          "end_line": 75,
+          "signature": "def broken(*args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_legacy_report_counts_failed_parse_and_preserves_attempts_before_parsing.Orchestrator",
+          "kind": "class",
+          "line": 78,
+          "end_line": 91,
+          "signature": "class Orchestrator",
+          "summary": ""
+        },
+        {
+          "name": "test_legacy_report_counts_failed_parse_and_preserves_attempts_before_parsing.Orchestrator.__init__",
+          "kind": "function",
+          "line": 80,
+          "end_line": 81,
+          "signature": "def __init__(self, config, root, backend)",
+          "summary": ""
+        },
+        {
+          "name": "test_legacy_report_counts_failed_parse_and_preserves_attempts_before_parsing.Orchestrator.answer",
+          "kind": "function",
+          "line": 82,
+          "end_line": 91,
+          "signature": "def answer(self, *args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_meter_distinguishes_refusal_unknown_and_failed_persistence",
+          "kind": "function",
+          "line": 109,
+          "end_line": 125,
+          "signature": "def test_meter_distinguishes_refusal_unknown_and_failed_persistence()",
+          "summary": ""
+        },
+        {
+          "name": "test_meter_distinguishes_refusal_unknown_and_failed_persistence.Refusal",
+          "kind": "class",
+          "line": 110,
+          "end_line": 111,
+          "signature": "class Refusal",
+          "summary": ""
+        },
+        {
+          "name": "test_meter_distinguishes_refusal_unknown_and_failed_persistence.refuse",
+          "kind": "function",
+          "line": 113,
+          "end_line": 114,
+          "signature": "def refuse(*args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_native_calls_are_observed_by_the_same_meter",
+          "kind": "function",
+          "line": 128,
+          "end_line": 135,
+          "signature": "def test_native_calls_are_observed_by_the_same_meter()",
+          "summary": ""
+        },
+        {
+          "name": "test_native_calls_are_observed_by_the_same_meter.Native",
+          "kind": "class",
+          "line": 129,
+          "end_line": 131,
+          "signature": "class Native",
+          "summary": ""
+        },
+        {
+          "name": "test_native_calls_are_observed_by_the_same_meter.Native.chat_tools",
+          "kind": "function",
+          "line": 130,
+          "end_line": 131,
+          "signature": "def chat_tools(self, *args, **kwargs)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_evidence_refresh.py",
       "sha256": "2ad3cd72fd87d06178f473afa38b8aff385988b364271c9d803ce8b08b1b7626",
       "bytes": 2305,
@@ -14085,6 +14610,121 @@
           "line": 158,
           "end_line": 182,
           "signature": "def test_real_container_boundaries(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_execution_confidentiality.py",
+      "sha256": "002293b44fe5c30360a35587e133bd2a26fe7d06b9e1cf51d1053991c4ea1607",
+      "bytes": 7901,
+      "lines": 150,
+      "summary": "Regressions for private execution inputs and checker identity/output gates.",
+      "imports": [
+        "__future__",
+        "atomic_flow.agents.changeset",
+        "atomic_flow.agents.completion",
+        "atomic_flow.agents.context",
+        "atomic_flow.agents.execution",
+        "atomic_flow.agents.source",
+        "atomic_flow.agents.task",
+        "atomic_flow.agents.tools.file_paths",
+        "atomic_flow.agents.tools.run_command",
+        "atomic_flow.config",
+        "atomic_flow.jobs",
+        "atomic_flow.output",
+        "atomic_flow.remote",
+        "json",
+        "os",
+        "pytest"
+      ],
+      "symbols": [
+        {
+          "name": "_completed_task",
+          "kind": "function",
+          "line": 25,
+          "end_line": 28,
+          "signature": "def _completed_task(project)",
+          "summary": ""
+        },
+        {
+          "name": "test_execution_snapshot_excludes_private_inputs_but_keeps_build_artifacts",
+          "kind": "function",
+          "line": 31,
+          "end_line": 53,
+          "signature": "def test_execution_snapshot_excludes_private_inputs_but_keeps_build_artifacts(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_command_output_and_diagnostics_redact_recognized_canaries",
+          "kind": "function",
+          "line": 56,
+          "end_line": 69,
+          "signature": "def test_command_output_and_diagnostics_redact_recognized_canaries(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_run_python_redacts_stdout_and_stderr",
+          "kind": "function",
+          "line": 72,
+          "end_line": 77,
+          "signature": "def test_run_python_redacts_stdout_and_stderr(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner",
+          "kind": "function",
+          "line": 80,
+          "end_line": 90,
+          "signature": "def test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_final_report_redacts_even_an_injected_executor_result",
+          "kind": "function",
+          "line": 93,
+          "end_line": 97,
+          "signature": "def test_final_report_redacts_even_an_injected_executor_result(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_installed_checker_cannot_be_replaced_by_project_module",
+          "kind": "function",
+          "line": 101,
+          "end_line": 107,
+          "signature": "def test_installed_checker_cannot_be_replaced_by_project_module(tmp_path, checker, arguments)",
+          "summary": ""
+        },
+        {
+          "name": "test_installed_pytest_preserves_project_imports",
+          "kind": "function",
+          "line": 110,
+          "end_line": 116,
+          "signature": "def test_installed_pytest_preserves_project_imports(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_final_pytest_gate_rejects_shadowing_and_zero_collection",
+          "kind": "function",
+          "line": 119,
+          "end_line": 133,
+          "signature": "def test_final_pytest_gate_rejects_shadowing_and_zero_collection(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_docker_quality_launch_uses_isolated_installed_checker",
+          "kind": "function",
+          "line": 136,
+          "end_line": 140,
+          "signature": "def test_docker_quality_launch_uses_isolated_installed_checker(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_docker_checker_rejects_shadow_module_and_protects_output",
+          "kind": "function",
+          "line": 144,
+          "end_line": 150,
+          "signature": "def test_real_docker_checker_rejects_shadow_module_and_protects_output(tmp_path)",
           "summary": ""
         }
       ]
@@ -16862,9 +17502,9 @@
     },
     {
       "path": "tests/test_plan_review_dependencies.py",
-      "sha256": "d830e1ce998a73dc7bce34ae9661f7360009ed4e45aba2a5ce7534de8720131c",
-      "bytes": 8487,
-      "lines": 178,
+      "sha256": "3694e36e1de9ce8d86853eb3164abe97863d5485822e3fe37840610c5a94f971",
+      "bytes": 9199,
+      "lines": 190,
       "summary": "Host review authority, stale source refusal, and dependency scheduling.",
       "imports": [
         "atomic_flow.agents.changeset",
@@ -16934,79 +17574,71 @@
           "summary": ""
         },
         {
-          "name": "test_independent_work_runs_while_failed_descendants_remain_blocked",
+          "name": "test_independent_work_finishes_before_failed_dependency_is_replanned",
           "kind": "function",
           "line": 81,
-          "end_line": 98,
-          "signature": "def test_independent_work_runs_while_failed_descendants_remain_blocked(tmp_path, monkeypatch)",
+          "end_line": 110,
+          "signature": "def test_independent_work_finishes_before_failed_dependency_is_replanned(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
-          "name": "test_independent_work_runs_while_failed_descendants_remain_blocked.execute",
+          "name": "test_independent_work_finishes_before_failed_dependency_is_replanned.execute",
           "kind": "function",
-          "line": 87,
-          "end_line": 90,
+          "line": 88,
+          "end_line": 91,
           "signature": "def execute(task, step)",
+          "summary": ""
+        },
+        {
+          "name": "test_independent_work_finishes_before_failed_dependency_is_replanned.replan",
+          "kind": "function",
+          "line": 93,
+          "end_line": 96,
+          "signature": "def replan(*args, **kwargs)",
           "summary": ""
         },
         {
           "name": "test_replanned_work_pauses_before_any_new_execution",
           "kind": "function",
-          "line": 101,
-          "end_line": 114,
+          "line": 113,
+          "end_line": 126,
           "signature": "def test_replanned_work_pauses_before_any_new_execution(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_replanned_work_pauses_before_any_new_execution.execute",
           "kind": "function",
-          "line": 104,
-          "end_line": 106,
+          "line": 116,
+          "end_line": 118,
           "signature": "def execute(task, step)",
           "summary": ""
         },
         {
           "name": "test_plan_tampering_after_approval_does_not_execute",
           "kind": "function",
-          "line": 117,
-          "end_line": 123,
+          "line": 129,
+          "end_line": 135,
           "signature": "def test_plan_tampering_after_approval_does_not_execute(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_revision_refuses_interrupted_step",
           "kind": "function",
-          "line": 126,
-          "end_line": 131,
+          "line": 138,
+          "end_line": 143,
           "signature": "def test_revision_refuses_interrupted_step(tmp_path)",
           "summary": ""
         },
         {
           "name": "test_final_scope_catches_out_of_scope_mutations_from_host_backend",
           "kind": "function",
-          "line": 134,
-          "end_line": 145,
+          "line": 146,
+          "end_line": 157,
           "signature": "def test_final_scope_catches_out_of_scope_mutations_from_host_backend(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_final_scope_catches_out_of_scope_mutations_from_host_backend.execute",
-          "kind": "function",
-          "line": 138,
-          "end_line": 140,
-          "signature": "def execute(task, step)",
-          "summary": ""
-        },
-        {
-          "name": "test_explicit_host_scope_can_authorize_new_path",
-          "kind": "function",
-          "line": 148,
-          "end_line": 155,
-          "signature": "def test_explicit_host_scope_can_authorize_new_path(tmp_path, monkeypatch)",
-          "summary": ""
-        },
-        {
-          "name": "test_explicit_host_scope_can_authorize_new_path.execute",
           "kind": "function",
           "line": 150,
           "end_line": 152,
@@ -17014,26 +17646,42 @@
           "summary": ""
         },
         {
+          "name": "test_explicit_host_scope_can_authorize_new_path",
+          "kind": "function",
+          "line": 160,
+          "end_line": 167,
+          "signature": "def test_explicit_host_scope_can_authorize_new_path(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_explicit_host_scope_can_authorize_new_path.execute",
+          "kind": "function",
+          "line": 162,
+          "end_line": 164,
+          "signature": "def execute(task, step)",
+          "summary": ""
+        },
+        {
           "name": "test_host_integrity_failure_never_calls_replanner",
           "kind": "function",
-          "line": 158,
-          "end_line": 167,
+          "line": 170,
+          "end_line": 179,
           "signature": "def test_host_integrity_failure_never_calls_replanner(tmp_path, monkeypatch)",
           "summary": ""
         },
         {
           "name": "test_host_integrity_failure_never_calls_replanner.execute",
           "kind": "function",
-          "line": 160,
-          "end_line": 161,
+          "line": 172,
+          "end_line": 173,
           "signature": "def execute(task, step)",
           "summary": ""
         },
         {
           "name": "test_revise_preserves_done_work_and_remaps_new_dependencies",
           "kind": "function",
-          "line": 170,
-          "end_line": 178,
+          "line": 182,
+          "end_line": 190,
           "signature": "def test_revise_preserves_done_work_and_remaps_new_dependencies(tmp_path)",
           "summary": ""
         }
@@ -20147,6 +20795,224 @@
       ]
     },
     {
+      "path": "tests/test_unresolved_effects.py",
+      "sha256": "cdb79e0daa8aa01f123d7716b5ef03a5826003e3b67b102f33525a2226e305f5",
+      "bytes": 9937,
+      "lines": 199,
+      "summary": "Uncertain effects stop host action, independently of model prompts/history.",
+      "imports": [
+        "atomic_flow",
+        "atomic_flow.agents.base",
+        "atomic_flow.agents.context",
+        "atomic_flow.agents.effects",
+        "atomic_flow.agents.execution",
+        "atomic_flow.agents.loop",
+        "atomic_flow.agents.planner",
+        "atomic_flow.agents.policy",
+        "atomic_flow.agents.task",
+        "atomic_flow.agents.task_loop",
+        "atomic_flow.api.server",
+        "atomic_flow.backends.base",
+        "atomic_flow.config",
+        "atomic_flow.llm.orchestrator",
+        "atomic_flow.llm.prompts",
+        "atomic_flow.llm.schemas",
+        "atomic_flow.sessions",
+        "conftest",
+        "fastapi.testclient",
+        "json",
+        "pydantic",
+        "pytest",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "Args",
+          "kind": "class",
+          "line": 24,
+          "end_line": 25,
+          "signature": "class Args",
+          "summary": ""
+        },
+        {
+          "name": "make_tools",
+          "kind": "function",
+          "line": 28,
+          "end_line": 55,
+          "signature": "def make_tools(project, *, cancel=False)",
+          "summary": ""
+        },
+        {
+          "name": "make_tools.Effect",
+          "kind": "class",
+          "line": 30,
+          "end_line": 39,
+          "signature": "class Effect",
+          "summary": ""
+        },
+        {
+          "name": "make_tools.Effect.run",
+          "kind": "function",
+          "line": 35,
+          "end_line": 39,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "make_tools.Other",
+          "kind": "class",
+          "line": 40,
+          "end_line": 41,
+          "signature": "class Other",
+          "summary": ""
+        },
+        {
+          "name": "make_tools.Read",
+          "kind": "class",
+          "line": 42,
+          "end_line": 46,
+          "signature": "class Read",
+          "summary": ""
+        },
+        {
+          "name": "make_tools.Read.run",
+          "kind": "function",
+          "line": 45,
+          "end_line": 46,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "make_tools.factory",
+          "kind": "function",
+          "line": 50,
+          "end_line": 52,
+          "signature": "def factory()",
+          "summary": ""
+        },
+        {
+          "name": "test_latch_precedes_factory_and_policy_survives_role_and_argument_changes",
+          "kind": "function",
+          "line": 58,
+          "end_line": 71,
+          "signature": "def test_latch_precedes_factory_and_policy_survives_role_and_argument_changes(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_role_loop_never_requests_another_response_after_uncertainty",
+          "kind": "function",
+          "line": 75,
+          "end_line": 93,
+          "signature": "def test_real_role_loop_never_requests_another_response_after_uncertainty(tmp_path, native)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_role_loop_never_requests_another_response_after_uncertainty.chat",
+          "kind": "function",
+          "line": 82,
+          "end_line": 86,
+          "signature": "def chat(*_)",
+          "summary": ""
+        },
+        {
+          "name": "test_cancelled_effect_is_latched_and_durably_observed",
+          "kind": "function",
+          "line": 96,
+          "end_line": 103,
+          "signature": "def test_cancelled_effect_is_latched_and_durably_observed(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_journal_failure_after_effect_never_becomes_retryable_tool_error",
+          "kind": "function",
+          "line": 106,
+          "end_line": 111,
+          "signature": "def test_journal_failure_after_effect_never_becomes_retryable_tool_error(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_expected_effect_error_is_concise_in_cli_and_api",
+          "kind": "function",
+          "line": 114,
+          "end_line": 129,
+          "signature": "def test_expected_effect_error_is_concise_in_cli_and_api(tmp_path, monkeypatch, capsys)",
+          "summary": ""
+        },
+        {
+          "name": "test_expected_effect_error_is_concise_in_cli_and_api.interrupted",
+          "kind": "function",
+          "line": 119,
+          "end_line": 120,
+          "signature": "def interrupted(*a, **kw)",
+          "summary": ""
+        },
+        {
+          "name": "test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval",
+          "kind": "function",
+          "line": 133,
+          "end_line": 156,
+          "signature": "def test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval(tmp_path, monkeypatch, artifacts)",
+          "summary": ""
+        },
+        {
+          "name": "test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval.execute",
+          "kind": "function",
+          "line": 141,
+          "end_line": 143,
+          "signature": "def execute(task, step)",
+          "summary": ""
+        },
+        {
+          "name": "test_same_request_cannot_restart_unresolved_effect_when_artifacts_disabled",
+          "kind": "function",
+          "line": 159,
+          "end_line": 172,
+          "signature": "def test_same_request_cannot_restart_unresolved_effect_when_artifacts_disabled(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_same_request_cannot_restart_unresolved_effect_when_artifacts_disabled.answer",
+          "kind": "function",
+          "line": 163,
+          "end_line": 165,
+          "signature": "def answer(self, run, *args)",
+          "summary": ""
+        },
+        {
+          "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary",
+          "kind": "function",
+          "line": 175,
+          "end_line": 199,
+          "signature": "def test_dispatch_result_artifacts_and_provider_history_redact_canary(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary.Output",
+          "kind": "class",
+          "line": 178,
+          "end_line": 183,
+          "signature": "class Output",
+          "summary": ""
+        },
+        {
+          "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary.Output.run",
+          "kind": "function",
+          "line": 182,
+          "end_line": 183,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "test_dispatch_result_artifacts_and_provider_history_redact_canary.chat",
+          "kind": "function",
+          "line": 192,
+          "end_line": 194,
+          "signature": "def chat(messages, *_)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_watching.py",
       "sha256": "09788e61de8f9fe694e31f29ddcfb70f6e05821d0acd0f87f589252020ad853e",
       "bytes": 6172,
@@ -20511,9 +21377,9 @@
     },
     {
       "path": "tests/test_workflows.py",
-      "sha256": "57fa8a320b92b394acdfa0e3de7e1b2e99015471c76469bbe7ee63d85bb11e96",
-      "bytes": 5559,
-      "lines": 122,
+      "sha256": "3ed3ac03523241fb40d9a62fa82a059a21d9a4abe52c5665b5bbf8e3997ddf65",
+      "bytes": 8977,
+      "lines": 195,
       "summary": "",
       "imports": [
         "atomic_flow.agents.base",
@@ -20634,6 +21500,86 @@
           "kind": "function",
           "line": 108,
           "end_line": 111,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_retains_completed_effects_separately_from_uncertainty",
+          "kind": "function",
+          "line": 127,
+          "end_line": 178,
+          "signature": "def test_workflow_retains_completed_effects_separately_from_uncertainty(tmp_path, effect, stop)",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_retains_completed_effects_separately_from_uncertainty.Effect",
+          "kind": "class",
+          "line": 132,
+          "end_line": 138,
+          "signature": "class Effect",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_retains_completed_effects_separately_from_uncertainty.Effect.run",
+          "kind": "function",
+          "line": 136,
+          "end_line": 138,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_retains_completed_effects_separately_from_uncertainty.FollowingRead",
+          "kind": "class",
+          "line": 140,
+          "end_line": 146,
+          "signature": "class FollowingRead",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_retains_completed_effects_separately_from_uncertainty.FollowingRead.run",
+          "kind": "function",
+          "line": 141,
+          "end_line": 146,
+          "signature": "def run(self, args, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_retains_completed_effects_separately_from_uncertainty.journal",
+          "kind": "function",
+          "line": 155,
+          "end_line": 156,
+          "signature": "def journal(event, payload, **options)",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_retains_completed_effects_separately_from_uncertainty.check_cancel",
+          "kind": "function",
+          "line": 158,
+          "end_line": 160,
+          "signature": "def check_cancel()",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_uncertain_effect_does_not_claim_completed_effect",
+          "kind": "function",
+          "line": 181,
+          "end_line": 195,
+          "signature": "def test_workflow_uncertain_effect_does_not_claim_completed_effect(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_uncertain_effect_does_not_claim_completed_effect.Uncertain",
+          "kind": "class",
+          "line": 182,
+          "end_line": 186,
+          "signature": "class Uncertain",
+          "summary": ""
+        },
+        {
+          "name": "test_workflow_uncertain_effect_does_not_claim_completed_effect.Uncertain.run",
+          "kind": "function",
+          "line": 185,
+          "end_line": 186,
           "signature": "def run(self, args, ctx)",
           "summary": ""
         }
@@ -21003,9 +21949,9 @@
     },
     {
       "path": "tools/colab_validate.py",
-      "sha256": "6bb0120eecad2708b1232e3064d1fc5b9b488e7040799d1a16789695491ab042",
-      "bytes": 5089,
-      "lines": 93,
+      "sha256": "05a8967ec6a6ba1ae801e01fa309e5a1c9f84f539aa7b2e9c754e34c6d2a278b",
+      "bytes": 5227,
+      "lines": 94,
       "summary": "CPU-only Colab/Linux validation. Never mounts Drive or accesses model credentials.",
       "imports": [
         "__future__",
@@ -21024,7 +21970,7 @@
           "name": "main",
           "kind": "function",
           "line": 15,
-          "end_line": 89,
+          "end_line": 90,
           "signature": "def main()",
           "summary": ""
         },
@@ -21750,6 +22696,54 @@
       "lines": 1
     },
     {
+      "path": "validation/critic-20261023/README.md",
+      "sha256": "abd6d116bec050ff43c95f428919bf01f931c38e0465a08b5c31930f710c281b",
+      "bytes": 1798,
+      "lines": 29
+    },
+    {
+      "path": "validation/critic-20261023/evaluation.json",
+      "sha256": "f47cae2dde50299d32e14086edf5e2d26c02557f217d7afd14ac0c0dfd47f638",
+      "bytes": 1257,
+      "lines": 54
+    },
+    {
+      "path": "validation/critic-20261023/manifest.json",
+      "sha256": "6ca09b5d30d047b3b1d96104091be002d1d1824849cd6990e9b7c8cc0fba26e4",
+      "bytes": 3637,
+      "lines": 103
+    },
+    {
+      "path": "validation/critic-20261023/repro_evaluation.py.txt",
+      "sha256": "2a94488cede35afe5509975006ca136f18d5d42179fa5d0d30a16129b38200d0",
+      "bytes": 2778,
+      "lines": 51
+    },
+    {
+      "path": "validation/critic-20261023/repro_runtime.py.txt",
+      "sha256": "b9a1b5d7fdd6c5d82e59dafacefa27b46201b527fe307d58517e3b7c6c7e1c50",
+      "bytes": 6004,
+      "lines": 123
+    },
+    {
+      "path": "validation/critic-20261023/repro_safety.py.txt",
+      "sha256": "b4df1619024d18d32d8f6ec6c373bbb1029593914af026625f87c5db9df71818",
+      "bytes": 3363,
+      "lines": 60
+    },
+    {
+      "path": "validation/critic-20261023/runtime.json",
+      "sha256": "0a8da5b493c3cfd21836b737731a114479ec5acd5c6c402ad6553fcb403e6cb6",
+      "bytes": 2645,
+      "lines": 94
+    },
+    {
+      "path": "validation/critic-20261023/safety.jsonl",
+      "sha256": "be50b0b6f5b8de2c987dc07e4ca01db225e119757f5c7ae384c59e68e604a9f4",
+      "bytes": 478,
+      "lines": 3
+    },
+    {
       "path": "validation/pilot-calibration-local.json",
       "sha256": "3507b9eabbd1a3719386961ba60b8ed7e332fc327c01377e9f456906ee1388dc",
       "bytes": 5715,
@@ -21874,6 +22868,30 @@
       "sha256": "169c4ffc1e85b9de073f1442159fea1db4e9c174680ce05123bed74643b25bf1",
       "bytes": 4568,
       "lines": 156
+    },
+    {
+      "path": "validation/step17-final-windows.txt",
+      "sha256": "2f9d84242be3eaa7f090ee9beaea02669c3780c63eb63aa7cd9db598bbf3111c",
+      "bytes": 770,
+      "lines": 9
+    },
+    {
+      "path": "validation/step17-regressions-windows.txt",
+      "sha256": "0dbd2ba570db47f0d26bea9f946a2c8104998c3e2e519064d96e5cd526155147",
+      "bytes": 194,
+      "lines": 3
+    },
+    {
+      "path": "validation/step17-risk-recheck-windows.txt",
+      "sha256": "620d00fd4533d3025451046709b5ff4009f47bd4fae96db148727325582460ac",
+      "bytes": 6921,
+      "lines": 112
+    },
+    {
+      "path": "validation/step17-risk-windows.txt",
+      "sha256": "51a19aeead0c03abe3c8a689494ef18f23f46e264eab75929795c23f6a556bd6",
+      "bytes": 6075,
+      "lines": 71
     },
     {
       "path": "validation/step8-windows-final.txt",

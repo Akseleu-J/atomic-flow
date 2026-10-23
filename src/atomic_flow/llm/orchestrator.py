@@ -188,6 +188,8 @@ class _Run:
             self.backend.config = backend.config.model_copy(update={"max_output_tokens": 4096})
         self.tool_registry = tool_registry
         self.tool_ctx = tool_ctx
+        from atomic_flow.agents.effects import EffectState
+        self.effects_state = tool_ctx.effects_state if tool_ctx is not None else EffectState()
         self.role_tools = role_tools or {}
         self.cancel_check = lambda: None
         self.intent: QueryIntent | None = None
@@ -214,6 +216,7 @@ class _Run:
         self.steering: list[str] = []
         self.ledger_prefix = uuid.uuid4().hex
         self.advisory_context = {"text": "", "continuation": None, "selection": []}
+        self._effects_persisted = False
 
     @staticmethod
     def assistant_message(response: ChatResult) -> dict:
@@ -237,11 +240,21 @@ class _Run:
             messages.append({"role": "user", "content": "<advisory_context>" + self.advisory_context["text"] + "</advisory_context>"})
 
     def event(self, kind: str, payload: dict, *, call_id=None, outcome=None):
+        from atomic_flow.output import sanitize_output
+        payload = sanitize_output(payload)
+        if kind == "tool_effect_unknown" and self.journal is None:
+            # Safety observations survive disabling optional prompt artifacts.
+            from atomic_flow.sessions import SessionJournal
+            effect_session = "effects_" + hashlib.sha256(self.ledger_prefix.encode()).hexdigest()[:24]
+            self.journal = SessionJournal.create(self.settings_project, effect_session,
+                                                 metadata={"kind": "unresolved_effect", "request_id": self.ledger_prefix})
         if self.journal is not None:
             # Dataclass contracts contain tuples; transport JSON gives the journal
             # the same plain values as persisted request/tool artifacts.
             plain = json.loads(json.dumps(payload, ensure_ascii=False, allow_nan=False))
             self.journal.append(kind, plain, call_id=call_id, outcome=outcome)
+            if kind == "tool_effect_unknown":
+                self._effects_persisted = True
         if self.event_sink is not None:
             # Live transport omits raw prompts/source. Durable observations retain
             # their existing bounded, redacted session contract.
@@ -375,10 +388,25 @@ class _Run:
 
     def write(self, name: str, content: str) -> None:
         if self.dir:
-            (self.dir / name).write_text(content, encoding="utf-8")
+            from atomic_flow.activation.redact import redact
+            (self.dir / name).write_text(redact(content), encoding="utf-8")
 
     def write_json(self, name: str, data: object) -> None:
-        self.write(name, json.dumps(data, ensure_ascii=False, indent=2, default=str) + "\n")
+        from atomic_flow.output import sanitize_output
+        self.write(name, json.dumps(sanitize_output(data), ensure_ascii=False, indent=2, default=str) + "\n")
+
+    def check_effects(self):
+        state = self.tool_ctx.effects_state if self.tool_ctx is not None and self.tool_ctx.effects_state.blocked else self.effects_state
+        if state.blocked and not self._effects_persisted:
+            observation = state.observation()
+            try:
+                self.event("tool_effect_unknown", observation, call_id=observation["effect_id"], outcome="unknown")
+            except Exception:
+                from atomic_flow.agents.effects import UnresolvedEffects
+                raise UnresolvedEffects("unresolved tool effects; safety journal unavailable, no automatic retry") from None
+        self.effects_state.require_clear()
+        if self.tool_ctx is not None:
+            self.tool_ctx.effects_state.require_clear()
 
     def _account(self, response: ChatResult) -> None:
         self.tokens_in += response.tokens_in
@@ -390,6 +418,7 @@ class _Run:
             self.cost += response.cost_usd
 
     def invoke(self, role: str, schema: type[M], data: dict[str, Any], context: str | None = None) -> M:
+        self.check_effects()
         allowed = self.role_tools.get(role, [])
         if not allowed or self.tool_registry is None or self.tool_ctx is None:
             return self._invoke_single(role, schema, data, context)
@@ -467,6 +496,7 @@ class _Run:
                                  request_renderer=request_renderer)
         native_seen_ids = set()
         for turn in range(TOOL_LOOP_MAX_TURNS + 1):
+            self.check_effects()
             self.ledger.check()
             self.cancel_check()
             messages = self.apply_steering(messages)
@@ -520,6 +550,7 @@ class _Run:
                 self.event("tool_result", {"role": role, "call": record, "result": observed,
                            "artifact": f"{step:02d}_{role}_tool_{turn}.json"}, call_id=tool_id, outcome=result.get("outcome"))
                 self.write_json(f"{step:02d}_{role}_tool_{turn}.json", {"call": record, "result": result})
+                self.check_effects()  # Persist result, then stop before any model retry.
                 messages.append(self.assistant_message(response))
                 model_result = result
                 if parsed_any["tool"] not in {"read_node", "read_file", "read_result", "read_many"} and len(
@@ -613,6 +644,12 @@ class Orchestrator:
                    conversation=self.config.conversation, native_tools=self.config.experimental.native_tools)
         run.control, run.event_sink, run.cancel_check = self.control, self.event_sink, self.cancel_check
         run.ledger_prefix = req_id
+        from atomic_flow.sessions import SessionJournal
+        effect_session = "effects_" + hashlib.sha256(req_id.encode()).hexdigest()[:24]
+        previous_effects = SessionJournal(effect_session)
+        if previous_effects.path.exists() and previous_effects.read().unresolved_call_ids:
+            from atomic_flow.agents.effects import UnresolvedEffects
+            raise UnresolvedEffects("request has unresolved tool effects; no automatic restart")
         from atomic_flow.llm.context_state import checkpoint_run, prepare_context
         run.advisory_context = prepare_context(self.settings_project, query=query, resume_from=resume_from,
                                                memory_ids=memory_ids, memory_query=memory_query)
@@ -633,6 +670,7 @@ class Orchestrator:
                                                "permissions_granted": False, "read_evidence": False})
             result = self._answer(run, registry, req_id, query, retrieval_query or query, mode,
                                   budget_tokens or self.config.context_budget_tokens, file_scope, approve_edits)
+            run.check_effects()
             self.cancel_check()
             if self.control is not None and self.control.boundary():
                 raise ValueError("run ended with unapplied steering; review results before continuing")
@@ -698,6 +736,7 @@ class Orchestrator:
         run.tool_ctx.mutation_scope = self.mutation_scope
         run.tool_ctx.workspace_session, run.tool_ctx.lsp_client = self.workspace_session, self.lsp_client
         run.tool_ctx.documentation_client, run.tool_ctx.hooks = self.documentation_client, self.hooks
+        run.tool_ctx.effects_state = run.effects_state
         if self.config.tree.watch_external:
             from atomic_flow.watching import SourceWatcher
             run.tool_ctx.source_watcher = SourceWatcher(self.project, interval=self.config.tree.watch_interval_seconds,

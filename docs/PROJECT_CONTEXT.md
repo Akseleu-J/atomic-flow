@@ -11,6 +11,37 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 
 ## Актуальный статус и история пакетов
 
+23 октября: пакет 17 — исправлены конкретные R01–R07 из critic pass:
+private-path execution exclusion, приватный snapshot для model checks вне TaskRunner,
+decoded output/diagnostic/artifact redaction; isolated installed checker bootstrap
+и zero-test gate; host unresolved-effect latch с mandatory journal при artifacts off,
+pause/no-replan/no-publish и CLI/API/SDK error; workflow completed/uncertain effects,
+delayed replan; finite calibrated answer rubric и parsing-independent durable
+evaluation attempt sidecars. Контракты и ограничения — `IMPLEMENTATION_STEP_17.md`.
+Исторический critic evidence сохранён. Последний targeted Windows recheck **81 passed /
+1 Docker-only skipped**, Ruff/compileall PASS. Expanded risk run **337 passed /
+12 skipped / 3 changed-error-message failures**; отдельный последующий recheck
+**134 passed / 1 skipped / 2 synthetic native-fixture failures**. Причины устранены,
+исходные logs сохранены; числа не суммируются как уникальные тесты. Новые Docker
+regressions добавлены в обязательный CI; exact-source results ожидаются.
+Model calls scripted, paid API calls=0. G01 live edit quality, G02 release/wheel и
+G03 scale/capability composition остаются открытыми. Не заявлять универсальную
+redaction/semantic verification или production readiness.
+
+23 октября, последующий независимый critic pass: `CRITICAL_REVIEW_2026-10-23.md`
+и `COMPETITIVE_ACCEPTANCE.md`. Три AI-reviewer с отдельными контекстами;
+основной агент повторил отобранные offline repros. Подтверждены **7 дефектов**:
+private snapshot/output redaction bypass, checker module shadowing, продолжение
+effects после uncertainty, потеря completed workflow effects, delayed replan,
+ложные QA grades и потеря usage failed legacy benchmark attempts. Дополнительно
+зафиксированы evaluation/release/scale/integration gates. На runtime `58b3dd4`
+находки **не исправлены**; прежний CI PASS их не исключает. Evidence:
+`validation/critic-20261023/`. Только synthetic credentials/models/local test
+projects; внешние model API/vault не использовались. Новые реальные Docker repros
+не запускались. Это внутренний AI review, не внешний pentest/certification.
+Следующее направление — закрыть R01/R02/R03, затем остальные regressions и Stage 4;
+62 scoped implementations не считаются production acceptance.
+
 23 октября: пакеты 15–16 завершают каталог до **62 implemented_scoped / 0 planned**.
 Три субагента параллельно реализовали MCP/IDE, extensions/workflows/hooks и read-only
 workers; основной агент — HTTPS docs connector, CLI/SDK/dispatcher и risk integration.

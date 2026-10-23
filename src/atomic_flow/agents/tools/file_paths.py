@@ -1,12 +1,12 @@
 """Shared admission rules for bounded source-file tools."""
 from __future__ import annotations
 
-import fnmatch
 import stat
 from pathlib import PurePosixPath
 
 from atomic_flow.agents.source import SourceConflict, confined_path
 from atomic_flow.config import user_dir
+from atomic_flow.execution_inputs import private_credential_path
 from atomic_flow.tree.builder import _Ignore
 from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES, SOURCE_SUFFIXES
 
@@ -27,8 +27,7 @@ def admitted_path(ctx, rel: str, *, existing: bool = False, notebook: bool = Fal
         raise SourceConflict("hidden/private or ambiguous source path")
     if any(ignore("/".join(parts[:i + 1]), i < len(parts) - 1) for i in range(len(parts))):
         raise SourceConflict("path is excluded by project source rules")
-    if any(fnmatch.fnmatch(part.lower(), pattern) for part in parts
-           for pattern in ("credentials*", "secrets*", "*private_key*", "*.pem", "*.key", "*.enc", "*.p12", "*.pfx")):
+    if private_credential_path(rel):
         raise SourceConflict("credential/private paths are not source")
     if (path.suffix.lower() != ".ipynb" if notebook else path.suffix.lower() not in SOURCE_SUFFIXES):
         raise SourceConflict("file type is not supported by the source index")
