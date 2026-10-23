@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "tested_commit": "58b3dd494ee038f5303386d3e527012150444e34",
+  "source_base": "f0b0882fb64ffa1e33c0a4a0a2d59ae722ebb780",
+  "push_run": "39938719112",
+  "pr_run": "39938724913",
+  "results": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+    "gpu_requested": false,
+    "model_calls": 0,
+    "container": "PASS",
+    "tests_exit": 0,
+    "extra_tests_exit": 0,
+    "compile_exit": 0,
+    "image_id": "sha256:5f98df166b2a51efc8fb7d093930763beeafc070f2abfa9f37df26ae7074e855"
+  },
+  "artifact_files": [
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/container-boundaries.txt",
+      "sha256": "5a9610a15082546f1a0d151d8514acfcfb593e73f13c399a9348fa0c628afa03"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/dependencies.txt",
+      "sha256": "b4881670a9a51b4226ba03c745096f01bc00c59cd72a389b040f6d531c1c7166"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/docker-build.txt",
+      "sha256": "2c56dcf60c3997f5de284c0e8d788c709d08686239929284404e8852111c297f"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/docker-info.txt",
+      "sha256": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/pytest-extra.txt",
+      "sha256": "44d83ad137613939263c06a94cfab265f730215f63d49278ebe4449ac0d33999"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/pytest.txt",
+      "sha256": "e4a950ba096fb0b6fa67e02b1c342547da41c57e5b801d99affcdf9be2187393"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/results.json",
+      "sha256": "6c1b0debd36c80158b08e462a6a348e3817cade1cd22c94c31f2f42c8a7e3445"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/task-calibration.json",
+      "sha256": "8ecb6bbbb31add72f8b5dada9ad3d8a66c9565ff7fc9b7d295c0974314776d7b"
+    },
+    {
+      "path": "validation/ci-step14-16-20261023/validation-58b3dd494ee038f5303386d3e527012150444e34/tested-commit.txt",
+      "sha256": "0c3f921fe609d7aecf6a728ba3d07686d59ac0c638b524ca8f586de4faad590a"
+    }
+  ],
+  "source_blobs": [
+    {
+      "path": "src/atomic_flow/agents/completion.py",
+      "sha256": "07bf4a80fe068824f817296bf0ffb5450820579326d03744703de8daa4635671"
+    },
+    {
+      "path": "src/atomic_flow/agents/context.py",
+      "sha256": "f1b57662e55800b2c83cf9ecdb3d158eee0066b4a71ba5ffd34539afe3ea6483"
+    },
+    {
+      "path": "src/atomic_flow/agents/loop.py",
+      "sha256": "dfe8a218ffb055922f4c7772ebade7fc847d5555f404e0cc9ee760f01c426c10"
+    },
+    {
+      "path": "src/atomic_flow/agents/policy.py",
+      "sha256": "55731267df136fd79ef55f8d2299514a30474d363eb48dab3acd78485f61d511"
+    },
+    {
+      "path": "src/atomic_flow/agents/result.py",
+      "sha256": "2139fa01ed150c05584eaae52e8f2aab70b65b2c75d56a4428da36f605835faf"
+    },
+    {
+      "path": "src/atomic_flow/agents/task_budget.py",
+      "sha256": "5f6fde564b00473b5be811d53f058e868e601c010ab69fd621b276718a3e8a7e"
+    },
+    {
+      "path": "src/atomic_flow/agents/task_loop.py",
+      "sha256": "26300a986bfd3e3239b017b747ec29ffdad49849221167289e8fe157877b3661"
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/__init__.py",
+      "sha256": "b9e1fde3e0731783ccfcb3f901d640e06f21b60d83574358713c22706f41e1b2"
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/documentation.py",
+      "sha256": "22e15f3cac8378250c93faf3e760b51367dfa712a195975be6a471681b501b06"
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/file_paths.py",
+      "sha256": "4d3a4b052a872d09ca0a004714a1890dfa2225c7507f41bfa2efff864bdd98e6"
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/language.py",
+      "sha256": "5fadca52c2ec88a460e3dc1fee7f89aedf910590b51671a4b6d73408dfde8e38"
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/notebook.py",
+      "sha256": "b43576697e7cb373fc4b5df26bc938bfd354a698031b28762b2a73ea89bd69a6"
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/workspace.py",
+      "sha256": "3eb8f7f6ec7299eaab722a5d40f0a7e5cddf576fedc83974bfcffc275989cb4d"
+    },
+    {
+      "path": "src/atomic_flow/cli.py",
+      "sha256": "1af34f55a6fc4080711eb4ef72791f9b214f154889e5bc39cf313f5cb607a164"
+    },
+    {
+      "path": "src/atomic_flow/config.py",
+      "sha256": "1c369f6ee8cdeba171b7bf49e132a2f298d569587a7360a8aa5379acf168a916"
+    },
+    {
+      "path": "src/atomic_flow/dialogue.py",
+      "sha256": "a5c9630c887d1cd3e33a658b2649a99745a7cc38c451bf66079641cf89251810"
+    },
+    {
+      "path": "src/atomic_flow/documentation.py",
+      "sha256": "1cb956277f49fc31566857966d9a17605ccef3d2e4d1c0d6c2850e400d509a21"
+    },
+    {
+      "path": "src/atomic_flow/extensions.py",
+      "sha256": "bc85a56cf9faa3a3a1688762da16dba8c144b202ec903f28e2d4b3b163b6a722"
+    },
+    {
+      "path": "src/atomic_flow/hooks.py",
+      "sha256": "5bf1b3c006ba7e1a65bba916d3b6ffac2d7a17396a770184854325b12a87ba1f"
+    },
+    {
+      "path": "src/atomic_flow/integrations/__init__.py",
+      "sha256": "059ce1e24ce8399c528196e043f60fe04db60475cc4966607c63cc47e60a64e2"
+    },
+    {
+      "path": "src/atomic_flow/integrations/ide.py",
+      "sha256": "ec5c09f85b024aae71a96d26e1164f0fcdb746d62e8eed7800486985b8e8a7b3"
+    },
+    {
+      "path": "src/atomic_flow/integrations/mcp.py",
+      "sha256": "430e6d20e1095ef029d4e2d782f3f1bb7888c4de721a1ba9983024d46e64842e"
+    },
+    {
+      "path": "src/atomic_flow/llm/orchestrator.py",
+      "sha256": "01dab1536d6644c8c2fccbc2c8e8ef6e7c425a2a73dff2c5b278e1e6e3d4ae6e"
+    },
+    {
+      "path": "src/atomic_flow/lsp.py",
+      "sha256": "54071a133bde40675e52bd699c261480fd378ee2d32bf08219006decaed8cb6f"
+    },
+    {
+      "path": "src/atomic_flow/notebooks.py",
+      "sha256": "3d6af566b65ec6303f60bdfc68f1f10b5f02a3f744d6dd38cb9716bbe8b3a356"
+    },
+    {
+      "path": "src/atomic_flow/project_cli.py",
+      "sha256": "302c1427cfd5030041fd55a3010e48cf7fe2fbb2880bc6c81be6d7abe1ed184b"
+    },
+    {
+      "path": "src/atomic_flow/sdk.py",
+      "sha256": "215417eb5ca46b99a4f7d9ddb4ff9aef2a269f71fe339e338af94e49fad09606"
+    },
+    {
+      "path": "src/atomic_flow/tree/builder.py",
+      "sha256": "85406343d2d889c8d28370042a16876d673d64e9964aab284307388f2dd16364"
+    },
+    {
+      "path": "src/atomic_flow/watching.py",
+      "sha256": "22624b22ed775a139e3352fd681258b8f5e0b95d18e0696a69815cd3a044ef54"
+    },
+    {
+      "path": "src/atomic_flow/workers.py",
+      "sha256": "6311c9ff531bc03a16daf4f6923be8e9a6de8cd3c16d6d1889b57f8f90ed234c"
+    },
+    {
+      "path": "src/atomic_flow/workflows.py",
+      "sha256": "ab772352295d10940928d7f25f2da78e9768940e05a9e1ae3fd89e2fde6ae5cc"
+    },
+    {
+      "path": "src/atomic_flow/workspace.py",
+      "sha256": "e2fa90089d32a52d1b0478479682d13842e551d85a68c096a128bc32134c6c43"
+    },
+    {
+      "path": "tests/fixtures/lsp_server.py",
+      "sha256": "cfe6517cbd521234c3b7143b0d34f850ffa6accf746182452986fe07b23244d7"
+    },
+    {
+      "path": "tests/fixtures/mcp_server.py",
+      "sha256": "32e1185870e933ab84fb76f3a333f95d8f3936c1a187538beac605fcc5820302"
+    },
+    {
+      "path": "tests/test_documentation.py",
+      "sha256": "efbdf1d2747df1642b90677b2bd59d7561768cf11fa95c34e524197f7aca86ea"
+    },
+    {
+      "path": "tests/test_extensions.py",
+      "sha256": "f990352b6d3be5e5a7fd0da4a6e809d25291e92c1d29abc92044d2e8afa6410c"
+    },
+    {
+      "path": "tests/test_hooks.py",
+      "sha256": "caf9d62c8d3ede4b5ef8b5a5fb7306b8a272328e4dc1b8890d6831fc6bee8189"
+    },
+    {
+      "path": "tests/test_ide_bridge.py",
+      "sha256": "73ec14e30eb148bac4e1350dd05c8612cb3842b82e4f9a0134d536849e06ad25"
+    },
+    {
+      "path": "tests/test_integrations_runtime.py",
+      "sha256": "1b433fa06fc5a59f76b48ade328430d6ab12c63717d6ccedfb5240502f17cc79"
+    },
+    {
+      "path": "tests/test_lsp.py",
+      "sha256": "49a8e6eb97b748c1b8c4944a4b337cb7062755c70fb2fd9a0713a9ffc1a0b0dc"
+    },
+    {
+      "path": "tests/test_mcp_integration.py",
+      "sha256": "b866d1354811b8400734fe02d656fec826fab97ef999c6e96376ac2484bbe476"
+    },
+    {
+      "path": "tests/test_notebooks.py",
+      "sha256": "7b279266d1852e0e80aaa3e5cd97592d61937869c6f626a3b3bf7938e2aa6f01"
+    },
+    {
+      "path": "tests/test_project_integration.py",
+      "sha256": "58583485b558bf2b2ab9ce8dd6878fb143d924e99c4d0e24b45e30cb26f4669b"
+    },
+    {
+      "path": "tests/test_watching.py",
+      "sha256": "09788e61de8f9fe694e31f29ddcfb70f6e05821d0acd0f87f589252020ad853e"
+    },
+    {
+      "path": "tests/test_workers.py",
+      "sha256": "a80d4f53504283f52f18b252919b7223170f5be78ec69c660b432bb339dfb995"
+    },
+    {
+      "path": "tests/test_workflows.py",
+      "sha256": "57fa8a320b92b394acdfa0e3de7e1b2e99015471c76469bbe7ee63d85bb11e96"
+    },
+    {
+      "path": "tests/test_workspace_roots.py",
+      "sha256": "a71a21ca613fed06ae90b9a878bdf4c2e7f4c52761b3e32b30f7f7e5dd9f309b"
+    },
+    {
+      "path": "tools/measure_startup.py",
+      "sha256": "bc04c2fe49029536ca04513c7553214b724ba54e1c225b25e8fe092a59dc0acb"
+    }
+  ],
+  "scope": "Exact-source GitHub Linux CPU and real Docker acceptance; protocol fixtures and scripted model calls; no external deployment or measured live edit quality"
+}

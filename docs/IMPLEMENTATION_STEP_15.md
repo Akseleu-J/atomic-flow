@@ -136,3 +136,13 @@ DNS cancellation и clean-process deferred imports проверяются лок
 Итоговые focused Windows и exact-source Linux/Docker результаты записываются в
 `PROJECT_CONTEXT.md`; промежуточные subagent runs не складываются в число уникальных тестов.
 Paid model calls: **0**. Stage 4 live edit / multi-repository quality остаётся открытым.
+
+
+Итоговая проверка runtime `58b3dd494ee038f5303386d3e527012150444e34`: push/PR CI
+`39938719112` / `39938724913` PASS, Python 3.11/3.12; скачанный Docker artifact:
+735 CPU passed / 10 skipped, 17 extra passed, 25 execution acceptance passed
+(9 real Docker, 16 supporting CPU/local jobs), compile/calibration PASS, model_calls=0.
+Raw files и hashes 48 изменённых source/test/tool blobs сохранены в
+`validation/ci-step14-16-20261023/`. Windows focused initial 360 passed / 4 skipped /
+1 outdated-test failure; исправление expectation и последние интеграции перепроверены:
+47 passed / 1 skipped. Production Stage 4 остаётся открытым.
