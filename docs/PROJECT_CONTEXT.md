@@ -4,8 +4,8 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–16 закоммичены; runtime `58b3dd494ee038f5303386d3e527012150444e34`.
-Последний runtime-коммит, подтверждённый Docker artifact, — `58b3dd494ee038f5303386d3e527012150444e34`.
+Пакеты 1–17 закоммичены; runtime `78f0df5c2abf18fc4b0035030a92178335134e04`.
+Последний runtime-коммит, подтверждённый Docker artifact, — `78f0df5c2abf18fc4b0035030a92178335134e04`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
@@ -18,12 +18,12 @@ decoded output/diagnostic/artifact redaction; isolated installed checker bootstr
 pause/no-replan/no-publish и CLI/API/SDK error; workflow completed/uncertain effects,
 delayed replan; finite calibrated answer rubric и parsing-independent durable
 evaluation attempt sidecars. Контракты и ограничения — `IMPLEMENTATION_STEP_17.md`.
-Исторический critic evidence сохранён. Последний targeted Windows recheck **81 passed /
+Исторический critic evidence сохранён. Один из targeted Windows rechecks **81 passed /
 1 Docker-only skipped**, Ruff/compileall PASS. Expanded risk run **337 passed /
 12 skipped / 3 changed-error-message failures**; отдельный последующий recheck
 **134 passed / 1 skipped / 2 synthetic native-fixture failures**. Причины устранены,
 исходные logs сохранены; числа не суммируются как уникальные тесты. Новые Docker
-regressions добавлены в обязательный CI; exact-source results ожидаются.
+regressions добавлены в обязательный CI; финальные exact-source results приведены ниже.
 Model calls scripted, paid API calls=0. G01 live edit quality, G02 release/wheel и
 G03 scale/capability composition остаются открытыми. Не заявлять универсальную
 redaction/semantic verification или production readiness.
@@ -33,9 +33,21 @@ pure read preflight; общий CI failure, calibration skipped. Raw failure art
 сохранён в `validation/ci-step17-before-fix-20261023/`. Исправлена только отдельная
 preflight ветка Patch/Delete/Move, post-write exception latch сохранён.
 Affected recheck **36 passed**, `validation/step17-preflight-final-windows.txt`;
-повторный exact-source CI ожидается.
+Последующие fixes сохраняют SourceConflict API через SourcePreconditionFailed;
+post-edit matching checks также используют private checked_workspace. Финальные
+локальные rechecks: 73 passed / 4 skipped и 54 passed / 1 skipped; logs сохранены.
 
-23 октября, последующий независимый critic pass: `CRITICAL_REVIEW_2026-10-23.md`
+Финальный runtime **`78f0df5c2abf18fc4b0035030a92178335134e04`**: push CI `39970683119` и PR CI `39970691727`
+PASS, Python 3.11/3.12. Скачанный exact-source artifact: **792 CPU passed / 11 skipped, 17 extra passed, 26 execution acceptance passed**
+(10 real Docker checks, 16 supporting CPU/local jobs); compile и historical
+six-change grader calibration PASS, model_calls=0. Image ID:
+`sha256:06fd74d44e2ba0d9d4b0835424c0921378e50f990695e82c0b79a91ff46e6b47`.
+`validation/ci-step17-20261023/evidence-manifest.json` связывает исходные
+**12 artifact files** и **31 changed source/test/tool Git blobs** с tested commit.
+Это проверка конкретных R01–R07 regressions, а не production/live-edit acceptance.
+
+
+23 октября, исторический независимый critic pass до пакета 17: `CRITICAL_REVIEW_2026-10-23.md`
 и `COMPETITIVE_ACCEPTANCE.md`. Три AI-reviewer с отдельными контекстами;
 основной агент повторил отобранные offline repros. Подтверждены **7 дефектов**:
 private snapshot/output redaction bypass, checker module shadowing, продолжение
@@ -46,7 +58,8 @@ effects после uncertainty, потеря completed workflow effects, delayed
 `validation/critic-20261023/`. Только synthetic credentials/models/local test
 projects; внешние model API/vault не использовались. Новые реальные Docker repros
 не запускались. Это внутренний AI review, не внешний pentest/certification.
-Следующее направление — закрыть R01/R02/R03, затем остальные regressions и Stage 4;
+Выбранное тогда направление — закрыть R01/R02/R03, затем остальные regressions и Stage 4;
+конкретные R01–R07 исправлены пакетом 17 выше, дальнейшие G01/G02/G03 открыты;
 62 scoped implementations не считаются production acceptance.
 
 23 октября: пакеты 15–16 завершают каталог до **62 implemented_scoped / 0 planned**.
