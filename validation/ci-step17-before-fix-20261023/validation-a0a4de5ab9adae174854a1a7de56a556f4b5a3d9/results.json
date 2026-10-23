@@ -1,0 +1,11 @@
+{
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+  "gpu_requested": false,
+  "model_calls": 0,
+  "container": "PASS",
+  "tests_exit": 1,
+  "extra_tests_exit": 0,
+  "compile_exit": 0,
+  "image_id": "sha256:92c69af7518e281b5b4e3a06ffe022c3c31604d7707147db50df154838a44fc0"
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "tested_commit": "a0a4de5ab9adae174854a1a7de56a556f4b5a3d9",
+  "push_run": "39968031957",
+  "results": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+    "gpu_requested": false,
+    "model_calls": 0,
+    "container": "PASS",
+    "tests_exit": 1,
+    "extra_tests_exit": 0,
+    "compile_exit": 0,
+    "image_id": "sha256:92c69af7518e281b5b4e3a06ffe022c3c31604d7707147db50df154838a44fc0"
+  },
+  "finding": "read-before-edit preflight refusal was conservatively classified as unknown effects; 788 CPU passed, 11 skipped, 1 failed; 26 execution acceptance passed; historical calibration skipped",
+  "artifact_files": [
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/container-boundaries.txt",
+      "sha256": "5156f1f5bdf93513a09faaee78c426136208e1ae2cdb0dac09ee31f17e1a532c"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/dependencies.txt",
+      "sha256": "8e44f0af290d7aed03638abd56131a218ddbfcb8d2f98faf7c8597c4e36f99a7"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-build.txt",
+      "sha256": "489fe1d35c7f215ca82f0c8ece73d21e92172aecf3c7dcf21f28c46ac4530ba5"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-info.txt",
+      "sha256": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest-extra.txt",
+      "sha256": "c3788640522b7a73a8a63ce1a35822e59814788116a50e7dc72a1c192363d3f2"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/pytest.txt",
+      "sha256": "0b529ae47825fe943ae1148a6bdf9ce3ded8e7d8deddf709922798efcb95022f"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/results.json",
+      "sha256": "715f25f95be81e346afe2d96a96602e6ff202da4ec8bd4b94d3ee58d94f13e20"
+    },
+    {
+      "path": "validation/ci-step17-before-fix-20261023/validation-a0a4de5ab9adae174854a1a7de56a556f4b5a3d9/tested-commit.txt",
+      "sha256": "185ee5c403ec3327dcc7a527e612c1ff43012f6b9298b05fc858274eed6bb9d1"
+    }
+  ]
+}

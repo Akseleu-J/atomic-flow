@@ -27,6 +27,13 @@ regressions добавлены в обязательный CI; exact-source resu
 Model calls scripted, paid API calls=0. G01 live edit quality, G02 release/wheel и
 G03 scale/capability composition остаются открытыми. Не заявлять универсальную
 redaction/semantic verification или production readiness.
+Первый fixes runtime `a0a4de5` получил 788 CPU / 17 extra / 26 execution PASS,
+но один advisory regression отказал из-за консервативной unknown-effect классификации
+pure read preflight; общий CI failure, calibration skipped. Raw failure artifact
+сохранён в `validation/ci-step17-before-fix-20261023/`. Исправлена только отдельная
+preflight ветка Patch/Delete/Move, post-write exception latch сохранён.
+Affected recheck **36 passed**, `validation/step17-preflight-final-windows.txt`;
+повторный exact-source CI ожидается.
 
 23 октября, последующий независимый critic pass: `CRITICAL_REVIEW_2026-10-23.md`
 и `COMPETITIVE_ACCEPTANCE.md`. Три AI-reviewer с отдельными контекстами;
