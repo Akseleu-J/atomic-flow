@@ -7,6 +7,7 @@ and lets the model continue.
 """
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import time
@@ -71,15 +72,39 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
     ctx.cancel_check()
     name = parsed["tool"]
     record = {"tool": name, "args": parsed.get("args", {}), "role": role}
+    read_snapshot = None
+    invoked = False
+    hook_finished = False
 
     def finish(payload: Any, outcome: Outcome | None = None):
-        if name == "ask_user" and isinstance(payload, dict) and payload.get("outcome") in {"success", "error", "denied"}:
+        nonlocal hook_finished
+        if invoked and ctx.hooks is not None and not hook_finished:
+            hook_finished = True
+            try:
+                ctx.hooks.after_tool(name, args.model_dump(), contract, payload, role, cancel_check=ctx.cancel_check)
+            except Exception as exc:
+                from atomic_flow.agents.execution import TaskCancelled
+                if isinstance(exc, TaskCancelled):
+                    if read_snapshot is not None:
+                        ctx.reads = read_snapshot
+                    raise
+                payload = _contract_error(payload, "post-tool hook failed; inspect effects before retrying", contract.effects)
+                outcome = "error"
+        if outcome is None and name == "ask_user" and isinstance(payload, dict) and payload.get("outcome") in {"success", "error", "denied"}:
             outcome = payload["outcome"]
         result = ToolResult.from_payload(payload, outcome=outcome)
+        if read_snapshot is not None and result.outcome != "success":
+            ctx.reads = read_snapshot
         provenance = {"origin": "tool_result", "tool": name, "role": role,
                       "trust": "data_only", "index_revision": ctx.revision}
         record["result_summary"] = {**result.summary(), "provenance": provenance}
         return {**result.model_payload(), "provenance": provenance}, record
+
+    try:
+        if not ctx.sync_external_changes():
+            return finish({"error": "source changed; waiting for bounded debounce before refreshing the index"})
+    except OSError:
+        return finish({"error": "source watch could not establish a current index; no tool was invoked"})
 
     if name not in allowed_tools:
         return finish({"error": f"tool '{name}' is not allowed for role '{role}'"}, "denied")
@@ -94,7 +119,6 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         return finish({"error": "invalid tool arguments", "details": exc.errors(include_url=False, include_context=False)[:3]})
     if "write" in contract.effects and not ctx.edits_enabled:
         return finish({"error": "edits disabled", "hint": "enable edits explicitly for this request"}, "denied")
-    invoked = False
     try:
         policy_args = args.model_dump()
         if "node_id" in policy_args:
@@ -103,7 +127,7 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
                 policy_args["path"] = node.path
         if "write" in contract.effects and ctx.mutation_scope is not None:
             from atomic_flow.agents.source import confined_path
-            if name not in {"edit_node", "patch_file", "create_file", "delete_file", "move_file"}:
+            if name not in {"edit_node", "patch_file", "create_file", "delete_file", "move_file", "notebook_edit"}:
                 return finish({"error": "write tool has no host-defined path contract for this approved plan"}, "denied")
             paths = [policy_args.get("path")]
             if name == "move_file":
@@ -141,10 +165,15 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
         ctx.active_registry = registry
         try:
             check_deadline()
+            if ctx.hooks is not None:
+                ctx.hooks.before_tool(name, args.model_dump(), contract, role, cancel_check=check_deadline)
+            check_deadline()
             implementation = registry.get(name)  # Only after role/arguments/edit/policy/approval gates.
             if ctx.action_boundary is not None and ctx.action_boundary():
                 return finish({"error": "new user guidance pending; reconsider tool arguments before execution"}, "denied")
             invoked = True
+            if set(contract.effects) == {"read"}:
+                read_snapshot = copy.deepcopy(ctx.reads)
             result = implementation.run(args, ctx)
         finally:
             ctx.cancel_check = original_check
@@ -170,6 +199,8 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
     except Exception as exc:  # noqa: BLE001 - a broken tool must not kill the run
         from atomic_flow.agents.execution import TaskCancelled
         if isinstance(exc, TaskCancelled):
+            if read_snapshot is not None:
+                ctx.reads = read_snapshot
             raise
         result = {"error": f"{type(exc).__name__}: {exc}"}
         if invoked and set(contract.effects) & {"write", "execute"}:
@@ -187,4 +218,5 @@ def _contract_error(result: Any, message: str, effects: tuple[str, ...]) -> dict
     # Even invalid tools must not smuggle oversized strings through proof fields.
     proof = {key: json.loads(json.dumps(value, ensure_ascii=False, default=str)) for key, value in proof.items()
              if len(json.dumps(value, ensure_ascii=False, default=str)) <= 4096}
-    return {**proof, "error": message, "side_effects_may_have_occurred": bool(set(effects) & {"write", "execute"})}
+    return {**proof, "error": message, "side_effects_may_have_occurred": bool(
+        set(effects) & {"write", "execute"}) or bool(isinstance(result, dict) and result.get("side_effects_may_have_occurred"))}

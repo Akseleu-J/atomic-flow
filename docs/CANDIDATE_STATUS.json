@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "authorized_scope": "All remaining catalogue candidates, per user request 2026-10-22. Each needs concrete integration and tests; no blanket completion claim.",
+  "authorized_scope": "All 62 catalogue candidates in bounded package contracts, per user 2026-10-23; parallel implementation and focused changed/risk validation. Production acceptance is separate.",
   "branch": "experimental",
   "status_meaning": "implemented_scoped is bounded by package documentation; not feature parity or production acceptance. planned is unimplemented.",
   "candidates": [
@@ -145,14 +145,14 @@
     {
       "id": 24,
       "candidate": "Работа с notebook по ячейкам",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 14
     },
     {
       "id": 25,
       "candidate": "LSP для definitions/references/rename",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 14
     },
     {
       "id": 26,
@@ -163,14 +163,14 @@
     {
       "id": 27,
       "candidate": "Изменения файлов извне и обновление индекса",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 14
     },
     {
       "id": 28,
       "candidate": "Несколько корней workspace",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 14
     },
     {
       "id": 29,
@@ -217,8 +217,8 @@
     {
       "id": 36,
       "candidate": "Hooks до/после tool и жизненного цикла",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 37,
@@ -277,20 +277,20 @@
     {
       "id": 46,
       "candidate": "Изолированные специализированные subagents",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 16
     },
     {
       "id": 47,
       "candidate": "Контролируемый handoff и результаты workers",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 16
     },
     {
       "id": 48,
       "candidate": "MCP client",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 49,
@@ -301,20 +301,20 @@
     {
       "id": 50,
       "candidate": "MCP server для возможностей atomic-flow",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 51,
       "candidate": "Skills / переиспользуемые workflows",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 52,
       "candidate": "Управляемые plugins",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 53,
@@ -325,14 +325,14 @@
     {
       "id": 54,
       "candidate": "IDE bridge",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 55,
       "candidate": "Web search/fetch для документации",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 56,
@@ -361,8 +361,8 @@
     {
       "id": 60,
       "candidate": "Загрузка необязательных компонентов по необходимости",
-      "status": "planned",
-      "package": null
+      "status": "implemented_scoped",
+      "package": 15
     },
     {
       "id": 61,

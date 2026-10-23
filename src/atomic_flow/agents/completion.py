@@ -34,6 +34,15 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dic
         report["workspace_manifest_sha256"] = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
         report["checks"].append({"name": "approved_diff_and_freshness", "status": "passed"})
         for path in changed:
+            if path in manifest and path.lower().endswith(".ipynb"):
+                from atomic_flow.notebooks import NotebookDocument
+                notebook = NotebookDocument.load(changeset.workspace, path, expected_hash=manifest[path], private_workspace=True,
+                                                 tree_ignore=config.tree.ignore, respect_gitignore=config.tree.respect_gitignore)
+                if notebook.read()["missing_ids"]:
+                    raise ValueError("Changed notebook needs explicit cell ID normalization")
+                report["checks"].append({"name": "notebook_structure", "status": "passed", "path": path,
+                                         "execution": "not_run"})
+        for path in changed:
             cancel_check()
             if path not in manifest or not path.endswith((".py", ".pyi")):
                 continue

@@ -1,8 +1,10 @@
-# Оставшийся разрешённый scope
+# Каталог: реализованный scope и оставшиеся acceptance gates
 
-22 октября 2026. Пользователь разрешил реализовать весь оставшийся каталог с тестами.
-Это continuation plan для следующих пакетов, **не список уже работающих подсистем**.
-После пакета 13 реализованы 48 scoped candidates; остаются 14 из 62.
+23 октября 2026. По просьбе пользователя завершён оставшийся каталог параллельно
+тремя субагентами и основным агентом. После пакетов 14–16: **62 implemented_scoped /
+0 planned**. Это каталог ограниченных реализаций; подробные контракты и исключения
+находятся в документах пакетов. Следующая работа — интеграционная эксплуатация,
+compatibility и независимое измерение качества, а не повторная реализация каталога.
 Источник статуса — `CANDIDATE_STATUS.json`; отдельные номера пакетов ниже не означают
 закрытие одноимённых этапов `PRODUCTION_ROADMAP.md`.
 
@@ -61,7 +63,12 @@ expired/revoked credential, child env и отсутствие secret в archive,
 conflicts и recovery, отмена remote job и подмена bundle/result manifest.
 Untrusted written code выполняется только в Docker/проверенном Linux worker.
 
-## 14. Проектные форматы и workspace: 24, 25, 27, 28
+## 14. Проектные форматы и workspace: 24, 25, 27, 28 — реализовано scoped
+
+Реализация и ограничения: `IMPLEMENTATION_STEP_14.md`. Source-only notebook cells,
+явный LSP host process/checked textual rename, bounded polling invalidation и
+root-qualified grants/host sessions. Synthetic LSP fixture не доказывает совместимость
+с реальным analyzer; notebook kernel execution и cross-root atomic TaskRunner не включены.
 
 Notebook cell API с устойчивыми cell IDs и отдельной output policy, без сырого
 JSON patch. Watcher invalidation/debounce не заменяет проверку hashes перед use.
@@ -72,7 +79,11 @@ Acceptance: notebook reorder/output leakage/stale cell; editor writes во вр�
 чтения/верификации; symlink/drive/root escape; rename с несколькими файлами,
 stale LSP version, malformed frames и shutdown/cancel дочернего процесса.
 
-## 15. Интеграции и workflows: 36, 48, 50, 51, 52, 54, 55, 60
+## 15. Интеграции и workflows: 36, 48, 50, 51, 52, 54, 55, 60 — реализовано scoped
+
+Контракты и исключения: `IMPLEMENTATION_STEP_15.md`. MCP stdio, readonly IDE, static
+workflows, host-trusted plugins/hooks, HTTPS fetch и lexical search по явным pages;
+общий web search, marketplace и готовое IDE extension не включены.
 
 MCP client/server, workflows, trusted plugin manifests, ограниченные hooks,
 локальный аутентифицированный IDE bridge и docs web fetch/search с network policy.
@@ -87,7 +98,11 @@ data, schema change и permission drift, private-network/redirect/URL attacks,
 oversized output, IDE token/origin/workspace binding, hook failure после side effect,
 lazy imports без скрытого запуска стороннего кода.
 
-## 16. Изолированные workers: 46, 47
+## 16. Изолированные workers: 46, 47 — реализовано scoped
+
+Контракт: `IMPLEMENTATION_STEP_16.md`. Read-only context/tool isolation и durable
+advisory handoff, общий parent backend/call lock/budget/cancel. Это не OS sandbox
+или writable delegation; польза для реальных задач пока не измерена.
 
 Сначала read-only worker/reviewer с отдельными context/tool scopes/workspace и
 общим parent budget/cancel. Parent проверяет evidence и result, не считает worker
@@ -101,3 +116,19 @@ Acceptance: handoff scope/cost/cancel, compromised worker output, stale hashes,
 обновление PROJECT_CONTEXT/index/status, commit от Omirbay Akseleu и push в
 `experimental` через process-only token. Не сливать main автоматически.
 Наличие реализации не закрывает independent multi-repository evaluation gate Stage 4.
+
+
+## Следующие производственные gates
+
+1. Stage 4: live edit evaluation на нескольких независимых репозиториях с paired
+   baseline, фиксированными budget/model/task fixtures, task-success и evidence.
+2. Реальный LSP analyzer и внешние MCP servers: compatibility tests отдельно от
+   synthetic protocol fixtures; IDE bridge требует клиентского расширения для UX.
+3. Проверить полезность read-only specialists на задачах и расходы; writable workers
+   проектировать только с ownership/conflict/publication контрактом.
+4. Эксплуатационные лимиты host callbacks, long-running service lifecycle и сетевые
+   compatibility tests; imported symbol не равен запущенному/проверенному service.
+
+На текущем проходе локально проверяем новые/изменённые и рискованные места; полный
+Windows набор не повторяем без нового основания. Mandatory GitHub Linux/Docker CI
+остаётся отдельным exact-source evidence gate. Платные model API не используются.

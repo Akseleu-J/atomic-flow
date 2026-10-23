@@ -11,6 +11,50 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 
 ## Локальные исправления поверх HEAD — актуальный статус
 
+23 октября: пакеты 15–16 завершают каталог до **62 implemented_scoped / 0 planned**.
+Три субагента параллельно реализовали MCP/IDE, extensions/workflows/hooks и read-only
+workers; основной агент — HTTPS docs connector, CLI/SDK/dispatcher и risk integration.
+Контракты: `IMPLEMENTATION_STEP_15.md`, `IMPLEMENTATION_STEP_16.md`. MCP stdio client /
+offline source server, authenticated readonly IDE bridge, digest-approved static
+workflows и trusted plugin factories/hooks, exact-host HTTPS documentation fetch /
+lexical search по 1–8 явным pages, deferred component loaders. Workers имеют отдельный
+context/read_source scope и durable advisory handoff; тот же TaskBudgetBackend
+сериализует parent/worker calls и общий учёт. Нет writable workers, OS sandbox для
+host callbacks, marketplace, общего web index или готового IDE editor extension.
+External/model data не выдаёт permission/read proof. Production Stage 4 остаётся открыт.
+Новые tools deferred; capabilities передаются только host SDK, не HTTP model input.
+Startup: fresh-process median catalog 0.701 s / 29.36 MiB, LSP symbol 1.366 s /
+32.25 MiB, MCP symbol 1.049 s / 30.04 MiB; три samples, без запуска services/inference.
+`validation/step15-startup-windows.json`. Focused checks и exact-source CI результаты
+записываются ниже после окончания проверки; paid model calls=0.
+
+Проверка пакетов 14–16: промежуточный полный Windows baseline пакета 14 **641 passed /
+22 skipped** (`step14-windows-final.txt`) предшествует последним integration правкам.
+Focused changed/risk run: **360 passed / 4 skipped / 1 failed**; failure — тест ожидал
+host mutation proof от model-facing workspace_read. Контракт намеренно не выдаёт
+этот proof; fixture исправлен на отдельный host read и проверяет отказ до него.
+`validation/step14-16-windows-focused.txt` сохраняет исходный failure для provenance.
+Финальный recheck изменённых workspace/IDE/hooks/CLI мест: **47 passed / 1 skipped**,
+`validation/step14-16-windows-recheck.txt`; Ruff и compileall PASS. Полный локальный
+набор повторно не запускался по просьбе пользователя. Exact-source Linux/Docker CI
+evidence ожидается после публикации runtime commit.
+
+
+23 октября: пакет 14 — notebook source-only cell read/preview/apply со стабильными IDs,
+explicit legacy migration, hash-bound output/trust clearing и journal rollback;
+host-approved LSP UTF-16/full-sync definitions/references/versioned diagnostics/checked
+textual WorkspaceEdit; bounded source hash polling/debounce и root-qualified explicit
+grants/read/session one-root publication. CLI/SDK/tool dispatcher integration,
+deferred tool schemas, notebook final structure gate и dialogue whole-file hashes.
+`IMPLEMENTATION_STEP_14.md`; каталог **52 scoped / 10 planned**. Watcher default off,
+same-size/mtime source index теперь проверяет bytes. Canceled/rejected read result
+не оставляет новый ToolContext read proof. Root proof не переносится между root IDs
+или в active-project authority; model/HTTP input не запускает LSP executable.
+Focused integration **91 passed / 2 skipped** и полный Windows baseline **641 / 22**
+относятся к промежуточным срезам; subsequent integration/risk checks описаны выше. Synthetic protocol server,
+без real analyzer install или notebook kernel execution; cross-root atomicity и
+multi-root TaskRunner не реализованы. Stage 4 live edit evaluation остаётся открытым.
+
 23 октября: пакет 13 — durable host jobs с snapshot/cancel/reconcile, потоковым prefix
 output/HMAC cursors/retention и global active admission; fixed checks/read-only Docker
 profiles; process-only project/connector/operation credential grants; private Git
@@ -35,8 +79,8 @@ compile и historical grader calibration PASS; model_calls=0. Image ID
 `validation/ci-step13-20261023/evidence-manifest.json` связывает все 12 artifact files
 и 20 изменённых source/test/tool Git blobs с tested commit. Raw logs сохранены без
 нормализации. Windows/CPU пропуски не считаются Docker acceptance.
-Следующий пакет 14 — notebooks/LSP/watchers/multiple roots. Stage 4 live multi-repository
-edit quality остаётся открытым; model_calls=0 для нового implementation/validation.
+Продолжение notebooks/LSP/watchers/multiple roots описано выше. Stage 4 live
+multi-repository edit quality остаётся открытым; model_calls=0 для implementation/validation.
 
 23 октября: пакет 12 — review/revise/approve по plan/source/scope digest, task schema 2,
 зависимости/blocked steps, structured summary, explicit project memory CRUD/selection,

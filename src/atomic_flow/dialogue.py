@@ -18,7 +18,7 @@ MAX_CONTEXT_BYTES = 24 * 1024
 
 def _path(project: Path, rel: str):
     return admitted_path(SimpleNamespace(project_root=project, private_workspace=False,
-                                        tree_ignore=[], respect_gitignore=True), rel)
+                                        tree_ignore=[], respect_gitignore=True), rel, notebook=rel.lower().endswith(".ipynb"))
 
 
 def _hashes(project: Path, paths) -> dict:

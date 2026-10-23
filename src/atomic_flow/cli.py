@@ -213,6 +213,9 @@ def _parser() -> argparse.ArgumentParser:
             sub.add_argument("--preview-token", required=True)
             sub.add_argument("--yes", action="store_true", help="Apply the reviewed hash-bound preview")
 
+    from atomic_flow.project_cli import add_project_parsers
+    add_project_parsers(cmd)
+
     job = cmd.add_parser("job", help="Durable bounded Python jobs; no model calls or source publication")
     js = job.add_subparsers(dest="job_action", required=True)
     for action in ("start", "list", "status", "cancel", "output", "reconcile"):
@@ -1054,6 +1057,11 @@ def cmd_rewind(args) -> int:
     return 0
 
 
+def cmd_project(args) -> int:
+    from atomic_flow.project_cli import dispatch
+    return dispatch(args)
+
+
 def cmd_job(args) -> int:
     from atomic_flow.jobs import JobStore
     project = Path(args.project).expanduser().resolve()
@@ -1092,7 +1100,9 @@ def cmd_worker(args) -> int:
     return 0
 
 
-HANDLERS = {"job": cmd_job, "worker": cmd_worker, "memory": cmd_memory, "rewind": cmd_rewind, "policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
+HANDLERS = {"docs": cmd_project, "components": cmd_project, "plugin": cmd_project, "workflow": cmd_project, "mcp": cmd_project, "ide": cmd_project,
+            "notebook": cmd_project, "workspace": cmd_project, "watch": cmd_project, "lsp": cmd_project,
+            "job": cmd_job, "worker": cmd_worker, "memory": cmd_memory, "rewind": cmd_rewind, "policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
             "benchmark": cmd_benchmark}
 

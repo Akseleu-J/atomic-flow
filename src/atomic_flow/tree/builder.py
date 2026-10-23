@@ -295,12 +295,11 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
             if stat.st_size > max_file_bytes:
                 continue
             cached = old.get(rel)
-            if cached and cached[0].size == stat.st_size and cached[0].mtime_ns == stat.st_mtime_ns:
-                per_file[rel] = cached
-                reused += 1
-                continue
             try:
-                data = path.read_bytes()
+                with path.open("rb") as handle:
+                    data = handle.read(max_file_bytes + 1)
+                if len(data) > max_file_bytes:
+                    continue
                 source = data.decode("utf-8-sig")
             except (OSError, UnicodeError):
                 continue
