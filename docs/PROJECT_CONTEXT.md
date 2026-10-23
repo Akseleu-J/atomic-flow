@@ -4,12 +4,12 @@
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–13 закоммичены.
-Последний runtime-коммит, подтверждённый Docker artifact, — `dea7fa742e9af5220cb4a8e67841aaf9f8dfd7a0`.
+Пакеты 1–16 закоммичены; runtime `58b3dd494ee038f5303386d3e527012150444e34`.
+Последний runtime-коммит, подтверждённый Docker artifact, — `58b3dd494ee038f5303386d3e527012150444e34`.
 Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
-## Локальные исправления поверх HEAD — актуальный статус
+## Актуальный статус и история пакетов
 
 23 октября: пакеты 15–16 завершают каталог до **62 implemented_scoped / 0 planned**.
 Три субагента параллельно реализовали MCP/IDE, extensions/workflows/hooks и read-only
@@ -26,7 +26,7 @@ External/model data не выдаёт permission/read proof. Production Stage 4 
 Startup: fresh-process median catalog 0.701 s / 29.36 MiB, LSP symbol 1.366 s /
 32.25 MiB, MCP symbol 1.049 s / 30.04 MiB; три samples, без запуска services/inference.
 `validation/step15-startup-windows.json`. Focused checks и exact-source CI результаты
-записываются ниже после окончания проверки; paid model calls=0.
+приведены ниже; paid model calls=0.
 
 Проверка пакетов 14–16: промежуточный полный Windows baseline пакета 14 **641 passed /
 22 skipped** (`step14-windows-final.txt`) предшествует последним integration правкам.
@@ -36,8 +36,17 @@ host mutation proof от model-facing workspace_read. Контракт наме�
 `validation/step14-16-windows-focused.txt` сохраняет исходный failure для provenance.
 Финальный recheck изменённых workspace/IDE/hooks/CLI мест: **47 passed / 1 skipped**,
 `validation/step14-16-windows-recheck.txt`; Ruff и compileall PASS. Полный локальный
-набор повторно не запускался по просьбе пользователя. Exact-source Linux/Docker CI
-evidence ожидается после публикации runtime commit.
+набор повторно не запускался по просьбе пользователя. Push CI `39938719112` и PR CI
+`39938724913` PASS на runtime `58b3dd494ee038f5303386d3e527012150444e34`, Python
+3.11/3.12. Скачанные artifact logs подтверждают **735 CPU passed / 10 skipped**,
+**17 extra passed**, **25 execution acceptance passed** (9 real Docker и 16
+supporting CPU/local job tests). Compile и historical six-change grader calibration
+PASS, model_calls=0. Image ID
+`sha256:5f98df166b2a51efc8fb7d093930763beeafc070f2abfa9f37df26ae7074e855`.
+`validation/ci-step14-16-20261023/evidence-manifest.json` связывает все **12** исходных
+artifact files и **48** изменённых source/test/tool Git blobs с tested commit.
+Raw artifact bytes сохранены без line-ending normalization. Это не подтверждение
+реального analyzer/server compatibility, внешнего deployment или live edit quality.
 
 
 23 октября: пакет 14 — notebook source-only cell read/preview/apply со стабильными IDs,
