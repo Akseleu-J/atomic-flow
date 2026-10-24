@@ -33,6 +33,8 @@ def patch_paths(patch):
         raise ValueError("patch exceeds byte limit")
     paths = set()
     for line in patch.splitlines():
+        if line.endswith((" 120000", " 160000")) or line == "GIT binary patch":
+            raise ValueError("symlink/submodule/binary changes are unsupported")
         if line.startswith(("--- ", "+++ ")):
             value = line[4:].split("\t")[0]
             if value == "/dev/null":
@@ -125,6 +127,8 @@ def grade(task, mirror, patch, evaluator, output, *, label="candidate", timeout=
                     target.write_bytes(text.encode())
                     checked_git(["apply", "--check", str(target)], work)
                     checked_git(["apply", str(target)], work)
+            if patch and any((work / p).is_symlink() or not (work / p).resolve().is_relative_to(work.resolve()) for p in patch_paths(patch)):
+                raise ValueError("candidate path resolves outside workspace")
             protected_hashes = {p: digest((work / p).read_bytes()) for p in protected if (work / p).exists()}
             oracle = output / (task["instance_id"] + "-" + label + "-oracle.json")
             oracle.unlink(missing_ok=True)
@@ -138,6 +142,8 @@ def grade(task, mirror, patch, evaluator, output, *, label="candidate", timeout=
             if not oracle.exists() or oracle.stat().st_size > 1_000_000:
                 raise ValueError("missing/big independent oracle report")
             observation = json.loads(oracle.read_text(encoding="utf-8"))
+            if observation.get("infrastructure_error") is True:
+                raise ValueError("evaluator infrastructure/collection failure")
             tests = observation["tests"]
             required = task["FAIL_TO_PASS"] + task["PASS_TO_PASS"]
             if not isinstance(tests, dict) or any(t not in tests or tests[t] not in {"pass", "fail", "error"} for t in required):
@@ -173,6 +179,8 @@ def validate_attempt(row, limits):
     if not row["model"] or not row["provider"] or not SHA.fullmatch(row["base_commit"]):
         raise ValueError("missing source/model identity")
     for key in ("calls", "tokens_in", "tokens_out", "human_interventions"):
+        if key in {"tokens_in", "tokens_out"} and row[key] is None:
+            continue
         if type(row[key]) is not int or row[key] < 0:
             raise ValueError("invalid usage counter")
     for key in ("wall_seconds", "cost_usd"):
@@ -228,7 +236,7 @@ def score_pairs(tasks, attempts, limits, grades, calibrations):
     task_map = {t["instance_id"]: t for t in tasks}
     totals = {}
     for arm in ("baseline", "atomic"):
-        successes, known_cost, unknown, measured = 0, 0.0, 0, 0
+        successes, known_cost, unknown, measured, token_unknown = 0, 0.0, 0, 0, 0
         for pair in report["pairs"]:
             attempt = pair["attempts"][arm]
             grade_result = indexed.get((pair["instance_id"], arm))
@@ -248,6 +256,7 @@ def score_pairs(tasks, attempts, limits, grades, calibrations):
             if attempt:
                 measured += attempt["status"] != "not_run"
                 unknown += attempt["cost_usd"] is None
+                token_unknown += attempt["tokens_in"] is None or attempt["tokens_out"] is None
                 known_cost += attempt["cost_usd"] or 0
             else:
                 unknown += 1
@@ -257,6 +266,7 @@ def score_pairs(tasks, attempts, limits, grades, calibrations):
         totals[arm] = {"verified_successes": successes, "all_task_denominator": len(tasks), "attempted": measured,
                        "known_cost_lower_bound_usd": known_cost, "cost_complete": unknown == 0,
                        "unknown_or_missing_cost_attempts": unknown,
+                       "unknown_token_attempts": token_unknown,
                        "cost_per_success_usd": known_cost / successes if successes and unknown == 0 else None}
     report.update(totals=totals, model_quality_measured=all(t["attempted"] == len(tasks) for t in totals.values())
                   and all(indexed.get((t["instance_id"], arm), {}).get("oracle_sha256")
@@ -304,6 +314,8 @@ def main():
     parser.add_argument("--output")
     parser.add_argument("--paired-report", help="JSON containing attempts, limits, grades, calibrations; never executes agents")
     parser.add_argument("--prepare", action="store_true", help="export prompts/host oracle targets and deterministic paired schedule")
+    parser.add_argument("--candidate-patch", help="independently grade an already generated source diff; does not call a model")
+    parser.add_argument("--label", choices=("baseline", "atomic"), default="atomic")
     args = parser.parse_args()
     manifest = load_manifest(args.manifest)
     if args.prepare:
@@ -320,6 +332,11 @@ def main():
         return
     task = next(t for t in manifest["tasks"] if t["instance_id"] == args.task)
     config = json.loads(Path(args.host_config).read_text())
+    if args.candidate_patch:
+        result = grade(task, args.mirror, Path(args.candidate_patch).read_text(encoding="utf-8"),
+                       config["evaluator"], args.output, label=args.label, timeout=config.get("timeout", 180))
+        Path(args.output, "grade.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
+        raise SystemExit(0 if result["verified_success"] else 1)
     report = calibrate(task, args.mirror, config["evaluator"], args.output,
                        Path(config["wrong_patch"]).read_text(), config.get("timeout", 180))
     Path(args.output, "calibration.json").write_text(json.dumps(report, indent=2), encoding="utf-8")

@@ -24,7 +24,7 @@ def test_public_corpus_has_independent_thirty_frozen_tasks():
                    for t in manifest["tasks"] if t["split"] == "development")
 
 
-@pytest.mark.parametrize("text", ["--- a/../secret\n+++ b/../secret\n", "--- a/.git/config\n+++ b/.git/config\n", "x"])
+@pytest.mark.parametrize("text", ["--- a/../secret\n+++ b/../secret\n", "--- a/.git/config\n+++ b/.git/config\n", "x", "new file mode 120000\n--- a/x\n+++ b/x\n"])
 def test_unsafe_patch_paths_refused(text):
     with pytest.raises(ValueError):
         stage4.patch_paths(text)
@@ -104,3 +104,6 @@ def test_empty_score_includes_all_tasks_and_has_no_quality_claim():
     assert result["totals"]["atomic"]["all_task_denominator"] == 1
     assert result["totals"]["atomic"]["cost_per_success_usd"] is None
     assert not result["model_quality_measured"]
+    row = attempt()
+    row["tokens_in"] = row["tokens_out"] = None
+    stage4.validate_attempt(row, {"calls": 10})

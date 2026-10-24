@@ -33,15 +33,23 @@ def main():
     parser.add_argument("--tests", required=True, help="trusted external JSON file containing pytest targets")
     args = parser.parse_args()
     root = Path(args.workspace).resolve()
-    targets = json.loads(Path(args.tests).read_text())
+    target_data = json.loads(Path(args.tests).read_text())
+    aliases = target_data.get("aliases", {}) if isinstance(target_data, dict) else {}
+    targets = target_data.get("targets") if isinstance(target_data, dict) else target_data
     if not isinstance(targets, list) or not targets or any(not isinstance(t, str) or t.startswith("-") for t in targets):
         raise ValueError("expected explicit test target list")
+    if not isinstance(aliases, dict) or any(not isinstance(k, str) or not isinstance(v, str) for k, v in aliases.items()):
+        raise ValueError("invalid trusted oracle ID aliases")
     # Import pytest from installed host environment before project import paths.
     os.chdir(root)
     sys.path[:0] = [str(root / "src"), str(root)]
     results = Results()
     code = pytest.main(["--override-ini", "addopts=", "-p", "no:cacheprovider", "-q", *targets], plugins=[results])
-    report = {"tests": results.tests, "regressions_passed": code == 0 and bool(results.tests), "exit_code": int(code)}
+    observed_tests = len(results.tests)
+    for original, node_id in aliases.items():
+        results.tests[original] = results.tests.get(node_id, "error")
+    report = {"tests": results.tests, "regressions_passed": code == 0 and observed_tests > 0, "exit_code": int(code),
+              "observed_tests": observed_tests, "infrastructure_error": int(code) not in {0, 1} or observed_tests == 0}
     Path(args.report).write_text(json.dumps(report, sort_keys=True), encoding="utf-8")
     return int(code)
 

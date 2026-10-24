@@ -1,0 +1,15 @@
+{
+  "evaluator": [
+    "C:\\Users\\omirb\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Scripts\\python.exe",
+    "-I",
+    "C:\\Users\\omirb\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\ChatGPT\\atomic-flow 2\\atomic-flow\\tools\\evaluation_pytest.py",
+    "--workspace",
+    "{workspace}",
+    "--report",
+    "{report}",
+    "--tests",
+    "C:\\Users\\omirb\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\ChatGPT\\atomic-flow 2\\atomic-flow\\validation\\import-20261024\\stage4-public-pilot-v2\\oracle-targets.json"
+  ],
+  "wrong_patch": "C:\\Users\\omirb\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\ChatGPT\\atomic-flow 2\\atomic-flow\\validation\\import-20261024\\stage4-public-pilot-v2\\wrong.patch",
+  "timeout": 180
+}
