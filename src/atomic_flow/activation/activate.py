@@ -328,7 +328,9 @@ def materialize(root: str | Path, candidates: list[tuple[TreeNode, float]], *, b
                 if node.kind != "file":
                     covered[node.path].append((node.start_line, last))
                 meta.append({"node_id": node.node_id, "alias": aliases.get(node.node_id), "path": node.path,
-                             "symbol": node.symbol, "score": round(score, 4), "zoom": zoom, "tokens": size})
+                             "symbol": node.symbol, "score": round(score, 4), "zoom": zoom, "tokens": size,
+                             "rendered_chars": len(body), "content_hash": hashes.get(node.path, node.content_hash),
+                             "source_complete": zoom >= 2 and last >= (len(lines) if node.kind == "file" else node.end_line)})
                 placed = True
                 break
         if not placed and used >= budget_tokens - 8:

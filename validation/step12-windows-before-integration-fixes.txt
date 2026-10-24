@@ -1,0 +1,207 @@
+...........................................sssss........................ [ 14%]
+............s.......s..................Fs.....F...s.................s... [ 28%]
+...ss..F...........................s..........s......................... [ 43%]
+................................s....................................... [ 57%]
+........................................................................ [ 72%]
+..........s............................................................. [ 86%]
+..................................................................       [100%]
+================================== FAILURES ===================================
+_________________ test_timeout_and_cancellation_stop_command __________________
+
+args = ['-c', 'import time; time.sleep(30)']
+project = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-step12-full1/test_timeout_and_cancellation_0')
+config = ExecutionConfig(mode='local', image='atomic-flow-checks:local', output_bytes=16384)
+timeout = 0.2, cancel_check = None
+
+    def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None = None,
+                   timeout: float = 120, cancel_check: Callable[[], None] | None = None) -> CommandResult:
+        """Execute Python arguments; docker mode fails closed without an engine/image.
+    
+        Cancel checks raise TaskCancelled. Output retains only a bounded tail per stream.
+        Local mode reduces accidental credential inheritance but permits host file/network access.
+        """
+        config = config or ExecutionConfig()
+        check = cancel_check or (lambda: None)
+        check()
+        engine = None
+        name = "atomic-check-" + uuid.uuid4().hex
+        if config.mode == "docker":
+            engine = shutil.which("docker")
+            if engine is None:
+                raise ExecutionUnavailable("Docker unavailable; no local fallback. See docs/EXECUTION.md.")
+            cmd = docker_command(engine, config.image, project, name, args)
+        else:
+            cmd = [sys.executable, *args]
+        tails = [bytearray(), bytearray()]
+    
+        def drain(stream, tail):
+            try:
+                while chunk := stream.read(4096):
+                    tail.extend(chunk)
+                    if len(tail) > config.output_bytes:
+                        del tail[:-config.output_bytes]
+            finally:
+                stream.close()
+    
+        with tempfile.TemporaryDirectory(prefix="atomic-exec-") as private_home:
+            proc = subprocess.Popen(cmd, cwd=project, env=clean_environment(Path(private_home)),
+                                    stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    start_new_session=os.name != "nt",
+                                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0)
+            readers = [threading.Thread(target=drain, args=(stream, tail), daemon=True)
+                       for stream, tail in zip((proc.stdout, proc.stderr), tails, strict=True)]
+            for reader in readers:
+                reader.start()
+            deadline = time.monotonic() + timeout
+            timed_out = False
+            try:
+                while proc.poll() is None:
+                    check()
+                    if time.monotonic() >= deadline:
+                        timed_out = True
+                        break
+                    time.sleep(0.05)
+                check()
+            finally:
+                # Even a successful parent must not leave background workers running.
+                try:
+                    if os.name != "nt" or proc.poll() is None:
+>                       _kill_tree(proc)
+
+src\atomic_flow\agents\execution.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\execution.py:68: in _kill_tree
+    subprocess.run([str(Path(os.environ["SYSTEMROOT"]) / "System32" / "taskkill.exe"),
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: 1 args: ['C:\\WINDOWS\\System32\\taskkill.exe', '/PID', ...>
+input = None, endtime = 987873.14, orig_timeout = 10
+
+    def _communicate(self, input, endtime, orig_timeout):
+        # Start reader threads feeding into a list hanging off of this
+        # object, unless they've already been started.
+        if self.stdout and not hasattr(self, "_stdout_buff"):
+            self._stdout_buff = []
+            self.stdout_thread = \
+                    threading.Thread(target=self._readerthread,
+                                     args=(self.stdout, self._stdout_buff))
+            self.stdout_thread.daemon = True
+            self.stdout_thread.start()
+        if self.stderr and not hasattr(self, "_stderr_buff"):
+            self._stderr_buff = []
+            self.stderr_thread = \
+                    threading.Thread(target=self._readerthread,
+                                     args=(self.stderr, self._stderr_buff))
+            self.stderr_thread.daemon = True
+            self.stderr_thread.start()
+    
+        if self.stdin:
+            self._stdin_write(input)
+    
+        # Wait for the reader threads, or time out.  If we time out, the
+        # threads remain reading and the fds left open in case the user
+        # calls communicate again.
+        if self.stdout is not None:
+            self.stdout_thread.join(self._remaining_time(endtime))
+            if self.stdout_thread.is_alive():
+>               raise TimeoutExpired(self.args, orig_timeout)
+E               subprocess.TimeoutExpired: Command '['C:\\WINDOWS\\System32\\taskkill.exe', '/PID', '27748', '/T', '/F']' timed out after 10 seconds
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:1630: TimeoutExpired
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-step12-full1/test_timeout_and_cancellation_0')
+
+    def test_timeout_and_cancellation_stop_command(tmp_path):
+        cfg = ExecutionConfig(mode="local")
+        start = time.monotonic()
+>       result = run_python(["-c", "import time; time.sleep(30)"], tmp_path, config=cfg, timeout=0.2)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_execution.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\execution.py:137: in run_python
+    proc.wait(timeout=15)
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:1264: in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: None args: ['C:\\Users\\omirb\\OneDrive\\���������\\Chat...>
+timeout = 15
+
+    def _wait(self, timeout):
+        """Internal implementation of wait() on Windows."""
+        if timeout is None:
+            timeout_millis = _winapi.INFINITE
+        elif timeout <= 0:
+            timeout_millis = 0
+        else:
+            timeout_millis = int(timeout * 1000)
+        if self.returncode is None:
+            # API note: Returns immediately if timeout_millis == 0.
+            result = _winapi.WaitForSingleObject(self._handle,
+                                                 timeout_millis)
+            if result == _winapi.WAIT_TIMEOUT:
+>               raise TimeoutExpired(self.args, timeout)
+E               subprocess.TimeoutExpired: Command '['C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.venv\\Scripts\\python.exe', '-c', 'import time; time.sleep(30)']' timed out after 15 seconds
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:1593: TimeoutExpired
+________ test_cancel_signal_survives_task_save_and_prevents_execution _________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-step12-full1/test_cancel_signal_survives_ta0')
+
+    def test_cancel_signal_survives_task_save_and_prevents_execution(tmp_path):
+        task = Task.new("test", tmp_path, [])
+        save(task)
+        request_cancel(task.id)
+        save(task)
+        with pytest.raises(TaskCancelled):
+            check_cancel(task.id)
+        task = TaskRunner(AtomicConfig(), tmp_path, None).resume(task)
+>       assert task.status == "failed" and task.error == "cancelled by user"
+E       AssertionError: assert ('paused' == 'failed'
+E         
+E         - failed
+E         + paused)
+
+tests\test_execution.py:98: AssertionError
+__________ test_create_publishes_verified_changes_with_task_journal ___________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-step12-full1/test_create_publishes_verified0')
+
+    def test_create_publishes_verified_changes_with_task_journal(tmp_path):
+        root = project(tmp_path)
+        backend = ScriptedBackend({
+            "parser": {"task_type": "modify", "focus_terms": ["sample"]},
+            "answerer": [{"tool": "create_file", "args": {"path": "created.py", "content": "VALUE = 7\n"}}, final()],
+            "critic": {"verdict": "ok", "citation_coverage": 1, "feedback": ""},
+        })
+        task = TaskRunner(AtomicConfig(), root, backend, approval_callback=lambda *a: True).run_plan(
+            "add sample module", Plan(steps=[PlanStep(description="Create sample module", tools_needed=["create_file"])]))
+>       assert task.status == "done", task.error
+E       AssertionError: model request failed; charge is unknown, automatic retries are blocked
+E       assert 'paused' == 'done'
+E         
+E         - done
+E         + paused
+
+tests\test_first12_integration.py:72: AssertionError
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_execution.py::test_timeout_and_cancellation_stop_command - ...
+FAILED tests/test_execution.py::test_cancel_signal_survives_task_save_and_prevents_execution
+FAILED tests/test_first12_integration.py::test_create_publishes_verified_changes_with_task_journal
+3 failed, 479 passed, 16 skipped, 1 warning in 161.92s (0:02:41)

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "reviewed_head": "00f77b592234ebca98ae5d6716a0ea6902d70b43",
+  "runtime_commit": "58b3dd494ee038f5303386d3e527012150444e34",
+  "review_method": "Three independent-context AI critics plus primary-agent selected reproduction reruns",
+  "confirmed_defects": [
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06",
+    "R07"
+  ],
+  "runtime_modified": false,
+  "vault_accessed": false,
+  "external_model_api_calls": 0,
+  "real_docker_reproductions": false,
+  "source_blobs": [
+    {
+      "path": "src/atomic_flow/agents/changeset.py",
+      "sha256": "0e96a899275a6971a582b305979fbeb39dbe1ad1683954e2da3a830106e75b19"
+    },
+    {
+      "path": "src/atomic_flow/agents/completion.py",
+      "sha256": "07bf4a80fe068824f817296bf0ffb5450820579326d03744703de8daa4635671"
+    },
+    {
+      "path": "src/atomic_flow/agents/task_loop.py",
+      "sha256": "26300a986bfd3e3239b017b747ec29ffdad49849221167289e8fe157877b3661"
+    },
+    {
+      "path": "src/atomic_flow/agents/execution.py",
+      "sha256": "2f1c712197ee381789a37e4c083d3216cdb47bd8c292900a7e8ac61cae6288ad"
+    },
+    {
+      "path": "src/atomic_flow/agents/tools/run_command.py",
+      "sha256": "fabc581dddbce41610329ce9374038a99e38397315684ad2ffa334a0d893acb8"
+    },
+    {
+      "path": "src/atomic_flow/agents/base.py",
+      "sha256": "183b02907003ba0bdae6337ce8c099e0bef99c4288ff213c93c2e474beb45746"
+    },
+    {
+      "path": "src/atomic_flow/llm/orchestrator.py",
+      "sha256": "01dab1536d6644c8c2fccbc2c8e8ef6e7c425a2a73dff2c5b278e1e6e3d4ae6e"
+    },
+    {
+      "path": "src/atomic_flow/llm/history.py",
+      "sha256": "f4bfa4efbf791777f4615004964fef5066a4405e6c42d05ffdd6a2a0d1654930"
+    },
+    {
+      "path": "src/atomic_flow/llm/verify.py",
+      "sha256": "33aada2870473aac65362ae2d2b6f6116d3a5938f71ae19a959804d8f809db61"
+    },
+    {
+      "path": "src/atomic_flow/benchmarking.py",
+      "sha256": "12adb6ceed99398a06eaf4b99899c09754c4744d137f96fab051287035c244da"
+    },
+    {
+      "path": "src/atomic_flow/qa_evaluation.py",
+      "sha256": "97186d2237f7eb89b23406be7f32474b162abb9cc1483461b0156172e5a0f6ca"
+    },
+    {
+      "path": "src/atomic_flow/workflows.py",
+      "sha256": "ab772352295d10940928d7f25f2da78e9768940e05a9e1ae3fd89e2fde6ae5cc"
+    },
+    {
+      "path": "src/atomic_flow/sdk.py",
+      "sha256": "215417eb5ca46b99a4f7d9ddb4ff9aef2a269f71fe339e338af94e49fad09606"
+    }
+  ],
+  "files": [
+    {
+      "path": "validation/critic-20261023/evaluation.json",
+      "sha256": "f47cae2dde50299d32e14086edf5e2d26c02557f217d7afd14ac0c0dfd47f638"
+    },
+    {
+      "path": "validation/critic-20261023/README.md",
+      "sha256": "abd6d116bec050ff43c95f428919bf01f931c38e0465a08b5c31930f710c281b"
+    },
+    {
+      "path": "validation/critic-20261023/repro_evaluation.py.txt",
+      "sha256": "2a94488cede35afe5509975006ca136f18d5d42179fa5d0d30a16129b38200d0"
+    },
+    {
+      "path": "validation/critic-20261023/repro_runtime.py.txt",
+      "sha256": "b9a1b5d7fdd6c5d82e59dafacefa27b46201b527fe307d58517e3b7c6c7e1c50"
+    },
+    {
+      "path": "validation/critic-20261023/repro_safety.py.txt",
+      "sha256": "b4df1619024d18d32d8f6ec6c373bbb1029593914af026625f87c5db9df71818"
+    },
+    {
+      "path": "validation/critic-20261023/runtime.json",
+      "sha256": "0a8da5b493c3cfd21836b737731a114479ec5acd5c6c402ad6553fcb403e6cb6"
+    },
+    {
+      "path": "validation/critic-20261023/safety.jsonl",
+      "sha256": "be50b0b6f5b8de2c987dc07e4ca01db225e119757f5c7ae384c59e68e604a9f4"
+    }
+  ]
+}

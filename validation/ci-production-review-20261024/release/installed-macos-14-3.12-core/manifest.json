@@ -1,0 +1,8 @@
+{
+  "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+  "sha256": "6a534d0ce73039cbdad0944483fbcf1f8b5111cbcb7626a511e58c4b1697fb03",
+  "python": "3.12.10 (v3.12.10:0cc81280367, Apr  8 2025, 08:46:59) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "platform": "darwin",
+  "extra": "core",
+  "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909"
+}

@@ -1,0 +1,30 @@
+{
+  "compacted_tool_results": 0,
+  "peak_request_bytes": 58250,
+  "max_request_bytes": 131072,
+  "pressure_ratio": 0.4444122314453125,
+  "compact_at_ratio": 0.85,
+  "near_capacity": false,
+  "context_breakdown": {
+    "serialized_bytes_by_component": {
+      "system_and_tools": 5223,
+      "source": 30497,
+      "tool_results": 14127,
+      "query_state_and_history": 6629,
+      "json_envelope_and_escaping": 1774
+    },
+    "output_reserve_tokens": 2048,
+    "accounting": "Exact serialized byte partition, not provider token counts. System includes text tool schemas."
+  },
+  "request_admission": {
+    "model": "google/gemini-3.1-flash-lite-preview",
+    "serialized_request_bytes": 58250,
+    "estimated_input_tokens": 58362,
+    "output_reserve_tokens": 2048,
+    "framing_tokens": 112,
+    "context_window_tokens": null,
+    "max_input_tokens": null,
+    "count_method": "utf8_bytes_estimate_with_configured_framing",
+    "provider_token_count_verified": false
+  }
+}

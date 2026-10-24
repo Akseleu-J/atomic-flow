@@ -1,0 +1,51 @@
+"""Offline review reproductions; all model responses are synthetic."""
+import json
+from contextlib import contextmanager
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+from atomic_flow.benchmarking import _evaluate, benchmark_cases, benchmark_root, run_benchmark
+from atomic_flow.config import AtomicConfig
+from atomic_flow.llm.verify import unknown_identifiers
+
+cases = {c["id"]: c for c in benchmark_cases()}
+rows = {}
+@contextmanager
+def readonly_fixture():
+    yield benchmark_root() / "fixtures", [SimpleNamespace(node_id=n) for c in cases.values() for n in c["expected_nodes"]]
+
+with readonly_fixture() as (project, nodes):
+    context = "\n".join(p.read_text(encoding="utf-8") for p in project.rglob("*.py"))
+    for case_id, text, confidence in [
+        ("invoice-subtotal", "The subtotal subtracts price from quantity.", "high"),
+        ("unanswerable-payout", "Payments are processed instantly.", "low"),
+    ]:
+        case = cases[case_id]
+        unknown, checked = unknown_identifiers(text, context)
+        answer = SimpleNamespace(text=text, confidence=confidence, missing_context=[],
+                                 unknown_identifiers=unknown,
+                                 citations=[SimpleNamespace(node_id=n) for n in case["expected_nodes"]])
+        rows[case_id] = {"text": text, "confidence": confidence, "identifiers_checked": checked,
+                         **_evaluate(case, answer, case["expected_nodes"])}
+
+calls = []
+class FakeOrchestrator:
+    def __init__(self, *args):
+        pass
+
+    def answer(self, *args, **kwargs):
+        calls.append({"cost_usd": 0.1, "tokens_in": 10, "tokens_out": 5})
+        if len(calls) == 2:
+            raise ValueError("synthetic parse failure after response was charged")
+        return SimpleNamespace(text="price quantity", citations=[], verdict="ok", confidence="high",
+                               grounding=1, tokens_in=10, tokens_out=5, cost_usd=0.1,
+                               latency_ms=1, ledger_id="synthetic", missing_context=[], unknown_identifiers=[])
+
+backend = SimpleNamespace(name="synthetic", config=SimpleNamespace(model="synthetic"))
+with patch("atomic_flow.benchmarking.fixture_project", readonly_fixture), patch("atomic_flow.benchmarking.make_backend", return_value=backend), patch("atomic_flow.benchmarking.Orchestrator", FakeOrchestrator):
+    result = run_benchmark(AtomicConfig(), limit=2, output=Path(__file__).with_name("review-eval-synthetic-run.json"))
+rows["failed_parse_accounting"] = {"synthetic_actual_usage": calls, "reported_summary": result["summary"]}
+out = Path(__file__).with_name("review-eval-evidence.json")
+out.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8")
+print(json.dumps(rows, indent=2))

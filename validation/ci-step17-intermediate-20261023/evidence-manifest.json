@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "tested_commit": "d86a43971d82fb5870f2b3b7400d1c6d909fc5be",
+  "push_run": "39969434678",
+  "results": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+    "gpu_requested": false,
+    "model_calls": 0,
+    "container": "PASS",
+    "tests_exit": 1,
+    "extra_tests_exit": 0,
+    "compile_exit": 0,
+    "image_id": "sha256:7de050f8c2720320eeed58be338ce6da563afeee467b6f5b3e0319de21021b67"
+  },
+  "finding": "stale patch direct API requires SourceConflict; 790 CPU passed, 11 skipped, 1 failed; 26 execution acceptance passed; calibration skipped",
+  "artifact_files": [
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/container-boundaries.txt",
+      "sha256": "f9eb7f0cb92561706b52bf42b069e43f7525dc1a060756570dee39a97a74e69f"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/dependencies.txt",
+      "sha256": "8e44f0af290d7aed03638abd56131a218ddbfcb8d2f98faf7c8597c4e36f99a7"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-build.txt",
+      "sha256": "302604e4e4764e2499fd6b406731d86de4ca258a3f2c4fa7437444fb2aec9fcc"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-info.txt",
+      "sha256": "ad0b9c44cfdbf2c7108dc3699820a8491bd5e1e46fa6e76c678ea63f2d31a91f"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/pytest-extra.txt",
+      "sha256": "05f0c6f8a7918aee199f9622e29aae29357785ab3b2b8a549a713423a2946786"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/pytest.txt",
+      "sha256": "d62797ca09e67fa6007c1379e6ec44bb59490a85fa91f62a86fb0737894445f5"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/results.json",
+      "sha256": "e9b2dc66e2179e4916e12dd8ca60a30e178d685a2bd9e498fe0174e33c0b2497"
+    },
+    {
+      "path": "validation/ci-step17-intermediate-20261023/validation-d86a43971d82fb5870f2b3b7400d1c6d909fc5be/tested-commit.txt",
+      "sha256": "a6725eef860c49f4a07799031652a6a7af7dd347e04286c040695a0033e842e4"
+    }
+  ]
+}

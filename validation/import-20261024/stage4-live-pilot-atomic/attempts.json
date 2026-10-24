@@ -1,0 +1,16 @@
+[
+  {
+    "attempt": 1,
+    "status": "response",
+    "cost_usd": 0.00040375,
+    "tokens_in": 547,
+    "tokens_out": 178,
+    "estimated_input_tokens": 2161,
+    "request_sha256": "4a84cc876cf50a3fd7bfb77dda064c3bf2446ce10ab241c669fc9871ab95220d",
+    "request_outcome": "completed",
+    "truncated": false,
+    "cost_source": "provider",
+    "response_sha256": "bc194e3a0de30ca38595a75a0c2152feda28195bc6e7fffcf32d3411a1614a4a",
+    "wall_seconds": 2.047000000020489
+  }
+]

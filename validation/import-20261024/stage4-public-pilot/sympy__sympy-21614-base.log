@@ -1,0 +1,16 @@
+ImportError while loading conftest 'C:\Users\omirb\AppData\Local\Temp\stage4-6d1zjktj\repo\conftest.py'.
+conftest.py:11: in <module>
+    from sympy.testing.runtests import setup_pprint, _get_doctest_blacklist
+sympy\__init__.py:51: in <module>
+    from .core import (sympify, SympifyError, cacheit, Basic, Atom,
+sympy\core\__init__.py:4: in <module>
+    from .sympify import sympify, SympifyError
+sympy\core\sympify.py:9: in <module>
+    from .compatibility import iterable
+sympy\core\compatibility.py:11: in <module>
+    from sympy.external.gmpy import SYMPY_INTS, HAS_GMPY, GROUND_TYPES, gmpy
+sympy\external\__init__.py:18: in <module>
+    from sympy.external.importtools import import_module
+sympy\external\importtools.py:4: in <module>
+    from distutils.version import LooseVersion
+E   ModuleNotFoundError: No module named 'distutils'

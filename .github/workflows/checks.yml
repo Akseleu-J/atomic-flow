@@ -1,0 +1,115 @@
+name: Project and container checks
+
+on:
+  push:
+    branches: [main, experimental, 'codex/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  wheel:
+    name: Installed wheel acceptance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Build wheel and sdist from the checkout
+        run: |
+          python -m pip install build
+          python -m build --wheel --sdist --outdir dist/
+          sha256sum dist/* | tee dist/SHA256SUMS.txt
+      - name: Clean install outside the checkout
+        run: |
+          python -m venv /tmp/atomic-wheel-venv
+          /tmp/atomic-wheel-venv/bin/python -m pip install --upgrade pip
+          wheel_file=$(python -c "from pathlib import Path; print(next(Path('dist').glob('*.whl')))")
+          /tmp/atomic-wheel-venv/bin/python -m pip install "${wheel_file}[api]" httpx
+          /tmp/atomic-wheel-venv/bin/python -m pip freeze > dist/installed-freeze.txt
+      - name: Smoke the installed package (never the checkout source)
+        run: |
+          mkdir -p wheel-results
+          echo "tested-commit $(git rev-parse HEAD)" > wheel-results/environment.txt
+          /tmp/atomic-wheel-venv/bin/python --version >> wheel-results/environment.txt
+          cd "$GITHUB_WORKSPACE"   # deliberately inside the checkout: the installed
+          /tmp/atomic-wheel-venv/bin/python tools/wheel_smoke.py --project-root "$GITHUB_WORKSPACE" --require-api | tee wheel-results/smoke.txt
+      - name: Upload wheel evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: wheel-acceptance-${{ matrix.python }}-${{ github.sha }}
+          path: |
+            dist/
+            wheel-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+  python:
+    name: Python ${{ matrix.python }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12']
+    env:
+      ATOMIC_FLOW_EXECUTION_MODE: local
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install '.[dev]'
+      - run: python -m compileall -q src tools
+      - run: python -m pytest -q tests test_text_v3.py test_references_v3.py
+
+  docker:
+    name: Real Docker acceptance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # Historical replay uses pinned base/gold commits.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install '.[dev]'
+      - name: Record tested source and environment
+        run: |
+          mkdir -p colab-results
+          git rev-parse HEAD > colab-results/tested-commit.txt
+          python --version > colab-results/python-version.txt
+          python -m pip freeze > colab-results/dependencies.txt
+          docker version > colab-results/docker-version.txt
+      - name: CPU checks, image build and real container tests
+        run: python tools/colab_validate.py --require-docker
+      - name: Calibrate historical task graders in containers
+        run: python tools/evaluate_tasks.py --output colab-results/task-calibration.json
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validation-${{ github.sha }}
+          path: colab-results/
+          retention-days: 14
+          if-no-files-found: warn

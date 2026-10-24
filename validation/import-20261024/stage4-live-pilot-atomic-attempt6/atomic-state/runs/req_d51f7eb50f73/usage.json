@@ -1,0 +1,112 @@
+{
+  "calls": [
+    {
+      "call_id": "model_1",
+      "role": "parser",
+      "status": "response",
+      "cost_usd": 0.0001985,
+      "system_prefix_sha256": "7e3920e25591c4ac560c73a70bd8a95bf5bc0e81f8ca15e1eda3d48ed4cfe228",
+      "system_prefix_changed": false,
+      "backend": "host_model_proxy",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "tokens_in": 494,
+      "tokens_out": 50,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "provider",
+      "latency_ms": 3327
+    },
+    {
+      "call_id": "model_2",
+      "role": "answerer",
+      "status": "response",
+      "cost_usd": 0.00413825,
+      "system_prefix_sha256": "c1ce5b1c8cf691475b2229ded9df12855fbbde0513d74be79a56167dc3e216c9",
+      "system_prefix_changed": false,
+      "backend": "host_model_proxy",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "tokens_in": 16373,
+      "tokens_out": 30,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "provider",
+      "latency_ms": 1718
+    },
+    {
+      "call_id": "model_3",
+      "role": "answerer",
+      "status": "response",
+      "cost_usd": 0.003512175,
+      "system_prefix_sha256": "c1ce5b1c8cf691475b2229ded9df12855fbbde0513d74be79a56167dc3e216c9",
+      "system_prefix_changed": false,
+      "backend": "host_model_proxy",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "tokens_in": 18945,
+      "tokens_out": 1636,
+      "cache_read_tokens": 16347,
+      "cache_write_tokens": null,
+      "cost_source": "provider",
+      "latency_ms": 4811
+    },
+    {
+      "call_id": "model_4",
+      "role": "answerer",
+      "status": "response",
+      "cost_usd": 0.001099925,
+      "system_prefix_sha256": "c1ce5b1c8cf691475b2229ded9df12855fbbde0513d74be79a56167dc3e216c9",
+      "system_prefix_changed": false,
+      "backend": "host_model_proxy",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "tokens_in": 20678,
+      "tokens_out": 45,
+      "cache_read_tokens": 18387,
+      "cache_write_tokens": null,
+      "cost_source": "provider",
+      "latency_ms": 1577
+    },
+    {
+      "call_id": "model_5",
+      "role": "answerer",
+      "status": "response",
+      "cost_usd": 0.001447725,
+      "system_prefix_sha256": "c1ce5b1c8cf691475b2229ded9df12855fbbde0513d74be79a56167dc3e216c9",
+      "system_prefix_changed": false,
+      "backend": "host_model_proxy",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "tokens_in": 23265,
+      "tokens_out": 152,
+      "cache_read_tokens": 20429,
+      "cache_write_tokens": null,
+      "cost_source": "provider",
+      "latency_ms": 2000
+    },
+    {
+      "call_id": "model_6",
+      "role": "answerer",
+      "status": "not_sent",
+      "cost_usd": 0.0,
+      "system_prefix_sha256": "c1ce5b1c8cf691475b2229ded9df12855fbbde0513d74be79a56167dc3e216c9",
+      "system_prefix_changed": false,
+      "backend": "host_model_proxy",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "error_type": "BudgetExceeded"
+    }
+  ],
+  "by_role": {
+    "parser": {
+      "calls": 1,
+      "tokens_in": 494,
+      "tokens_out": 50,
+      "known_cost_usd": 0.0001985,
+      "unknown_cost_calls": 0
+    },
+    "answerer": {
+      "calls": 5,
+      "tokens_in": 79261,
+      "tokens_out": 1863,
+      "known_cost_usd": 0.010198075000000001,
+      "unknown_cost_calls": 0
+    }
+  },
+  "cache_note": "Prefix fingerprints diagnose local changes only; cache usage is provider-reported or unknown."
+}

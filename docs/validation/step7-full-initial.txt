@@ -1,0 +1,98 @@
+............................sssss....F...s.........s.................s.. [ 24%]
+....ss................s....................s......FF.................... [ 49%]
+.............................Fs.........FF...............F.......F...... [ 74%]
+..................F..F.................................................. [ 98%]
+...                                                                      [100%]
+================================== FAILURES ===================================
+______________ test_new_source_is_used_for_grounding_and_critic _______________
+tests\test_evidence_refresh.py:23: in test_new_source_is_used_for_grounding_and_critic
+    assert result.grounding == 1 and result.unknown_identifiers == []
+E   AssertionError: assert (0.5 == 1)
+E    +  where 0.5 = AnswerResult(text='`sample` returns `new_identifier`.', citations=[Citation(node_id='sample.py::sample', what='', line...lete current source before editing; follow read_file/read_node next_offset', 'outcome': 'error', 'verification': {}}}]).grounding
+___________________________ test_plan_parses_valid ____________________________
+tests\test_planner.py:29: in test_plan_parses_valid
+    plan = plan_task("rename root", project_root=Path("."), backend=backend,
+src\atomic_flow\agents\planner.py:108: in plan_task
+    response = _chat(backend, messages)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\planner.py:19: in _chat
+    if backend.config.max_output_tokens is None:
+       ^^^^^^^^^^^^^^
+E   AttributeError: 'FakeBackend' object has no attribute 'config'
+_______________________ test_plan_retries_on_malformed ________________________
+tests\test_planner.py:40: in test_plan_retries_on_malformed
+    plan = plan_task("fix bug", project_root=Path("."), backend=backend,
+src\atomic_flow\agents\planner.py:108: in plan_task
+    response = _chat(backend, messages)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\planner.py:19: in _chat
+    if backend.config.max_output_tokens is None:
+       ^^^^^^^^^^^^^^
+E   AttributeError: 'FakeBackend' object has no attribute 'config'
+________________________ test_path_escape_is_rejected _________________________
+tests\test_source_freshness.py:90: in test_path_escape_is_rejected
+    assert "error" in EditNodeTool().run(EditNodeArgs(node_id="evil", new_source="def f(): pass"), ctx)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\tools\edit_node.py:52: in run
+    ctx.require_read(node.path, ctx.file_hashes[node.path], node.node_id)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: '../outside.py'
+______________ test_verify_runs_pytest_itself_when_model_did_not ______________
+tests\test_task.py:210: in test_verify_runs_pytest_itself_when_model_did_not
+    assert task.status == "done"
+E   AssertionError: assert 'failed' == 'done'
+E
+E     - done
+E     + failed
+__________________ test_verify_fails_task_when_pytest_fails ___________________
+tests\test_task.py:244: in test_verify_fails_task_when_pytest_fails
+    assert "pytest" in task.error.lower()
+E   AssertionError: assert 'pytest' in 'changesetconflict: workspace no longer matches verified edit: pkg/m.py'
+E    +  where 'changesetconflict: workspace no longer matches verified edit: pkg/m.py' = <built-in method lower of str object at 0x000002286B355290>()
+E    +    where <built-in method lower of str object at 0x000002286B355290> = 'ChangeSetConflict: workspace no longer matches verified edit: pkg/m.py'.lower
+E    +      where 'ChangeSetConflict: workspace no longer matches verified edit: pkg/m.py' = Task(id='task_e8576cf07b68', query='do', project='C:\\Users\\omirb\\AppData\\Local\\Temp\\atomic-first12-full-a\\test_... rationale='', replan_count=0, changeset_id='change_a6b72a7f5cd1', plan_ready=True, budget_events=[], schema_version=1).error
+________ test_budget_pause_restores_step_and_resumes_with_known_spend _________
+tests\test_task_budget.py:239: in test_budget_pause_restores_step_and_resumes_with_known_spend
+    assert task.status == "done", task.error
+E   AssertionError: model request failed; charge is unknown, automatic retries are blocked
+E   assert 'paused' == 'done'
+E
+E     - done
+E     + paused
+_______________ test_multistep_task_publishes_all_or_none[True] _______________
+tests\test_task_changeset.py:45: in test_multistep_task_publishes_all_or_none
+    assert task.status == ("done" if second_ok else "failed")
+E   AssertionError: assert 'failed' == 'done'
+E
+E     - done
+E     + failed
+_________ test_task_uses_real_orchestrator_and_approval_channel[True] _________
+tests\test_task_execution.py:106: in test_task_uses_real_orchestrator_and_approval_channel
+    assert task.status == ("done" if approved else "failed")
+E   AssertionError: assert 'failed' == 'done'
+E
+E     - done
+E     + failed
+_____________ test_task_failed_matching_tests_roll_back_real_edit _____________
+tests\test_task_execution.py:159: in test_task_failed_matching_tests_roll_back_real_edit
+    assert "rolled back" in task.error
+E   assert 'rolled back' in "StepFailure: (0, 'edit_node: cannot read sample.py: read the complete current source before editing; follow read_file/read_node next_offset')"
+E    +  where "StepFailure: (0, 'edit_node: cannot read sample.py: read the complete current source before editing; follow read_file/read_node next_offset')" = Task(id='task_a02aa50d2fb8', query='change sample', project='C:\\Users\\omirb\\AppData\\Local\\Temp\\atomic-first12-fu...tok': 1.0, 'cost_usd': 0.001, 'tokens_in': 100, 'tokens_out': 50, 'finished_at': 1792643155.171893}], schema_version=1).error
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_evidence_refresh.py::test_new_source_is_used_for_grounding_and_critic
+FAILED tests/test_planner.py::test_plan_parses_valid - AttributeError: 'FakeB...
+FAILED tests/test_planner.py::test_plan_retries_on_malformed - AttributeError...
+FAILED tests/test_source_freshness.py::test_path_escape_is_rejected - KeyErro...
+FAILED tests/test_task.py::test_verify_runs_pytest_itself_when_model_did_not
+FAILED tests/test_task.py::test_verify_fails_task_when_pytest_fails - Asserti...
+FAILED tests/test_task_budget.py::test_budget_pause_restores_step_and_resumes_with_known_spend
+FAILED tests/test_task_changeset.py::test_multistep_task_publishes_all_or_none[True]
+FAILED tests/test_task_execution.py::test_task_uses_real_orchestrator_and_approval_channel[True]
+FAILED tests/test_task_execution.py::test_task_failed_matching_tests_roll_back_real_edit
+10 failed, 268 passed, 13 skipped, 1 warning in 75.38s (0:01:15)

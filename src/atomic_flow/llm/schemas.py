@@ -116,3 +116,4 @@ class AnswerResult(StrictModel):
     retrieval_weak: bool = False
     warnings: list[str] = Field(default_factory=list)
     tool_calls: list[dict[str, Any]] = Field(default_factory=list)
+    usage: dict[str, Any] = Field(default_factory=dict)

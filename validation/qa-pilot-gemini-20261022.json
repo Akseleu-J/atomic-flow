@@ -1,0 +1,726 @@
+{
+  "schema_version": 1,
+  "suite": "paired-fixture-qa-v1",
+  "kind": "read_only_qa_pilot",
+  "created_at": "2026-10-22T05:19:16.879520+00:00",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "backend": "kaggle",
+  "case_ids": [
+    "invoice-subtotal",
+    "refund-call-chain",
+    "checkout-composition",
+    "unanswerable-payout",
+    "russian-discount",
+    "sourcing-pipeline",
+    "ru-shipping",
+    "multi-checkout-flow"
+  ],
+  "limits": {
+    "max_calls": 64,
+    "per_trial_calls": 8,
+    "max_reported_cost_usd": 0.5,
+    "max_output_tokens": 2048
+  },
+  "disclosure": "Known project fixtures; single repeat; heuristic regex/citation/identifier grading. Baseline receives all fixture source and node IDs, atomic receives retrieved context. No code-edit success or production readiness measured. Cost threshold can overshoot by one call; attempted chat calls exclude HTTP parameter-negotiation requests.",
+  "results": [
+    {
+      "case_id": "invoice-subtotal",
+      "strategy": "full_context",
+      "passed": true,
+      "text": "The `Invoice.subtotal` method calculates the subtotal by summing the product of each item's unit price and its quantity from the `self.items` list, returning the result as a `Decimal`.",
+      "citations": [
+        "invoice_service.py::Invoice.subtotal"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)\\bprice\\b": true,
+        "(?i)\\bquantit": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 1.922,
+      "calls": [
+        {
+          "attempt": 1,
+          "cost_usd": 0.0060435,
+          "status": "response",
+          "tokens_in": 23610,
+          "tokens_out": 94,
+          "truncated": false,
+          "wall_seconds": 1.922
+        }
+      ]
+    },
+    {
+      "case_id": "invoice-subtotal",
+      "strategy": "atomic_medium",
+      "passed": true,
+      "text": "`Invoice.subtotal` calculates the subtotal by summing the product of the unit price and quantity for each item in the `self.items` list, starting from a base value of `Decimal(\"0.00\")`.",
+      "citations": [
+        "invoice_service.py::Invoice.subtotal"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)\\bprice\\b": true,
+        "(?i)\\bquantit": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 3.891,
+      "calls": [
+        {
+          "attempt": 2,
+          "cost_usd": 0.000147,
+          "status": "response",
+          "tokens_in": 330,
+          "tokens_out": 43,
+          "truncated": false,
+          "wall_seconds": 1.062
+        },
+        {
+          "attempt": 3,
+          "cost_usd": 0.00182275,
+          "status": "response",
+          "tokens_in": 6661,
+          "tokens_out": 105,
+          "truncated": false,
+          "wall_seconds": 1.36
+        },
+        {
+          "attempt": 4,
+          "cost_usd": 0.0015805,
+          "status": "response",
+          "tokens_in": 6106,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.094
+        }
+      ]
+    },
+    {
+      "case_id": "refund-call-chain",
+      "strategy": "atomic_medium",
+      "passed": true,
+      "text": "The `refund_message` function [n21] can return two possible outcomes: \"refund approved\" or \"refund denied\". These outcomes are determined by the helper function `is_refundable` [n19], which evaluates whether the order status is \"paid\" and the purchase occurred within the last 30 days.",
+      "citations": [
+        "refund_policy.py::refund_message",
+        "invoice_service.py::is_refundable"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "is_refundable": true,
+        "(?i)approved": true,
+        "(?i)denied": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 3.875,
+      "calls": [
+        {
+          "attempt": 5,
+          "cost_usd": 0.000153,
+          "status": "response",
+          "tokens_in": 348,
+          "tokens_out": 44,
+          "truncated": false,
+          "wall_seconds": 1.032
+        },
+        {
+          "attempt": 6,
+          "cost_usd": 0.0019695,
+          "status": "response",
+          "tokens_in": 6948,
+          "tokens_out": 155,
+          "truncated": false,
+          "wall_seconds": 1.375
+        },
+        {
+          "attempt": 7,
+          "cost_usd": 0.0016675,
+          "status": "response",
+          "tokens_in": 6454,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.312
+        }
+      ]
+    },
+    {
+      "case_id": "refund-call-chain",
+      "strategy": "full_context",
+      "passed": true,
+      "text": "The possible outcomes of `refund_message` are \"refund approved\" and \"refund denied\". These outcomes are determined by the helper function `is_refundable`.",
+      "citations": [
+        "refund_policy.py::refund_message",
+        "invoice_service.py::is_refundable"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "is_refundable": true,
+        "(?i)approved": true,
+        "(?i)denied": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 1.75,
+      "calls": [
+        {
+          "attempt": 8,
+          "cost_usd": 0.00606575,
+          "status": "response",
+          "tokens_in": 23615,
+          "tokens_out": 108,
+          "truncated": false,
+          "wall_seconds": 1.734
+        }
+      ]
+    },
+    {
+      "case_id": "checkout-composition",
+      "strategy": "full_context",
+      "passed": true,
+      "text": "The final checkout total is composed by taking the net total from an `Invoice` object, adding VAT based on the country code (calculated via `vat_rate`), and adding shipping costs (calculated via `shipping_cost` based on the net total and delivery speed). The final result is rounded to two decimal places.",
+      "citations": [
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.total",
+        "tax_rules.py::vat_rate",
+        "shipping.py::shipping_cost"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)\\bvat\\w*": true,
+        "(?i)shipping": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 1.922,
+      "calls": [
+        {
+          "attempt": 9,
+          "cost_usd": 0.006217,
+          "status": "response",
+          "tokens_in": 23608,
+          "tokens_out": 210,
+          "truncated": false,
+          "wall_seconds": 1.922
+        }
+      ]
+    },
+    {
+      "case_id": "checkout-composition",
+      "strategy": "atomic_medium",
+      "passed": true,
+      "text": "The final checkout total is calculated in `checkout.py::checkout_total` [n13] by aggregating values from three distinct modules:\n\n1. **Invoice Service**: The base amount is derived from `Invoice.total()` [n18], which calculates the subtotal [n17] and applies a percentage discount [n18, lines 17].\n2. **Tax Rules**: The VAT is calculated by multiplying the invoice total by the rate returned from `tax_rules.py::vat_rate` [n37].\n3. **Shipping**: The shipping cost is added based on the invoice total and the express delivery status using `shipping.py::shipping_cost` [n27].\n\nThe final result is the sum of the VAT-adjusted invoice total and the shipping cost, rounded to two decimal places [n13, lines 11-12].",
+      "citations": [
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.total",
+        "tax_rules.py::vat_rate",
+        "shipping.py::shipping_cost"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)\\bvat\\w*": true,
+        "(?i)shipping": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 4.032,
+      "calls": [
+        {
+          "attempt": 10,
+          "cost_usd": 0.00018725,
+          "status": "response",
+          "tokens_in": 359,
+          "tokens_out": 65,
+          "truncated": false,
+          "wall_seconds": 0.953
+        },
+        {
+          "attempt": 11,
+          "cost_usd": 0.00215075,
+          "status": "response",
+          "tokens_in": 6587,
+          "tokens_out": 336,
+          "truncated": false,
+          "wall_seconds": 1.781
+        },
+        {
+          "attempt": 12,
+          "cost_usd": 0.00162075,
+          "status": "response",
+          "tokens_in": 6267,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.141
+        }
+      ]
+    },
+    {
+      "case_id": "unanswerable-payout",
+      "strategy": "atomic_medium",
+      "passed": false,
+      "text": "The provided project context does not contain information regarding how refunds are paid out to a customer's bank account. The available code only defines the logic for determining if a refund is eligible (`is_refundable` in `n19`) and generating a corresponding message (`refund_message` in `n21`).",
+      "citations": [
+        "invoice_service.py::is_refundable",
+        "refund_policy.py::refund_message"
+      ],
+      "unknown_identifiers": [
+        "n19",
+        "n21"
+      ],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {},
+      "forbidden_patterns": {},
+      "abstained": false,
+      "grounded": false,
+      "wall_seconds": 3.812,
+      "calls": [
+        {
+          "attempt": 13,
+          "cost_usd": 0.000175,
+          "status": "response",
+          "tokens_in": 364,
+          "tokens_out": 56,
+          "truncated": false,
+          "wall_seconds": 0.89
+        },
+        {
+          "attempt": 14,
+          "cost_usd": 0.0018225,
+          "status": "response",
+          "tokens_in": 6432,
+          "tokens_out": 143,
+          "truncated": false,
+          "wall_seconds": 1.422
+        },
+        {
+          "attempt": 15,
+          "cost_usd": 0.0015355,
+          "status": "response",
+          "tokens_in": 5926,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.25
+        }
+      ]
+    },
+    {
+      "case_id": "unanswerable-payout",
+      "strategy": "full_context",
+      "passed": false,
+      "text": "I am sorry, but the provided source files do not contain information regarding how refunds are paid out to a customer's bank account. The available files only define the eligibility criteria for refunds.",
+      "citations": [],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {},
+      "forbidden_patterns": {},
+      "abstained": false,
+      "grounded": true,
+      "wall_seconds": 1.812,
+      "calls": [
+        {
+          "attempt": 16,
+          "cost_usd": 0.00601225,
+          "status": "response",
+          "tokens_in": 23611,
+          "tokens_out": 73,
+          "truncated": false,
+          "wall_seconds": 1.797
+        }
+      ]
+    },
+    {
+      "case_id": "russian-discount",
+      "strategy": "full_context",
+      "passed": true,
+      "text": "Скидка рассчитывается путем умножения промежуточной суммы (subtotal) на процент скидки, после чего результат вычитается из промежуточной суммы. Итоговая сумма счета (total) округляется до центов (двух знаков после запятой).",
+      "citations": [
+        "invoice_service.py::Invoice.total"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)(discount|скидк)": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 1.719,
+      "calls": [
+        {
+          "attempt": 17,
+          "cost_usd": 0.00606075,
+          "status": "response",
+          "tokens_in": 23613,
+          "tokens_out": 105,
+          "truncated": false,
+          "wall_seconds": 1.719
+        }
+      ]
+    },
+    {
+      "case_id": "russian-discount",
+      "strategy": "atomic_medium",
+      "passed": true,
+      "text": "Скидка применяется к промежуточному итогу (`subtotal`) в методе `Invoice.total` [n18]. Она рассчитывается как процент от суммы: `subtotal * (100 - discount_percent) / 100` [n18, line 17]. Итоговая сумма счёта округляется до двух знаков после запятой (центов) с помощью метода `quantize(Decimal(\"0.01\"))` [n18, line 18].\n\nПри расчёте итоговой суммы заказа в `checkout_total` [n13], результат `invoice.total()` преобразуется в `float`, к нему добавляется НДС (рассчитанный через `vat_rate`) и стоимость доставки (`shipping_cost`), после чего финальный результат округляется до двух знаков после запятой с помощью стандартной функции `round(..., 2)` [n13, lines 10-12].",
+      "citations": [
+        "invoice_service.py::Invoice.total",
+        "checkout.py::checkout_total"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)(discount|скидк)": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 4.281,
+      "calls": [
+        {
+          "attempt": 18,
+          "cost_usd": 0.00016225,
+          "status": "response",
+          "tokens_in": 349,
+          "tokens_out": 50,
+          "truncated": false,
+          "wall_seconds": 1.109
+        },
+        {
+          "attempt": 19,
+          "cost_usd": 0.0021295,
+          "status": "response",
+          "tokens_in": 6616,
+          "tokens_out": 317,
+          "truncated": false,
+          "wall_seconds": 1.828
+        },
+        {
+          "attempt": 20,
+          "cost_usd": 0.0016225,
+          "status": "response",
+          "tokens_in": 6274,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.157
+        }
+      ]
+    },
+    {
+      "case_id": "sourcing-pipeline",
+      "strategy": "atomic_medium",
+      "passed": true,
+      "text": "Основной пайплайн мульти-агентной системы реализован в методе `ManagerAgent.run_pipeline` (n34). Процесс выполнения выглядит следующим образом:\n\n1. **Инициализация**: `ManagerAgent` (n29) последовательно проходит по списку зарегистрированных агентов (n31).\n2. **Выполнение задачи**: Каждый агент выполняет свою часть работы через метод `agent.run` (n8), который использует либо потоковую передачу (`stream`), либо генерацию (`generate`) (n2, n3).\n3. **Безопасность**: Если для менеджера установлен `ShieldAgent` (n32, n66), результат работы каждого агента проходит проверку через `shield.chek_security` (n39). Если вердикт `REJECTED`, выполнение конвейера немедленно прерывается (n45-49).\n4. **Передача данных**: Выходные данные текущего агента становятся входными для следующего (`current_input = output`) (n50).\n5. **Мониторинг**: После каждого шага сохраняются логи агента (`agent.save_logs`) и выводится статистика его работы (`agent.get_stats`) (n51-52).",
+      "citations": [
+        "sourcing_main.py::ManagerAgent.run_pipeline",
+        "base.py::GeminiAgent.run",
+        "shield.py::ShieldAgent.chek_security"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)(ManagerAgent|pipeline)": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 8.281,
+      "calls": [
+        {
+          "attempt": 21,
+          "cost_usd": 0.0001355,
+          "status": "response",
+          "tokens_in": 308,
+          "tokens_out": 39,
+          "truncated": false,
+          "wall_seconds": 0.984
+        },
+        {
+          "attempt": 22,
+          "cost_usd": 0.00248575,
+          "status": "response",
+          "tokens_in": 7225,
+          "tokens_out": 453,
+          "truncated": false,
+          "wall_seconds": 2.5
+        },
+        {
+          "attempt": 23,
+          "cost_usd": 0.00181625,
+          "status": "response",
+          "tokens_in": 7049,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.219
+        },
+        {
+          "attempt": 24,
+          "cost_usd": 0.001525425,
+          "status": "response",
+          "tokens_in": 7389,
+          "tokens_out": 397,
+          "truncated": false,
+          "wall_seconds": 2.375
+        },
+        {
+          "attempt": 25,
+          "cost_usd": 0.0008854,
+          "status": "response",
+          "tokens_in": 6994,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.062
+        }
+      ]
+    },
+    {
+      "case_id": "sourcing-pipeline",
+      "strategy": "full_context",
+      "passed": true,
+      "text": "Основной пайплайн в системе управляется методом `run_pipeline` класса `ManagerAgent`. Процесс устроен следующим образом:\n\n1. **Инициализация**: Метод принимает задачу (`task`) и последовательно передает её списку агентов (`self.agents`).\n2. **Выполнение**: Каждый агент по очереди выполняет задачу, используя свой метод `run`.\n3. **Безопасность**: Если установлен агент `shield` (через `set_shield`), после каждого агента результат его работы проходит проверку на безопасность методом `chek_security`.\n4. **Контроль**: Если `shield` возвращает статус `REJECTED`, конвейер немедленно блокируется и выполнение прекращается.\n5. **Передача данных**: Если проверка пройдена, результат работы текущего агента становится входными данными для следующего агента в цепочке.\n6. **Завершение**: После каждого успешного шага сохраняются логи агента и выводится его статистика.",
+      "citations": [
+        "sourcing_main.py::ManagerAgent.run_pipeline",
+        "sourcing_main.py::ManagerAgent.set_shield",
+        "shield.py::ShieldAgent.chek_security"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)(ManagerAgent|pipeline)": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 2.25,
+      "calls": [
+        {
+          "attempt": 26,
+          "cost_usd": 0.0063965,
+          "status": "response",
+          "tokens_in": 23606,
+          "tokens_out": 330,
+          "truncated": false,
+          "wall_seconds": 2.25
+        }
+      ]
+    },
+    {
+      "case_id": "ru-shipping",
+      "strategy": "full_context",
+      "passed": false,
+      "text": "Доставка становится бесплатной при сумме заказа от 50.",
+      "citations": [
+        "shipping.py"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": false,
+      "citation_strict": false,
+      "required_patterns": {
+        "\\b50\\b": true,
+        "(?i)(free|бесплат)": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 1.671,
+      "calls": [
+        {
+          "attempt": 27,
+          "cost_usd": 0.00599125,
+          "status": "response",
+          "tokens_in": 23605,
+          "tokens_out": 60,
+          "truncated": false,
+          "wall_seconds": 1.656
+        }
+      ]
+    },
+    {
+      "case_id": "ru-shipping",
+      "strategy": "atomic_medium",
+      "passed": true,
+      "text": "Доставка становится бесплатной при сумме заказа от 50 единиц и выше.",
+      "citations": [
+        "shipping.py::shipping_cost"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "\\b50\\b": true,
+        "(?i)(free|бесплат)": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 3.125,
+      "calls": [
+        {
+          "attempt": 28,
+          "cost_usd": 0.00013525,
+          "status": "response",
+          "tokens_in": 307,
+          "tokens_out": 39,
+          "truncated": false,
+          "wall_seconds": 1.0
+        },
+        {
+          "attempt": 29,
+          "cost_usd": 0.0006005,
+          "status": "response",
+          "tokens_in": 1958,
+          "tokens_out": 74,
+          "truncated": false,
+          "wall_seconds": 1.062
+        },
+        {
+          "attempt": 30,
+          "cost_usd": 0.000399,
+          "status": "response",
+          "tokens_in": 1380,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 0.969
+        }
+      ]
+    },
+    {
+      "case_id": "multi-checkout-flow",
+      "strategy": "atomic_medium",
+      "passed": true,
+      "text": "The `checkout_total` function [n13] calculates the final amount through the following flow:\n\n1. **Invoice Total**: It calls `invoice.total()` [n18], which calculates the subtotal [n17] and applies a percentage discount: `subtotal * (100 - discount_percent) / 100`, rounded to two decimal places.\n2. **VAT**: It retrieves the VAT rate for the given `country_code` using `vat_rate` [n37] and applies it to the invoice total: `net * (1 + vat_rate)` [n13].\n3. **Shipping**: It calculates shipping costs via `shipping_cost` [n27], which returns 0.0 if the `order_total` meets the `FREE_SHIPPING_THRESHOLD`, or a flat rate (doubled for express delivery) otherwise.\n4. **Final Result**: The function sums the VAT-adjusted total and the shipping cost, returning the result rounded to two decimal places [n13].",
+      "citations": [
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.total",
+        "tax_rules.py::vat_rate",
+        "shipping.py::shipping_cost"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)vat": true,
+        "(?i)shipping": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 4.657,
+      "calls": [
+        {
+          "attempt": 31,
+          "cost_usd": 0.00018675,
+          "status": "response",
+          "tokens_in": 351,
+          "tokens_out": 66,
+          "truncated": false,
+          "wall_seconds": 1.218
+        },
+        {
+          "attempt": 32,
+          "cost_usd": 0.002223,
+          "status": "response",
+          "tokens_in": 6708,
+          "tokens_out": 364,
+          "truncated": false,
+          "wall_seconds": 1.953
+        },
+        {
+          "attempt": 33,
+          "cost_usd": 0.00165825,
+          "status": "response",
+          "tokens_in": 6417,
+          "tokens_out": 36,
+          "truncated": false,
+          "wall_seconds": 1.171
+        }
+      ]
+    },
+    {
+      "case_id": "multi-checkout-flow",
+      "strategy": "full_context",
+      "passed": true,
+      "text": "The flow from checkout_total to the final invoice total is as follows: \n1. The `checkout_total` function takes an `Invoice` object, a `country_code`, and an `express` flag.\n2. It retrieves the net total from the invoice using `invoice.total()`.\n3. It calculates the VAT amount by applying the `vat_rate(country_code)` to the net total.\n4. It calculates the shipping cost by calling `shipping_cost(net, express)`.\n5. The final result is the sum of the VAT-inclusive net total and the shipping cost, rounded to two decimal places.",
+      "citations": [
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.total",
+        "tax_rules.py::vat_rate",
+        "shipping.py::shipping_cost"
+      ],
+      "unknown_identifiers": [],
+      "citation_hit": true,
+      "citation_strict": true,
+      "required_patterns": {
+        "(?i)vat": true,
+        "(?i)shipping": true
+      },
+      "forbidden_patterns": {},
+      "abstained": null,
+      "grounded": true,
+      "wall_seconds": 2.531,
+      "calls": [
+        {
+          "attempt": 34,
+          "cost_usd": 0.00629675,
+          "status": "response",
+          "tokens_in": 23615,
+          "tokens_out": 262,
+          "truncated": false,
+          "wall_seconds": 2.531
+        }
+      ]
+    }
+  ],
+  "corpus_sha256": "9e3818040fa438bb8903b1d64f6e808fea580111b56e81a73078062ecb3d7526",
+  "cases_sha256": "2ce24fba52d8159243abb177249ba2c2a3016f7b70bcaa8371f4b1f7640eac3e",
+  "summary": {
+    "full_context": {
+      "trials": 8,
+      "passed": 6,
+      "pass_rate": 0.75,
+      "chat_calls": 8,
+      "failed_calls": 0,
+      "tokens_in": 188883,
+      "tokens_out": 1242,
+      "reported_cost_usd": 0.04908375,
+      "cost_per_success_usd": 0.008180625,
+      "wall_seconds": 15.577
+    },
+    "atomic_medium": {
+      "trials": 8,
+      "passed": 7,
+      "pass_rate": 0.875,
+      "chat_calls": 26,
+      "failed_calls": 0,
+      "tokens_in": 112107,
+      "tokens_out": 3070,
+      "reported_cost_usd": 0.030797325,
+      "cost_per_success_usd": 0.004399617857142857,
+      "wall_seconds": 35.954
+    }
+  }
+}

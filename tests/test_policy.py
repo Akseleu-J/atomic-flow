@@ -1,7 +1,7 @@
 """Policy engine: declarative tool approval rules."""
 from __future__ import annotations
 
-from atomic_flow.agents.policy import PolicyEngine, READ_ONLY_TOOLS
+from atomic_flow.agents.policy import READ_ONLY_TOOLS, PolicyEngine
 
 
 def test_read_only_never_asks():

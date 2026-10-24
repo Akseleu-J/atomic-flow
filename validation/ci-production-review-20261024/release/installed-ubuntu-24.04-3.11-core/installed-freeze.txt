@@ -1,0 +1,10 @@
+annotated-types==0.8.0
+atomic-flow @ file:///home/runner/work/atomic-flow/atomic-flow/release-evidence/atomic_flow-0.2.0-py3-none-any.whl#sha256=ae213e1ba576acbc30d7666cdc4dd95cf78362c6677bf7ca48b1946a2df62964
+pathspec==1.1.1
+pip==24.0
+pydantic==2.14.1
+pydantic_core==2.50.1
+PyYAML==6.0.3
+setuptools==79.0.1
+typing-inspection==0.4.4
+typing_extensions==4.16.0

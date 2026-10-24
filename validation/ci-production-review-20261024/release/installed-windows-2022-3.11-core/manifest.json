@@ -1,0 +1,8 @@
+{
+  "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+  "sha256": "fc8baf6d4864e33ab4d9bb67b424029a526db1d320f4087963540d4a2044423c",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "platform": "win32",
+  "extra": "core",
+  "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909"
+}

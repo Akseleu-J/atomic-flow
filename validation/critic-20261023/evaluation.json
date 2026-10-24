@@ -1,0 +1,54 @@
+{
+  "invoice-subtotal": {
+    "text": "The subtotal subtracts price from quantity.",
+    "confidence": "high",
+    "identifiers_checked": 0,
+    "citation_hit": true,
+    "citation_strict": true,
+    "required_patterns": {
+      "(?i)\\bprice\\b": true,
+      "(?i)\\bquantit": true
+    },
+    "forbidden_patterns": {},
+    "abstained": null,
+    "grounded": true,
+    "passed": true
+  },
+  "unanswerable-payout": {
+    "text": "Payments are processed instantly.",
+    "confidence": "low",
+    "identifiers_checked": 0,
+    "citation_hit": true,
+    "citation_strict": true,
+    "required_patterns": {},
+    "forbidden_patterns": {},
+    "abstained": true,
+    "grounded": true,
+    "passed": true
+  },
+  "failed_parse_accounting": {
+    "synthetic_actual_usage": [
+      {
+        "cost_usd": 0.1,
+        "tokens_in": 10,
+        "tokens_out": 5
+      },
+      {
+        "cost_usd": 0.1,
+        "tokens_in": 10,
+        "tokens_out": 5
+      }
+    ],
+    "reported_summary": {
+      "passed": 0,
+      "strict_passed": 0,
+      "total": 2,
+      "pass_rate": 0.0,
+      "flaky_cases": [],
+      "average_latency_ms": 1,
+      "tokens_in": 10,
+      "tokens_out": 5,
+      "cost_usd": 0.1
+    }
+  }
+}

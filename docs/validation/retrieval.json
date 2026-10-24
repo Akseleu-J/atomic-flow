@@ -1,0 +1,409 @@
+{
+  "k": 5,
+  "summary": {
+    "cases": 13,
+    "hit_all_at_k": 0.923,
+    "mean_recall_at_k": 0.923,
+    "mrr": 0.827
+  },
+  "results": [
+    {
+      "case_id": "invoice-subtotal",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "invoice_service.py::Invoice.subtotal",
+        "invoice_service.py::Invoice.total",
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice",
+        "invoice_service.py::Invoice.__init__"
+      ]
+    },
+    {
+      "case_id": "discount-rounding",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "invoice_service.py::Invoice.total",
+        "invoice_service.py::Invoice.subtotal",
+        "invoice_service.py::Invoice.__init__",
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice"
+      ]
+    },
+    {
+      "case_id": "refund-window",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "invoice_service.py::is_refundable",
+        "refund_policy.py::refund_message",
+        "refund_policy.py",
+        "shipping.py::shipping_cost",
+        "tax_rules.py::vat_rate"
+      ]
+    },
+    {
+      "case_id": "refund-call-chain",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "refund_policy.py::refund_message",
+        "invoice_service.py::is_refundable",
+        "refund_policy.py",
+        "atomic_ops/configs.py"
+      ]
+    },
+    {
+      "case_id": "free-shipping",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "shipping.py::shipping_cost",
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.total",
+        "tax_rules.py::vat_rate",
+        "shipping.py"
+      ]
+    },
+    {
+      "case_id": "vat-unknown-country",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "tax_rules.py::vat_rate",
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.total",
+        "shipping.py::shipping_cost",
+        "tax_rules.py"
+      ]
+    },
+    {
+      "case_id": "checkout-composition",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "checkout.py::checkout_total",
+        "checkout.py",
+        "invoice_service.py::Invoice.total",
+        "shipping.py::shipping_cost",
+        "tax_rules.py::vat_rate"
+      ]
+    },
+    {
+      "case_id": "unanswerable-payout",
+      "skipped": true,
+      "recall_at_k": null,
+      "hit_all_at_k": null,
+      "mrr": null,
+      "weak": false,
+      "top": [
+        "invoice_service.py::is_refundable",
+        "refund_policy.py::refund_message",
+        "refund_policy.py",
+        "atomic_ops/gdn2_pipeline.py::_gdn2_core",
+        "atomic_ops/gdn2_pipeline.py"
+      ]
+    },
+    {
+      "case_id": "russian-discount",
+      "skipped": true,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "invoice_service.py::Invoice.total",
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.subtotal",
+        "invoice_service.py::Invoice.__init__",
+        "shipping.py::shipping_cost"
+      ]
+    },
+    {
+      "case_id": "sourcing-pipeline",
+      "skipped": true,
+      "recall_at_k": 0.0,
+      "hit_all_at_k": false,
+      "mrr": 0.0,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "sourcing-shield",
+      "skipped": true,
+      "recall_at_k": 0.0,
+      "hit_all_at_k": false,
+      "mrr": 0.0,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "sourcing-data-flow",
+      "skipped": true,
+      "recall_at_k": 0.0,
+      "hit_all_at_k": false,
+      "mrr": 0.0,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "sourcing-stats",
+      "skipped": true,
+      "recall_at_k": 0.0,
+      "hit_all_at_k": false,
+      "mrr": 0.0,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "neg-payment",
+      "skipped": true,
+      "recall_at_k": null,
+      "hit_all_at_k": null,
+      "mrr": null,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "neg-oauth",
+      "skipped": true,
+      "recall_at_k": null,
+      "hit_all_at_k": null,
+      "mrr": null,
+      "weak": false,
+      "top": [
+        "atomic_ops/configs.py",
+        "atomic_ops/configs.py::KernelConfig"
+      ]
+    },
+    {
+      "case_id": "neg-database",
+      "skipped": true,
+      "recall_at_k": null,
+      "hit_all_at_k": null,
+      "mrr": null,
+      "weak": true,
+      "top": [
+        "shield.py::ShieldAgent.chek_security",
+        "base.py::GeminiAgent.run",
+        "sourcing_main.py::ManagerAgent.run_pipeline",
+        "shield.py::ShieldAgent"
+      ]
+    },
+    {
+      "case_id": "neg-email",
+      "skipped": true,
+      "recall_at_k": null,
+      "hit_all_at_k": null,
+      "mrr": null,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "neg-metrics",
+      "skipped": true,
+      "recall_at_k": null,
+      "hit_all_at_k": null,
+      "mrr": null,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "multi-checkout-flow",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice.total",
+        "shipping.py::shipping_cost",
+        "tax_rules.py::vat_rate",
+        "checkout.py"
+      ]
+    },
+    {
+      "case_id": "multi-refund-decision",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "refund_policy.py::refund_message",
+        "invoice_service.py::is_refundable",
+        "refund_policy.py"
+      ]
+    },
+    {
+      "case_id": "ru-invoice-total",
+      "skipped": true,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "invoice_service.py::Invoice.total",
+        "invoice_service.py::Invoice.subtotal",
+        "checkout.py::checkout_total",
+        "invoice_service.py::Invoice",
+        "invoice_service.py::Invoice.__init__"
+      ]
+    },
+    {
+      "case_id": "ru-shipping",
+      "skipped": true,
+      "recall_at_k": 0.0,
+      "hit_all_at_k": false,
+      "mrr": 0.0,
+      "weak": true,
+      "top": [
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/configs.py::_stage_diag",
+        "atomic_ops/configs.py::validate_inputs",
+        "atomic_ops/gdn2_fwd.py::_reshape_from_chunks",
+        "atomic_ops/configs.py::sanitize_h0"
+      ]
+    },
+    {
+      "case_id": "atomic-ops-backward-flow",
+      "skipped": false,
+      "recall_at_k": 0.0,
+      "hit_all_at_k": false,
+      "mrr": 0.0,
+      "weak": false,
+      "top": [
+        "atomic_ops/gdn2_fwd.py::gdn2_inter_chunk_combine_with_state.step",
+        "atomic_ops/gdn2_fwd.py::gdn2_inter_chunk_combine_with_state",
+        "atomic_ops/reference.py::gdn2_chunked_wy_reference.chunk_step",
+        "atomic_ops/gdn2_bwd.py::gdn2_dhu_backward.step",
+        "atomic_ops/reference.py::gdn2_chunked_wy_reference"
+      ]
+    },
+    {
+      "case_id": "atomic-ops-forward-pass",
+      "skipped": true,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 0.3333333333333333,
+      "weak": false,
+      "top": [
+        "atomic_ops/gdn2_fwd.py::_micro_forward_substitution",
+        "atomic_ops/gdn2_fwd.py::_micro_forward_substitution.body",
+        "atomic_ops/gdn2_fwd.py::gdn2_pallas_forward",
+        "atomic_ops/gdn2_fwd.py::gdn2_pallas_forward_with_residuals",
+        "atomic_ops/gdn2_pipeline.py::gdn2_pallas_forward_trainable"
+      ]
+    },
+    {
+      "case_id": "atomic-ops-chunk-combine",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 0.5,
+      "weak": false,
+      "top": [
+        "atomic_ops/gdn2_fwd.py::gdn2_inter_chunk_combine_with_state.step",
+        "atomic_ops/gdn2_fwd.py::gdn2_inter_chunk_combine_with_state",
+        "atomic_ops/gdn2_fwd.py::gdn2_inter_chunk_combine.step",
+        "atomic_ops/gdn2_fwd.py::gdn2_inter_chunk_combine",
+        "atomic_ops/configs.py::sanitize"
+      ]
+    },
+    {
+      "case_id": "atomic-ops-kernel-config",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 1.0,
+      "weak": false,
+      "top": [
+        "atomic_ops/configs.py::KernelConfig",
+        "atomic_ops/configs.py::sanitize",
+        "atomic_ops/gdn2_bwd.py::_kernel_b4_body",
+        "atomic_ops/gdn2_fwd.py::_kernel_b_body",
+        "atomic_ops/gdn2_fwd.py::_kernel_a_body"
+      ]
+    },
+    {
+      "case_id": "atomic-ops-reference",
+      "skipped": false,
+      "recall_at_k": 1.0,
+      "hit_all_at_k": true,
+      "mrr": 0.25,
+      "weak": false,
+      "top": [
+        "atomic_ops/reference.py",
+        "atomic_ops/reference.py::gdn2_token_serial_reference",
+        "atomic_ops/reference.py::gdn2_token_serial_reference.step",
+        "atomic_ops/reference.py::gdn2_chunked_wy_reference",
+        "atomic_ops/reference.py::gdn2_chunked_wy_reference.chunk_step"
+      ]
+    }
+  ]
+}

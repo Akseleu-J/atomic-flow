@@ -1,0 +1,68 @@
+{
+  "network_calls": 0,
+  "model_calls": 0,
+  "interleaved_publication": {
+    "injected_at_real_replace_boundary": true,
+    "a_status": "published",
+    "b_status": "published",
+    "final_source": "value = 'A'\n",
+    "distinct_task_leases_both_acquired": true,
+    "b_returned_success_but_its_source_overwritten": true
+  },
+  "later_known_response": {
+    "pending": [],
+    "unresolved": [
+      "call_1"
+    ]
+  },
+  "later_successful_tool_result": {
+    "unresolved": [
+      "call_1",
+      "effect_1"
+    ]
+  },
+  "journal_append_work": [
+    {
+      "appends": 20,
+      "prior_record_validations": 210,
+      "expected_triangular": 210
+    },
+    {
+      "appends": 40,
+      "prior_record_validations": 820,
+      "expected_triangular": 820
+    },
+    {
+      "appends": 80,
+      "prior_record_validations": 3240,
+      "expected_triangular": 3240
+    }
+  ],
+  "capability_injection": {
+    "workspace_session": {
+      "orchestrator": true,
+      "task_runner": false
+    },
+    "lsp_client": {
+      "orchestrator": true,
+      "task_runner": false
+    },
+    "documentation_client": {
+      "orchestrator": true,
+      "task_runner": false
+    },
+    "hooks": {
+      "orchestrator": true,
+      "task_runner": false
+    },
+    "tool_registry": {
+      "orchestrator": true,
+      "task_runner": false
+    },
+    "role_tools": {
+      "orchestrator": true,
+      "task_runner": false
+    }
+  },
+  "evidence_directory": "runtime-evidence-a1e8sfba"
+}
