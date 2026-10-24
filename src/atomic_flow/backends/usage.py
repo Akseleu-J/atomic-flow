@@ -87,6 +87,13 @@ def anthropic_usage(payload, config, cache_prices=None, *, model=None):
     total = (incoming or 0) + (read or 0) + (write or 0)
     if None in (incoming, outgoing, read, write):
         return total, outgoing or 0, None, "invalid_provider_usage", read, write
+    if "cache_creation" in usage:
+        breakdown = usage["cache_creation"]
+        if (not isinstance(breakdown, dict)
+                or optional_token_count(breakdown.get("ephemeral_5m_input_tokens")) is None
+                or optional_token_count(breakdown.get("ephemeral_1h_input_tokens")) is None
+                or sum(breakdown[k] for k in ("ephemeral_5m_input_tokens", "ephemeral_1h_input_tokens")) != write):
+            return total, outgoing, None, "invalid_provider_usage", read, write
     if model is not None and model != config.model:
         return total, outgoing, None, "model_price_mismatch", read, write
     # Server-side tools incur additional charges; a text-only adapter cannot

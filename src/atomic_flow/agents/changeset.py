@@ -61,10 +61,14 @@ def _git(directory: Path, *args: str, data: bytes | None = None, output_limit: i
                 def receive():
                     try:
                         result_bytes.append(process.stdout.read(output_limit + 1))
-                        if len(result_bytes[0]) > output_limit:
-                            process.kill()
                     except OSError as exc:
                         read_errors.append(exc)
+                        return
+                    if len(result_bytes[0]) > output_limit:
+                        try:
+                            process.kill()
+                        except OSError:
+                            pass  # The child may already have exited after filling the bounded pipe.
 
                 reader = threading.Thread(target=receive, daemon=True)
                 reader.start()
@@ -398,22 +402,26 @@ class ChangeSet:
 
     @mutation_guard("workspace")
     def restore_checkpoint(self, checkpoint: dict):
+        # Recovery must finish after task cancellation. Keep resource and identity
+        # checks, but do not reuse the cancelled task's forward-work callback.
         # Workspace is task-owned. Original project paths are never touched here.
+        def recovery_check():
+            pass
         self._validate_ownership()
-        current = self._manifest(self.workspace)
+        current = _files(self.workspace, limits=self.limits, cancel_check=recovery_check)
         previous = checkpoint["files"]
         for rel in current.keys() | previous.keys():
             if current.get(rel) == previous.get(rel):
                 continue
             if rel in previous:
-                data = _bounded_bytes(confined_path(checkpoint["folder"], rel), self.limits, self.cancel_check)
+                data = _bounded_bytes(confined_path(checkpoint["folder"], rel), self.limits, recovery_check)
                 if digest(data) != previous[rel]:
                     raise ChangeSetConflict(f"checkpoint damaged: {rel}")
                 replace_checked(self.workspace, rel, data, current.get(rel))
                 confined_path(self.workspace, rel).chmod(stat.S_IMODE(confined_path(checkpoint["folder"], rel).stat().st_mode))
             else:
                 target = confined_path(self.workspace, rel)
-                if stream_source(target, self.limits, self.cancel_check)[0] != current[rel]:
+                if stream_source(target, self.limits, recovery_check)[0] != current[rel]:
                     raise ChangeSetConflict(f"workspace recovery conflict: {rel}")
                 target.unlink()
         self.state["approved"] = checkpoint["approved"]

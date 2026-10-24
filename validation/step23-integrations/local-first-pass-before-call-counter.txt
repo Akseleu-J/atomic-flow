@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "external_services": "real local processes",
+  "model": "scripted; no model quality claim",
+  "paid_calls": 0,
+  "observations": [
+    {
+      "phase": "before",
+      "workspace": "staged",
+      "version": 1,
+      "hash": "a66948897ff1355c03922828f3f42685766d5bd3",
+      "definitions": 1
+    },
+    {
+      "phase": "after",
+      "workspace": "staged",
+      "version": 2,
+      "hash": "33968aa35ff8d2090345df0af46b4c7b25ab9ba5",
+      "definitions": 1
+    }
+  ],
+  "scripted_calls": 0,
+  "budget_events": 7,
+  "recorded_spend": 0.007,
+  "published_sha256": "ab9a9e7571dc3df2baf1975f0f70fa139251fdb0ff7f44c65f91f53154e42d1f",
+  "completion": {
+    "schema_version": 1,
+    "ready_to_publish": true,
+    "checked_at": 1792828837.8050861,
+    "checks": [
+      {
+        "name": "completed_steps",
+        "status": "passed",
+        "superseded_by_replanning": []
+      },
+      {
+        "name": "approved_diff_and_freshness",
+        "status": "passed"
+      },
+      {
+        "name": "final_python_syntax",
+        "status": "passed",
+        "scope": "Changed surviving Python files only"
+      }
+    ],
+    "diagnostics": [],
+    "tests": "not_run",
+    "model_calls": 0,
+    "changed_paths": [
+      {
+        "path": "sample.py",
+        "before_hash": "a66948897ff1355c03922828f3f42685766d5bd3",
+        "after_hash": "33968aa35ff8d2090345df0af46b4c7b25ab9ba5"
+      }
+    ],
+    "workspace_manifest_sha256": "6cc9d0162cb01cd7eb622b9ed353e89be3007cda9f493387670b58d4e5294fb9",
+    "limits": "Host gates confirm declared checks and approved bytes, not semantic fulfillment of every user requirement."
+  }
+}

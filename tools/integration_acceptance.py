@@ -36,7 +36,7 @@ class ScriptedBackend:
 
     def __init__(self):
         self.config = BackendConfig(model="scripted", price_in_per_mtok=1, price_out_per_mtok=1)
-        self.calls = 0
+        self.calls = []
         self.replies = iter([
             {"tool": "external_probe", "args": {"phase": "before"}},
             {"tool": "read_file", "args": {"path": "sample.py"}},
@@ -47,9 +47,9 @@ class ScriptedBackend:
         ])
 
     def chat(self, messages, **kwargs):
-        self.calls += 1
         match = re.search(r"<role>(\w+)</role>", messages[1]["content"])
         role = match.group(1) if match else "unknown"
+        self.calls.append(role)
         if role == "parser":
             value = {}
         elif role == "critic":
@@ -68,7 +68,7 @@ def run(args):
         root = Path(tmp)
         project = root / "project"
         project.mkdir()
-        (project / "sample.py").write_text(BEFORE, encoding="utf-8")
+        (project / "sample.py").write_bytes(BEFORE.encode("utf-8"))
         os.environ["ATOMIC_FLOW_HOME"] = str(root / "host-state")
         os.environ["ATOMIC_FLOW_EXECUTION_MODE"] = "local"
         save_tree(project, build_tree(project))
@@ -89,10 +89,11 @@ def run(args):
                 assert (project / "sample.py").read_text(encoding="utf-8") == BEFORE
                 doc = lsp.read_document("sample.py")
                 definitions = lsp.definition("sample.py", 3, 10)
-                assert doc["text"] == expected and definitions and definitions[0]["path"] == "sample.py"
+                assert doc["text"] == expected, "LSP document bytes differ from expected revision"
+                assert definitions and definitions[0]["path"] == "sample.py", f"unexpected definitions: {definitions}"
                 result = mcp.call_tool("read_text_file", {"path": str(ctx.project_root / "sample.py")})
                 text = "\n".join(block.get("text", "") for block in result["remote_result"]["content"])
-                assert expected.strip() in text
+                assert expected.strip() in text, "MCP source response differs from staged revision"
                 evidence["observations"].append({"phase": params.phase, "workspace": "staged", "version": doc["version"],
                                                    "hash": doc["content_hash"], "definitions": len(definitions)})
                 return {"phase": params.phase, "data_only": True, "definition_count": len(definitions)}
@@ -101,7 +102,7 @@ def run(args):
             nonlocal lsp, mcp
             assert context.workspace != context.project
             lsp_command = [str(args.pylsp)] + (["-m", "pylsp"] if args.pylsp_python else [])
-            lsp = clients.enter_context(LSPClient(context.workspace, lsp_command, approved=True, timeout=45))
+            lsp = clients.enter_context(LSPClient(context.workspace, lsp_command, approved=True, timeout=45, private_workspace=True))
             mcp = clients.enter_context(MCPClient(context.workspace, [str(args.node), str(args.mcp_server), str(context.workspace)],
                                                   approved=True, timeout=45, approval=lambda method, params: method == "tools/call"))
             tools = mcp.list_tools()
@@ -125,8 +126,8 @@ def run(args):
         assert evidence["observations"][1]["version"] > evidence["observations"][0]["version"]
         assert abs(SpendLedger(10).today_total() - task.budget_spent) < 1e-8
         assert task.completion_report["ready_to_publish"]
-        evidence.update(status="passed", scripted_calls=backend.calls, budget_events=len(task.budget_events),
-                        recorded_spend=task.budget_spent, published_sha256=hashlib.sha256(AFTER.encode()).hexdigest(),
+        evidence.update(status="passed", scripted_calls=len(backend.calls), budget_events=len(task.budget_events),
+                        accounting_fixture_spend_usd=task.budget_spent, published_sha256=hashlib.sha256(AFTER.encode()).hexdigest(),
                         completion=task.completion_report)
     return evidence
 

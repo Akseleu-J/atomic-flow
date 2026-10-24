@@ -132,7 +132,8 @@ def test_native_catalog_activates_allowed_schema_before_factory_load(tmp_path, m
         return {"choices": [{"message": message}], "usage": {"prompt_tokens": 10, "completion_tokens": 10, "cost_usd": 0}}
 
     monkeypatch.setattr("atomic_flow.backends.openai_compatible.post_json", request)
-    backend = OpenAICompatibleBackend(BackendConfig(type="openai-compatible", tool_protocol="native", max_output_tokens=256))
+    backend = OpenAICompatibleBackend(BackendConfig(type="openai-compatible", tool_protocol="native", max_output_tokens=256,
+                                                   price_in_per_mtok=0, price_out_per_mtok=0))
     config = AtomicConfig()
     config.experimental.native_tools = True
     answer = Orchestrator(config, tmp_path, backend, approval_callback=lambda *a: True).answer("sample", mode="simple")

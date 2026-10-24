@@ -175,7 +175,7 @@ class LSPClient:
     """
 
     def __init__(self, project: Path, command: list[str], *, approved: bool = False,
-                 timeout: float = 10, cancel_check=None):
+                 timeout: float = 10, cancel_check=None, private_workspace: bool = False):
         if approved is not True:
             raise LSPError("explicit host approval of LSP command is required")
         if not isinstance(command, (list, tuple)) or not 1 <= len(command) <= 32 or any(
@@ -188,6 +188,9 @@ class LSPClient:
         if not 0.05 <= timeout <= 120:
             raise LSPError("invalid LSP timeout")
         self.project = Path(project).resolve()
+        if type(private_workspace) is not bool:
+            raise LSPError("private workspace authority must be a host boolean")
+        self.private_workspace = private_workspace
         if not self.project.is_dir():
             raise LSPError("LSP project must be a directory")
         self.command = tuple(command)
@@ -241,7 +244,7 @@ class LSPClient:
     def _path(self, rel: str) -> Path:
         if not isinstance(rel, str) or not rel or "\\" in rel or ":" in rel or "\0" in rel:
             raise LSPError("invalid project path")
-        ctx = SimpleNamespace(project_root=self.project, private_workspace=False, tree_ignore=None, respect_gitignore=True)
+        ctx = SimpleNamespace(project_root=self.project, private_workspace=self.private_workspace, tree_ignore=None, respect_gitignore=True)
         try:
             return admitted_path(ctx, rel)
         except (OSError, ValueError):
@@ -263,7 +266,13 @@ class LSPClient:
         if admitted.as_uri() != uri:
             # URI spelling may differ in percent-escape case, but decoded path
             # must still be exactly the admitted non-resolved relative path.
-            if unquote(admitted.as_uri()) != unquote(uri):
+            canonical, incoming = unquote(admitted.as_uri()), unquote(uri)
+            if os.name == "nt":
+                # Real Windows analyzers commonly lowercase only the drive in
+                # file URIs. Preserve every other canonical spelling gate.
+                canonical = re.sub(r"^file:///([A-Za-z]):", lambda match: "file:///" + match[1].lower() + ":", canonical)
+                incoming = re.sub(r"^file:///([A-Za-z]):", lambda match: "file:///" + match[1].lower() + ":", incoming)
+            if canonical != incoming:
                 raise LSPError("noncanonical document URI")
         return rel
 
