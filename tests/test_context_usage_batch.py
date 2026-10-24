@@ -62,18 +62,18 @@ def test_openai_usage_cache_and_duplicated_proxy_cost_are_not_double_counted(mon
     assert OpenAICompatibleBackend(BackendConfig()).chat([]).cache_read_tokens is None
 
 
-def test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate(monkeypatch):
+def test_anthropic_input_counts_include_cache_but_unpriced_cache_cost_stays_unknown(monkeypatch):
     monkeypatch.setattr("atomic_flow.backends.anthropic.post_json", lambda *a, **kw: {
         "content": [{"type": "text", "text": "{}"}], "usage": {
             "input_tokens": 10, "output_tokens": 5, "cache_read_input_tokens": 80, "cache_creation_input_tokens": 20}})
     result = AnthropicBackend(BackendConfig(price_in_per_mtok=1, price_out_per_mtok=1)).chat([])
     assert result.tokens_in == 110 and result.cache_read_tokens == 80 and result.cache_write_tokens == 20
-    assert result.cost_source == "configured_estimate"
+    assert result.cost_usd is None and result.cost_source == "unpriced_cache_usage"
 
 
 def test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies(tmp_path):
     class Backend:
-        config = BackendConfig(model="test", max_output_tokens=256)
+        config = BackendConfig(model="test", max_output_tokens=256, price_in_per_mtok=1, price_out_per_mtok=1)
         name = "fake"
         calls = 0
 

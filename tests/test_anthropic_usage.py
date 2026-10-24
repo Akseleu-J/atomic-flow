@@ -53,6 +53,7 @@ def test_wrong_cache_breakdown_and_server_tool_usage_are_not_known_cost():
     assert anthropic_usage(record, config(), AnthropicCachePrices(.2, 2.5, 4))[2:4] == (None, "invalid_provider_usage")
     assert anthropic_usage(usage(server_tool_use={"web_search_requests": 1}), config())[2:4] == (None, "unpriced_server_tool_usage")
     assert anthropic_usage(usage(), config(), model="different")[2:4] == (None, "model_price_mismatch")
+    assert anthropic_usage(usage(cache_creation={"ephemeral_5m_input_tokens": 1, "ephemeral_1h_input_tokens": 0}), config())[2:4] == (None, "invalid_provider_usage")
 
 
 @pytest.mark.parametrize("content", [None, {}, [], [{"type": "text", "text": 2}], [{"type": "tool_use", "id": "x"}]])

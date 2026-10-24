@@ -52,6 +52,28 @@ work root is explicit, must have fresh case subdirectories and is retained. This
 a bounded measurement on this host, not a benchmark against competitors or a
 stress test of production ceilings.
 
+Measured Windows smoke (`resources-scale-smoke.json`, synthetic, model_calls=0):
+
+| Files/events | Source bytes | Snapshot seconds | Python allocation peak bytes | Journal bytes reread |
+|---|---:|---:|---:|---:|
+| 16 | 65,632 | 4.51 | 338,804 | 37,117 |
+| 64 | 262,528 | 12.15 | 346,457 | 564,262 |
+| 256 | 1,050,112 | 73.25 | 423,436 | 8,903,950 |
+
+RSS snapshots were 26.9/18.2/6.1 MB; paging and shared-host load make these unsuitable
+as stable peak-memory claims. Journal append median latency was 33.6/36.3/111.2 ms.
+Latency includes flush and host filesystem contention. The 4x event increases
+produced approximately 15-16x reread-byte work, consistent with retained quadratic
+prefix validation. The bounded source smoke does not measure production ceilings.
+
+The 38-pass run predates the additional Git inventory output cap. A follow-up
+focused check exercises that cap, its early-kill path, refusal journaling and
+normal private worktree behavior; its separate evidence is
+`resources-git-cap-recheck.txt`. The scale smoke used copy mode and is unaffected
+by the Git inventory follow-up. Final follow-up: **23 passed / 1 skipped in
+40.11 seconds**, and targeted Ruff PASS (`resources-final-ruff.txt`). The skip is
+the existing symlink-creation case unavailable on this Windows host.
+
 The journal still hashes the committed prefix before append so same-size/mtime
 tampering and cross-process integrity are detected. Consequently repeated append
 still performs quadratic total prefix-byte work. This package measures that cost;
@@ -67,3 +89,5 @@ an oversized inventory kills the child and refuses creation. Other Git plumbing
 returns fixed-size object IDs or bounded metadata. New default file ceilings can
 refuse an oversized historical workspace until an explicitly reviewed host limit
 is used; no partial publication is allowed to bypass the limits.
+The envelope bounds source/Python buffers and inventory output, not the Git
+child's OS memory usage; an OS memory quota for trusted Git is not implemented.

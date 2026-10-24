@@ -1,11 +1,12 @@
 """Whole-source snapshots enforce host resource envelopes before task execution."""
 import json
+import shutil
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict, _files
+from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict, _files, _git
 from atomic_flow.config import user_dir
 from atomic_flow.project_resources import ProjectLimits, ResourceLimitError, stream_source
 
@@ -126,3 +127,45 @@ def test_workspace_rechecks_use_persisted_limits_and_checkpoint_streaming(tmp_pa
         change.validate_workspace()
     with pytest.raises(ResourceLimitError, match="file count"):
         ChangeSet.open(root, change.id).validate_workspace()
+
+
+def test_git_inventory_output_cap_refuses_without_unbounded_capture(tmp_path):
+    if not shutil.which("git"):
+        pytest.skip("Git unavailable")
+    assert _git(tmp_path, "--version", output_limit=1024).startswith(b"git version")
+    with pytest.raises(ResourceLimitError, match="inventory output limit"):
+        _git(tmp_path, "--version", output_limit=1)
+
+
+def test_checkpoint_recovery_finishes_after_task_cancel_and_keeps_source(tmp_path):
+    root = project(tmp_path, (b"x=1\n",))
+    cancelled = False
+
+    def check():
+        if cancelled:
+            raise RuntimeError("cancelled task")
+
+    change = ChangeSet.create(root, cancel_check=check)
+    checkpoint = change.checkpoint()
+    (change.workspace / "file0.py").write_bytes(b"x=2\n")
+    change.track("file0.py")
+    cancelled = True
+    change.restore_checkpoint(checkpoint)
+    assert (change.workspace / "file0.py").read_bytes() == b"x=1\n"
+    assert (root / "file0.py").read_bytes() == b"x=1\n"
+    with pytest.raises(RuntimeError, match="cancelled task"):
+        change.validate_workspace()
+
+
+def test_private_worktree_creation_honors_inventory_output_envelope(tmp_path):
+    if not shutil.which("git"):
+        pytest.skip("Git unavailable")
+    root = project(tmp_path, (b"x=1\n",))
+    _git(root, "init", "--template=")
+    _git(root, "add", "file0.py")
+    limits = replace(ProjectLimits(), max_total_bytes=8)
+    with pytest.raises(ResourceLimitError, match="inventory output limit"):
+        ChangeSet.create(root, backend="git-worktree", limits=limits)
+    journal = next((user_dir() / "changesets").glob("*/journal.json"))
+    assert json.loads(journal.read_text())["status"] == "creation_failed"
+    assert (root / "file0.py").read_bytes() == b"x=1\n"

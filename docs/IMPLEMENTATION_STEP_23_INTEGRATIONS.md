@@ -42,3 +42,31 @@ artifacts. Native sandboxing, independently evaluated live-model task quality,
 signed release/SBOM publication and a transitive hash-complete dependency lock
 are distinct gates. Local installation/execution evidence will be recorded
 under `validation/step23-integrations/`; a workflow definition alone is not PASS.
+
+## Measured local interoperability
+
+On Windows/Python 3.12, actual pylsp 1.15.0 and official filesystem MCP 2.0.0
+(Node 24.22.1, pnpm install with scripts disabled) completed the staged journey.
+Both real definition lookups resolved `sample.py`, synchronized document version
+increased 1 -> 2, both MCP reads returned the staged revision, original bytes
+stayed unchanged during probes, and the final reviewed patch was published.
+Seven scripted calls settled through the shared task ledger; accounting values
+are synthetic fixtures and not provider billing. Final syntax/approved-diff
+checks passed. No tests or live model quality are inferred from that syntax gate.
+
+The actual run exposed two previously untested composition defects: staged
+workspaces under application state were refused by LSP's hardcoded ordinary
+source admission, and Windows analyzer lower-case drive URIs were rejected as
+noncanonical. LSPClient now accepts explicit host-only `private_workspace=True`
+while default clients still refuse private state, and normalizes only the drive
+letter case on Windows. Independent admission/URI regressions passed 2 tests;
+the incremental negotiation regression passed 1 test. Other path/credential/
+scope/hash/version gates remain intact. Prior failed runs are retained, including
+a Windows CRLF fixture mismatch fixed by deterministic initial file bytes.
+
+Local analyzer dependencies were installed into a task-local directory and
+copied into a tool venv with inherited core runtime dependencies. This is real
+external protocol evidence, not the clean wheel support matrix. The latter
+requires the exact-source CI terminal artifacts. Public package primary versions
+are pinned but transitive Python/npm dependencies remain first-resolution with
+retained freeze/lock provenance, not a hash-complete committed lock.
