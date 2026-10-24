@@ -166,3 +166,70 @@ sensitivity for this case, not model success or framework superiority.
 Final small regression recheck after compatibility/report hardening and updated
 CI fixtures: **47 passed / 1 expensive synthetic round-trip deselected** in
 `validation/import-20261024/step24-fixture-recheck.txt`; scoped Ruff passed.
+
+### Live public pilot on one task (24 October)
+
+A bounded live pilot ran on `sympy__sympy-21614` with the fixed model
+`google/gemini-3.1-flash-lite-preview` through the Kaggle model proxy of the
+owner's account (sequential requests only; every run's reported cost matched
+the observed Kaggle quota delta exactly; total spend this day was about
+US$0.036 of the US$10 daily quota). Both arms ran on the same task with
+per-run caps (calls, output tokens, wall seconds, reported cost stop);
+absolute per-arm limits are recorded inside each `report.json` and were NOT
+identical across retries — the atomic arm needed larger wall/input-estimate
+bounds after measured infrastructure bottlenecks, so this remains an exposed
+development pilot, not a matched comparison.
+
+Findings, in order of discovery:
+
+1. **Parser strictness bug (fixed).** The baseline arm's first two runs
+   returned a valid patch wrapped in a ```json fence, which `parse_patch`
+   rejected (it accepted only ```diff or bare JSON). The tool now accepts any
+   single fenced block; regression tests cover json/diff/plain fences and
+   scope/shape refusals. Raw model output that exposed this is preserved at
+   `stage4-live-pilot-debug-parser/raw-response.txt`.
+2. **CRLF clone corruption on Windows (fixed).** The host Git for Windows
+   system config sets `core.autocrlf=true`; every checkout written by
+   `checked_git` (pilot clones and grading clones) was byte-different from
+   the committed blobs (LF→CRLF). In the atomic arm this reached the changeset
+   workspace (default copy backend copies bytes faithfully, so the CRLF came
+   from the source clone) and broke patch-context matching. `checked_git` now
+   passes `-c core.autocrlf=false`; a byte-identity regression
+   (`test_checked_git_checkouts_are_byte_identical_to_blobs`) fails on an
+   autocrlf=true host without the fix. The framework's own Git isolation
+   (`GIT_CONFIG_NOSYSTEM`, null global config) was already correct.
+3. **Deep output paths exceed Windows MAX_PATH.** The atomic arm's changeset
+   workspace under `validation/import-20261024/...` exceeded 260 characters;
+   runs 2026-10-24 now use a short output root (`C:/Users/<user>/.cache/...`)
+   and only compact evidence (reports, attempts, task state, journals, run
+   JSONs — no workspace copies) is committed under `validation/`.
+4. **Measured infrastructure bounds.** One full SymPy tree build takes ~179 s
+   / 44,379 nodes on this laptop; the TaskRunner resume path builds the tree
+   twice (workspace at resume, project at publication), and tree builds are
+   not interruptible by the pilot's cooperative deadline — actual wall time
+   exceeded the deadline while model sends stayed bounded.
+5. **The small model does not complete the atomic tool protocol within 6
+   calls.** In the final run (artifacts preserved: `stage4-live-pilot-atomic-attempt6/`)
+   the planner produced an approved single-step plan, but the answerer read
+   the first 6 KiB page of `Derivative`, ignored `next_offset` pagination on
+   the next read, attempted `edit_node`/`patch_file` with incomplete reads and
+   a placeholder `old_text` (`...`), which the framework correctly refused
+   (`SourcePreconditionFailed`), and the loop exhausted the call cap before a
+   valid edit. No unverified write was applied — the refusal path worked as
+   designed.
+
+Results on this one development task:
+
+| Arm | Runs | Calls | Cost | Candidate | Independent grade |
+|---|---|---|---|---|---|
+| baseline (one direct completion, full source excerpt in prompt) | 3 (2 refused by the fence bug, 1 finished) | 1 | $0.0016 | plausible unified diff | **requirement_failed** — `kind` implemented via kind division raises `TypeError` on the matrix requirement; grader caught it exactly as the wrong-patch calibration predicted |
+| atomic (TaskRunner plan→review→approve→tool loop) | 6 (deadline, MAX_PATH, estimator caps ×2, protocol exhaustion) | 1–6 per run | $0.0108 final run | none — no accepted edit | not gradeable (no patch); all charges accounted, quota matched to the cent |
+
+This is a negative pilot result for model quality on this task with this
+small fixed model — and a positive validation of the harness: strict patch
+admission, pagination-before-edit enforcement, cost accounting and quota
+attribution all behaved as specified. It does not measure the framework's
+value on easier tasks, with larger models, or across the other 29 corpus
+entries. Evidence: `validation/import-20261024/stage4-live-pilot-*` (each run
+directory contains `report.json`, `attempts.json`, `kaggle-quota.json` and,
+for the final atomic run, the preserved tool-loop artifacts).

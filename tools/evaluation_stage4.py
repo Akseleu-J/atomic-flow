@@ -92,7 +92,11 @@ def run(command, cwd, timeout, log):
 
 
 def checked_git(args, cwd=None):
-    result = subprocess.run(["git", *args], cwd=cwd, capture_output=True, timeout=120, check=False)
+    # core.autocrlf=false keeps checkouts byte-identical to committed blobs;
+    # Git for Windows defaults to autocrlf=true, which rewrites every checked
+    # out file to CRLF and breaks patch-context matching against LF sources.
+    result = subprocess.run(["git", "-c", "core.autocrlf=false", *args], cwd=cwd,
+                            capture_output=True, timeout=120, check=False)
     if result.returncode:
         raise ValueError("git source/patch operation failed: " + result.stderr.decode(errors="replace")[:500])
     return result.stdout.decode().strip()

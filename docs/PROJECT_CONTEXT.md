@@ -13,6 +13,27 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 
 ## Актуальный статус и история пакетов
 
+24 октября (вечер): запушены коммиты `2399ebf` (потоковое чтение session journal
+и tail recovery без копирования всего файла), `d67579b` (усиление stage4-грейдера:
+symlink/submodule/binary-патчи запрещены, infrastructure_error у оценщика,
+`--candidate-patch` для независимой оценки, инструменты живого пилота) и
+`5dfa9f8` (Docker-free гайд установки и границ исполнения, пакет 25). Push CI на
+`5dfa9f8` зелёный: основной Docker-workflow, матрица wheel из 12 сочетаний
+ОС/Python и job реального pylsp/MCP staged task. Затем выполнен живой пилот
+на `sympy__sympy-21614` (Kaggle model proxy, аккаунт владельца, последовательно;
+~$0.036 из дневных $10; расход каждого прогона совпал с дельтой квоты):
+baseline дал правдоподобный, но неверный патч — независимый оракул
+`requirement_failed` (kind-деление → TypeError), atomic за 6 вызовов не завершил
+tool-протокол (пагинация не соблюдена, placeholder old_text, правки отклонены
+by design). Пилот нашёл и закрыл два реальных дефекта: отказ ```json-фенсов в
+`parse_patch` и CRLF-конвертацию клонов `checked_git` на Windows
+(`core.autocrlf=false` + байт-идентичность regression). Измерено: build_tree
+SymPy ≈179 c / 44 379 узлов, двойной rebuild в resume-пути, MAX_PATH на глубоких
+выходных каталогах (используйте короткий output-root). Полный разбор и evidence:
+`IMPLEMENTATION_STEP_24_EVALUATION.md` (Live public pilot) и
+`validation/import-20261024/stage4-live-pilot-*`. Остальные 29 задач корпуса,
+LSP/MCP composition acceptance (W6), нагрузочные W7 и W9 остаются открытыми.
+
 24 октября: по прямому запросу пользователя проверена вторая рабочая копия
 `C:/Users/omirb/.zcode/workspace/7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8/atomic-flow`,
 source `c8820ff445b318c3fbf1c3cf76451ebe30a27774`. Её семь коммитов пакетов 18–21
