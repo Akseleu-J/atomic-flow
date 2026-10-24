@@ -13,6 +13,31 @@ SPEC = importlib.util.spec_from_file_location("stage4", ROOT / "tools/evaluation
 stage4 = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(stage4)
 
+sys.modules.setdefault("evaluation_stage4", stage4)
+PILOT_SPEC = importlib.util.spec_from_file_location("live_pilot", ROOT / "tools/evaluation_live_pilot.py")
+live_pilot = importlib.util.module_from_spec(PILOT_SPEC)
+PILOT_SPEC.loader.exec_module(live_pilot)
+
+
+DIFF = "--- a/sympy/core/function.py\n+++ b/sympy/core/function.py\n@@ -1 +1 @@\n-x\n+y\n"
+
+
+def test_pilot_patch_parser_accepts_json_and_diff_fences():
+    fenced_json = "```json\n" + json.dumps({"patch": DIFF}) + "\n```"
+    fenced_diff = "```diff\n" + DIFF + "```"
+    fenced_plain = "```\n" + DIFF + "```"
+    assert live_pilot.parse_patch(fenced_json) == DIFF
+    assert live_pilot.parse_patch(fenced_diff) == DIFF
+    assert live_pilot.parse_patch(fenced_plain) == DIFF
+    assert live_pilot.parse_patch(json.dumps({"patch": DIFF})) == DIFF
+
+
+def test_pilot_patch_parser_still_refuses_wrong_scope_and_shape():
+    with pytest.raises(ValueError):
+        live_pilot.parse_patch("```json\n" + json.dumps({"patch": "--- a/other.py\n+++ b/other.py\n"}) + "\n```")
+    with pytest.raises(ValueError):
+        live_pilot.parse_patch("```json\n" + json.dumps({"patch": DIFF, "extra": 1}) + "\n```")
+
 
 def test_public_corpus_has_independent_thirty_frozen_tasks():
     manifest = stage4.load_manifest(ROOT / "benchmarks/stage4/corpus.json")
@@ -58,6 +83,26 @@ def test_real_git_patch_calibration_base_gold_wrong(tmp_path):
     assert not result["model_quality_measured"]
     forbidden = stage4.grade(task, source, oracle, command, tmp_path / "forbidden")
     assert forbidden["status"] == "infrastructure_error" and not forbidden["verified_success"]
+
+
+def test_checked_git_checkouts_are_byte_identical_to_blobs(tmp_path):
+    # Git for Windows defaults to core.autocrlf=true, which rewrites LF blobs
+    # to CRLF on disk; a host with that default must still get exact bytes.
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    stage4.checked_git(["init"], origin)
+    stage4.checked_git(["config", "user.email", "fixture@example.invalid"], origin)
+    stage4.checked_git(["config", "user.name", "Fixture"], origin)
+    body = b"def answer():\n    return 1\n"
+    (origin / "calc.py").write_bytes(body)
+    stage4.checked_git(["add", "calc.py"], origin)
+    stage4.checked_git(["commit", "-m", "base"], origin)
+    base = stage4.checked_git(["rev-parse", "HEAD"], origin)
+    clone = tmp_path / "clone"
+    stage4.checked_git(["clone", "--no-checkout", str(origin), str(clone)])
+    stage4.checked_git(["checkout", "--detach", base], clone)
+    blob = stage4.checked_git(["show", base + ":calc.py"], clone).encode() + b"\n"
+    assert (clone / "calc.py").read_bytes() == blob
 
 
 def attempt(arm="atomic", cost=None):

@@ -147,9 +147,13 @@ def source_excerpt(source):
 
 def parse_patch(content):
     text = content.strip()
-    if text.startswith("```diff") and text.endswith("```"):
-        text = text[7:-3].strip()
-    elif text.startswith("{"):
+    if text.startswith("```") and text.endswith("```") and "\n" in text:
+        # Models commonly wrap the JSON object in a ```json fence; accept any
+        # single fenced block, not only ```diff.
+        text = text[3:-3].strip()
+        if text.split("\n", 1)[0].startswith(("json", "diff")):
+            text = text.split("\n", 1)[1].strip()
+    if text.startswith("{"):
         obj = json.loads(text)
         if not isinstance(obj, dict) or set(obj) != {"patch"} or not isinstance(obj["patch"], str):
             raise ValueError("expected only patch JSON field")
@@ -174,7 +178,10 @@ def atomic(task, work, source, backend, args):
     from atomic_flow.agents.tools import ROLE_TOOLS
 
     config = AtomicConfig(max_attempts=1, auto_mode=False)
-    config.artifacts.save = False
+    # Step prompts/responses stay under the pilot's own ATOMIC_FLOW_HOME in the
+    # short output directory (outside any repository); they are the only way to
+    # audit tool-loop turns that end without an accepted edit.
+    config.artifacts.save = True
     config.budget.daily_limit_usd = 0  # Pilot has its own sidecar and per-task ledger; no host-global spend mutation.
     config.task.max_model_calls = args.max_calls
     config.task.max_replans = 0
@@ -240,9 +247,19 @@ def parser():
 
 def main():
     args = parser().parse_args()
-    if not args.yes or args.model != MODEL or not 1 <= args.max_calls <= 4 or not 16 <= args.max_output_tokens <= 2048:
+    if not args.yes or args.model != MODEL or not 1 <= args.max_calls <= 6 or not 16 <= args.max_output_tokens <= 2048:
+        # 6-call bound: one planner call plus tool-loop turns; the prepared
+        # corpus doc proposed 20 calls/arm, so the pilot stays stricter.
         raise ValueError("explicit authorized fixed-model pilot and bounded caps required")
-    if not 0 < args.max_wall_seconds <= 120 or not 1 <= args.max_input_tokens <= 60_000 or not 0 < args.max_reported_cost <= .05:
+    if not 0 < args.max_wall_seconds <= 600 or not 1 <= args.max_input_tokens <= 240_000 or not 0 < args.max_reported_cost <= .05:
+        # 600 s wall bound: the atomic arm builds the full SymPy tree twice
+        # (changeset workspace at resume, project at publication); one build
+        # measured 179 s / 44,379 nodes on the reference laptop. Tree builds
+        # are not interruptible, so wall can exceed the cooperative deadline.
+        # 240k aggregate input estimate: admit_request estimates bytes/4,
+        # ~2.3x the provider's actual tokens; a 60k/120k estimate cap blocked
+        # the terminal tool-loop turn mid-edit. Cost stays bounded by the
+        # per-response reported-cost stop below.
         raise ValueError("pilot caps exceed reviewed bounds")
     if (args.price_in is None) != (args.price_out is None) or any(v is not None and not valid_amount(v) for v in (args.price_in, args.price_out)):
         raise ValueError("both explicit nonnegative prices or neither required")

@@ -1,0 +1,7 @@
+{
+  "type": "BudgetExceeded",
+  "message": "task model-call limit reached",
+  "roles_done": [
+    "parser"
+  ]
+}

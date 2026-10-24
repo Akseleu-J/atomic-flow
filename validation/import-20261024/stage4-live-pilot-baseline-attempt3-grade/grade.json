@@ -1,0 +1,34 @@
+{
+  "instance_id": "sympy__sympy-21614",
+  "label": "baseline",
+  "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+  "patch_sha256": "54c5e29844729c2ecca2a1c45ab8b57bfa71595db59dfc0654207a59626c22cc",
+  "status": "requirement_failed",
+  "verified_success": false,
+  "execution": {
+    "status": "finished",
+    "exit_code": 1,
+    "wall_seconds": 18.375,
+    "log_sha256": "10836f9ac4901d24be551fec8b6f965c4d863879ce5f590b885024d4c2b1c1d2",
+    "log_bytes": 1766,
+    "log_prefix": ".....F..                                                                 [100%]\r\n================================== FAILURES ===================================\r\n____________________________ test_Derivative_kind _____________________________\r\n\r\n    def test_Derivative_kind():\r\n        A = MatrixSymbol('A', 2,2)\r\n>       assert Derivative(comm_x, comm_x).kind is NumberKind\r\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n\r\nsympy\\core\\tests\\test_kind.py:45: \r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n\r\nself = Derivative(x, x)\r\n\r\n    @property\r\n    def kind(self):\r\n        from sympy.core.kind import Kind\r\n        k = self.expr.kind\r\n        for v, _ in self.variable_count:\r\n>           k = k / v.kind\r\n                ^^^^^^^^^^\r\nE           TypeError: unsupported operand type(s) for /: '_NumberKind' and '_NumberKind'\r\n\r\nsympy\\core\\function.py:1239: TypeError\r\n============================== warnings summary ===============================\r\n..\\..\\..\\..\\..\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474\r\n  C:\\Users\\omirb\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474: PytestConfigWarning: Unknown config option: doctestplus\r\n  \r\n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\r\n\r\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\r\n                               DO *NOT* COMMIT!                               \r\n=========================== short test summary info ===========================\r\nFAILED sympy/core/tests/test_kind.py::test_Derivative_kind - TypeError: unsup...\r\n1 failed, 7 passed, 1 warning in 1.73s\r\n"
+  },
+  "oracle_sha256": "0247c32e398975d3ca7decf7da3c8149cc9de8c5aba807c259fd112f4ae01397",
+  "tests": {
+    "sympy/core/tests/test_kind.py::test_Add_kind": "pass",
+    "sympy/core/tests/test_kind.py::test_Derivative_kind": "fail",
+    "sympy/core/tests/test_kind.py::test_Integral_kind": "pass",
+    "sympy/core/tests/test_kind.py::test_MatMul_kind": "pass",
+    "sympy/core/tests/test_kind.py::test_Matrix_kind": "pass",
+    "sympy/core/tests/test_kind.py::test_NumberKind": "pass",
+    "sympy/core/tests/test_kind.py::test_Symbol_kind": "pass",
+    "sympy/core/tests/test_kind.py::test_mul_kind": "pass",
+    "test_Add_kind": "pass",
+    "test_Derivative_kind": "fail",
+    "test_Integral_kind": "pass",
+    "test_Matrix_kind": "pass",
+    "test_NumberKind": "pass",
+    "test_Symbol_kind": "pass",
+    "test_mul_kind": "pass"
+  }
+}
