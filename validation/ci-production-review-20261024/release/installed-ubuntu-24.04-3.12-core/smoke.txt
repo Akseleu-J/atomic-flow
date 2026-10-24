@@ -1,0 +1,7 @@
+import location: /tmp/atomic-wheel-venv-t_vbsiof/lib/python3.12/site-packages/atomic_flow/__init__.py
+packaged fixtures: cases.json (7053 bytes)
+tree build/save/load: ok
+sdk import: ok
+api extra: not installed (skipped)
+cli --help: ok
+wheel smoke: PASS

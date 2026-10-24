@@ -7,6 +7,19 @@
 
 ## Текущий статус — читать первым
 
+Глава аудита/сверки и scoped исправлений завершена на runtime
+`0dbd5938958074eae4ff73f6424f06425a525909`. Оба push workflow PASS:
+[checks](https://github.com/Akseleu-J/atomic-flow/actions/runs/40101171166),
+[release/composition](https://github.com/Akseleu-J/atomic-flow/actions/runs/40101171149).
+Python 3.12 job: **1021 passed / 14 skipped**; Docker validation: **1004 CPU /
+17 extra / 26 execution passed** (наборы пересекаются). Все 12 wheel combinations
+и три real Linux LSP/MCP composition scenarios PASS. Скачанные artifacts проверены
+на tested commit, hash скрипта и source bytes всех 133 Python-файлов каждого wheel:
+8 wheels совпали побайтно, 4 Windows wheels отличаются только CRLF.
+Evidence: `validation/ci-production-review-20261024/evidence-manifest.json`.
+Четыре оставшихся production-блока перечислены в конце `PRODUCTION_PLAN.md`.
+Новых provider calls в этой главе не было, PR остаётся draft.
+
 Проверенная исходная точка этого review: `445f1b9f036111de0c2113884cc9eb65e78749e1`;
 на момент сверки `HEAD...origin/experimental` = `0 0`.
 Пакеты 18–25 и исправления пилота уже закоммичены. Это не незакоммиченный `8a18fbe`.
@@ -63,7 +76,7 @@ Base FAIL / gold PASS / plausible wrong FAIL калибровка одной з�
 ## Технические границы и ближайшая работа
 
 Реальный staged TaskRunner edit→checker→publish с pylsp/MCP уже проверен.
-Расширенный W6 локально прошёл три сценария: public prepare/review/approve/resume,
+Расширенный W6 локально и в exact-source Linux CI прошёл три сценария: public prepare/review/approve/resume,
 Python+notebook edits→pytest→publish, cancel/conflict и recovery без новых calls.
 Точный script SHA и observed states: `validation/step23-integrations/composition-final-result.json`.
 W7 имеет bounded snapshot и потоковый journal read/recovery; append всё ещё
