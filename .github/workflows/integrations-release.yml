@@ -36,7 +36,7 @@ jobs:
           path: release-evidence/
 
   external:
-    name: Real pylsp and MCP staged task
+    name: Real reviewed task, notebook and recovery composition
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -54,6 +54,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p external-evidence external-tools
+          git rev-parse HEAD > external-evidence/tested-commit.txt
           python -m pip install . -r requirements/acceptance.txt
           python -m pip freeze --all > external-evidence/python-freeze.txt
           node --version > external-evidence/node-version.txt

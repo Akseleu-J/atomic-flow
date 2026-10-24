@@ -14,9 +14,11 @@ from atomic_flow.agents.planner import Plan, plan_task, replan_task
 from atomic_flow.agents.task import Step, Task, load, save
 from atomic_flow.agents.task_budget import TaskBudgetBackend, check_accounting
 from atomic_flow.config import AtomicConfig
-from atomic_flow.errors import BudgetExceeded
+from atomic_flow.errors import BudgetExceeded, TreeError
 from atomic_flow.llm.orchestrator import Orchestrator
-from atomic_flow.tree.builder import build_tree, save_tree
+from atomic_flow.project_resources import ProjectLimits
+from atomic_flow.source_lock import source_mutation_lease
+from atomic_flow.tree.builder import build_tree, load_tree, save_tree
 
 MUTATING_TOOLS = {"edit_node", "patch_file", "create_file", "delete_file", "move_file", "notebook_edit"}
 
@@ -60,13 +62,16 @@ class StepFailure(Exception):
 
 class TaskRunner:
     def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None,
-                 capability_factory=None):
+                 capability_factory=None, resource_limits: ProjectLimits | None = None):
+        if resource_limits is not None and not isinstance(resource_limits, ProjectLimits):
+            raise TypeError("resource_limits must be host-owned ProjectLimits")
         self.config = config if config is not None else AtomicConfig()
         self.project = project
         self.backend = backend
         self.approval_callback = approval_callback
         self.question_callback = question_callback
         self.capability_factory = capability_factory
+        self.resource_limits = resource_limits
         self.changeset: ChangeSet | None = None
         self.cancel_check = lambda: None
         self.task_backend = backend
@@ -241,11 +246,10 @@ class TaskRunner:
                 if task.current_index:
                     raise ChangeSetConflict("legacy checkpoint has no workspace; cannot safely replay/resume it")
                 self.changeset = ChangeSet.create(self.project, backend=self.config.task.workspace_backend,
-                                                  cancel_check=self.cancel_check)
+                                                  limits=self.resource_limits, cancel_check=self.cancel_check)
                 task.changeset_id = self.changeset.id
-            save_tree(self.changeset.workspace, build_tree(self.changeset.workspace, self.config.tree.ignore,
-                      respect_gitignore=self.config.tree.respect_gitignore))
-        except (OSError, ValueError) as exc:
+            self._refresh_index(self.changeset.workspace, seed_root=self.project)
+        except (OSError, ValueError, TreeError) as exc:
             task.status = "failed"
             task.error = str(exc)
             save(task)
@@ -263,9 +267,8 @@ class TaskRunner:
                     save(result)
                     return result
                 require_scope(result, self.changeset)
-                self.changeset.publish(cancel_check=self.cancel_check, finalize=lambda: save_tree(
-                    self.project, build_tree(self.project, self.config.tree.ignore,
-                                             respect_gitignore=self.config.tree.respect_gitignore)))
+                self.changeset.publish(cancel_check=self.cancel_check,
+                                       finalize=lambda: self._refresh_index(self.project))
                 result.status = "done"
                 result.finished_at = time.time()
                 result.error = ""
@@ -273,13 +276,46 @@ class TaskRunner:
                 result.status, result.error = "paused", str(exc)
             except TaskCancelled:
                 raise
-            except (OSError, ValueError) as exc:
+            except (OSError, ValueError, TreeError) as exc:
                 result.status = "failed"
                 result.error = f"publication failed: {exc} (journal: {self.changeset.id})"
         elif result.status == "failed":
             self.changeset.abort()
         save(result)
         return result
+
+    def _refresh_index(self, root: Path, *, seed_root: Path | None = None, recovering=False):
+        """Reuse syntax only after hashing current bytes; never reuse read authority.
+
+        The task lease serializes this runner's staged source. A new workspace
+        may seed its parse cache from the source index, but build_tree still
+        traverses and hashes every admitted file, rebuilds links, and save_tree
+        compares the destination's generation before committing.
+        """
+        with source_mutation_lease(root):
+            return self._refresh_index_locked(root, seed_root=seed_root, recovering=recovering)
+
+    def _refresh_index_locked(self, root, *, seed_root, recovering):
+        current = None
+        try:
+            current = load_tree(root)
+        except TreeError:
+            pass  # Missing/old/corrupt advisory cache is rebuilt from source.
+        previous = current
+        if previous is None and seed_root is not None:
+            try:
+                previous = load_tree(seed_root)
+            except TreeError:
+                pass
+        tree = build_tree(root, self.config.tree.ignore, previous=previous,
+                          respect_gitignore=self.config.tree.respect_gitignore,
+                          limits=self.changeset.limits if self.changeset else self.resource_limits,
+                          cancel_check=None if recovering else self.cancel_check)
+        if (current is None or tree["fingerprint"] != current.get("fingerprint")
+                or tree["reference_format"] != current.get("reference_format")
+                or tree["nodes"] != current.get("nodes")):
+            save_tree(root, tree)
+        return tree
 
     def _resume_steps(self, task: Task) -> Task:
         task.status = "running"
@@ -342,9 +378,7 @@ class TaskRunner:
                     if checkpoint is None:
                         raise ChangeSetConflict(f"checkpoint failed: {exc}")
                     self.changeset.restore_checkpoint(checkpoint)
-                    save_tree(self.changeset.workspace, build_tree(
-                        self.changeset.workspace, self.config.tree.ignore,
-                        respect_gitignore=self.config.tree.respect_gitignore))
+                    self._refresh_index(self.changeset.workspace, recovering=True)
                 except Exception as restore_error:
                     task.status = "failed"
                     task.error = f"workspace rollback failed: {restore_error}"

@@ -18,6 +18,7 @@ import threading
 import time
 from pathlib import Path
 
+from evaluation_provenance import runtime_state, source_state
 from evaluation_stage4 import checked_git, digest, load_manifest, patch_paths
 
 from atomic_flow.agents.execution import TaskCancelled
@@ -247,6 +248,7 @@ def parser():
 
 def main():
     args = parser().parse_args()
+    started = time.monotonic()
     if not args.yes or args.model != MODEL or not 1 <= args.max_calls <= 6 or not 16 <= args.max_output_tokens <= 2048:
         # 6-call bound: one planner call plus tool-loop turns; the prepared
         # corpus doc proposed 20 calls/arm, so the pilot stays stricter.
@@ -258,8 +260,8 @@ def main():
         # are not interruptible, so wall can exceed the cooperative deadline.
         # 240k aggregate input estimate: admit_request estimates bytes/4,
         # ~2.3x the provider's actual tokens; a 60k/120k estimate cap blocked
-        # the terminal tool-loop turn mid-edit. Cost stays bounded by the
-        # per-response reported-cost stop below.
+        # the terminal tool-loop turn mid-edit. The reported-cost stop is
+        # checked after receipt; it is not an absolute provider invoice cap.
         raise ValueError("pilot caps exceed reviewed bounds")
     if (args.price_in is None) != (args.price_out is None) or any(v is not None and not valid_amount(v) for v in (args.price_in, args.price_out)):
         raise ValueError("both explicit nonnegative prices or neither required")
@@ -275,15 +277,19 @@ def main():
     limits = {"max_calls": args.max_calls, "max_output_tokens": args.max_output_tokens,
               "max_input_tokens": args.max_input_tokens, "max_wall_seconds": args.max_wall_seconds,
               "max_reported_cost_usd": args.max_reported_cost}
-    report = {"version": 1, "instance_id": TASK_ID, "arm": args.arm, "base_commit": task["base_commit"],
+    framework_before = source_state(root)
+    report = {"version": 2, "instance_id": TASK_ID, "arm": args.arm, "base_commit": task["base_commit"],
+              "framework_before": framework_before, "runtime": runtime_state(),
+              "configured_prices_usd_per_mtok": {"input": args.price_in, "output": args.price_out},
+              "source_context_policy": "Derivative excerpt, at most 550 lines and 32000 bytes; no oracle or gold",
               "model": args.model, "provider": "host_model_proxy", "limits": limits, "status": "not_run",
               "calls": 0, "tokens_in": None, "tokens_out": None, "cost_usd": None, "cost_complete": False,
               "human_interventions": 0, "model_quality_measured": False,
+              "human_intervention_scope": "within this run only; cross-run cap/code changes require a separate experiment log",
               "experiment": "exposed_public_development_pilot_not_formal_matched_comparison",
               "money_admission": "declared_estimate_not_billing_guarantee" if args.price_in is not None else "disabled_unknown_tariff_reported_cost_stop_only",
               "quota_admission": "authorized_host_responsibility", "wall_enforcement": "cooperative_deadline_and_bounded_transport_not_os_hard_kill"}
     write_json(output / "report.json", report)
-    started = time.monotonic()
     config = BackendConfig(type="kaggle", name="host_model_proxy", model=args.model,
                            base_url=endpoint.rstrip("/") if endpoint.rstrip("/").endswith("/openapi") else endpoint.rstrip("/") + "/openapi",
                            api_key_env="MODEL_PROXY_API_KEY", max_retries=0, timeout_seconds=args.max_wall_seconds,
@@ -299,6 +305,11 @@ def main():
             if checked_git(["rev-parse", "HEAD"], work) != task["base_commit"]:
                 raise ValueError("generation source identity mismatch")
             source = (work / SOURCE).read_text(encoding="utf-8")
+            report["generation_input_sha256"] = digest({"issue": task["problem_statement"],
+                                                         "base": task["base_commit"],
+                                                         "source": source_excerpt(source)})
+            report["source_file_sha256"] = digest((work / SOURCE).read_bytes())
+            write_json(output / "report.json", report)
             patch, detail = baseline(task, source, backend) if args.arm == "baseline" else atomic(task, work, source, backend, args)
             report.update(detail)
             if patch:
@@ -327,6 +338,15 @@ def main():
                       known_cost_lower_bound_usd=sum(row["cost_usd"] or 0 for row in rows))
         for token in ("tokens_in", "tokens_out"):
             report[token] = sum(row[token] for row in rows) if rows and all(row[token] is not None for row in rows) else None
+        try:
+            after = source_state(root)
+            report["framework_after"] = after
+            report["observed_source_unchanged"] = (after == framework_before)
+            if after != framework_before:
+                report["provenance_warning"] = "framework source changed during pilot; not accepted for comparison"
+        except Exception as exc:
+            report["provenance_error_type"] = type(exc).__name__
+            report["observed_source_unchanged"] = False
         write_json(output / "report.json", report)
     print(json.dumps({k: report[k] for k in ("instance_id", "arm", "status", "calls", "cost_usd", "cost_complete")}))
     return 0 if report["status"] == "finished" else 1

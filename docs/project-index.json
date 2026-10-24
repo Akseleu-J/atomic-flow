@@ -1,70 +1,76 @@
 {
-  "source_commit": "8a18fbe837b5c82597f782b6455e96b708607f36",
-  "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
-  "untracked_python_files": [
-    "src/atomic_flow/backends/routing.py",
-    "src/atomic_flow/backends/usage.py",
-    "src/atomic_flow/durability.py",
-    "src/atomic_flow/project_resources.py",
-    "src/atomic_flow/reconcile.py",
-    "src/atomic_flow/source_lock.py",
-    "src/atomic_flow/windows_job.py",
-    "tests/test_api_admission.py",
-    "tests/test_capability_composition.py",
-    "tests/test_host_reconciliation.py",
-    "tests/test_index_commit.py",
-    "tests/test_ledger_day_identity.py",
-    "tests/test_provider_contracts.py",
-    "tests/test_reconcile.py",
-    "tests/test_reconcile_import_regressions.py",
-    "tests/test_routed_accounting.py",
-    "tests/test_routing.py",
-    "tests/test_routing_import_review.py",
-    "tests/test_write_serialization.py"
-  ],
+  "source_commit": "445f1b9f036111de0c2113884cc9eb65e78749e1",
+  "scope": "tracked working-tree files plus new src/tests Python files; excludes generated index itself; static AST, no imports",
+  "untracked_python_files": [],
   "tracked_changes": [
-    ".github/workflows/checks.yml",
+    ".github/workflows/integrations-release.yml",
+    ".gitignore",
     "AGENTS.md",
+    "docs/IMPLEMENTATION_STEP_23_INTEGRATIONS.md",
+    "docs/IMPLEMENTATION_STEP_24_EVALUATION.md",
+    "docs/IMPLEMENTATION_STEP_26_SCALE.md",
+    "docs/PRODUCTION_PLAN.md",
     "docs/PROJECT_CONTEXT.md",
+    "docs/REVIEW_PRODUCTION_2026-10-24.md",
     "docs/project-index.json",
     "src/atomic_flow/agents/changeset.py",
-    "src/atomic_flow/agents/context.py",
-    "src/atomic_flow/agents/execution.py",
-    "src/atomic_flow/agents/file_transaction.py",
-    "src/atomic_flow/agents/source.py",
-    "src/atomic_flow/agents/task_budget.py",
     "src/atomic_flow/agents/task_loop.py",
-    "src/atomic_flow/agents/tools/edit_node.py",
-    "src/atomic_flow/agents/tools/file_ops.py",
-    "src/atomic_flow/agents/undo.py",
-    "src/atomic_flow/api/server.py",
-    "src/atomic_flow/backends/anthropic.py",
-    "src/atomic_flow/backends/base.py",
-    "src/atomic_flow/backends/http.py",
-    "src/atomic_flow/backends/openai_compatible.py",
-    "src/atomic_flow/backends/router.py",
-    "src/atomic_flow/budget.py",
-    "src/atomic_flow/cli.py",
-    "src/atomic_flow/config.py",
-    "src/atomic_flow/integrations/mcp.py",
-    "src/atomic_flow/job_worker.py",
-    "src/atomic_flow/jobs.py",
-    "src/atomic_flow/llm/orchestrator.py",
-    "src/atomic_flow/locking.py",
-    "src/atomic_flow/lsp.py",
-    "src/atomic_flow/notebooks.py",
-    "src/atomic_flow/rewind.py",
-    "src/atomic_flow/sdk.py",
-    "src/atomic_flow/sessions.py",
+    "src/atomic_flow/project_resources.py",
     "src/atomic_flow/tree/builder.py",
-    "tests/test_execution_profiles.py",
-    "tests/test_planner.py",
-    "tests/test_policy.py",
-    "tests/test_run_control.py"
+    "src/atomic_flow/tree/node.py",
+    "tests/test_composition_acceptance.py",
+    "tests/test_evaluation_provenance.py",
+    "tests/test_pilot_evidence_audit.py",
+    "tests/test_resume_index_resources.py",
+    "tests/test_stage4_harness.py",
+    "tools/audit_live_pilot.py",
+    "tools/evaluation_live_pilot.py",
+    "tools/evaluation_provenance.py",
+    "tools/index_reuse_probe.py",
+    "tools/integration_acceptance.py",
+    "tools/update_project_index.py",
+    "validation/ci-production-before-fix-20261024/docker-artifact/compile.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/container-boundaries.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/dependencies.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/docker-build.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/docker-info.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/docker-version.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/pytest-extra.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/pytest.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/python-version.txt",
+    "validation/ci-production-before-fix-20261024/docker-artifact/results.json",
+    "validation/ci-production-before-fix-20261024/docker-artifact/tested-commit.txt",
+    "validation/import-20261024/live-pilot-audit-ruff.txt",
+    "validation/import-20261024/live-pilot-audit-tests-final.txt",
+    "validation/import-20261024/live-pilot-audit-tests.txt",
+    "validation/import-20261024/live-pilot-audit.json",
+    "validation/import-20261024/pilot-import-recheck.txt",
+    "validation/import-20261024/production-review-final-ruff.txt",
+    "validation/import-20261024/project-index-review.txt",
+    "validation/import-20261024/provenance-regression.txt",
+    "validation/import-20261024/session-streaming-ruff.txt",
+    "validation/import-20261024/step26-final-ruff.txt",
+    "validation/import-20261024/step26-final.txt",
+    "validation/import-20261024/step26-focused.txt",
+    "validation/import-20261024/step26-probe-help.txt",
+    "validation/import-20261024/step26-probe-ruff.txt",
+    "validation/import-20261024/step26-review-final-ruff.txt",
+    "validation/import-20261024/step26-review-final.txt",
+    "validation/import-20261024/step26-review-ruff.txt",
+    "validation/import-20261024/step26-review.txt",
+    "validation/import-20261024/step26-ruff.txt",
+    "validation/step23-integrations/composition-final-result.json",
+    "validation/step23-integrations/composition-final-run.txt",
+    "validation/step23-integrations/composition-ruff.txt",
+    "validation/step23-integrations/composition-unit.txt",
+    "validation/step23-integrations/composition-v2-result.json",
+    "validation/step23-integrations/composition-v2-run.txt",
+    "validation/step23-integrations/composition-v3-result.json",
+    "validation/step23-integrations/composition-v3-run.txt"
   ],
-  "file_count": 555,
-  "python_file_count": 228,
-  "symbol_count": 2393,
+  "file_count": 790,
+  "python_file_count": 253,
+  "symbol_count": 2595,
   "missing_absolute_internal_imports": [],
   "files": [
     {
@@ -104,15 +110,21 @@
       "lines": 115
     },
     {
+      "path": ".github/workflows/integrations-release.yml",
+      "sha256": "92714829545aa5c488aab0bc655b0c9c5f544337b0ff862f451cd0aac47ca074",
+      "bytes": 3198,
+      "lines": 75
+    },
+    {
       "path": ".gitignore",
-      "sha256": "7e432e828ec636abbeb864a5bca765bd44d94705193b0392b542ea6fa0c2cb12",
-      "bytes": 554,
-      "lines": 32
+      "sha256": "7ec8e9fd88af056ce92e09fd49f1bff9f6142cce3a5a73b8b7e602d2ed513a70",
+      "bytes": 917,
+      "lines": 42
     },
     {
       "path": "AGENTS.md",
-      "sha256": "d946b74bfc30d48010d1d0d80b7cea0ef3c663753792ab34d1bda88d67300c57",
-      "bytes": 10647,
+      "sha256": "1dc48fc6c78989f1c0b29a13eed9c14baae97fa832a65e823d27cc52678c054d",
+      "bytes": 10695,
       "lines": 28
     },
     {
@@ -364,6 +376,12 @@
       "lines": 22
     },
     {
+      "path": "benchmarks/stage4/corpus.json",
+      "sha256": "01e282e7f2b25c49dfc6ce6ed83f6bc3d253c88c0864d2d02431dd1174e2c12b",
+      "bytes": 329187,
+      "lines": 2912
+    },
+    {
       "path": "docs/ARCHITECTURE_REFERENCE_REVIEW.md",
       "sha256": "430707f3d1d28e4957eef6f5557b38df1258dc809d5c5a2112ab594d69797c9d",
       "bytes": 6585,
@@ -398,6 +416,12 @@
       "sha256": "70d5222cfab23edd48089a0ff3c94e1dd16ed9a3e4be5dcf60ecbadb1756ca8f",
       "bytes": 6726,
       "lines": 104
+    },
+    {
+      "path": "docs/GITHUB_WORKFLOW.md",
+      "sha256": "a2bcc408a203c579b55766109e1d14e773377b5a61ee026b3c856b43e73fe049",
+      "bytes": 5761,
+      "lines": 61
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_1.md",
@@ -454,10 +478,64 @@
       "lines": 186
     },
     {
+      "path": "docs/IMPLEMENTATION_STEP_18.md",
+      "sha256": "5ace8aa047a297d5fe23d435755efc832b03205182f7683655c8b56b1824da6a",
+      "bytes": 14733,
+      "lines": 179
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_19.md",
+      "sha256": "5e018ffb0845d62841be7193c45a7be68cff109e86428560df8d8eb9d4932881",
+      "bytes": 3361,
+      "lines": 45
+    },
+    {
       "path": "docs/IMPLEMENTATION_STEP_2.md",
       "sha256": "90d601937419c2300f81b41ada8958f9c11bebe22dbdb73492a41765ff3f2810",
       "bytes": 11313,
       "lines": 99
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_20.md",
+      "sha256": "2da6b7906813f6d57e54aa5e0d6fa4ec50532947877f2d207f6e26304e8f421c",
+      "bytes": 5595,
+      "lines": 73
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_21.md",
+      "sha256": "00d1d9068ac1fa21ea055e979c699a13bc8a2cd36f6f9458ad94bb40e551a31a",
+      "bytes": 3463,
+      "lines": 46
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_22_RESOURCES.md",
+      "sha256": "bbf3cacab154e248115110c61787e7f03024668fab483a7e0db02ccbf9ebd237",
+      "bytes": 9795,
+      "lines": 150
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_23_INTEGRATIONS.md",
+      "sha256": "e266a8ae49a059ef771f13b735275c1a42fb554e9c65033a644f0993b78fcdc1",
+      "bytes": 9984,
+      "lines": 149
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_24_EVALUATION.md",
+      "sha256": "0225d17f8e4a7baa5a7eaea827da405033108e6216b6669daffb623c5009d28e",
+      "bytes": 16209,
+      "lines": 259
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_25_DOCKER_FREE.md",
+      "sha256": "e3890d888e063ea64648ac5d17317c15d4ca09230751054d9253debed8f35553",
+      "bytes": 9735,
+      "lines": 198
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STEP_26_SCALE.md",
+      "sha256": "37174a2fcb94785f31ef041c63ad14439434467ee197d6304fdeec49e0072fb7",
+      "bytes": 10381,
+      "lines": 115
     },
     {
       "path": "docs/IMPLEMENTATION_STEP_3.md",
@@ -496,6 +574,36 @@
       "lines": 57
     },
     {
+      "path": "docs/IMPORT_EXECUTION_REVIEW.md",
+      "sha256": "6b33b0086c16e70198952c9b3a3175f971b947c70253dd02faa55c187ddfddf0",
+      "bytes": 6276,
+      "lines": 101
+    },
+    {
+      "path": "docs/IMPORT_REVIEW_2026-10-24.md",
+      "sha256": "4f4541f3799a5ab0e4f7b8cfb7f273d8ef68a4eed19a3aa4fdcaecc23267487a",
+      "bytes": 10374,
+      "lines": 97
+    },
+    {
+      "path": "docs/IMPORT_ROUTING_REVIEW.md",
+      "sha256": "6a3e746f4775ec3069c9dee87d4db1d742809bd8e8c2d1020200e532168b6b39",
+      "bytes": 5012,
+      "lines": 80
+    },
+    {
+      "path": "docs/IMPORT_RUNTIME_REVIEW.md",
+      "sha256": "d4f3dab4f84e2a80718a1ab1c322c47f2d5961e8c83356e4908ce9fadf4336f9",
+      "bytes": 4758,
+      "lines": 71
+    },
+    {
+      "path": "docs/PRODUCTION_PLAN.md",
+      "sha256": "8135e3ddd43a8e571a6675bad2cf23392a25913266bd477085d4062b9c1203d5",
+      "bytes": 12247,
+      "lines": 104
+    },
+    {
       "path": "docs/PRODUCTION_ROADMAP.md",
       "sha256": "3501fb0c71116b9fc705c76739256a4baf51e96830e92aac5076ab257a48c7d2",
       "bytes": 16234,
@@ -503,9 +611,9 @@
     },
     {
       "path": "docs/PROJECT_CONTEXT.md",
-      "sha256": "0ede9d54b0cf94d5f83e7d7de4eb409d7cdc08b3b7d01b05725f62970dc57724",
-      "bytes": 59420,
-      "lines": 615
+      "sha256": "0d2babdd2a2fba3399183557327ddd5d60490f112de0b3d00f29a13a5cc8f236",
+      "bytes": 63312,
+      "lines": 664
     },
     {
       "path": "docs/REFERENCE_INSPECTION.json",
@@ -526,16 +634,236 @@
       "lines": 134
     },
     {
+      "path": "docs/REVIEW_PRODUCTION_2026-10-24.md",
+      "sha256": "c11808f19d26e30b9b095a84b34442962710673209fde6d47bfa331c908476e2",
+      "bytes": 16445,
+      "lines": 190
+    },
+    {
       "path": "docs/architecture.md",
       "sha256": "e6438e89f4a7a18f26d1e15e46985a98e9fcd520a593c50aaf776c2673a4f273",
       "bytes": 2797,
       "lines": 33
     },
     {
-      "path": "docs/project-index.json",
-      "sha256": "b28e25cc5e03e77ee4f75d56202514bbf1da9bdf5920576bbc5b2033bafee8c1",
-      "bytes": 848789,
-      "lines": 25718
+      "path": "docs/audit-2026-10-23/PRODUCTION_PLAN.md",
+      "sha256": "50cd48ac770d0d112d387fc05434101b54890716588c30e480097e83f8ef2a7e",
+      "bytes": 26535,
+      "lines": 130
+    },
+    {
+      "path": "docs/audit-2026-10-23/audit-manifest.json",
+      "sha256": "d9b74beb3a6f812ab7bca3c222dc97b2bd441a0f917c01d03574c7aabe37078e",
+      "bytes": 13576,
+      "lines": 338
+    },
+    {
+      "path": "docs/audit-2026-10-23/docker-release-audit.md",
+      "sha256": "395050d2a87760d6dceec3af196ef76b06b4fc274869b4e532ff850bc7583f9e",
+      "bytes": 19400,
+      "lines": 75
+    },
+    {
+      "path": "docs/audit-2026-10-23/provider-probes.json",
+      "sha256": "daec7b87359ce1eb045de640acf196a5eb590796863d0d728f8a1e90625cf5df",
+      "bytes": 911,
+      "lines": 38
+    },
+    {
+      "path": "docs/audit-2026-10-23/provider-routing.md",
+      "sha256": "59ed57fe4643c9704ac393274f0b47f76a9f3bbf093f86cc8069ebb381eb89d3",
+      "bytes": 20974,
+      "lines": 77
+    },
+    {
+      "path": "docs/audit-2026-10-23/provider_probes.py",
+      "sha256": "17ab9d9ea95d91677fa039fa058af1cdb1d8d44e9a233ae0d7775296afa2b10b",
+      "bytes": 2667,
+      "lines": 58,
+      "summary": "Offline audit probes: no model calls, keys, sockets or runtime modifications.",
+      "imports": [
+        "__future__",
+        "atomic_flow.backends",
+        "atomic_flow.backends.openai_compatible",
+        "atomic_flow.config",
+        "json",
+        "unittest.mock"
+      ],
+      "symbols": [
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 12,
+          "end_line": 54,
+          "signature": "def main()",
+          "summary": ""
+        },
+        {
+          "name": "main.exchange",
+          "kind": "function",
+          "line": 35,
+          "end_line": 41,
+          "signature": "def exchange(*args)",
+          "summary": ""
+        },
+        {
+          "name": "main.sleep",
+          "kind": "function",
+          "line": 43,
+          "end_line": 44,
+          "signature": "def sleep(seconds)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "docs/audit-2026-10-23/quality-scale-audit.md",
+      "sha256": "d9e76f5983419dc93207b6f3e9e14e727187528586da7cbd4f24fc0b375216ab",
+      "bytes": 20291,
+      "lines": 137
+    },
+    {
+      "path": "docs/audit-2026-10-23/quality-scale-probes.json",
+      "sha256": "b5e89e0a9698e3493a35722986a58dd6ccb70133076607f899e8512656d8abc6",
+      "bytes": 1083,
+      "lines": 52
+    },
+    {
+      "path": "docs/audit-2026-10-23/quality_scale_probes.py",
+      "sha256": "bb2be019b2942bcd14af0099a5ffbf0e5695fd44755e640f5c1920da1d84c6ee",
+      "bytes": 4393,
+      "lines": 81,
+      "summary": "Offline audit probes. No model/network/host-state calls; temporary project only.",
+      "imports": [
+        "atomic_flow.agents.task_loop",
+        "atomic_flow.api.server",
+        "atomic_flow.llm.orchestrator",
+        "atomic_flow.tree.builder",
+        "fastapi.testclient",
+        "inspect",
+        "json",
+        "os",
+        "pathlib",
+        "sys",
+        "threading",
+        "unittest.mock"
+      ],
+      "symbols": [
+        {
+          "name": "probe_tree_race",
+          "kind": "function",
+          "line": 34,
+          "end_line": 75,
+          "signature": "def probe_tree_race()",
+          "summary": ""
+        },
+        {
+          "name": "probe_tree_race.synchronized_write",
+          "kind": "function",
+          "line": 42,
+          "end_line": 53,
+          "signature": "def synchronized_write(path, data, *args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "probe_tree_race.synchronized_replace",
+          "kind": "function",
+          "line": 54,
+          "end_line": 61,
+          "signature": "def synchronized_replace(path, target)",
+          "summary": ""
+        },
+        {
+          "name": "probe_tree_race.writer",
+          "kind": "function",
+          "line": 62,
+          "end_line": 67,
+          "signature": "def writer(value)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "docs/audit-2026-10-23/retrieval-probe.json",
+      "sha256": "b7b153b72ad4d5c94784de0e591208354a0ca5d61d0396bd6974a3ea5d8090ed",
+      "bytes": 2030,
+      "lines": 91
+    },
+    {
+      "path": "docs/audit-2026-10-23/retrieval_probe.py",
+      "sha256": "e08b2df1bd8299b18de89160ff8066c19e58774b237761fbe9492be1bb6bc0f0",
+      "bytes": 1394,
+      "lines": 20,
+      "summary": "",
+      "imports": [
+        "atomic_flow.activation.activate",
+        "atomic_flow.benchmarking",
+        "atomic_flow.tree.builder",
+        "atomic_flow.tree.node",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ],
+      "symbols": []
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-audit.md",
+      "sha256": "399ccf8a02be0e35c55710372ffcb8d6f417628613068122d5b37efc8a43ec86",
+      "bytes": 17328,
+      "lines": 68
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-probes.json",
+      "sha256": "7fe68fe3cbc84d3acfef5b464aad3fb26d33f2860f1459893f31ab9cd0e923ae",
+      "bytes": 1533,
+      "lines": 68
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime_probes.py",
+      "sha256": "0d75b8a23d6a47286520ff2f5be8c138266eb606b8ba41f7c8c416bd8a81ee33",
+      "bytes": 4535,
+      "lines": 96,
+      "summary": "Small deterministic audit probes; local synthetic files, no model/network calls.",
+      "imports": [
+        "atomic_flow.agents.changeset",
+        "atomic_flow.agents.control",
+        "atomic_flow.agents.task_loop",
+        "atomic_flow.llm.orchestrator",
+        "atomic_flow.sessions",
+        "inspect",
+        "json",
+        "os",
+        "pathlib",
+        "tempfile",
+        "unittest.mock"
+      ],
+      "symbols": [
+        {
+          "name": "run",
+          "kind": "function",
+          "line": 20,
+          "end_line": 92,
+          "signature": "def run()",
+          "summary": ""
+        },
+        {
+          "name": "run.interleave",
+          "kind": "function",
+          "line": 39,
+          "end_line": 46,
+          "signature": "def interleave(source, destination)",
+          "summary": ""
+        },
+        {
+          "name": "run.counted",
+          "kind": "function",
+          "line": 74,
+          "end_line": 77,
+          "signature": "def counted(*args)",
+          "summary": ""
+        }
+      ]
     },
     {
       "path": "docs/prompts.md",
@@ -1241,6 +1569,12 @@
       ]
     },
     {
+      "path": "requirements/acceptance.txt",
+      "sha256": "4c7bffedfcfaf1f7706b9057df8fe154f792707f6e01d98779fd1825c7ef71bb",
+      "bytes": 277,
+      "lines": 7
+    },
+    {
       "path": "src/atomic_flow/__init__.py",
       "sha256": "7d4c40f9dd7e1d0634852ad388d7fab22b536577667d16ee0f4ac6136f0bd948",
       "bytes": 87,
@@ -1658,9 +1992,9 @@
     },
     {
       "path": "src/atomic_flow/agents/changeset.py",
-      "sha256": "3710a4d4615770cd19575f570d2d1f4a3b782cf17178d6df222843040be3671d",
-      "bytes": 22602,
-      "lines": 439,
+      "sha256": "20a05bd97e5fb61f7120696b1c2ab0376e2ef30176d3ee7e6eb503a82fc39262",
+      "bytes": 28589,
+      "lines": 559,
       "summary": "Task workspaces and journaled, conflict-checked publication of approved paths.",
       "imports": [
         "__future__",
@@ -1668,9 +2002,12 @@
         "atomic_flow.config",
         "atomic_flow.durability",
         "atomic_flow.execution_inputs",
+        "atomic_flow.project_resources",
         "atomic_flow.source_lock",
         "atomic_flow.tree.defaults",
+        "dataclasses",
         "fnmatch",
+        "io",
         "json",
         "os",
         "pathlib",
@@ -1678,214 +2015,255 @@
         "shutil",
         "stat",
         "subprocess",
+        "threading",
         "uuid"
       ],
       "symbols": [
         {
           "name": "ChangeSetConflict",
           "kind": "class",
-          "line": 26,
-          "end_line": 27,
+          "line": 38,
+          "end_line": 39,
           "signature": "class ChangeSetConflict",
           "summary": ""
         },
         {
           "name": "_git",
           "kind": "function",
-          "line": 33,
-          "end_line": 56,
-          "signature": "def _git(directory: Path, *args: str, data: bytes | None=None)",
+          "line": 45,
+          "end_line": 105,
+          "signature": "def _git(directory: Path, *args: str, data: bytes | None=None, output_limit: int | None=None)",
           "summary": "Only built-in plumbing, no user environment, global config, hooks or filters."
+        },
+        {
+          "name": "_git.receive",
+          "kind": "function",
+          "line": 69,
+          "end_line": 79,
+          "signature": "def receive()",
+          "summary": ""
         },
         {
           "name": "_plain_path",
           "kind": "function",
-          "line": 59,
-          "end_line": 62,
+          "line": 108,
+          "end_line": 111,
           "signature": "def _plain_path(path: Path)",
           "summary": ""
         },
         {
           "name": "_snapshot_tree",
           "kind": "function",
-          "line": 65,
-          "end_line": 93,
-          "signature": "def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str])",
+          "line": 114,
+          "end_line": 146,
+          "signature": "def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str], limits: ProjectLimits, cancel_check)",
           "summary": "Create a private snapshot commit without checkout, Git attributes or source config."
         },
         {
           "name": "_snapshot_tree.store",
           "kind": "function",
-          "line": 81,
-          "end_line": 90,
+          "line": 132,
+          "end_line": 143,
           "signature": "def store(node)",
+          "summary": ""
+        },
+        {
+          "name": "_bounded_bytes",
+          "kind": "function",
+          "line": 149,
+          "end_line": 152,
+          "signature": "def _bounded_bytes(path, limits, cancel_check)",
+          "summary": ""
+        },
+        {
+          "name": "_copy_source",
+          "kind": "function",
+          "line": 155,
+          "end_line": 173,
+          "signature": "def _copy_source(source, target, expected, limits, cancel_check, *, remaining_bytes=None)",
           "summary": ""
         },
         {
           "name": "_files",
           "kind": "function",
-          "line": 96,
-          "end_line": 121,
-          "signature": "def _files(root: Path, excluded: Path | None=None)",
+          "line": 176,
+          "end_line": 205,
+          "signature": "def _files(root: Path, excluded: Path | None=None, *, limits: ProjectLimits | None=None, cancel_check=lambda: None, sizes: dict | None=None)",
           "summary": ""
         },
         {
-          "name": "_files.ignored",
+          "name": "_files.skip",
           "kind": "function",
-          "line": 98,
-          "end_line": 99,
-          "signature": "def ignored(name)",
+          "line": 181,
+          "end_line": 194,
+          "signature": "def skip(rel, is_dir)",
           "summary": ""
         },
         {
           "name": "ChangeSet",
           "kind": "class",
-          "line": 124,
-          "end_line": 439,
+          "line": 208,
+          "end_line": 559,
           "signature": "class ChangeSet",
           "summary": ""
         },
         {
           "name": "ChangeSet.__init__",
           "kind": "function",
-          "line": 125,
-          "end_line": 130,
-          "signature": "def __init__(self, project: Path, directory: Path, state: dict)",
+          "line": 209,
+          "end_line": 216,
+          "signature": "def __init__(self, project: Path, directory: Path, state: dict, *, limits=None, cancel_check=lambda: None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.create",
           "kind": "function",
-          "line": 133,
-          "end_line": 166,
-          "signature": "def create(cls, project: Path, *, backend: str='copy')",
+          "line": 219,
+          "end_line": 270,
+          "signature": "def create(cls, project: Path, *, backend: str='copy', limits: ProjectLimits | None=None, cancel_check=lambda: None)",
           "summary": ""
         },
         {
           "name": "ChangeSet._create_worktree",
           "kind": "function",
-          "line": 168,
-          "end_line": 189,
+          "line": 272,
+          "end_line": 294,
           "signature": "def _create_worktree(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet._validate_ownership",
           "kind": "function",
-          "line": 191,
-          "end_line": 231,
+          "line": 296,
+          "end_line": 336,
           "signature": "def _validate_ownership(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.open",
           "kind": "function",
-          "line": 234,
-          "end_line": 243,
+          "line": 339,
+          "end_line": 348,
           "signature": "def open(cls, project: Path, change_id: str)",
           "summary": ""
         },
         {
           "name": "ChangeSet._save",
           "kind": "function",
-          "line": 245,
-          "end_line": 247,
+          "line": 350,
+          "end_line": 352,
           "signature": "def _save(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.check_original",
           "kind": "function",
-          "line": 249,
-          "end_line": 252,
+          "line": 354,
+          "end_line": 357,
           "signature": "def check_original(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.track",
           "kind": "function",
-          "line": 254,
-          "end_line": 264,
+          "line": 359,
+          "end_line": 369,
           "signature": "def track(self, rel: str, expected_hash: str | None | object=_UNSPECIFIED_HASH)",
           "summary": ""
         },
         {
           "name": "ChangeSet.validate_workspace",
           "kind": "function",
-          "line": 266,
-          "end_line": 277,
+          "line": 371,
+          "end_line": 382,
           "signature": "def validate_workspace(self)",
+          "summary": ""
+        },
+        {
+          "name": "ChangeSet._manifest",
+          "kind": "function",
+          "line": 384,
+          "end_line": 385,
+          "signature": "def _manifest(self, root, excluded=None, *, sizes=None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.abort",
           "kind": "function",
-          "line": 279,
-          "end_line": 284,
+          "line": 387,
+          "end_line": 392,
           "signature": "def abort(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.cleanup",
           "kind": "function",
-          "line": 286,
-          "end_line": 297,
+          "line": 394,
+          "end_line": 405,
           "signature": "def cleanup(self)",
           "summary": "Explicitly remove only a verified owned terminal Git workspace; retain journal/objects."
         },
         {
           "name": "ChangeSet.checkpoint",
           "kind": "function",
-          "line": 299,
-          "end_line": 309,
+          "line": 407,
+          "end_line": 421,
           "signature": "def checkpoint(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.restore_checkpoint",
           "kind": "function",
-          "line": 312,
-          "end_line": 333,
+          "line": 424,
+          "end_line": 449,
           "signature": "def restore_checkpoint(self, checkpoint: dict)",
+          "summary": ""
+        },
+        {
+          "name": "ChangeSet.restore_checkpoint.recovery_check",
+          "kind": "function",
+          "line": 428,
+          "end_line": 429,
+          "signature": "def recovery_check()",
           "summary": ""
         },
         {
           "name": "ChangeSet._write_target",
           "kind": "function",
-          "line": 335,
-          "end_line": 348,
+          "line": 451,
+          "end_line": 464,
           "signature": "def _write_target(self, rel: str, data: bytes | None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.publish",
           "kind": "function",
-          "line": 351,
-          "end_line": 396,
+          "line": 467,
+          "end_line": 516,
           "signature": "def publish(self, finalize=None, cancel_check=lambda: None)",
           "summary": ""
         },
         {
           "name": "ChangeSet.recover",
           "kind": "function",
-          "line": 399,
-          "end_line": 401,
+          "line": 519,
+          "end_line": 521,
           "signature": "def recover(self)",
           "summary": "Restore only bytes written by this publication; never overwrite a third version."
         },
         {
           "name": "ChangeSet._recover",
           "kind": "function",
-          "line": 403,
-          "end_line": 435,
+          "line": 523,
+          "end_line": 555,
           "signature": "def _recover(self)",
           "summary": ""
         },
         {
           "name": "ChangeSet.verify_published",
           "kind": "function",
-          "line": 437,
-          "end_line": 439,
+          "line": 557,
+          "end_line": 559,
           "signature": "def verify_published(self)",
           "summary": ""
         }
@@ -2165,8 +2543,8 @@
     },
     {
       "path": "src/atomic_flow/agents/execution.py",
-      "sha256": "f7cc6d41a0517cd93815b4125d18fcb553a939b03f2ac0b51b2f5dc4b12bbaa0",
-      "bytes": 17443,
+      "sha256": "6366792a1a3212f3190c7ea56cab4d2dd2b7310914247b9c7c0072c4e05644c1",
+      "bytes": 17507,
       "lines": 371,
       "summary": "Bounded command execution. Local mode is explicitly NOT a security sandbox.",
       "imports": [
@@ -2264,7 +2642,7 @@
           "kind": "function",
           "line": 142,
           "end_line": 153,
-          "signature": "def checked_workspace(project: Path, *, private_workspace=False)",
+          "signature": "def checked_workspace(project: Path, *, private_workspace=False, cancel_check=None)",
           "summary": "Model-facing checks use admitted copies; never publish writes by tests."
         },
         {
@@ -3067,8 +3445,8 @@
     },
     {
       "path": "src/atomic_flow/agents/task_budget.py",
-      "sha256": "dcfc2a82dc497235266d4cab26e7c0f079882c96f2fd8042c7567c76c4251702",
-      "bytes": 14894,
+      "sha256": "d5ebdbb08c073bd746c63658ad04df04699214740477ee1db397933276f789ee",
+      "bytes": 14896,
       "lines": 243,
       "summary": "Durable per-call task accounting, including planner and failed/cancelled runs.",
       "imports": [
@@ -3171,9 +3549,9 @@
     },
     {
       "path": "src/atomic_flow/agents/task_loop.py",
-      "sha256": "564708b727b371cb9eabaa40b86141004dd01e4e9c4c41d6f9f29f1e5191c45d",
-      "bytes": 28787,
-      "lines": 553,
+      "sha256": "3496a8d7ef1a2f32f354e4164188939801e789a0106b0d11cb06c123c5efb128",
+      "bytes": 30680,
+      "lines": 588,
       "summary": "TaskRunner: execute a plan step-by-step, verifying each step.",
       "imports": [
         "__future__",
@@ -3189,7 +3567,9 @@
         "atomic_flow.config",
         "atomic_flow.errors",
         "atomic_flow.llm.orchestrator",
+        "atomic_flow.project_resources",
         "atomic_flow.sessions",
+        "atomic_flow.source_lock",
         "atomic_flow.tree.builder",
         "dataclasses",
         "pathlib",
@@ -3200,168 +3580,184 @@
         {
           "name": "TaskCapabilityContext",
           "kind": "class",
-          "line": 25,
-          "end_line": 36,
+          "line": 27,
+          "end_line": 38,
           "signature": "class TaskCapabilityContext",
           "summary": "What a host capability factory may bind to for one step."
         },
         {
           "name": "TaskCapabilities",
           "kind": "class",
-          "line": 40,
-          "end_line": 52,
+          "line": 42,
+          "end_line": 54,
           "signature": "class TaskCapabilities",
           "summary": "Host-injected step capabilities passed through to the step Orchestrator."
         },
         {
           "name": "StepFailure",
           "kind": "class",
-          "line": 56,
-          "end_line": 58,
+          "line": 58,
+          "end_line": 60,
           "signature": "class StepFailure",
           "summary": ""
         },
         {
           "name": "TaskRunner",
           "kind": "class",
-          "line": 61,
-          "end_line": 553,
+          "line": 63,
+          "end_line": 588,
           "signature": "class TaskRunner",
           "summary": ""
         },
         {
           "name": "TaskRunner.__init__",
           "kind": "function",
-          "line": 62,
-          "end_line": 72,
-          "signature": "def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None, capability_factory=None)",
+          "line": 64,
+          "end_line": 77,
+          "signature": "def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None, capability_factory=None, resource_limits: ProjectLimits | None=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner._steps",
           "kind": "function",
-          "line": 75,
-          "end_line": 79,
+          "line": 80,
+          "end_line": 84,
           "signature": "def _steps(plan: Plan, offset: int=0)",
           "summary": ""
         },
         {
           "name": "TaskRunner.review",
           "kind": "function",
-          "line": 81,
-          "end_line": 84,
+          "line": 86,
+          "end_line": 89,
           "signature": "def review(self, task: Task, *, allowed_paths: list[str] | None=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner.approve",
           "kind": "function",
-          "line": 86,
-          "end_line": 96,
+          "line": 91,
+          "end_line": 101,
           "signature": "def approve(self, task: Task, expected_digest: str, *, allowed_paths: list[str] | None=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner.revise",
           "kind": "function",
-          "line": 98,
-          "end_line": 114,
+          "line": 103,
+          "end_line": 119,
           "signature": "def revise(self, task: Task, plan: Plan)",
           "summary": ""
         },
         {
           "name": "TaskRunner._editable_plan",
           "kind": "function",
-          "line": 117,
-          "end_line": 119,
+          "line": 122,
+          "end_line": 124,
           "signature": "def _editable_plan(task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._check_effects",
           "kind": "function",
-          "line": 122,
-          "end_line": 128,
+          "line": 127,
+          "end_line": 133,
           "signature": "def _check_effects(task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._hold_effects",
           "kind": "function",
-          "line": 130,
-          "end_line": 139,
+          "line": 135,
+          "end_line": 144,
           "signature": "def _hold_effects(self, task)",
           "summary": ""
         },
         {
           "name": "TaskRunner.prepare",
           "kind": "function",
-          "line": 141,
-          "end_line": 165,
+          "line": 146,
+          "end_line": 170,
           "signature": "def prepare(self, query: str, *, candidates: list[str], n_files: int)",
           "summary": "Persist a task before planning, including rejected/repaired planner responses."
         },
         {
           "name": "TaskRunner.prepare.check",
           "kind": "function",
-          "line": 147,
-          "end_line": 148,
+          "line": 152,
+          "end_line": 153,
           "signature": "def check()",
           "summary": ""
         },
         {
           "name": "TaskRunner.run_plan",
           "kind": "function",
-          "line": 167,
-          "end_line": 173,
+          "line": 172,
+          "end_line": 178,
           "signature": "def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None=None)",
           "summary": ""
         },
         {
           "name": "TaskRunner.resume",
           "kind": "function",
-          "line": 175,
-          "end_line": 215,
+          "line": 180,
+          "end_line": 220,
           "signature": "def resume(self, task: Task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._resume_locked",
           "kind": "function",
-          "line": 217,
-          "end_line": 281,
+          "line": 222,
+          "end_line": 285,
           "signature": "def _resume_locked(self, task: Task)",
+          "summary": ""
+        },
+        {
+          "name": "TaskRunner._refresh_index",
+          "kind": "function",
+          "line": 287,
+          "end_line": 296,
+          "signature": "def _refresh_index(self, root: Path, *, seed_root: Path | None=None, recovering=False)",
+          "summary": "Reuse syntax only after hashing current bytes; never reuse read authority."
+        },
+        {
+          "name": "TaskRunner._refresh_index_locked",
+          "kind": "function",
+          "line": 298,
+          "end_line": 318,
+          "signature": "def _refresh_index_locked(self, root, *, seed_root, recovering)",
           "summary": ""
         },
         {
           "name": "TaskRunner._resume_steps",
           "kind": "function",
-          "line": 283,
-          "end_line": 382,
+          "line": 320,
+          "end_line": 417,
           "signature": "def _resume_steps(self, task: Task)",
           "summary": ""
         },
         {
           "name": "TaskRunner._replan_failed_step",
           "kind": "function",
-          "line": 384,
-          "end_line": 445,
+          "line": 419,
+          "end_line": 480,
           "signature": "def _replan_failed_step(self, task: Task, step: Step)",
           "summary": "Replan only after all independently runnable work has drained."
         },
         {
           "name": "TaskRunner._execute_step",
           "kind": "function",
-          "line": 448,
-          "end_line": 482,
+          "line": 483,
+          "end_line": 517,
           "signature": "def _execute_step(self, task: Task, step: Step)",
           "summary": ""
         },
         {
           "name": "TaskRunner._verify_step",
           "kind": "function",
-          "line": 484,
-          "end_line": 553,
+          "line": 519,
+          "end_line": 588,
           "signature": "def _verify_step(self, step: Step, result)",
           "summary": ""
         }
@@ -3556,8 +3952,8 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/file_ops.py",
-      "sha256": "589424f5bdcee8586c61a75eb12bac0b9506fefa8ec4ba7dafcd36534c47cda8",
-      "bytes": 10914,
+      "sha256": "ea64283d3430ff2a0d4b4b4a3f24f7a397cbf57352a84ad574dfbbce61d78ea6",
+      "bytes": 10945,
       "lines": 215,
       "summary": "Small hash-bound patches and explicit source-file lifecycle operations.",
       "imports": [
@@ -4233,8 +4629,8 @@
     },
     {
       "path": "src/atomic_flow/agents/tools/run_command.py",
-      "sha256": "b381e83cf3bb9cc1b9fe22907157df2234217f206f9f952e219f7398c4f5e102",
-      "bytes": 2613,
+      "sha256": "baa5df0536a6504c7ce6e963a9bf300b6996dd829ba24c3dac5be24612da7ac7",
+      "bytes": 2644,
       "lines": 55,
       "summary": "run_command: execute a fixed set of project quality tools without a shell.",
       "imports": [
@@ -4547,8 +4943,8 @@
     },
     {
       "path": "src/atomic_flow/agents/verify.py",
-      "sha256": "bc134576464029c8f5d0c12a2e397eebc40576875cd5e2a63830186cfc02cfc7",
-      "bytes": 3779,
+      "sha256": "a4e4124c501c40261d43cb649a568f7dc9a77a086748832bb4873fc302c6a0c5",
+      "bytes": 3806,
       "lines": 74,
       "summary": "Post-edit verification for Python source files.",
       "imports": [
@@ -4915,16 +5311,16 @@
     },
     {
       "path": "src/atomic_flow/backends/anthropic.py",
-      "sha256": "1ff3320641ecc3390edf0143fa1d0407db9a3c76afa1cea92bdd5c34cc82e415",
-      "bytes": 3390,
-      "lines": 55,
+      "sha256": "32acab55f8f97a777e6bfc3d01fe0d0b589f772ad7be0c76844cd87ae554906a",
+      "bytes": 3851,
+      "lines": 66,
       "summary": "Native Anthropic Messages API adapter.",
       "imports": [
         "__future__",
         "atomic_flow.backends.base",
         "atomic_flow.backends.http",
+        "atomic_flow.backends.usage",
         "atomic_flow.config",
-        "atomic_flow.errors",
         "time"
       ],
       "symbols": [
@@ -4932,7 +5328,7 @@
           "name": "AnthropicBackend",
           "kind": "class",
           "line": 13,
-          "end_line": 55,
+          "end_line": 66,
           "signature": "class AnthropicBackend",
           "summary": ""
         },
@@ -4940,15 +5336,15 @@
           "name": "AnthropicBackend.__init__",
           "kind": "function",
           "line": 14,
-          "end_line": 16,
-          "signature": "def __init__(self, config: BackendConfig, *, backend_name: str='anthropic')",
+          "end_line": 17,
+          "signature": "def __init__(self, config: BackendConfig, *, backend_name: str='anthropic', cache_prices: AnthropicCachePrices | None=None)",
           "summary": ""
         },
         {
           "name": "AnthropicBackend.chat",
           "kind": "function",
-          "line": 18,
-          "end_line": 55,
+          "line": 19,
+          "end_line": 66,
           "signature": "def chat(self, messages: list[dict[str, str]], *, json_mode: bool=False, model: str | None=None)",
           "summary": ""
         }
@@ -5525,31 +5921,56 @@
     },
     {
       "path": "src/atomic_flow/backends/usage.py",
-      "sha256": "a54bfac8aa24a64816e6381071d9f8b4ad241291e643b74af10a2f5d8cbd5105",
-      "bytes": 2752,
-      "lines": 54,
+      "sha256": "08eeeb3bee5a0c4130e8ceb061d07c8ed4d95db715b953e3ada13ab823f7120a",
+      "bytes": 7030,
+      "lines": 130,
       "summary": "Normalize provider usage independently of generated content parsing.",
       "imports": [
         "__future__",
         "atomic_flow.backends.base",
+        "dataclasses",
         "math"
       ],
       "symbols": [
         {
+          "name": "AnthropicCachePrices",
+          "kind": "class",
+          "line": 11,
+          "end_line": 21,
+          "signature": "class AnthropicCachePrices",
+          "summary": "Explicit host tariffs, USD/MTok; no inferred model multipliers or TTL."
+        },
+        {
+          "name": "AnthropicCachePrices.__post_init__",
+          "kind": "function",
+          "line": 18,
+          "end_line": 21,
+          "signature": "def __post_init__(self)",
+          "summary": ""
+        },
+        {
           "name": "_amount",
           "kind": "function",
-          "line": 9,
-          "end_line": 16,
+          "line": 24,
+          "end_line": 31,
           "signature": "def _amount(value)",
           "summary": ""
         },
         {
           "name": "openai_usage",
           "kind": "function",
-          "line": 19,
-          "end_line": 54,
+          "line": 34,
+          "end_line": 69,
           "signature": "def openai_usage(payload, config)",
           "summary": ""
+        },
+        {
+          "name": "anthropic_usage",
+          "kind": "function",
+          "line": 72,
+          "end_line": 130,
+          "signature": "def anthropic_usage(payload, config, cache_prices=None, *, model=None)",
+          "summary": "Normalize documented Messages counters before any content parsing."
         }
       ]
     },
@@ -9815,9 +10236,9 @@
     },
     {
       "path": "src/atomic_flow/lsp.py",
-      "sha256": "6466f2e347dd7277e32f9d5fc91a8fe817a039c9e04487df23220b8d1ce2b2df",
-      "bytes": 38283,
-      "lines": 745,
+      "sha256": "1e7fd9ede99eba79e2737d7e4efcb65caf5186baa72cf2446d6bfba7de28a6a9",
+      "bytes": 39253,
+      "lines": 757,
       "summary": "Explicit trusted-host LSP 3.17 client; server output never authorizes edits.",
       "imports": [
         "__future__",
@@ -9930,7 +10351,7 @@
           "name": "LSPClient",
           "kind": "class",
           "line": 170,
-          "end_line": 745,
+          "end_line": 757,
           "signature": "class LSPClient",
           "summary": "One bounded host-owned server, one project, serialized explicit requests."
         },
@@ -9938,223 +10359,223 @@
           "name": "LSPClient.__init__",
           "kind": "function",
           "line": 177,
-          "end_line": 209,
-          "signature": "def __init__(self, project: Path, command: list[str], *, approved: bool=False, timeout: float=10, cancel_check=None)",
+          "end_line": 212,
+          "signature": "def __init__(self, project: Path, command: list[str], *, approved: bool=False, timeout: float=10, cancel_check=None, private_workspace: bool=False)",
           "summary": ""
         },
         {
           "name": "LSPClient.__enter__",
           "kind": "function",
-          "line": 211,
-          "end_line": 212,
+          "line": 214,
+          "end_line": 215,
           "signature": "def __enter__(self)",
           "summary": ""
         },
         {
           "name": "LSPClient.__exit__",
           "kind": "function",
-          "line": 214,
-          "end_line": 215,
+          "line": 217,
+          "end_line": 218,
           "signature": "def __exit__(self, *_)",
           "summary": ""
         },
         {
           "name": "LSPClient.operation",
           "kind": "function",
-          "line": 218,
-          "end_line": 239,
+          "line": 221,
+          "end_line": 242,
           "signature": "def operation(self, *, cancel_check=None)",
           "summary": "Bind one host operation to its caller without leaking cancellation."
         },
         {
           "name": "LSPClient.operation.combined",
           "kind": "function",
-          "line": 230,
-          "end_line": 232,
+          "line": 233,
+          "end_line": 235,
           "signature": "def combined()",
           "summary": ""
         },
         {
           "name": "LSPClient._path",
           "kind": "function",
-          "line": 241,
-          "end_line": 248,
+          "line": 244,
+          "end_line": 251,
           "signature": "def _path(self, rel: str)",
           "summary": ""
         },
         {
           "name": "LSPClient._rel",
           "kind": "function",
-          "line": 250,
-          "end_line": 268,
+          "line": 253,
+          "end_line": 277,
           "signature": "def _rel(self, uri: str)",
           "summary": ""
         },
         {
           "name": "LSPClient._bytes",
           "kind": "function",
-          "line": 270,
-          "end_line": 282,
+          "line": 279,
+          "end_line": 291,
           "signature": "def _bytes(self, rel: str)",
           "summary": ""
         },
         {
           "name": "LSPClient.start",
           "kind": "function",
-          "line": 284,
-          "end_line": 322,
+          "line": 293,
+          "end_line": 334,
           "signature": "def start(self)",
           "summary": ""
         },
         {
           "name": "LSPClient._send",
           "kind": "function",
-          "line": 324,
-          "end_line": 334,
+          "line": 336,
+          "end_line": 346,
           "signature": "def _send(self, message: dict)",
           "summary": ""
         },
         {
           "name": "LSPClient._notify",
           "kind": "function",
-          "line": 336,
-          "end_line": 337,
+          "line": 348,
+          "end_line": 349,
           "signature": "def _notify(self, method, params)",
           "summary": ""
         },
         {
           "name": "LSPClient._writer",
           "kind": "function",
-          "line": 339,
-          "end_line": 353,
+          "line": 351,
+          "end_line": 365,
           "signature": "def _writer(self)",
           "summary": ""
         },
         {
           "name": "LSPClient._reader",
           "kind": "function",
-          "line": 355,
-          "end_line": 400,
+          "line": 367,
+          "end_line": 412,
           "signature": "def _reader(self)",
           "summary": ""
         },
         {
           "name": "LSPClient._request",
           "kind": "function",
-          "line": 402,
-          "end_line": 429,
+          "line": 414,
+          "end_line": 441,
           "signature": "def _request(self, method: str, params)",
           "summary": ""
         },
         {
           "name": "LSPClient._terminate",
           "kind": "function",
-          "line": 431,
-          "end_line": 458,
+          "line": 443,
+          "end_line": 470,
           "signature": "def _terminate(self)",
           "summary": ""
         },
         {
           "name": "LSPClient.close",
           "kind": "function",
-          "line": 460,
-          "end_line": 475,
+          "line": 472,
+          "end_line": 487,
           "signature": "def close(self)",
           "summary": ""
         },
         {
           "name": "LSPClient._sync",
           "kind": "function",
-          "line": 477,
-          "end_line": 502,
+          "line": 489,
+          "end_line": 514,
           "signature": "def _sync(self, rel: str)",
           "summary": ""
         },
         {
           "name": "LSPClient.read_document",
           "kind": "function",
-          "line": 504,
-          "end_line": 509,
+          "line": 516,
+          "end_line": 521,
           "signature": "def read_document(self, path: str)",
           "summary": "Explicit complete host read; preview generation alone gives no read proof."
         },
         {
           "name": "LSPClient._position_params",
           "kind": "function",
-          "line": 511,
-          "end_line": 515,
+          "line": 523,
+          "end_line": 527,
           "signature": "def _position_params(self, path, line, character)",
           "summary": ""
         },
         {
           "name": "LSPClient._locations",
           "kind": "function",
-          "line": 517,
-          "end_line": 532,
+          "line": 529,
+          "end_line": 544,
           "signature": "def _locations(self, value)",
           "summary": ""
         },
         {
           "name": "LSPClient.definition",
           "kind": "function",
-          "line": 534,
-          "end_line": 540,
+          "line": 546,
+          "end_line": 552,
           "signature": "def definition(self, path: str, line: int, character: int)",
           "summary": ""
         },
         {
           "name": "LSPClient.references",
           "kind": "function",
-          "line": 542,
-          "end_line": 549,
+          "line": 554,
+          "end_line": 561,
           "signature": "def references(self, path: str, line: int, character: int, *, include_declaration=True)",
           "summary": ""
         },
         {
           "name": "LSPClient._record_diagnostics",
           "kind": "function",
-          "line": 551,
-          "end_line": 573,
+          "line": 563,
+          "end_line": 585,
           "signature": "def _record_diagnostics(self, params)",
           "summary": ""
         },
         {
           "name": "LSPClient.diagnostics",
           "kind": "function",
-          "line": 575,
-          "end_line": 583,
+          "line": 587,
+          "end_line": 595,
           "signature": "def diagnostics(self, path: str)",
           "summary": "Latest versioned push only; no unversioned diagnostics are treated as current."
         },
         {
           "name": "LSPClient.preview_rename",
           "kind": "function",
-          "line": 585,
-          "end_line": 597,
+          "line": 597,
+          "end_line": 609,
           "signature": "def preview_rename(self, path: str, line: int, character: int, new_name: str)",
           "summary": ""
         },
         {
           "name": "LSPClient._preview",
           "kind": "function",
-          "line": 599,
-          "end_line": 668,
+          "line": 611,
+          "end_line": 680,
           "signature": "def _preview(self, edit, snapshot)",
           "summary": ""
         },
         {
           "name": "LSPClient.apply_preview",
           "kind": "function",
-          "line": 671,
-          "end_line": 745,
+          "line": 683,
+          "end_line": 757,
           "signature": "def apply_preview(self, preview: EditPreview, *, approved: bool=False, expected_digest: str | None=None, context=None)",
           "summary": "Explicit recoverable multi-path apply, current complete read required."
         },
         {
           "name": "LSPClient.apply_preview.cancel",
           "kind": "function",
-          "line": 707,
-          "end_line": 710,
+          "line": 719,
+          "end_line": 722,
           "signature": "def cancel()",
           "summary": ""
         }
@@ -10639,46 +11060,98 @@
     },
     {
       "path": "src/atomic_flow/project_resources.py",
-      "sha256": "f3793563f98b94a34c088203d1d13d488d5d6acff7091fdbc2c1a2b223c37bf0",
-      "bytes": 2159,
-      "lines": 52,
+      "sha256": "e7c44dc012f76e090d85910444263bc8feca4a80339f4fefaa10309394c52273",
+      "bytes": 6776,
+      "lines": 142,
       "summary": "Host-owned resource envelope for source traversal; no model-configured limits.",
       "imports": [
         "atomic_flow.errors",
         "collections.abc",
         "dataclasses",
-        "pathlib"
+        "hashlib",
+        "os",
+        "pathlib",
+        "shutil",
+        "stat"
       ],
       "symbols": [
         {
           "name": "ResourceLimitError",
           "kind": "class",
-          "line": 9,
-          "end_line": 10,
+          "line": 13,
+          "end_line": 14,
           "signature": "class ResourceLimitError",
           "summary": "The complete operation was refused; partial context must not be accepted."
         },
         {
           "name": "ProjectLimits",
           "kind": "class",
-          "line": 14,
-          "end_line": 23,
+          "line": 18,
+          "end_line": 37,
           "signature": "class ProjectLimits",
           "summary": ""
         },
         {
           "name": "ProjectLimits.__post_init__",
           "kind": "function",
-          "line": 21,
-          "end_line": 23,
+          "line": 31,
+          "end_line": 37,
           "signature": "def __post_init__(self)",
+          "summary": ""
+        },
+        {
+          "name": "require_workspace_paths",
+          "kind": "function",
+          "line": 40,
+          "end_line": 59,
+          "signature": "def require_workspace_paths(directory: Path, relative_paths, limits: ProjectLimits)",
+          "summary": "Refuse a known host path envelope before allocating snapshot/checkpoints."
+        },
+        {
+          "name": "require_workspace_paths.admit",
+          "kind": "function",
+          "line": 50,
+          "end_line": 52,
+          "signature": "def admit(path)",
+          "summary": ""
+        },
+        {
+          "name": "workspace_path_error",
+          "kind": "function",
+          "line": 62,
+          "end_line": 68,
+          "signature": "def workspace_path_error(exc: OSError)",
+          "summary": "Explain an actual Windows path failure without claiming generic support."
+        },
+        {
+          "name": "require_disk_space",
+          "kind": "function",
+          "line": 71,
+          "end_line": 77,
+          "signature": "def require_disk_space(path: Path, required: int, limits: ProjectLimits)",
+          "summary": "Admission estimate, not a reservation against concurrent disk users."
+        },
+        {
+          "name": "stream_source",
+          "kind": "function",
+          "line": 80,
+          "end_line": 113,
+          "signature": "def stream_source(path: Path, limits: ProjectLimits, cancel_check, *, sink=None, remaining_bytes: int | None=None)",
+          "summary": "Hash/copy one regular file in bounded chunks and reject changed reads."
+        },
+        {
+          "name": "stream_source.identity",
+          "kind": "function",
+          "line": 108,
+          "end_line": 109,
+          "signature": "def identity(item)",
           "summary": ""
         },
         {
           "name": "source_files",
           "kind": "function",
-          "line": 26,
-          "end_line": 52,
+          "line": 116,
+          "end_line": 142,
           "signature": "def source_files(root: Path, skip, limits: ProjectLimits, cancel_check: Callable[[], None], *, private_root=None)",
           "summary": "Incremental scandir admission, without os.walk's unbounded directory list."
         }
@@ -11767,9 +12240,9 @@
     },
     {
       "path": "src/atomic_flow/sessions.py",
-      "sha256": "b66b01cf36500859a5753b797b3e0cf2dcf052d1130cbc123dc4a4b6cc7869cf",
-      "bytes": 19019,
-      "lines": 368,
+      "sha256": "e4543678261be97f1469c0207d85a00e2e1713a43bb341a941214c30f7b80356",
+      "bytes": 20747,
+      "lines": 401,
       "summary": "Bounded, redacted, append-only session observations, never executable replay.",
       "imports": [
         "__future__",
@@ -11841,7 +12314,7 @@
           "name": "SessionJournal",
           "kind": "class",
           "line": 146,
-          "end_line": 343,
+          "end_line": 376,
           "signature": "class SessionJournal",
           "summary": ""
         },
@@ -11905,39 +12378,47 @@
           "name": "SessionJournal.read",
           "kind": "function",
           "line": 266,
-          "end_line": 284,
+          "end_line": 307,
           "signature": "def read(self)",
+          "summary": ""
+        },
+        {
+          "name": "SessionJournal.read.admitted_read",
+          "kind": "function",
+          "line": 272,
+          "end_line": 278,
+          "signature": "def admitted_read(handle)",
           "summary": ""
         },
         {
           "name": "SessionJournal._validate_event",
           "kind": "function",
-          "line": 286,
-          "end_line": 303,
+          "line": 309,
+          "end_line": 326,
           "signature": "def _validate_event(self, event: dict, sequence: int)",
           "summary": ""
         },
         {
           "name": "SessionJournal.recover_tail",
           "kind": "function",
-          "line": 305,
-          "end_line": 328,
+          "line": 328,
+          "end_line": 361,
           "signature": "def recover_tail(self)",
           "summary": "Preserve and remove only uncommitted tail bytes; do not replay effects."
         },
         {
           "name": "SessionJournal.export",
           "kind": "function",
-          "line": 330,
-          "end_line": 343,
+          "line": 363,
+          "end_line": 376,
           "signature": "def export(self, path: Path)",
           "summary": ""
         },
         {
           "name": "list_sessions",
           "kind": "function",
-          "line": 346,
-          "end_line": 368,
+          "line": 379,
+          "end_line": 401,
           "signature": "def list_sessions(*, limit: int=100)",
           "summary": ""
         }
@@ -12200,9 +12681,9 @@
     },
     {
       "path": "src/atomic_flow/tree/builder.py",
-      "sha256": "aa95dffc8defeba996f67b6a7da494354b7f6425a1ef5ad440752f44b1705ed4",
-      "bytes": 19936,
-      "lines": 436,
+      "sha256": "69d90ee3a136daed7ccc36154b78bb7734ecc5b421533c208e3d843e1c818e34",
+      "bytes": 22440,
+      "lines": 499,
       "summary": "Build a persistent, source-free, incrementally refreshable tree from a project directory.",
       "imports": [
         "__future__",
@@ -12227,226 +12708,250 @@
       ],
       "symbols": [
         {
+          "name": "_periodic_cancel",
+          "kind": "function",
+          "line": 26,
+          "end_line": 41,
+          "signature": "def _periodic_cancel(cancel_check)",
+          "summary": "Check immediately, then at most 128 bounded graph/cache operations apart."
+        },
+        {
+          "name": "_periodic_cancel.check",
+          "kind": "function",
+          "line": 34,
+          "end_line": 40,
+          "signature": "def check()",
+          "summary": ""
+        },
+        {
           "name": "node_id",
           "kind": "function",
-          "line": 25,
-          "end_line": 27,
+          "line": 44,
+          "end_line": 46,
           "signature": "def node_id(path: str, symbol: str='')",
           "summary": "Readable and stable while path + qualified symbol stay the same."
         },
         {
           "name": "_Ignore",
           "kind": "class",
-          "line": 32,
-          "end_line": 54,
+          "line": 51,
+          "end_line": 73,
           "signature": "class _Ignore",
           "summary": "Hidden dirs, configured glob patterns and (optionally) the project's .gitignore."
         },
         {
           "name": "_Ignore.__init__",
           "kind": "function",
-          "line": 35,
-          "end_line": 44,
+          "line": 54,
+          "end_line": 63,
           "signature": "def __init__(self, root: Path, patterns: list[str], respect_gitignore: bool)",
           "summary": ""
         },
         {
           "name": "_Ignore.__call__",
           "kind": "function",
-          "line": 46,
-          "end_line": 54,
+          "line": 65,
+          "end_line": 73,
           "signature": "def __call__(self, rel: str, is_dir: bool)",
           "summary": ""
         },
         {
           "name": "_signature",
           "kind": "function",
-          "line": 59,
-          "end_line": 69,
+          "line": 78,
+          "end_line": 88,
           "signature": "def _signature(node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef)",
           "summary": "Full, single-pass signature built from the AST (works for multi-line parameter lists)."
         },
         {
           "name": "_first_line",
           "kind": "function",
-          "line": 72,
-          "end_line": 73,
+          "line": 91,
+          "end_line": 92,
           "signature": "def _first_line(text: str | None, limit: int=240)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor",
           "kind": "class",
-          "line": 76,
-          "end_line": 137,
+          "line": 95,
+          "end_line": 164,
           "signature": "class _PythonVisitor",
           "summary": ""
         },
         {
           "name": "_PythonVisitor.__init__",
           "kind": "function",
-          "line": 77,
-          "end_line": 84,
-          "signature": "def __init__(self, rel: str, file_id: str)",
+          "line": 96,
+          "end_line": 105,
+          "signature": "def __init__(self, rel: str, file_id: str, cancel_check=lambda: None)",
+          "summary": ""
+        },
+        {
+          "name": "_PythonVisitor.visit",
+          "kind": "function",
+          "line": 107,
+          "end_line": 111,
+          "signature": "def visit(self, node)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor.visit_Import",
           "kind": "function",
-          "line": 86,
-          "end_line": 87,
+          "line": 113,
+          "end_line": 114,
           "signature": "def visit_Import(self, node: ast.Import)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor.visit_ImportFrom",
           "kind": "function",
-          "line": 89,
-          "end_line": 95,
+          "line": 116,
+          "end_line": 122,
           "signature": "def visit_ImportFrom(self, node: ast.ImportFrom)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor.visit_Call",
           "kind": "function",
-          "line": 97,
-          "end_line": 104,
+          "line": 124,
+          "end_line": 131,
           "signature": "def visit_Call(self, node: ast.Call)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor.visit_ClassDef",
           "kind": "function",
-          "line": 106,
-          "end_line": 107,
+          "line": 133,
+          "end_line": 134,
           "signature": "def visit_ClassDef(self, node: ast.ClassDef)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor.visit_FunctionDef",
           "kind": "function",
-          "line": 109,
-          "end_line": 110,
+          "line": 136,
+          "end_line": 137,
           "signature": "def visit_FunctionDef(self, node: ast.FunctionDef)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor.visit_AsyncFunctionDef",
           "kind": "function",
-          "line": 112,
-          "end_line": 113,
+          "line": 139,
+          "end_line": 140,
           "signature": "def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef)",
           "summary": ""
         },
         {
           "name": "_PythonVisitor._definition",
           "kind": "function",
-          "line": 115,
-          "end_line": 137,
+          "line": 142,
+          "end_line": 164,
           "signature": "def _definition(self, node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef, kind: str)",
           "summary": ""
         },
         {
           "name": "_index_file",
           "kind": "function",
-          "line": 140,
-          "end_line": 165,
-          "signature": "def _index_file(rel: str, source: str, digest: str, size: int, mtime_ns: int, is_python: bool)",
+          "line": 167,
+          "end_line": 196,
+          "signature": "def _index_file(rel: str, source: str, digest: str, size: int, mtime_ns: int, is_python: bool, *, cancel_check=lambda: None)",
           "summary": ""
         },
         {
           "name": "_module_keys",
           "kind": "function",
-          "line": 170,
-          "end_line": 178,
+          "line": 201,
+          "end_line": 209,
           "signature": "def _module_keys(path: str)",
           "summary": "'src/a/b.py' -> ['src.a.b', 'a.b', 'b'];  'pkg/__init__.py' -> ['pkg']."
         },
         {
           "name": "_link",
           "kind": "function",
-          "line": 181,
-          "end_line": 244,
-          "signature": "def _link(nodes: list[TreeNode])",
+          "line": 212,
+          "end_line": 286,
+          "signature": "def _link(nodes: list[TreeNode], cancel_check=lambda: None)",
           "summary": "Resolve raw call *names* into call-graph *edges* between nodes."
         },
         {
           "name": "_join",
           "kind": "function",
-          "line": 249,
-          "end_line": 250,
+          "line": 291,
+          "end_line": 292,
           "signature": "def _join(rel_dir: str, name: str)",
           "summary": ""
         },
         {
           "name": "_group_by_path",
           "kind": "function",
-          "line": 253,
-          "end_line": 262,
-          "signature": "def _group_by_path(previous: dict | None)",
+          "line": 295,
+          "end_line": 316,
+          "signature": "def _group_by_path(previous: dict | None, cancel_check=lambda: None)",
           "summary": ""
         },
         {
           "name": "build_tree",
           "kind": "function",
-          "line": 265,
-          "end_line": 342,
+          "line": 319,
+          "end_line": 403,
           "signature": "def build_tree(root: str | Path, ignore: list[str] | None=None, *, previous: dict | None=None, respect_gitignore: bool=True, max_file_bytes: int=MAX_FILE_BYTES, limits: ProjectLimits | None=None, cancel_check=None)",
           "summary": "Index ``root``. With ``previous`` only files whose size/mtime/content changed are re-parsed."
         },
         {
           "name": "_tree_path",
           "kind": "function",
-          "line": 345,
-          "end_line": 346,
+          "line": 406,
+          "end_line": 407,
           "signature": "def _tree_path(root: str | Path)",
           "summary": ""
         },
         {
           "name": "_generation",
           "kind": "function",
-          "line": 349,
-          "end_line": 364,
+          "line": 410,
+          "end_line": 425,
           "signature": "def _generation(root: str | Path)",
           "summary": ""
         },
         {
           "name": "save_tree",
           "kind": "function",
-          "line": 367,
-          "end_line": 395,
+          "line": 428,
+          "end_line": 456,
           "signature": "def save_tree(root: str | Path, tree: dict)",
           "summary": "Commit only the generation observed before build; contention is retryable."
         },
         {
           "name": "load_tree",
           "kind": "function",
-          "line": 398,
-          "end_line": 415,
+          "line": 459,
+          "end_line": 476,
           "signature": "def load_tree(root: str | Path)",
           "summary": ""
         },
         {
           "name": "refresh_tree",
           "kind": "function",
-          "line": 418,
-          "end_line": 427,
+          "line": 479,
+          "end_line": 490,
           "signature": "def refresh_tree(root: str | Path, ignore: list[str] | None=None, *, respect_gitignore: bool=True, save: bool=True, limits: ProjectLimits | None=None, cancel_check=None)",
           "summary": "Bring an existing tree up to date. Returns ``(tree, changed)``."
         },
         {
           "name": "diff_trees",
           "kind": "function",
-          "line": 430,
-          "end_line": 436,
+          "line": 493,
+          "end_line": 499,
           "signature": "def diff_trees(old: dict, new: dict)",
           "summary": "File-level diff. Content hashes catch body edits that a node-id diff cannot see."
         },
         {
           "name": "diff_trees.files",
           "kind": "function",
-          "line": 432,
-          "end_line": 433,
+          "line": 495,
+          "end_line": 496,
           "signature": "def files(tree: dict)",
           "summary": ""
         }
@@ -12463,9 +12968,9 @@
     },
     {
       "path": "src/atomic_flow/tree/node.py",
-      "sha256": "0c4006154fe30c9ff7463062a1513b002e1517ef0317b77789794f40223c9d6f",
-      "bytes": 1293,
-      "lines": 36,
+      "sha256": "5587b99c1c65b38f03a15f9c81e754cc2d1b38d8a099dc46dc163179f4677d70",
+      "bytes": 1408,
+      "lines": 37,
       "summary": "Serializable project tree records.",
       "imports": [
         "__future__",
@@ -12477,15 +12982,15 @@
           "name": "TreeNode",
           "kind": "class",
           "line": 12,
-          "end_line": 36,
+          "end_line": 37,
           "signature": "class TreeNode",
           "summary": ""
         },
         {
           "name": "TreeNode.label",
           "kind": "function",
-          "line": 35,
-          "end_line": 36,
+          "line": 36,
+          "end_line": 37,
           "signature": "def label(self)",
           "summary": ""
         }
@@ -13514,8 +14019,8 @@
     },
     {
       "path": "tests/fixtures/lsp_server.py",
-      "sha256": "cfe6517cbd521234c3b7143b0d34f850ffa6accf746182452986fe07b23244d7",
-      "bytes": 5098,
+      "sha256": "92959137b9ba975b955c94509625b2aa9cdd6676def59d7a7915f0fa2692522b",
+      "bytes": 5130,
       "lines": 116,
       "summary": "Synthetic stdio LSP peer for host protocol acceptance; no real analyzer.",
       "imports": [
@@ -13729,6 +14234,110 @@
           "line": 125,
           "end_line": 127,
           "signature": "def observe(ctx)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_anthropic_usage.py",
+      "sha256": "2e2ec7b4f773e31a079d987397fbc226228492d683d6c2c91b7901d424f5de78",
+      "bytes": 4020,
+      "lines": 78,
+      "summary": "Anthropic token breakdown and content failures retain conservative accounting.",
+      "imports": [
+        "atomic_flow.backends.anthropic",
+        "atomic_flow.backends.base",
+        "atomic_flow.backends.usage",
+        "atomic_flow.config",
+        "pytest"
+      ],
+      "symbols": [
+        {
+          "name": "config",
+          "kind": "function",
+          "line": 10,
+          "end_line": 11,
+          "signature": "def config(**kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "usage",
+          "kind": "function",
+          "line": 14,
+          "end_line": 15,
+          "signature": "def usage(**kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_no_cache_uses_only_explicit_base_tariff",
+          "kind": "function",
+          "line": 18,
+          "end_line": 20,
+          "signature": "def test_no_cache_uses_only_explicit_base_tariff()",
+          "summary": ""
+        },
+        {
+          "name": "test_cached_tokens_have_separate_explicit_prices_and_ttl_counters",
+          "kind": "function",
+          "line": 23,
+          "end_line": 29,
+          "signature": "def test_cached_tokens_have_separate_explicit_prices_and_ttl_counters()",
+          "summary": ""
+        },
+        {
+          "name": "test_cached_usage_without_explicit_tariff_or_ttl_never_uses_base_input_rate",
+          "kind": "function",
+          "line": 33,
+          "end_line": 35,
+          "signature": "def test_cached_usage_without_explicit_tariff_or_ttl_never_uses_base_input_rate(record)",
+          "summary": ""
+        },
+        {
+          "name": "test_invalid_token_count_never_converts_to_number",
+          "kind": "function",
+          "line": 39,
+          "end_line": 41,
+          "signature": "def test_invalid_token_count_never_converts_to_number(bad)",
+          "summary": ""
+        },
+        {
+          "name": "test_malformed_usage_stays_unknown_even_with_zero_tariffs",
+          "kind": "function",
+          "line": 45,
+          "end_line": 47,
+          "signature": "def test_malformed_usage_stays_unknown_even_with_zero_tariffs(bad)",
+          "summary": ""
+        },
+        {
+          "name": "test_wrong_cache_breakdown_and_server_tool_usage_are_not_known_cost",
+          "kind": "function",
+          "line": 50,
+          "end_line": 56,
+          "signature": "def test_wrong_cache_breakdown_and_server_tool_usage_are_not_known_cost()",
+          "summary": ""
+        },
+        {
+          "name": "test_malformed_content_keeps_received_token_cost",
+          "kind": "function",
+          "line": 60,
+          "end_line": 65,
+          "signature": "def test_malformed_content_keeps_received_token_cost(monkeypatch, content)",
+          "summary": ""
+        },
+        {
+          "name": "test_thinking_blocks_are_not_answer_text",
+          "kind": "function",
+          "line": 68,
+          "end_line": 72,
+          "signature": "def test_thinking_blocks_are_not_answer_text(monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_cache_tariff_validates_at_host_construction",
+          "kind": "function",
+          "line": 76,
+          "end_line": 78,
+          "signature": "def test_cache_tariff_validates_at_host_construction(bad)",
           "summary": ""
         }
       ]
@@ -14401,6 +15010,126 @@
       ]
     },
     {
+      "path": "tests/test_composition_acceptance.py",
+      "sha256": "1181775ac5170accdee1798fc94ccf2a688980c3eb6d1419b766e5d6f6f59609",
+      "bytes": 2970,
+      "lines": 75,
+      "summary": "Exercise the host journey fixtures; real protocol coverage is a separate CI job.",
+      "imports": [
+        "hashlib",
+        "importlib.util",
+        "pathlib",
+        "pytest",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys",
+          "kind": "function",
+          "line": 16,
+          "end_line": 75,
+          "signature": "def test_public_review_edit_check_and_fault_journeys(tmp_path, monkeypatch, mode)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.LSP",
+          "kind": "class",
+          "line": 22,
+          "end_line": 42,
+          "signature": "class LSP",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.LSP.__init__",
+          "kind": "function",
+          "line": 23,
+          "end_line": 26,
+          "signature": "def __init__(self, root, command, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.LSP.__enter__",
+          "kind": "function",
+          "line": 28,
+          "end_line": 29,
+          "signature": "def __enter__(self)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.LSP.__exit__",
+          "kind": "function",
+          "line": 31,
+          "end_line": 32,
+          "signature": "def __exit__(self, *args)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.LSP.read_document",
+          "kind": "function",
+          "line": 34,
+          "end_line": 39,
+          "signature": "def read_document(self, path)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.LSP.definition",
+          "kind": "function",
+          "line": 41,
+          "end_line": 42,
+          "signature": "def definition(self, path, line, column)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.MCP",
+          "kind": "class",
+          "line": 44,
+          "end_line": 61,
+          "signature": "class MCP",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.MCP.__init__",
+          "kind": "function",
+          "line": 45,
+          "end_line": 48,
+          "signature": "def __init__(self, root, command, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.MCP.__enter__",
+          "kind": "function",
+          "line": 50,
+          "end_line": 51,
+          "signature": "def __enter__(self)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.MCP.__exit__",
+          "kind": "function",
+          "line": 53,
+          "end_line": 54,
+          "signature": "def __exit__(self, *args)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.MCP.list_tools",
+          "kind": "function",
+          "line": 56,
+          "end_line": 57,
+          "signature": "def list_tools(self)",
+          "summary": ""
+        },
+        {
+          "name": "test_public_review_edit_check_and_fault_journeys.MCP.call_tool",
+          "kind": "function",
+          "line": 59,
+          "end_line": 61,
+          "signature": "def call_tool(self, name, params)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_config_backends_api.py",
       "sha256": "cbc9bb9e6eb0741e3d468915fd6c8456307a53ad63f9f1c37df17df2e6f45ece",
       "bytes": 3691,
@@ -14531,8 +15260,8 @@
     },
     {
       "path": "tests/test_context_usage_batch.py",
-      "sha256": "d6c6d58bf996ba1456f85bf4843d4e960f74469e4acfb84b1bea837a934d5b28",
-      "bytes": 7953,
+      "sha256": "377f85847d5b70fbfb441a17689a610dbffc6fd9daf10ba40cf5f67d2a40724f",
+      "bytes": 8031,
       "lines": 150,
       "summary": "",
       "imports": [
@@ -14580,11 +15309,11 @@
           "summary": ""
         },
         {
-          "name": "test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate",
+          "name": "test_anthropic_input_counts_include_cache_but_unpriced_cache_cost_stays_unknown",
           "kind": "function",
           "line": 65,
           "end_line": 71,
-          "signature": "def test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate(monkeypatch)",
+          "signature": "def test_anthropic_input_counts_include_cache_but_unpriced_cache_cost_stays_unknown(monkeypatch)",
           "summary": ""
         },
         {
@@ -15475,6 +16204,53 @@
           "line": 130,
           "end_line": 131,
           "signature": "def chat_tools(self, *args, **kwargs)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_evaluation_provenance.py",
+      "sha256": "60a9ab97373378039832361d00641936602ff7906328d5e89d2fe89895abd35a",
+      "bytes": 1827,
+      "lines": 42,
+      "summary": "",
+      "imports": [
+        "importlib.util",
+        "json",
+        "pathlib",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "module",
+          "kind": "function",
+          "line": 7,
+          "end_line": 12,
+          "signature": "def module()",
+          "summary": ""
+        },
+        {
+          "name": "test_provenance_detects_same_size_source_change_and_records_dirty_state",
+          "kind": "function",
+          "line": 15,
+          "end_line": 31,
+          "signature": "def test_provenance_detects_same_size_source_change_and_records_dirty_state(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_provenance_detects_same_size_source_change_and_records_dirty_state.git",
+          "kind": "function",
+          "line": 22,
+          "end_line": 23,
+          "signature": "def git(command, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_runtime_metadata_does_not_capture_credentials",
+          "kind": "function",
+          "line": 34,
+          "end_line": 42,
+          "signature": "def test_runtime_metadata_does_not_capture_credentials(monkeypatch)",
           "summary": ""
         }
       ]
@@ -17641,8 +18417,8 @@
     },
     {
       "path": "tests/test_lsp.py",
-      "sha256": "49a8e6eb97b748c1b8c4944a4b337cb7062755c70fb2fd9a0713a9ffc1a0b0dc",
-      "bytes": 12997,
+      "sha256": "ff6bdc38a93f4307136c455dc0401504c84b188190420697ee9b514c1a8bf725",
+      "bytes": 13012,
       "lines": 311,
       "summary": "",
       "imports": [
@@ -17875,6 +18651,37 @@
           "line": 302,
           "end_line": 304,
           "signature": "def check()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_lsp_staged_admission.py",
+      "sha256": "6de356604070bc4b3f8dd450e6ee6d40d125a1f85696a820881511a4c7a5fadb",
+      "bytes": 1336,
+      "lines": 34,
+      "summary": "Host-only staged binding never grants ordinary clients private-state access.",
+      "imports": [
+        "atomic_flow.lsp",
+        "os",
+        "pytest",
+        "sys"
+      ],
+      "symbols": [
+        {
+          "name": "test_staged_admission_requires_explicit_host_authority",
+          "kind": "function",
+          "line": 10,
+          "end_line": 24,
+          "signature": "def test_staged_admission_requires_explicit_host_authority(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_windows_analyzer_lowercase_drive_is_canonical",
+          "kind": "function",
+          "line": 28,
+          "end_line": 34,
+          "signature": "def test_windows_analyzer_lowercase_drive_is_canonical(tmp_path)",
           "summary": ""
         }
       ]
@@ -19014,6 +19821,94 @@
           "line": 91,
           "end_line": 100,
           "signature": "def test_benchmark_min_citations_is_respected()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_pilot_evidence_audit.py",
+      "sha256": "bb77f26981bc7a5d230009030e6e76d5a8669c08a4fd1eafbbc441315f4c7735",
+      "bytes": 6919,
+      "lines": 129,
+      "summary": "Offline evidence reconciliation tests; no providers or candidate execution.",
+      "imports": [
+        "hashlib",
+        "importlib.util",
+        "json",
+        "pathlib",
+        "pytest"
+      ],
+      "symbols": [
+        {
+          "name": "write_json",
+          "kind": "function",
+          "line": 15,
+          "end_line": 16,
+          "signature": "def write_json(path, body)",
+          "summary": ""
+        },
+        {
+          "name": "saved_run",
+          "kind": "function",
+          "line": 19,
+          "end_line": 37,
+          "signature": "def saved_run(root, suffix, arm, costs, *, receipt=False, complete=None)",
+          "summary": ""
+        },
+        {
+          "name": "test_retains_failed_unknown_zero_and_repeated_records_without_deduplication",
+          "kind": "function",
+          "line": 40,
+          "end_line": 55,
+          "signature": "def test_retains_failed_unknown_zero_and_repeated_records_without_deduplication(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_mismatched_cost_count_quota_and_candidate_are_errors_and_cli_exits_nonzero",
+          "kind": "function",
+          "line": 58,
+          "end_line": 68,
+          "signature": "def test_mismatched_cost_count_quota_and_candidate_are_errors_and_cli_exits_nonzero(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_missing_receipts_are_coverage_gaps_and_known_hashes_match_without_changing_inputs",
+          "kind": "function",
+          "line": 71,
+          "end_line": 85,
+          "signature": "def test_missing_receipts_are_coverage_gaps_and_known_hashes_match_without_changing_inputs(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_decreased_quota_counter_is_retained_as_possible_reset_not_false_cost_mismatch",
+          "kind": "function",
+          "line": 88,
+          "end_line": 98,
+          "signature": "def test_decreased_quota_counter_is_retained_as_possible_reset_not_false_cost_mismatch(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_bounded_json_rejects_oversized_attempts_and_nonfinite_report_fields",
+          "kind": "function",
+          "line": 101,
+          "end_line": 112,
+          "signature": "def test_bounded_json_rejects_oversized_attempts_and_nonfinite_report_fields(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_empty_root_refuses_silent_success_and_tolerance_must_be_positive",
+          "kind": "function",
+          "line": 115,
+          "end_line": 119,
+          "signature": "def test_empty_root_refuses_silent_success_and_tolerance_must_be_positive(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_cli_refuses_to_overwrite_historical_evidence",
+          "kind": "function",
+          "line": 122,
+          "end_line": 129,
+          "signature": "def test_cli_refuses_to_overwrite_historical_evidence(tmp_path, monkeypatch)",
           "summary": ""
         }
       ]
@@ -20423,6 +21318,189 @@
       ]
     },
     {
+      "path": "tests/test_resume_index_resources.py",
+      "sha256": "ffa1475288e7a4e295eb157d85270a053c4deb25030ae74ab88cb0bd021cedd6",
+      "bytes": 9376,
+      "lines": 215,
+      "summary": "Task index reuse rehashes bytes, preserves edges and keeps cancellation live.",
+      "imports": [
+        "atomic_flow.agents.changeset",
+        "atomic_flow.agents.execution",
+        "atomic_flow.agents.planner",
+        "atomic_flow.agents.task_loop",
+        "atomic_flow.config",
+        "atomic_flow.project_resources",
+        "atomic_flow.tree",
+        "conftest",
+        "copy",
+        "dataclasses",
+        "os",
+        "pytest"
+      ],
+      "symbols": [
+        {
+          "name": "project",
+          "kind": "function",
+          "line": 18,
+          "end_line": 22,
+          "signature": "def project(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "edges",
+          "kind": "function",
+          "line": 25,
+          "end_line": 27,
+          "signature": "def edges(tree)",
+          "summary": ""
+        },
+        {
+          "name": "test_incremental_refresh_preserves_reference_edges_and_relinks_after_changes",
+          "kind": "function",
+          "line": 30,
+          "end_line": 44,
+          "signature": "def test_incremental_refresh_preserves_reference_edges_and_relinks_after_changes(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_legacy_cache_reparses_and_persists_raw_reference_upgrade",
+          "kind": "function",
+          "line": 47,
+          "end_line": 59,
+          "signature": "def test_legacy_cache_reparses_and_persists_raw_reference_upgrade(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_invalid_cached_child_invalidates_entire_file_instead_of_dropping_symbol",
+          "kind": "function",
+          "line": 62,
+          "end_line": 70,
+          "signature": "def test_invalid_cached_child_invalidates_entire_file_instead_of_dropping_symbol(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_repaired_children_are_persisted_even_if_source_fingerprint_unchanged",
+          "kind": "function",
+          "line": 74,
+          "end_line": 86,
+          "signature": "def test_repaired_children_are_persisted_even_if_source_fingerprint_unchanged(tmp_path, via_runner)",
+          "summary": ""
+        },
+        {
+          "name": "test_index_respects_host_per_file_envelope_even_with_matching_cache",
+          "kind": "function",
+          "line": 89,
+          "end_line": 97,
+          "signature": "def test_index_respects_host_per_file_envelope_even_with_matching_cache(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_task_resume_reuses_original_parse_cache_without_skipping_source_hashes",
+          "kind": "function",
+          "line": 100,
+          "end_line": 119,
+          "signature": "def test_task_resume_reuses_original_parse_cache_without_skipping_source_hashes(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_task_resume_reuses_original_parse_cache_without_skipping_source_hashes.observe",
+          "kind": "function",
+          "line": 106,
+          "end_line": 108,
+          "signature": "def observe(*args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_same_size_same_mtime_source_edit_invalidates_reused_syntax",
+          "kind": "function",
+          "line": 122,
+          "end_line": 133,
+          "signature": "def test_same_size_same_mtime_source_edit_invalidates_reused_syntax(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_index_graph_linking_observes_cancel_before_any_cache_commit",
+          "kind": "function",
+          "line": 136,
+          "end_line": 159,
+          "signature": "def test_index_graph_linking_observes_cancel_before_any_cache_commit(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_index_graph_linking_observes_cancel_before_any_cache_commit.check",
+          "kind": "function",
+          "line": 143,
+          "end_line": 145,
+          "signature": "def check()",
+          "summary": ""
+        },
+        {
+          "name": "test_index_graph_linking_observes_cancel_before_any_cache_commit.link",
+          "kind": "function",
+          "line": 147,
+          "end_line": 150,
+          "signature": "def link(nodes, cancel_check)",
+          "summary": ""
+        },
+        {
+          "name": "test_host_path_envelope_refuses_before_workspace_allocation",
+          "kind": "function",
+          "line": 162,
+          "end_line": 167,
+          "signature": "def test_host_path_envelope_refuses_before_workspace_allocation(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_task_runner_host_path_envelope_fails_before_model_step",
+          "kind": "function",
+          "line": 170,
+          "end_line": 178,
+          "signature": "def test_task_runner_host_path_envelope_fails_before_model_step(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_path_envelope_includes_checkpoint_and_atomic_suffix",
+          "kind": "function",
+          "line": 181,
+          "end_line": 189,
+          "signature": "def test_path_envelope_includes_checkpoint_and_atomic_suffix(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_actual_windows_path_error_has_actionable_hint_only_for_path_failures",
+          "kind": "function",
+          "line": 192,
+          "end_line": 198,
+          "signature": "def test_actual_windows_path_error_has_actionable_hint_only_for_path_failures()",
+          "summary": ""
+        },
+        {
+          "name": "test_graph_cancellation_checks_do_not_perform_io_for_every_node",
+          "kind": "function",
+          "line": 201,
+          "end_line": 206,
+          "signature": "def test_graph_cancellation_checks_do_not_perform_io_for_every_node()",
+          "summary": ""
+        },
+        {
+          "name": "test_large_python_ast_visit_is_cooperatively_cancelled",
+          "kind": "function",
+          "line": 209,
+          "end_line": 215,
+          "signature": "def test_large_python_ast_visit_is_cooperatively_cancelled()",
+          "summary": ""
+        },
+        {
+          "name": "test_large_python_ast_visit_is_cooperatively_cancelled.check",
+          "kind": "function",
+          "line": 210,
+          "end_line": 211,
+          "signature": "def check()",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_routed_accounting.py",
       "sha256": "dcb13f0d9459aee974fb3b8f208bc9186fa81b35b4dda5de9a758ac2b05ca7b8",
       "bytes": 6191,
@@ -21646,6 +22724,88 @@
       ]
     },
     {
+      "path": "tests/test_session_streaming.py",
+      "sha256": "ee21428bc5c30e650ee50fa743fceb947b42103eecb9476eca1cf500ecbd1abb",
+      "bytes": 4882,
+      "lines": 112,
+      "summary": "Bounded journal reads retain strict committed/tail and prefix integrity rules.",
+      "imports": [
+        "atomic_flow.sessions",
+        "atomic_flow.state",
+        "os",
+        "pathlib",
+        "pytest",
+        "tools.resource_scale_smoke",
+        "types"
+      ],
+      "symbols": [
+        {
+          "name": "test_read_and_recovery_stream_long_uncommitted_tail_without_whole_file_copy",
+          "kind": "function",
+          "line": 12,
+          "end_line": 36,
+          "signature": "def test_read_and_recovery_stream_long_uncommitted_tail_without_whole_file_copy(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_read_and_recovery_stream_long_uncommitted_tail_without_whole_file_copy.reject_whole_journal",
+          "kind": "function",
+          "line": 20,
+          "end_line": 23,
+          "signature": "def reject_whole_journal(path)",
+          "summary": ""
+        },
+        {
+          "name": "test_oversized_committed_line_cannot_be_misclassified_as_recoverable_tail",
+          "kind": "function",
+          "line": 39,
+          "end_line": 49,
+          "signature": "def test_oversized_committed_line_cannot_be_misclassified_as_recoverable_tail(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_newline_boundary_oversized_commit_is_refused",
+          "kind": "function",
+          "line": 52,
+          "end_line": 57,
+          "signature": "def test_newline_boundary_oversized_commit_is_refused(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_same_size_tamper_with_restored_mtime_still_blocks_append",
+          "kind": "function",
+          "line": 60,
+          "end_line": 70,
+          "signature": "def test_same_size_tamper_with_restored_mtime_still_blocks_append(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_separate_writer_append_is_validated_and_expected_sequence_remains_strict",
+          "kind": "function",
+          "line": 73,
+          "end_line": 81,
+          "signature": "def test_separate_writer_append_is_validated_and_expected_sequence_remains_strict(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_growth_during_read_cannot_bypass_session_byte_admission",
+          "kind": "function",
+          "line": 84,
+          "end_line": 96,
+          "signature": "def test_growth_during_read_cannot_bypass_session_byte_admission(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_recovery_reads_committed_prefix_only_once",
+          "kind": "function",
+          "line": 99,
+          "end_line": 112,
+          "signature": "def test_recovery_reads_committed_prefix_only_once(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tests/test_sessions_migrations.py",
       "sha256": "0c788b1295cc6f5f07a508f42a43ab69a9e52697bee22434939359c5acc15baf",
       "bytes": 6567,
@@ -21724,6 +22884,153 @@
           "line": 131,
           "end_line": 149,
           "signature": "def test_process_append_lease_prevents_concurrent_write(tmp_path)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_snapshot_resources.py",
+      "sha256": "a13fdfa4405ed1ce38d23c7f7bcafafd803b5138ee8ffc57e69b18bcdbf3ffef",
+      "bytes": 6851,
+      "lines": 171,
+      "summary": "Whole-source snapshots enforce host resource envelopes before task execution.",
+      "imports": [
+        "atomic_flow.agents.changeset",
+        "atomic_flow.config",
+        "atomic_flow.project_resources",
+        "dataclasses",
+        "json",
+        "pathlib",
+        "pytest",
+        "shutil"
+      ],
+      "symbols": [
+        {
+          "name": "project",
+          "kind": "function",
+          "line": 14,
+          "end_line": 19,
+          "signature": "def project(tmp_path, contents=(b'1234', b'5678'))",
+          "summary": ""
+        },
+        {
+          "name": "test_snapshot_refuses_complete_operation_without_allocating_workspace",
+          "kind": "function",
+          "line": 28,
+          "end_line": 33,
+          "signature": "def test_snapshot_refuses_complete_operation_without_allocating_workspace(tmp_path, overrides, message)",
+          "summary": ""
+        },
+        {
+          "name": "test_depth_admission_and_secret_exclusion",
+          "kind": "function",
+          "line": 36,
+          "end_line": 45,
+          "signature": "def test_depth_admission_and_secret_exclusion(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_disk_floor_refuses_before_workspace_allocation",
+          "kind": "function",
+          "line": 48,
+          "end_line": 55,
+          "signature": "def test_disk_floor_refuses_before_workspace_allocation(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_streaming_hash_and_copy_do_not_read_whole_source",
+          "kind": "function",
+          "line": 58,
+          "end_line": 76,
+          "signature": "def test_streaming_hash_and_copy_do_not_read_whole_source(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_streaming_hash_and_copy_do_not_read_whole_source.no_source_whole_reads",
+          "kind": "function",
+          "line": 62,
+          "end_line": 65,
+          "signature": "def no_source_whole_reads(path)",
+          "summary": ""
+        },
+        {
+          "name": "test_copy_cancellation_retains_creation_failed_journal_and_no_partial_file",
+          "kind": "function",
+          "line": 79,
+          "end_line": 100,
+          "signature": "def test_copy_cancellation_retains_creation_failed_journal_and_no_partial_file(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_copy_cancellation_retains_creation_failed_journal_and_no_partial_file.Cancelled",
+          "kind": "class",
+          "line": 85,
+          "end_line": 86,
+          "signature": "class Cancelled",
+          "summary": ""
+        },
+        {
+          "name": "test_copy_cancellation_retains_creation_failed_journal_and_no_partial_file.cancel_copy",
+          "kind": "function",
+          "line": 88,
+          "end_line": 92,
+          "signature": "def cancel_copy(path, limits, check, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_copy_changed_source_refuses_and_original_stays_external_version",
+          "kind": "function",
+          "line": 103,
+          "end_line": 116,
+          "signature": "def test_copy_changed_source_refuses_and_original_stays_external_version(tmp_path, monkeypatch)",
+          "summary": ""
+        },
+        {
+          "name": "test_copy_changed_source_refuses_and_original_stays_external_version.changed",
+          "kind": "function",
+          "line": 109,
+          "end_line": 111,
+          "signature": "def changed(source, target, *args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "test_workspace_rechecks_use_persisted_limits_and_checkpoint_streaming",
+          "kind": "function",
+          "line": 119,
+          "end_line": 129,
+          "signature": "def test_workspace_rechecks_use_persisted_limits_and_checkpoint_streaming(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_git_inventory_output_cap_refuses_without_unbounded_capture",
+          "kind": "function",
+          "line": 132,
+          "end_line": 137,
+          "signature": "def test_git_inventory_output_cap_refuses_without_unbounded_capture(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_checkpoint_recovery_finishes_after_task_cancel_and_keeps_source",
+          "kind": "function",
+          "line": 140,
+          "end_line": 157,
+          "signature": "def test_checkpoint_recovery_finishes_after_task_cancel_and_keeps_source(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_checkpoint_recovery_finishes_after_task_cancel_and_keeps_source.check",
+          "kind": "function",
+          "line": 144,
+          "end_line": 146,
+          "signature": "def check()",
+          "summary": ""
+        },
+        {
+          "name": "test_private_worktree_creation_honors_inventory_output_envelope",
+          "kind": "function",
+          "line": 160,
+          "end_line": 171,
+          "signature": "def test_private_worktree_creation_honors_inventory_output_envelope(tmp_path)",
           "summary": ""
         }
       ]
@@ -21830,6 +23137,120 @@
           "line": 128,
           "end_line": 134,
           "signature": "def test_private_state_is_not_indexed_even_inside_project(tmp_path, monkeypatch)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/test_stage4_harness.py",
+      "sha256": "5a16ea690b9551ae7c199919eb9bb29893513781e0210e557ba507f99f1015c0",
+      "bytes": 8062,
+      "lines": 158,
+      "summary": "Synthetic oracle calibration tests; not a model or public-corpus quality score.",
+      "imports": [
+        "copy",
+        "importlib.util",
+        "json",
+        "pathlib",
+        "pytest",
+        "subprocess",
+        "sys"
+      ],
+      "symbols": [
+        {
+          "name": "test_pilot_patch_parser_accepts_json_and_diff_fences",
+          "kind": "function",
+          "line": 29,
+          "end_line": 36,
+          "signature": "def test_pilot_patch_parser_accepts_json_and_diff_fences()",
+          "summary": ""
+        },
+        {
+          "name": "test_pilot_patch_parser_still_refuses_wrong_scope_and_shape",
+          "kind": "function",
+          "line": 39,
+          "end_line": 43,
+          "signature": "def test_pilot_patch_parser_still_refuses_wrong_scope_and_shape()",
+          "summary": ""
+        },
+        {
+          "name": "test_public_corpus_has_independent_thirty_frozen_tasks",
+          "kind": "function",
+          "line": 46,
+          "end_line": 53,
+          "signature": "def test_public_corpus_has_independent_thirty_frozen_tasks()",
+          "summary": ""
+        },
+        {
+          "name": "test_unsafe_patch_paths_refused",
+          "kind": "function",
+          "line": 57,
+          "end_line": 59,
+          "signature": "def test_unsafe_patch_paths_refused(text)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_git_patch_calibration_base_gold_wrong",
+          "kind": "function",
+          "line": 62,
+          "end_line": 89,
+          "signature": "def test_real_git_patch_calibration_base_gold_wrong(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_real_git_patch_calibration_base_gold_wrong.git",
+          "kind": "function",
+          "line": 66,
+          "end_line": 67,
+          "signature": "def git(*args)",
+          "summary": ""
+        },
+        {
+          "name": "test_checked_git_checkouts_are_byte_identical_to_blobs",
+          "kind": "function",
+          "line": 92,
+          "end_line": 109,
+          "signature": "def test_checked_git_checkouts_are_byte_identical_to_blobs(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "attempt",
+          "kind": "function",
+          "line": 112,
+          "end_line": 115,
+          "signature": "def attempt(arm='atomic', cost=None)",
+          "summary": ""
+        },
+        {
+          "name": "test_missing_failed_unknown_attempts_are_not_dropped_or_zeroed",
+          "kind": "function",
+          "line": 118,
+          "end_line": 123,
+          "signature": "def test_missing_failed_unknown_attempts_are_not_dropped_or_zeroed()",
+          "summary": ""
+        },
+        {
+          "name": "test_pair_identity_and_unknown_cost_cannot_be_forged",
+          "kind": "function",
+          "line": 126,
+          "end_line": 136,
+          "signature": "def test_pair_identity_and_unknown_cost_cannot_be_forged()",
+          "summary": ""
+        },
+        {
+          "name": "test_prepare_never_exports_gold_oracle_into_model_prompt",
+          "kind": "function",
+          "line": 139,
+          "end_line": 146,
+          "signature": "def test_prepare_never_exports_gold_oracle_into_model_prompt(tmp_path)",
+          "summary": ""
+        },
+        {
+          "name": "test_empty_score_includes_all_tasks_and_has_no_quality_claim",
+          "kind": "function",
+          "line": 149,
+          "end_line": 158,
+          "signature": "def test_empty_score_includes_all_tasks_and_has_no_quality_claim()",
           "summary": ""
         }
       ]
@@ -22891,9 +24312,9 @@
     },
     {
       "path": "tests/test_tool_discovery.py",
-      "sha256": "c789415509ea89522c55154433852d2e486c4dc023542c3fa4f5d0b1b2c90cb8",
-      "bytes": 6830,
-      "lines": 140,
+      "sha256": "78f0a30ed22da53354c101da3221c059fd383382940e5c71c3e8f702ef23b685",
+      "bytes": 6924,
+      "lines": 141,
       "summary": "",
       "imports": [
         "__future__",
@@ -23012,7 +24433,7 @@
           "name": "test_native_catalog_activates_allowed_schema_before_factory_load",
           "kind": "function",
           "line": 102,
-          "end_line": 140,
+          "end_line": 141,
           "signature": "def test_native_catalog_activates_allowed_schema_before_factory_load(tmp_path, monkeypatch)",
           "summary": ""
         },
@@ -24459,6 +25880,73 @@
       "lines": 7
     },
     {
+      "path": "tools/audit_live_pilot.py",
+      "sha256": "db50e4bc8cd33aff9efd248aff69e95825998dc24533900c9eff69f5e0b568eb",
+      "bytes": 14662,
+      "lines": 242,
+      "summary": "Audit saved pilot JSON and hashes offline; never imports or runs candidates.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "datetime",
+        "hashlib",
+        "json",
+        "math",
+        "pathlib"
+      ],
+      "symbols": [
+        {
+          "name": "amount",
+          "kind": "function",
+          "line": 20,
+          "end_line": 21,
+          "signature": "def amount(value)",
+          "summary": ""
+        },
+        {
+          "name": "count",
+          "kind": "function",
+          "line": 24,
+          "end_line": 25,
+          "signature": "def count(value)",
+          "summary": ""
+        },
+        {
+          "name": "audit",
+          "kind": "function",
+          "line": 28,
+          "end_line": 220,
+          "signature": "def audit(root, *, tolerance_usd=1e-09)",
+          "summary": "Return evidence observations, not provider billing or model quality claims."
+        },
+        {
+          "name": "audit.issue",
+          "kind": "function",
+          "line": 44,
+          "end_line": 45,
+          "signature": "def issue(run, code, *, warning=False, **details)",
+          "summary": ""
+        },
+        {
+          "name": "audit.read",
+          "kind": "function",
+          "line": 47,
+          "end_line": 64,
+          "signature": "def read(path, run, *, optional=False, raw=False)",
+          "summary": ""
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 223,
+          "end_line": 238,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tools/build_colab_bundle.py",
       "sha256": "23128bd5d07665c5810fbba09abb7ac06475e8ee53379cc4736a1f13f9b7eac6",
       "bytes": 4584,
@@ -24582,6 +26070,621 @@
       ]
     },
     {
+      "path": "tools/evaluation_build_corpus.py",
+      "sha256": "0b5426f925af27288164c5c5baf6c9bc023801411093834c6a63beb252fae11a",
+      "bytes": 2794,
+      "lines": 43,
+      "summary": "Curate a bounded public SWE-bench Lite snapshot; no evaluator scripts execute.",
+      "imports": [
+        "argparse",
+        "hashlib",
+        "json",
+        "pathlib"
+      ],
+      "symbols": [
+        {
+          "name": "build",
+          "kind": "function",
+          "line": 11,
+          "end_line": 33,
+          "signature": "def build(pages, revision)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/evaluation_live_pilot.py",
+      "sha256": "88c8a83ce098bb3db052af18c122f1de61a9b1ed3dfafd0aa09609d685ca4394",
+      "bytes": 20747,
+      "lines": 356,
+      "summary": "Bounded public SymPy development pilot; proxy credentials are environment-only.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "atomic_flow.agents.changeset",
+        "atomic_flow.agents.control",
+        "atomic_flow.agents.execution",
+        "atomic_flow.agents.task_loop",
+        "atomic_flow.agents.tools",
+        "atomic_flow.backends.base",
+        "atomic_flow.backends.cancellation",
+        "atomic_flow.backends.http",
+        "atomic_flow.backends.openai_compatible",
+        "atomic_flow.config",
+        "atomic_flow.llm.request_budget",
+        "copy",
+        "difflib",
+        "evaluation_provenance",
+        "evaluation_stage4",
+        "json",
+        "math",
+        "os",
+        "pathlib",
+        "tempfile",
+        "threading",
+        "time"
+      ],
+      "symbols": [
+        {
+          "name": "write_json",
+          "kind": "function",
+          "line": 37,
+          "end_line": 41,
+          "signature": "def write_json(path, value)",
+          "summary": ""
+        },
+        {
+          "name": "valid_amount",
+          "kind": "function",
+          "line": 44,
+          "end_line": 45,
+          "signature": "def valid_amount(value)",
+          "summary": ""
+        },
+        {
+          "name": "PilotLimit",
+          "kind": "class",
+          "line": 48,
+          "end_line": 49,
+          "signature": "class PilotLimit",
+          "summary": ""
+        },
+        {
+          "name": "PilotBackend",
+          "kind": "class",
+          "line": 52,
+          "end_line": 135,
+          "signature": "class PilotBackend",
+          "summary": "Physical-send meter with shared state across TaskBudgetBackend copies."
+        },
+        {
+          "name": "PilotBackend.__init__",
+          "kind": "function",
+          "line": 55,
+          "end_line": 59,
+          "signature": "def __init__(self, transport, output, limits, deadline)",
+          "summary": ""
+        },
+        {
+          "name": "PilotBackend.checkpoint",
+          "kind": "function",
+          "line": 61,
+          "end_line": 62,
+          "signature": "def checkpoint(self)",
+          "summary": ""
+        },
+        {
+          "name": "PilotBackend.chat",
+          "kind": "function",
+          "line": 64,
+          "end_line": 135,
+          "signature": "def chat(self, messages, *, json_mode=False, model=None)",
+          "summary": ""
+        },
+        {
+          "name": "PilotBackend.chat.check",
+          "kind": "function",
+          "line": 94,
+          "end_line": 98,
+          "signature": "def check()",
+          "summary": ""
+        },
+        {
+          "name": "source_excerpt",
+          "kind": "function",
+          "line": 138,
+          "end_line": 146,
+          "signature": "def source_excerpt(source)",
+          "summary": "Frozen issue-relevant context; no gold/test oracle content is read."
+        },
+        {
+          "name": "parse_patch",
+          "kind": "function",
+          "line": 149,
+          "end_line": 164,
+          "signature": "def parse_patch(content)",
+          "summary": ""
+        },
+        {
+          "name": "baseline",
+          "kind": "function",
+          "line": 167,
+          "end_line": 172,
+          "signature": "def baseline(task, source, backend)",
+          "summary": ""
+        },
+        {
+          "name": "atomic",
+          "kind": "function",
+          "line": 175,
+          "end_line": 229,
+          "signature": "def atomic(task, work, source, backend, args)",
+          "summary": ""
+        },
+        {
+          "name": "atomic.capabilities",
+          "kind": "function",
+          "line": 199,
+          "end_line": 200,
+          "signature": "def capabilities(context)",
+          "summary": ""
+        },
+        {
+          "name": "atomic.approve",
+          "kind": "function",
+          "line": 202,
+          "end_line": 203,
+          "signature": "def approve(tool, *unused)",
+          "summary": ""
+        },
+        {
+          "name": "parser",
+          "kind": "function",
+          "line": 232,
+          "end_line": 246,
+          "signature": "def parser()",
+          "summary": ""
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 249,
+          "end_line": 352,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/evaluation_provenance.py",
+      "sha256": "2379c12030e4768f23947575f04242c4fa5cb147631bf4085075ad1a4b30e7eb",
+      "bytes": 1937,
+      "lines": 39,
+      "summary": "Secret-free source/runtime metadata for future local development pilots.",
+      "imports": [
+        "__future__",
+        "hashlib",
+        "importlib.metadata",
+        "json",
+        "pathlib",
+        "platform",
+        "subprocess",
+        "sys"
+      ],
+      "symbols": [
+        {
+          "name": "source_state",
+          "kind": "function",
+          "line": 13,
+          "end_line": 31,
+          "signature": "def source_state(root)",
+          "summary": ""
+        },
+        {
+          "name": "runtime_state",
+          "kind": "function",
+          "line": 34,
+          "end_line": 39,
+          "signature": "def runtime_state()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/evaluation_public_pilot.py",
+      "sha256": "942335224914e6e9b586766b78f76bc475d3ce13ff1fb5d8a1d762bdb0bb7c4a",
+      "bytes": 3222,
+      "lines": 56,
+      "summary": "Run the explicitly reviewed public SymPy21614 grader pilot, no model calls.",
+      "imports": [
+        "argparse",
+        "evaluation_stage4",
+        "json",
+        "pathlib",
+        "subprocess"
+      ],
+      "symbols": [
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 15,
+          "end_line": 52,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/evaluation_pytest.py",
+      "sha256": "d53ec7c3092675d98fd46745b99968100f34e99f999c8e9cc7cd01f6236f8e31",
+      "bytes": 2624,
+      "lines": 58,
+      "summary": "Trusted pytest oracle adapter: run via pinned interpreter -I outside checkout.",
+      "imports": [
+        "argparse",
+        "json",
+        "os",
+        "pathlib",
+        "pytest",
+        "sys"
+      ],
+      "symbols": [
+        {
+          "name": "Results",
+          "kind": "class",
+          "line": 15,
+          "end_line": 26,
+          "signature": "class Results",
+          "summary": ""
+        },
+        {
+          "name": "Results.__init__",
+          "kind": "function",
+          "line": 16,
+          "end_line": 17,
+          "signature": "def __init__(self)",
+          "summary": ""
+        },
+        {
+          "name": "Results.pytest_runtest_logreport",
+          "kind": "function",
+          "line": 19,
+          "end_line": 26,
+          "signature": "def pytest_runtest_logreport(self, report)",
+          "summary": ""
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 29,
+          "end_line": 54,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/evaluation_stage4.py",
+      "sha256": "46986f791baa78a53b35ebae90d9b6c16d6e1f4fa571a2ff1ca612a077aa4e86",
+      "bytes": 20653,
+      "lines": 351,
+      "summary": "Offline Stage 4 patch grading and paired result admission.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "math",
+        "os",
+        "pathlib",
+        "re",
+        "subprocess",
+        "tempfile",
+        "time"
+      ],
+      "symbols": [
+        {
+          "name": "digest",
+          "kind": "function",
+          "line": 26,
+          "end_line": 28,
+          "signature": "def digest(value)",
+          "summary": ""
+        },
+        {
+          "name": "patch_paths",
+          "kind": "function",
+          "line": 31,
+          "end_line": 50,
+          "signature": "def patch_paths(patch)",
+          "summary": ""
+        },
+        {
+          "name": "load_manifest",
+          "kind": "function",
+          "line": 53,
+          "end_line": 71,
+          "signature": "def load_manifest(path)",
+          "summary": ""
+        },
+        {
+          "name": "run",
+          "kind": "function",
+          "line": 74,
+          "end_line": 91,
+          "signature": "def run(command, cwd, timeout, log)",
+          "summary": "File-backed output avoids unbounded capture in low-memory workers."
+        },
+        {
+          "name": "checked_git",
+          "kind": "function",
+          "line": 94,
+          "end_line": 102,
+          "signature": "def checked_git(args, cwd=None)",
+          "summary": ""
+        },
+        {
+          "name": "grade",
+          "kind": "function",
+          "line": 105,
+          "end_line": 162,
+          "signature": "def grade(task, mirror, patch, evaluator, output, *, label='candidate', timeout=180)",
+          "summary": "Evaluator emits oracle.json outside project: exact test id->pass/fail/error."
+        },
+        {
+          "name": "calibrate",
+          "kind": "function",
+          "line": 165,
+          "end_line": 176,
+          "signature": "def calibrate(task, mirror, evaluator, output, wrong_patch, timeout=180)",
+          "summary": "No task may enter measured pairs unless base FAIL/gold PASS/wrong FAIL."
+        },
+        {
+          "name": "validate_attempt",
+          "kind": "function",
+          "line": 179,
+          "end_line": 200,
+          "signature": "def validate_attempt(row, limits)",
+          "summary": "Strict result admission retains incomplete/unknown usage, never imputes zero."
+        },
+        {
+          "name": "pair_report",
+          "kind": "function",
+          "line": 203,
+          "end_line": 228,
+          "signature": "def pair_report(tasks, attempts, limits)",
+          "summary": ""
+        },
+        {
+          "name": "score_pairs",
+          "kind": "function",
+          "line": 231,
+          "end_line": 279,
+          "signature": "def score_pairs(tasks, attempts, limits, grades, calibrations)",
+          "summary": "Join host oracle evidence; include every missing/failed task in denominator."
+        },
+        {
+          "name": "prepare",
+          "kind": "function",
+          "line": 282,
+          "end_line": 308,
+          "signature": "def prepare(manifest, output, limits)",
+          "summary": "Separate model-visible prompts from host oracle/gold artifacts."
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 311,
+          "end_line": 347,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/index_reuse_probe.py",
+      "sha256": "8918be15880f6853e1459de755f52e9ec1d53307fe1864acf61de206ac8aecf8",
+      "bytes": 5506,
+      "lines": 114,
+      "summary": "Measure one pinned, already checked-out source tree; no downloads or model calls.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "atomic_flow.project_resources",
+        "atomic_flow.source_lock",
+        "atomic_flow.tree.builder",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "resource_scale_smoke",
+        "subprocess",
+        "tempfile",
+        "time",
+        "tracemalloc"
+      ],
+      "symbols": [
+        {
+          "name": "git",
+          "kind": "function",
+          "line": 26,
+          "end_line": 37,
+          "signature": "def git(root, *args)",
+          "summary": ""
+        },
+        {
+          "name": "graph",
+          "kind": "function",
+          "line": 40,
+          "end_line": 42,
+          "signature": "def graph(tree)",
+          "summary": ""
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 45,
+          "end_line": 110,
+          "signature": "def main()",
+          "summary": ""
+        },
+        {
+          "name": "main.check",
+          "kind": "function",
+          "line": 63,
+          "end_line": 65,
+          "signature": "def check()",
+          "summary": ""
+        },
+        {
+          "name": "main.measured",
+          "kind": "function",
+          "line": 67,
+          "end_line": 79,
+          "signature": "def measured(previous)",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/integration_acceptance.py",
+      "sha256": "946f677ce736b6f5e27a87c1320f49b5b0e199ec3f7731e9685981a58b134bd0",
+      "bytes": 17816,
+      "lines": 301,
+      "summary": "Real pinned LSP/MCP processes in reviewed staged TaskRunner journeys.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "atomic_flow.agents.base",
+        "atomic_flow.agents.changeset",
+        "atomic_flow.agents.control",
+        "atomic_flow.agents.planner",
+        "atomic_flow.agents.task",
+        "atomic_flow.agents.task_loop",
+        "atomic_flow.agents.tools",
+        "atomic_flow.backends.base",
+        "atomic_flow.budget",
+        "atomic_flow.config",
+        "atomic_flow.integrations.mcp",
+        "atomic_flow.lsp",
+        "atomic_flow.tree.builder",
+        "contextlib",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "pydantic",
+        "re",
+        "tempfile"
+      ],
+      "symbols": [
+        {
+          "name": "notebook_bytes",
+          "kind": "function",
+          "line": 42,
+          "end_line": 47,
+          "signature": "def notebook_bytes()",
+          "summary": ""
+        },
+        {
+          "name": "notebook_apply_reply",
+          "kind": "function",
+          "line": 50,
+          "end_line": 57,
+          "signature": "def notebook_apply_reply(messages)",
+          "summary": "Use the actual delivered preview, without minting read/approval authority."
+        },
+        {
+          "name": "ScriptedBackend",
+          "kind": "class",
+          "line": 60,
+          "end_line": 104,
+          "signature": "class ScriptedBackend",
+          "summary": ""
+        },
+        {
+          "name": "ScriptedBackend.__init__",
+          "kind": "function",
+          "line": 63,
+          "end_line": 83,
+          "signature": "def __init__(self)",
+          "summary": ""
+        },
+        {
+          "name": "ScriptedBackend.chat",
+          "kind": "function",
+          "line": 85,
+          "end_line": 104,
+          "signature": "def chat(self, messages, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "run_single",
+          "kind": "function",
+          "line": 107,
+          "end_line": 252,
+          "signature": "def run_single(args, mode='publish', evidence=None)",
+          "summary": ""
+        },
+        {
+          "name": "run_single.Probe",
+          "kind": "class",
+          "line": 126,
+          "end_line": 155,
+          "signature": "class Probe",
+          "summary": ""
+        },
+        {
+          "name": "run_single.Probe.Args",
+          "kind": "class",
+          "line": 130,
+          "end_line": 131,
+          "signature": "class Args",
+          "summary": ""
+        },
+        {
+          "name": "run_single.Probe.run",
+          "kind": "function",
+          "line": 135,
+          "end_line": 155,
+          "signature": "def run(self, params, ctx)",
+          "summary": ""
+        },
+        {
+          "name": "run_single.factory",
+          "kind": "function",
+          "line": 157,
+          "end_line": 172,
+          "signature": "def factory(context)",
+          "summary": ""
+        },
+        {
+          "name": "run_single.no_rebind",
+          "kind": "function",
+          "line": 223,
+          "end_line": 224,
+          "signature": "def no_rebind(context)",
+          "summary": ""
+        },
+        {
+          "name": "run",
+          "kind": "function",
+          "line": 255,
+          "end_line": 279,
+          "signature": "def run(args)",
+          "summary": ""
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 282,
+          "end_line": 297,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tools/measure_startup.py",
       "sha256": "bc04c2fe49029536ca04513c7553214b724ba54e1c225b25e8fe092a59dc0acb",
       "bytes": 3498,
@@ -24609,10 +26712,182 @@
       ]
     },
     {
+      "path": "tools/release_acceptance.py",
+      "sha256": "a62a5e7e5f2d2774598538bac6b77cbe3ac76e51597bfed60db49745a74dd23e",
+      "bytes": 2433,
+      "lines": 51,
+      "summary": "Build/install wheel in an isolated external venv and retain exact environment.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "tempfile"
+      ],
+      "symbols": [
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 14,
+          "end_line": 47,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/resource_scale_smoke.py",
+      "sha256": "fc64d8db2b4c6ee5f2b1cbda9f5f5cbed15b631c392cb6b9250dfdd0932e13c1",
+      "bytes": 5924,
+      "lines": 151,
+      "summary": "Bounded offline synthetic snapshot/journal measurements; never calls models.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "atomic_flow.agents.changeset",
+        "atomic_flow.project_resources",
+        "atomic_flow.sessions",
+        "contextlib",
+        "ctypes",
+        "json",
+        "os",
+        "pathlib",
+        "statistics",
+        "time",
+        "tracemalloc"
+      ],
+      "symbols": [
+        {
+          "name": "rss_bytes",
+          "kind": "function",
+          "line": 24,
+          "end_line": 47,
+          "signature": "def rss_bytes()",
+          "summary": ""
+        },
+        {
+          "name": "rss_bytes.Counters",
+          "kind": "class",
+          "line": 28,
+          "end_line": 32,
+          "signature": "class Counters",
+          "summary": ""
+        },
+        {
+          "name": "count_reads",
+          "kind": "function",
+          "line": 51,
+          "end_line": 89,
+          "signature": "def count_reads(target)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader",
+          "kind": "class",
+          "line": 55,
+          "end_line": 79,
+          "signature": "class Reader",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader.__init__",
+          "kind": "function",
+          "line": 56,
+          "end_line": 57,
+          "signature": "def __init__(self, handle)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader.__enter__",
+          "kind": "function",
+          "line": 59,
+          "end_line": 61,
+          "signature": "def __enter__(self)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader.__exit__",
+          "kind": "function",
+          "line": 63,
+          "end_line": 64,
+          "signature": "def __exit__(self, *args)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader.__getattr__",
+          "kind": "function",
+          "line": 66,
+          "end_line": 67,
+          "signature": "def __getattr__(self, name)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader._read",
+          "kind": "function",
+          "line": 69,
+          "end_line": 73,
+          "signature": "def _read(self, method, *args)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader.read",
+          "kind": "function",
+          "line": 75,
+          "end_line": 76,
+          "signature": "def read(self, *args)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.Reader.readline",
+          "kind": "function",
+          "line": 78,
+          "end_line": 79,
+          "signature": "def readline(self, *args)",
+          "summary": ""
+        },
+        {
+          "name": "count_reads.opened",
+          "kind": "function",
+          "line": 81,
+          "end_line": 83,
+          "signature": "def opened(path, mode='r', *args, **kwargs)",
+          "summary": ""
+        },
+        {
+          "name": "measure",
+          "kind": "function",
+          "line": 92,
+          "end_line": 129,
+          "signature": "def measure(root, label, count)",
+          "summary": ""
+        },
+        {
+          "name": "measure.checkpoint",
+          "kind": "function",
+          "line": 107,
+          "end_line": 108,
+          "signature": "def checkpoint()",
+          "summary": ""
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 132,
+          "end_line": 147,
+          "signature": "def main()",
+          "summary": ""
+        }
+      ]
+    },
+    {
       "path": "tools/update_project_index.py",
-      "sha256": "e0b847eddf29f9ac6fe3d474b2034f76f90426dd58a35b2acc25784bd7b54e18",
-      "bytes": 4139,
-      "lines": 84,
+      "sha256": "9dcc86699f7b97e114810c7c021340e1861bb7bd1b2474b3c9d206050617b663",
+      "bytes": 4299,
+      "lines": 86,
       "summary": "Offline repository inventory; parses source without importing application/fixture code.",
       "imports": [
         "__future__",
@@ -24627,16 +26902,49 @@
           "name": "main",
           "kind": "function",
           "line": 13,
-          "end_line": 80,
+          "end_line": 82,
           "signature": "def main()",
           "summary": ""
         },
         {
           "name": "main.visit",
           "kind": "function",
-          "line": 47,
-          "end_line": 58,
+          "line": 49,
+          "end_line": 60,
           "signature": "def visit(node, scope='')",
+          "summary": ""
+        }
+      ]
+    },
+    {
+      "path": "tools/wheel_smoke.py",
+      "sha256": "7a617a760994395a813a4438400165fbd01cfb48af7800124ba123ceb523821a",
+      "bytes": 3935,
+      "lines": 89,
+      "summary": "W5 installed-wheel smoke: prove the package works from site-packages, not the checkout.",
+      "imports": [
+        "__future__",
+        "argparse",
+        "atomic_flow",
+        "atomic_flow.api.server",
+        "atomic_flow.sdk",
+        "atomic_flow.tree.builder",
+        "fastapi.testclient",
+        "importlib.resources",
+        "importlib.util",
+        "os",
+        "pathlib",
+        "subprocess",
+        "sysconfig",
+        "tempfile"
+      ],
+      "symbols": [
+        {
+          "name": "main",
+          "kind": "function",
+          "line": 18,
+          "end_line": 85,
+          "signature": "def main()",
           "summary": ""
         }
       ]
@@ -24712,6 +27020,84 @@
       "sha256": "bad66dca924067d0201724408a0b62a792f96e29ed3f448e1191768f6b6ed01c",
       "bytes": 41,
       "lines": 1
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/compile.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/container-boundaries.txt",
+      "sha256": "5922f8185d5a9297c633cf2774b76b2757267fdc03b464dfa4db51b089ad7adf",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/dependencies.txt",
+      "sha256": "c1436661d063aeeb9d31f38ce3ef98be35b227d7d88caa6e540d2e2b9b2f676d",
+      "bytes": 536,
+      "lines": 28
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/docker-build.txt",
+      "sha256": "41168860ab6bf43d6cddbdcbfcecfbfcfe106beb352c98e9e243fe4d0301bece",
+      "bytes": 13221,
+      "lines": 176
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/docker-info.txt",
+      "sha256": "5b19ae24145640f34f3f9c46205acbae30b234a683de08cea220ff243d0dd369",
+      "bytes": 1491,
+      "lines": 61
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/docker-version.txt",
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098",
+      "bytes": 769,
+      "lines": 27
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/pytest-extra.txt",
+      "sha256": "c3788640522b7a73a8a63ce1a35822e59814788116a50e7dc72a1c192363d3f2",
+      "bytes": 99,
+      "lines": 2
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/pytest.txt",
+      "sha256": "64251a7fa813f0a0f5377f0152194353fd8db8efaa61986b4a6d44aa88a14696",
+      "bytes": 11993,
+      "lines": 200
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/python-version.txt",
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+      "bytes": 15,
+      "lines": 1
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/results.json",
+      "sha256": "f81a301b483bb2bb3a67b052298d41cd412cd0b6db11c36146218b359ede957f",
+      "bytes": 355,
+      "lines": 11
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/docker-artifact/tested-commit.txt",
+      "sha256": "672b98700baf219e49560e6bea0cecbf0b263ce52a1ed478c43a9efa34a1f3c0",
+      "bytes": 41,
+      "lines": 1
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/job-0.txt",
+      "sha256": "994b38222934d56a1611af41cd4e0abe88999d3f991987d351cb1f85a35666f5",
+      "bytes": 48357,
+      "lines": 528
+    },
+    {
+      "path": "validation/ci-production-before-fix-20261024/job-1.txt",
+      "sha256": "cb9c530df082ef72d62054d63b7df631e5cca055d87d10ec422c17e2aa3f9949",
+      "bytes": 34406,
+      "lines": 371
     },
     {
       "path": "validation/ci-step10-20261022/validation-e9c50bfc7e62cf187c2203fa1b10c56aed1e4f0a/compile.txt",
@@ -25518,6 +27904,890 @@
       "lines": 3
     },
     {
+      "path": "validation/import-20261024/anthropic-usage-focused.txt",
+      "sha256": "563b561989a1f215738e789dfb76d264cf9bca13f920686641032f477d9330ad",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/cancel-recovery.txt",
+      "sha256": "8e7e2371a803af65262e72b69defd701e1d492df6bbb2f8eaefffd865b87b723",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/combined-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/diff-check.txt",
+      "sha256": "929634819ff027845bb7260c05a2eb63da4ee6a85fee14e81467a3dbd2a79457",
+      "bytes": 232,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/evidence-manifest.json",
+      "sha256": "01eb92aa949ebd70573202bf6dcfa5e102e0f6055d14817d394eff5bbe9bbf09",
+      "bytes": 31869,
+      "lines": 903
+    },
+    {
+      "path": "validation/import-20261024/execution-lsp-recheck.txt",
+      "sha256": "4c28515122e637ad486913ef2b6526d6fa22385f869950e4caec5596d5b379a9",
+      "bytes": 101,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/execution-lsp-tests.txt",
+      "sha256": "bdf6aeef02e6a601ef4165723c5996e56440ea3294ec7d50c8791ab9ea895695",
+      "bytes": 3021,
+      "lines": 56
+    },
+    {
+      "path": "validation/import-20261024/execution-mock-after.json",
+      "sha256": "fd1a8ea61ccda7b915668ccc9e6c7250c8476d5be1aad87e04fafc7104413080",
+      "bytes": 133,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/execution-mock-before.json",
+      "sha256": "b08b6a1d417706fb23a98b746b7a15bce4398f0a07b3202c6f44edf2ffbbedac",
+      "bytes": 129,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/execution-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/execution-tests-before-mcp-ownership.txt",
+      "sha256": "35aa7c535713b03fd5cc537b511a20fdcd40a1224c972df9cb21c68e561e555a",
+      "bytes": 4007,
+      "lines": 57
+    },
+    {
+      "path": "validation/import-20261024/execution-tests-first.txt",
+      "sha256": "e20631e93448197c651bb69c3da662bdbeb6e558ff6034d5ea364b6cb75d9134",
+      "bytes": 5515,
+      "lines": 64
+    },
+    {
+      "path": "validation/import-20261024/execution-tests.txt",
+      "sha256": "b671eb2c091f5f172c03ed22207a868bb85a26b556ff7c86ac6ff2f33f69931f",
+      "bytes": 113,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/execution-workflow-pins.txt",
+      "sha256": "96e9a55aeb22eb9ed13e433db447184b6f3d3af48f06ef361b60e688bc1bdcbe",
+      "bytes": 429,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/live-pilot-audit-ruff.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/live-pilot-audit-tests-final.txt",
+      "sha256": "38952b750881b795661db72d58c7688ae412399c2bc8d8fbca0f8fb28db49667",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/live-pilot-audit-tests.txt",
+      "sha256": "cdaaf8a150cef59ad418d08edd3df76ee0e015df4911ac16c318bc43f2c45125",
+      "bytes": 1232,
+      "lines": 19
+    },
+    {
+      "path": "validation/import-20261024/live-pilot-audit.json",
+      "sha256": "f23f6258f1bc191b18523f13183a55c51f3736aeb6c2aef757f0e3d3117125f0",
+      "bytes": 21325,
+      "lines": 636
+    },
+    {
+      "path": "validation/import-20261024/parent-admission-recheck.txt",
+      "sha256": "5342134ad67067ec4dca734be9af8903817418792d920af2f98f6d550e18d602",
+      "bytes": 2388,
+      "lines": 38
+    },
+    {
+      "path": "validation/import-20261024/parent-unknown-cost-isolated.txt",
+      "sha256": "5dd2de751352464f11f8b8571ce1f602301a59304adc69e4eae78366ffbbe035",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/pilot-final-focused.txt",
+      "sha256": "7ac4660696b4370178640df61ded52a98c6877bae44e3395617c4c2cd57d3c13",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/pilot-final-ruff.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/pilot-import-recheck.txt",
+      "sha256": "912f777f32792b26bcb8ecbd1103abc711753d3a3631698f9a3a24c124fd7c69",
+      "bytes": 115,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/production-review-final-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/project-index-review.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/import-20261024/project-index-update.txt",
+      "sha256": "18a40ac90547e1fb1b7ea7d452c97e763bb0fc18f819dbac5becff171fc458d8",
+      "bytes": 2466,
+      "lines": 3
+    },
+    {
+      "path": "validation/import-20261024/provenance-regression.txt",
+      "sha256": "4b58620ee41b54f558b5acd651a421be3e101b01a5140b9e7a4560d19ccb6ff0",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/resources-final-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/resources-git-cap-recheck.txt",
+      "sha256": "5e12432f141fe986919c1e82f7aff55cde04379388c4f71750b0b91ffcc99fcb",
+      "bytes": 113,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/resources-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/resources-scale-smoke.json",
+      "sha256": "1247b2f16a1b04896fbd1d0d8d180453c3250b39a1b8c95fcd05a510fdb65c17",
+      "bytes": 1604,
+      "lines": 53
+    },
+    {
+      "path": "validation/import-20261024/resources-scale-smoke.txt",
+      "sha256": "1247b2f16a1b04896fbd1d0d8d180453c3250b39a1b8c95fcd05a510fdb65c17",
+      "bytes": 1604,
+      "lines": 53
+    },
+    {
+      "path": "validation/import-20261024/resources-scoped.txt",
+      "sha256": "1089ca3b4c3cdb07e8668284d1f3f3cd578e7f31d65dbbdf807e2344dbe543d0",
+      "bytes": 124,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/routing-accounting-focused.txt",
+      "sha256": "1d270d08527a6cb638b2240cf1841fa8cd6f3da0d17bb842f8f76962f65620e8",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/routing-focused.txt",
+      "sha256": "0443fc6c5d98209bc58344bd29a37309f987ed840d9c668ce7d6c32c26389576",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/routing-lint.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/runtime-final-scoped.txt",
+      "sha256": "cb9a309d51c94f3bdffee1755b76dcc7b8531a6e3534a7d343bdf128dad69859",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/runtime-final-task-save-gap.txt",
+      "sha256": "653e6f7390f0c5c00dc20a6f50d4eb79ede4c597dae487883687dad1265d5dc9",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/runtime-ledger-cross-day.txt",
+      "sha256": "9e79e9c662d492374e0803b328f6372fb0ab5de8581da41fc9d16025b41c4c75",
+      "bytes": 113,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/runtime-ledger-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/runtime-reconcile-recheck.txt",
+      "sha256": "06014f701c84a1046ed6fb50e9b435a76ea6b0d7d502ef353ab018650e738cda",
+      "bytes": 5473,
+      "lines": 64
+    },
+    {
+      "path": "validation/import-20261024/runtime-reconcile-tests.txt",
+      "sha256": "f812a3606fda69c08d694a21260cfa2fd5a2190061c5a1b9f9a0492c5bff46a0",
+      "bytes": 97663,
+      "lines": 1840
+    },
+    {
+      "path": "validation/import-20261024/runtime-reconcile-unsandboxed.txt",
+      "sha256": "9674410608a8ec184b1e05fc5920680f01d1caec51199575e3cedb9f54f87770",
+      "bytes": 3140,
+      "lines": 49
+    },
+    {
+      "path": "validation/import-20261024/runtime-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-final-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-final-with-counters-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-final-with-counters.txt",
+      "sha256": "4063991fcf06a66a23758467df828b8480e989a8b4340606458e56e38f9fbceb",
+      "bytes": 115,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-final.txt",
+      "sha256": "f8d5bff8373c016c25bbd31788e97f71d2343a4cedb0867f2b68b916cd357e26",
+      "bytes": 115,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-scoped.txt",
+      "sha256": "80d6ef0c416215ec22fe2955378f9763e8ba0449248e400b01f5d6e7900cfdf4",
+      "bytes": 1890,
+      "lines": 33
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-small-scale.json",
+      "sha256": "6a4609756556beb2a279bdf73a8b34396e72cfe5941c9a76ee74541ab00fdcb2",
+      "bytes": 621,
+      "lines": 23
+    },
+    {
+      "path": "validation/import-20261024/session-streaming-small-scale.txt",
+      "sha256": "6a4609756556beb2a279bdf73a8b34396e72cfe5941c9a76ee74541ab00fdcb2",
+      "bytes": 621,
+      "lines": 23
+    },
+    {
+      "path": "validation/import-20261024/stage4-harness-additional.txt",
+      "sha256": "9408d01d6b4ebf9db63b220818a1eb9deecb6cf87345e9bc0d7463be94cd4216",
+      "bytes": 114,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/stage4-harness.txt",
+      "sha256": "c4644361af3269f9d1f8be088560a1d635211de22b042e56c1799d2f248eb83a",
+      "bytes": 112,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt2/attempts.json",
+      "sha256": "76b4d927bcbe18ad5826b2a401b4bb41d20a2756ce68811b6068b3b64ed658b9",
+      "bytes": 489,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt2/kaggle-quota.json",
+      "sha256": "cd970f9d280dda7de332631ee0714586f6e5c893f917c93a74a2316f111b1364",
+      "bytes": 731,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt2/report.json",
+      "sha256": "09fced27b663b75709b2320cda5bbcb9fcd8cac6533486fd6313efe8dbca99dd",
+      "bytes": 1186,
+      "lines": 37
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt3/atomic-state/tasks/task_adbbcd306704.json",
+      "sha256": "c6e24df1c37e8069fe6927fc2a351e1b88b90470a0e424cc54326ef37eb2c18c",
+      "bytes": 176193,
+      "lines": 2026
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt3/attempts.json",
+      "sha256": "9d948310a87d04cf8d34732c7740f462081336491ebeb014b513b93bcdec25a7",
+      "bytes": 1462,
+      "lines": 44
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt3/kaggle-quota.json",
+      "sha256": "26c83d814befc73c38005be7594be8e06fa03bd9ad7d88a56dda522259e0783a",
+      "bytes": 731,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt3/report.json",
+      "sha256": "3791f4aeaaa30dd2b76314b5f4732a41720652a074cf7bc80bea2bec000395fe",
+      "bytes": 1189,
+      "lines": 37
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt4/atomic-state/tasks/task_eb3b4d10d55a.json",
+      "sha256": "39e2a0a5797d016cb8fc101fd99dca9755d603670b7ba32e41edf59e820a0d9b",
+      "bytes": 177040,
+      "lines": 2046
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt4/attempts.json",
+      "sha256": "bb8317496a02580816de89b6bfec62aea81968f8fcd3ec24950856e950cb1e70",
+      "bytes": 1938,
+      "lines": 58
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt4/kaggle-quota.json",
+      "sha256": "c5969b428fd9fb8559a97ee8c00d6914c37e379f9014b38c09c3deca6bad38c0",
+      "bytes": 730,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt4/report.json",
+      "sha256": "706e15c8ef2d7677e267b94c07097154b430bdfb457ead2eec9070fb39cbaa75",
+      "bytes": 1210,
+      "lines": 37
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt5/atomic-state/tasks/task_fa34f73ecbdd.json",
+      "sha256": "d7fbc2ca8086114a285f7b4192d5d96bf38e4144591685d1df338a2e417d6754",
+      "bytes": 177051,
+      "lines": 2046
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt5/attempts.json",
+      "sha256": "37c4e546c983c994a47bfe00f476b110979834c82e28c1bd648799920d0f9f1c",
+      "bytes": 1955,
+      "lines": 58
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt5/kaggle-quota.json",
+      "sha256": "178f7caa7cf34d4e0cddba176391b1177c726f814db8f5de29d3f49846785401",
+      "bytes": 729,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt5/report.json",
+      "sha256": "52341c0192f80032898d96f1b433373f11774e0a6138addbab8c3aba4fb99063",
+      "bytes": 1182,
+      "lines": 37
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/00_parser.json",
+      "sha256": "2ec46ff8a5ec25e8b2a7794f21f81b848ae69dff5d5cc73b72d55bace6216f19",
+      "bytes": 221,
+      "lines": 13
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/00_parser_context.json",
+      "sha256": "079da0af1691baf3874a241759f72dc7acbf1916e112c88328ca6f4d1a5402ae",
+      "bytes": 993,
+      "lines": 30
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/01_answerer_context.json",
+      "sha256": "4b716192c7efe295c5cd837d75b5e09b7fe27d63551a5465804fe50b5d04719d",
+      "bytes": 1006,
+      "lines": 30
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/01_answerer_tool_0.json",
+      "sha256": "1b2b7988009e13c6226a3d98182a0041d3e24ab0cf8269c68b53fc411d2b3ed6",
+      "bytes": 8140,
+      "lines": 70
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/01_answerer_tool_1.json",
+      "sha256": "b8a295e6d474f7d274107678dae4995f578a99548434934536d39b62cd3c0cc8",
+      "bytes": 6842,
+      "lines": 52
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/01_answerer_tool_2.json",
+      "sha256": "f9cf8a0976371080df4f01024eba67706386d9d524d92be51ce2ff0814417981",
+      "bytes": 8182,
+      "lines": 72
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/01_answerer_tool_3.json",
+      "sha256": "abd4501d3030fb39dca930333aede518bb0167b2348093a41a5dde39d6c2b321",
+      "bytes": 1779,
+      "lines": 55
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/advisory-selection.json",
+      "sha256": "c3fb01ea8d59a460556f77b7c01d308927a45fb6b83eb2a4551dfad8fbec738f",
+      "bytes": 52,
+      "lines": 4
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/error.json",
+      "sha256": "82a2960ecb686d4b418813a67dc66e6dfc58a4c411036b9a1638e940752406a5",
+      "bytes": 120,
+      "lines": 7
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/instructions.json",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+      "bytes": 4,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/request.json",
+      "sha256": "5cbfc327eecbe33f65599e9b94181ee686ea6e3da63c45acaf2aa56df0c663d1",
+      "bytes": 391,
+      "lines": 6
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/runs/req_d51f7eb50f73/usage.json",
+      "sha256": "1b80e4f778962e9ac4e45f0e8ed40e086dbe0b1a4c406aecdfd218b7eb2e17e1",
+      "bytes": 3616,
+      "lines": 112
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/sessions/session_req_d51f7eb50f73.jsonl",
+      "sha256": "9a967663edfbafc643a3aae8241c469d6974bba27186fcc489e922e22c90fe5f",
+      "bytes": 290686,
+      "lines": 23
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/sessions/session_task_1cdc3cfb1028.jsonl",
+      "sha256": "30d4752ee19e92757d109aeedfff32be47519558c07a7cdfc42cfe2f06034b55",
+      "bytes": 204714,
+      "lines": 14
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/atomic-state/tasks/task_1cdc3cfb1028.json",
+      "sha256": "74d8abed8cc3d46fb7e9a5fbacda7aa09d3467cca2fa8408039a029987738030",
+      "bytes": 177794,
+      "lines": 2070
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/attempts.json",
+      "sha256": "768ce4d4a41d22b453932b561c5f8c91323f9e731c8f7ff4d205fbf6f3853c45",
+      "bytes": 2932,
+      "lines": 86
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/kaggle-quota.json",
+      "sha256": "be4c1cb88d50f3020bc940b99195cb08ba58c615a12d32b6b9d220dca582aa3f",
+      "bytes": 729,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic-attempt6/report.json",
+      "sha256": "b5b7cbd731fcb9784120aec1b46733957888e3628d5a880880a264f9921517fb",
+      "bytes": 1193,
+      "lines": 37
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic/atomic-state/ledger/2026-10-24.jsonl",
+      "sha256": "1867befe489dc334831fe23730ec8ed8d7c993f4432f41294cfdc27db5f75e46",
+      "bytes": 568,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic/atomic-state/ledger/spend.lock",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic/atomic-state/tasks/task_74780dc9d463.cancel",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "lines": 0
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic/atomic-state/tasks/task_74780dc9d463.json",
+      "sha256": "c0deace1af54a780e0c77dbd1f661c6e027f24386a3bbf7e6a88711dc9644fa4",
+      "bytes": 174355,
+      "lines": 1970
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic/atomic-state/tasks/task_74780dc9d463.lock",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic/attempts.json",
+      "sha256": "852bd7644f0a118ff7a5ef8a9391e5a39297de9ba5e3efd07f38b949434ce3f7",
+      "bytes": 489,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-atomic/report.json",
+      "sha256": "fc3ab9e7383707abcd95cf70823a4c486f42deea24748fbcb6de8becb802883c",
+      "bytes": 1188,
+      "lines": 37
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt2/attempts.json",
+      "sha256": "57eb15a5f256d7f0a29f39a6288ee9ab27b5238c47fa8f71dcdf197fc8ea3959",
+      "bytes": 492,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt2/report.json",
+      "sha256": "f0d9ca13f9672f4028f5352aaabb237f7bc2f05aa47abde17e83b7fca9764982",
+      "bytes": 1044,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt3-grade/grade.json",
+      "sha256": "fa172d1cd79616e839b0fbd70e73a5551dac2934950c11b616c1dbcb394e785c",
+      "bytes": 3327,
+      "lines": 34
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt3-grade/sympy__sympy-21614-baseline-oracle.json",
+      "sha256": "0247c32e398975d3ca7decf7da3c8149cc9de8c5aba807c259fd112f4ae01397",
+      "bytes": 774,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt3-grade/sympy__sympy-21614-baseline.log",
+      "sha256": "10836f9ac4901d24be551fec8b6f965c4d863879ce5f590b885024d4c2b1c1d2",
+      "bytes": 1766
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt3/attempts.json",
+      "sha256": "dc8a80d5f92aae2b54133b0feec3d23f82646a71aef4e732e4a04c116274e39d",
+      "bytes": 492,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt3/candidate.patch",
+      "sha256": "54c5e29844729c2ecca2a1c45ab8b57bfa71595db59dfc0654207a59626c22cc",
+      "bytes": 416,
+      "lines": 17
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt3/kaggle-quota.json",
+      "sha256": "c2e3ce4336bc329a50c3dff17924ea9de4aea4366699b08afcae734cc5e69cea",
+      "bytes": 734,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-attempt3/report.json",
+      "sha256": "c65096293f7e9a4155f4e2293e00dedde2a49aa8f915271d9bd9e73499c44ac4",
+      "bytes": 1144,
+      "lines": 32
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline-env-failures/report.json",
+      "sha256": "d8d2f9583fd477f8dce7212e32b1e8fe1093be4ba0d71274cd19fc8ac410c17e",
+      "bytes": 1037,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline/attempts.json",
+      "sha256": "f0d0f0b2f72700521c4196ebf786cf442b8513b1af70ebffebe46880c08ee57c",
+      "bytes": 492,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline/kaggle-quota.json",
+      "sha256": "89ea0c6921e32151bbd7fb558fcef82ed0eccada53911afaffeb1c977ebd9859",
+      "bytes": 725,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-baseline/report.json",
+      "sha256": "740ef1b73232a8ce55f56a8bed5f299b50bfe291c65608d54a167b3da27334fe",
+      "bytes": 1042,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-debug-parser/attempts.json",
+      "sha256": "92e66a44f396bffb705f264d45fa7e074e3f1446b9b343cf77946932fd10c42f",
+      "bytes": 492,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-debug-parser/raw-response.txt",
+      "sha256": "c566a7d1bcd6618534e80e6a230f0093a39e47d58abcdcbe98583a86b57a3483",
+      "bytes": 484,
+      "lines": 3
+    },
+    {
+      "path": "validation/import-20261024/stage4-live-pilot-debug-parser/report.json",
+      "sha256": "8ebc610be6cc9ec6777e88fd387f394a5369ef61f6242aebe19989a447b6e0c6",
+      "bytes": 1042,
+      "lines": 31
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-run.txt",
+      "sha256": "0425fd63d253db1d85a237b75fca258e3f2e90bb5c0f0de2e8250ef3979b728a",
+      "bytes": 93,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2-run.txt",
+      "sha256": "f8ba49e4e91d56298f00a84fa053d90203bbe720034a2cd48c1023766963b69e",
+      "bytes": 92,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/calibration.json",
+      "sha256": "e9db9d3b499afb60afe8ae40a5c9fbe5dd32f2e991dc391130725d188c8e7e83",
+      "bytes": 9359,
+      "lines": 116
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/host-config.json",
+      "sha256": "98f99dbfef68046c97a1a673f9c80b23a93e43a33798388f7a0706a0e33b9514",
+      "bytes": 887,
+      "lines": 15
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/oracle-targets.json",
+      "sha256": "9033327602b5f28e8979be17ac7748dd7ca1ef3fe41315fd14e1224d2b21acce",
+      "bytes": 613,
+      "lines": 14
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/sympy__sympy-21614-base-oracle.json",
+      "sha256": "0247c32e398975d3ca7decf7da3c8149cc9de8c5aba807c259fd112f4ae01397",
+      "bytes": 774,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/sympy__sympy-21614-base.log",
+      "sha256": "ab933738144f10f6a31263881ae496bcfe87e7a9eb3648d1702c90e3d6725e36",
+      "bytes": 1443
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/sympy__sympy-21614-gold-oracle.json",
+      "sha256": "02c4c150deecf9ac1a31a1a304d03e93f481399a8993f6976bb60617d01781c7",
+      "bytes": 773,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/sympy__sympy-21614-gold.log",
+      "sha256": "1afb9e2d7d6b996ba243bb8b065bce2d4745d54598950aecd8d682f92f9820ea",
+      "bytes": 685
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/sympy__sympy-21614-wrong-oracle.json",
+      "sha256": "0247c32e398975d3ca7decf7da3c8149cc9de8c5aba807c259fd112f4ae01397",
+      "bytes": 774,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/sympy__sympy-21614-wrong.log",
+      "sha256": "f0de1a5dddb9348ad4b5dfd724ff9c54d047fb62c977446b7e2b1b48e88e0235",
+      "bytes": 1585
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot-v2/wrong.patch",
+      "sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+      "bytes": 455,
+      "lines": 14
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/calibration.json",
+      "sha256": "2723add016b8ad3d586580c31134ef06bca3d6a7cd1afb351992aef3e80a1c49",
+      "bytes": 6269,
+      "lines": 92
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/oracle-targets.json",
+      "sha256": "9033327602b5f28e8979be17ac7748dd7ca1ef3fe41315fd14e1224d2b21acce",
+      "bytes": 613,
+      "lines": 14
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/sympy__sympy-21614-base-oracle.json",
+      "sha256": "d94f7d2f0f632c698c668e9c65712728646d4822a3c9ef9de2c9c5b8f6533549",
+      "bytes": 258,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/sympy__sympy-21614-base.log",
+      "sha256": "9c60e40c120b6e2a585e7b0f6548e0990e2d8b94d0d73d9b65799979d6bdfc8f",
+      "bytes": 855,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/sympy__sympy-21614-gold-oracle.json",
+      "sha256": "d94f7d2f0f632c698c668e9c65712728646d4822a3c9ef9de2c9c5b8f6533549",
+      "bytes": 258,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/sympy__sympy-21614-gold.log",
+      "sha256": "5dc8551b7a125622729ba8041fcb66742514a421f5a63f4a8ad810b9edfa2801",
+      "bytes": 855,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/sympy__sympy-21614-wrong-oracle.json",
+      "sha256": "d94f7d2f0f632c698c668e9c65712728646d4822a3c9ef9de2c9c5b8f6533549",
+      "bytes": 258,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/sympy__sympy-21614-wrong.log",
+      "sha256": "44e10e81a57b5f2094c58c805732b709263ce95c6fd838e69b09939ac2f039c9",
+      "bytes": 855,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/stage4-public-pilot/wrong.patch",
+      "sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+      "bytes": 455,
+      "lines": 14
+    },
+    {
+      "path": "validation/import-20261024/step24-final-focused.txt",
+      "sha256": "f91734d02de1ba125c30a4681e8446eb9c81eb2c0a081c86e1226b2f4d656156",
+      "bytes": 115,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/step24-final-lint.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/step24-fixture-recheck.txt",
+      "sha256": "9b3113404e29abc48cf935a32d97d776306b92c1f6410a36d1f9e73cd0641787",
+      "bytes": 115,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/step26-final-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/step26-final.txt",
+      "sha256": "d735c48b7cca0dc452fec5f4ecded23725ad2d15c5b7fccd662663fdc3e13c07",
+      "bytes": 112,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/step26-focused.txt",
+      "sha256": "dfadd6aee7ed26493171997217c107eb733e2ba0a20604e9c63accb19c51b18a",
+      "bytes": 112,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/step26-probe-help.txt",
+      "sha256": "418ebecd9d3a4470cb0d1a2b52f2a2e34914d83874a12fa272e6c4691612430b",
+      "bytes": 704,
+      "lines": 16
+    },
+    {
+      "path": "validation/import-20261024/step26-probe-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/step26-review-final-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/step26-review-final.txt",
+      "sha256": "624aacc8bd73638fb637c9be1fe7a46efcb2cb2a601a24305d0034454ba7c1a3",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/step26-review-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/step26-review.txt",
+      "sha256": "fdf62e1b5d458ed9d8ca0e6b3b39264370dfd9a2f98a863bbdf99066f0d1c256",
+      "bytes": 102,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/step26-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/import-20261024/tool-discovery-price-fixture.txt",
+      "sha256": "7487f309a610921396e007175350c27521948af848d64c4994de1cc9a9df1711",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/import-20261024/wheel-build.txt",
+      "sha256": "5c2a88b29d36fd3812cfea64ecee34a68693166621d5f5b1c4e1768b82474a6c",
+      "bytes": 675,
+      "lines": 9
+    },
+    {
+      "path": "validation/import-20261024/wheel-install-scope.json",
+      "sha256": "0aca3246e4ceb043e0a1ed99b4e1b19fe08510f86babc02c595163c3bce9e09b",
+      "bytes": 4772,
+      "lines": 251
+    },
+    {
+      "path": "validation/import-20261024/wheel-installed-smoke.txt",
+      "sha256": "39848efb55915692505a9fd596906f3bc67e560a669cabaaee42666fb88bb2e8",
+      "bytes": 856,
+      "lines": 13
+    },
+    {
       "path": "validation/pilot-calibration-local.json",
       "sha256": "3507b9eabbd1a3719386961ba60b8ed7e332fc327c01377e9f456906ee1388dc",
       "bytes": 5715,
@@ -25695,6 +28965,132 @@
       "path": "validation/step17-verification-final-windows.txt",
       "sha256": "702cc0839b6566ac0abac648a9cf25f121480738051d02a42c09009db300c266",
       "bytes": 113,
+      "lines": 2
+    },
+    {
+      "path": "validation/step23-integrations/composition-final-result.json",
+      "sha256": "4c2c9f066edf4e46c6f149c7a79d7b1fa93415374a17103785450ec817d96889",
+      "bytes": 6480,
+      "lines": 198
+    },
+    {
+      "path": "validation/step23-integrations/composition-final-run.txt",
+      "sha256": "783b9f2be1a6c7b0cd15ab7e99945c8a7685faa7d4844d22c8ae29c738cc8708",
+      "bytes": 6743,
+      "lines": 204
+    },
+    {
+      "path": "validation/step23-integrations/composition-ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/step23-integrations/composition-unit.txt",
+      "sha256": "6bd2bf70cd798f4a92d7a8c88a738094a0d62f0f3392653820a8f1624d669b88",
+      "bytes": 112,
+      "lines": 2
+    },
+    {
+      "path": "validation/step23-integrations/composition-v2-result.json",
+      "sha256": "7e317bf93d74bf32c1a4954a00ba6398fef722d24935d0696f369f981e8b3031",
+      "bytes": 352,
+      "lines": 9
+    },
+    {
+      "path": "validation/step23-integrations/composition-v2-run.txt",
+      "sha256": "5f3fd4edd8d021595dd07359fd93dcd84082a062bbf75509c18f74f4a84338c3",
+      "bytes": 354,
+      "lines": 9
+    },
+    {
+      "path": "validation/step23-integrations/composition-v3-result.json",
+      "sha256": "ca75c0f5d2a403a7ad322f23649c9a6663155c7b9a0a4baa30d36bbc95c91c8d",
+      "bytes": 959,
+      "lines": 30
+    },
+    {
+      "path": "validation/step23-integrations/composition-v3-run.txt",
+      "sha256": "856872d2abc52d2fb353c4a1b959d4c11c64c5e8531e87271985354eef2ef26f",
+      "bytes": 961,
+      "lines": 30
+    },
+    {
+      "path": "validation/step23-integrations/incremental-unit.txt",
+      "sha256": "0823a3386a208324b305f54fc6f485f5a05f8349c579be91780688525ab43862",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/step23-integrations/local-before-fixture-fix.txt",
+      "sha256": "3b002cabf69525aeff2c687faed2b790beb8a3e7ad6d175ca6eaa0fc4f81d752",
+      "bytes": 802,
+      "lines": 10
+    },
+    {
+      "path": "validation/step23-integrations/local-before-staged-fix.txt",
+      "sha256": "9c4e104efb9db20f8baed5c1e9b6f02d1995c2613e39935a5e263b0be8694b19",
+      "bytes": 886,
+      "lines": 10
+    },
+    {
+      "path": "validation/step23-integrations/local-before-uri-fix.txt",
+      "sha256": "6fea36eae005911c304d0a094246244667ea818413edf6604d41a26c54192bf5",
+      "bytes": 840,
+      "lines": 10
+    },
+    {
+      "path": "validation/step23-integrations/local-first-pass-before-call-counter.txt",
+      "sha256": "5a23a0771788656d018fcca66c1c1b4ce5d438e66e060035600d8fd437ee8770",
+      "bytes": 1729,
+      "lines": 60
+    },
+    {
+      "path": "validation/step23-integrations/local-pnpm-lock.yaml",
+      "sha256": "dfb4ec2bc931e25beef2aaa56c76e5192256df5a261d49c80ac104e2b0a02606",
+      "bytes": 3277,
+      "lines": 111
+    },
+    {
+      "path": "validation/step23-integrations/local-result.json",
+      "sha256": "998987712788fbbc413f8462c0e399eb87a25de47115019d48b9132b64b20f12",
+      "bytes": 1741,
+      "lines": 60
+    },
+    {
+      "path": "validation/step23-integrations/local-run.txt",
+      "sha256": "f047cf4c9b1821103f2c2f3a809b12ba2c99956f9d33706e8b0e40eaae9a6bbe",
+      "bytes": 1743,
+      "lines": 60
+    },
+    {
+      "path": "validation/step23-integrations/pylsp-package-metadata.txt",
+      "sha256": "922f98208d9f01785ac7fecb13082ceedbb2e181aed75cf2e8d8a1765ec69e0e",
+      "bytes": 10977,
+      "lines": 264
+    },
+    {
+      "path": "validation/step23-integrations/ruff-final.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/step23-integrations/ruff.txt",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "bytes": 20,
+      "lines": 1
+    },
+    {
+      "path": "validation/step23-integrations/staged-unit.txt",
+      "sha256": "e1df6cd736b8f1172b7985107e740c79bf8d91e17e2633bfc1587b24816e2d69",
+      "bytes": 100,
+      "lines": 2
+    },
+    {
+      "path": "validation/step23-integrations/staged-uri-unit.txt",
+      "sha256": "ee996adab2e08ffc3e84eba7c1a499694fff17e0ed6255eb024715b7a3a4d11f",
+      "bytes": 100,
       "lines": 2
     },
     {

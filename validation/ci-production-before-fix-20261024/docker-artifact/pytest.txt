@@ -1,0 +1,200 @@
+........................................................................ [  7%]
+.....sssss...FF......................................................... [ 14%]
+..................................................................Fs.... [ 22%]
+.........ssss..........s................................................ [ 29%]
+........................................................................ [ 36%]
+.s...................................................................... [ 44%]
+........................................................................ [ 51%]
+........................................................................ [ 59%]
+................................................s....................... [ 66%]
+........................................................................ [ 73%]
+........................................................................ [ 81%]
+.......................................................................F [ 88%]
+........................................................................ [ 96%]
+.......................................                                  [100%]
+=================================== FAILURES ===================================
+__ test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f082a316360>
+
+    def test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate(monkeypatch):
+        monkeypatch.setattr("atomic_flow.backends.anthropic.post_json", lambda *a, **kw: {
+            "content": [{"type": "text", "text": "{}"}], "usage": {
+                "input_tokens": 10, "output_tokens": 5, "cache_read_input_tokens": 80, "cache_creation_input_tokens": 20}})
+        result = AnthropicBackend(BackendConfig(price_in_per_mtok=1, price_out_per_mtok=1)).chat([])
+        assert result.tokens_in == 110 and result.cache_read_tokens == 80 and result.cache_write_tokens == 20
+>       assert result.cost_source == "configured_estimate"
+E       AssertionError: assert 'unpriced_cache_usage' == 'configured_estimate'
+E         
+E         - configured_estimate
+E         + unpriced_cache_usage
+
+tests/test_context_usage_batch.py:71: AssertionError
+____ test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies ____
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_usage_keeps_failed_call_a0')
+
+    def test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies(tmp_path):
+        class Backend:
+            config = BackendConfig(model="test", max_output_tokens=256)
+            name = "fake"
+            calls = 0
+    
+            def chat(self, *a, **kw):
+                self.calls += 1
+                if self.calls == 3:
+                    raise ValueError("private detail")
+                return ChatResult("{}", 20, 5, 0.001, cache_read_tokens=10, cost_source="provider")
+    
+        run = _Run(Backend(), PromptRegistry(tmp_path), SpendLedger(1), "query", None)
+        for content in ("system-1", "system-2"):
+>           run.chat([{"role": "system", "content": content}], "answerer")
+
+tests/test_context_usage_batch.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/atomic_flow/llm/orchestrator.py:306: in chat
+    return self._chat_attempt(messages, role, self.backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/atomic_flow/llm/orchestrator.py:311: in _chat_attempt
+    return self._chat_physical(messages, role, backend, state)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/atomic_flow/llm/orchestrator.py:347: in _chat_physical
+    self.ledger.reserve(call_id=ledger_id, backend=backend.name, model=backend.config.model,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <atomic_flow.budget.SpendLedger object at 0x7f08288a7dd0>
+fields = {'call_id': 'd064bc31af7347ea90322f0ae9ca567b_model_1', 'backend': 'fake', 'model': 'test', 'reserved_usd': 0.0, ...}
+
+    def reserve(self, **fields):
+        """Atomic admission across cooperating processes; holds persist after a crash."""
+        if self.limit > 0 and fields.get("prices_known") is False:
+>           raise BudgetExceeded("configure model prices before calls under a daily budget")
+E           atomic_flow.errors.BudgetExceeded: configure model prices before calls under a daily budget
+
+src/atomic_flow/budget.py:69: BudgetExceeded
+______ test_cancellation_after_model_response_does_not_execute_next_tool _______
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_cancellation_after_model_0')
+
+    def test_cancellation_after_model_response_does_not_execute_next_tool(tmp_path):
+        from conftest import ScriptedBackend
+    
+        from atomic_flow.agents.planner import Plan, PlanStep
+        from atomic_flow.agents.task import list_tasks
+        from atomic_flow.tree.builder import build_tree, save_tree
+    
+        (tmp_path / "a.py").write_text("def a():\n    return 1\n")
+        save_tree(tmp_path, build_tree(tmp_path))
+    
+        def stop_after_response(_):
+            request_cancel(list_tasks()[0].id)
+            return {"task_type": "modify", "focus_terms": ["a"]}
+    
+        backend = ScriptedBackend({"parser": stop_after_response})
+        task = TaskRunner(AtomicConfig(), tmp_path, backend).run_plan("update a", Plan(steps=[PlanStep(description="update a")]))
+>       assert task.status == "failed" and task.error == "cancelled by user"
+E       AssertionError: assert ('failed' == 'failed'
+E         
+E           failed and 'workspace ro...elled by user' == 'cancelled by user'
+E         
+E         - cancelled by user
+E         + workspace rollback failed: cancelled by user)
+
+tests/test_execution.py:152: AssertionError
+_______ test_native_catalog_activates_allowed_schema_before_factory_load _______
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_native_catalog_activates_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f082a0fbe60>
+
+    def test_native_catalog_activates_allowed_schema_before_factory_load(tmp_path, monkeypatch):
+        import json
+    
+        from atomic_flow.agents import tools
+        from atomic_flow.backends.openai_compatible import OpenAICompatibleBackend
+        from atomic_flow.config import AtomicConfig, BackendConfig
+        from atomic_flow.llm.orchestrator import Orchestrator
+        from atomic_flow.tree.builder import build_tree, save_tree
+    
+        (tmp_path / "a.py").write_text("def sample():\n    return 1\n")
+        save_tree(tmp_path, build_tree(tmp_path))
+        reg = tools.default_registry()
+        loaded = []
+        reg.register_lazy(Lazy.name, Lazy.description, Args, Lazy.contract, lambda: loaded.append(True) or Lazy())
+        monkeypatch.setattr(tools, "default_registry", lambda: reg)
+        monkeypatch.setitem(tools.ROLE_TOOLS, "answerer", [*tools.ROLE_TOOLS["answerer"], "lazy_read"])
+        bodies = []
+    
+        def request(endpoint, body, headers, **kwargs):
+            bodies.append(body)
+            if len(bodies) <= 2:
+                assert not loaded
+                names = {t["function"]["name"] for t in body["tools"]}
+                assert ("lazy_read" in names) == (len(bodies) == 2)
+                name, args = ("tool_catalog", {"query": "lazy_read", "include_schema": True}) if len(bodies) == 1 else ("lazy_read", {"value": 7})
+                message = {"content": None, "tool_calls": [{"id": f"native_{len(bodies)}", "type": "function",
+                           "function": {"name": name, "arguments": json.dumps(args)}}]}
+            else:
+                assert loaded == [True]
+                message = {"content": '{"text":"The value is 7"}'}
+            return {"choices": [{"message": message}], "usage": {"prompt_tokens": 10, "completion_tokens": 10, "cost_usd": 0}}
+    
+        monkeypatch.setattr("atomic_flow.backends.openai_compatible.post_json", request)
+        backend = OpenAICompatibleBackend(BackendConfig(type="openai-compatible", tool_protocol="native", max_output_tokens=256))
+        config = AtomicConfig()
+        config.experimental.native_tools = True
+>       answer = Orchestrator(config, tmp_path, backend, approval_callback=lambda *a: True).answer("sample", mode="simple")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_tool_discovery.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/atomic_flow/llm/orchestrator.py:710: in answer
+    result = self._answer(run, registry, req_id, query, retrieval_query or query, mode,
+src/atomic_flow/llm/orchestrator.py:880: in _answer
+    answer = run.invoke("answerer", Answer, data, context=evidence_context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/atomic_flow/llm/orchestrator.py:464: in invoke
+    return self._invoke_with_tools(role, schema, data, context, allowed)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/atomic_flow/llm/orchestrator.py:548: in _invoke_with_tools
+    response = self.chat(request, role)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/atomic_flow/llm/orchestrator.py:306: in chat
+    return self._chat_attempt(messages, role, self.backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/atomic_flow/llm/orchestrator.py:311: in _chat_attempt
+    return self._chat_physical(messages, role, backend, state)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/atomic_flow/llm/orchestrator.py:347: in _chat_physical
+    self.ledger.reserve(call_id=ledger_id, backend=backend.name, model=backend.config.model,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <atomic_flow.budget.SpendLedger object at 0x7f082874abd0>
+fields = {'call_id': 'req_7b46f594ce85_model_1', 'backend': 'openai-compatible', 'model': '', 'reserved_usd': 0.0, ...}
+
+    def reserve(self, **fields):
+        """Atomic admission across cooperating processes; holds persist after a crash."""
+        if self.limit > 0 and fields.get("prices_known") is False:
+>           raise BudgetExceeded("configure model prices before calls under a daily budget")
+E           atomic_flow.errors.BudgetExceeded: configure model prices before calls under a daily budget
+
+src/atomic_flow/budget.py:69: BudgetExceeded
+=============================== warnings summary ===============================
+tests/test_api_admission.py::test_oversized_and_malformed_chat_input_returns_4xx_never_500
+  /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_context_usage_batch.py::test_anthropic_input_counts_include_cache_but_cost_stays_labeled_estimate - AssertionError: assert 'unpriced_cache_usage' == 'configured_estimate'
+  
+  - configured_estimate
+  + unpriced_cache_usage
+FAILED tests/test_context_usage_batch.py::test_usage_keeps_failed_call_and_prefix_changes_without_message_bodies - atomic_flow.errors.BudgetExceeded: configure model prices before calls under a daily budget
+FAILED tests/test_execution.py::test_cancellation_after_model_response_does_not_execute_next_tool - AssertionError: assert ('failed' == 'failed'
+  
+    failed and 'workspace ro...elled by user' == 'cancelled by user'
+  
+  - cancelled by user
+  + workspace rollback failed: cancelled by user)
+FAILED tests/test_tool_discovery.py::test_native_catalog_activates_allowed_schema_before_factory_load - atomic_flow.errors.BudgetExceeded: configure model prices before calls under a daily budget
+4 failed, 958 passed, 13 skipped, 1 warning in 50.85s

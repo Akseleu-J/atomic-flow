@@ -22,7 +22,15 @@ from atomic_flow.agents.source import SourceConflict, confined_path, digest, rep
 from atomic_flow.config import user_dir
 from atomic_flow.durability import atomic_bytes, write_bytes
 from atomic_flow.execution_inputs import private_credential_path
-from atomic_flow.project_resources import ProjectLimits, ResourceLimitError, require_disk_space, source_files, stream_source
+from atomic_flow.project_resources import (
+    ProjectLimits,
+    ResourceLimitError,
+    require_disk_space,
+    require_workspace_paths,
+    source_files,
+    stream_source,
+    workspace_path_error,
+)
 from atomic_flow.source_lock import mutation_guard
 from atomic_flow.tree.defaults import DEFAULT_IGNORE
 
@@ -224,7 +232,14 @@ class ChangeSet:
         reserve += 1024 * 1024 + len(baseline) * 1024
         require_disk_space(user_dir(), reserve, limits)
         directory = user_dir() / "changesets" / ("change_" + uuid.uuid4().hex[:12])
-        directory.mkdir(parents=True)
+        require_workspace_paths(directory, baseline, limits)
+        try:
+            directory.mkdir(parents=True)
+        except OSError as exc:
+            hint = workspace_path_error(exc)
+            if hint is not None:
+                raise hint from exc
+            raise
         change = cls(project, directory, {"project": str(project), "status": "active", "baseline": baseline,
                                          "approved": [], "approved_hashes": {}, "changes": {},
                                          "backend": backend, "excluded": str(user_dir().resolve()),
@@ -244,9 +259,13 @@ class ChangeSet:
             change.check_original()
             change._validate_ownership()
             change._save()
-        except BaseException:
+        except BaseException as exc:
             change.state["status"] = "creation_failed"
             change._save()  # Keep partial workspace and creation evidence for explicit review.
+            if isinstance(exc, OSError):
+                hint = workspace_path_error(exc)
+                if hint is not None:
+                    raise hint from exc
             raise
         return change
 
@@ -388,6 +407,7 @@ class ChangeSet:
     def checkpoint(self) -> dict:
         folder = self.directory / "checkpoints" / uuid.uuid4().hex
         files = self.validate_workspace()
+        require_workspace_paths(self.directory, files, self.limits)
         sizes = {}
         if self._manifest(self.workspace, sizes=sizes) != files:
             raise ChangeSetConflict("workspace changed before checkpoint")
