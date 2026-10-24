@@ -1,0 +1,19 @@
+F......                                                                  [100%]
+================================== FAILURES ===================================
+_ test_retains_failed_unknown_zero_and_repeated_records_without_deduplication _
+
+tmp_path = WindowsPath('C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/pilot-evidence-audit-tests/test_retains_failed_unknown_ze0')
+
+    def test_retains_failed_unknown_zero_and_repeated_records_without_deduplication(tmp_path):
+        saved_run(tmp_path, "baseline", "baseline", [.1, .2], receipt=True)
+        saved_run(tmp_path, "atomic", "atomic", [.3, None])
+        saved_run(tmp_path, "environment", "baseline", [])
+        observed = audit_tool.audit(tmp_path)
+        assert not observed["inconsistencies"]
+>       assert observed["summary"]["calls_reported"] == observed["summary"]["attempt_records"] == 5
+E       assert 4 == 5
+
+tests\test_pilot_evidence_audit.py:46: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_pilot_evidence_audit.py::test_retains_failed_unknown_zero_and_repeated_records_without_deduplication
+1 failed, 6 passed in 6.47s

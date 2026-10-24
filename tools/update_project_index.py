@@ -20,6 +20,8 @@ def main() -> None:
     paths = list(tracked) + new_python
     entries = []
     for rel in sorted(filter(None, paths)):
+        if rel == "docs/project-index.json":
+            continue  # The generated inventory cannot hash its own future bytes.
         path = ROOT / rel
         if not path.is_file():
             continue
@@ -68,7 +70,7 @@ def main() -> None:
             modules[module] = rel
     missing = sorted({module for entry in entries for module in entry.get("imports", [])
                       if module.startswith("atomic_flow.") and module not in modules})
-    result = {"source_commit": revision, "scope": "tracked working-tree files plus new src/tests Python files; static AST, no imports",
+    result = {"source_commit": revision, "scope": "tracked working-tree files plus new src/tests Python files; excludes generated index itself; static AST, no imports",
               "untracked_python_files": new_python,
               "tracked_changes": subprocess.check_output(
                   ["git", "diff", "HEAD", "--name-only"], cwd=ROOT, text=True).splitlines(),

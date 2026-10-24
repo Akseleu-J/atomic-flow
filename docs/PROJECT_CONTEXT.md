@@ -1,64 +1,92 @@
 # atomic-flow — рабочая карта проекта
 
-Практические команды и порядок аутентификации GitHub описаны в [`GITHUB_WORKFLOW.md`](GITHUB_WORKFLOW.md).
+Обновлено 24 октября 2026 после независимой сверки исходников, CI и pilot evidence.
+Работать из этого репозитория `atomic-flow/`; внешний родитель — другой Git root.
+Ветка `experimental`, draft [PR №2](https://github.com/Akseleu-J/atomic-flow/pull/2),
+версия пакета `0.2.0`. Протокол доступа: [GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md).
 
-Обновлено **24 октября 2026**. Исходная база:
-`820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
-Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
-PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
-Пакеты 1–17 закоммичены; runtime `78f0df5c2abf18fc4b0035030a92178335134e04`.
-Последний runtime-коммит, подтверждённый Docker artifact, — `78f0df5c2abf18fc4b0035030a92178335134e04`.
-Первоначально анализировался `656c8158`; после публикации изменений из Codespace клон обновлён fast-forward.
-Источник: https://github.com/Akseleu-J/atomic-flow.git.
+## Текущий статус — читать первым
 
-## Актуальный статус и история пакетов
+Проверенная исходная точка этого review: `445f1b9f036111de0c2113884cc9eb65e78749e1`;
+на момент сверки `HEAD...origin/experimental` = `0 0`.
+Пакеты 18–25 и исправления пилота уже закоммичены. Это не незакоммиченный `8a18fbe`.
+После дальнейших runtime-изменений результаты CI этого SHA нельзя автоматически
+переносить на новое дерево; финальный tested SHA записывается в evidence manifest.
 
-24 октября (вечер): запушены коммиты `2399ebf` (потоковое чтение session journal
-и tail recovery без копирования всего файла), `d67579b` (усиление stage4-грейдера:
-symlink/submodule/binary-патчи запрещены, infrastructure_error у оценщика,
-`--candidate-patch` для независимой оценки, инструменты живого пилота) и
-`5dfa9f8` (Docker-free гайд установки и границ исполнения, пакет 25). Push CI на
-`5dfa9f8` зелёный: основной Docker-workflow, матрица wheel из 12 сочетаний
-ОС/Python и job реального pylsp/MCP staged task. Затем выполнен живой пилот
-на `sympy__sympy-21614` (Kaggle model proxy, аккаунт владельца, последовательно;
-~$0.036 из дневных $10; расход каждого прогона совпал с дельтой квоты):
-baseline дал правдоподобный, но неверный патч — независимый оракул
-`requirement_failed` (kind-деление → TypeError), atomic за 6 вызовов не завершил
-tool-протокол (пагинация не соблюдена, placeholder old_text, правки отклонены
-by design). Пилот нашёл и закрыл два реальных дефекта: отказ ```json-фенсов в
-`parse_patch` и CRLF-конвертацию клонов `checked_git` на Windows
-(`core.autocrlf=false` + байт-идентичность regression). Измерено: build_tree
-SymPy ≈179 c / 44 379 узлов, двойной rebuild в resume-пути, MAX_PATH на глубоких
-выходных каталогах (используйте короткий output-root). Полный разбор и evidence:
-`IMPLEMENTATION_STEP_24_EVALUATION.md` (Live public pilot) и
-`validation/import-20261024/stage4-live-pilot-*`. Остальные 29 задач корпуса,
-LSP/MCP composition acceptance (W6), нагрузочные W7 и W9 остаются открытыми.
+GitHub подтвердил два зелёных PR workflow для head `445f1b9`:
+[Project/container checks](https://github.com/Akseleu-J/atomic-flow/actions/runs/40088135253)
+и [External interoperability/installed release](https://github.com/Akseleu-J/atomic-flow/actions/runs/40088135306).
+PR job проверяет свой merge checkout: точный tested commit берётся из artifact,
+а не подменяется head SHA. Matrix: Windows 2022, macOS 14, Ubuntu 24.04 × Python
+3.11/3.12 × core/API; реальный pylsp/MCP и Docker проверяются отдельными jobs.
+Зелёный CI подтверждает эти сценарии, а не все критерии production readiness.
 
-24 октября: по прямому запросу пользователя проверена вторая рабочая копия
-`C:/Users/omirb/.zcode/workspace/7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8/atomic-flow`,
-source `c8820ff445b318c3fbf1c3cf76451ebe30a27774`. Её семь коммитов пакетов 18–21
-доступны как `refs/remotes/zcode/experimental`; выбранные src/tests/tools/CI и
-package docs перенесены в текущую working tree с дополнительными исправлениями.
-Git HEAD этой копии пока остаётся `8a18fbe`; это локальные незакоммиченные изменения,
-не новый подтверждённый CI commit. Исходная рабочая версия сохранена отдельно.
+Актуальный план и критерии выхода: [PRODUCTION_PLAN.md](PRODUCTION_PLAN.md).
+Независимая сверка отчёта: [REVIEW_PRODUCTION_2026-10-24.md](REVIEW_PRODUCTION_2026-10-24.md).
+Исторический аудит/исходный W1–W9: `audit-2026-10-23/PRODUCTION_PLAN.md`.
 
-Приняты source mutation leases, index generation CAS/limits, strict API admission,
-provider usage/routing, reconciliation, execution identity, Windows Job Object,
-staged capability factory и installed-wheel pipeline. Review дополнительно исправил
-cross-day ledger identity, reconciliation crash gap/amount/effect validation,
-free_only/non-sent quota/deadline/hidden retry issues, outer accounting,
-unsafe parent-only cleanup proof, Windows MCP/LSP ownership и два wheel CI blockers.
-Подробности/remaining gates: `IMPORT_REVIEW_2026-10-24.md` и три `IMPORT_*_REVIEW.md`.
+Приняты и дополнительно исправлены source leases/publication, index CAS/limits,
+API admission, provider usage/routing, durable reconciliation, owned Windows
+process jobs, staged capability factory и installed-wheel pipelines. Границы
+описаны в `IMPORT_REVIEW_2026-10-24.md` и трёх `IMPORT_*_REVIEW.md`.
+Локальные focused counts в этих документах пересекаются: их нельзя складывать.
+Другой checkout `.zcode/.../atomic-flow` остаётся на `c8820ff445b318c3fbf1c3cf76451ebe30a27774`;
+его результаты 850/33 не заменяют проверку нынешней версии.
 
-Новые focused results: routing/accounting **67 passed**; ledger/reconcile/task budget
-**43 passed**; execution/profiles/MCP **34 passed / 3 skipped**. При нагрузке LSP
-имел четыре initialize timeouts; повтор ровно этих cases **4 passed** без изменения
-deadlines. Parent checks и исходные failures отдельно описаны в import review;
-числа пересекаются и не складываются. Ruff changed files PASS. Local wheel собрана,
-её source bytes совпадают с текущей working tree. Logs: `validation/import-20261024/`.
-Заявленные source-копией 850/33 не являются проверкой этой итоговой версии.
-Model calls=0. Docker/live providers/полный suite не запускались; общий Stage 4,
-native sandbox, real external integration, scale и final release gates остаются открыты.
+## Что действительно показал живой пилот
+
+Одна открытая задача `sympy__sympy-21614`, fixed Gemini Flash Lite, только
+авторизованный аккаунт владельца №2, последовательные запросы. Все сохранённые
+попытки, включая parser debug: **23 физических вызова, $0.0364695 quota cost**.
+Atomic: шесть запусков, **19 вызовов / $0.030702175**; baseline: три основных
+запуска плюс debug, **4 вызова / $0.005767325**. Отдельный infrastructure failure
+с нулём вызовов сохранён; неизвестная стоимость такого отчёта не объявляется нулём.
+
+Доступные семь per-run quota snapshots согласуются с соответствующими расходами
+с погрешностью float. Для трёх платных ранних запусков snapshots отсутствуют;
+сумма всех reported costs согласуется с финальным дневным used, но это не
+полная независимая сверка каждого запуска.
+
+Baseline видел issue и ограниченный фрагмент Derivative (до 550 строк/32 KB),
+а не весь исходный файл. Его кандидат **requirement_failed**: деление kind
+вызывает TypeError уже на первой скалярной проверке; матричная проверка до этого
+не доходит. Atomic в финальном запуске за шесть вызовов не получил допустимую
+правку; read-before-edit/пагинация/точный old_text были сохранены. Принятого
+кандидата нет. Это отрицательный exposed development pilot, не matched comparison:
+между запусками менялись limits, исправлялась инфраструктура, task/gold уже известны.
+
+Base FAIL / gold PASS / plausible wrong FAIL калибровка одной задачи подтверждена.
+Остальные 29 исторических окружений не откалиброваны. Корпус 30 задач существует;
+полного 30-task/60-arm результата, blinded holdout и доказанного преимущества нет.
+Подробности: `IMPLEMENTATION_STEP_24_EVALUATION.md` и `validation/import-20261024/`.
+
+## Технические границы и ближайшая работа
+
+Реальный staged TaskRunner edit→checker→publish с pylsp/MCP уже проверен.
+Расширенный W6 локально прошёл три сценария: public prepare/review/approve/resume,
+Python+notebook edits→pytest→publish, cancel/conflict и recovery без новых calls.
+Точный script SHA и observed states: `validation/step23-integrations/composition-final-result.json`.
+W7 имеет bounded snapshot и потоковый journal read/recovery; append всё ещё
+перечитывает hash prefix, поэтому долгий session имеет квадратичную суммарную работу.
+Замена этого поведения должна сохранить проверку целостности и crash recovery.
+Измерение SymPy ~179 s не является p95/SLO и не доказывает, что оба rebuild лишние:
+workspace и опубликованный source требуют разных актуальных индексов.
+
+Core/CLI/SDK/API устанавливаются без Docker: `IMPLEMENTATION_STEP_25_DOCKER_FREE.md`.
+Trusted local/Windows Job Object отвечают за lifetime, не filesystem/network isolation.
+Для непроверенного выполнения нужен явно принятый sandbox/remote worker; silent
+local fallback запрещён. Полного native sandbox сейчас нет.
+
+Routing не обещает unlimited free API. Переключение допустимо лишь при подтверждённом
+отказе до inference/исчерпании разрешённого route; unknown outcome сохраняет hold.
+Аккаунты участников учитываются отдельно; account rotation для обхода ограничений
+не является fallback. Ключи только process-local, не в CI/ноутбуках/evidence.
+
+## История проверок до текущего review
+
+Далее сохранены датированные записи прошлых этапов. Слова «финальный», «текущий»,
+«не закоммичен», model_calls=0 и старые ограничения внутри них относятся к тому
+этапу и SHA; они не заменяют текущий статус выше и актуальный production plan.
 
 23 октября: пакет 17 — исправлены конкретные R01–R07 из critic pass:
 private-path execution exclusion, приватный snapshot для model checks вне TaskRunner,

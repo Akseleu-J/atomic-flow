@@ -1,0 +1,16 @@
+usage: index_reuse_probe.py [-h] --project PROJECT --expected-commit
+                            EXPECTED_COMMIT --output OUTPUT
+                            [--max-wall-seconds MAX_WALL_SECONDS]
+
+Measure one pinned, already checked-out source tree; no downloads or model
+calls. Never imports or executes target project code. Hashes source on both
+passes; reports one cold/warm sample, current RSS and Python allocation peaks,
+not SLOs. Use a trusted checkout and an explicit output file outside that
+checkout.
+
+options:
+  -h, --help            show this help message and exit
+  --project PROJECT
+  --expected-commit EXPECTED_COMMIT
+  --output OUTPUT
+  --max-wall-seconds MAX_WALL_SECONDS

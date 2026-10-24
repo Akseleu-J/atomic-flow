@@ -171,9 +171,11 @@ CI fixtures: **47 passed / 1 expensive synthetic round-trip deselected** in
 
 A bounded live pilot ran on `sympy__sympy-21614` with the fixed model
 `google/gemini-3.1-flash-lite-preview` through the Kaggle model proxy of the
-owner's account (sequential requests only; every run's reported cost matched
-the observed Kaggle quota delta exactly; total spend this day was about
-US$0.036 of the US$10 daily quota). Both arms ran on the same task with
+owner's account (sequential requests only). All saved run reports, including
+the parser-debug call, total 23 physical calls and US$0.0364695. Seven saved
+per-run quota snapshots agree within floating-point precision; three charged
+early runs lack snapshots. Aggregate reported spend agrees with final daily
+quota used; individual reconciliation is incomplete for those three runs. Both arms ran on the same task with
 per-run caps (calls, output tokens, wall seconds, reported cost stop);
 absolute per-arm limits are recorded inside each `report.json` and were NOT
 identical across retries — the atomic arm needed larger wall/input-estimate
@@ -182,9 +184,12 @@ development pilot, not a matched comparison.
 
 Findings, in order of discovery:
 
-1. **Parser strictness bug (fixed).** The baseline arm's first two runs
-   returned a valid patch wrapped in a ```json fence, which `parse_patch`
-   rejected (it accepted only ```diff or bare JSON). The tool now accepts any
+1. **Parser strictness bug (fixed).** Two early baseline runs failed parsing.
+   A preserved parser-debug response exposed a ```json fence, which `parse_patch`
+   rejected (it accepted only ```diff or bare JSON). The first failed response
+   has the same saved hash as this debug output; the second has no saved raw
+   response, so its precise cause and patch validity cannot be established.
+   The tool now accepts a supported
    single fenced block; regression tests cover json/diff/plain fences and
    scope/shape refusals. Raw model output that exposed this is preserved at
    `stage4-live-pilot-debug-parser/raw-response.txt`.
@@ -222,8 +227,8 @@ Results on this one development task:
 
 | Arm | Runs | Calls | Cost | Candidate | Independent grade |
 |---|---|---|---|---|---|
-| baseline (one direct completion, full source excerpt in prompt) | 3 (2 refused by the fence bug, 1 finished) | 1 | $0.0016 | plausible unified diff | **requirement_failed** — `kind` implemented via kind division raises `TypeError` on the matrix requirement; grader caught it exactly as the wrong-patch calibration predicted |
-| atomic (TaskRunner plan→review→approve→tool loop) | 6 (deadline, MAX_PATH, estimator caps ×2, protocol exhaustion) | 1–6 per run | $0.0108 final run | none — no accepted edit | not gradeable (no patch); all charges accounted, quota matched to the cent |
+| baseline (bounded Derivative excerpt) | 4 charged incl. parser debug; plus 1 zero-call env failure | 4 total; final 1 | $0.005767325 total; final $0.00156575 | one candidate | **requirement_failed**: kind division raises TypeError on the first scalar requirement before matrix assertions |
+| atomic (TaskRunner public plan/review/approve/tool loop) | 6 runs with changed caps | 19 total; final 6 | $0.030702175 total; final ~$0.0108 | no accepted edit | no candidate to grade; refusal before unverified source effects |
 
 This is a negative pilot result for model quality on this task with this
 small fixed model — and a positive validation of the harness: strict patch
@@ -233,3 +238,22 @@ value on easier tasks, with larger models, or across the other 29 corpus
 entries. Evidence: `validation/import-20261024/stage4-live-pilot-*` (each run
 directory contains `report.json`, `attempts.json`, `kaggle-quota.json` and,
 for the final atomic run, the preserved tool-loop artifacts).
+
+
+### Independent audit correction (24 October)
+
+The table above lists the final baseline candidate and final atomic run, not
+aggregate model consumption. Include failed generations and the parser-debug
+request in any cost comparison: baseline 4 calls / USD 0.005767325; atomic
+19 calls across six runs / USD 0.030702175. Combined 23 / USD 0.0364695.
+The zero-call environment failure remains present with an unknown monetary
+field; it is not silently converted into a successfully measured zero.
+Missing quota snapshots: first atomic run, baseline attempt 2, parser debug.
+Their reported costs sum to USD 0.003051575, matching the first saved quota
+before-value. This is consistency evidence, not replacement missing snapshots.
+
+The claim that both tree builds are redundant is withdrawn: staged and
+published-source revisions require separate index validation. Reuse may skip
+AST parsing only after fresh source-content verification, with cancellation
+and generation CAS retained. Full Stage 4 remains open; these corrections
+do not retroactively turn the development case into a blinded comparison.

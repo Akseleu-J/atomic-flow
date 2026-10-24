@@ -20,6 +20,25 @@ from atomic_flow.tree.node import TreeNode
 from atomic_flow.tree.references import collect_references
 
 TREE_VERSION = 4
+REFERENCE_FORMAT = "names-v1"
+
+
+def _periodic_cancel(cancel_check):
+    """Check immediately, then at most 128 bounded graph/cache operations apart.
+
+    Task cancellation may stat a durable signal. Calling it for every graph
+    node would turn one warm build into hundreds of thousands of filesystem IOs.
+    """
+    remaining = 0
+
+    def check():
+        nonlocal remaining
+        if remaining == 0:
+            cancel_check()
+            remaining = 127
+        else:
+            remaining -= 1
+    return check
 
 
 def node_id(path: str, symbol: str = "") -> str:
@@ -74,7 +93,7 @@ def _first_line(text: str | None, limit: int = 240) -> str:
 
 
 class _PythonVisitor(ast.NodeVisitor):
-    def __init__(self, rel: str, file_id: str):
+    def __init__(self, rel: str, file_id: str, cancel_check=lambda: None):
         self.rel, self.file_id = rel, file_id
         self.nodes: list[TreeNode] = []
         self.scope: list[str] = []
@@ -82,6 +101,14 @@ class _PythonVisitor(ast.NodeVisitor):
         self.call_stack: list[set[str]] = []
         self.imports: set[str] = set()
         self.seen: Counter[str] = Counter()
+        self.cancel_check = cancel_check
+        self.visited = 0
+
+    def visit(self, node):
+        self.visited += 1
+        if self.visited % 256 == 0:
+            self.cancel_check()
+        return super().visit(node)
 
     def visit_Import(self, node: ast.Import) -> None:
         self.imports.update(alias.name for alias in node.names)
@@ -137,7 +164,8 @@ class _PythonVisitor(ast.NodeVisitor):
         self.scope.pop()
 
 
-def _index_file(rel: str, source: str, digest: str, size: int, mtime_ns: int, is_python: bool) -> list[TreeNode]:
+def _index_file(rel: str, source: str, digest: str, size: int, mtime_ns: int, is_python: bool,
+                *, cancel_check=lambda: None) -> list[TreeNode]:
     lines = split_lines(source)
     file_node = TreeNode(node_id=node_id(rel), path=rel, kind="file", end_line=max(1, len(lines)),
                          content_hash=digest, size=size, mtime_ns=mtime_ns)
@@ -151,17 +179,20 @@ def _index_file(rel: str, source: str, digest: str, size: int, mtime_ns: int, is
         file_node.summary = "(unparseable Python file)"
         return [file_node]
     file_node.summary = redact(_first_line(ast.get_docstring(tree)))
-    visitor = _PythonVisitor(rel, file_node.node_id)
+    visitor = _PythonVisitor(rel, file_node.node_id, cancel_check)
     visitor.visit(tree)
     file_node.imports = sorted(visitor.imports)
     try:
+        cancel_check()
         references, aliases = collect_references(source)
     except (SyntaxError, ValueError, RecursionError):
         references, aliases = {}, {}
-    file_node.reference_ids = sorted({aliases.get(name, name) for name in references.get("", set())})
+    file_node.reference_names = sorted({aliases.get(name, name) for name in references.get("", set())})
+    check = _periodic_cancel(cancel_check)
     for item in visitor.nodes:
+        check()
         scope = item.symbol.rsplit(".", 1)[-1].split("#")[0]
-        item.reference_ids = sorted({aliases.get(name, name) for name in references.get(scope, set())})
+        item.reference_names = sorted({aliases.get(name, name) for name in references.get(scope, set())})
     return [file_node, *visitor.nodes]
 
 
@@ -178,20 +209,24 @@ def _module_keys(path: str) -> list[str]:
     return [".".join(parts[i:]) for i in range(len(parts))]
 
 
-def _link(nodes: list[TreeNode]) -> None:
+def _link(nodes: list[TreeNode], cancel_check=lambda: None) -> None:
     """Resolve raw call *names* into call-graph *edges* between nodes.
 
     A bare-name counter (what v0.1 did) makes ``get``/``run``/``append`` look like the most
     important functions in the project. Resolution order here: same file -> files this file
     imports -> a project-wide unique definition. Ambiguous names produce no edge.
     """
+    cancel_check = _periodic_cancel(cancel_check)
+    cancel_check()
     modules: dict[str, list[str]] = defaultdict(list)
     for n in nodes:
+        cancel_check()
         if n.kind == "file":
             for key in _module_keys(n.path):
                 modules[key].append(n.path)
     imported: dict[str, set[str]] = {}
     for n in nodes:
+        cancel_check()
         if n.kind == "file":
             targets: set[str] = set()
             for entry in n.imports:
@@ -202,16 +237,20 @@ def _link(nodes: list[TreeNode]) -> None:
             imported[n.path] = targets
     defs: dict[str, list[TreeNode]] = defaultdict(list)
     for n in nodes:
+        cancel_check()
         if n.kind in {"function", "class"}:
             defs[n.symbol.rsplit(".", 1)[-1].split("#")[0]].append(n)
     fan_in: Counter[str] = Counter()
     for n in nodes:
-        n.callees, n.reference_ids, n.fan_in, n.fan_out = [], n.reference_ids, 0, 0
+        cancel_check()
+        n.callees, n.reference_ids, n.fan_in, n.fan_out = [], [], 0, 0
     for n in nodes:
+        cancel_check()
         if n.kind not in {"function", "class"}:
             continue
         resolved: list[str] = []
         for name in n.calls:
+            cancel_check()
             candidates = defs.get(name, [])
             picked = [c for c in candidates if c.path == n.path]
             if not picked:
@@ -226,8 +265,10 @@ def _link(nodes: list[TreeNode]) -> None:
         n.fan_out = len(resolved)
         fan_in.update(resolved)
     for n in nodes:
+        cancel_check()
         resolved: list[str] = []
-        for name in n.reference_ids:
+        for name in n.reference_names:
+            cancel_check()
             candidates = defs.get(name, [])
             picked = [c for c in candidates if c.path == n.path]
             if not picked:
@@ -241,6 +282,7 @@ def _link(nodes: list[TreeNode]) -> None:
         n.reference_ids = resolved
         fan_in.update(resolved)
     for n in nodes:
+        cancel_check()
         n.fan_in = fan_in[n.node_id]
 
 
@@ -250,16 +292,28 @@ def _join(rel_dir: str, name: str) -> str:
     return name if rel_dir in {"", "."} else f"{rel_dir}/{name}"
 
 
-def _group_by_path(previous: dict | None) -> dict[str, list[TreeNode]]:
-    if not previous or previous.get("version") != TREE_VERSION:
+def _group_by_path(previous: dict | None, cancel_check=lambda: None) -> dict[str, list[TreeNode]]:
+    if (not previous or previous.get("version") != TREE_VERSION
+            or previous.get("reference_format") != REFERENCE_FORMAT):
         return {}
     grouped: dict[str, list[TreeNode]] = defaultdict(list)
-    for raw in previous.get("nodes", []):
+    invalid: set[str] = set()
+    cancel_check = _periodic_cancel(cancel_check)
+    records = previous.get("nodes", [])
+    if not isinstance(records, list):
+        return {}
+    for raw in records:
+        cancel_check()
+        if not isinstance(raw, dict) or not isinstance(raw.get("path"), str):
+            return {}  # Cannot identify the affected path; rebuild the advisory cache.
+        path = raw["path"]
         try:
-            grouped[raw["path"]].append(TreeNode.model_validate(raw))
+            grouped[path].append(TreeNode.model_validate(raw))
         except Exception:  # noqa: BLE001 - a corrupt record only costs a re-parse of that file
-            continue
-    return {path: items for path, items in grouped.items() if items and items[0].kind == "file"}
+            invalid.add(path)
+    return {path: items for path, items in grouped.items()
+            if path not in invalid and items and items[0].kind == "file"
+            and sum(item.kind == "file" for item in items) == 1}
 
 
 def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: dict | None = None,
@@ -268,6 +322,7 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
     """Index ``root``. With ``previous`` only files whose size/mtime/content changed are re-parsed."""
     root = Path(root).expanduser().resolve()
     limits = limits or ProjectLimits()
+    max_file_bytes = min(max_file_bytes, limits.max_file_bytes)
     cancel_check = cancel_check or (lambda: None)
     cancel_check()
     generation = _generation(root)
@@ -279,7 +334,7 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
     if root == private_root:
         raise TreeError("Refusing to index atomic_flow private state as project source.")
     skip = _Ignore(root, list(DEFAULT_IGNORE if ignore is None else ignore), respect_gitignore)
-    old = _group_by_path(previous)
+    old = _group_by_path(previous, cancel_check)
     per_file: dict[str, list[TreeNode]] = {}
     parsed = reused = total_bytes = admitted_files = node_count = skipped = 0
     for rel, path in source_files(root, skip, limits, cancel_check, private_root=private_root):
@@ -295,6 +350,8 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
             except OSError:
                 continue
             if stat.st_size > max_file_bytes:
+                if stat.st_size > limits.max_file_bytes:
+                    raise ResourceLimitError("indexed source per-file byte limit exceeded")
                 skipped += 1
                 continue
             cached = old.get(rel)
@@ -315,6 +372,8 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
                             break
                     data = b"".join(chunks)
                 if len(data) > max_file_bytes:
+                    if len(data) > limits.max_file_bytes:
+                        raise ResourceLimitError("indexed source per-file byte limit exceeded")
                     skipped += 1
                     continue
                 source = data.decode("utf-8-sig")
@@ -327,16 +386,18 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
                 per_file[rel] = cached
                 reused += 1
             else:
-                per_file[rel] = _index_file(rel, source, digest, stat.st_size, stat.st_mtime_ns, suffix in PYTHON_SUFFIXES)
+                per_file[rel] = _index_file(rel, source, digest, stat.st_size, stat.st_mtime_ns,
+                                            suffix in PYTHON_SUFFIXES, cancel_check=cancel_check)
                 parsed += 1
             node_count += len(per_file[rel])
             if node_count > limits.max_nodes:
                 raise ResourceLimitError("indexed node limit exceeded")
     cancel_check()
     nodes = [n.model_copy(deep=True) for items in per_file.values() for n in items]
-    _link(nodes)
+    _link(nodes, cancel_check)
     fingerprint = hashlib.sha1("\n".join(f"{n.path}:{n.content_hash}" for n in nodes if n.kind == "file").encode()).hexdigest()
-    return {"version": TREE_VERSION, "root": root.name, "files": len(per_file), "fingerprint": fingerprint,
+    return {"version": TREE_VERSION, "reference_format": REFERENCE_FORMAT,
+            "root": root.name, "files": len(per_file), "fingerprint": fingerprint,
             "_base_generation": generation,
             "stats": {"parsed": parsed, "reused": reused, "skipped": skipped, "read_bytes": total_bytes},
             "nodes": [n.model_dump() for n in nodes]}
@@ -421,7 +482,9 @@ def refresh_tree(root: str | Path, ignore: list[str] | None = None, *, respect_g
     previous = load_tree(root)
     tree = build_tree(root, ignore, previous=previous, respect_gitignore=respect_gitignore,
                       limits=limits, cancel_check=cancel_check)
-    changed = tree["fingerprint"] != previous.get("fingerprint")
+    changed = (tree["fingerprint"] != previous.get("fingerprint")
+               or tree["reference_format"] != previous.get("reference_format")
+               or tree["nodes"] != previous.get("nodes"))
     if changed and save:
         save_tree(root, tree)
     return tree, changed

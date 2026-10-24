@@ -32,3 +32,11 @@ artifacts/colab/
 colab-results/
 colab-results.zip
 .local-tools/
+
+# Temporary probe workspaces; compact logs/reports are tracked separately.
+/.test-*/
+/runtime-probe-*/
+/docs/audit-2026-10-23/quality-probe-workspace/
+/docs/audit-2026-10-23/runtime-evidence-*/
+/validation/import-20261024/*.whl
+/validation/import-20261024/stage4-live-pilot-atomic-attempt2/atomic-state/

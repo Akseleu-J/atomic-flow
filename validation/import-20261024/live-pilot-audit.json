@@ -1,0 +1,636 @@
+{
+  "version": 1,
+  "audit_kind": "offline_saved_pilot_evidence",
+  "generated_at_utc": "2026-10-24T13:52:19.824694+00:00",
+  "root": "C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\validation\\import-20261024",
+  "tolerance_usd": 1e-09,
+  "producer_sha256": "db50e4bc8cd33aff9efd248aff69e95825998dc24533900c9eff69f5e0b568eb",
+  "model_calls_made_by_audit": 0,
+  "candidate_execution": false,
+  "model_quality_measured": false,
+  "runs": [
+    {
+      "run": "stage4-live-pilot-atomic",
+      "arm": "atomic",
+      "status": "failed",
+      "task_status": "failed",
+      "error_type": null,
+      "calls_reported": 1,
+      "cost_reported_usd": 0.00040375,
+      "cost_complete": true,
+      "wall_seconds": 122.40600000019185,
+      "attempt_records": 1,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.00040375,
+      "quota_receipt": false,
+      "quota_comparisons": [],
+      "attempt_status_counts": {
+        "response": 1
+      },
+      "request_outcome_counts": {
+        "completed": 1
+      }
+    },
+    {
+      "run": "stage4-live-pilot-atomic-attempt2",
+      "arm": "atomic",
+      "status": "failed",
+      "task_status": "failed",
+      "error_type": null,
+      "calls_reported": 1,
+      "cost_reported_usd": 0.0004015,
+      "cost_complete": true,
+      "wall_seconds": 160.09400000004098,
+      "attempt_records": 1,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.0004015,
+      "quota_receipt": true,
+      "quota_comparisons": [
+        {
+          "period": "ModelProxyQuotaRefillPeriod.DAILY",
+          "before_used": 0.006171074999999249,
+          "after_used": 0.006572574999999858,
+          "allowed_after": 10,
+          "delta_usd": 0.0004015000000006097,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 6.097010916972234e-16
+        },
+        {
+          "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+          "before_used": 7.992508549999997,
+          "after_used": 7.992910050000006,
+          "allowed_after": 100,
+          "delta_usd": 0.0004015000000094915,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 9.491485288698476e-15
+        }
+      ],
+      "attempt_status_counts": {
+        "response": 1
+      },
+      "request_outcome_counts": {
+        "completed": 1
+      },
+      "credential_label": "owner-account-2",
+      "quota_utc": "2026-10-24T09:32:50.612073+00:00"
+    },
+    {
+      "run": "stage4-live-pilot-atomic-attempt3",
+      "arm": "atomic",
+      "status": "failed",
+      "task_status": "failed",
+      "error_type": null,
+      "calls_reported": 3,
+      "cost_reported_usd": 0.00472575,
+      "cost_complete": true,
+      "wall_seconds": 973.4840000001714,
+      "attempt_records": 3,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.00472575,
+      "quota_receipt": true,
+      "quota_comparisons": [
+        {
+          "period": "ModelProxyQuotaRefillPeriod.DAILY",
+          "before_used": 0.006572574999999858,
+          "after_used": 0.011298325000000276,
+          "allowed_after": 10,
+          "delta_usd": 0.004725750000000417,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 4.172009959724221e-16
+        },
+        {
+          "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+          "before_used": 7.992910050000006,
+          "after_used": 7.997635799999998,
+          "allowed_after": 100,
+          "delta_usd": 0.004725749999991535,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 8.46458320102883e-15
+        }
+      ],
+      "attempt_status_counts": {
+        "response": 3
+      },
+      "request_outcome_counts": {
+        "completed": 3
+      },
+      "credential_label": "owner-account-2",
+      "quota_utc": "2026-10-24T09:37:03.501013+00:00"
+    },
+    {
+      "run": "stage4-live-pilot-atomic-attempt4",
+      "arm": "atomic",
+      "status": "failed",
+      "task_status": "failed",
+      "error_type": null,
+      "calls_reported": 4,
+      "cost_reported_usd": 0.006044674999999999,
+      "cost_complete": true,
+      "wall_seconds": 560.5469999997877,
+      "attempt_records": 4,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.006044674999999999,
+      "quota_receipt": true,
+      "quota_comparisons": [
+        {
+          "period": "ModelProxyQuotaRefillPeriod.DAILY",
+          "before_used": 0.011298325000000276,
+          "after_used": 0.01734300000000033,
+          "allowed_after": 10,
+          "delta_usd": 0.006044675000000055,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 5.551115123125783e-17
+        },
+        {
+          "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+          "before_used": 7.997635799999998,
+          "after_used": 8.003680474999996,
+          "allowed_after": 100,
+          "delta_usd": 0.0060446749999982785,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 1.7208456881689926e-15
+        }
+      ],
+      "attempt_status_counts": {
+        "response": 4
+      },
+      "request_outcome_counts": {
+        "completed": 4
+      },
+      "credential_label": "owner-account-2",
+      "quota_utc": "2026-10-24T09:56:16.182909+00:00"
+    },
+    {
+      "run": "stage4-live-pilot-atomic-attempt5",
+      "arm": "atomic",
+      "status": "failed",
+      "task_status": "failed",
+      "error_type": null,
+      "calls_reported": 4,
+      "cost_reported_usd": 0.008312925,
+      "cost_complete": true,
+      "wall_seconds": 422.25,
+      "attempt_records": 4,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.008312925,
+      "quota_receipt": true,
+      "quota_comparisons": [
+        {
+          "period": "ModelProxyQuotaRefillPeriod.DAILY",
+          "before_used": 0.01734300000000033,
+          "after_used": 0.02565592500000058,
+          "allowed_after": 10,
+          "delta_usd": 0.008312925000000249,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 2.480654570646834e-16
+        },
+        {
+          "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+          "before_used": 8.003680474999996,
+          "after_used": 8.011993399999994,
+          "allowed_after": 100,
+          "delta_usd": 0.008312924999998472,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 1.528291382335567e-15
+        }
+      ],
+      "attempt_status_counts": {
+        "response": 4
+      },
+      "request_outcome_counts": {
+        "completed": 4
+      },
+      "credential_label": "owner-account-2",
+      "quota_utc": "2026-10-24T10:28:24.742518+00:00"
+    },
+    {
+      "run": "stage4-live-pilot-atomic-attempt6",
+      "arm": "atomic",
+      "status": "failed",
+      "task_status": "paused",
+      "error_type": null,
+      "calls_reported": 6,
+      "cost_reported_usd": 0.010813575,
+      "cost_complete": true,
+      "wall_seconds": 701.4060000001919,
+      "attempt_records": 6,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.010813575,
+      "quota_receipt": true,
+      "quota_comparisons": [
+        {
+          "period": "ModelProxyQuotaRefillPeriod.DAILY",
+          "before_used": 0.02565592500000058,
+          "after_used": 0.03646950000000082,
+          "allowed_after": 10,
+          "delta_usd": 0.010813575000000242,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 2.411265631607762e-16
+        },
+        {
+          "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+          "before_used": 8.011993399999994,
+          "after_used": 8.022806974999995,
+          "allowed_after": 100,
+          "delta_usd": 0.010813575000000242,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 2.411265631607762e-16
+        }
+      ],
+      "attempt_status_counts": {
+        "response": 6
+      },
+      "request_outcome_counts": {
+        "completed": 6
+      },
+      "credential_label": "owner-account-2",
+      "quota_utc": "2026-10-24T10:39:20.373886+00:00"
+    },
+    {
+      "run": "stage4-live-pilot-baseline",
+      "arm": "baseline",
+      "status": "failed",
+      "task_status": null,
+      "error_type": "ValueError",
+      "calls_reported": 1,
+      "cost_reported_usd": 0.00155375,
+      "cost_complete": true,
+      "wall_seconds": 13.343999999808148,
+      "attempt_records": 1,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.00155375,
+      "quota_receipt": true,
+      "quota_comparisons": [
+        {
+          "period": "ModelProxyQuotaRefillPeriod.DAILY",
+          "before_used": 0.003051575000000639,
+          "after_used": 0.0046053249999999935,
+          "allowed_after": 10,
+          "delta_usd": 0.0015537499999993543,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 6.457508139323664e-16
+        },
+        {
+          "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+          "before_used": 7.98938905,
+          "after_used": 7.990942799999999,
+          "allowed_after": 100,
+          "delta_usd": 0.0015537499999993543,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 6.457508139323664e-16
+        }
+      ],
+      "attempt_status_counts": {
+        "response": 1
+      },
+      "request_outcome_counts": {
+        "completed": 1
+      },
+      "credential_label": "owner-account-2",
+      "quota_utc": "2026-10-24T09:13:17.073768+00:00"
+    },
+    {
+      "run": "stage4-live-pilot-baseline-attempt2",
+      "arm": "baseline",
+      "status": "failed",
+      "task_status": null,
+      "error_type": "ValueError",
+      "calls_reported": 1,
+      "cost_reported_usd": 0.001094075,
+      "cost_complete": true,
+      "wall_seconds": 12.281999999890104,
+      "attempt_records": 1,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.001094075,
+      "quota_receipt": false,
+      "quota_comparisons": [],
+      "attempt_status_counts": {
+        "response": 1
+      },
+      "request_outcome_counts": {
+        "completed": 1
+      }
+    },
+    {
+      "run": "stage4-live-pilot-baseline-attempt3",
+      "arm": "baseline",
+      "status": "finished",
+      "task_status": "finished",
+      "error_type": null,
+      "calls_reported": 1,
+      "cost_reported_usd": 0.00156575,
+      "cost_complete": true,
+      "wall_seconds": 11.327999999979511,
+      "attempt_records": 1,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.00156575,
+      "quota_receipt": true,
+      "quota_comparisons": [
+        {
+          "period": "ModelProxyQuotaRefillPeriod.DAILY",
+          "before_used": 0.0046053249999999935,
+          "after_used": 0.006171074999999249,
+          "allowed_after": 10,
+          "delta_usd": 0.0015657499999992552,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 7.448468924975415e-16
+        },
+        {
+          "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+          "before_used": 7.990942799999999,
+          "after_used": 7.992508549999997,
+          "allowed_after": 100,
+          "delta_usd": 0.0015657499999974789,
+          "matches_reported_cost": true,
+          "absolute_error_usd": 2.521203731897792e-15
+        }
+      ],
+      "attempt_status_counts": {
+        "response": 1
+      },
+      "request_outcome_counts": {
+        "completed": 1
+      },
+      "candidate_sha256": "54c5e29844729c2ecca2a1c45ab8b57bfa71595db59dfc0654207a59626c22cc",
+      "credential_label": "owner-account-2",
+      "quota_utc": "2026-10-24T09:31:59.847466+00:00"
+    },
+    {
+      "run": "stage4-live-pilot-baseline-env-failures",
+      "arm": "baseline",
+      "status": "failed",
+      "task_status": null,
+      "error_type": "FileNotFoundError",
+      "calls_reported": 0,
+      "cost_reported_usd": null,
+      "cost_complete": false,
+      "wall_seconds": 0.04600000008940697,
+      "attempt_records": null,
+      "unknown_charge_records": null,
+      "known_cost_lower_bound_usd": 0,
+      "quota_receipt": false,
+      "quota_comparisons": []
+    },
+    {
+      "run": "stage4-live-pilot-debug-parser",
+      "arm": "baseline",
+      "status": "failed",
+      "task_status": null,
+      "error_type": "ValueError",
+      "calls_reported": 1,
+      "cost_reported_usd": 0.00155375,
+      "cost_complete": true,
+      "wall_seconds": 10.969000000040978,
+      "attempt_records": 1,
+      "unknown_charge_records": 0,
+      "known_cost_lower_bound_usd": 0.00155375,
+      "quota_receipt": false,
+      "quota_comparisons": [],
+      "attempt_status_counts": {
+        "response": 1
+      },
+      "request_outcome_counts": {
+        "completed": 1
+      }
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "stage4-live-pilot-atomic/report.json",
+      "bytes": 1188,
+      "sha256": "fc3ab9e7383707abcd95cf70823a4c486f42deea24748fbcb6de8becb802883c"
+    },
+    {
+      "path": "stage4-live-pilot-atomic/attempts.json",
+      "bytes": 489,
+      "sha256": "852bd7644f0a118ff7a5ef8a9391e5a39297de9ba5e3efd07f38b949434ce3f7"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt2/report.json",
+      "bytes": 1186,
+      "sha256": "09fced27b663b75709b2320cda5bbcb9fcd8cac6533486fd6313efe8dbca99dd"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt2/attempts.json",
+      "bytes": 489,
+      "sha256": "76b4d927bcbe18ad5826b2a401b4bb41d20a2756ce68811b6068b3b64ed658b9"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt2/kaggle-quota.json",
+      "bytes": 731,
+      "sha256": "cd970f9d280dda7de332631ee0714586f6e5c893f917c93a74a2316f111b1364"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt3/report.json",
+      "bytes": 1189,
+      "sha256": "3791f4aeaaa30dd2b76314b5f4732a41720652a074cf7bc80bea2bec000395fe"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt3/attempts.json",
+      "bytes": 1462,
+      "sha256": "9d948310a87d04cf8d34732c7740f462081336491ebeb014b513b93bcdec25a7"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt3/kaggle-quota.json",
+      "bytes": 731,
+      "sha256": "26c83d814befc73c38005be7594be8e06fa03bd9ad7d88a56dda522259e0783a"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt4/report.json",
+      "bytes": 1210,
+      "sha256": "706e15c8ef2d7677e267b94c07097154b430bdfb457ead2eec9070fb39cbaa75"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt4/attempts.json",
+      "bytes": 1938,
+      "sha256": "bb8317496a02580816de89b6bfec62aea81968f8fcd3ec24950856e950cb1e70"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt4/kaggle-quota.json",
+      "bytes": 730,
+      "sha256": "c5969b428fd9fb8559a97ee8c00d6914c37e379f9014b38c09c3deca6bad38c0"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt5/report.json",
+      "bytes": 1182,
+      "sha256": "52341c0192f80032898d96f1b433373f11774e0a6138addbab8c3aba4fb99063"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt5/attempts.json",
+      "bytes": 1955,
+      "sha256": "37c4e546c983c994a47bfe00f476b110979834c82e28c1bd648799920d0f9f1c"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt5/kaggle-quota.json",
+      "bytes": 729,
+      "sha256": "178f7caa7cf34d4e0cddba176391b1177c726f814db8f5de29d3f49846785401"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt6/report.json",
+      "bytes": 1193,
+      "sha256": "b5b7cbd731fcb9784120aec1b46733957888e3628d5a880880a264f9921517fb"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt6/attempts.json",
+      "bytes": 2932,
+      "sha256": "768ce4d4a41d22b453932b561c5f8c91323f9e731c8f7ff4d205fbf6f3853c45"
+    },
+    {
+      "path": "stage4-live-pilot-atomic-attempt6/kaggle-quota.json",
+      "bytes": 729,
+      "sha256": "be4c1cb88d50f3020bc940b99195cb08ba58c615a12d32b6b9d220dca582aa3f"
+    },
+    {
+      "path": "stage4-live-pilot-baseline/report.json",
+      "bytes": 1042,
+      "sha256": "740ef1b73232a8ce55f56a8bed5f299b50bfe291c65608d54a167b3da27334fe"
+    },
+    {
+      "path": "stage4-live-pilot-baseline/attempts.json",
+      "bytes": 492,
+      "sha256": "f0d0f0b2f72700521c4196ebf786cf442b8513b1af70ebffebe46880c08ee57c"
+    },
+    {
+      "path": "stage4-live-pilot-baseline/kaggle-quota.json",
+      "bytes": 725,
+      "sha256": "89ea0c6921e32151bbd7fb558fcef82ed0eccada53911afaffeb1c977ebd9859"
+    },
+    {
+      "path": "stage4-live-pilot-baseline-attempt2/report.json",
+      "bytes": 1044,
+      "sha256": "f0d9ca13f9672f4028f5352aaabb237f7bc2f05aa47abde17e83b7fca9764982"
+    },
+    {
+      "path": "stage4-live-pilot-baseline-attempt2/attempts.json",
+      "bytes": 492,
+      "sha256": "57eb15a5f256d7f0a29f39a6288ee9ab27b5238c47fa8f71dcdf197fc8ea3959"
+    },
+    {
+      "path": "stage4-live-pilot-baseline-attempt3/report.json",
+      "bytes": 1144,
+      "sha256": "c65096293f7e9a4155f4e2293e00dedde2a49aa8f915271d9bd9e73499c44ac4"
+    },
+    {
+      "path": "stage4-live-pilot-baseline-attempt3/attempts.json",
+      "bytes": 492,
+      "sha256": "dc8a80d5f92aae2b54133b0feec3d23f82646a71aef4e732e4a04c116274e39d"
+    },
+    {
+      "path": "stage4-live-pilot-baseline-attempt3/candidate.patch",
+      "bytes": 416,
+      "sha256": "54c5e29844729c2ecca2a1c45ab8b57bfa71595db59dfc0654207a59626c22cc"
+    },
+    {
+      "path": "stage4-live-pilot-baseline-attempt3/kaggle-quota.json",
+      "bytes": 734,
+      "sha256": "c2e3ce4336bc329a50c3dff17924ea9de4aea4366699b08afcae734cc5e69cea"
+    },
+    {
+      "path": "stage4-live-pilot-baseline-env-failures/report.json",
+      "bytes": 1037,
+      "sha256": "d8d2f9583fd477f8dce7212e32b1e8fe1093be4ba0d71274cd19fc8ac410c17e"
+    },
+    {
+      "path": "stage4-live-pilot-debug-parser/report.json",
+      "bytes": 1042,
+      "sha256": "8ebc610be6cc9ec6777e88fd387f394a5369ef61f6242aebe19989a447b6e0c6"
+    },
+    {
+      "path": "stage4-live-pilot-debug-parser/attempts.json",
+      "bytes": 492,
+      "sha256": "92e66a44f396bffb705f264d45fa7e074e3f1446b9b343cf77946932fd10c42f"
+    }
+  ],
+  "inconsistencies": [],
+  "warnings": [
+    {
+      "run": "stage4-live-pilot-atomic",
+      "code": "missing_kaggle-quota_json"
+    },
+    {
+      "run": "stage4-live-pilot-baseline-attempt2",
+      "code": "missing_kaggle-quota_json"
+    },
+    {
+      "run": "stage4-live-pilot-baseline-env-failures",
+      "code": "missing_attempts_json"
+    },
+    {
+      "run": "stage4-live-pilot-baseline-env-failures",
+      "code": "missing_kaggle-quota_json"
+    },
+    {
+      "run": "stage4-live-pilot-debug-parser",
+      "code": "missing_kaggle-quota_json"
+    }
+  ],
+  "by_arm": {
+    "atomic": {
+      "runs": 6,
+      "calls_reported": 19,
+      "attempt_records": 19,
+      "zero_call_runs": 0,
+      "incomplete_cost_runs": 0,
+      "known_cost_lower_bound_usd": 0.030702175,
+      "status_counts": {
+        "failed": 6
+      }
+    },
+    "baseline": {
+      "runs": 5,
+      "calls_reported": 4,
+      "attempt_records": 4,
+      "zero_call_runs": 1,
+      "incomplete_cost_runs": 1,
+      "known_cost_lower_bound_usd": 0.005767325,
+      "status_counts": {
+        "failed": 4,
+        "finished": 1
+      }
+    }
+  },
+  "summary": {
+    "runs": 11,
+    "calls_reported": 23,
+    "attempt_records": 23,
+    "known_cost_lower_bound_usd": 0.0364695,
+    "incomplete_cost_runs": 1,
+    "zero_call_runs": 1,
+    "inconsistencies": 0,
+    "warnings": 5
+  },
+  "quota_coverage": {
+    "receipts": 7,
+    "missing_runs": [
+      "stage4-live-pilot-atomic",
+      "stage4-live-pilot-baseline-attempt2",
+      "stage4-live-pilot-baseline-env-failures",
+      "stage4-live-pilot-debug-parser"
+    ],
+    "missing_charged_runs": [
+      "stage4-live-pilot-atomic",
+      "stage4-live-pilot-baseline-attempt2",
+      "stage4-live-pilot-debug-parser"
+    ],
+    "all_runs_have_receipts": false,
+    "max_observed_absolute_error_usd": 9.491485288698476e-15
+  },
+  "repeated_fingerprints": [
+    {
+      "request_sha256": "8373271e2bcab9d3347a87464082b0cb09835e20a4fbd428c765089800d7b9b6",
+      "response_sha256": "46a34d03b518001d99f216d9386d8962ddbedd5de676d3e15474a4891ee8604d",
+      "records": 2
+    },
+    {
+      "request_sha256": "8977f4b399ece78e946eeb66fe013f0894b6234ddd589a612b7ae1cc70e4903f",
+      "response_sha256": "ca4e86a6e6a194c15444b4934f4ee0ca9e07218856d4c970b6447b1dd57db441",
+      "records": 2
+    },
+    {
+      "request_sha256": "cd962b7ac200c3f4b862bc40079874eb5ec228ba44947f82eefe39abf51dfec9",
+      "response_sha256": "3469b29bc67f54c6a387de9a9817cbc34e0016125812ad8344c13e7a4159d37b",
+      "records": 2
+    }
+  ],
+  "interpretation": "Saved records are retained without deduplication. Missing receipts and unknown charges are not known zero. A quota match does not prove absence of other account activity or provider billing guarantees."
+}
