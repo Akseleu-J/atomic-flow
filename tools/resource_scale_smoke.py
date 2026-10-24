@@ -133,11 +133,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--work-root", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--cases", nargs="+", choices=("small", "medium", "large"),
+                        default=["small", "medium", "large"])
     args = parser.parse_args()
     args.work_root.mkdir(parents=True, exist_ok=True)
     result = {"schema_version": 1, "model_calls": 0, "synthetic": True,
               "journal_quadratic_work_fixed": False, "cases": []}
-    for label, count in (("small", 16), ("medium", 64), ("large", 256)):
+    for label in dict.fromkeys(args.cases):
+        count = {"small": 16, "medium": 64, "large": 256}[label]
         result["cases"].append(measure(args.work_root.resolve(), label, count))
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

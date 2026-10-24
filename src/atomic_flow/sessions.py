@@ -266,22 +266,45 @@ class SessionJournal:
     def read(self) -> SessionSnapshot:
         if self.path.stat().st_size > MAX_SESSION_BYTES:
             raise StateError("session exceeds 64 MiB; inspect it offline")
-        raw = self.path.read_bytes()
-        complete_end = raw.rfind(b"\n") + 1
-        events = []
-        for sequence, line in enumerate(raw[:complete_end].splitlines(), 1):
-            if len(line) + 1 > MAX_EVENT_BYTES:
-                raise StateError(f"session event {sequence} exceeds size limit")
-            try:
-                event = json.loads(line)
-                self._validate_event(event, sequence)
-            except (ValueError, TypeError, UnicodeError, KeyError, AttributeError) as exc:
-                raise StateError(f"invalid committed session event {sequence}; unsupported schema or corrupt data: update atomic-flow or restore known-good journal, do not replay actions") from exc
-            events.append(event)
+        events, total, complete_end, tail_bytes = [], 0, 0, 0
+        fingerprint = hashlib.sha256()
+
+        def admitted_read(handle):
+            nonlocal total
+            line = handle.readline(MAX_EVENT_BYTES + 1)
+            total += len(line)
+            if total > MAX_SESSION_BYTES:
+                raise StateError("session exceeds 64 MiB; inspect it offline")
+            return line
+
+        with self.path.open("rb") as handle:
+            while line := admitted_read(handle):
+                sequence = len(events) + 1
+                if not line.endswith(b"\n"):
+                    # A long malformed *unterminated* tail is still uncommitted.
+                    # Scan in bounded blocks to distinguish it from an oversized
+                    # committed event without loading the entire tail in memory.
+                    tail_bytes = len(line)
+                    while len(line) == MAX_EVENT_BYTES + 1:
+                        line = admitted_read(handle)
+                        if line.endswith(b"\n"):
+                            raise StateError(f"session event {sequence} exceeds size limit")
+                        tail_bytes += len(line)
+                    break
+                if len(line) > MAX_EVENT_BYTES:
+                    raise StateError(f"session event {sequence} exceeds size limit")
+                try:
+                    event = json.loads(line)
+                    self._validate_event(event, sequence)
+                except (ValueError, TypeError, UnicodeError, KeyError, AttributeError) as exc:
+                    raise StateError(f"invalid committed session event {sequence}; unsupported schema or corrupt data: update atomic-flow or restore known-good journal, do not replay actions") from exc
+                events.append(event)
+                fingerprint.update(line)
+                complete_end += len(line)
         if not events or events[0]["event_type"] != "session_created":
             raise StateError("session has no committed creation event")
-        self._validated = (len(events), complete_end, hashlib.sha256(raw[:complete_end]))
-        return SessionSnapshot(self.session_id, events, complete_end != len(raw), len(raw) - complete_end)
+        self._validated = (len(events), complete_end, fingerprint)
+        return SessionSnapshot(self.session_id, events, bool(tail_bytes), tail_bytes)
 
     def _validate_event(self, event: dict, sequence: int):
         if not isinstance(event, dict):
@@ -308,23 +331,33 @@ class SessionJournal:
             snapshot = self.read()
             if not snapshot.incomplete_tail:
                 return None
-            raw = self.path.read_bytes()
-            split = len(raw) - snapshot.tail_bytes
+            sequence, split, fingerprint = self._validated
             backup = self.path.with_suffix(f".interrupted-{uuid.uuid4().hex}.tail")
-            with backup.open("xb") as handle:
-                handle.write(raw[split:])
-                handle.flush()
-                os.fsync(handle.fileno())
+            with self.path.open("rb") as source, backup.open("xb") as target:
+                source.seek(split)
+                remaining = snapshot.tail_bytes
+                while remaining:
+                    block = source.read(min(MAX_EVENT_BYTES, remaining))
+                    if not block:
+                        raise StateError("session tail changed during recovery; inspect preserved backup")
+                    target.write(block)
+                    remaining -= len(block)
+                if source.read(1):
+                    raise StateError("session tail changed during recovery; inspect preserved backup")
+                target.flush()
+                os.fsync(target.fileno())
             with self.path.open("r+b") as handle:
                 handle.truncate(split)
                 handle.flush()
                 os.fsync(handle.fileno())
-            event = self._event(len(snapshot.events) + 1, "tail_recovered", {"discarded_bytes": snapshot.tail_bytes, "backup": backup.name})
+            event = self._event(sequence + 1, "tail_recovered", {"discarded_bytes": snapshot.tail_bytes, "backup": backup.name})
+            encoded = _encode(event)
             with self.path.open("ab") as handle:
-                handle.write(_encode(event))
+                handle.write(encoded)
                 handle.flush()
                 os.fsync(handle.fileno())
-            self._validated = None
+            fingerprint.update(encoded)
+            self._validated = (sequence + 1, split + len(encoded), fingerprint)
             return backup
 
     def export(self, path: Path) -> Path:

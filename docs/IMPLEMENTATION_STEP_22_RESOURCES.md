@@ -91,3 +91,60 @@ refuse an oversized historical workspace until an explicitly reviewed host limit
 is used; no partial publication is allowed to bypass the limits.
 The envelope bounds source/Python buffers and inventory output, not the Git
 child's OS memory usage; an OS memory quota for trusted Git is not implemented.
+
+## Journal follow-up: preserve integrity, bound copies, retain the append gate
+
+Investigation confirmed that a portable shortcut based only on file size/mtime,
+the last record, or a sidecar head digest cannot prove that an earlier byte in a
+mutable JSONL prefix has not changed. Segments marked read-only by the same user
+do not supply an immutable storage boundary. A SQLite or segmented redesign alone
+would move, rather than preserve, the current old-byte tamper-before-append check.
+No such shortcut or implicit format migration was introduced.
+
+The existing 256 KiB event and 64 MiB session caps are retained. A new event-count
+cap was deliberately not added: without reserving observation space before a
+provider/tool request, it could deny the terminal/unknown-effect record after the
+external operation had already occurred. Byte admission is finite, but it is not
+a journal latency SLO or a guarantee of post-effect observation capacity.
+
+The accepted narrow improvement streams `read()` with at most `MAX_EVENT_BYTES+1`
+bytes per input block instead of allocating the whole file, a second prefix slice,
+and split-line copies. A malformed unterminated tail remains uncommitted even when
+it exceeds the per-event cap; a newline-terminated oversized event still fails
+closed. The total byte cap is rechecked while reading, preventing concurrent file
+growth from bypassing the initial stat check. The returned decoded snapshot still
+contains the complete event list and consumes memory proportional to that list.
+
+`recover_tail()` performs the full streaming validation once, then seeks directly
+to the uncommitted tail and streams only those bytes to the fsynced backup. It no
+longer rereads/copies the entire file to extract the tail. Truncation and recovery
+observation remain explicit and leased; pending/unknown calls are never replayed.
+The validated prefix fingerprint is updated with the recovery event, so the next
+append still verifies all prior bytes. Old same-size tampering, restored mtime,
+foreign writer extensions, expected-sequence conflicts and process leases retain
+their existing checks.
+
+Focused final evidence: `session-streaming-final-with-counters.txt` **28 passed /
+4 deselected in 7.01 seconds**, `session-streaming-final-with-counters-ruff.txt`
+PASS. An instrumented regression confirms exact recovery reads equal one full
+validation plus one tail-only backup copy. The earlier focused run had 27 passed
+before this additional counter test. The initial run had 26 passed and one new
+test expecting only `interrupted tail`; the existing append path correctly reports
+`size limit` for a huge unterminated tail. Only the fixture expectation was widened;
+the raw initial log is retained. The excluded tests concern job GC/workers, which
+are outside this change. A small synthetic remeasurement is retained separately
+in `session-streaming-small-scale.json`; it explicitly reports that quadratic
+append work is **not fixed**. Its 16-event journal still reread **37,240 bytes**;
+the snapshot took 0.570 s with a 339,580-byte Python allocation peak. Host load
+differs from the earlier run, so these timings are not a claimed speedup.
+
+A future canonical-store design needs explicit versioning and crash-safe legacy
+migration, append transactions with sequence/head conflict checks, a persisted
+digest chain, bounded reads, durable tail/uncertainty handling, and an integrity
+boundary that detects old-page changes without silently trusting mutable cached
+bytes. Acceptance must include arbitrary same-size old-record changes with restored
+mtime, prefix truncation/replacement, corrupted metadata, concurrent writers,
+crashes around each commit phase, reconciliation, and reserved capacity for terminal
+observations. Until these pass under a stated storage threat contract, full-prefix
+rehashing remains the portable append behavior and its quadratic total byte work
+remains an open production scaling barrier.
