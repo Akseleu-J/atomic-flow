@@ -28,6 +28,7 @@ from atomic_flow.agents.execution import clean_environment
 from atomic_flow.agents.source import SourceConflict, digest
 from atomic_flow.agents.tools.file_paths import admitted_path
 from atomic_flow.config import user_dir
+from atomic_flow.source_lock import mutation_guard
 
 MAX_FRAME_BYTES = 2 * 1024 * 1024
 MAX_DOCUMENT_BYTES = 512 * 1024
@@ -64,6 +65,7 @@ def _transaction_storage(project: Path) -> Path:
     return storage
 
 
+@mutation_guard("project")
 def recover_lsp_edit(project: Path, edit_id: str, *, approved: bool = False) -> dict:
     """Explicit compare-before-restore of an interrupted local rename transaction.
 
@@ -202,6 +204,8 @@ class LSPClient:
         self._request_id = 0
         self._process = None
         self._home = None
+        self._owned_job = None
+        self._cleanup_unknown = False
         self._closed = False
 
     def __enter__(self):
@@ -286,7 +290,13 @@ class LSPClient:
             self.cancel_check()
             self._home = tempfile.TemporaryDirectory(prefix="atomic-lsp-")
             try:
-                self._process = subprocess.Popen(list(self.command), cwd=self.project,
+                spawn = subprocess.Popen
+                if os.name == "nt":
+                    from atomic_flow.windows_job import WindowsJob
+
+                    self._owned_job = WindowsJob()
+                    spawn = self._owned_job.spawn
+                self._process = spawn(list(self.command), cwd=self.project,
                     env=clean_environment(Path(self._home.name)), stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=0,
                     start_new_session=os.name != "nt",
@@ -303,7 +313,10 @@ class LSPClient:
                     raise LSPError("server did not negotiate UTF-16 positions")
                 sync = capabilities.get("textDocumentSync", 0)
                 sync_kind = sync.get("change", 0) if isinstance(sync, dict) else sync
-                if sync_kind != 1 or (isinstance(sync, dict) and not sync.get("openClose")):
+                # LSP ContentChangeEvent permits text-only whole-document
+                # replacement for incremental servers too. Keep sending complete
+                # versioned text; never synthesize partial ranges from stale data.
+                if sync_kind not in (1, 2) or (isinstance(sync, dict) and not sync.get("openClose")):
                     raise LSPError("server must support full open/change document synchronization")
                 self._notify("initialized", {})
                 return self
@@ -422,6 +435,14 @@ class LSPClient:
         self._closed = True
         self._failure.set()
         proc = self._process
+        if self._owned_job is not None:
+            try:
+                self._owned_job.terminate()
+            except OSError:
+                self._cleanup_unknown = True
+            finally:
+                self._owned_job.close()
+                self._owned_job = None
         if proc is not None:
             # The exact owned process is terminated; this is not a sandbox or a
             # guarantee about detached descendants created by trusted host code.
@@ -436,10 +457,14 @@ class LSPClient:
                     stream.close()
         if self._home:
             self._home.cleanup()
+        if self._cleanup_unknown:
+            raise LSPError("Windows process-tree cleanup could not be confirmed; effects remain unknown")
 
     def close(self):
         with self._serial:
             if self._closed:
+                if self._cleanup_unknown:
+                    raise LSPError("Windows process-tree cleanup could not be confirmed; effects remain unknown")
                 return
             try:
                 if self._process is not None:
@@ -645,6 +670,7 @@ class LSPClient:
         self._previews[preview.digest] = preview
         return preview
 
+    @mutation_guard("project")
     def apply_preview(self, preview: EditPreview, *, approved: bool = False,
                       expected_digest: str | None = None, context=None) -> dict:
         """Explicit recoverable multi-path apply, current complete read required.

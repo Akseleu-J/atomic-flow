@@ -12,6 +12,7 @@ from atomic_flow.agents.execution import TaskCancelled, checked_workspace, run_p
 from atomic_flow.agents.source import SourceConflict, SourcePreconditionFailed, digest, read_checked
 from atomic_flow.agents.tools.file_paths import admitted_path, text_bytes
 from atomic_flow.agents.verify import _matching_tests, verify_edit
+from atomic_flow.source_lock import mutation_guard
 
 
 class FileArgs(BaseModel):
@@ -55,6 +56,7 @@ def _read(ctx, path: str, expected_hash: str) -> bytes:
     return data
 
 
+@mutation_guard("ctx")
 def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None], *, after_modes=None) -> dict[str, Any]:
     if not ctx.edits_enabled:
         return {"error": "edits disabled"}
@@ -90,7 +92,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
         removed_tests = sorted({test for path, data in after.items() if data is None
                                 for test in _matching_tests(ctx.project_root, path)} - tested)
         if removed_tests:
-            with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace) as check_root:
+            with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
                 result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *removed_tests], check_root,
                                     config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
             checks.append("pytest")

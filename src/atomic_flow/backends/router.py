@@ -31,6 +31,11 @@ def resolve_backend_name(config: AtomicConfig, name: str = "auto") -> str:
 
 
 def make_backend(config: AtomicConfig, name: str = "auto", model: str | None = None) -> LLMBackend:
+    if name == "auto" and config.routing.mode != "fixed":
+        from atomic_flow.backends.routing import RoutingBackend
+        if model is not None or not config.routing.routes or "auto" in config.routing.routes:
+            raise ConfigurationError("routing requires named routes and no model override")
+        return RoutingBackend([make_backend(config, route) for route in config.routing.routes], config.routing, config.conversation)
     resolved = resolve_backend_name(config, name)
     entry = config.backends.get(resolved)
     kind = (entry.type if entry and entry.type else None) or ("kaggle" if resolved == "kaggle" else "openai-compatible")

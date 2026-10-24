@@ -12,6 +12,8 @@ import uuid
 from pathlib import Path
 
 from atomic_flow.agents.source import SourceConflict, confined_path, digest, replace_checked
+from atomic_flow.durability import atomic_bytes, write_bytes
+from atomic_flow.source_lock import mutation_guard
 
 
 def _current(root: Path, rel: str) -> str | None:
@@ -32,9 +34,7 @@ def _write(root: Path, rel: str, data: bytes | None, expected: str | None):
 
 def _save(folder: Path, state: dict):
     target = folder / "file-transaction.json"
-    temp = target.with_suffix(".json.tmp")
-    temp.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
-    temp.replace(target)
+    atomic_bytes(target, (json.dumps(state, indent=2) + "\n").encode("utf-8"))
 
 
 def begin(storage: Path, root: Path, before: dict[str, bytes | None], after: dict[str, bytes | None]) -> tuple[str, dict]:
@@ -51,7 +51,7 @@ def begin(storage: Path, root: Path, before: dict[str, bytes | None], after: dic
             raise SourceConflict(f"source changed before transaction: {rel}")
         backup = f"before-{index}"
         if data is not None:
-            (folder / backup).write_bytes(data)
+            write_bytes(folder / backup, data)
         changes[rel] = {"before": expected, "after": digest(after[rel]) if after[rel] is not None else None, "backup": backup,
                         "before_mode": stat.S_IMODE(confined_path(root, rel).stat().st_mode) if data is not None else None}
     state = {"edit_id": edit_id, "project": str(root.resolve()), "timestamp": time.time(),
@@ -60,6 +60,7 @@ def begin(storage: Path, root: Path, before: dict[str, bytes | None], after: dic
     return edit_id, state
 
 
+@mutation_guard("root")
 def apply(storage: Path, root: Path, edit_id: str, state: dict, after: dict[str, bytes | None], cancel_check,
           after_modes: dict[str, int] | None = None):
     for rel, data in after.items():
@@ -76,6 +77,7 @@ def finish(storage: Path, edit_id: str, state: dict):
     _save(storage / edit_id, state)
 
 
+@mutation_guard("root")
 def undo(storage: Path, root: Path, edit_id: str, *, interrupted: bool = False) -> dict | None:
     """Undo own bytes, preserving third-party versions. Supports interrupted writes."""
     if not re.fullmatch(r"fileedit_[a-f0-9]{12}", edit_id):

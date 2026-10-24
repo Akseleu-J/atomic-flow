@@ -1,0 +1,7 @@
+# Development-only tools; runtime dependencies remain in pyproject.toml.
+# Exact primary versions. Transitive resolution/freeze is retained per CI run;
+# this file alone is not a hash-complete transitive lock.
+build==1.3.0
+pytest==8.4.2
+httpx==0.28.1
+python-lsp-server==1.15.0

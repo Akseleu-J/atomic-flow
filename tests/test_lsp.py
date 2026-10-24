@@ -35,7 +35,7 @@ def test_command_requires_explicit_host_authority(project):
         LSPClient(project, ["python"], approved=True)
 
 
-@pytest.mark.parametrize("mode", ["normal", "fragmented", "unsolicited"])
+@pytest.mark.parametrize("mode", ["normal", "fragmented", "unsolicited", "incremental"])
 def test_definitions_references_diagnostics_and_shutdown(project, mode):
     with client(project, mode) as peer:
         doc = peer.read_document("a.py")

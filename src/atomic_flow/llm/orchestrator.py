@@ -298,13 +298,32 @@ class _Run:
         return False
 
     def chat(self, messages: list[dict[str, str]], role: str) -> ChatResult:
+        from atomic_flow.backends.routing import RoutingBackend
+        if isinstance(self.backend, RoutingBackend):
+            return self.backend.run_attempts(lambda selected: self._chat_attempt(messages, role, selected),
+                                             messages, check=self.cancel_check,
+                                             tools=self.native_schemas_by_role.get(role) if self.native_enabled else None)
+        return self._chat_attempt(messages, role, self.backend)
+
+    def _chat_attempt(self, messages, role, backend):
+        state = {"outcome": "not_sent"}
+        try:
+            return self._chat_physical(messages, role, backend, state)
+        except BaseException as exc:
+            if not hasattr(exc, "request_outcome"):
+                exc.request_outcome = state["outcome"]
+            if state["outcome"] == "completed" and "response" in state and not hasattr(exc, "usage_result"):
+                exc.usage_result = state["response"]
+            raise
+
+    def _chat_physical(self, messages, role, backend, call_state):
         if self.ledger.limit > 0 and any(row.get("cost_usd") is None for row in self.usage_calls):
             raise BudgetExceeded("unresolved model cost; automatic follow-up calls are blocked")
         self.call_sequence += 1
         call_id = f"model_{self.call_sequence}"
         tools = self.native_schemas_by_role.get(role) if self.native_enabled else None
         self.event("model_request", {"role": role, "messages": messages, **({"tools": tools} if tools else {})}, call_id=call_id)
-        prefix = json.dumps({"model": self.backend.config.model, "system": [m for m in messages if m["role"] == "system"],
+        prefix = json.dumps({"model": backend.config.model, "system": [m for m in messages if m["role"] == "system"],
                              "tools": tools},
                             sort_keys=True, ensure_ascii=False, separators=(",", ":"))
         fingerprint = hashlib.sha256(prefix.encode()).hexdigest()
@@ -312,16 +331,20 @@ class _Run:
                  "system_prefix_sha256": fingerprint,
                  "system_prefix_changed": role in self.prompt_prefixes and self.prompt_prefixes[role] != fingerprint}
         self.prompt_prefixes[role] = fingerprint
+        usage.update(backend=backend.name, model=backend.config.model)
+        if hasattr(backend, "route_attempt_id"):
+            usage.update(attempt_id=backend.route_attempt_id, logical_call_id=backend.logical_call_id,
+                         quota_scope=backend.quota_scope)
         self.usage_calls.append(usage)
-        managed = not getattr(self.backend, "accounts_spend", False)
+        managed = not getattr(backend, "accounts_spend", False)
         ledger_id = self.ledger_prefix + "_" + call_id
-        prices = (self.backend.config.price_in_per_mtok, self.backend.config.price_out_per_mtok)
+        prices = (backend.config.price_in_per_mtok, backend.config.price_out_per_mtok)
         known_prices = all(p is not None and math.isfinite(p) and p >= 0 for p in prices)
         allowance = len(json.dumps({"messages": messages, "tools": tools}, ensure_ascii=False).encode()) + 512 * len(messages) + 1024
-        reservation = (allowance * prices[0] + (self.backend.config.max_output_tokens or 4096) * prices[1]) / 1e6 if known_prices else 0.0
+        reservation = (allowance * prices[0] + (backend.config.max_output_tokens or 4096) * prices[1]) / 1e6 if known_prices else 0.0
         try:
             if managed:
-                self.ledger.reserve(call_id=ledger_id, backend=self.backend.name, model=self.backend.config.model,
+                self.ledger.reserve(call_id=ledger_id, backend=backend.name, model=backend.config.model,
                                     reserved_usd=reservation, prices_known=known_prices)
         except Exception:
             usage.update(status="not_sent", cost_usd=0.0)
@@ -329,9 +352,18 @@ class _Run:
             raise
         try:
             from atomic_flow.backends.cancellation import cancellation_scope
+            response_error = None
             with cancellation_scope(self.cancel_check):
-                response = (self.backend.chat_tools(messages, tools=tools) if tools
-                            else self.backend.chat(messages, json_mode=True))
+                try:
+                    call_state["outcome"] = "unknown"
+                    response = (backend.chat_tools(messages, tools=tools) if tools
+                                else backend.chat(messages, json_mode=True))
+                except Exception as exc:
+                    if not isinstance(getattr(exc, "usage_result", None), ChatResult):
+                        raise
+                    response, response_error = exc.usage_result, exc
+                call_state["outcome"] = "completed"
+                call_state["response"] = response
         except Exception as exc:
             outcome = getattr(exc, "request_outcome", "unknown")
             known_zero = outcome in {"not_sent", "refused"}
@@ -346,12 +378,12 @@ class _Run:
                        call_id=call_id, outcome=outcome)
             raise
         # Account before optional transcript I/O: a persistence error cannot erase spend.
-        if response.cost_usd is not None and (not isinstance(response.cost_usd, (int, float))
+        if response.cost_usd is not None and (type(response.cost_usd) not in (int, float)
                                               or not math.isfinite(response.cost_usd) or response.cost_usd < 0):
             response.cost_usd = None
         self._account(response)
         if managed:
-            self.ledger.record(call_id=ledger_id, backend=self.backend.name, model=self.backend.config.model,
+            self.ledger.record(call_id=ledger_id, backend=backend.name, model=backend.config.model,
                                cost_usd=response.cost_usd, reserved_usd=reservation,
                                tokens_in=response.tokens_in, tokens_out=response.tokens_out,
                                status="completed" if response.cost_usd is not None else "unknown")
@@ -363,6 +395,11 @@ class _Run:
                    "tokens_in": response.tokens_in, "tokens_out": response.tokens_out,
                    "cost_usd": response.cost_usd, "tool_calls": [call.wire() for call in response.tool_calls]},
                    call_id=call_id, outcome="success")
+        if managed and self.ledger.limit > 0:
+            if response.cost_usd is None:
+                raise BudgetExceeded("unresolved model cost; stopped before tool effects")
+            if response.cost_usd > reservation:
+                raise BudgetExceeded("received model cost exceeded its reservation; stopped before tool effects")
         if self.tool_ctx is not None and role == "answerer":
             for item in self.context_reads:
                 if item.get("source_complete") and item.get("content_hash") == self.tool_ctx.file_hashes.get(item["path"]):
@@ -371,6 +408,8 @@ class _Run:
                     self.tool_ctx.record_read(item["path"], item["content_hash"], "materialized", 0, size, size,
                                               node_id=node.node_id if node and node.kind != "file" else None,
                                               source_complete=True)
+        if response_error is not None:
+            raise response_error
         return response
 
     def usage_report(self) -> dict:
@@ -703,7 +742,8 @@ class Orchestrator:
         if self.config.tree.auto_refresh:
             with project_lock(self.project):
                 tree, changed = refresh_tree(self.project, self.config.tree.ignore,
-                                             respect_gitignore=self.config.tree.respect_gitignore)
+                                             respect_gitignore=self.config.tree.respect_gitignore,
+                                             cancel_check=self.cancel_check)
             if changed:
                 log.info("Project index refreshed before answering.")
         nodes = [TreeNode.model_validate(item) for item in tree.get("nodes", [])]

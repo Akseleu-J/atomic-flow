@@ -12,12 +12,18 @@ import re
 import shutil
 import stat
 import subprocess
+import threading
 import uuid
+from dataclasses import asdict
+from io import BytesIO
 from pathlib import Path
 
 from atomic_flow.agents.source import SourceConflict, confined_path, digest, replace_checked
 from atomic_flow.config import user_dir
+from atomic_flow.durability import atomic_bytes, write_bytes
 from atomic_flow.execution_inputs import private_credential_path
+from atomic_flow.project_resources import ProjectLimits, ResourceLimitError, require_disk_space, source_files, stream_source
+from atomic_flow.source_lock import mutation_guard
 from atomic_flow.tree.defaults import DEFAULT_IGNORE
 
 
@@ -28,7 +34,7 @@ class ChangeSetConflict(SourceConflict):
 _UNSPECIFIED_HASH = object()
 
 
-def _git(directory: Path, *args: str, data: bytes | None = None) -> bytes:
+def _git(directory: Path, *args: str, data: bytes | None = None, output_limit: int | None = None) -> bytes:
     """Only built-in plumbing, no user environment, global config, hooks or filters."""
     engine = shutil.which("git")
     if engine is None:
@@ -44,6 +50,39 @@ def _git(directory: Path, *args: str, data: bytes | None = None) -> bytes:
                "-c", "protocol.file.allow=never", "-c", "maintenance.auto=false",
                "-c", "gc.auto=0", *args]
     try:
+        if output_limit is not None:
+            if data is not None:
+                raise ChangeSetConflict("bounded Git inventory does not accept input")
+            with subprocess.Popen(command, cwd=directory, env=env, stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as process:
+                result_bytes = []
+                read_errors = []
+
+                def receive():
+                    try:
+                        result_bytes.append(process.stdout.read(output_limit + 1))
+                        if len(result_bytes[0]) > output_limit:
+                            process.kill()
+                    except OSError as exc:
+                        read_errors.append(exc)
+
+                reader = threading.Thread(target=receive, daemon=True)
+                reader.start()
+                try:
+                    process.wait(timeout=30)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+                    raise
+                finally:
+                    reader.join(timeout=1)
+                if reader.is_alive() or read_errors or not result_bytes:
+                    raise ChangeSetConflict("Git inventory unavailable")
+                if len(result_bytes[0]) > output_limit:
+                    raise ResourceLimitError("Git source inventory output limit exceeded")
+                if process.returncode:
+                    raise ChangeSetConflict("Git workspace operation failed")
+                return result_bytes[0]
         result = subprocess.run(command, cwd=directory, env=env, input=data,
                                 capture_output=True, timeout=30, check=False)
     except (OSError, subprocess.TimeoutExpired) as exc:
@@ -60,12 +99,14 @@ def _plain_path(path: Path):
             raise ChangeSetConflict("workspace ownership path contains a link")
 
 
-def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str]) -> str:
+def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str], limits: ProjectLimits,
+                   cancel_check) -> str:
     """Create a private snapshot commit without checkout, Git attributes or source config."""
     tree: dict = {}
     for rel, expected in manifest.items():
+        cancel_check()
         source = confined_path(workspace, rel)
-        data = source.read_bytes()
+        data = _bounded_bytes(source, limits, cancel_check)
         if digest(data) != expected:
             raise ChangeSetConflict(f"workspace changed while snapshotting: {rel}")
         blob = _git(metadata.parent, "--git-dir=" + str(metadata), "hash-object", "-w", "--stdin", data=data).strip()
@@ -77,8 +118,10 @@ def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str]) ->
         node[parts[-1]] = (mode, blob)
 
     def store(node):
+        cancel_check()
         records = []
         for name, value in sorted(node.items()):
+            cancel_check()
             if isinstance(value, dict):
                 mode, kind, oid = b"040000", b"tree", store(value)
             else:
@@ -91,69 +134,109 @@ def _snapshot_tree(metadata: Path, workspace: Path, manifest: dict[str, str]) ->
                 "-m", "Managed source snapshot; no original Git history or credentials").decode().strip()
 
 
-def _files(root: Path, excluded: Path | None = None) -> dict[str, str]:
-    files = {}
-    def ignored(name):
-        return any(fnmatch.fnmatch(name, pattern) for pattern in DEFAULT_IGNORE)
-    for current, dirs, names in os.walk(root, followlinks=False):
-        folder = Path(current)
-        dirs[:] = sorted(name for name in dirs if not ignored(name)
-                         and not private_credential_path((folder / name).relative_to(root).as_posix())
-                         and (not name.startswith(".") or name == ".github")
-                         and (excluded is None or (folder / name).resolve() != excluded))
-        for name in sorted(names):
-            if ignored(name):
-                continue
-            if name.startswith(".") and name not in {".gitignore", ".coveragerc", ".python-version"}:
-                continue
-            if name.endswith((".pyc", ".atomic-tmp")):
-                continue
-            path = folder / name
-            rel = path.relative_to(root).as_posix()
-            if private_credential_path(rel):
-                continue
-            files[rel] = digest(confined_path(root, rel).read_bytes())
-        # os.walk would silently ignore symlink directories unless checked here.
-        for name in dirs:
-            confined_path(root, (folder / name).relative_to(root).as_posix())
+def _bounded_bytes(path, limits, cancel_check):
+    sink = BytesIO()
+    stream_source(path, limits, cancel_check, sink=sink)
+    return sink.getvalue()
+
+
+def _copy_source(source, target, expected, limits, cancel_check, *, remaining_bytes=None):
+    cancel_check()
+    require_disk_space(target.parent, source.stat().st_size, limits)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    created = False
+    try:
+        with target.open("xb") as sink:
+            created = True
+            actual, size = stream_source(source, limits, cancel_check, sink=sink, remaining_bytes=remaining_bytes)
+            sink.flush()
+            os.fsync(sink.fileno())
+        if actual != expected:
+            raise ChangeSetConflict("source changed while copying")
+        shutil.copystat(source, target, follow_symlinks=False)
+        return size
+    except BaseException:
+        if created:
+            target.unlink(missing_ok=True)
+        raise
+
+
+def _files(root: Path, excluded: Path | None = None, *, limits: ProjectLimits | None = None,
+           cancel_check=lambda: None, sizes: dict | None = None) -> dict[str, str]:
+    limits = limits or ProjectLimits()
+    files, total_bytes = {}, 0
+
+    def skip(rel, is_dir):
+        name = Path(rel).name
+        if any(fnmatch.fnmatch(name, pattern) for pattern in DEFAULT_IGNORE) or private_credential_path(rel):
+            return True
+        if name == ".github" and (root / rel).is_symlink():
+            confined_path(root, rel)
+        if name.startswith(".") and (name != ".github" if is_dir else name not in {".gitignore", ".coveragerc", ".python-version"}):
+            return True
+        if not is_dir and name.endswith((".pyc", ".atomic-tmp")):
+            return True
+        if excluded is not None and (root / rel).resolve() == excluded:
+            return True
+        confined_path(root, rel)  # Do not silently accept links omitted by traversal.
+        return False
+
+    for rel, _ in source_files(root, skip, limits, cancel_check):
+        if len(files) >= limits.max_files:
+            raise ResourceLimitError("project snapshot file count limit exceeded")
+        fingerprint, size = stream_source(confined_path(root, rel), limits, cancel_check,
+                                          remaining_bytes=limits.max_total_bytes - total_bytes)
+        total_bytes += size
+        files[rel] = fingerprint
+        if sizes is not None:
+            sizes[rel] = size
     return files
 
 
 class ChangeSet:
-    def __init__(self, project: Path, directory: Path, state: dict):
+    def __init__(self, project: Path, directory: Path, state: dict, *, limits=None, cancel_check=lambda: None):
         self.project = project.resolve()
         self.directory = directory
         self.workspace = directory / "workspace"
         self.id = directory.name
         self.state = state
+        self.limits = limits or ProjectLimits(**state.get("resource_limits", {}))
+        self.cancel_check = cancel_check
 
     @classmethod
-    def create(cls, project: Path, *, backend: str = "copy") -> ChangeSet:
+    def create(cls, project: Path, *, backend: str = "copy", limits: ProjectLimits | None = None,
+               cancel_check=lambda: None) -> ChangeSet:
         project = project.resolve()
         if not project.is_dir():
             raise ChangeSetConflict("project directory does not exist")
         if backend not in {"copy", "git-worktree"}:
             raise ChangeSetConflict("unknown workspace backend")
         _plain_path(user_dir().absolute())
-        baseline = _files(project, user_dir().resolve())
+        limits = limits or ProjectLimits()
+        sizes = {}
+        baseline = _files(project, user_dir().resolve(), limits=limits, cancel_check=cancel_check, sizes=sizes)
+        # Git objects and metadata need extra headroom beyond the staged copy.
+        reserve = sum(sizes.values()) * (3 if backend == "git-worktree" else 1)
+        reserve += 1024 * 1024 + len(baseline) * 1024
+        require_disk_space(user_dir(), reserve, limits)
         directory = user_dir() / "changesets" / ("change_" + uuid.uuid4().hex[:12])
         directory.mkdir(parents=True)
         change = cls(project, directory, {"project": str(project), "status": "active", "baseline": baseline,
                                          "approved": [], "approved_hashes": {}, "changes": {},
-                                         "backend": backend, "excluded": str(user_dir().resolve())})
+                                         "backend": backend, "excluded": str(user_dir().resolve()),
+                                         "resource_limits": asdict(limits)}, limits=limits, cancel_check=cancel_check)
         change._save()
         try:
             if backend == "git-worktree":
                 change._create_worktree()
             else:
                 change.workspace.mkdir()
+            copied = 0
             for rel, expected in baseline.items():
                 source = confined_path(project, rel)
                 target = confined_path(change.workspace, rel)
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, target)
-                if digest(target.read_bytes()) != expected:
-                    raise ChangeSetConflict(f"source changed while copying: {rel}")
+                copied += _copy_source(source, target, expected, limits, cancel_check,
+                                       remaining_bytes=limits.max_total_bytes - copied)
             change.check_original()
             change._validate_ownership()
             change._save()
@@ -172,12 +255,13 @@ class ChangeSet:
         top = _git(self.project, "rev-parse", "--show-toplevel").decode().strip()
         if Path(top).resolve() != self.project:
             raise ChangeSetConflict("git-worktree project must be the repository root")
-        index = _git(self.project, "ls-files", "--stage", "-z")
+        index = _git(self.project, "ls-files", "--stage", "-z",
+                     output_limit=min(self.limits.max_total_bytes, 4 * 1024 * 1024))
         if any(record.startswith(b"160000 ") for record in index.split(b"\0")):
             raise ChangeSetConflict("submodules are unsupported by managed worktrees")
         metadata = self.directory / "git-private"
         _git(self.directory, "init", "--bare", "--template=", str(metadata))
-        commit = _snapshot_tree(metadata, self.project, self.state["baseline"])
+        commit = _snapshot_tree(metadata, self.project, self.state["baseline"], self.limits, self.cancel_check)
         _git(self.directory, "--git-dir=" + str(metadata), "worktree", "add", "--detach",
              "--no-checkout", str(self.workspace), commit)
         _git(self.workspace, "read-tree", commit)  # Populate only the private index, never checkout/filter source.
@@ -242,18 +326,16 @@ class ChangeSet:
 
     def _save(self):
         target = self.directory / "journal.json"
-        temp = target.with_suffix(".json.tmp")
-        temp.write_text(json.dumps(self.state, indent=2) + "\n", encoding="utf-8")
-        temp.replace(target)
+        atomic_bytes(target, (json.dumps(self.state, indent=2) + "\n").encode("utf-8"))
 
     def check_original(self):
         self._validate_ownership()
-        if _files(self.project, Path(self.state["excluded"])) != self.state["baseline"]:
+        if self._manifest(self.project, Path(self.state["excluded"])) != self.state["baseline"]:
             raise ChangeSetConflict("original project changed since task snapshot; refusing publication/resume")
 
     def track(self, rel: str, expected_hash: str | None | object = _UNSPECIFIED_HASH):
         path = confined_path(self.workspace, rel)
-        current = digest(path.read_bytes()) if path.exists() else None
+        current = stream_source(path, self.limits, self.cancel_check)[0] if path.exists() else None
         # An explicit None is proof of deletion, rather than an omitted check.
         if expected_hash is not _UNSPECIFIED_HASH and current != expected_hash:
             raise ChangeSetConflict(f"workspace no longer matches verified edit: {rel}")
@@ -265,7 +347,7 @@ class ChangeSet:
 
     def validate_workspace(self) -> dict[str, str]:
         self._validate_ownership()
-        staged = _files(self.workspace)
+        staged = self._manifest(self.workspace)
         baseline = self.state["baseline"]
         changed = {rel for rel in baseline.keys() | staged.keys() if baseline.get(rel) != staged.get(rel)}
         unapproved = changed - set(self.state["approved"])
@@ -275,6 +357,9 @@ class ChangeSet:
             if staged.get(rel) != self.state["approved_hashes"].get(rel):
                 raise ChangeSetConflict(f"workspace changed after verification: {rel}")
         return staged
+
+    def _manifest(self, root, excluded=None, *, sizes=None):
+        return _files(root, excluded, limits=self.limits, cancel_check=self.cancel_check, sizes=sizes)
 
     def abort(self):
         if self.state["status"] == "active":
@@ -299,32 +384,36 @@ class ChangeSet:
     def checkpoint(self) -> dict:
         folder = self.directory / "checkpoints" / uuid.uuid4().hex
         files = self.validate_workspace()
+        sizes = {}
+        if self._manifest(self.workspace, sizes=sizes) != files:
+            raise ChangeSetConflict("workspace changed before checkpoint")
+        require_disk_space(self.directory, sum(sizes.values()) + len(files) * 1024, self.limits)
+        copied = 0
         for rel, expected in files.items():
             target = confined_path(folder, rel)
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(confined_path(self.workspace, rel), target)
-            if digest(target.read_bytes()) != expected:
-                raise ChangeSetConflict(f"workspace changed during checkpoint: {rel}")
+            copied += _copy_source(confined_path(self.workspace, rel), target, expected, self.limits,
+                                   self.cancel_check, remaining_bytes=self.limits.max_total_bytes - copied)
         return {"folder": folder, "files": files, "approved": list(self.state["approved"]),
                 "approved_hashes": dict(self.state["approved_hashes"])}
 
+    @mutation_guard("workspace")
     def restore_checkpoint(self, checkpoint: dict):
         # Workspace is task-owned. Original project paths are never touched here.
         self._validate_ownership()
-        current = _files(self.workspace)
+        current = self._manifest(self.workspace)
         previous = checkpoint["files"]
         for rel in current.keys() | previous.keys():
             if current.get(rel) == previous.get(rel):
                 continue
             if rel in previous:
-                data = confined_path(checkpoint["folder"], rel).read_bytes()
+                data = _bounded_bytes(confined_path(checkpoint["folder"], rel), self.limits, self.cancel_check)
                 if digest(data) != previous[rel]:
                     raise ChangeSetConflict(f"checkpoint damaged: {rel}")
                 replace_checked(self.workspace, rel, data, current.get(rel))
                 confined_path(self.workspace, rel).chmod(stat.S_IMODE(confined_path(checkpoint["folder"], rel).stat().st_mode))
             else:
                 target = confined_path(self.workspace, rel)
-                if digest(target.read_bytes()) != current[rel]:
+                if stream_source(target, self.limits, self.cancel_check)[0] != current[rel]:
                     raise ChangeSetConflict(f"workspace recovery conflict: {rel}")
                 target.unlink()
         self.state["approved"] = checkpoint["approved"]
@@ -335,7 +424,7 @@ class ChangeSet:
         expected = self.state["baseline"].get(rel)
         if data is None:
             target = confined_path(self.project, rel)
-            if digest(target.read_bytes()) != expected:
+            if stream_source(target, self.limits, self.cancel_check)[0] != expected:
                 raise ChangeSetConflict(f"conflict deleting {rel}")
             target.unlink()
         else:
@@ -346,6 +435,7 @@ class ChangeSet:
             if expected is None and mode is not None:
                 confined_path(self.project, rel).chmod(mode)
 
+    @mutation_guard("project", publication=True)
     def publish(self, finalize=None, cancel_check=lambda: None):
         cancel_check()
         if self.state["status"] != "active":
@@ -362,39 +452,47 @@ class ChangeSet:
             for rel in changed
         }
         self.state["published_manifest"] = staged
+        require_disk_space(self.directory, sum(confined_path(self.project, rel).stat().st_size
+                                              for rel in changed if rel in baseline) + len(changed) * 1024,
+                           self.limits)
         for rel in changed:
             if rel in baseline:
-                data = confined_path(self.project, rel).read_bytes()
+                data = _bounded_bytes(confined_path(self.project, rel), self.limits, self.cancel_check)
                 if digest(data) != baseline[rel]:
                     raise ChangeSetConflict(f"original changed while preparing: {rel}")
                 backup = confined_path(backup_root, rel)
                 backup.parent.mkdir(parents=True, exist_ok=True)
-                backup.write_bytes(data)
+                write_bytes(backup, data)
         self.state["status"] = "publishing"
-        self._save()  # all intents/backups durable before the first target write
+        self._save()  # Flushed intents/backups precede source writes; see durability contract.
         try:
             for rel in changed:
                 cancel_check()
-                data = confined_path(self.workspace, rel).read_bytes() if rel in staged else None
+                data = (_bounded_bytes(confined_path(self.workspace, rel), self.limits, self.cancel_check)
+                        if rel in staged else None)
                 if data is not None and digest(data) != staged[rel]:
                     raise ChangeSetConflict(f"workspace changed while publishing: {rel}")
                 self._write_target(rel, data)
-            if _files(self.project, Path(self.state["excluded"])) != staged:
+            if self._manifest(self.project, Path(self.state["excluded"])) != staged:
                 raise ChangeSetConflict("project changed during publication")
             if finalize is not None:
                 finalize()
-            if _files(self.project, Path(self.state["excluded"])) != staged:
+            if self._manifest(self.project, Path(self.state["excluded"])) != staged:
                 raise ChangeSetConflict("project changed during finalization")
             self.state["status"] = "published"
             cancel_check()
             self._save()
         except Exception:
             self.state["status"] = "publishing"
-            self.recover()
+            self._recover()  # the publication lease is already held; recovery runs under it
             raise
 
+    @mutation_guard("project", publication=True)
     def recover(self):
         """Restore only bytes written by this publication; never overwrite a third version."""
+        self._recover()
+
+    def _recover(self):
         self._validate_ownership()
         if self.state["status"] not in {"publishing", "recovery_conflict"}:
             raise ChangeSetConflict("changeset does not need publication recovery")
@@ -402,7 +500,7 @@ class ChangeSet:
         for rel, hashes in self.state["changes"].items():
             try:
                 target = confined_path(self.project, rel)
-                current = digest(target.read_bytes()) if target.exists() else None
+                current = stream_source(target, self.limits, lambda: None)[0] if target.exists() else None
                 if current == hashes["before"]:
                     continue
                 if current != hashes["after"]:
@@ -410,17 +508,17 @@ class ChangeSet:
                     continue
                 if hashes["before"] is None:
                     # Recheck immediately before removing our newly created file.
-                    if digest(target.read_bytes()) != hashes["after"]:
+                    if stream_source(target, self.limits, lambda: None)[0] != hashes["after"]:
                         raise ChangeSetConflict(f"recovery conflict: {rel}")
                     target.unlink()
                 else:
-                    data = confined_path(self.directory / "before", rel).read_bytes()
+                    data = _bounded_bytes(confined_path(self.directory / "before", rel), self.limits, lambda: None)
                     if digest(data) != hashes["before"]:
                         raise ChangeSetConflict(f"backup damaged: {rel}")
                     replace_checked(self.project, rel, data, hashes["after"])
                     if hashes.get("before_mode") is not None:
                         confined_path(self.project, rel).chmod(hashes["before_mode"])
-            except OSError:
+            except (OSError, ResourceLimitError):
                 conflicts.append(rel)
         self.state["status"] = "recovery_conflict" if conflicts else "rolled_back"
         self.state["conflicts"] = conflicts
@@ -429,5 +527,5 @@ class ChangeSet:
             raise ChangeSetConflict(f"recovery needs review; preserved conflicting files: {conflicts}")
 
     def verify_published(self):
-        if _files(self.project, Path(self.state["excluded"])) != self.state.get("published_manifest"):
+        if self._manifest(self.project, Path(self.state["excluded"])) != self.state.get("published_manifest"):
             raise ChangeSetConflict("published files changed before task completion was recorded")

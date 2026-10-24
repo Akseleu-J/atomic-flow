@@ -1,6 +1,8 @@
 # atomic-flow — рабочая карта проекта
 
-Обновлено **23 октября 2026**. Исходная база:
+Практические команды и порядок аутентификации GitHub описаны в [`GITHUB_WORKFLOW.md`](GITHUB_WORKFLOW.md).
+
+Обновлено **24 октября 2026**. Исходная база:
 `820fc83d1850b01baeb78a7a9e14035a3b44ddcc`, `main`, версия пакета `0.2.0`.
 Рабочая ветка `experimental`, draft PR №2. Ветка переименована по просьбе пользователя;
 PR №1 закрыт GitHub при rename. Новые коммиты от Omirbay Akseleu / Akseleu-J.
@@ -10,6 +12,32 @@ PR №1 закрыт GitHub при rename. Новые коммиты от Omirba
 Источник: https://github.com/Akseleu-J/atomic-flow.git.
 
 ## Актуальный статус и история пакетов
+
+24 октября: по прямому запросу пользователя проверена вторая рабочая копия
+`C:/Users/omirb/.zcode/workspace/7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8/atomic-flow`,
+source `c8820ff445b318c3fbf1c3cf76451ebe30a27774`. Её семь коммитов пакетов 18–21
+доступны как `refs/remotes/zcode/experimental`; выбранные src/tests/tools/CI и
+package docs перенесены в текущую working tree с дополнительными исправлениями.
+Git HEAD этой копии пока остаётся `8a18fbe`; это локальные незакоммиченные изменения,
+не новый подтверждённый CI commit. Исходная рабочая версия сохранена отдельно.
+
+Приняты source mutation leases, index generation CAS/limits, strict API admission,
+provider usage/routing, reconciliation, execution identity, Windows Job Object,
+staged capability factory и installed-wheel pipeline. Review дополнительно исправил
+cross-day ledger identity, reconciliation crash gap/amount/effect validation,
+free_only/non-sent quota/deadline/hidden retry issues, outer accounting,
+unsafe parent-only cleanup proof, Windows MCP/LSP ownership и два wheel CI blockers.
+Подробности/remaining gates: `IMPORT_REVIEW_2026-10-24.md` и три `IMPORT_*_REVIEW.md`.
+
+Новые focused results: routing/accounting **67 passed**; ledger/reconcile/task budget
+**43 passed**; execution/profiles/MCP **34 passed / 3 skipped**. При нагрузке LSP
+имел четыре initialize timeouts; повтор ровно этих cases **4 passed** без изменения
+deadlines. Parent checks и исходные failures отдельно описаны в import review;
+числа пересекаются и не складываются. Ruff changed files PASS. Local wheel собрана,
+её source bytes совпадают с текущей working tree. Logs: `validation/import-20261024/`.
+Заявленные source-копией 850/33 не являются проверкой этой итоговой версии.
+Model calls=0. Docker/live providers/полный suite не запускались; общий Stage 4,
+native sandbox, real external integration, scale и final release gates остаются открыты.
 
 23 октября: пакет 17 — исправлены конкретные R01–R07 из critic pass:
 private-path execution exclusion, приватный snapshot для model checks вне TaskRunner,

@@ -61,7 +61,7 @@ def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
     test_files = _matching_tests(project_root, rel_path)
     if not test_files:
         return VerificationResult(ok=True, checks=["syntax"], message="compile OK; no matching tests", source_hash=source_hash)
-    with checked_workspace(project_root, private_workspace=private_workspace) as check_root:
+    with checked_workspace(project_root, private_workspace=private_workspace, cancel_check=cancel_check) as check_root:
         result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *test_files],
                             check_root, config=execution, timeout=timeout_seconds, cancel_check=cancel_check)
     if result.timed_out:

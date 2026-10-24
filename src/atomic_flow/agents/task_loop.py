@@ -21,6 +21,37 @@ from atomic_flow.tree.builder import build_tree, save_tree
 MUTATING_TOOLS = {"edit_node", "patch_file", "create_file", "delete_file", "move_file", "notebook_edit"}
 
 
+@dataclass(frozen=True)
+class TaskCapabilityContext:
+    """What a host capability factory may bind to for one step.
+
+    ``workspace`` is the staged task workspace when a changeset exists and the
+    original root otherwise; capabilities that operate on source must bind HERE,
+    never to the original root while staging is active.
+    """
+
+    task_id: str
+    project: Path
+    workspace: Path
+    phase: str
+
+
+@dataclass
+class TaskCapabilities:
+    """Host-injected step capabilities passed through to the step Orchestrator.
+
+    The factory is trusted host code re-invoked per step against the current
+    staged root; persisted task state never stores or restores these objects.
+    """
+
+    workspace_session: object | None = None
+    lsp_client: object | None = None
+    documentation_client: object | None = None
+    hooks: object | None = None
+    tool_registry: object | None = None
+    role_tools: dict | None = None
+
+
 @dataclass
 class StepFailure(Exception):
     step_index: int
@@ -28,12 +59,14 @@ class StepFailure(Exception):
 
 
 class TaskRunner:
-    def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None):
+    def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None,
+                 capability_factory=None):
         self.config = config if config is not None else AtomicConfig()
         self.project = project
         self.backend = backend
         self.approval_callback = approval_callback
         self.question_callback = question_callback
+        self.capability_factory = capability_factory
         self.changeset: ChangeSet | None = None
         self.cancel_check = lambda: None
         self.task_backend = backend
@@ -207,7 +240,8 @@ class TaskRunner:
             else:
                 if task.current_index:
                     raise ChangeSetConflict("legacy checkpoint has no workspace; cannot safely replay/resume it")
-                self.changeset = ChangeSet.create(self.project, backend=self.config.task.workspace_backend)
+                self.changeset = ChangeSet.create(self.project, backend=self.config.task.workspace_backend,
+                                                  cancel_check=self.cancel_check)
                 task.changeset_id = self.changeset.id
             save_tree(self.changeset.workspace, build_tree(self.changeset.workspace, self.config.tree.ignore,
                       respect_gitignore=self.config.tree.respect_gitignore))
@@ -417,10 +451,19 @@ class TaskRunner:
         workspace = self.changeset.workspace if self.changeset else self.project
         if isinstance(self.task_backend, TaskBudgetBackend):
             self.task_backend.phase = "step"
+        capabilities = TaskCapabilities()
+        if self.capability_factory is not None:
+            context = TaskCapabilityContext(task_id=task.id, project=self.project, workspace=workspace, phase="step")
+            capabilities = self.capability_factory(context)
+            if not isinstance(capabilities, TaskCapabilities):
+                raise StepFailure(step.index, "capability factory must return TaskCapabilities")
         orch = Orchestrator(self.config, workspace, self.task_backend, approval_callback=self.approval_callback,
                             settings_project=self.project, cancel_check=self.cancel_check,
                             question_callback=self.question_callback, private_workspace=self.changeset is not None,
-                            mutation_scope=require_approval(task, self.project))
+                            mutation_scope=require_approval(task, self.project),
+                            workspace_session=capabilities.workspace_session, lsp_client=capabilities.lsp_client,
+                            documentation_client=capabilities.documentation_client, hooks=capabilities.hooks,
+                            tool_registry=capabilities.tool_registry, role_tools=capabilities.role_tools)
         result = orch.answer(subquery, mode="medium", approve_edits=True)
         step.request_id = result.ledger_id
         if self.changeset:

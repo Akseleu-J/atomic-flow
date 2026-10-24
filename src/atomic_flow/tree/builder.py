@@ -7,11 +7,13 @@ import fnmatch
 import hashlib
 import json
 import os
+import tempfile
 from collections import Counter, defaultdict
 from pathlib import Path, PurePosixPath
 
 from atomic_flow.activation.redact import redact
 from atomic_flow.errors import TreeError
+from atomic_flow.project_resources import ProjectLimits, ResourceLimitError, source_files
 from atomic_flow.textutil import split_lines
 from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES, PYTHON_SUFFIXES, SOURCE_SUFFIXES
 from atomic_flow.tree.node import TreeNode
@@ -261,9 +263,14 @@ def _group_by_path(previous: dict | None) -> dict[str, list[TreeNode]]:
 
 
 def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: dict | None = None,
-               respect_gitignore: bool = True, max_file_bytes: int = MAX_FILE_BYTES) -> dict:
+               respect_gitignore: bool = True, max_file_bytes: int = MAX_FILE_BYTES,
+               limits: ProjectLimits | None = None, cancel_check=None) -> dict:
     """Index ``root``. With ``previous`` only files whose size/mtime/content changed are re-parsed."""
     root = Path(root).expanduser().resolve()
+    limits = limits or ProjectLimits()
+    cancel_check = cancel_check or (lambda: None)
+    cancel_check()
+    generation = _generation(root)
     if not root.is_dir():
         raise TreeError(f"Project directory does not exist: {root}")
     from atomic_flow.config import user_dir
@@ -274,60 +281,117 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
     skip = _Ignore(root, list(DEFAULT_IGNORE if ignore is None else ignore), respect_gitignore)
     old = _group_by_path(previous)
     per_file: dict[str, list[TreeNode]] = {}
-    parsed = reused = 0
-    for current, dirs, files in os.walk(root):
-        current_path = Path(current)
-        rel_dir = current_path.relative_to(root).as_posix()
-        dirs[:] = sorted(d for d in dirs if not skip(_join(rel_dir, d), True)
-                         and (current_path / d).resolve() != private_root)
-        for name in sorted(files):
-            rel = _join(rel_dir, name)
-            path = current_path / name
+    parsed = reused = total_bytes = admitted_files = node_count = skipped = 0
+    for rel, path in source_files(root, skip, limits, cancel_check, private_root=private_root):
             suffix = path.suffix.lower()
-            if suffix not in SOURCE_SUFFIXES or skip(rel, False):
+            if suffix not in SOURCE_SUFFIXES:
+                skipped += 1
                 continue
-            if path.is_symlink() and not path.resolve().is_relative_to(root):
-                continue
+            admitted_files += 1
+            if admitted_files > limits.max_files:
+                raise ResourceLimitError("indexed source file limit exceeded")
             try:
                 stat = path.stat()
             except OSError:
                 continue
             if stat.st_size > max_file_bytes:
+                skipped += 1
                 continue
             cached = old.get(rel)
             try:
                 with path.open("rb") as handle:
-                    data = handle.read(max_file_bytes + 1)
+                    chunks, size = [], 0
+                    while True:
+                        cancel_check()
+                        chunk = handle.read(min(64 * 1024, max_file_bytes + 1 - size))
+                        if not chunk:
+                            break
+                        size += len(chunk)
+                        total_bytes += len(chunk)
+                        if total_bytes > limits.max_total_bytes:
+                            raise ResourceLimitError("indexed source byte limit exceeded")
+                        chunks.append(chunk)
+                        if size > max_file_bytes:
+                            break
+                    data = b"".join(chunks)
                 if len(data) > max_file_bytes:
+                    skipped += 1
                     continue
                 source = data.decode("utf-8-sig")
             except (OSError, UnicodeError):
+                skipped += 1
                 continue
             digest = hashlib.sha1(data).hexdigest()
             if cached and cached[0].content_hash == digest:      # touched, not edited
                 cached[0] = cached[0].model_copy(update={"mtime_ns": stat.st_mtime_ns})
                 per_file[rel] = cached
                 reused += 1
-                continue
-            per_file[rel] = _index_file(rel, source, digest, stat.st_size, stat.st_mtime_ns, suffix in PYTHON_SUFFIXES)
-            parsed += 1
+            else:
+                per_file[rel] = _index_file(rel, source, digest, stat.st_size, stat.st_mtime_ns, suffix in PYTHON_SUFFIXES)
+                parsed += 1
+            node_count += len(per_file[rel])
+            if node_count > limits.max_nodes:
+                raise ResourceLimitError("indexed node limit exceeded")
+    cancel_check()
     nodes = [n.model_copy(deep=True) for items in per_file.values() for n in items]
     _link(nodes)
     fingerprint = hashlib.sha1("\n".join(f"{n.path}:{n.content_hash}" for n in nodes if n.kind == "file").encode()).hexdigest()
     return {"version": TREE_VERSION, "root": root.name, "files": len(per_file), "fingerprint": fingerprint,
-            "stats": {"parsed": parsed, "reused": reused}, "nodes": [n.model_dump() for n in nodes]}
+            "_base_generation": generation,
+            "stats": {"parsed": parsed, "reused": reused, "skipped": skipped, "read_bytes": total_bytes},
+            "nodes": [n.model_dump() for n in nodes]}
 
 
 def _tree_path(root: str | Path) -> Path:
     return Path(root).expanduser().resolve() / ".atomic_flow" / "tree.json"
 
 
+def _generation(root: str | Path) -> str | None:
+    target = _tree_path(root)
+    try:
+        with target.open("rb") as handle:
+            digest = hashlib.sha256()
+            size = 0
+            while chunk := handle.read(64 * 1024):
+                size += len(chunk)
+                if size > 128 * 1024 * 1024:
+                    raise TreeError("project tree cache exceeds byte limit; remove it and rebuild")
+                digest.update(chunk)
+            return digest.hexdigest()
+    except FileNotFoundError:
+        return None
+    except OSError as exc:
+        raise TreeError("cannot inspect project tree generation") from exc
+
+
 def save_tree(root: str | Path, tree: dict) -> Path:
+    """Commit only the generation observed before build; contention is retryable."""
+    from atomic_flow.locking import exclusive_file
+
     target = _tree_path(root)
     target.parent.mkdir(parents=True, exist_ok=True)
-    tmp = target.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(tree, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    tmp.replace(target)                                            # atomic: no half-written tree.json
+    tmp = None
+    try:
+        with exclusive_file(target.parent / "tree.lock", busy_message="index writer busy; rebuild and retry"):
+            if tree.get("_base_generation") != _generation(root):
+                raise TreeError("stale index generation; rebuild before saving")
+            payload = {key: value for key, value in tree.items() if key != "_base_generation"}
+            data = (json.dumps(payload, ensure_ascii=False, indent=1) + "\n").encode("utf-8")
+            if len(data) > 128 * 1024 * 1024:
+                raise TreeError("project tree cache exceeds byte limit")
+            fd, name = tempfile.mkstemp(prefix="tree-", suffix=".tmp", dir=target.parent)
+            tmp = Path(name)
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(data)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(tmp, target)
+            tree["_base_generation"] = hashlib.sha256(data).hexdigest()
+    except (OSError, ValueError) as exc:
+        raise TreeError("index commit unavailable; rebuild and retry") from exc
+    finally:
+        if tmp is not None:
+            tmp.unlink(missing_ok=True)
     return target
 
 
@@ -336,19 +400,27 @@ def load_tree(root: str | Path) -> dict:
     if not target.exists():
         raise TreeError(f"No project tree found at {target}. Run `atomic tree build` first.")
     try:
-        tree = json.loads(target.read_text(encoding="utf-8"))
+        with target.open("rb") as handle:
+            data = handle.read(128 * 1024 * 1024 + 1)
+        if len(data) > 128 * 1024 * 1024:
+            raise TreeError("project tree cache exceeds byte limit")
+        tree = json.loads(data)
     except (OSError, json.JSONDecodeError) as exc:
         raise TreeError(f"Cannot read project tree {target}: {exc}") from exc
+    if not isinstance(tree, dict):
+        raise TreeError("project tree cache must be an object; rebuild")
     if tree.get("version") != TREE_VERSION:
         raise TreeError(f"Project tree format v{tree.get('version')} is outdated (need v{TREE_VERSION}). Run `atomic tree build`.")
+    tree["_base_generation"] = hashlib.sha256(data).hexdigest()
     return tree
 
 
 def refresh_tree(root: str | Path, ignore: list[str] | None = None, *, respect_gitignore: bool = True,
-                 save: bool = True) -> tuple[dict, bool]:
+                 save: bool = True, limits: ProjectLimits | None = None, cancel_check=None) -> tuple[dict, bool]:
     """Bring an existing tree up to date. Returns ``(tree, changed)``."""
     previous = load_tree(root)
-    tree = build_tree(root, ignore, previous=previous, respect_gitignore=respect_gitignore)
+    tree = build_tree(root, ignore, previous=previous, respect_gitignore=respect_gitignore,
+                      limits=limits, cancel_check=cancel_check)
     changed = tree["fingerprint"] != previous.get("fingerprint")
     if changed and save:
         save_tree(root, tree)

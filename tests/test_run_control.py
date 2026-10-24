@@ -514,13 +514,14 @@ def test_steering_during_critic_requires_new_answer(project, config):
 
     def old_critic(user):
         entered.set()
-        assert release.wait(4)
+        assert release.wait(20)
         return {"verdict": "ok", "citation_coverage": 1}
 
     model = ScriptedBackend({"parser": {}, "answerer": [{"text": "old"}, {"text": "new"}],
                              "critic": [old_critic, {"verdict": "ok", "citation_coverage": 1}]})
     handle = start_answer(config, project, model, "refund", mode="medium")
-    assert entered.wait(3)
+    # Generous budget: the assertions verify steering semantics, not scheduler latency.
+    assert entered.wait(20)
     handle.steer("Change the answer")
     release.set()
     assert handle.result(5).text == "new"

@@ -19,6 +19,7 @@ from atomic_flow.activation.redact import redact
 from atomic_flow.agents import file_transaction
 from atomic_flow.agents.source import SourceConflict, digest
 from atomic_flow.agents.tools.file_paths import admitted_path
+from atomic_flow.source_lock import mutation_guard
 from atomic_flow.tree.defaults import MAX_FILE_BYTES
 
 MAX_CELLS = 2048
@@ -293,6 +294,7 @@ class NotebookDocument:
         self.assert_current()
         return NotebookPreview(self.path, self.content_hash, digest(after), token, copy.deepcopy(operation), after)
 
+    @mutation_guard("project")
     def apply(self, preview: NotebookPreview, *, storage: Path, approved: bool = False,
               preview_token: str, allow_normalization: bool = False,
               cancel_check: Callable[[], None] = lambda: None,

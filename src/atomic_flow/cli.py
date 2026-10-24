@@ -103,6 +103,13 @@ def _parser() -> argparse.ArgumentParser:
     task_p.add_argument("--approve", metavar="TASK_ID", help="Approve exactly --plan-digest without starting execution")
     task_p.add_argument("--plan-digest", help="Digest from the reviewed plan and source manifest")
     task_p.add_argument("--scope-path", action="append", default=None, help="Exact approved relative path, repeatable; can name a new file")
+    task_p.add_argument("--reconcile", metavar="CALL_ID", help="Settle one unknown charge/effect hold with host evidence; never replays a call")
+    task_p.add_argument("--task-id", metavar="TASK_ID", help="Task owning the call being reconciled")
+    task_p.add_argument("--scope", choices=("charge", "effect"), default="charge", help="Reconciliation scope")
+    task_p.add_argument("--cost-usd", type=float, default=None, help="Settled charge in USD (charge scope; 0.0 means confirmed free)")
+    task_p.add_argument("--evidence-file", type=Path, default=None, help="File whose bytes hash as reconciliation evidence; content is never stored")
+    task_p.add_argument("--actor", default=None, help="Human/operator identity taking responsibility")
+    task_p.add_argument("--reason", default=None, help="Why this settlement is correct")
 
     undo = cmd.add_parser("undo", help="Restore a previous approved edit")
     undo.add_argument("edit_id", nargs="?", default="last")
@@ -608,6 +615,17 @@ def cmd_task(args) -> int:
             save(task)
             _print_task(task, verbose=True)
             return 0
+    if args.reconcile:
+        from atomic_flow.reconcile import reconcile_call
+        if not args.task_id or not args.evidence_file:
+            raise ValueError("--reconcile requires --task-id and --evidence-file")
+        result = reconcile_call(args.task_id, args.reconcile, args.scope,
+                                evidence=args.evidence_file.read_bytes(),
+                                actor=args.actor or "", reason=args.reason or "",
+                                cost_usd=args.cost_usd)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+
     if args.task_list:
         tasks = list_tasks()
         if not tasks:

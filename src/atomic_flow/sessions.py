@@ -6,6 +6,7 @@ or tool request without a terminal event remains pending: reading never retries 
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -29,6 +30,7 @@ EVENT_TYPES = frozenset({
     "tool_request", "tool_result", "tool_effect_unknown", "question", "answer", "completed", "failed", "tail_recovered",
     "steering_applied", "response_discarded", "context_summary", "continuation",
     "dialogue_state", "snapshot_created", "rewind_applied", "fork_created",
+    "host_reconciliation",
 })
 _SECRET_KEY = re.compile(r"(?i)(?:password|passwd|secret|authorization|api[_-]?key|(?:^|_)token(?:$|_))")
 
@@ -80,25 +82,40 @@ class SessionSnapshot:
                 pending[call_id] = True
             elif event["event_type"] in ("model_response", "model_failed", "tool_result"):
                 pending.pop(call_id, None)
+            elif event["event_type"] == "host_reconciliation":
+                pending.pop(call_id, None)
         return sorted(pending)
 
     @property
     def unresolved_call_ids(self) -> list[str]:
         """Closed transport observations do not establish settled charges/effects."""
-        unresolved = set(self.pending_call_ids)
+        charges, effects = set(), set()
+        unknown_charges, unknown_effects = set(), set()
         for event in self.events:
             call_id = event.get("call_id") or event["payload"].get("call_id")
             if call_id is None:
                 continue
             kind, outcome = event["event_type"], event.get("outcome")
+            if kind == "model_request":
+                charges.add(call_id)
+            if kind == "tool_request":
+                effects.add(call_id)
             if kind == "tool_effect_unknown":
-                unresolved.add(call_id)
+                effects.add(call_id)
+                unknown_effects.add(call_id)
+            if kind == "model_failed" and outcome in {"not_sent", "refused"}:
+                if call_id not in unknown_charges:
+                    charges.discard(call_id)
             if kind == "model_failed" and outcome not in {"not_sent", "refused"}:
-                unresolved.add(call_id)
+                charges.add(call_id)
+                unknown_charges.add(call_id)
             if kind == "model_response":
                 cost = event["payload"].get("cost_usd")
                 if type(cost) not in (int, float) or not math.isfinite(cost) or cost < 0:
-                    unresolved.add(call_id)
+                    charges.add(call_id)
+                    unknown_charges.add(call_id)
+                elif call_id not in unknown_charges:
+                    charges.discard(call_id)
             if kind == "tool_result":
                 payload = event["payload"]
                 call = payload.get("call")
@@ -112,8 +129,18 @@ class SessionSnapshot:
                     for item in results
                 )
                 if outcome in {"unknown", "pending"} or uncertain_effects:
-                    unresolved.add(call_id)
-        return sorted(unresolved)
+                    effects.add(call_id)
+                    unknown_effects.add(call_id)
+                elif call_id not in unknown_effects:
+                    effects.discard(call_id)
+            if kind == "host_reconciliation":
+                if event["payload"]["scope"] == "charge":
+                    charges.discard(call_id)
+                    unknown_charges.discard(call_id)
+                else:
+                    effects.discard(call_id)
+                    unknown_effects.discard(call_id)
+        return sorted(charges | effects)
 
 
 class SessionJournal:
@@ -121,6 +148,7 @@ class SessionJournal:
         self.session_id = _id(session_id)
         # Fixed prefix also avoids Windows reserved device names, e.g. CON.
         self.path = user_dir() / "sessions" / f"session_{self.session_id}.jsonl"
+        self._validated = None
 
     @classmethod
     def create(cls, project: Path, session_id: str | None = None, *, metadata: dict | None = None) -> SessionJournal:
@@ -152,6 +180,14 @@ class SessionJournal:
             raise StateError(f"unsupported session event type: {event_type}")
         if not isinstance(payload, dict):
             raise StateError("session event payload must be an object")
+        if event_type == "host_reconciliation":
+            if (payload.get("scope") not in {"charge", "effect"}
+                    or not isinstance(payload.get("reconciliation_id"), str)
+                    or not re.fullmatch(r"reconcile_[a-f0-9]{64}", payload["reconciliation_id"])
+                    or not isinstance(payload.get("evidence_sha256"), str)
+                    or not re.fullmatch(r"[a-f0-9]{64}", payload["evidence_sha256"])
+                    or not payload.get("actor") or not payload.get("reason") or not call_id):
+                raise StateError("invalid host reconciliation observation")
         if "call_id" in payload and (not isinstance(payload["call_id"], str)
                                       or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", payload["call_id"])):
             raise StateError("invalid session payload call_id")
@@ -173,20 +209,59 @@ class SessionJournal:
     def append(self, event_type: str, payload: dict, *, call_id: str | None = None, outcome: str | None = None,
                expected_sequence: int | None = None) -> dict:
         with self._lease():
-            snapshot = self.read()
-            if expected_sequence is not None and len(snapshot.events) != expected_sequence:
+            sequence, size, fingerprint = self._append_position()
+            if expected_sequence is not None and sequence != expected_sequence:
                 raise StateError("session changed before host checkpoint; inspect the latest observations")
-            if snapshot.incomplete_tail:
-                raise StateError("session has an interrupted tail; inspect it and call recover_tail() before appending; never replay pending calls")
-            event = self._event(len(snapshot.events) + 1, event_type, payload, call_id, outcome)
+            event = self._event(sequence + 1, event_type, payload, call_id, outcome)
             encoded = _encode(event)
-            if self.path.stat().st_size + len(encoded) > MAX_SESSION_BYTES:
+            if size + len(encoded) > MAX_SESSION_BYTES:
                 raise StateError("session exceeds 64 MiB; start a new session")
             with self.path.open("ab") as handle:
                 handle.write(encoded)
                 handle.flush()
                 os.fsync(handle.fileno())
+            fingerprint.update(encoded)
+            self._validated = (sequence + 1, size + len(encoded), fingerprint)
         return event
+
+    def _append_position(self):
+        """Validate new records only; rehash the prefix to detect any old-byte edit.
+
+        A stat-only cache would miss same-size/mtime tampering. This deliberately
+        retains linear byte hashing per append until a transactional store exists.
+        """
+        if self._validated is None:
+            snapshot = self.read()
+            if snapshot.incomplete_tail:
+                raise StateError("session has an interrupted tail; call recover_tail() before appending; never replay pending calls")
+            return self._validated
+        sequence, offset, known = self._validated
+        if self.path.stat().st_size > MAX_SESSION_BYTES:
+            raise StateError("session exceeds 64 MiB; inspect it offline")
+        fingerprint = hashlib.sha256()
+        with self.path.open("rb") as handle:
+            remaining = offset
+            while remaining:
+                block = handle.read(min(1024 * 1024, remaining))
+                if not block:
+                    raise StateError("validated session prefix was truncated")
+                fingerprint.update(block)
+                remaining -= len(block)
+            if fingerprint.digest() != known.digest():
+                raise StateError("validated session prefix changed; inspect integrity before appending")
+            while line := handle.readline(MAX_EVENT_BYTES + 1):
+                if len(line) > MAX_EVENT_BYTES:
+                    raise StateError("session event exceeds size limit")
+                if not line.endswith(b"\n"):
+                    raise StateError("session has an interrupted tail; call recover_tail() before appending; never replay pending calls")
+                sequence += 1
+                try:
+                    self._validate_event(json.loads(line), sequence)
+                except (ValueError, TypeError, UnicodeError, KeyError, AttributeError) as exc:
+                    raise StateError("invalid committed session event") from exc
+                fingerprint.update(line)
+                offset += len(line)
+        return sequence, offset, fingerprint
 
     def read(self) -> SessionSnapshot:
         if self.path.stat().st_size > MAX_SESSION_BYTES:
@@ -205,6 +280,7 @@ class SessionJournal:
             events.append(event)
         if not events or events[0]["event_type"] != "session_created":
             raise StateError("session has no committed creation event")
+        self._validated = (len(events), complete_end, hashlib.sha256(raw[:complete_end]))
         return SessionSnapshot(self.session_id, events, complete_end != len(raw), len(raw) - complete_end)
 
     def _validate_event(self, event: dict, sequence: int):
@@ -248,6 +324,7 @@ class SessionJournal:
                 handle.write(_encode(event))
                 handle.flush()
                 os.fsync(handle.fileno())
+            self._validated = None
             return backup
 
     def export(self, path: Path) -> Path:

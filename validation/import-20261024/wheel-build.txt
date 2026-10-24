@@ -1,0 +1,9 @@
+Processing .\.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: atomic-flow
+  Building wheel for atomic-flow (pyproject.toml): started
+  Building wheel for atomic-flow (pyproject.toml): finished with status 'done'
+  Created wheel for atomic-flow: filename=atomic_flow-0.2.0-py3-none-any.whl size=334903 sha256=ada4036eadccf28b3da571687a10a46561dff42862e20318202f745b89cd6bc6
+  Stored in directory: C:\Users\omirb\AppData\Local\Temp\pip-ephem-wheel-cache-3ls50w_c\wheels\14\8e\64\88ac8aef7bc6b60143fbac90370bd8c4ec61003a11b955cf41
+Successfully built atomic-flow
