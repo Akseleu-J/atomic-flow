@@ -211,8 +211,10 @@ Findings, in order of discovery:
 4. **Measured infrastructure bounds.** One full SymPy tree build takes ~179 s
    / 44,379 nodes on this laptop; the TaskRunner resume path builds the tree
    twice (workspace at resume, project at publication), and tree builds are
-   not interruptible by the pilot's cooperative deadline — actual wall time
-   exceeded the deadline while model sends stayed bounded.
+   not interruptible by that pilot version's cooperative deadline — actual wall
+   time exceeded the deadline while model sends stayed bounded. Package 26 adds
+   cancellation boundaries and hash-validated AST reuse; it does not promise an
+   OS-enforced hard deadline for individual parsing/filesystem calls.
 5. **The small model does not complete the atomic tool protocol within 6
    calls.** In the final run (artifacts preserved: `stage4-live-pilot-atomic-attempt6/`)
    the planner produced an approved single-step plan, but the answerer read
@@ -235,9 +237,10 @@ small fixed model — and a positive validation of the harness: strict patch
 admission, pagination-before-edit enforcement, cost accounting and quota
 attribution all behaved as specified. It does not measure the framework's
 value on easier tasks, with larger models, or across the other 29 corpus
-entries. Evidence: `validation/import-20261024/stage4-live-pilot-*` (each run
-directory contains `report.json`, `attempts.json`, `kaggle-quota.json` and,
-for the final atomic run, the preserved tool-loop artifacts).
+entries. Evidence: `validation/import-20261024/stage4-live-pilot-*` preserves
+run reports and available attempt sidecars. Seven runs have `kaggle-quota.json`;
+the three missing charged-run receipts are enumerated below. The final atomic
+run also retains its tool-loop artifacts.
 
 
 ### Independent audit correction (24 October)

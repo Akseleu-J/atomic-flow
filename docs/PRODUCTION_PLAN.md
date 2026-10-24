@@ -25,7 +25,7 @@ Core/client устанавливаются без Docker. Непроверенн
 | W3: routing | Fixed/free_only/capped_paid, per-physical-attempt ledger, quota scope/cooldown, отказ от retry unknown. | Отдельный bounded live adapter smoke на официальных разрешённых routes; подтверждённый pre-inference отказ и отсутствие повторного списания. Не истощать квоту искусственно. |
 | W4: Docker-free | Core/CLI/SDK/API wheel matrix без Docker; trusted local lifecycle, optional remote worker/OCI adapter, fail-closed execution. | Принять один настоящий worker deployment с environment identity и повторяемой consumer-проверкой. Native filesystem/network sandbox не реализован и не заявляется. |
 | W5: release foundation | Wheel/sdist, installed-package isolation, 12 core/API OS/Python combinations, real interoperability job. | Reproducible constraints/transitive dependency hashes, SBOM/licenses, source→wheel provenance и offline consumer rehearsal. Публикация на PyPI/подпись релиза — отдельный шаг. |
-| W6: composition | Три реальных local LSP/MCP сценария: public prepare/review/approve/resume, Python+notebook edit→pytest→publish; cancel и source conflict; published-journal recovery без новых calls. Общий budget, staged bindings и expected terminal states проверены. | Подтвердить расширенные сценарии на итоговом exact-source Linux CI. Local durable-state injection не доказывает OS process-kill/power-loss recovery или remote deployment. |
+| W6: composition | Три реальных LSP/MCP сценария на Windows локально и Linux CI `0dbd593`: public prepare/review/approve/resume, Python+notebook edit→pytest→publish; cancel и source conflict; published-journal recovery без новых calls. Общий budget, staged bindings и expected terminal states проверены. Scoped composition gate **PASS**. | Durable-state injection не доказывает OS process-kill/power-loss recovery или remote deployment; эти требования переходят в production acceptance. |
 | W7: operations/scale | File/byte/disk preflight, bounded snapshots, streaming session read/recovery, cancellation hooks; synthetic measurements. | Cold/warm pinned real repos; RSS/disk/queue/cancel, p50/p95 по повторным запускам; long-session soak. Journal append всё ещё имеет quadratic cumulative prefix reads. |
 | W8: utility | 30 pinned issues/5 repos, независимый patch grader, одна real calibration и отрицательный live development pilot. | Остальные 29 environment calibrations; self-hosted pytest-source evaluator; одинаковые frozen caps; replacement blinded holdout; все 60 arms, failures/costs/interventions. No superiority claim до результатов. |
 | W9: release candidate | Draft PR, обязательные CI workflows и сохраняемые artifacts. | Закрытые scope-specific gates W1–W8, exact-source/wheel/config manifest, независимый review и consumer run. Пока **OPEN**. |
@@ -102,3 +102,30 @@ candidate; не выдавать нынешний pytest harness за такой
 Зеркало Claude Code остаётся архитектурным reference с неподтверждённой provenance
 и закрытой лицензией; код/prompts не импортируются. Собственные implementation
 choices проверяются regression/composition/quality evidence, а не сходством с зеркалом.
+
+## Закрытие текущей главы и сколько осталось
+
+Текущая глава **завершена**: независимая сверка стороннего отчёта и копии,
+исправленные totals/provenance claims, воспроизводимый offline auditor, новая
+run provenance, expanded W6 acceptance, исправления warm index/references,
+resource/path admission и cancellation. Всё проверено на runtime `0dbd593`.
+Два push workflow и соответствующие PR workflows PASS; source-specific evidence:
+`validation/ci-production-review-20261024/evidence-manifest.json`.
+Полный Python job: 1021 passed / 14 skipped; clean wheel matrix: 12 PASS;
+actual external composition: 3 PASS. Пересекающиеся наборы не суммируются.
+
+До общего production acceptance остаются **четыре рабочих блока**, а не
+«ещё четыре теста». Реализации W1–W5 подтверждены в указанном scope, W6 scope
+закрыт; это не означает, что все их первоначальные exit criteria выполнены.
+
+| Следующая глава | Измеримый результат завершения |
+|---|---|
+| 1. Полезность / W8 | Ещё 29 environment calibrations, корректный pytest-source runner, замена раскрытого holdout; 30 задач × baseline/atomic при frozen caps. Все ошибки, вмешательства, время и расходы включены. |
+| 2. Масштаб / W7 | Реальные pinned repo cold/warm measurements, repeated p95/RSS/disk/cancel, long-session soak; решение journal append с integrity-preserving migration. Supported envelope опубликован. |
+| 3. Release foundation / W5+W9 | Полные dependency constraints/hashes, SBOM/licenses/source-wheel provenance; clean consumer rehearsal без checkout. Проверяемые wheel/sdist/config manifest, отсутствие скрытых ручных подмен. |
+| 4. Production acceptance / W1–W4+W9 | Заявленная OS/multiprocess/crash matrix, failure injection между persistence boundaries, принятый remote/isolated worker и bounded live route acceptance; независимый финальный review. |
+
+Время этих блоков пока не оценено: исторические окружения и стоимость 60 arms
+ещё не измерены. Не назначать дату release из количества Markdown-пунктов.
+Каждый блок заканчивается отдельным evidence-bound решением; отрицательный
+quality result допустим как результат эксперимента, но не как доказательство пользы.
