@@ -1,0 +1,38 @@
+{
+  "network_calls": 0,
+  "model_calls": 0,
+  "findings": [
+    {
+      "case": "openrouter_numeric_nonzero_cost",
+      "outcome": "error",
+      "type": "BackendError",
+      "cause": "AttributeError",
+      "message": "The LLM backend response did not contain choices[0].message.content."
+    },
+    {
+      "case": "openrouter_numeric_zero_cost",
+      "outcome": "response",
+      "cost_usd": null,
+      "cost_source": "unknown"
+    },
+    {
+      "case": "explicit_free_numeric_zero_cost",
+      "outcome": "response",
+      "cost_usd": 0.0,
+      "cost_source": "configured_estimate"
+    },
+    {
+      "case": "retry_after_120_seconds",
+      "attempted_at_seconds": [
+        0.0,
+        10.0
+      ],
+      "server_retry_after_seconds": 120
+    },
+    {
+      "case": "payment_required_outcome",
+      "http_status": 402,
+      "outcome": "unknown"
+    }
+  ]
+}

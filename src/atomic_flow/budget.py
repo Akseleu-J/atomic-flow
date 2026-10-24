@@ -56,15 +56,17 @@ class SpendLedger:
             raise BudgetExceeded(f"Daily limit ${self.limit:.2f} reached (${spent:.4f} spent/reserved today). "
                                  "Raise budget.daily_limit_usd or set it to 0 to disable.")
 
-    def _append(self, fields):
+    def _append(self, fields, *, path=None):
         row = json.dumps({"ts": datetime.now(UTC).isoformat(), **fields}, ensure_ascii=False) + "\n"
-        with self.path.open("a", encoding="utf-8") as handle:
+        with (path or self.path).open("a", encoding="utf-8") as handle:
             handle.write(row)
             handle.flush()
             os.fsync(handle.fileno())
 
     def reserve(self, **fields):
         """Atomic admission across cooperating processes; holds persist after a crash."""
+        if self.limit > 0 and fields.get("prices_known") is False:
+            raise BudgetExceeded("configure model prices before calls under a daily budget")
         amount = fields["reserved_usd"]
         self.dir.mkdir(parents=True, exist_ok=True)
         with self._lock, exclusive_file(self.dir / "spend.lock", blocking=True):
@@ -74,14 +76,80 @@ class SpendLedger:
             self._append({**fields, "status": "in_flight", "cost_usd": None})
 
     def record(self, **fields: object) -> None:
+        """Record on the existing call day; previously unseen legacy calls use today.
+
+        Identity corruption raises instead of silently recording another day's
+        charge. Ordinary I/O failure still retains the existing conservative hold.
+        """
+        from atomic_flow.state import StateError
+
         try:
             self.dir.mkdir(parents=True, exist_ok=True)
             with self._lock, exclusive_file(self.dir / "spend.lock", blocking=True):
-                self._append(fields)
+                matches = self._call_rows(fields) if fields.get("call_id") else []
+                path = matches[0][0] if matches else self.path
+                if matches and matches[-1][1].get("status") == "reconciled":
+                    if fields.get("cost_usd") != matches[-1][1].get("cost_usd"):
+                        raise StateError("cannot overwrite a reconciled spend call")
+                    return
+                self._append(fields, path=path)
+        except StateError:
+            raise
         except (OSError, ValueError):
             # Task calls already have a durable reservation and task-local response record.
             # The unresolved ledger reservation stays conservative if settlement fails.
             pass
+
+    def _call_rows(self, fields):
+        """Under spend.lock, prove exact identity across retained ledger days.
+
+        Inspect today first, then retained days; all days are checked to refuse
+        duplicate identities rather than trusting an incomplete fast-path hit.
+        This costs O(retained ledger bytes); a transactional index is future work.
+        """
+        from atomic_flow.state import StateError
+
+        paths = sorted(self.dir.glob("????-??-??.jsonl"), key=lambda item: item != self.path)
+        matches = []
+        for path in paths:
+            try:
+                with path.open(encoding="utf-8") as handle:
+                    for line in handle:
+                        row = json.loads(line)
+                        if not isinstance(row, dict):
+                            raise StateError("invalid original spend ledger row")
+                        if row.get("call_id") == fields["call_id"]:
+                            if row.get("task_id") != fields.get("task_id"):
+                                raise StateError("spend call identity belongs to a different task")
+                            matches.append((path, row))
+            except (ValueError, OSError) as exc:
+                if isinstance(exc, StateError):
+                    raise
+                raise StateError("cannot validate original spend ledger") from exc
+        if len({path for path, _ in matches}) > 1:
+            raise StateError("spend call spans multiple ledger days; inspect it before settlement")
+        return matches
+
+    def settle(self, **fields: object) -> None:
+        """Settle the original call/day exactly once, refusing identity conflicts."""
+        from atomic_flow.state import StateError
+
+        self.dir.mkdir(parents=True, exist_ok=True)
+        with self._lock, exclusive_file(self.dir / "spend.lock", blocking=True):
+            matches = self._call_rows(fields)
+            if not matches:
+                raise StateError("reconciliation requires the original spend reservation")
+            if not any(row.get("status") == "in_flight" and type(row.get("reserved_usd")) in (int, float)
+                       and math.isfinite(row["reserved_usd"]) and row["reserved_usd"] >= 0
+                       for _, row in matches):
+                raise StateError("reconciliation requires the original spend reservation")
+            path = matches[0][0]
+            for _, row in matches:
+                if row.get("status") == "reconciled":
+                    if any(row.get(key) != fields.get(key) for key in ("cost_usd", "reconciliation_id")):
+                        raise StateError("spend call already reconciled with different evidence or cost")
+                    return
+            self._append(fields, path=path)
 
 
 def prune_runs(keep_days: int, root: Path | None = None) -> int:

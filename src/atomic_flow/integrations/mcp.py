@@ -93,6 +93,8 @@ class MCPClient:
         self.timeout = timeout
         self._lock = threading.RLock()
         self._proc = None
+        self._owned_job = None
+        self._cleanup_unknown = False
         self._temp = None
         self._frames = queue.Queue(maxsize=16)
         self._next_id = 0
@@ -107,7 +109,13 @@ class MCPClient:
             self._temp = tempfile.TemporaryDirectory(prefix="atomic-mcp-")
             home = Path(self._temp.name)
             try:
-                self._proc = subprocess.Popen(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                spawn = subprocess.Popen
+                if os.name == "nt":
+                    from atomic_flow.windows_job import WindowsJob
+
+                    self._owned_job = WindowsJob()
+                    spawn = self._owned_job.spawn
+                self._proc = spawn(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                               stderr=subprocess.DEVNULL, cwd=home, env=clean_environment(home),
                                               start_new_session=os.name != "nt")
                 threading.Thread(target=self._reader, daemon=True).start()
@@ -256,8 +264,16 @@ class MCPClient:
     def close(self):
         with self._lock:
             self._initialized = False
+            if self._owned_job is not None:
+                try:
+                    self._owned_job.terminate()
+                except OSError:
+                    self._cleanup_unknown = True
+                finally:
+                    self._owned_job.close()
+                    self._owned_job = None
             if self._proc is not None:
-                if self._proc.poll() is None:
+                if os.name != "nt" and self._proc.poll() is None:
                     _kill_tree(self._proc)
                 try:
                     self._proc.wait(timeout=2)
@@ -269,6 +285,8 @@ class MCPClient:
             if self._temp is not None:
                 self._temp.cleanup()
                 self._temp = None
+            if self._cleanup_unknown:
+                raise MCPError("Windows process-tree cleanup could not be confirmed; effects remain unknown")
 
     def __enter__(self):
         return self.start()

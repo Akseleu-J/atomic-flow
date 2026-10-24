@@ -24,7 +24,7 @@ class RunError(BaseModel):
     version: Literal[1] = 1
     code: str
     message: str
-    request_outcome: Literal["not_sent", "refused", "unknown"] = "unknown"
+    request_outcome: Literal["not_sent", "refused", "completed", "unknown"] = "unknown"
 
 
 class AnswerHandle:
@@ -66,7 +66,7 @@ class AnswerHandle:
                                "Tool effects unresolved; inspect external state before starting new work" if isinstance(exc, UnresolvedEffects) else
                                "Run failed; inspect local session diagnostics")
                     self.error = RunError(code=type(exc).__name__, message=message,
-                                          request_outcome=outcome if outcome in {"not_sent", "refused", "unknown"} else "unknown")
+                                          request_outcome=outcome if outcome in {"not_sent", "refused", "completed", "unknown"} else "unknown")
                     self.buffer.emit("run_cancelled" if cancelled else "run_failed", {"error": self.error.model_dump()},
                                      outcome="cancelled" if cancelled else "error", terminal=True)
                 finally:

@@ -158,7 +158,8 @@ class ToolContext:
         from atomic_flow.activation.activate import ActivationIndex
         from atomic_flow.tree.builder import build_tree, save_tree
 
-        tree = build_tree(self.project_root, self.tree_ignore, respect_gitignore=self.respect_gitignore)
+        tree = build_tree(self.project_root, self.tree_ignore, respect_gitignore=self.respect_gitignore,
+                          cancel_check=self.cancel_check)
         fresh = {item["node_id"]: TreeNode.model_validate(item) for item in tree["nodes"]}
         next_alias = max((int(a[1:]) for a in self.alias_to_id if a.startswith("n") and a[1:].isdigit()), default=0) + 1
         for nid in fresh:

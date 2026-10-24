@@ -8,7 +8,7 @@ import threading
 import time
 from pathlib import Path
 
-from atomic_flow.agents.execution import ExecutionUnavailable, TaskCancelled, run_python
+from atomic_flow.agents.execution import ExecutionUnavailable, TaskCancelled, execution_manifest, run_python
 from atomic_flow.config import ExecutionConfig
 from atomic_flow.jobs import TERMINAL, JobError, JobStore, _atomic, _snapshot_hashes
 from atomic_flow.locking import exclusive_file
@@ -74,6 +74,9 @@ def run_worker(store: JobStore, job_id: str):
                 raise JobError("Docker unavailable before execution")
             if state["execution"]["mode"] == "local" and state["execution"].get("profile", "checks") != "checks":
                 raise JobError("selected execution profile requires Docker")
+            resolved = execution_manifest(ExecutionConfig.model_validate(state["execution"]), probe=True)
+            if state.get("resolved_execution", resolved) != resolved:
+                raise JobError("execution runtime identity changed after job preparation")
             launch_attempted = True
             result = run_python(state["args"], workspace, config=ExecutionConfig.model_validate(state["execution"]),
                                 timeout=state["timeout"], cancel_check=check, output_callback=output,
@@ -105,6 +108,7 @@ def run_worker(store: JobStore, job_id: str):
                 current.update(status=status, returncode=returncode, error=error,
                                updated_at=time.time(), finished_at=time.time(), discarded_bytes=discarded,
                                effects_unknown=effects_unknown,
+                               cleanup_confirmed=not effects_unknown,
                                output_complete=status in {"succeeded", "failed", "timed_out", "cancelled"} and error is None)
                 _atomic(directory / "state.json", current)
 

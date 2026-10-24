@@ -1,0 +1,38 @@
+F....................                                                    [100%]
+================================== FAILURES ===================================
+____________ test_unknown_cost_blocks_format_repair_and_keeps_hold ____________
+
+project = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-import-recheck-20261024/test_unknown_cost_blocks_forma0/proj')
+config = AtomicConfig(mode='medium', context_budget_tokens=8000, max_attempts=3, auto_mode=True, default_backend='auto', tree=T...tools=False), routing=RoutingConfig(mode='fixed', routes=[], max_attempts=3, timeout_seconds=120, cooldown_seconds=60))
+
+    def test_unknown_cost_blocks_format_repair_and_keeps_hold(project, config):
+        class Unknown(ScriptedBackend):
+            def chat(self, messages, **kwargs):
+                super().chat(messages, **kwargs)
+                return ChatResult("invalid JSON", cost_usd=None)
+    
+        model = Unknown({"answerer": {"text": "ignored"}})
+        handle = start_answer(config, project, model, "refund", mode="simple")
+        with pytest.raises(BudgetExceeded, match="unresolved model cost"):
+>           handle.result(5)
+
+tests\test_run_control.py:475: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <atomic_flow.sdk.AnswerHandle object at 0x000002203D19ED50>, timeout = 5
+
+    def result(self, timeout: float | None = None):
+        if not self._done.wait(timeout):
+>           raise TimeoutError("run has not completed")
+E           TimeoutError: run has not completed
+
+src\atomic_flow\sdk.py:112: TimeoutError
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_run_control.py::test_unknown_cost_blocks_format_repair_and_keeps_hold
+1 failed, 20 passed, 1 warning in 78.12s (0:01:18)

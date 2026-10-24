@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from atomic_flow.agents.source import confined_path, digest, replace_checked
+from atomic_flow.durability import atomic_bytes, write_bytes
+from atomic_flow.source_lock import mutation_guard
 
 
 @dataclass
@@ -38,7 +40,7 @@ class UndoStack:
         folder = self.storage_dir / edit_id
         folder.mkdir()
         backup = folder / "original.py"
-        backup.write_bytes(before)
+        write_bytes(backup, before)
         record = EditRecord(edit_id, rel_path, node_id, old_source, new_source, time.time(), backup,
                             str(project_root.resolve()), digest(before), digest(after))
         self._write_meta(record)
@@ -50,9 +52,7 @@ class UndoStack:
             "edit_id", "rel_path", "node_id", "timestamp", "project", "before_hash", "after_hash",
         )}
         target = record.backup.parent / "meta.json"
-        temp = target.with_suffix(".json.tmp")
-        temp.write_text(json.dumps({**meta, "undone": undone}, indent=2), encoding="utf-8")
-        temp.replace(target)
+        atomic_bytes(target, json.dumps({**meta, "undone": undone}, indent=2).encode("utf-8"))
 
     def _record_from_dir(self, path: Path) -> EditRecord | None:
         try:
@@ -67,6 +67,7 @@ class UndoStack:
         except (OSError, KeyError, TypeError, ValueError):
             return None
 
+    @mutation_guard("project_root")
     def undo(self, project_root: Path, edit_id: str = "last") -> EditRecord | None:
         if edit_id.startswith("fileedit_"):
             return self._undo_files(project_root, edit_id)

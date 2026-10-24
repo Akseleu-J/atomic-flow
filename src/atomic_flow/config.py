@@ -27,7 +27,7 @@ BACKEND_DEFAULTS: dict[str, dict[str, Any]] = {
 }
 
 # A cloned repository must not be able to redirect your API key or source code.
-UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task", "conversation", "experimental")
+UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task", "conversation", "experimental", "routing")
 
 
 def user_dir() -> Path:
@@ -58,6 +58,13 @@ class BackendConfig(BaseModel):
     price_in_per_mtok: float | None = Field(default=None, ge=0)  # lets budget enforcement work without provider cost
     price_out_per_mtok: float | None = Field(default=None, ge=0)
     tool_protocol: Literal["text_json", "native"] = "text_json"
+    quota_scope: str = Field(default="", max_length=100)
+    requests_per_minute: int | None = Field(default=None, ge=1)
+    requests_per_day: int | None = Field(default=None, ge=1)
+    tokens_per_minute: int | None = Field(default=None, ge=1)
+    max_concurrent_requests: int = Field(default=1, ge=1, le=32)
+    # Host-confirmed tariff expiry, Unix UTC seconds. Routing never guesses free pricing.
+    free_until: float | None = Field(default=None, gt=0, allow_inf_nan=False)
 
     @field_validator("base_url")
     @classmethod
@@ -73,6 +80,15 @@ class BackendConfig(BaseModel):
 class BudgetConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     daily_limit_usd: float = Field(default=10.0, ge=0)          # 0 disables; enforced locally in budget.py
+
+
+class RoutingConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    mode: Literal["fixed", "free_only", "capped_paid"] = "fixed"
+    routes: list[str] = Field(default_factory=list, max_length=8)
+    max_attempts: int = Field(default=3, ge=1, le=8)
+    timeout_seconds: float = Field(default=120, gt=0, le=600)
+    cooldown_seconds: float = Field(default=60, ge=1, le=86400)
 
 
 class ArtifactsConfig(BaseModel):
@@ -142,6 +158,7 @@ class AtomicConfig(BaseModel):
     execution: ExecutionConfig = Field(default_factory=ExecutionConfig)
     conversation: ConversationConfig = Field(default_factory=ConversationConfig)
     experimental: ExperimentalConfig = Field(default_factory=ExperimentalConfig)
+    routing: RoutingConfig = Field(default_factory=RoutingConfig)
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
@@ -208,6 +225,8 @@ def _resolve_config(project: str | Path | None = None) -> tuple[AtomicConfig, di
     _deep_update(merged, user_yaml)
     record(user_yaml, "user")
     project_yaml = _read_yaml(project_dir(project) / "config.yaml")
+    # Routing is a host egress decision, even a trusted repo cannot expand it.
+    project_yaml.pop("routing", None)
     root = Path(project or Path.cwd()).expanduser().resolve()
     dropped = []
     if project_yaml and not is_trusted(root):

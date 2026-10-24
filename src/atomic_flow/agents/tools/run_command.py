@@ -46,7 +46,7 @@ class RunCommandTool(Tool):
         # contain credentials excluded by source admission). TaskRunner already
         # supplies a private snapshot; ordinary ask gets an ephemeral changeset.
         ctx.cancel_check()
-        with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace) as check_root:
+        with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
             result = run_python(cmd, check_root, config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
         if result.timed_out:
             return {"command": args.command, "error": "command timed out after 120 seconds"}

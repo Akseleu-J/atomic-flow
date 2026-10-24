@@ -1,0 +1,49 @@
+............F                                                            [100%]
+================================== FAILURES ===================================
+_____ test_effect_rejects_missing_charge_only_and_already_terminal_calls ______
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-reconcile-7a844d0862b24a4fac2dbe425acca7a8/test_effect_rejects_missing_ch0')
+
+    monkeypatch.setattr(module, "_session_event", real)
+    settle(task)
+    check_accounting(load(task.id))
+>   assert load(task.id).budget_spent == 0.4
+
+tests\test_reconcile_import_regressions.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\sessions.py:215: in append
+    event = self._event(sequence + 1, event_type, payload, call_id, outcome)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <atomic_flow.sessions.SessionJournal object at 0x000002836CEF6CF0>
+sequence = 5, event_type = 'tool_result', payload = {'ok': True}
+call_id = 'write_done', outcome = 'completed'
+
+    def _event(self, sequence: int, event_type: str, payload: dict, call_id: str | None = None,
+               outcome: str | None = None) -> dict:
+        if event_type not in EVENT_TYPES:
+            raise StateError(f"unsupported session event type: {event_type}")
+        if not isinstance(payload, dict):
+            raise StateError("session event payload must be an object")
+        if event_type == "host_reconciliation":
+            if (payload.get("scope") not in {"charge", "effect"}
+                    or not isinstance(payload.get("reconciliation_id"), str)
+                    or not re.fullmatch(r"reconcile_[a-f0-9]{64}", payload["reconciliation_id"])
+                    or not isinstance(payload.get("evidence_sha256"), str)
+                    or not re.fullmatch(r"[a-f0-9]{64}", payload["evidence_sha256"])
+                    or not payload.get("actor") or not payload.get("reason") or not call_id):
+                raise StateError("invalid host reconciliation observation")
+        if "call_id" in payload and (not isinstance(payload["call_id"], str)
+                                      or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", payload["call_id"])):
+            raise StateError("invalid session payload call_id")
+        if call_id is not None and (not isinstance(call_id, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", call_id)):
+            raise StateError("invalid session call_id")
+        if outcome is not None and outcome not in ("success", "error", "denied", "cancelled", "unknown", "pending", "refused", "not_sent"):
+>           raise StateError("invalid session outcome")
+E           atomic_flow.state.StateError: invalid session outcome
+
+src\atomic_flow\sessions.py:197: StateError
+=========================== short test summary info ===========================
+FAILED tests/test_reconcile_import_regressions.py::test_effect_rejects_missing_charge_only_and_already_terminal_calls
+1 failed, 12 passed in 9.13s

@@ -77,7 +77,7 @@ while True:
                 json.dump({"secret": os.environ.get("GITHUB_TOKEN"), "pythonpath": os.environ.get("PYTHONPATH"),
                            "home": os.environ.get("HOME")}, handle)
         result = {"capabilities": {"positionEncoding": "utf-8" if mode == "utf8" else "utf-16",
-                                   "textDocumentSync": 1, "renameProvider": True}}
+                                   "textDocumentSync": 2 if mode == "incremental" else 1, "renameProvider": True}}
     elif method == "textDocument/definition" or method == "textDocument/references":
         if mode == "timeout":
             time.sleep(10)

@@ -6,6 +6,9 @@ import stat
 import uuid
 from pathlib import Path
 
+from atomic_flow.durability import sync_directory, write_bytes
+from atomic_flow.source_lock import LOCK_NAME, mutation_guard
+
 
 class SourceConflict(OSError):
     pass
@@ -26,6 +29,8 @@ def digest(data: bytes) -> str:
 def confined_path(root: Path, rel: str) -> Path:
     root = root.resolve()
     part = Path(rel)
+    if part.parts and part.parts[0].casefold() == LOCK_NAME:
+        raise SourceConflict("source mutation lock is reserved host state")
     if part.is_absolute() or part.drive or not part.parts or ".." in part.parts:
         raise SourceConflict("source path escapes project root")
     target = root / part
@@ -46,6 +51,7 @@ def read_checked(root: Path, rel: str, expected: str) -> bytes:
     return data
 
 
+@mutation_guard("root")
 def replace_checked(root: Path, rel: str, data: bytes, expected: str | None) -> None:
     target = confined_path(root, rel)
 
@@ -58,11 +64,12 @@ def replace_checked(root: Path, rel: str, data: bytes, expected: str | None) -> 
     target.parent.mkdir(parents=True, exist_ok=True)
     temp = target.with_name(target.name + f".{uuid.uuid4().hex}.atomic-tmp")
     try:
-        temp.write_bytes(data)
+        write_bytes(temp, data)
         if target.exists():
             temp.chmod(stat.S_IMODE(target.stat().st_mode))
         check()
         confined_path(root, rel)
         temp.replace(target)
+        sync_directory(target.parent)
     finally:
         temp.unlink(missing_ok=True)

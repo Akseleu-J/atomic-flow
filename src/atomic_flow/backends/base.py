@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 from atomic_flow.config import BackendConfig
+from atomic_flow.errors import BackendError
 
 
 @dataclass(frozen=True)
@@ -36,6 +37,23 @@ class ChatResult:
     cache_write_tokens: int | None = None
     cost_source: str = "unspecified"
     tool_calls: list[NativeToolCall] = field(default_factory=list)
+    resolved_backend: str | None = None
+    resolved_model: str | None = None
+    attempt_id: str | None = None
+
+
+class ResponseShapeError(BackendError):
+    """A received response with recoverable usage, but unusable content.
+
+    Accounting callers settle usage_result before propagating the failure.
+    A completed response must never trigger provider failover.
+    """
+
+    request_outcome = "completed"
+
+    def __init__(self, message: str, usage_result: ChatResult):
+        self.usage_result = usage_result
+        super().__init__(message)
 
 
 def backend_capabilities(config: BackendConfig) -> dict:

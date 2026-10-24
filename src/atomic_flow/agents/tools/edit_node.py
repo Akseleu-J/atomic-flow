@@ -10,6 +10,7 @@ from atomic_flow.agents.base import Tool
 from atomic_flow.agents.context import ToolContext
 from atomic_flow.agents.source import digest, read_checked, replace_checked
 from atomic_flow.agents.verify import verify_edit
+from atomic_flow.source_lock import mutation_guard
 from atomic_flow.textutil import split_lines
 
 
@@ -29,6 +30,7 @@ class EditNodeTool(Tool):
     )
     args_schema = EditNodeArgs
 
+    @mutation_guard("ctx")
     def run(self, args: EditNodeArgs, ctx: ToolContext) -> dict[str, Any]:
         if not ctx.edits_enabled:
             return {"error": "edits disabled", "hint": "run with --approve-edits (CLI) or ATOMIC_FLOW_ALLOW_EDITS=1"}

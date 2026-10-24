@@ -6,10 +6,11 @@ import json
 import os
 import threading
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from atomic_flow.agents.effects import UnresolvedEffects
 from atomic_flow.backends.router import make_backend
@@ -22,34 +23,116 @@ from atomic_flow.runtime import ControlMessage
 Mode = Literal["simple", "medium", "hard"]
 PLACEHOLDER_KEYS = {"replace-with-a-long-random-value", "changeme", "secret", "password"}
 STATUS_FOR = {UnresolvedEffects: 409, BackendError: 502, BudgetExceeded: 429, TreeError: 409, ConfigurationError: 400}
+MAX_BODY_BYTES = 1_048_576
+MAX_TEXT_BYTES = 200_000
+Text = Annotated[str, Field(strict=True, max_length=50_000)]
 
 
-class AnswerRequest(BaseModel):
+class StrictRequest(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+
+class AnswerRequest(StrictRequest):
     query: str = Field(min_length=1, max_length=50_000)
     project: str = Field(default=".", max_length=4096)
     mode: Mode | None = None
     auto_mode: bool | None = None
     budget_tokens: int | None = Field(default=None, ge=256, le=200_000)
-    backend: str = "auto"
-    model: str | None = None
-    role_prompts: dict[str, str] = Field(default_factory=dict)
+    backend: str = Field(default="auto", max_length=128)
+    model: str | None = Field(default=None, max_length=256)
+    role_prompts: dict[Annotated[str, Field(max_length=64)], Text] = Field(default_factory=dict, max_length=16)
     acknowledge_default_prompts: bool = False
     retrieval_query: str | None = Field(default=None, max_length=50_000)
     resume_from: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,64}$")
-    memory_ids: list[str] = Field(default_factory=list, max_length=10)
+    memory_ids: list[Annotated[str, Field(max_length=128)]] = Field(default_factory=list, max_length=10)
     memory_query: str | None = Field(default=None, min_length=1, max_length=1000)
 
+    @model_validator(mode="after")
+    def aggregate_text(self):
+        texts = [self.query, self.retrieval_query or "", *self.role_prompts.values()]
+        if sum(len(text.encode("utf-8")) for text in texts) > MAX_TEXT_BYTES:
+            raise ValueError("aggregate query and role prompt byte limit exceeded")
+        return self
 
-class ChatRequest(BaseModel):
-    model: str = "atomic-medium"
-    messages: list[dict[str, Any]] = Field(min_length=1, max_length=100)
+
+class TextPart(StrictRequest):
+    type: Literal["text"]
+    text: Text
+
+
+class ChatMessage(StrictRequest):
+    role: Literal["system", "developer", "user", "assistant"]
+    content: Text | Annotated[list[TextPart], Field(max_length=100)]
+
+    def text(self) -> str:
+        return self.content if isinstance(self.content, str) else "".join(p.text for p in self.content)
+
+    @model_validator(mode="after")
+    def bounded_message(self):
+        if len(self.text()) > 50_000:
+            raise ValueError("combined message text limit exceeded")
+        return self
+
+
+class ChatRequest(StrictRequest):
+    model: str = Field(default="atomic-medium", max_length=256)
+    messages: list[ChatMessage] = Field(min_length=1, max_length=100)
     stream: bool = False
 
+    @model_validator(mode="after")
+    def bounded_transcript(self):
+        if sum(len(m.text().encode("utf-8")) for m in self.messages) > MAX_TEXT_BYTES:
+            raise ValueError("aggregate conversation byte limit exceeded")
+        return self
 
-def _text(content: Any) -> str:
-    if isinstance(content, list):                              # OpenAI "content parts"
-        return "".join(p.get("text", "") for p in content if isinstance(p, dict))
-    return str(content or "")
+
+class BoundedBodyMiddleware:
+    """Bound the received body before JSON decoding, including chunked requests."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http" or not scope["path"].startswith("/v1/"):
+            return await self.app(scope, receive, send)
+        from starlette.responses import JSONResponse
+
+        async def reject(status, code):
+            await JSONResponse({"error": {"code": code}}, status_code=status)(scope, receive, send)
+
+        for key, value in scope.get("headers", []):
+            if key.lower() == b"content-length":
+                try:
+                    length = int(value)
+                    if length < 0:
+                        raise ValueError
+                except ValueError:
+                    return await reject(400, "invalid_content_length")
+                if length > MAX_BODY_BYTES:
+                    return await reject(413, "body_too_large")
+        chunks, size = [], 0
+        while True:
+            message = await receive()
+            if message["type"] == "http.disconnect":
+                return
+            body = message.get("body", b"")
+            size += len(body)
+            if size > MAX_BODY_BYTES:
+                return await reject(413, "body_too_large")
+            chunks.append(body)
+            if not message.get("more_body", False):
+                break
+        buffered = b"".join(chunks)
+        delivered = False
+
+        async def bounded_receive():
+            nonlocal delivered
+            if not delivered:
+                delivered = True
+                return {"type": "http.request", "body": buffered, "more_body": False}
+            return await receive()
+
+        return await self.app(scope, bounded_receive, send)
 
 
 def split_conversation(turns: list[tuple[str, str]]) -> tuple[str | None, str]:
@@ -72,17 +155,44 @@ def create_app():
     if server_key and (len(server_key) < 16 or server_key.lower() in PLACEHOLDER_KEYS):
         raise RuntimeError("ATOMIC_FLOW_SERVER_API_KEY is a placeholder or shorter than 16 characters.")
 
-    app = FastAPI(title="atomic_flow", version="0.2.0",
+    project_root = Path(os.getenv("ATOMIC_FLOW_PROJECT_ROOT", Path.cwd())).expanduser().resolve()
+    for variable in ("WEB_CONCURRENCY", "UVICORN_WORKERS"):
+        if os.getenv(variable, "1") != "1":
+            raise RuntimeError("The live-run API supports exactly one worker per project.")
+
+    @asynccontextmanager
+    async def lifespan(app):
+        from atomic_flow.locking import exclusive_file
+        with exclusive_file(project_root / ".atomic_flow" / "api-service.lock",
+                            busy_message="An API worker already owns this project; multi-worker mode is unsupported."):
+            app.state.ready = True
+            try:
+                yield
+            finally:
+                app.state.ready = False
+
+    app = FastAPI(title="atomic_flow", version="0.2.0", lifespan=lifespan,
                   docs_url=None if server_key else "/docs",
                   redoc_url=None if server_key else "/redoc",
                   openapi_url=None if server_key else "/openapi.json")
+    app.state.ready = False
+    app.add_middleware(BoundedBodyMiddleware)
+
+    from fastapi.exceptions import RequestValidationError
+
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(request, exc):
+        # Never echo submitted prompts, credentials or large rejected bodies.
+        return JSONResponse(status_code=422, content={"detail": [
+            {"loc": list(error["loc"]), "type": error["type"], "msg": error["msg"]}
+            for error in exc.errors()[:16]]})
     slots = threading.BoundedSemaphore(int(os.getenv("ATOMIC_FLOW_MAX_CONCURRENCY", "4")))
     runs = {}
     runs_lock = threading.Lock()
     streaming = set()
 
     def configured_project_root() -> Path:
-        return Path(os.getenv("ATOMIC_FLOW_PROJECT_ROOT", Path.cwd())).expanduser().resolve()
+        return project_root
 
     @app.middleware("http")
     async def protect_api(request: Request, call_next):
@@ -102,6 +212,11 @@ def create_app():
     @app.get("/health")
     def health():
         return {"status": "ok", "service": "atomic_flow"}
+
+    @app.get("/ready")
+    def ready():
+        return JSONResponse(status_code=200 if app.state.ready else 503,
+                            content={"ready": app.state.ready, "ownership": "single_process", "durable_runs": False})
 
     @app.get("/v1/models")
     def models():
@@ -250,12 +365,13 @@ def create_app():
     def chat(request: ChatRequest):
         if request.stream:
             raise HTTPException(400, detail={"error": "streaming_not_supported", "message": "Streaming is not available in this release."})
-        turns = [(str(m.get("role", "user")), _text(m.get("content"))) for m in request.messages
-                 if m.get("role") in {"system", "developer", "user", "assistant"}]
+        turns = [(m.role, m.text()) for m in request.messages]
         last_user, history = split_conversation(turns)
         if last_user is None:
             raise HTTPException(400, detail={"error": "no_user_message", "message": "At least one user message is required."})
         query = f"Conversation so far:\n{history}\n\nCurrent question: {last_user}" if history else last_user
+        if len(query) > 50_000 or len(query.encode("utf-8")) + len(last_user.encode("utf-8")) > MAX_TEXT_BYTES:
+            raise HTTPException(422, detail={"error": "composed_query_too_large"})
         mode: Mode = "hard" if request.model.endswith("hard") else "simple" if request.model.endswith("simple") else "medium"
         # Retrieval uses ONLY the last user turn: BM25 over the whole transcript drowns the real question.
         data = run_answer(AnswerRequest(query=query, retrieval_query=last_user, project=str(configured_project_root()),

@@ -1,0 +1,1840 @@
+EEEEEEEEEEEEE                                                            [100%]
+=================================== ERRORS ====================================
+__ ERROR at setup of test_charge_reconciliation_settles_all_three_artifacts ___
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_reconciliation_is_idempotent_and_repairs_crash_gaps __
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_reconciliation_input_validation[kwargs0-settled cost] _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_reconciliation_input_validation[kwargs1-settled cost] _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_reconciliation_input_validation[kwargs2-actor and reason] _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+__________ ERROR at setup of test_reconciliation_refuses_wrong_state __________
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_effect_reconciliation_requires_session_and_clears_only_effects _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+________________ ERROR at setup of test_cli_reconcile_wrapper _________________
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_cross_day_settlement_repairs_original_day_and_does_not_charge_today _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_same_evidence_cannot_change_amount_or_report_false_result _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_missing_or_foreign_ledger_identity_never_completes_task _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_crash_after_ledger_before_session_blocks_until_same_evidence_repair _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+_ ERROR at setup of test_effect_rejects_missing_charge_only_and_already_terminal_calls _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+>           os.rmdir(path)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:637: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+ignore_errors = False, onerror = None
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+dir_fd = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            stack = [(os.lstat, dir_fd, path, None)]
+            try:
+                while stack:
+                    _rmtree_safe_fd(stack, onexc)
+            finally:
+                # Close any file descriptors still on the stack.
+                while stack:
+                    func, fd, path, entry = stack.pop()
+                    if func is not os.close:
+                        continue
+                    try:
+                        os.close(fd)
+                    except OSError as err:
+                        onexc(os.close, path, err)
+        else:
+            if dir_fd is not None:
+                raise NotImplementedError("dir_fd unavailable on this platform")
+            try:
+                if _rmtree_islink(path):
+                    # symlinks to directories are forbidden, see bug #1669
+                    raise OSError("Cannot call rmtree on a symbolic link")
+            except OSError as err:
+                onexc(os.path.islink, path, err)
+                # can't continue even if onexc hook returns
+                return
+>           return _rmtree_unsafe(path, onexc)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+onexc = functools.partial(<function on_rm_rf_error at 0x000002318E07A7A0>, start_path=WindowsPath('//?/C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/reconcile-import-temp'))
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.unlink(fullname)
+                except OSError as err:
+                    onexc(os.unlink, fullname, err)
+        try:
+            os.rmdir(path)
+        except OSError as err:
+>           onexc(os.rmdir, path, err)
+E           PermissionError: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py:639: PermissionError
+============================== warnings summary ===============================
+tests/test_reconcile.py: 8 warnings
+tests/test_reconcile_import_regressions.py: 5 warnings
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\_pytest\pathlib.py:102: PytestWarning: (rm_rf) unknown function <built-in function scandir> when removing \\?\C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.local-tools\reconcile-import-temp:
+  <class 'PermissionError'>: [WinError 5] �������� � �������: '\\\\?\\C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\reconcile-import-temp'
+    warnings.warn(
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.pytest_cache\v\cache\nodeids: [WinError 5] �������� � �������: 'C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:423
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\_pytest\cacheprovider.py:423: PytestCacheWarning: could not create cache path C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.pytest_cache\v\cache\lastfailed: [WinError 5] �������� � �������: 'C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/test_reconcile.py::test_charge_reconciliation_settles_all_three_artifacts
+ERROR tests/test_reconcile.py::test_reconciliation_is_idempotent_and_repairs_crash_gaps
+ERROR tests/test_reconcile.py::test_reconciliation_input_validation[kwargs0-settled cost]
+ERROR tests/test_reconcile.py::test_reconciliation_input_validation[kwargs1-settled cost]
+ERROR tests/test_reconcile.py::test_reconciliation_input_validation[kwargs2-actor and reason]
+ERROR tests/test_reconcile.py::test_reconciliation_refuses_wrong_state - Perm...
+ERROR tests/test_reconcile.py::test_effect_reconciliation_requires_session_and_clears_only_effects
+ERROR tests/test_reconcile.py::test_cli_reconcile_wrapper - PermissionError: ...
+ERROR tests/test_reconcile_import_regressions.py::test_cross_day_settlement_repairs_original_day_and_does_not_charge_today
+ERROR tests/test_reconcile_import_regressions.py::test_same_evidence_cannot_change_amount_or_report_false_result
+ERROR tests/test_reconcile_import_regressions.py::test_missing_or_foreign_ledger_identity_never_completes_task
+ERROR tests/test_reconcile_import_regressions.py::test_crash_after_ledger_before_session_blocks_until_same_evidence_repair
+ERROR tests/test_reconcile_import_regressions.py::test_effect_rejects_missing_charge_only_and_already_terminal_calls
+15 warnings, 13 errors in 5.16s

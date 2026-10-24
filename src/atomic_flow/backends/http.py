@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import json
+import math
 import random
 import threading
 import time
 import urllib.error
 import urllib.request
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from typing import Any
 
 from atomic_flow.agents.execution import TaskCancelled
@@ -37,6 +40,24 @@ class HTTPStatusError(TransportError):
         super().__init__(f"LLM backend returned HTTP {status}: {detail}",
                          outcome="refused" if status in REFUSED else "unknown")
         self.status, self.detail = status, detail
+        self.retry_after = None
+
+
+def retry_after_seconds(value, *, now=None):
+    """Delta seconds or HTTP-date; never shorten a provider's cooldown."""
+    if value is None:
+        return None
+    try:
+        delay = float(value)
+    except (TypeError, ValueError):
+        try:
+            deadline = parsedate_to_datetime(str(value))
+            if deadline.tzinfo is None:
+                deadline = deadline.replace(tzinfo=UTC)
+            delay = deadline.timestamp() - (datetime.now(UTC).timestamp() if now is None else now)
+        except (TypeError, ValueError, OverflowError):
+            return None
+    return max(0.0, delay) if math.isfinite(delay) else None
 
 
 def _cancel(check, outcome):
@@ -108,6 +129,7 @@ def post_json(url: str, body: dict[str, Any], headers: dict[str, str], *, timeou
         return text
 
     check = current_check()
+    overall_deadline = time.monotonic() + timeout
     _cancel(check, "not_sent")
     try:
         data = json.dumps(body, allow_nan=False).encode("utf-8")
@@ -120,16 +142,19 @@ def post_json(url: str, body: dict[str, Any], headers: dict[str, str], *, timeou
         except (ValueError, TypeError) as exc:
             raise TransportError("invalid model request URL/headers; request not sent", outcome="not_sent") from exc
         try:
-            return _exchange(request, timeout, check)
+            remaining = overall_deadline - time.monotonic()
+            if remaining <= 0:
+                raise TransportError("model retry deadline exceeded; request not sent", outcome="not_sent")
+            return _exchange(request, remaining, check)
         except HTTPStatusError as exc:
             exc.detail = redact(exc.detail)
             exc.args = (f"LLM backend returned HTTP {exc.status}: {exc.detail}",)
             if exc.status not in RETRYABLE or attempt >= retries:
                 raise
-            try:
-                delay = min(10.0, max(0.1, float(exc.retry_after))) if exc.retry_after else None
-            except ValueError:
-                delay = None
+            delay = retry_after_seconds(exc.retry_after)
+            if delay is not None and time.monotonic() + delay >= overall_deadline:
+                # Give the caller the original refusal/reset rather than retry early.
+                raise
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             raise TransportError(f"Could not reach LLM backend: {redact(str(exc))}") from exc
         except (json.JSONDecodeError, UnicodeDecodeError) as exc:

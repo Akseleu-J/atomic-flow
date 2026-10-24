@@ -18,21 +18,133 @@ from atomic_flow.config import ExecutionConfig, TaskConfig, load_config
 @pytest.mark.skipif(os.name != "nt", reason="Windows taskkill helper")
 def test_failed_tree_helper_still_kills_owned_parent_and_preserves_uncertainty(monkeypatch):
     from atomic_flow.agents.execution import _kill_tree
+
     class Process:
         pid = 123
         killed = False
+
         def poll(self):
             return None if not self.killed else -1
+
         def kill(self):
             self.killed = True
+
+        def wait(self, timeout=None):
+            if not self.killed:
+                raise subprocess.TimeoutExpired("proc", timeout)
+            return -1
+
     proc = Process()
+
     def helper(command, **kwargs):
         assert kwargs["stdout"] == kwargs["stderr"] == subprocess.DEVNULL
         raise subprocess.TimeoutExpired(command, 10)
+
+    # Parent exit cannot prove that descendants died after the helper failed.
     monkeypatch.setattr("atomic_flow.agents.execution.subprocess.run", helper)
     with pytest.raises(ExecutionUnavailable, match="effects remain unknown"):
         _kill_tree(proc)
     assert proc.killed
+
+    # A process that survives even the forceful kill keeps the honest unknown.
+    class Stubborn(Process):
+        def kill(self):
+            pass  # TerminateProcess refused; the tree is still running
+
+    stubborn = Stubborn()
+    with pytest.raises(ExecutionUnavailable, match="effects remain unknown"):
+        _kill_tree(stubborn)
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows taskkill helper")
+@pytest.mark.parametrize("helper_status", [1, 128])
+def test_exited_parent_does_not_prove_descendant_cleanup(monkeypatch, helper_status):
+    from types import SimpleNamespace
+
+    from atomic_flow.agents.execution import _kill_tree
+
+    class ExitedParent:
+        pid = 123
+
+        def poll(self):
+            return 0
+
+        def wait(self, timeout=None):
+            return 0
+
+        def kill(self):
+            pytest.fail("already exited parent must not need killing")
+
+    monkeypatch.setattr("atomic_flow.agents.execution.subprocess.run",
+                        lambda *args, **kwargs: SimpleNamespace(returncode=helper_status))
+    with pytest.raises(ExecutionUnavailable, match="effects remain unknown"):
+        _kill_tree(ExitedParent())
+
+
+def test_owned_windows_job_waits_for_every_process(monkeypatch):
+    from types import SimpleNamespace
+
+    from atomic_flow.windows_job import WindowsJob
+
+    active_counts = [2, 1, 0]
+    observed = []
+
+    def query(handle, information_class, info, size, returned):
+        info._obj.active = active_counts.pop(0)
+        observed.append(info._obj.active)
+        return 1
+
+    job = WindowsJob.__new__(WindowsJob)
+    job.handle = 123
+    job.api = SimpleNamespace(TerminateJobObject=lambda *args: 1, QueryInformationJobObject=query)
+    monkeypatch.setattr("atomic_flow.windows_job.time.sleep", lambda seconds: None)
+    job.terminate()
+    assert observed == [2, 1, 0]
+
+
+@pytest.mark.parametrize("query_success", [True, False])
+def test_owned_windows_job_unobserved_or_active_tree_remains_unknown(monkeypatch, query_success):
+    from types import SimpleNamespace
+
+    from atomic_flow.windows_job import WindowsJob
+
+    def query(handle, information_class, info, size, returned):
+        info._obj.active = 1
+        return query_success
+
+    job = WindowsJob.__new__(WindowsJob)
+    job.handle = 123
+    job.api = SimpleNamespace(TerminateJobObject=lambda *args: 1, QueryInformationJobObject=query)
+    times = iter([0, 31])
+    monkeypatch.setattr("atomic_flow.windows_job.time.monotonic", lambda: next(times, 31))
+    with pytest.raises(OSError, match="processes remain active|could not be observed"):
+        job.terminate()
+
+
+@pytest.mark.parametrize("kind", ["mcp", "lsp"])
+def test_host_clients_retain_owned_job_cleanup_uncertainty(tmp_path, kind):
+    import sys
+
+    from atomic_flow.integrations.mcp import MCPClient, MCPError
+    from atomic_flow.lsp import LSPClient, LSPError
+
+    class UnobservedJob:
+        closed = False
+
+        def terminate(self):
+            raise OSError("query refused")
+
+        def close(self):
+            self.closed = True
+
+    cls, error = (MCPClient, MCPError) if kind == "mcp" else (LSPClient, LSPError)
+    peer = cls(tmp_path, [sys.executable], approved=True)
+    job = UnobservedJob()
+    peer._owned_job = job
+    for _ in range(2):
+        with pytest.raises(error, match="effects remain unknown"):
+            peer.close()
+    assert job.closed
 
 
 def test_fixed_profiles_and_mount_options(tmp_path):

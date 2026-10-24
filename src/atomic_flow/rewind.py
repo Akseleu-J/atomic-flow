@@ -18,8 +18,10 @@ from atomic_flow.activation.redact import redact
 from atomic_flow.agents.source import SourceConflict, digest, replace_checked
 from atomic_flow.config import user_dir
 from atomic_flow.dialogue import _path
+from atomic_flow.durability import sync_directory
 from atomic_flow.locking import exclusive_file
 from atomic_flow.sessions import SessionJournal
+from atomic_flow.source_lock import mutation_guard
 from atomic_flow.state import StateError
 
 MAX_PATHS = 64
@@ -53,6 +55,7 @@ def _save(path: Path, state: dict):
             handle.flush()
             os.fsync(handle.fileno())
         temp.replace(path)
+        sync_directory(path.parent)
     finally:
         temp.unlink(missing_ok=True)
 
@@ -235,6 +238,7 @@ def _restore(project: Path, folder: Path, state: dict, desired: dict, snapshot: 
             "paths": list(state["expected"])}
 
 
+@mutation_guard("project")
 def apply_rewind(project: Path, snapshot_id: str, preview_token: str) -> dict:
     project = Path(project).resolve()
     storage = _storage()
@@ -260,6 +264,7 @@ def apply_rewind(project: Path, snapshot_id: str, preview_token: str) -> dict:
         return _restore(project, folder, state, desired, snapshot)
 
 
+@mutation_guard("project")
 def recover_rewind(project: Path, restore_id: str, preview_token: str) -> dict:
     project = Path(project).resolve()
     folder = _folder(restore_id, "restore")

@@ -22,7 +22,7 @@ import uuid
 from pathlib import Path, PurePosixPath
 from types import SimpleNamespace
 
-from atomic_flow.agents.execution import _remove_container, clean_environment
+from atomic_flow.agents.execution import _remove_container, clean_environment, execution_manifest
 from atomic_flow.agents.source import SourceConflict, confined_path
 from atomic_flow.agents.tools.file_paths import admitted_path
 from atomic_flow.config import ExecutionConfig, user_dir
@@ -209,9 +209,6 @@ class JobStore:
                     _safe(job)
                     path = job / "state.json"
                     _safe(path, regular=True)
-                    records += 1
-                    if records > 4096:
-                        raise JobError("global job metadata count exhausted")
                     try:
                         with path.open("rb") as handle:
                             data = handle.read(_MAX_STATE + 1)
@@ -223,6 +220,10 @@ class JobStore:
                             raise ValueError
                     except (OSError, ValueError, TypeError, AttributeError):
                         raise JobError("global job admission metadata unavailable; reconcile before new work") from None
+                    if not state.get("payload_collected", False):
+                        records += 1
+                        if records > 4096:
+                            raise JobError("global job metadata count exhausted")
                     if (state["status"] not in TERMINAL
                             or (state.get("effects_unknown") and state.get("cleanup_confirmed") is not True)):
                         count += 1
@@ -237,6 +238,7 @@ class JobStore:
                 or not 1 <= retention_seconds <= 2592000):
             raise JobError("invalid job arguments or limits")
         config = config or ExecutionConfig()
+        resolved_execution = execution_manifest(config)
         _safe(self.directory)
         self.directory.mkdir(mode=0o700, parents=True, exist_ok=True)
         job_id = "job_" + uuid.uuid4().hex[:24]
@@ -249,13 +251,14 @@ class JobStore:
                  "snapshot_hash": hashlib.sha256(_json({})).hexdigest(), "cursor_key": os.urandom(32).hex(),
                  "returncode": None, "error": None, "effects_unknown": False,
                  "output_complete": False, "output_expired": False, "discarded_bytes": 0,
-                 "container_name": "atomic-job-" + job_id[4:]}
+                 "container_name": "atomic-job-" + job_id[4:], "resolved_execution": resolved_execution}
         admission_lock = self.admission_root / "admission.lock"
         _safe(admission_lock, regular=True)
         with exclusive_file(admission_lock, blocking=True):
             if self._active_count() >= 4:
                 raise JobError("global active job limit exhausted (4); reconcile unresolved jobs")
-            if len(list(self.directory.glob("job_*"))) >= 64:
+            if sum(not self._read(path.name).get("payload_collected", False)
+                   for path in self.directory.glob("job_*")) >= 64:
                 raise JobError("job storage count exhausted (64 per project)")
             directory.mkdir(mode=0o700, parents=True)
             _atomic(directory / "state.json", state)
@@ -315,6 +318,52 @@ class JobStore:
     def list(self) -> list[dict]:
         _safe(self.directory)
         return [self.status(path.name) for path in sorted(self.directory.glob("job_*")) if path.is_dir()]
+
+    def collect(self) -> list[str]:
+        """Host-invoked GC of expired terminal payloads; retain identity tombstones.
+
+        Pending, uncertain or leased work is never collected. Validate every path
+        before recursive removal. A crash leaves a terminal record, never replay.
+        Tombstones retain the original hashes/status and remain readable.
+        """
+        collected = []
+        self.admission_root.mkdir(mode=0o700, parents=True, exist_ok=True)
+        with exclusive_file(self.admission_root / "admission.lock", blocking=True):
+            for directory in sorted(self.directory.glob("job_*")):
+                identifier = directory.name
+                directory = self._directory(identifier)
+                try:
+                    with exclusive_file(directory / "worker.lock", busy_message="worker active"):
+                        with self._lease(identifier):
+                            state = self._read(identifier)
+                            if (state["status"] not in TERMINAL or state.get("effects_unknown")
+                                    or state.get("payload_collected") or state.get("cleanup_confirmed") is False
+                                    or time.time() - state["finished_at"] <= state["retention_seconds"]):
+                                continue
+                            payloads = [directory / name for name in ("workspace", "host_home", "stdout.bin", "stderr.bin")]
+                            for path in payloads:
+                                _safe(path)
+                                if not path.resolve().is_relative_to(directory.resolve()):
+                                    raise JobError("job payload escaped owned storage")
+                                if path.is_dir():
+                                    for current, dirs, files in os.walk(path, followlinks=False):
+                                        for name in [*dirs, *files]:
+                                            _safe(Path(current) / name)
+                            # Mark expired first; interrupted deletion cannot resurrect output.
+                            state.update(output_expired=True, output_complete=False)
+                            _atomic(directory / "state.json", state)
+                            for path in payloads:
+                                if path.is_dir():
+                                    shutil.rmtree(path)
+                                else:
+                                    path.unlink(missing_ok=True)
+                            state.update(payload_collected=True, collected_at=time.time())
+                            _atomic(directory / "state.json", state)
+                            collected.append(identifier)
+                except ValueError as exc:
+                    if str(exc) != "worker active":
+                        raise
+        return collected
 
     def cancel(self, job_id: str) -> dict:
         with self._lease(job_id):
