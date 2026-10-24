@@ -1,0 +1,60 @@
+{
+  "schema": "acceptance-registry/1",
+  "generated_utc": "2026-10-24T16:30:00Z",
+  "baseline_head": "2342dc2c7e86911b76bf91b437a8306356cdabc1",
+  "model_calls": 0,
+  "status_kinds": ["LOCAL_PASS", "CI_PASS", "LIVE_API_RESPONSE", "REMOTE_TASK_COMPLETED", "ORACLE_PASS"],
+  "recorded_evidence": [
+    {
+      "claim": "CPU/execution suite green at runtime commit",
+      "head": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "status": "LOCAL_PASS",
+      "result": "1021 passed / 14 skipped",
+      "evidence": "docs/PRODUCTION_ROADMAP.md section 1; committed validation manifests of packages 18-25"
+    },
+    {
+      "claim": "Installed-wheel matrix across OS/Python",
+      "head": "5cf4068505cf5d020c1762254b7e23992405a415",
+      "status": "CI_PASS",
+      "result": "12 combinations green (ubuntu-24.04/windows-2022/macos-14 x py3.11/3.12 x core/api)",
+      "evidence": "GitHub Actions runs 40103168136/40103168158 on push of 5cf4068"
+    },
+    {
+      "claim": "Real pylsp/MCP staged composition journey",
+      "head": "5cf4068505cf5d020c1762254b7e23992405a415",
+      "status": "CI_PASS",
+      "result": "Real pylsp and MCP staged task job green",
+      "evidence": ".github/workflows/integrations-release.yml job 'Real pylsp and MCP staged task'"
+    },
+    {
+      "claim": "Live edit pilot on exposed SymPy development case",
+      "head": "445f1b9",
+      "status": "ORACLE_PASS",
+      "result": "grader calibration confirmed (base FAIL/gold PASS/wrong FAIL); baseline patch graded requirement_failed; atomic arm produced no accepted edit in 6 calls",
+      "evidence": "validation/import-20261024/stage4-live-pilot-* (report/attempts/kaggle-quota per run)"
+    },
+    {
+      "claim": "Infrastructure baseline indicators captured",
+      "head": "2342dc2c7e86911b76bf91b437a8306356cdabc1",
+      "status": "LOCAL_PASS",
+      "result": "cold import median 0.089 s; self tree build median 5.52 s; process RSS 36.05 MiB; 5 samples with dispersion",
+      "evidence": "validation/p00-baseline-20261024/card.json via tools/p00_baseline.py"
+    }
+  ],
+  "open_gates": [
+    "W6 full composition acceptance beyond CI scenarios",
+    "W7 load p95/RSS/soak on pinned repos",
+    "W8 remaining 29 corpus calibrations and matched comparison",
+    "W9 release candidate rehearsal",
+    "P01-P14 per docs/PRODUCTION_ROADMAP.md; E00-E08 per docs/ENTERPRISE_CORE_PLAN.md"
+  ],
+  "primary_hypothesis_pre_registered": {
+    "source": "COMPETITIVE_ACCEPTANCE.md targets referenced by PRODUCTION_ROADMAP.md P07",
+    "statement": "quality non-inferiority within 5 points AND >=20% lower complete cost per verified success versus capable plain-agent baseline on 30 pinned tasks, frozen model/provider and identical caps; exploratory until a fresh holdout with computed sample size",
+    "budgets": "no paid calls in P00; future live runs require owner-confirmed account/model/caps per REAL_API_BENCHMARK_PROTOCOL.md"
+  },
+  "notes": [
+    "Historical grades of past runtimes are evidence of those sources only; they are not re-run here.",
+    "Local/CI/live/consumer results are recorded separately and never summed as unique tests."
+  ]
+}

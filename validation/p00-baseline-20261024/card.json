@@ -1,0 +1,100 @@
+{
+  "schema": "p00-baseline/1",
+  "model_calls": 0,
+  "generated_utc": "2026-10-24T16:32:15Z",
+  "source": {
+    "head": "2342dc2c7e86911b76bf91b437a8306356cdabc1",
+    "dirty_files": [
+      "M docs/PRODUCTION_PLAN.md",
+      " M docs/PROJECT_CONTEXT.md",
+      " M docs/project-index.json",
+      "?? .atomic_flow/tree.lock",
+      "?? docs/UNDERSTAND_ANYTHING_REFERENCE_2026-10-24.md",
+      "?? tools/p00_baseline.py",
+      "?? validation/core-corporate-review-20261024/"
+    ],
+    "branch": "experimental"
+  },
+  "config_digests": {
+    "pyproject.toml": "7a92e6b48b8c5cd4b6779563e769888e38319bbd21439598c9954c3b1adf84c7"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "machine": "AMD64",
+    "cpu_count": 4
+  },
+  "indicators": {
+    "cold_import": {
+      "n": 5,
+      "min_s": 0.0802,
+      "median_s": 0.0888,
+      "max_s": 0.2655,
+      "rows": [
+        {
+          "seconds": 0.2655,
+          "value": 0.006
+        },
+        {
+          "seconds": 0.1104,
+          "value": 0.0019
+        },
+        {
+          "seconds": 0.0802,
+          "value": 0.0032
+        },
+        {
+          "seconds": 0.082,
+          "value": 0.0018
+        },
+        {
+          "seconds": 0.0888,
+          "value": 0.0058
+        }
+      ]
+    },
+    "tree_build_self": {
+      "n": 1,
+      "min_s": 5.5224,
+      "median_s": 5.5224,
+      "max_s": 5.5224,
+      "rows": [
+        {
+          "seconds": 5.5224,
+          "value": 3086
+        }
+      ]
+    },
+    "tree_save_bytes": {
+      "n": 1,
+      "min_s": 5.5611,
+      "median_s": 5.5611,
+      "max_s": 5.5611,
+      "rows": [
+        {
+          "seconds": 5.5611,
+          "value": 3136457
+        }
+      ]
+    },
+    "tree_load": {
+      "n": 1,
+      "min_s": 1.2839,
+      "median_s": 1.2839,
+      "max_s": 1.2839,
+      "rows": [
+        {
+          "seconds": 1.2839,
+          "value": 3086
+        }
+      ]
+    },
+    "tree_artifact_bytes": 3136457,
+    "tree_artifact_sha256": "456c7e50126099be7e1682cae64701fbe619b0d26f7f97d3532c92d6aa30d62d",
+    "process_rss_mib_final": 36.05
+  },
+  "notes": [
+    "Host-load dependent indicators; not an SLO.",
+    "Cold import runs in a fresh subprocess each repeat."
+  ]
+}
