@@ -480,9 +480,42 @@ class TaskRunner:
         return task
 
 
+    def _read_plan(self, task: Task, workspace) -> str:
+        """Host-computed advisory read order for the approved paths (P04).
+
+        Bounded, deterministic, model-free; graph problems degrade to an
+        explicit notice instead of silently skipping the plan.
+        """
+        try:
+            from atomic_flow.graph.impact import context_pack
+            from atomic_flow.graph.project import project_files
+
+            goals = sorted({path for path in require_approval(task, self.project)
+                            if (workspace / path).is_file()})
+            if not goals:
+                return ""
+            files = project_files(workspace)
+            pack = context_pack(files, goals)
+            lines = ["Host read plan (advisory, name-level; read goal files completely, "
+                     "following read_file/read_node next_offset, before any edit):"]
+            for entry in pack["entries"][:12]:
+                note = " [over byte cap: read selectively]" if entry.get("truncated") else ""
+                lines.append(f"- {entry['file']} ({entry['bytes']} bytes) - {entry['reason']}{note}")
+            text = "\n".join(lines)
+            return text if len(text) <= 2000 else text[:1997] + "\n..."
+        except Exception as exc:  # advisory only; the step itself must proceed
+            return f"Host read plan unavailable ({type(exc).__name__}); read approved files completely before editing."
+
     def _execute_step(self, task: Task, step: Step) -> None:
-        subquery = f"[Step {step.index + 1}/{len(task.steps)}] {step.description}"
+        base_query = f"[Step {step.index + 1}/{len(task.steps)}] {step.description}"
         workspace = self.changeset.workspace if self.changeset else self.project
+        subquery = base_query
+        plan_text = self._read_plan(task, workspace)
+        if plan_text:
+            # The plan rides in the model-visible query only; retrieval keeps
+            # ranking on the pristine step description so context selection
+            # does not shift because of the advisory text.
+            subquery += "\n" + plan_text
         if isinstance(self.task_backend, TaskBudgetBackend):
             self.task_backend.phase = "step"
         capabilities = TaskCapabilities()
@@ -498,7 +531,7 @@ class TaskRunner:
                             workspace_session=capabilities.workspace_session, lsp_client=capabilities.lsp_client,
                             documentation_client=capabilities.documentation_client, hooks=capabilities.hooks,
                             tool_registry=capabilities.tool_registry, role_tools=capabilities.role_tools)
-        result = orch.answer(subquery, mode="medium", approve_edits=True)
+        result = orch.answer(subquery, mode="medium", approve_edits=True, retrieval_query=base_query)
         step.request_id = result.ledger_id
         if self.changeset:
             edits = {}
