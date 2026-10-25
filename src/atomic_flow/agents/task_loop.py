@@ -11,6 +11,7 @@ from atomic_flow.agents.control import check_cancel, task_lease
 from atomic_flow.agents.effects import UnresolvedEffects
 from atomic_flow.agents.envelope import envelope_preserved, failure_signature, make_envelope, no_progress, runtime_digest
 from atomic_flow.agents.execution import TaskCancelled, run_python
+from atomic_flow.agents.failure_policy import classify
 from atomic_flow.agents.goals import Goal, goal_context, replan_requirements, step_scope, validate_goals
 from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
 from atomic_flow.agents.planner import Plan, plan_task, replan_task
@@ -584,6 +585,26 @@ class TaskRunner:
                     return task
                 if isinstance(exc, TaskCancelled):
                     raise
+                # P06 failure classification: deterministic host-observed
+                # StepFailure may enter bounded repair; anything else is an
+                # unclassified failure with potentially unknown effects and
+                # stops fail-closed until the contract names it.
+                if isinstance(exc, StepFailure):
+                    remaining = None
+                    if self.config is not None and self.config.task.max_budget_usd > 0:
+                        remaining = self.config.task.max_budget_usd - task.budget_spent
+                    decision = classify({"kind": "deterministic_test_failure",
+                                         "remaining_budget_usd": remaining})
+                else:
+                    decision = classify({})
+                task.last_failure_decision = decision
+                save(task)
+                if decision["action"] != "continue_bounded_repair":
+                    task.status, task.error = "paused", (
+                        f"failure policy: {decision.get('reason') or decision['action']}; "
+                        f"step {step.index} outcome: {step.result_summary[:200]}")
+                    save(task)
+                    return task
 
             # Finish other independently authorized work before replanning a
             # failed dependency. Blocked descendants remain explicit in state.
