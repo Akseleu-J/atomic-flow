@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="194" time="137.256" timestamp="2026-10-25T10:26:58.238198+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_step_evidence" name="test_exact_receipt_roundtrip_and_legacy_is_not_replay_authority" time="0.077" /><testcase classname="tests.test_step_evidence" name="test_stale_binding_is_diagnostic_only[source]" time="0.008" /><testcase classname="tests.test_step_evidence" name="test_stale_binding_is_diagnostic_only[contract]" time="0.007" /><testcase classname="tests.test_step_evidence" name="test_stale_binding_is_diagnostic_only[task]" time="0.007" /><testcase classname="tests.test_step_evidence" name="test_stale_binding_is_diagnostic_only[request]" time="0.007" /><testcase classname="tests.test_step_evidence" name="test_stale_binding_is_diagnostic_only[scope]" time="0.007" /><testcase classname="tests.test_step_evidence" name="test_transcript_digest_never_includes_raw_args_outputs_or_errors" time="0.009" /><testcase classname="tests.test_step_evidence" name="test_malformed_receipts_fail_closed[version-True]" time="0.007" /><testcase classname="tests.test_step_evidence" name="test_malformed_receipts_fail_closed[step_index-False]" time="0.011" /><testcase classname="tests.test_step_evidence" name="test_malformed_receipts_fail_closed[task_id-../../task]" time="0.012" /><testcase classname="tests.test_step_evidence" name="test_malformed_receipts_fail_closed[graph_revision-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]" time="0.009" /><testcase classname="tests.test_step_evidence" name="test_malformed_receipts_fail_closed[linked_test_nodes-value4]" time="0.009" /><testcase classname="tests.test_step_evidence" name="test_integrity_and_unknown_fields_are_rejected" time="0.008" /><testcase classname="tests.test_step_evidence" name="test_unsafe_or_invalid_manifest_rejected_before_receipt" time="0.007" /><testcase classname="tests.test_step_evidence" name="test_failed_or_unavailable_check_remains_observation_not_success" time="0.008" /><testcase classname="tests.test_step_evidence" name="test_explicit_premises_allow_unrelated_edits_but_detect_changes_and_new_files" time="0.024" /><testcase classname="tests.test_step_evidence" name="test_unknown_premise_coverage_uses_full_manifest_binding" time="0.019" /><testcase classname="tests.test_step_evidence" name="test_invalid_or_unbounded_premise_paths_fail_closed" time="0.014" /><testcase classname="tests.test_rolling_plan" name="test_expansion_preserves_history_ids_requirements_and_clears_approval" time="0.029" /><testcase classname="tests.test_rolling_plan" name="test_parallel_children_join_all_terminals_and_preserve_other_prerequisites" time="0.009" /><testcase classname="tests.test_rolling_plan" name="test_forward_local_edge_is_supported_without_reordering_stable_ids" time="0.025" /><testcase classname="tests.test_rolling_plan" name="test_unvalidated_plan_cannot_smuggle_cycles_missing_or_self_edges[deps0]" time="0.018" /><testcase classname="tests.test_rolling_plan" name="test_unvalidated_plan_cannot_smuggle_cycles_missing_or_self_edges[deps1]" time="0.011" /><testcase classname="tests.test_rolling_plan" name="test_unvalidated_plan_cannot_smuggle_cycles_missing_or_self_edges[deps2]" time="0.008" /><testcase classname="tests.test_rolling_plan" name="test_expansion_refuses_changed_obligations_without_mutation[change0]" time="0.006" /><testcase classname="tests.test_rolling_plan" name="test_expansion_refuses_changed_obligations_without_mutation[change1]" time="0.007" /><testcase classname="tests.test_rolling_plan" name="test_expansion_refuses_changed_obligations_without_mutation[change2]" time="0.007" /><testcase classname="tests.test_rolling_plan" name="test_expansion_refuses_changed_obligations_without_mutation[change3]" time="0.007" /><testcase classname="tests.test_rolling_plan" name="test_expansion_refuses_changed_obligations_without_mutation[change4]" time="0.008" /><testcase classname="tests.test_rolling_plan" name="test_only_pending_placeholder_may_be_expanded[done]" time="0.006" /><testcase classname="tests.test_rolling_plan" name="test_only_pending_placeholder_may_be_expanded[failed]" time="0.054" /><testcase classname="tests.test_rolling_plan" name="test_only_pending_placeholder_may_be_expanded[running]" time="0.065" /><testcase classname="tests.test_rolling_plan" name="test_only_pending_placeholder_may_be_expanded[blocked]" time="0.009" /><testcase classname="tests.test_rolling_plan" name="test_only_pending_placeholder_may_be_expanded[superseded]" time="0.007" /><testcase classname="tests.test_rolling_plan" name="test_pending_placeholder_with_prior_request_is_not_replayed" time="0.035" /><testcase classname="tests.test_rolling_plan" name="test_expansion_does_not_rewrite_executed_dependents" time="0.011" /><testcase classname="tests.test_rolling_plan" name="test_missing_placeholder_and_invalid_existing_graph_are_refused" time="0.066" /><testcase classname="tests.test_rolling_plan" name="test_history_and_expansion_count_limits_include_superseded_steps" time="0.021" /><testcase classname="tests.test_rolling_plan" name="test_more_than_three_children_and_goal_rewrite_are_rejected" time="0.014" /><testcase classname="tests.test_rolling_plan" name="test_second_expansion_keeps_first_children_and_ids_stable" time="0.011" /><testcase classname="tests.test_rolling_plan" name="test_children_narrow_scope_inherit_caps_and_merge_only_advisory_links" time="0.010" /><testcase classname="tests.test_rolling_plan" name="test_explicit_scope_cannot_widen_inherited_or_exact_scope[existing0]" time="0.008" /><testcase classname="tests.test_rolling_plan" name="test_explicit_scope_cannot_widen_inherited_or_exact_scope[existing1]" time="0.007" /><testcase classname="tests.test_rolling_plan" name="test_link_union_is_bounded_without_discarding_original_links" time="0.008" /><testcase classname="tests.test_p05_acceptance" name="test_goal_call_cap_shared_across_steps_and_resume" time="0.628" /><testcase classname="tests.test_p05_acceptance" name="test_goal_usd_caps_independent_of_global_enforcement[parent]" time="0.073" /><testcase classname="tests.test_p05_acceptance" name="test_goal_usd_caps_independent_of_global_enforcement[unknown_prices]" time="0.124" /><testcase classname="tests.test_p05_acceptance" name="test_goal_usd_caps_independent_of_global_enforcement[reported_overspend]" time="0.666" /><testcase classname="tests.test_p05_acceptance" name="test_goal_usd_caps_independent_of_global_enforcement[zero]" time="0.299" /><testcase classname="tests.test_p05_acceptance" name="test_nested_scope_catches_unscoped_host_command_delta_and_rolls_back" time="4.183" /><testcase classname="tests.test_p05_acceptance" name="test_empty_goal_scope_denies_writes_and_is_bound_to_review" time="0.392"><failure message="PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\p05-closure-final\\test_empty_goal_scope_denies_w0\\home\\tasks\\task_6e82431de4e7.json.0avnqnug.tmp' -&gt; 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\p05-closure-final\\test_empty_goal_scope_denies_w0\\home\\tasks\\task_6e82431de4e7.json'">tmp_path = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_empty_goal_scope_denies_w0')
+
+    def test_empty_goal_scope_denies_writes_and_is_bound_to_review(tmp_path):
+        task = job(tmp_path)
+        task.goals[0].scope_paths = []
+&gt;       save(task)
+
+tests\test_p05_acceptance.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\task.py:106: in save
+    tmp.replace(target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_empty_goal_scope_denies_w0/home/tasks/task_6e82431de4e7.json.0avnqnug.tmp')
+target = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_empty_goal_scope_denies_w0/home/tasks/task_6e82431de4e7.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+&gt;       os.replace(self, target)
+E       PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\p05-closure-final\\test_empty_goal_scope_denies_w0\\home\\tasks\\task_6e82431de4e7.json.0avnqnug.tmp' -&gt; 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\p05-closure-final\\test_empty_goal_scope_denies_w0\\home\\tasks\\task_6e82431de4e7.json'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py:1376: PermissionError</failure></testcase><testcase classname="tests.test_p05_acceptance" name="test_expand_public_api_preserves_goals_requires_new_review" time="1.339" /><testcase classname="tests.test_p05_acceptance" name="test_done_step_receipt_survives_resume_and_stale_premise_never_replays" time="1.318" /><testcase classname="tests.test_p05_acceptance" name="test_cancelled_task_is_terminal_without_replay" time="0.240" /><testcase classname="tests.test_goal_hierarchy" name="test_roundtrip_preserves_stable_goal_ids_and_ancestor_requirements" time="0.077" /><testcase classname="tests.test_goal_hierarchy" name="test_goal_and_step_requirement_changes_stale_approval[goal_criterion]" time="0.186" /><testcase classname="tests.test_goal_hierarchy" name="test_goal_and_step_requirement_changes_stale_approval[step_criterion]" time="0.203" /><testcase classname="tests.test_goal_hierarchy" name="test_goal_and_step_requirement_changes_stale_approval[parent]" time="0.127" /><testcase classname="tests.test_goal_hierarchy" name="test_legacy_canonical_plan_is_byte_compatible_and_migration_grants_nothing" time="0.051" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[cycle]" time="0.022" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[missing_parent]" time="0.013" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[uncovered]" time="0.015" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[depth]" time="0.010" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[count]" time="0.042" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[duplicate]" time="0.053" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[criteria]" time="0.013" /><testcase classname="tests.test_goal_hierarchy" name="test_persisted_goal_validation_rejects_cross_generation_and_unknown_fields" time="0.090" /><testcase classname="tests.test_goal_hierarchy" name="test_revise_after_completed_work_keeps_history_and_namespaces_new_goals" time="0.075" /><testcase classname="tests.test_goal_hierarchy" name="test_hierarchical_internal_replan_cannot_drop_original_requirements" time="2.078" /><testcase classname="tests.test_goal_hierarchy" name="test_task_goal_history_is_bounded" time="0.018" /><testcase classname="tests.test_goal_hierarchy" name="test_requirements_reach_step_context_without_claiming_semantic_acceptance" time="1.264" /><testcase classname="tests.test_goal_hierarchy" name="test_replan_requirement_context_refuses_overflow_instead_of_truncating" time="0.010" /><testcase classname="tests.test_goal_hierarchy" name="test_completed_goal_criteria_remain_observations_in_replan_context" time="0.050" /><testcase classname="tests.test_goal_hierarchy" name="test_saved_state_enforces_decomposition_limits_too[uncovered]" time="0.029" /><testcase classname="tests.test_goal_hierarchy" name="test_saved_state_enforces_decomposition_limits_too[generation_count]" time="0.024" /><testcase classname="tests.test_task_frontier" name="test_frontier_drains_independent_work_and_links_existing_ledgers" time="0.008" /><testcase classname="tests.test_task_frontier" name="test_invalidation_recomputes_frontier_without_replaying_done_steps" time="0.084" /><testcase classname="tests.test_task_frontier" name="test_resume_explanation_is_read_only_and_project_bound" time="0.057" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[0]" time="0.009" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[4]" time="0.008" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[True]" time="0.008" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[1.5]" time="0.008" /><testcase classname="tests.test_task_frontier" name="test_horizon_and_context_stay_bounded_with_valid_json" time="0.038" /><testcase classname="tests.test_task_frontier" name="test_invalid_dag_never_produces_a_frontier[steps0-cyclic]" time="0.039" /><testcase classname="tests.test_task_frontier" name="test_invalid_dag_never_produces_a_frontier[steps1-missing]" time="0.052" /><testcase classname="tests.test_task_frontier" name="test_running_requires_reconciliation_superseded_does_not_satisfy_dependency" time="0.010" /><testcase classname="tests.test_task_frontier" name="test_scheduler_does_not_drain_ready_work_while_running_step_is_unresolved" time="0.105" /><testcase classname="tests.test_task_budget" name="test_planning_repairs_are_persisted_and_charged_once" time="0.664" /><testcase classname="tests.test_task_budget" name="test_preflight_budget_refusal_sends_no_request[missing_prices]" time="0.096" /><testcase classname="tests.test_task_budget" name="test_preflight_budget_refusal_sends_no_request[task]" time="0.106" /><testcase classname="tests.test_task_budget" name="test_preflight_budget_refusal_sends_no_request[daily]" time="0.094" /><testcase classname="tests.test_task_budget" name="test_call_limit_survives_resume_and_counts_planner" time="5.013" /><testcase classname="tests.test_task_budget" name="test_uncertain_charge_is_held_and_not_replayed[response0]" time="0.307" /><testcase classname="tests.test_task_budget" name="test_uncertain_charge_is_held_and_not_replayed[response1]" time="0.275" /><testcase classname="tests.test_task_budget" name="test_uncertain_charge_is_held_and_not_replayed[response2]" time="0.252" /><testcase classname="tests.test_task_budget" name="test_process_interruption_preserves_call_reservation" time="0.151" /><testcase classname="tests.test_task_budget" name="test_cancel_after_response_keeps_known_cost" time="0.192" /><testcase classname="tests.test_task_budget" name="test_explicit_zero_price_allows_free_backend_without_reported_cost" time="0.177" /><testcase classname="tests.test_task_budget" name="test_failed_orchestrator_response_does_not_lose_cost" time="3.442" /><testcase classname="tests.test_task_budget" name="test_replanner_calls_share_task_spend_and_daily_ledger" time="6.232" /><testcase classname="tests.test_task_budget" name="test_recovery_cli_cannot_write_while_runner_holds_lease" time="0.140" /><testcase classname="tests.test_task_budget" name="test_daily_reservation_excludes_competing_processes" time="2.204" /><testcase classname="tests.test_task_budget" name="test_budget_pause_restores_step_and_resumes_with_known_spend" time="6.806" /><testcase classname="tests.test_task_budget" name="test_missing_usage_does_not_fabricate_zero_cost" time="0.012" /><testcase classname="tests.test_task_budget" name="test_dry_run_keeps_planning_task_and_cost" time="0.326" /><testcase classname="tests.test_task_budget" name="test_corrupt_daily_ledger_blocks_call_before_submission" time="0.104" /><testcase classname="tests.test_task_budget" name="test_cancel_after_reservation_sends_no_call_and_releases_hold" time="0.139" /><testcase classname="tests.test_task_budget" name="test_saved_cost_cannot_disappear_on_resume" time="0.044" /><testcase classname="tests.test_task_budget" name="test_reported_overspend_is_accounted_and_blocks_publication" time="0.174" /><testcase classname="tests.test_task_budget" name="test_kaggle_router_preserves_explicit_budget_prices" time="0.010" /><testcase classname="tests.test_plan_review_dependencies" name="test_unapproved_legacy_task_cannot_execute" time="0.076" /><testcase classname="tests.test_plan_review_dependencies" name="test_legacy_migration_cannot_carry_approval_and_preserves_sequential_dependencies[0]" time="0.034" /><testcase classname="tests.test_plan_review_dependencies" name="test_legacy_migration_cannot_carry_approval_and_preserves_sequential_dependencies[1]" time="0.034" /><testcase classname="tests.test_plan_review_dependencies" name="test_review_and_approval_bind_plan_source_and_new_path_scope" time="0.160" /><testcase classname="tests.test_plan_review_dependencies" name="test_revision_invalidates_approval_without_model_call" time="0.144" /><testcase classname="tests.test_plan_review_dependencies" name="test_review_rejects_directory_traversal_and_wildcards" time="0.081" /><testcase classname="tests.test_plan_review_dependencies" name="test_invalid_dependency_graphs_rejected[dependencies0]" time="0.008" /><testcase classname="tests.test_plan_review_dependencies" name="test_invalid_dependency_graphs_rejected[dependencies1]" time="0.007" /><testcase classname="tests.test_plan_review_dependencies" name="test_invalid_dependency_graphs_rejected[dependencies2]" time="0.007" /><testcase classname="tests.test_plan_review_dependencies" name="test_independent_work_finishes_before_failed_dependency_is_replanned" time="0.944" /><testcase classname="tests.test_plan_review_dependencies" name="test_replanned_work_pauses_before_any_new_execution" time="1.468" /><testcase classname="tests.test_plan_review_dependencies" name="test_plan_tampering_after_approval_does_not_execute" time="0.222" /><testcase classname="tests.test_plan_review_dependencies" name="test_revision_refuses_interrupted_step" time="0.059" /><testcase classname="tests.test_plan_review_dependencies" name="test_final_scope_catches_out_of_scope_mutations_from_host_backend" time="2.240" /><testcase classname="tests.test_plan_review_dependencies" name="test_explicit_host_scope_can_authorize_new_path" time="0.984" /><testcase classname="tests.test_plan_review_dependencies" name="test_host_integrity_failure_never_calls_replanner" time="0.512" /><testcase classname="tests.test_plan_review_dependencies" name="test_revise_preserves_done_work_and_remaps_new_dependencies" time="0.060" /><testcase classname="tests.test_internal_replan" name="test_internal_replan_is_explicit_and_bound_to_review_digest" time="0.140" /><testcase classname="tests.test_internal_replan" name="test_authorized_repair_continues_in_same_resume_and_preserves_scope" time="2.212" /><testcase classname="tests.test_internal_replan" name="test_legacy_approval_still_pauses_before_replanned_execution" time="0.467" /><testcase classname="tests.test_internal_replan" name="test_replan_cannot_drop_pytest_obligation_from_mixed_plan" time="0.666" /><testcase classname="tests.test_internal_replan" name="test_replan_cannot_introduce_new_execution_tool" time="0.450" /><testcase classname="tests.test_internal_replan" name="test_runtime_change_after_opt_in_pauses_before_any_step" time="0.135" /><testcase classname="tests.test_internal_replan" name="test_actual_backend_change_with_same_runner_config_pauses_before_inference[model-other-model]" time="0.136" /><testcase classname="tests.test_internal_replan" name="test_actual_backend_change_with_same_runner_config_pauses_before_inference[base_url-https://other.invalid/v1]" time="0.140" /><testcase classname="tests.test_internal_replan" name="test_backend_added_after_approval_requires_fresh_review" time="0.140" /><testcase classname="tests.test_internal_replan" name="test_repeated_failure_pauses_before_global_replan_cap" time="1.441" /><testcase classname="tests.test_internal_replan" name="test_opt_in_enforces_effective_tool_allowlist_in_orchestrator" time="0.859" /><testcase classname="tests.test_internal_replan" name="test_real_dispatcher_denies_undeclared_execution_before_tool_implementation" time="3.485" /><testcase classname="tests.test_internal_replan" name="test_opt_in_requires_enforceable_finite_task_limits[unlimited_budget]" time="0.043" /><testcase classname="tests.test_internal_replan" name="test_opt_in_requires_enforceable_finite_task_limits[disabled_budget_guard]" time="0.042" /><testcase classname="tests.test_internal_replan" name="test_opt_in_requires_enforceable_finite_task_limits[no_replans]" time="0.047" /><testcase classname="tests.test_completion_diagnostics" name="test_syntax_diagnostic_is_revision_bound_and_compile_does_not_execute" time="0.524" /><testcase classname="tests.test_completion_diagnostics" name="test_quality_diagnostics_exclude_outside_private_and_stale_locations" time="0.039" /><testcase classname="tests.test_completion_diagnostics" name="test_run_command_exposes_typed_diagnostics_even_on_failure" time="0.613" /><testcase classname="tests.test_completion_diagnostics" name="test_completion_rejects_empty_and_unfinished_task" time="0.088" /><testcase classname="tests.test_completion_diagnostics" name="test_completion_rechecks_approved_final_syntax_and_original_freshness" time="0.257" /><testcase classname="tests.test_completion_diagnostics" name="test_final_pytest_failure_is_not_published_and_report_survives_reload" time="0.415" /><testcase classname="tests.test_completion_diagnostics" name="test_completion_detects_test_process_changes_after_its_success" time="0.155" /><testcase classname="tests.test_completion_diagnostics" name="test_unavailable_final_executor_cannot_pass_and_cancellation_propagates" time="0.059" /><testcase classname="tests.test_task_changeset" name="test_multistep_task_publishes_all_or_none[True]" time="8.199" /><testcase classname="tests.test_task_changeset" name="test_multistep_task_publishes_all_or_none[False]" time="6.547" /><testcase classname="tests.test_task_changeset" name="test_resume_conflict_sends_no_model_request" time="0.354" /><testcase classname="tests.test_task_changeset" name="test_legacy_checkpoint_is_not_silently_replayed" time="0.068" /><testcase classname="tests.test_task_changeset" name="test_interrupted_step_requires_review" time="0.186" /><testcase classname="tests.test_task_changeset" name="test_offline_cli_recovery_never_constructs_backend" time="0.406" /><testcase classname="tests.test_task_changeset" name="test_completed_publish_is_not_replayed_after_crash" time="0.167" /><testcase classname="tests.test_task_changeset" name="test_task_ids_cannot_escape_storage[../outside]" time="0.015" /><testcase classname="tests.test_task_changeset" name="test_task_ids_cannot_escape_storage[x/y]" time="0.009" /><testcase classname="tests.test_task_changeset" name="test_task_ids_cannot_escape_storage[task_not-an-id]" time="0.008" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls0-py_compile]" time="0.009" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls1-py_compile]" time="0.009" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls2-py_compile]" time="0.009" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls3-py_compile]" time="0.010" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls4-py_compile]" time="0.008" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls5-pytest]" time="0.010" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls6-pytest]" time="0.009" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls7-pytest]" time="0.010" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls8-none]" time="0.009" /><testcase classname="tests.test_task_execution" name="test_incomplete_or_failed_evidence_cannot_pass[calls9-unknown-method]" time="0.010" /><testcase classname="tests.test_task_execution" name="test_declared_edit_requires_an_edit_even_with_pytest" time="0.009" /><testcase classname="tests.test_task_execution" name="test_declared_command_cannot_be_replaced_with_prose" time="0.009" /><testcase classname="tests.test_task_execution" name="test_pytest_before_last_edit_is_rerun" time="0.009" /><testcase classname="tests.test_task_execution" name="test_only_full_pytest_after_edits_satisfies_step[-False]" time="0.009" /><testcase classname="tests.test_task_execution" name="test_only_full_pytest_after_edits_satisfies_step[tests/test_sample.py-True]" time="0.010" /><testcase classname="tests.test_task_execution" name="test_task_uses_real_orchestrator_and_approval_channel[True]" time="2.471" /><testcase classname="tests.test_task_execution" name="test_task_uses_real_orchestrator_and_approval_channel[False]" time="3.288" /><testcase classname="tests.test_task_execution" name="test_cli_task_bootstraps_persisted_index" time="4.547" /><testcase classname="tests.test_task_execution" name="test_task_failed_matching_tests_roll_back_real_edit" time="5.128" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_cascades_to_dependents_and_records_reason" time="0.104" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_spares_independent_done_steps" time="0.140" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_refusals" time="0.189" /><testcase classname="tests.test_step_invalidation" name="test_invalidated_done_step_is_rerunnable_state" time="0.114" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_cannot_requeue_a_different_project" time="0.058" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_reason_in_persisted_state_must_be_text" time="0.031" /><testcase classname="tests.test_task_read_plan" name="test_step_query_includes_read_plan_with_reasons" time="0.945" /><testcase classname="tests.test_task_read_plan" name="test_read_plan_degrades_explicitly_when_graph_fails" time="0.019" /><testcase classname="tests.test_replan_cli" name="test_cli_review_and_approve_bind_internal_replan_option" time="0.308" /><testcase classname="tests.test_replan_cli" name="test_cli_refuses_ambiguous_operations_before_loading_or_execution[operation0]" time="0.050" /><testcase classname="tests.test_replan_cli" name="test_cli_refuses_ambiguous_operations_before_loading_or_execution[operation1]" time="0.047" /><testcase classname="tests.test_replan_cli" name="test_cli_refuses_ambiguous_operations_before_loading_or_execution[operation2]" time="0.045" /><testcase classname="tests.test_composition_acceptance" name="test_public_review_edit_check_and_fault_journeys[publish]" time="8.404" /><testcase classname="tests.test_composition_acceptance" name="test_public_review_edit_check_and_fault_journeys[cancel]" time="6.494"><failure message="AssertionError: cancelled by user">tmp_path = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_public_review_edit_check_1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002442ADF7E30&gt;
+mode = 'cancel'
+
+    @pytest.mark.parametrize("mode", ["publish", "cancel", "source_conflict"])
+    def test_public_review_edit_check_and_fault_journeys(tmp_path, monkeypatch, mode):
+        # Only public dependency constructors are replaced. TaskRunner, notebook
+        # operations, dispatcher, ledger, checks and publication remain real. These
+        # fakes cannot establish external LSP/MCP interoperability.
+        clients = []
+    
+        class LSP:
+            def __init__(self, root, command, **kwargs):
+                assert kwargs["approved"] and kwargs["private_workspace"]
+                self.root, self.revisions, self.closed = root, {}, False
+                clients.append(self)
+    
+            def __enter__(self):
+                return self
+    
+            def __exit__(self, *args):
+                self.closed = True
+    
+            def read_document(self, path):
+                text = (self.root / path).read_text(encoding="utf-8")
+                old, version = self.revisions.get(path, (None, 0))
+                version += old != text
+                self.revisions[path] = text, version
+                return {"text": text, "version": version, "content_hash": hashlib.sha1(text.encode()).hexdigest()}
+    
+            def definition(self, path, line, column):
+                return [{"path": path}]
+    
+        class MCP:
+            def __init__(self, root, command, **kwargs):
+                assert kwargs["approved"]
+                self.allowed_tools, self.closed = {}, False
+                clients.append(self)
+    
+            def __enter__(self):
+                return self
+    
+            def __exit__(self, *args):
+                self.closed = True
+    
+            def list_tools(self):
+                return [{"name": "read_text_file", "inputSchema": {"type": "object"}}]
+    
+            def call_tool(self, name, params):
+                assert name in self.allowed_tools
+                return {"remote_result": {"content": [{"text": Path(params["path"]).read_text(encoding="utf-8")}]}}
+    
+        monkeypatch.setattr(acceptance, "LSPClient", LSP)
+        monkeypatch.setattr(acceptance, "MCPClient", MCP)
+        args = SimpleNamespace(pylsp=tmp_path / "host-pylsp", pylsp_python=False,
+                               node=tmp_path / "host-node", mcp_server=tmp_path / "host-mcp.js")
+&gt;       result = acceptance.run_single(args, mode)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_composition_acceptance.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = namespace(pylsp=WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-clos...кументы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_public_review_edit_check_1/host-mcp.js'))
+mode = 'cancel'
+evidence = {'schema_version': 2, 'name': 'cancel', 'status': 'running', 'external_services': 'real local processes', ...}
+
+    def run_single(args, mode="publish", evidence=None):
+        if evidence is None:
+            evidence = {}
+        evidence.update(schema_version=2, name=mode, status="running", external_services="real local processes",
+                        model="scripted; no model quality claim", paid_calls=0, observations=[])
+        print(f"acceptance scenario={mode} start", flush=True)
+        with tempfile.TemporaryDirectory(prefix="atomic-external-acceptance-") as tmp, ExitStack() as clients:
+            root = Path(tmp)
+            project = root / "project"
+            project.mkdir()
+            (project / "sample.py").write_bytes(BEFORE.encode("utf-8"))
+            (project / "book.ipynb").write_bytes(notebook_bytes())
+            test_bytes = b"from sample import answer\n\ndef test_answer():\n    assert answer() == 2\n"
+            (project / "test_sample.py").write_bytes(test_bytes)
+            os.environ["ATOMIC_FLOW_HOME"] = str(root / "host-state")
+            os.environ["ATOMIC_FLOW_EXECUTION_MODE"] = "local"
+            save_tree(project, build_tree(project))
+            backend = ScriptedBackend()
+    
+            class Probe(Tool):
+                name, description = "external_probe", "Read source through real host-approved LSP and MCP clients"
+                contract = ToolContract(effects=("read",), timeout_seconds=90)
+    
+                class Args(BaseModel):
+                    phase: str
+    
+                args_schema = Args
+    
+                def run(self, params, ctx):
+                    assert params.phase in {"before", "after"}
+                    expected = BEFORE if params.phase == "before" else AFTER
+                    assert ctx.project_root != project
+                    assert (project / "sample.py").read_text(encoding="utf-8") == BEFORE
+                    doc = lsp.read_document("sample.py")
+                    definitions = lsp.definition("sample.py", 3, 10)
+                    assert doc["text"] == expected, "LSP document bytes differ from expected revision"
+                    assert definitions and definitions[0]["path"] == "sample.py", f"unexpected definitions: {definitions}"
+                    result = mcp.call_tool("read_text_file", {"path": str(ctx.project_root / "sample.py")})
+                    text = "\n".join(block.get("text", "") for block in result["remote_result"]["content"])
+                    assert expected.strip() in text, "MCP source response differs from staged revision"
+                    evidence["observations"].append({"phase": params.phase, "workspace": "staged", "version": doc["version"],
+                                                       "hash": doc["content_hash"], "definitions": len(definitions)})
+                    if params.phase == "after" and mode == "cancel":
+                        request_cancel(task.id)
+                        evidence["host_fault"] = "cancel after staged edit and completed read-only external probes"
+                    elif params.phase == "after" and mode == "source_conflict":
+                        (project / "sample.py").write_bytes(EXTERNAL.encode())
+                        evidence["host_fault"] = "external source editor changed original after staged edit"
+                    return {"phase": params.phase, "data_only": True, "definition_count": len(definitions)}
+    
+            def factory(context):
+                nonlocal lsp, mcp
+                assert context.workspace != context.project
+                evidence["factory_bindings"] = evidence.get("factory_bindings", 0) + 1
+                lsp_command = [str(args.pylsp)] + (["-m", "pylsp"] if args.pylsp_python else [])
+                lsp = clients.enter_context(LSPClient(context.workspace, lsp_command, approved=True, timeout=45, private_workspace=True))
+                mcp = clients.enter_context(MCPClient(context.workspace, [str(args.node), str(args.mcp_server), str(context.workspace)],
+                                                      approved=True, timeout=45, approval=lambda method, params: method == "tools/call"))
+                tools = mcp.list_tools()
+                descriptor = next(t for t in tools if t["name"] == "read_text_file")
+                mcp.allowed_tools["read_text_file"] = schema_hash(descriptor)
+                registry = default_registry()
+                registry.register(Probe())
+                return TaskCapabilities(lsp_client=lsp, tool_registry=registry,
+                                        role_tools={"answerer": ["external_probe", "read_file", "patch_file",
+                                                                  "notebook_read", "notebook_edit"]})
+    
+            lsp = mcp = None
+            config = AtomicConfig()
+            config.task.max_replans = 0
+            config.task.max_model_calls = 16
+            config.task.final_check = "pytest"
+            runner = TaskRunner(config, project, backend, approval_callback=lambda *a: True, capability_factory=factory)
+            task = runner.prepare("Change sample and notebook source to two and verify through external source tools",
+                                  candidates=["sample.py::answer"], n_files=3)
+            assert task.status == "paused" and task.plan_ready and len(backend.calls) == 1
+            assert not task.plan_approval and not task.changeset_id
+            task = runner.resume(task)
+            assert task.status == "paused" and "plan approval required" in task.error
+            assert not task.changeset_id and len(backend.calls) == 1
+            review = runner.review(task, allowed_paths=["sample.py", "book.ipynb"])
+            task = runner.approve(task, review["digest"], allowed_paths=["sample.py", "book.ipynb"])
+            assert task.plan_approval["digest"] == review["digest"]
+            assert not task.changeset_id and len(backend.calls) == 1
+            evidence["review"] = {"unapproved_resume_blocked": True, "allowed_paths": review["allowed_paths"],
+                                  "approval_digest": review["digest"], "planning_calls": 1}
+            task = runner.resume(task)
+            print(f"acceptance scenario={mode} task_status={task.status}", flush=True)
+            assert len(evidence["observations"]) == 2, f"missing completed external probes: {task.error}"
+            assert evidence["observations"][1]["version"] &gt; evidence["observations"][0]["version"]
+            assert abs(SpendLedger(10).today_total() - task.budget_spent) &lt; 1e-8
+            assert all(event["status"] == "completed" for event in task.budget_events)
+            assert len(task.budget_events) == len(backend.calls)
+            evidence.update(task_status=task.status, task_error=task.error)
+            if mode == "publish":
+                assert task.status == "done", f"{task.status}: {task.error} {task.steps[0].result_summary}"
+                assert len(backend.calls) == 14 and evidence["factory_bindings"] == 2
+                assert (project / "sample.py").read_bytes() == AFTER.encode()
+                assert (project / "test_sample.py").read_bytes() == test_bytes
+                assert task.completion_report["ready_to_publish"] and task.completion_report["tests"] == "passed"
+                book = json.loads((project / "book.ipynb").read_text(encoding="utf-8"))
+                cell = book["cells"][0]
+                assert cell["id"] == "cell-one" and "".join(cell["source"]) == "value = 2\n"
+                assert cell["outputs"] == [] and cell["execution_count"] is None
+                assert "trusted" not in cell["metadata"] and "signature" not in book["metadata"]
+                assert any(c["name"] == "notebook_structure" and c["status"] == "passed" and c["execution"] == "not_run"
+                           for c in task.completion_report["checks"])
+                evidence["notebook"] = {"source_changed": True, "stable_ids": True, "outputs_cleared": True,
+                                        "trust_cleared": True, "notebook_execution": "not_run"}
+                # Exact crash boundary: publication journal is saved but task's final
+                # completion save was lost. This is durable-state injection, not an
+                # actual OS process-kill test, and never patches a private method.
+                task.status, task.finished_at, task.error = "paused", None, "fault: completion save interrupted after publication"
+                save(task)
+                calls_before_recovery = len(backend.calls)
+    
+                def no_rebind(context):
+                    raise AssertionError("published recovery must not recreate execution capabilities")
+    
+                recovered = TaskRunner(config, project, backend, capability_factory=no_rebind).resume(task)
+                assert recovered.status == "done" and not recovered.error
+                assert len(backend.calls) == calls_before_recovery
+                assert (project / "sample.py").read_bytes() == AFTER.encode()
+                evidence["recovery"] = {"published_journal_unsaved_completion": "verified", "new_model_calls": 0,
+                                        "recreated_capabilities": 0, "source_bytes_verified": True,
+                                        "fault_method": "host durable-state injection; not process-kill coverage"}
+            elif mode == "cancel":
+&gt;               assert task.status == "failed" and task.error == "cancelled by user", task.error
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: cancelled by user
+
+tools\integration_acceptance.py:234: AssertionError</failure></testcase><testcase classname="tests.test_composition_acceptance" name="test_public_review_edit_check_and_fault_journeys[source_conflict]" time="9.720" /></testsuite></testsuites>

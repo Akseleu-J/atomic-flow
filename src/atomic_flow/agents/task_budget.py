@@ -50,6 +50,8 @@ class TaskBudgetBackend:
         if self.backend is not None:
             self.backend.config = self.config
         self.name = getattr(backend, "name", "unconfigured")
+        self.active_step_index = None
+        self.active_goal_ids = ()
         self.ledger = SpendLedger(config.budget.daily_limit_usd)
         self.journal = None
         if config.artifacts.save:
@@ -71,6 +73,43 @@ class TaskBudgetBackend:
 
     def chat(self, messages, *, json_mode=False, model=None):
         return self._chat(messages, json_mode=json_mode, model=model)
+
+    def bind_steps(self, indices):
+        """Host-only attribution; shared backend and durable reservations stay intact."""
+        from atomic_flow.agents.goals import goal_context
+
+        by_id = {step.index: step for step in self.task.steps}
+        self.active_step_index = indices[0] if len(indices) == 1 else None
+        self.active_goal_ids = tuple(sorted({goal["id"] for index in indices
+                                            for goal in goal_context(self.task.goals, by_id[index])}))
+
+    def _goal_limits(self):
+        by_id = {goal.id: goal for goal in self.task.goals}
+        return [by_id[identity] for identity in self.active_goal_ids]
+
+    def _check_goal_reservation(self, reservation, known_prices):
+        for goal in self._goal_limits():
+            if goal.max_budget_usd is not None and not known_prices:
+                raise BudgetExceeded("goal budget requires known input/output prices")
+            if goal.max_model_calls is None and goal.max_budget_usd is None:
+                continue
+            if any(event.get("phase") in {"step", "replan"} and "goal_ids" not in event
+                   and not event.get("not_sent") for event in self.task.budget_events):
+                raise BudgetExceeded("legacy goal accounting cannot be attributed; start a reviewed new task")
+            events = [event for event in self.task.budget_events
+                      if goal.id in event.get("goal_ids", []) and not event.get("not_sent")]
+            if goal.max_model_calls is not None and len(events) >= goal.max_model_calls:
+                raise BudgetExceeded(f"goal {goal.id} model-call cap reached")
+            if goal.max_budget_usd is not None and sum(event["cost_usd"] for event in events) + reservation > goal.max_budget_usd + 1e-12:
+                raise BudgetExceeded(f"goal {goal.id} budget cannot cover reservation")
+
+    def _check_goal_settlement(self, cost, reservation):
+        for goal in self._goal_limits():
+            events = [event for event in self.task.budget_events
+                      if goal.id in event.get("goal_ids", []) and not event.get("not_sent")]
+            if goal.max_budget_usd is not None and (sum(event["cost_usd"] for event in events) > goal.max_budget_usd + 1e-12
+                                                   or cost > reservation):
+                raise BudgetExceeded(f"goal {goal.id} reported spend exceeded reservation/cap")
 
     @contextmanager
     def call_scope(self):
@@ -142,11 +181,13 @@ class TaskBudgetBackend:
             raise BudgetExceeded("invalid model-call reservation")
         if enforce and self.task.budget_spent + reservation > self.settings.task.max_budget_usd:
             raise BudgetExceeded("remaining task budget cannot cover the next model-call reservation")
+        self._check_goal_reservation(reservation, known_prices)
         event = {"id": "call_" + uuid.uuid4().hex, "phase": self.phase, "status": "in_flight",
                  "reserved_usd": reservation, "created_at": time.time(), "backend": backend_name,
                  "model": backend_config.model, "input_allowance": input_allowance,
                  "max_output_tokens": backend_config.max_output_tokens,
                  "price_in_per_mtok": prices[0], "price_out_per_mtok": prices[1]}
+        event.update(step_index=self.active_step_index, goal_ids=list(self.active_goal_ids))
         if selected is not None:
             event.update(route_attempt_id=selected.route_attempt_id, logical_call_id=selected.logical_call_id,
                          quota_scope=selected.quota_scope)
@@ -236,6 +277,7 @@ class TaskBudgetBackend:
                                 "cost_usd": cost, "tokens_in": response.tokens_in, "tokens_out": response.tokens_out},
                                 call_id=event["id"], outcome="success")
         self.cancel_check()
+        self._check_goal_settlement(cost, reservation)
         if enforce and (self.task.budget_spent > self.settings.task.max_budget_usd or cost > reservation):
             raise BudgetExceeded("reported model cost exceeded its reservation; task paused before further calls/publication")
         if response_error is not None:

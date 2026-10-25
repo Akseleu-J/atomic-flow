@@ -79,7 +79,18 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install '.[dev]'
       - run: python -m compileall -q src tools
-      - run: python -m pytest -q tests test_text_v3.py test_references_v3.py
+      - run: python -m pytest -q tests test_text_v3.py test_references_v3.py --junitxml=python-results/junit.xml
+      - name: Seal exact-source host acceptance
+        if: always()
+        run: python tools/capture_p05_acceptance.py --output python-results
+      - name: Upload host test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: host-tests-${{ matrix.python }}-${{ github.sha }}
+          path: python-results/
+          retention-days: 14
+          if-no-files-found: error
 
   docker:
     name: Real Docker acceptance

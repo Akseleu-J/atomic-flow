@@ -74,3 +74,26 @@ def test_invalidated_done_step_is_rerunnable_state(tmp_path, isolated_home):
     from atomic_flow.agents.task import load
     reloaded = load("task_aa4000000004")
     assert reloaded.steps[0].status == "pending" and reloaded.steps[0].invalidated_reason
+
+
+def test_invalidation_cannot_requeue_a_different_project(tmp_path):
+    from atomic_flow.agents.changeset import ChangeSetConflict
+    from atomic_flow.config import user_dir
+
+    task = _task(tmp_path)
+    path = user_dir() / "tasks" / f"{task.id}.json"
+    before = path.read_bytes()
+    other = tmp_path / "other"
+    other.mkdir()
+    with pytest.raises(ChangeSetConflict, match="another project"):
+        TaskRunner(None, other, None).invalidate_step(task.id, 0, "wrong root")
+    assert path.read_bytes() == before
+
+
+def test_invalidation_reason_in_persisted_state_must_be_text(tmp_path):
+    from atomic_flow.state import StateError
+
+    task = _task(tmp_path)
+    task.steps[0].invalidated_reason = {"not": "text"}
+    with pytest.raises(StateError, match="invalidated_reason"):
+        save(task)

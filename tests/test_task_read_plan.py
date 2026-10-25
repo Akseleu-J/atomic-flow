@@ -29,6 +29,7 @@ def test_step_query_includes_read_plan_with_reasons(monkeypatch, isolated_home, 
 
         def answer(self, query, *a, **kw):
             captured["query"] = query
+            captured["retrieval_query"] = kw["retrieval_query"]
             return R()
 
     monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
@@ -38,6 +39,8 @@ def test_step_query_includes_read_plan_with_reasons(monkeypatch, isolated_home, 
     task = runner.run_plan("fix helper", plan)
     assert task.status == "done", task.error
     query = captured["query"]
+    assert "Host task frontier" in query and "current_step_running" in query
+    assert captured["retrieval_query"] == "[Step 1/1] edit helper"
     assert "Host read plan" in query
     assert "- lib.py (" in query and "goal file" in query
     assert "- app.py (" in query  # included with a reason (goal file or name match)
@@ -53,5 +56,5 @@ def test_read_plan_degrades_explicitly_when_graph_fails(monkeypatch, isolated_ho
     monkeypatch.setattr(task_loop, "require_approval", lambda task, project: ["lib.py"])
     monkeypatch.setattr("atomic_flow.graph.project.project_files", broken)
     runner = task_loop.TaskRunner(config=None, project=project, backend=None)
-    text = runner._read_plan(type("T", (), {"plan_approval": {}})(), project)
+    text = runner._read_plan(type("T", (), {"plan_approval": {}, "id": "task_aaaaaaaaaaaa"})(), project)
     assert text.startswith("Host read plan unavailable (RuntimeError)")

@@ -95,7 +95,7 @@ def test_cancel_signal_survives_task_save_and_prevents_execution(tmp_path):
     with pytest.raises(TaskCancelled):
         check_cancel(task.id)
     task = TaskRunner(AtomicConfig(), tmp_path, None).resume(task)
-    assert task.status == "failed" and task.error == "cancelled by user"
+    assert task.status == "cancelled" and task.error == "cancelled by user"
     assert not task.changeset_id
 
 
@@ -149,7 +149,7 @@ def test_cancellation_after_model_response_does_not_execute_next_tool(tmp_path):
 
     backend = ScriptedBackend({"parser": stop_after_response})
     task = TaskRunner(AtomicConfig(), tmp_path, backend).run_plan("update a", Plan(steps=[PlanStep(description="update a")]))
-    assert task.status == "failed" and task.error == "cancelled by user"
+    assert task.status == "cancelled" and task.error == "cancelled by user"
     assert backend.roles() == ["parser"]
     assert (tmp_path / "a.py").read_text() == "def a():\n    return 1\n"
 

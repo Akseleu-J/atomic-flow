@@ -231,7 +231,7 @@ def run_single(args, mode="publish", evidence=None):
                                     "recreated_capabilities": 0, "source_bytes_verified": True,
                                     "fault_method": "host durable-state injection; not process-kill coverage"}
         elif mode == "cancel":
-            assert task.status == "failed" and task.error == "cancelled by user", task.error
+            assert task.status == "cancelled" and task.error == "cancelled by user", task.error
             assert (project / "sample.py").read_bytes() == BEFORE.encode()
             assert (project / "book.ipynb").read_bytes() == notebook_bytes()
             assert ChangeSet.open(project, task.changeset_id).state["status"] == "aborted"

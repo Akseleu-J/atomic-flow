@@ -1,10 +1,49 @@
 # Production plan: критерии принятия и оставшаяся работа
 
+25 октября, package 39: [P05 host contracts и acceptance](IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md).
+Остаток hierarchy/rolling/evidence/scope/caps реализован, local 208 PASS / 2 SKIP;
+exact-source CI gate pending. Четыре production-блока остаются OPEN.
+
 24 октября 2026. Заменяет рабочие статусы первоначального
 [`audit-2026-10-23/PRODUCTION_PLAN.md`](audit-2026-10-23/PRODUCTION_PLAN.md),
 который сохраняется как исторический аудит. Исходная точка review — `445f1b9`.
 Наличие реализации и зелёный CI — отдельные факты от выполнения всех exit gates.
+
+25 октября: ночные implementation slices дошли до HEAD `20cdd776`; локальное
+продолжение и independent review fixes описаны в
+[IMPLEMENTATION_STEP_35_P06_INTERNAL_REPLAN_REVIEW_FIXES.md](IMPLEMENTATION_STEP_35_P06_INTERNAL_REPLAN_REVIEW_FIXES.md).
+Локальные 168 PASS / 2 skipped не закрывают четыре production-блока и не являются
+CI для нового runtime. P04 ещё не использует delta store на всём live hot path.
+
+Следующий локальный P04 slice: [IMPLEMENTATION_STEP_36_P04_STEP_CACHE.md](IMPLEMENTATION_STEP_36_P04_STEP_CACHE.md),
+step-focused goals и переиспользование AST planning projection; 101 PASS / 1 skipped
+в новых непересекающихся selections. Это не p95/RSS или live utility acceptance.
 UI/UX, marketplace, writable parallel workers и multi-tenant service вне этого этапа.
+
+Локальный P05 slice: [IMPLEMENTATION_STEP_37_P05_FRONTIER.md](IMPLEMENTATION_STEP_37_P05_FRONTIER.md),
+общий ready/blocked frontier для scheduler и read-only explain-next API, до трёх
+подробных шагов и existing ledger links. 82 unique offline tests PASS; 12 frontier
+tests повторно PASS после bound-only исправления. Hierarchy, acceptance criteria
+и revision-bound subgoal evidence остаются OPEN, четыре production-блока сохраняются.
+
+Локальный package 38: [IMPLEMENTATION_STEP_38_P05_GOALS.md](IMPLEMENTATION_STEP_38_P05_GOALS.md),
+bounded goal hierarchy, criteria-bound approval, legacy compatibility и structured
+replan context. Финальный offline acceptance **107 PASS / 1 FAIL (MemoryError)**;
+host memory pressure подтверждено, status=failed сохранён. Требуется повтор после
+освобождения ресурсов. P05 revisions/evidence/rolling expansion остаются OPEN.
+
+Новый порядок разработки по запросу владельца 24 октября:
+[PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) — Understand-Anything graph,
+delta updates, task DAG, bounded autonomy, затем efficiency и product parity.
+Он расширяет будущую цель; существующие W1–W9 acceptance gates ниже сохраняются.
+Reference source и ограничения адаптации: [UNDERSTAND_ANYTHING_REFERENCE_2026-10-24.md](UNDERSTAND_ANYTHING_REFERENCE_2026-10-24.md).
+
+После повторной проверки двух внешних разборов добавлены
+[CORE_CRITIQUE_RECHECK_2026-10-24.md](CORE_CRITIQUE_RECHECK_2026-10-24.md) и
+[ENTERPRISE_CORE_PLAN.md](ENTERPRISE_CORE_PLAN.md), E00–E08 OPEN.
+Четыре оставшихся блока ниже сохранены; corporate core добавляет identity/policy,
+data isolation, durable scheduling, evidence semantics и headless consumer gates.
+Изоляция необходима до untrusted live evaluation, а не только на финальном release.
 
 ## Поддерживаемый первый scope
 

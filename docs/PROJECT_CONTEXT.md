@@ -1,11 +1,85 @@
 # atomic-flow — рабочая карта проекта
 
-Обновлено 24 октября 2026 после независимой сверки исходников, CI и pilot evidence.
+Обновлено 25 октября 2026 после сверки ночных пакетов и локального продолжения.
 Работать из этого репозитория `atomic-flow/`; внешний родитель — другой Git root.
 Ветка `experimental`, draft [PR №2](https://github.com/Akseleu-J/atomic-flow/pull/2),
-версия пакета `0.2.0`. Протокол доступа: [GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md).
+версия пакета `0.2.0`. Протоколы: [GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md) для GitHub;
+[REAL_API_BENCHMARK_PROTOCOL.md](REAL_API_BENCHMARK_PROTOCOL.md) для live API и Kaggle runs.
 
 ## Текущий статус — читать первым
+
+Package 39 реализует оставшиеся host contracts P05:
+[IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md](IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md).
+Revision-bound receipts, conservative stale-premise pause, bounded 1–3 child
+expansion/max8/history128, descendant horizon, goal scopes/caps и terminal cancelled
+встроены в прежний runtime. Local JUnit: **208 PASS / 2 SKIP**, 210 unique cases;
+Ruff/compile PASS. Exact-source CI gate ещё должен быть принят на новом commit.
+Evidence: `validation/p05-closure-20261025/`. Docker-free core не означает isolated
+local execution; quality/scale/release/isolated-worker production gates сохраняются.
+
+Локальный package 38 — P05 bounded hierarchy и reviewed acceptance metadata:
+[IMPLEMENTATION_STEP_38_P05_GOALS.md](IMPLEMENTATION_STEP_38_P05_GOALS.md).
+Goal IDs/parents/criteria сохраняются и входят в approval; legacy canonical
+digest без metadata сохранён. Bounds: 32 goals/generation, depth 4, history128.
+Step context и replan получают требования; done не означает semantic acceptance.
+Internal hierarchical replan требует fresh review. Финальный offline selection:
+**107 PASS / 1 FAIL (MemoryError)**; Windows имела около 76 MiB physical / 276 MiB
+virtual free. Manifest status=failed; initial rollback failures сохранены, их
+причина не установлена. Ruff/compile PASS. Повтор acceptance нужен после снятия
+host memory pressure; P05 evidence/revisions/rolling expansion/CI остаются OPEN.
+
+Локальный package 37 — P05 rolling frontier:
+[IMPLEMENTATION_STEP_37_P05_FRONTIER.md](IMPLEMENTATION_STEP_37_P05_FRONTIER.md).
+Scheduler и read-only `TaskRunner.explain_next` используют общий расчёт ready/
+blocked; bounded context показывает до трёх доступных шагов и существующие ledger
+references. Unresolved running step останавливает scheduling до reconciliation.
+**82 passed** в основном offline selection; 12 frontier tests повторно PASS после
+финального ограничения reference length (не складывать counts). Ruff/compile PASS.
+Evidence: `validation/p05-frontier-20261025/`. P05 hierarchy/criteria/revision-bound
+evidence остаются OPEN; это локальный working diff, без нового commit/CI/live calls.
+
+Следующее локальное продолжение 25 октября — P04 step-focused read-plan cache:
+[IMPLEMENTATION_STEP_36_P04_STEP_CACHE.md](IMPLEMENTATION_STEP_36_P04_STEP_CACHE.md).
+Цели берутся из текущего шага, context-pack AST facts переиспользуются по content
+revision, изменённые файлы обновляются отдельно. Scanner применяет общие source
+admission/limits/cancel; кэш не даёт read authority. Текущие selections:
+**101 passed / 1 skipped** (JUnit без пересечений), Ruff/compile/diff PASS.
+Это локальный пакет поверх package 35, не новый commit/CI. Полный обход и hashing
+для reconciliation, legacy source-index refresh и четыре production-блока остаются.
+
+25 октября: ночные P00/P01/P02-1/P03-1/P04-1/P04-2/P05-1/P02-2/P06-1
+существуют на HEAD `20cdd7767ad846ad42dd9d08fcd709c4d5c11b0d`. Два workflow
+этого HEAD подтверждены SUCCESS: `40159998948` и `40159998952`.
+В текущем рабочем дереве добавлен P06-2 opt-in internal replan, исправлены
+persisted graph CAS/unresolved-addition relink и project binding invalidation.
+Результаты и ограничения: [IMPLEMENTATION_STEP_35_P06_INTERNAL_REPLAN_REVIEW_FIXES.md](IMPLEMENTATION_STEP_35_P06_INTERNAL_REPLAN_REVIEW_FIXES.md).
+Это локальные изменения, не новый проверенный CI commit. Providers/vault/Kaggle
+не вызывались. На момент package 35 P04 pack ещё делал clean build на шаге; package 36
+выше заменяет этот planning path, но full delta hot-path,
+полные P00–P14/E00–E08 acceptance и четыре production-блока не закрыты.
+Финальные непересекающиеся локальные selections: **168 passed / 2 skipped**
+(79 focused + 85 neighboring + 4 CLI); Ruff/compileall/diff PASS.
+
+Далее — дорожная карта и датированные evidence предыдущих проверок. Старое
+утверждение «production-код не менялся» относится к review 24 октября ниже.
+
+План следующей программы по запросу владельца:
+[PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md), P00–P14 OPEN: UA graph mechanism,
+delta refresh → subtask DAG/rolling planning → bounded autonomy → utility →
+efficiency/reliability/release → IDE/browser/multilanguage и measured differentiation.
+Reference закреплён на UA `e24fcf6d371bcfa529bc110bacb1bb43de1b8d33`:
+[source review](UNDERSTAND_ANYTHING_REFERENCE_2026-10-24.md).
+Полные этапы остаются OPEN; реализованные ночные срезы и локальное продолжение
+перечислены выше и не равны завершению всей программы.
+
+Дополнение к roadmap после критики ядра:
+[CORE_CRITIQUE_RECHECK_2026-10-24.md](CORE_CRITIQUE_RECHECK_2026-10-24.md),
+[ENTERPRISE_CORE_PLAN.md](ENTERPRISE_CORE_PLAN.md), E00–E08 OPEN.
+Fresh offline probes подтвердили grounding=1.0 при checked=0 и при неверной логике
+с известными именами; это ограничение answer heuristic, не обход host completion.
+11 focused regressions PASS (26.36 s, вне Windows desktop sandbox из-за temp ACL).
+Новых provider calls=0; production-код не менялся. Corporate core имеет отдельный
+headless acceptance gate; четыре W8/W7/release/production блока остаются открытыми.
 
 Глава аудита/сверки и scoped исправлений завершена на runtime
 `0dbd5938958074eae4ff73f6424f06425a525909`. Оба push workflow PASS:

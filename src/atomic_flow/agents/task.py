@@ -16,11 +16,12 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
 
+from atomic_flow.agents.goals import Goal, validate_goals
 from atomic_flow.config import user_dir
 from atomic_flow.state import TASK_SCHEMA_VERSION, StateError, migrate_task
 
-StepStatus = Literal["pending", "running", "done", "failed", "blocked", "superseded"]
-TaskStatus = Literal["running", "paused", "done", "failed"]
+StepStatus = Literal["pending", "running", "done", "failed", "blocked", "superseded", "cancelled"]
+TaskStatus = Literal["running", "paused", "done", "failed", "cancelled"]
 
 
 @dataclass
@@ -38,6 +39,12 @@ class Step:
     depends_on: list[int] = field(default_factory=list)
     blocked_reason: str = ""
     invalidated_reason: str = ""
+    parent_goal: str = ""
+    acceptance_criteria: list[str] = field(default_factory=list)
+    scope_paths: list[str] = field(default_factory=list)
+    linked_code_nodes: list[str] = field(default_factory=list)
+    linked_test_nodes: list[str] = field(default_factory=list)
+    evidence: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -61,6 +68,8 @@ class Task:
     schema_version: int = TASK_SCHEMA_VERSION
     completion_report: dict = field(default_factory=dict)
     plan_approval: dict = field(default_factory=dict)
+    goals: list[Goal] = field(default_factory=list)
+    expansion_count: int = 0
 
     @classmethod
     def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> Task:
@@ -125,16 +134,18 @@ def _decode(raw: object, task_id: str) -> Task:
     for name in ("id", "query", "project", "tree_fingerprint", "error", "rationale", "changeset_id"):
         if name in data and not isinstance(data[name], str):
             raise StateError(f"invalid task state: {name} must be text")
-    for name in ("current_index", "replan_count"):
+    for name in ("current_index", "replan_count", "expansion_count"):
         if name in data and (type(data[name]) is not int or data[name] < 0):
             raise StateError(f"invalid task state: {name} must be a nonnegative integer")
+    if data.get("expansion_count", 0) > 8:
+        raise StateError("task expansion limit exceeded")
     for name in ("created_at", "finished_at", "budget_spent"):
         value = data.get(name)
         if name in data and value is None and name != "finished_at":
             raise StateError(f"invalid task state: {name} cannot be null")
         if value is not None and (type(value) not in (int, float) or not math.isfinite(value) or value < 0):
             raise StateError(f"invalid task state: {name} must be a finite nonnegative number")
-    if "status" in data and data["status"] not in ("running", "paused", "done", "failed"):
+    if "status" in data and data["status"] not in ("running", "paused", "done", "failed", "cancelled"):
         raise StateError("invalid task status")
     if "plan_ready" in data and type(data["plan_ready"]) is not bool:
         raise StateError("invalid task state: plan_ready must be boolean")
@@ -145,19 +156,26 @@ def _decode(raw: object, task_id: str) -> Task:
         if name in data and not isinstance(data[name], dict):
             raise StateError(f"invalid task state: {name} must be an object")
     _validate_approval(data.get("plan_approval", {}))
+    raw_goals = data.pop("goals", [])
+    if not isinstance(raw_goals, list) or len(raw_goals) > 128:
+        raise StateError("invalid task goals")
+    try:
+        goals = [Goal(**goal) for goal in raw_goals]
+    except (TypeError, ValueError) as exc:
+        raise StateError("invalid task goal fields") from exc
     raw_steps = data.pop("steps", [])
-    if not isinstance(raw_steps, list):
+    if not isinstance(raw_steps, list) or len(raw_steps) > 128:
         raise StateError("invalid task state: steps must be a list")
     steps = []
     for raw_step in raw_steps:
         if not isinstance(raw_step, dict):
             raise StateError("invalid task step: expected an object")
-        for name in ("description", "expected_outcome", "verify_with", "result_summary", "request_id", "blocked_reason"):
+        for name in ("description", "expected_outcome", "verify_with", "result_summary", "request_id", "blocked_reason", "invalidated_reason"):
             if name in raw_step and not isinstance(raw_step[name], str):
                 raise StateError(f"invalid task step: {name} must be text")
         if type(raw_step.get("index")) is not int or raw_step["index"] < 0:
             raise StateError("invalid task step index")
-        if raw_step.get("status", "pending") not in ("pending", "running", "done", "failed", "blocked", "superseded"):
+        if raw_step.get("status", "pending") not in ("pending", "running", "done", "failed", "blocked", "superseded", "cancelled"):
             raise StateError("invalid task step status")
         dependencies = raw_step.get("depends_on", [])
         if not isinstance(dependencies, list) or any(type(d) is not int or d < 0 for d in dependencies):
@@ -173,9 +191,15 @@ def _decode(raw: object, task_id: str) -> Task:
             steps.append(Step(**raw_step))
         except TypeError as exc:
             raise StateError("invalid task step fields; inspect saved state before resuming") from exc
+        from atomic_flow.agents.step_evidence import validate_receipt
+        try:
+            validate_receipt(steps[-1].evidence)
+        except ValueError as exc:
+            raise StateError(str(exc)) from exc
     validate_dependencies(steps)
+    validate_goals(goals, steps)
     try:
-        return Task(steps=steps, **data)
+        return Task(steps=steps, goals=goals, **data)
     except TypeError as exc:
         raise StateError("invalid task fields; inspect saved state before resuming") from exc
 
@@ -216,8 +240,17 @@ def _validate_approval(approval: dict) -> None:
         return
     required = {"schema_version", "task_id", "project", "plan", "source_manifest", "allowed_paths",
                 "scope_hashes", "workspace_manifest", "digest"}
-    if set(approval) != required or type(approval["schema_version"]) is not int or approval["schema_version"] != 1:
+    version = approval.get("schema_version")
+    if version == 2:
+        required.add("internal_replan")
+    if set(approval) != required or type(version) is not int or version not in {1, 2}:
         raise StateError("invalid task plan approval fields/version")
+    if version == 2:
+        from atomic_flow.agents.envelope import validate_envelope
+        try:
+            validate_envelope(approval["internal_replan"])
+        except ValueError as exc:
+            raise StateError(str(exc)) from exc
     if (any(not isinstance(approval[key], str) for key in ("task_id", "project", "digest"))
             or not re.fullmatch(r"[a-f0-9]{64}", approval["digest"])
             or not isinstance(approval["plan"], dict)
