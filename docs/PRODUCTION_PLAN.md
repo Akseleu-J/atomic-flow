@@ -1,5 +1,7 @@
 # Production plan: критерии принятия и оставшаяся работа
 
+Package 41 (25 октября): [P06 matrix и original goal accounting](IMPLEMENTATION_STEP_41_P06_MATRIX.md). Runtime da67d89 сохраняет исходные goal IDs/caps/scopes/links при доказуемой замене и устраняет stale project bytecode в pytest checker. Полная public multi-file failure→repair→publish→graph journey реализована; CI 40221853531 / 40221853379 SUCCESS: по 1296 PASS / 14 SKIP, 277 source hashes verified; 9/9 host rows PASS на обеих Python versions, real Docker/composition и wheel matrix PASS. Evidence — в отчёте. Независимый P06 review и четыре production-блока остаются OPEN.
+
 25 октября, package 39: [P05 host contracts и acceptance](IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md).
 Остаток hierarchy/rolling/evidence/scope/caps реализован, local 208 PASS / 2 SKIP;
 exact-source CI gate PASS на `91d22e2` (runs 40175334384 / 40175334261).

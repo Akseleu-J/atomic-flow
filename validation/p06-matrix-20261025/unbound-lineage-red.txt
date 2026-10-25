@@ -1,0 +1,62 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_original_goal_cap_survives_replan_and_restart[calls-True] ________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-9/test_original_goal_cap_survive0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001CD23602840>
+flat = True, limit = 'calls'
+
+    @pytest.mark.parametrize("flat", [False, True])
+    @pytest.mark.parametrize("limit", ["calls", "usd"])
+    def test_original_goal_cap_survives_replan_and_restart(tmp_path, monkeypatch, flat, limit):
+        task, runner, backend, plan = staged(tmp_path, calls=2 if limit == "calls" else 20,
+                                            budget=0.0025 if limit == "usd" else 1.0)
+        replacement = copy.deepcopy(plan)
+        replacement.steps[0].description = "Read the source another way"
+        if flat:
+            replacement.goals = []
+            replacement.steps[0].parent_goal = ""
+    
+        def execute(task_, step):
+            runner.task_backend.chat(MESSAGES)
+            if step.index == 0:
+                raise runner._check_failure(step, "fixture pytest failure", "pytest", 1)
+            pytest.fail("replacement received a fresh goal call allowance")
+    
+        monkeypatch.setattr(runner, "_execute_step", execute)
+        def replan(*args, **kwargs):
+            kwargs["backend"].chat(MESSAGES)  # The real planner reservation also consumes the original goal cap.
+            return replacement
+    
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", replan)
+>       result = runner.resume(task)
+                 ^^^^^^^^^^^^^^^^^^^
+
+tests\test_p06_constraints.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\task_loop.py:344: in resume
+    return self._resume_locked(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:397: in _resume_locked
+    result = self._resume_steps(task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:542: in _resume_steps
+    self._execute_step(task, step)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+task_ = Task(id='task_0603b32b5186', query='inspect safely', project='C:\\Users\\omirb\\AppData\\Local\\Temp\\pytest-of-unknow...nce_criteria=['Report the constant'], scope_paths=['a.py'], max_model_calls=2, max_budget_usd=1.0)], expansion_count=0)
+step = Step(index=1, description='Read the source another way', tools_needed=['read_file'], expected_outcome='', verify_with=...Report the constant'], scope_paths=['a.py'], linked_code_nodes=[], linked_test_nodes=['a.py'], evidence={}, failure={})
+
+    def execute(task_, step):
+        runner.task_backend.chat(MESSAGES)
+        if step.index == 0:
+            raise runner._check_failure(step, "fixture pytest failure", "pytest", 1)
+>       pytest.fail("replacement received a fresh goal call allowance")
+E       Failed: replacement received a fresh goal call allowance
+
+tests\test_p06_constraints.py:47: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_p06_constraints.py::test_original_goal_cap_survives_replan_and_restart[calls-True]
+1 failed, 3 deselected in 3.07s
+
+EXIT_CODE=1

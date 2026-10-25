@@ -1,0 +1,97 @@
+{
+  "status": "verified",
+  "published_head": "da67d89a86c917249216747f44e82b9239b72ca2",
+  "tested_merge": "5275a7bbf43f3be0fafcde8fac742cf404384000",
+  "tree": "1fb53c4a96ad6bb69ad6f766a26fb606a23b0e0e",
+  "runs": [
+    40221853531,
+    40221853379
+  ],
+  "reports": [
+    {
+      "artifact_id": 12610185268,
+      "archive_sha256": "8d7f31b02b4487d46245e94dbd3da66cc46d18f67708cc9d3854ab406f170cba",
+      "name": "host-tests-3.12-5275a7bbf43f3be0fafcde8fac742cf404384000",
+      "cases": 1310,
+      "passed": 1296,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 277,
+      "python": "3.12.15",
+      "matrix_passed_cases": {
+        "M01": 1,
+        "M02": 8,
+        "M03": 10,
+        "M04": 7,
+        "M05": 6,
+        "M06": 6,
+        "M07": 2,
+        "M08": 4,
+        "M09": 1
+      }
+    },
+    {
+      "artifact_id": 12609845997,
+      "archive_sha256": "c2141eb8b6cfec71a9f4a3152d29a4f94b0268febdf20ae5b4afeaba91864e0a",
+      "name": "validation-5275a7bbf43f3be0fafcde8fac742cf404384000",
+      "docker": {
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+        "gpu_requested": false,
+        "model_calls": 0,
+        "container": "PASS",
+        "tests_exit": 0,
+        "extra_tests_exit": 0,
+        "compile_exit": 0,
+        "image_id": "sha256:8fb99013b39fb8db15d5d2cec0fae2dc6e68cdb34bffcbe3d234e49a29e62154"
+      }
+    },
+    {
+      "artifact_id": 12609626928,
+      "archive_sha256": "31157f6bec820374b7ea3e19ee07c225bad8ba8ec58ebcd89d7ef40c41723d82",
+      "name": "host-tests-3.11-5275a7bbf43f3be0fafcde8fac742cf404384000",
+      "cases": 1310,
+      "passed": 1296,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 277,
+      "python": "3.11.17",
+      "matrix_passed_cases": {
+        "M01": 1,
+        "M02": 8,
+        "M03": 10,
+        "M04": 7,
+        "M05": 6,
+        "M06": 6,
+        "M07": 2,
+        "M08": 4,
+        "M09": 1
+      }
+    },
+    {
+      "artifact_id": 12610245010,
+      "archive_sha256": "5d43383f4221782a2cd4606e174652bbcf5459ce7ee426966e14a1d19a947a7a",
+      "name": "external-interoperability-5275a7bbf43f3be0fafcde8fac742cf404384000",
+      "composition_scenarios": [
+        "publish",
+        "cancel",
+        "source_conflict"
+      ]
+    }
+  ],
+  "local_final_new_cases": {
+    "cases": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "local_checker_selection": {
+    "cases": 30,
+    "passed": 27,
+    "failed": 0,
+    "skipped": 3
+  },
+  "local_history": "Historical failed fixtures and expected-red unbound-lineage repro retained; counts from different selections are not summed.",
+  "new_provider_calls": 0,
+  "limits": "Wheel matrix job status recorded separately; its 12 archives were not downloaded. No live utility, independent review, worker deployment or production acceptance claim."
+}

@@ -1,0 +1,24 @@
+{
+  "workflow_runs": [
+    {
+      "id": 40221853531,
+      "name": "Project and container checks",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 122,
+      "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40221853531/jobs",
+      "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40221853531/logs",
+      "workflow_id": 388210223
+    },
+    {
+      "id": 40221853379,
+      "name": "External interoperability and installed release",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 70,
+      "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40221853379/jobs",
+      "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40221853379/logs",
+      "workflow_id": 394926526
+    }
+  ]
+}
