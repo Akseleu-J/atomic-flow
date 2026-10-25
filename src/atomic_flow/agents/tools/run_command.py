@@ -9,7 +9,7 @@ from atomic_flow.agents.base import Tool
 from atomic_flow.agents.context import ToolContext
 from atomic_flow.agents.diagnostics import quality_diagnostics
 from atomic_flow.agents.execution import checked_workspace, run_python
-from atomic_flow.agents.verify import check_source_revision
+from atomic_flow.agents.verify import check_source_changed, check_source_snapshot
 from atomic_flow.output import sanitize_output
 
 ALLOWED = {
@@ -48,9 +48,11 @@ class RunCommandTool(Tool):
         # supplies a private snapshot; ordinary ask gets an ephemeral changeset.
         ctx.cancel_check()
         with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
-            checked_revision = check_source_revision(check_root, ctx.cancel_check)
+            from atomic_flow.agents.step_evidence import manifest_digest
+            checked_snapshot = check_source_snapshot(check_root, ctx.cancel_check)
+            checked_revision = manifest_digest(checked_snapshot)
             result = run_python(cmd, check_root, config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
-            changed = check_source_revision(check_root, ctx.cancel_check) != checked_revision
+            changed = check_source_changed(checked_snapshot, check_source_snapshot(check_root, ctx.cancel_check))
         if changed:
             return {"command": args.command, "error": "source changed during check", "check_source_changed": True,
                     "checked_source_revision": checked_revision}

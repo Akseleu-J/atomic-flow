@@ -101,7 +101,9 @@ def test_task_runner_stops_on_failed_edit(monkeypatch, isolated_home, tmp_path):
     plan = Plan(steps=[PlanStep(description="bad edit", verify_with="py_compile")])
     runner = TaskRunner(config=None, project=tmp_path, backend=None)
     task = runner.run_plan("fail", plan)
-    assert task.status == "failed"
+    assert task.status == "paused", task.error
+    assert task.last_failure_decision["action"] == "stop"
+    assert task.replan_count == 0
     assert task.steps[0].status == "failed"
     assert "rolled back" in task.error
 
@@ -170,7 +172,12 @@ def test_replan_appends_steps_on_failure(monkeypatch, isolated_home, tmp_path):
             pass
 
         def answer(self, *a, **kw):
-            return responses.pop(0)
+            result = responses.pop(0)
+            if result.tool_calls[0]["result_summary"].get("status") == "rolled_back":
+                from atomic_flow.agents.step_evidence import manifest_digest
+                result.tool_calls[0]["result_summary"].update(verification={"syntax": "failed"}, checks=["syntax"],
+                    checked_source_revision=manifest_digest(runner.changeset.validate_workspace()))
+            return result
 
     monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
     monkeypatch.setattr(task_loop, "replan_task", lambda *a, **kw: Plan(

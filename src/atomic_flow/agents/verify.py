@@ -26,11 +26,24 @@ class VerificationResult:
     source_changed: bool = False
 
 
-def check_source_revision(root: Path, cancel_check=None) -> str:
+def check_source_snapshot(root: Path, cancel_check=None) -> dict:
     """Execution-boundary audit over the same admitted snapshot as changesets."""
     from atomic_flow.agents.changeset import _files
+    return _files(root, cancel_check=cancel_check or (lambda: None))
+
+
+def check_source_revision(root: Path, cancel_check=None) -> str:
     from atomic_flow.agents.step_evidence import manifest_digest
-    return manifest_digest(_files(root, cancel_check=cancel_check or (lambda: None)))
+    return manifest_digest(check_source_snapshot(root, cancel_check))
+
+
+def check_source_changed(before: dict, after: dict) -> bool:
+    from atomic_flow.tree.defaults import SOURCE_SUFFIXES
+    # Preserve every original input, including data fixtures. New code/config
+    # is a conflict. Generated data outputs in disposable copies are allowed;
+    # persistent TaskRunner workspaces still enforce the full publication scope.
+    return (any(after.get(p) != h for p, h in before.items())
+            or any(Path(p).suffix.lower() in SOURCE_SUFFIXES for p in after.keys() - before.keys()))
 
 
 def _matching_tests(project_root: Path, rel_path: str) -> list[str]:
@@ -77,10 +90,12 @@ def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
     if not test_files:
         return VerificationResult(ok=True, checks=["syntax"], message="compile OK; no matching tests", source_hash=source_hash)
     with checked_workspace(project_root, private_workspace=private_workspace, cancel_check=cancel_check) as check_root:
-        checked_revision = check_source_revision(check_root, cancel_check)
+        from atomic_flow.agents.step_evidence import manifest_digest
+        checked_snapshot = check_source_snapshot(check_root, cancel_check)
+        checked_revision = manifest_digest(checked_snapshot)
         result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *test_files],
                             check_root, config=execution, timeout=timeout_seconds, cancel_check=cancel_check)
-        changed = check_source_revision(check_root, cancel_check) != checked_revision
+        changed = check_source_changed(checked_snapshot, check_source_snapshot(check_root, cancel_check))
     if changed:
         return VerificationResult(False, ["syntax", "pytest"], "source changed during check",
                                   source_hash=source_hash, source_changed=True, checked_source_revision=checked_revision)

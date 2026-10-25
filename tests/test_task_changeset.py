@@ -44,7 +44,10 @@ def test_multistep_task_publishes_all_or_none(tmp_path, second_ok):
         "update both functions", Plan(steps=[PlanStep(description=f"Update {name} function", tools_needed=["edit_node"])
                                             for name in ("a", "b")]),
     )
-    assert task.status == ("done" if second_ok else "failed"), task.error
+    assert task.status == ("done" if second_ok else "paused"), task.error
+    if not second_ok:
+        assert task.last_failure_decision["kind"] == "tool_precondition_failure"
+        assert task.replan_count == 0
     expected = "return 2" if second_ok else "return 1"
     assert all(expected in (root / f"{name}.py").read_text() for name in ("a", "b"))
     assert task.changeset_id
