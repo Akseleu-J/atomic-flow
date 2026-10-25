@@ -32,6 +32,30 @@ from atomic_flow.llm.request_budget import admit_request
 TASK_ID = "sympy__sympy-21614"
 SOURCE = "sympy/core/function.py"
 MODEL = "google/gemini-3.1-flash-lite-preview"
+READ_TOOLS = frozenset({"read_node", "search_tree", "find_callers", "search_text", "read_file", "find_files", "read_result"})
+EDIT_TOOLS = frozenset({"patch_file", "edit_node"})
+PROFILES = {
+    "original": {"calls": 6, "input": 240_000, "wall": 600, "cost": .05},
+    "p05-diagnostic": {"calls": 20, "input": 1_000_000, "wall": 1200, "cost": 1.80},
+}
+
+
+def plan_policy_violations(steps, *, allow_research=False):
+    """Admit research only as read-only work; keep an actual verified edit obligation."""
+    reasons, edits = [], 0
+    for step in steps:
+        tools = set(step.tools_needed)
+        if tools - (READ_TOOLS | EDIT_TOOLS):
+            reasons.append(f"step {step.index}: unsupported tool obligation")
+        if step.verify_with == "py_compile":
+            edits += 1
+        elif step.verify_with == "none" and allow_research and tools and tools <= READ_TOOLS:
+            pass
+        else:
+            reasons.append(f"step {step.index}: source-only verification policy")
+    if not edits:
+        reasons.append("plan has no syntax-verified edit obligation")
+    return reasons
 
 
 def write_json(path, value):
@@ -203,13 +227,18 @@ def atomic(task, work, source, backend, args):
         return tool in {"patch_file", "edit_node", "read_file", "read_node", "search_tree", "search_text", "find_files", "find_callers", "read_result"}
 
     runner = TaskRunner(config, work, backend, approval_callback=approve, capability_factory=capabilities)
+    research = getattr(args, "profile", "original") == "p05-diagnostic"
     query = task["problem_statement"] + "\nHost scope: only " + SOURCE + ". Tests are independently run AFTER generation. " \
-            "Use verify_with=py_compile for the pilot syntax check. No test execution, shell, dependency installation or test edits are permitted."
+            "Use verify_with=py_compile for code edits. No test execution, shell, dependency installation or test edits are permitted."
+    if research:
+        query += " Read-only research may use verify_with=none with read tools only; at least one verified edit is required."
     prepared = runner.prepare(query, candidates=[SOURCE], n_files=1)
     if not prepared.plan_ready:
         return "", {"task_status": prepared.status, "task_id": prepared.id, "generation_kind": "TaskRunner"}
-    if any(step.verify_with != "py_compile" for step in prepared.steps):
-        return "", {"task_status": "plan_policy_refused", "task_id": prepared.id, "generation_kind": "TaskRunner"}
+    policy_errors = plan_policy_violations(prepared.steps, allow_research=research)
+    if policy_errors:
+        return "", {"task_status": "plan_policy_refused", "task_id": prepared.id,
+                    "generation_kind": "TaskRunner", "plan_policy_reasons": policy_errors}
     review = runner.review(prepared, allowed_paths=[SOURCE])
     prepared = runner.approve(prepared, review["digest"], allowed_paths=[SOURCE])
     timer = threading.Timer(max(0.001, backend.deadline - time.monotonic()), lambda: request_cancel(prepared.id))
@@ -235,6 +264,7 @@ def parser():
     result.add_argument("--mirror", required=True)
     result.add_argument("--output", required=True)
     result.add_argument("--model", default=MODEL)
+    result.add_argument("--profile", choices=tuple(PROFILES), default="original")
     result.add_argument("--max-calls", type=int, default=4)
     result.add_argument("--max-output-tokens", type=int, default=2048)
     result.add_argument("--max-input-tokens", type=int, default=60_000)
@@ -249,19 +279,15 @@ def parser():
 def main():
     args = parser().parse_args()
     started = time.monotonic()
-    if not args.yes or args.model != MODEL or not 1 <= args.max_calls <= 6 or not 16 <= args.max_output_tokens <= 2048:
-        # 6-call bound: one planner call plus tool-loop turns; the prepared
-        # corpus doc proposed 20 calls/arm, so the pilot stays stricter.
+    profile = PROFILES[args.profile]
+    if not args.yes or args.model != MODEL or not 1 <= args.max_calls <= profile["calls"] or not 16 <= args.max_output_tokens <= 2048:
+        # Historical bounds remain the default; larger bounds require an
+        # explicit diagnostic profile and separate host authorization.
         raise ValueError("explicit authorized fixed-model pilot and bounded caps required")
-    if not 0 < args.max_wall_seconds <= 600 or not 1 <= args.max_input_tokens <= 240_000 or not 0 < args.max_reported_cost <= .05:
-        # 600 s wall bound: the atomic arm builds the full SymPy tree twice
-        # (changeset workspace at resume, project at publication); one build
-        # measured 179 s / 44,379 nodes on the reference laptop. Tree builds
-        # are not interruptible, so wall can exceed the cooperative deadline.
-        # 240k aggregate input estimate: admit_request estimates bytes/4,
-        # ~2.3x the provider's actual tokens; a 60k/120k estimate cap blocked
-        # the terminal tool-loop turn mid-edit. The reported-cost stop is
-        # checked after receipt; it is not an absolute provider invoice cap.
+    if (not 0 < args.max_wall_seconds <= profile["wall"] or not 1 <= args.max_input_tokens <= profile["input"]
+            or not 0 < args.max_reported_cost <= profile["cost"]):
+        # Source indexing and model work share the cooperative deadline.
+        # Reported cost is observed after receipt, not a billing guarantee.
         raise ValueError("pilot caps exceed reviewed bounds")
     if (args.price_in is None) != (args.price_out is None) or any(v is not None and not valid_amount(v) for v in (args.price_in, args.price_out)):
         raise ValueError("both explicit nonnegative prices or neither required")
@@ -279,6 +305,7 @@ def main():
               "max_reported_cost_usd": args.max_reported_cost}
     framework_before = source_state(root)
     report = {"version": 2, "instance_id": TASK_ID, "arm": args.arm, "base_commit": task["base_commit"],
+              "profile": args.profile,
               "framework_before": framework_before, "runtime": runtime_state(),
               "configured_prices_usd_per_mtok": {"input": args.price_in, "output": args.price_out},
               "source_context_policy": "Derivative excerpt, at most 550 lines and 32000 bytes; no oracle or gold",
