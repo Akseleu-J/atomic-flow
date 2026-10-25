@@ -397,7 +397,7 @@ Failing gate нельзя закрывать переименованием ст
 environment. Не подменять worker deployment локальным mock или untrusted tests
 trusted-local запуском. Не называть AI-review человеческим pentest.
 
-## 14. Готовое стартовое поручение помощнику
+## 14. Готовое стартовое поручение помощнику (исторический snapshot)
 
 > Продолжай atomic-flow из актуальной ветки, сначала сверив HEAD/diff и
 > docs/PROJECT_CONTEXT.md. Прочитай docs/ASSISTANT_HANDOFF.md и относящиеся к P06
@@ -411,3 +411,19 @@ trusted-local запуском. Не называть AI-review человече
 
 Этот текст передаёт задачу и контекст, но не credentials и не дополнительные права.
 Для другой главы заменить P06 на её номер и применить её prerequisites/gates.
+
+
+## 15. Продолжение марафона 25 октября
+
+Актуальная сдача P00–P06, gaps, локальные и CI доказательства:
+[P00_P06_MARATHON_2026-10-25.md](P00_P06_MARATHON_2026-10-25.md).
+Runtime 395b8ac добавляет Git reconciliation, UA resource kinds, semantic callback
+stage/SDK и version-bound range patch. Прежнее поручение P06 выше историческое:
+lineage и failure classification уже wired, malicious-instruction journey есть.
+Следующее поручение: закрыть explicit integration gaps P01–P03 и независимый
+review/matrix P06, затем P07 quality. Полный P00–P06 acceptance не заявлен.
+
+SymPy: USD 0.001608 — known lower bound, accepted patch/oracle PASS нет.
+Последний MemoryError report имеет request_outcome=unknown; полную стоимость
+не считать нулевой/известной и неизвестный запрос не повторять вслепую.
+В новом пакете live calls=0. Сначала reconciliation и host с достаточной памятью.

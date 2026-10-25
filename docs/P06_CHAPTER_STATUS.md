@@ -1,68 +1,15 @@
-# P06 chapter status (DRAFT — independent review pending)
+# P06 chapter status — актуализация 25 октября 2026
 
-Filled per [ASSISTANT_HANDOFF.md](ASSISTANT_HANDOFF.md) §13. Decision line
-stays OPEN until the independent review findings are addressed.
+Полная сдача по §13: [P00–P06 marathon report](P00_P06_MARATHON_2026-10-25.md#p06--bounded-autonomy).
 
-```text
-Глава / поддерживаемый scope:
-  P06 bounded autonomy: opt-in envelope (foundation by packages 35–39) +
-  slices 2–4 (lineage predicate, failure classification table, publication
-  graph delta-sync). Full hierarchical auto-replan wiring: OPEN.
+Lineage predicate и failure table встроены в runtime. StepFailure → bounded repair
+с persisted last_failure_decision; неизвестное исключение → paused/stop. Dedicated
+malicious-instruction и sync-crash journeys реализованы. Runtime 395b8ac;
+P06 wiring опубликован как 0551924 с tree локального fc3bd2a.
 
-Base SHA → result SHA / PR:
-  a566675 → e43b45b (branch experimental, PR №2 draft).
-  Runtime-relevant: 35573f6 (lineage+failure table), 20913a5/e43b45b
-  (graph sync + Task.graph_sync), on top of runtime 91d22e2.
+Code scope локально проверен; full P06 acceptance OPEN: независимого review
+в этом продолжении не было, self-review явно отделён от него. Scripted evidence
+не подтверждает качество live repair и не закрывает production worker gate.
 
-Что изменилось и какое поведение теперь поддержано:
-  - ADR-0001: immutable authorization envelope vs mutable plan.
-  - lineage_preserved(): criteria/scope/ancestor-cap/required-checks obligations
-    fail closed (pure; not yet wired into the live replan path).
-  - failure_policy.classify(): explicit stop/continue table; unknown kind stops.
-  - Publication hot path delta-syncs .atomic_flow/graph.json (content-CAS +
-    closure relink; reasoned fallback; failures recorded, never flip a
-    completed publication). Task.graph_sync field; budget_events untouched.
-  - §7.7 scripted journey green: edit→checks→publish→graph parity; adversarial
-    sync-crash row green (publication stays done).
-  - lineage_preserved() WIRED into the live internal-replan path: an
-    obligation-keeping hierarchical replan continues autonomously; a replan
-    that drops any criterion/scope/check pauses naming each lost obligation
-    (replaces the old blanket pause; test_goal_hierarchy updated to the
-    stronger message).
-
-Local checks:
-  tests/test_replan_lineage.py 6, test_failure_policy.py 15,
-  test_graph_sync.py 3, test_p06_journey.py 1 — PASS.
-  Neighbours: task/task_execution/internal_replan/task_changeset/
-  capability_composition/composition_acceptance — 74 passed total across
-  focused runs; selections do not overlap in counted case IDs.
-
-CI:
-  push 40193302207 + 40193302211 and PR 40193305969/40193306020 on e43b45b:
-  both workflows SUCCESS. (Interim 20913a5 was RED — budget_events pollution
-  caught by CI, fixed in e43b45b; history preserved.)
-
-Real executor / protocol / live model evidence: отдельно:
-  Scripted only; live SymPy diagnostic session stopped after 3 infrastructure
-  failures ($0.001608 of $1.80; harness ValidationError fixed in 7ab12d4,
-  then host MemoryError — §10 machine boundary). No quality claim.
-
-Измерения: graph sync on 2-file project: parsed_files=1 per delta,
-  relink without reparse (test_graph_sync). SymPy-scale hot-path numbers:
-  not measured (MemoryError boundary).
-
-Независимый review: PENDING (reviewer session running; self-review не считается).
-
-Известные ограничения и внешний blocker:
-  - failure_policy table still a contract, not the sole decision source in
-    task_loop (envelope+lineage are; classification wiring remains).
-  - malicious-instruction-during-repair row relies on existing policy suites,
-    no new dedicated journey yet; graph sync does not feed retrieval.
-  - live diagnostic blocked by host RAM (3.4 GiB) for SymPy-scale runs.
-
-Решение: OPEN — awaiting independent review + remaining slices above.
-
-Следующая глава и её prerequisites:
-  finish P06 wiring + adversarial matrix rows, then P07 (needs E01 honest
-  verification and accepted isolated execution before untrusted code).
-```
+CI/source evidence и оставшиеся matrix cases — в общем отчёте и
+validation/marathon-20261025/manifest.json.

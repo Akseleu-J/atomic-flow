@@ -1,0 +1,3 @@
+{"12605259143.zip": ["junit.xml", "source-evidence.json"], "12606368992.zip": ["compile.txt", "container-boundaries.txt", "dependencies.txt", "docker-build.txt", "docker-info.txt", "docker-version.txt", "pytest-extra.txt", "pytest.txt", "python-version.txt", "results.json", "task-calibration.json", "tested-commit.txt"], "12606485660.zip": ["node-version.txt", "npm-tree.json", "npm-package-lock.json", "python-freeze.txt", "result.json", "tested-commit.txt"], "12606635488.zip": ["junit.xml", "source-evidence.json"]}
+
+EXIT_CODE=0

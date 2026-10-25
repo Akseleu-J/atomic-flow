@@ -559,3 +559,12 @@ development milestone, а не закрытие P07 или production acceptance
 
 Документация конкурентов описывает capabilities. Она не даёт нам их source,
 не доказывает их надёжность и не устанавливает общий benchmark quality.
+
+
+## Доказательное продолжение 25 октября 2026
+
+Сдача текущих P00–P06 срезов и явные остатки:
+[P00_P06_MARATHON_2026-10-25.md](P00_P06_MARATHON_2026-10-25.md).
+Runtime 395b8ac имеет оба зелёных workflow; source-bound evidence сохранён.
+Это scoped code acceptance. Полный статус глав и четыре production gates
+не меняются на closed одним наличием новых adapters/scripted tests.
