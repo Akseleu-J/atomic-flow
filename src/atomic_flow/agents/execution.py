@@ -104,10 +104,15 @@ EXECUTION_PROFILES = MappingProxyType({
 # Source tests/plugins still execute project code: this is launcher integrity,
 # not a claim that hostile tests cannot lie or mutate their own interpreter.
 _CHECKER_BOOTSTRAP = """
-import importlib, os, runpy, sys
+import importlib, os, runpy, sys, tempfile
 tool, arguments = sys.argv[1], sys.argv[2:]
 if tool == 'pytest':
     import pytest
+    # Timestamp/size-valid project .pyc can describe an earlier edit. -B alone
+    # only prevents writes and still reads that cache. Use a fresh private
+    # prefix for each check before permitting any project module imports.
+    sys.pycache_prefix = tempfile.mkdtemp(prefix='atomic-check-bytecode-')
+    sys.dont_write_bytecode = True
     class Collection:
         collected = 0
         def pytest_sessionfinish(self, session, exitstatus):

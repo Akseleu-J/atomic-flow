@@ -32,8 +32,8 @@ def staged(root, *, calls=1, budget=1.0):
 @pytest.mark.parametrize("flat", [False, True])
 @pytest.mark.parametrize("limit", ["calls", "usd"])
 def test_original_goal_cap_survives_replan_and_restart(tmp_path, monkeypatch, flat, limit):
-    task, runner, backend, plan = staged(tmp_path, calls=1 if limit == "calls" else 20,
-                                        budget=0.002 if limit == "usd" else 1.0)
+    task, runner, backend, plan = staged(tmp_path, calls=2 if limit == "calls" else 20,
+                                        budget=0.0025 if limit == "usd" else 1.0)
     replacement = copy.deepcopy(plan)
     replacement.steps[0].description = "Read the source another way"
     if flat:
@@ -47,15 +47,19 @@ def test_original_goal_cap_survives_replan_and_restart(tmp_path, monkeypatch, fl
         pytest.fail("replacement received a fresh goal call allowance")
 
     monkeypatch.setattr(runner, "_execute_step", execute)
-    monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", lambda *a, **kw: replacement)
+    def replan(*args, **kwargs):
+        kwargs["backend"].chat(MESSAGES)  # The real planner reservation also consumes the original goal cap.
+        return replacement
+
+    monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", replan)
     result = runner.resume(task)
     assert result.status == "paused" and "goal p0:root" in result.error
     assert ("model-call cap" if limit == "calls" else "budget cannot cover reservation") in result.error
-    assert len(backend.calls) == 1 and result.steps[-1].parent_goal == "p0:root"
-    assert len(result.goals) == 1 and result.budget_events[0]["goal_ids"] == ["p0:root"]
-    assert result.budget_spent == 0.0005
+    assert len(backend.calls) == 2 and result.steps[-1].parent_goal == "p0:root"
+    assert len(result.goals) == 1 and all(e["goal_ids"] == ["p0:root"] for e in result.budget_events)
+    assert result.budget_spent == 0.001
     resumed = TaskRunner(runner.config, tmp_path, backend).resume(load(task.id))
-    assert resumed.status == "paused" and len(backend.calls) == 1
+    assert resumed.status == "paused" and len(backend.calls) == 2
     assert not resumed.completion_report.get("ready_to_publish")
 
 
