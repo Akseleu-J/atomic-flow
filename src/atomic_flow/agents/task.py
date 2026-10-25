@@ -69,6 +69,7 @@ class Task:
     completion_report: dict = field(default_factory=dict)
     plan_approval: dict = field(default_factory=dict)
     graph_sync: dict = field(default_factory=dict)
+    last_failure_decision: dict = field(default_factory=dict)
     goals: list[Goal] = field(default_factory=list)
     expansion_count: int = 0
 
