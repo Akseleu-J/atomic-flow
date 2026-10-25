@@ -8,6 +8,17 @@
 
 ## Текущий статус — читать первым
 
+Продолжение 25 октября: [P00–P06 marathon report](P00_P06_MARATHON_2026-10-25.md).
+Runtime 395b8ac: Python Git ingestion с admitted reconciliation/CAS, UA resource
+adapters, scripted semantic stage + SDK и hash-bound range patch. P06 failure/lineage
+wiring опубликован. Полные главы не объявлены закрытыми; точные gaps и self-review
+указаны в отчёте. Новый CI и source-bound evidence: validation/marathon-20261025/.
+Первый checks run на c6e4bc9 был RED (устаревшее failed-vs-paused ожидание);
+история сохранена, accounting assertions усилены. Финальный runtime CI 40212848955
+и 40212848950 SUCCESS: по 1260 PASS / 14 SKIP на Python 3.11/3.12; 271 source
+hash verified; real Docker и composition PASS. Provider calls в этом пакете=0.
+
+
 Для передачи основной работы другому помощнику:
 [ASSISTANT_HANDOFF.md](ASSISTANT_HANDOFF.md) — snapshot на `a638e96`, карта кода,
 контракты, первое поручение P06, порядок глав и критерии приёмки. Четыре production

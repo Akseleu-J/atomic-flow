@@ -1,0 +1,86 @@
+{
+  "schema": "marathon-acceptance/1",
+  "date": "2026-10-25",
+  "published_runtime": "395b8accfb8b5aa61a4270543c42185dde596db1",
+  "source_tree": "ecdd45b385090c85a6d5d1831339b7af12511c88",
+  "tested_merge": "a8a76f86f2a6a60f9e02bee0db0294270970608a",
+  "local_checkpoints": {
+    "fc3bd2a": "0551924362001bff3651d053055779db51c1bed7",
+    "54ed6c1": "c6e4bc9a6c5e2170f71cc074ce21ba930b3f43d3",
+    "5928e0a": "395b8accfb8b5aa61a4270543c42185dde596db1"
+  },
+  "review": {
+    "kind": "self-review",
+    "independent": false,
+    "subagents_used": false
+  },
+  "provider_calls": 0,
+  "cost_usd": 0,
+  "local_unique_union": {
+    "passed": 165,
+    "skipped": 3,
+    "failed": 0
+  },
+  "ci_runs": [
+    40212848955,
+    40212848950
+  ],
+  "first_ci_failure": {
+    "head": "c6e4bc9a6c5e2170f71cc074ce21ba930b3f43d3",
+    "run": 40212540321,
+    "failed_case": "tests.test_task_budget::test_failed_orchestrator_response_does_not_lose_cost",
+    "reason": "expected failed but P06 unclassified exception contract is paused; strengthened assertions in 395b8ac"
+  },
+  "chapter_scope_acceptance": {
+    "P00": "baseline/registry accepted; scale SLO open",
+    "P01": "resource adapters accepted; full UA compatibility/API open",
+    "P02": "Python Git reconciliation API accepted; watcher/non-Git/full re-export semantics open",
+    "P03": "scripted host API accepted; CLI/MCP/provider/model quality open",
+    "P04": "range patch accepted; complete impact/coverage journeys open",
+    "P05": "prior bounded core acceptance preserved; regression checked",
+    "P06": "code scope checked; independent review/full journey matrix open"
+  },
+  "production_gates": {
+    "quality": "OPEN",
+    "scale": "OPEN",
+    "release_provenance": "OPEN",
+    "isolated_worker_crash_os_review": "OPEN"
+  },
+  "primary_hypothesis_pre_registered": {
+    "source": "COMPETITIVE_ACCEPTANCE.md targets referenced by PRODUCTION_ROADMAP.md P07",
+    "statement": "quality non-inferiority within 5 points AND >=20% lower complete cost per verified success versus capable plain-agent baseline on 30 pinned tasks, frozen model/provider and identical caps; exploratory until a fresh holdout with computed sample size",
+    "budgets": "no paid calls in P00; future live runs require owner-confirmed account/model/caps per REAL_API_BENCHMARK_PROTOCOL.md"
+  },
+  "artifacts_sha256": {
+    "12605259143.zip": "292eb7a880f24916ecf6bdd29af142ee7f856b8e4b3bd39a7fe06978916d21c9",
+    "12606368992.zip": "4f6b44999c27bd9be5e137b9c8d9783adb1968cbd0cb0c9f7e43639b9c7d7f3c",
+    "12606485660.zip": "241ada49dcdf05b6bc97287bda6e7ea8445a50a52808d6e39dee226b4b9b1686",
+    "12606635488.zip": "01e03a389a52b3036bb4678bed569b6d1766d397401151ad85c3b835c622a658",
+    "accounting-fail-closed.txt": "a7e969a5efcff707a1f15574483fc4e5c3005d374ce1792c99c6bc42bea90ba9",
+    "accounting-fail-closed.xml": "5c206da18af8e37cf832c2570e5186ff9113f6e9ba9099d77942d037748f0dcc",
+    "archive-inventory.txt": "34dbf7efaab6eb1e809cad6aa43702e6260005e50068f7f40279368b64194062",
+    "baseline-card.json": "0c97915f8121263556b65ab13f6bb7a12eb7a740ea2daf3fdf7e030ad801aaef",
+    "baseline.txt": "a576badf967d35ee7732e0b37fad5ffb94f98f760abfc7832ce7dd0ce9a69fcb",
+    "ci-artifacts.json": "cfb518d9aa06b30107e950c54390ff3ca70a84f082a45695a0956bab0c59720d",
+    "ci-runs.json": "bd2adc396d58b63ed7a478e16f3b665818657c9bb31b8fab996250af26e07fb6",
+    "ci-verified.json": "497491c35ef9c356e54102ab2ee3a761e8d781cab5d506eca321493692ef64d6",
+    "compile.txt": "9cfb6133271c066f7c810e6d3aec5fc309247b4a2377c11f8e85a750a2f7cec0",
+    "ingest-range.xml": "fe38a4876a44be2a6d33e841e4efa04fbd6a858b2cc97e12089f326ef9ac3eb6",
+    "initial-ci-failure.txt": "50619f59fefbd92dd244613274318df1f743936e184704e69fa62d909cd775f7",
+    "inventory-refresh-final.txt": "a01514f15815307fe955cff06ea65d58d72ba57fa057efa980c6416b88c378cb",
+    "inventory-refresh.txt": "ebd9ef1d8bf4980ee0caf7593bbe35e5e4aa6051ab6ee3a0c7d8e402455841c0",
+    "reports-preview.txt": "c9e0a24759db80d996e31c4a9c39471fe254cffcce6ceae78faa057b9ea41297",
+    "ruff-final.txt": "24c1ca66db33368ad620db6abf94094369ff9d25d308e4200ff5cbfca25561f1",
+    "ruff.txt": "24c1ca66db33368ad620db6abf94094369ff9d25d308e4200ff5cbfca25561f1",
+    "semantic-autonomy-final.txt": "75172cef50c172805bfdc7407a59f5906591803938543bbf840f5066f5f5e46d",
+    "semantic-autonomy-final.xml": "61e054cd475467ab8d1ebbaf7170544877d2c966bec33bd886f16ef31a95c3e4",
+    "semantic-autonomy.xml": "c76c79dad52d3715f985db93ae27ce58bb4e70d084cd4672e2c37dc43bbe792f",
+    "semantic.xml": "56ed13b14fd289aa94f5c33abc1269cedf1bcaa6b2ccf754ea30284d88e65d58",
+    "structural-edit-final.xml": "1453c4a33cae6f1a43126210907aa2ae9e297bf2fbf34a695901a47513ce5b64",
+    "structural-edit-reviewed.txt": "01b39e1034f258bc922d9c1c7465d0ecc5c946a3247829b0542062f6c66442b6",
+    "structural-edit-reviewed.xml": "03ee48948580ce8befd7c1142ecb6b8c45f0d59aa58efb848e8eeb81f336c49f",
+    "structural-edit.xml": "f3e586fbdd8aff1c49c59b27801c10c168d9d195454060dde910aa18899620eb",
+    "verify.py": "8871ef9265e179b40b6f54a62035f401d587a68a1a62e03c13787072904cf36c",
+    "verify.txt": "a550b867132a835ca63e8e4658cb4a13b2a1fd698b45beddcbf86385ed79cf22"
+  }
+}

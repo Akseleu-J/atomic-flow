@@ -1,0 +1,37 @@
+=================================== FAILURES ===================================
+2026-10-25T16:38:00.7751960Z _____________ test_failed_orchestrator_response_does_not_lose_cost _____________
+2026-10-25T16:38:00.7752235Z 
+2026-10-25T16:38:00.7752459Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_failed_orchestrator_respo0')
+2026-10-25T16:38:00.7752754Z 
+2026-10-25T16:38:00.7752929Z     def test_failed_orchestrator_response_does_not_lose_cost(tmp_path):
+2026-10-25T16:38:00.7753273Z         project = sample_project(tmp_path)
+2026-10-25T16:38:00.7753801Z         backend = ScriptedBackend({"parser": {}, "answerer": "invalid JSON"})
+2026-10-25T16:38:00.7754134Z         cfg = AtomicConfig()
+2026-10-25T16:38:00.7754353Z         cfg.task.max_replans = 0
+2026-10-25T16:38:00.7754836Z         task = TaskRunner(cfg, project, backend).run_plan("report", Plan(steps=[PlanStep(description="Report sample", verify_with="none")]))
+2026-10-25T16:38:00.7755372Z >       assert task.status == "failed"
+2026-10-25T16:38:00.7756312Z E       AssertionError: assert 'paused' == 'failed'
+2026-10-25T16:38:00.7756589Z E         
+2026-10-25T16:38:00.7756765Z E         - failed
+2026-10-25T16:38:00.7756938Z E         + paused
+2026-10-25T16:38:00.7757040Z 
+2026-10-25T16:38:00.7757145Z tests/test_task_budget.py:154: AssertionError
+2026-10-25T16:38:00.7757443Z =============================== warnings summary ===============================
+2026-10-25T16:38:00.7757995Z tests/test_api_admission.py::test_oversized_and_malformed_chat_input_returns_4xx_never_500
+2026-10-25T16:38:00.7758923Z   /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+2026-10-25T16:38:00.7759752Z     from starlette.testclient import TestClient as TestClient  # noqa
+2026-10-25T16:38:00.7760280Z 
+2026-10-25T16:38:00.7760501Z tests/test_rolling_plan.py::test_more_than_three_children_and_goal_rewrite_are_rejected
+2026-10-25T16:38:00.7761127Z   /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pydantic/main.py:520: UserWarning: Pydantic serializer warnings:
+2026-10-25T16:38:00.7762027Z     PydanticSerializationUnexpectedValue(Expected `PlanGoal` - serialized value may not be as expected [field_name='goals', input_value={'id': 'other'}, input_type=dict])
+2026-10-25T16:38:00.7762668Z     return self.__pydantic_serializer__.to_python(
+2026-10-25T16:38:00.7762855Z 
+2026-10-25T16:38:00.7763060Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2026-10-25T16:38:00.7763594Z =========================== short test summary info ============================
+2026-10-25T16:38:00.7764149Z FAILED tests/test_task_budget.py::test_failed_orchestrator_response_does_not_lose_cost - AssertionError: assert 'paused' == 'failed'
+2026-10-25T16:38:00.7764645Z   
+2026-10-25T16:38:00.7764797Z   - failed
+2026-10-25T16:38:00.7764955Z   + paused
+2026-10-25T16:38:00.7765171Z 1 failed, 1259 passed, 14 skipped, 2 warnings in 39.03s
+2026-10-25T16:38:00.9284793Z ##[error]Process completed with exit code 1.
+2026-10-25T16:38:00.9333125Z ##[group]
