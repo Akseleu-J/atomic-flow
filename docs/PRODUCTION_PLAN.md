@@ -2,7 +2,9 @@
 
 25 октября, package 39: [P05 host contracts и acceptance](IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md).
 Остаток hierarchy/rolling/evidence/scope/caps реализован, local 208 PASS / 2 SKIP;
-exact-source CI gate pending. Четыре production-блока остаются OPEN.
+exact-source CI gate PASS на `91d22e2` (runs 40175334384 / 40175334261).
+P05 functional core ACCEPTED; verified source/JUnit evidence:
+`validation/p05-ci-20261025/verified.json`. Четыре production-блока остаются OPEN.
 
 24 октября 2026. Заменяет рабочие статусы первоначального
 [`audit-2026-10-23/PRODUCTION_PLAN.md`](audit-2026-10-23/PRODUCTION_PLAN.md),

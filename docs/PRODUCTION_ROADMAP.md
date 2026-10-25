@@ -275,6 +275,12 @@ relations и weak fallback не считаются доказанным отсу
 
 ## P05. Иерархические подзадачи и планирование следующих шагов
 
+25 октября: **functional core ACCEPTED** на `91d22e2`, exact-source CI и source
+evidence в [package 39](IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md). Ready — derived
+state, succeeded отображается как done после host checks, semantic criteria
+остаются not_assessed до независимого evaluator. Rolling expansion ограничена
+host proposal/review; автоматическое расширение authority не разрешено.
+
 1. Развить существующие Plan/Step/depends_on, не строить второй scheduler рядом.
    Ввести stable task/subtask IDs, parent_goal, acceptance criteria, dependencies,
    linked code/test nodes, scope, estimates/caps, evidence и explicit state.
