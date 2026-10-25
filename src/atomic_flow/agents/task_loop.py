@@ -247,13 +247,12 @@ class TaskRunner:
                        if (self.project / path).is_file() else None
                        for path in changed_paths}
             report = sync_project_graph(self.project, changed, cancel_check=self.cancel_check)
-            task.budget_events.append({"event": "graph_sync",
-                                       "deltas": report.get("deltas", 0),
-                                       "created": report.get("created", False),
-                                       "fallback": bool(report.get("fallback")),
-                                       "failed": bool(report.get("failed"))})
+            task.graph_sync = {"deltas": report.get("deltas", 0),
+                               "created": report.get("created", False),
+                               "fallback": bool(report.get("fallback")),
+                               "failed": bool(report.get("failed"))}
         except Exception as exc:  # publication already succeeded; record only
-            task.budget_events.append({"event": "graph_sync", "error_type": type(exc).__name__})
+            task.graph_sync = {"failed": True, "error_type": type(exc).__name__}
 
     def invalidate_step(self, task_id: str, index: int, reason: str) -> Task:
         """Host-explicit requeue of a done step (roadmap P05).
