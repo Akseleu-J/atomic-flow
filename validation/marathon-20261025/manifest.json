@@ -38,7 +38,7 @@
     "P03": "scripted host API accepted; CLI/MCP/provider/model quality open",
     "P04": "range patch accepted; complete impact/coverage journeys open",
     "P05": "prior bounded core acceptance preserved; regression checked",
-    "P06": "code scope checked; independent review/full journey matrix open"
+    "P06": "code slice checked; per-repair cap enforcement, typed failure/evidence gates, independent review and full matrix OPEN"
   },
   "production_gates": {
     "quality": "OPEN",
