@@ -1,0 +1,40 @@
+{
+  "run_id": "sympy-recheck-a638e96-20261025T084946Z",
+  "credential_label": "owner-account-2",
+  "model_calls": 1,
+  "status": "generation_failed",
+  "utc": "2026-10-25T08:50:47.635426+00:00",
+  "wrapper_sha256": "82d807de8d6dde4ede638534b7b1235f72f9eba2621b4e69be49471f95b72b8c",
+  "configured_price_provenance": "previous pilot configured estimates, not a new verified price quote",
+  "generation_source_only": true,
+  "source_only_basis": "only function.py edits; no root tests/ at pinned base; no run_command tool; plan py_compile only",
+  "before": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 0.03646950000000082,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 8.022806974999995,
+      "allowed": 100
+    }
+  ],
+  "owner_active_verified": true,
+  "fixed_model_available": true,
+  "after": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 0.037277500000000074,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 8.023614975000001,
+      "allowed": 100
+    }
+  ],
+  "cost_usd": 0.000808,
+  "cost_complete": true,
+  "generation_status": "failed"
+}
