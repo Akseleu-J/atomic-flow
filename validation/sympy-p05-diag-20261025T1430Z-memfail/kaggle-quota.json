@@ -1,0 +1,31 @@
+{
+  "credential_label": "owner-account-2",
+  "owner_authorized": true,
+  "utc": "2026-10-25T09:37:53.236760+00:00",
+  "kernel_submissions": 0,
+  "before": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 0.0,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 8.023614975000001,
+      "allowed": 100
+    }
+  ],
+  "status": "generation_failed",
+  "after": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 0.0007999999999999119,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 8.024414975,
+      "allowed": 100
+    }
+  ]
+}

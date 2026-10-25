@@ -8,6 +8,11 @@
 
 ## Текущий статус — читать первым
 
+Для передачи основной работы другому помощнику:
+[ASSISTANT_HANDOFF.md](ASSISTANT_HANDOFF.md) — snapshot на `a638e96`, карта кода,
+контракты, первое поручение P06, порядок глав и критерии приёмки. Четыре production
+блока не заменяют главы P06–P14 и корпоративную программу E00–E08.
+
 Package 39 реализует оставшиеся host contracts P05:
 [IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md](IMPLEMENTATION_STEP_39_P05_ACCEPTANCE.md).
 Revision-bound receipts, conservative stale-premise pause, bounded 1–3 child
@@ -23,6 +28,12 @@ Evidence: `validation/p05-ci-20261025/verified.json` (individual 12 wheel archiv
 не скачивались этим пакетом; CI jobs passed).
 Evidence: `validation/p05-closure-20261025/`. Docker-free core не означает isolated
 local execution; quality/scale/release/isolated-worker production gates сохраняются.
+
+## История implementation packages
+
+Ниже сохранены статусы на момент подготовки пакетов. Старые OPEN/working diff/
+«не опубликовано» не отменяют финальную приёмку package 39 выше: packages 35–39
+уже опубликованы в runtime `91d22e2`, evidence follow-up — `a638e96`.
 
 Локальный package 38 — P05 bounded hierarchy и reviewed acceptance metadata:
 [IMPLEMENTATION_STEP_38_P05_GOALS.md](IMPLEMENTATION_STEP_38_P05_GOALS.md).

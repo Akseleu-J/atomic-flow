@@ -1,0 +1,25 @@
+{
+  "calls": [
+    {
+      "call_id": "model_1",
+      "role": "parser",
+      "status": "not_sent",
+      "cost_usd": 0.0,
+      "system_prefix_sha256": "7e3920e25591c4ac560c73a70bd8a95bf5bc0e81f8ca15e1eda3d48ed4cfe228",
+      "system_prefix_changed": false,
+      "backend": "host_model_proxy",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "error_type": "PilotLimit"
+    }
+  ],
+  "by_role": {
+    "parser": {
+      "calls": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "known_cost_usd": 0.0,
+      "unknown_cost_calls": 0
+    }
+  },
+  "cache_note": "Prefix fingerprints diagnose local changes only; cache usage is provider-reported or unknown."
+}
