@@ -59,7 +59,8 @@ class GraphStore:
 
     # -- writes --------------------------------------------------------------
     def commit(self, *, base_generation: int, put_nodes: list[dict] | None = None,
-               put_edges: list[dict] | None = None, drop_node_ids: list[str] | None = None) -> int:
+               put_edges: list[dict] | None = None, drop_node_ids: list[str] | None = None,
+               drop_edge_ids: list[str] | None = None) -> int:
         """Apply one transaction; refuse when the base generation moved."""
         if base_generation != self._generation:
             raise GraphGenerationConflict(
@@ -69,6 +70,8 @@ class GraphStore:
             nodes.pop(node_id, None)
             edges = {eid: edge for eid, edge in edges.items()
                      if edge["src"] != node_id and edge["dst"] != node_id}
+        for edge_id in drop_edge_ids or []:
+            edges.pop(edge_id, None)
         for node in put_nodes or []:
             validate_node(node)
             nodes[node["id"]] = node

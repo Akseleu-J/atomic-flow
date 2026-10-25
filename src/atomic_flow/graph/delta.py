@@ -31,6 +31,54 @@ def file_delta(path: str, new_bytes: bytes | None, *, expected_old_digest: str |
             "expected_old_digest": expected_old_digest}
 
 
+def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
+    """Recompute inferred cross-file edges of the closure hit by this delta.
+
+    The closure is the changed file plus the files it imports or that import
+    it (pre-change topology from the store). Their inferred edges are rebuilt
+    from stored file facts — no source re-parsing. Returns (edges, dropped
+    edge ids, relinked file count, unresolved report).
+    """
+    from atomic_flow.graph.resolve import exports_by_file, infer_file_edges, module_map
+
+    path = delta["path"]
+    nodes_pre = [n for n in store.nodes()]
+    post_nodes = [n for n in nodes_pre if n["id"] not in drop_ids and n["path"] != path]
+    post_nodes.extend(delta["put_nodes"])
+    file_nodes = {n["path"]: n for n in post_nodes if n["kind"] == "file"}
+    modules = module_map(sorted(file_nodes))
+    exports = exports_by_file(post_nodes)
+
+    affected = {path}
+    for edge in store.edges():
+        if edge.get("facts_class") != "inferred" or edge["status"] != "active":
+            continue
+        src_file = edge["src"][len("file:"):] if edge["src"].startswith("file:") else edge["src"].split("::")[0][len("sym:"):]
+        dst_file = edge["dst"][len("file:"):] if edge["dst"].startswith("file:") else edge["dst"].split("::")[0][len("sym:"):]
+        if path in {src_file, dst_file}:
+            affected.add(src_file)
+            affected.add(dst_file)
+
+    dropped: set[str] = set()
+    for edge in store.edges():
+        if edge.get("facts_class") != "inferred":
+            continue
+        src_file = edge["src"][len("file:"):] if edge["src"].startswith("file:") else edge["src"].split("::")[0][len("sym:"):]
+        if src_file in affected:
+            dropped.add(edge["id"])
+
+    new_edges: list[dict] = []
+    unresolved: list[str] = []
+    for affected_path in sorted(affected):
+        node = file_nodes.get(affected_path)
+        if node is None:
+            continue
+        inferred = infer_file_edges(node, modules=modules, exports=exports)
+        new_edges.extend(inferred["edges"])
+        unresolved.extend(f"{affected_path}: {item}" for item in inferred["unresolved"])
+    return new_edges, sorted(dropped), len(affected), sorted(unresolved)
+
+
 def apply_delta(store: GraphStore, delta: dict[str, Any]) -> dict[str, Any]:
     """Validate digests, then commit; returns instrumentation for the report."""
     path, expected = delta["path"], delta.get("expected_old_digest")
@@ -46,16 +94,20 @@ def apply_delta(store: GraphStore, delta: dict[str, Any]) -> dict[str, Any]:
             raise GraphContractError(
                 f"source changed since delta was built: {path} (expected {expected[:12]}, "
                 f"store has {stored_digest[:12] or 'no file'})")
+    relink_edges, dropped_edges, relinked, unresolved = _relink(store, delta, drop_ids)
+    put_edges = list(delta["put_edges"])
+    put_edge_ids = {edge["id"] for edge in put_edges}
+    put_edges.extend(edge for edge in relink_edges if edge["id"] not in put_edge_ids)
     try:
         generation = store.commit(base_generation=store.generation,
-                                  put_nodes=delta["put_nodes"], put_edges=delta["put_edges"],
-                                  drop_node_ids=sorted(drop_ids))
+                                  put_nodes=delta["put_nodes"], put_edges=put_edges,
+                                  drop_node_ids=sorted(drop_ids), drop_edge_ids=dropped_edges)
     except GraphGenerationConflict as exc:
         raise GraphContractError(f"delta superseded: {exc}") from exc
     return {"path": path, "generation": generation, "deleted": delta["deleted"],
-            "put_nodes": len(delta["put_nodes"]), "put_edges": len(delta["put_edges"]),
-            "dropped": len(delta["drop_node_ids"]), "parsed_files": delta["parsed_files"],
-            "scanned_files": 1, "relinked_files": 0}
+            "put_nodes": len(delta["put_nodes"]), "put_edges": len(put_edges),
+            "dropped": len(drop_ids), "parsed_files": delta["parsed_files"],
+            "scanned_files": 1, "relinked_files": relinked, "unresolved": unresolved}
 
 
 def fallback_rebuild(store: GraphStore, files: dict[str, bytes], reason: str) -> dict[str, Any]:
