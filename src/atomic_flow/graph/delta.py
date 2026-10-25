@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from atomic_flow.graph.adapter_ast import adapt_file
+from atomic_flow.graph.adapter_resource import adapt_source as adapt_file
 from atomic_flow.graph.project import clean_build
 from atomic_flow.graph.schema import GraphContractError, file_id
 from atomic_flow.graph.store import GraphGenerationConflict, GraphStore

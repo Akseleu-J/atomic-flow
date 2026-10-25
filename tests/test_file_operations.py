@@ -309,3 +309,37 @@ def test_changeset_move_publish_and_deleted_recovery_keep_modes(tmp_path):
         change.publish(finalize=failed_finalize)
     assert stat.S_IMODE((ctx.project_root / "a.py").stat().st_mode) == 0o751
     assert not (ctx.project_root / "moved.py").exists()
+
+
+def test_version_bound_range_patch_and_line_shift_refusal(tmp_path):
+    ctx = context(tmp_path)
+    path = ctx.project_root / "a.py"
+    path.write_bytes(b"value = 1\r\nvalue = 1\r\n")
+    ctx.refresh()
+    original = ctx.read_source("a.py")
+    ctx.enforce_read_before_edit = True
+    ctx.record_read("a.py", digest(original), view="file", offset=0, end=len(original), total=len(original), source_complete=True)
+    args = PatchFileArgs(path="a.py", expected_hash=digest(original), start_line=2, end_line=2,
+                         old_text="value = 1\r\n", new_text="value = 2\r\n")
+    result = PatchFileTool().run(args, ctx)
+    assert result["status"] == "applied"
+    assert path.read_bytes() == b"value = 1\r\nvalue = 2\r\n"
+    path.write_bytes(b"# shifted\r\n" + path.read_bytes())
+    before = path.read_bytes()
+    with pytest.raises(SourceConflict):
+        PatchFileTool().run(args, ctx)
+    assert path.read_bytes() == before
+
+
+def test_range_patch_requires_exact_span_and_paired_coordinates(tmp_path):
+    from pydantic import ValidationError
+    ctx = context(tmp_path)
+    raw = ctx.read_source("a.py")
+    ctx.enforce_read_before_edit = True
+    ctx.record_read("a.py", digest(raw), view="file", offset=0, end=len(raw), total=len(raw), source_complete=True)
+    base = dict(path="a.py", expected_hash=digest(raw), old_text="value = 1", new_text="value = 2")
+    with pytest.raises(ValidationError):
+        PatchFileArgs(**base, start_line=1)
+    result = PatchFileTool().run(PatchFileArgs(**base, start_line=1, end_line=1), ctx)
+    assert "precondition" in result["error"]
+    assert (ctx.project_root / "a.py").read_bytes() == raw

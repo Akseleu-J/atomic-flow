@@ -224,3 +224,32 @@ def execute_workflow(definition, registry, context, *, expected_digest, approved
     from atomic_flow.workflows import run_workflow
     return run_workflow(definition, registry, context, allowed_tools=allowed_tools, role=role,
                         expected_digest=expected_digest, approved=approved)
+
+
+def understand_project(project: str | Path, *, project_scope: str, identity: dict,
+                       analyzer, budget, cache: dict, dependencies=None, cancel_check=lambda: None):
+    """Host-injected semantic stage over admitted source; no implicit provider.
+
+    Unsupported language adapters are reported as omissions. Returned inferred
+    text supplies no tool authority, exact-read receipt or completion approval.
+    """
+    import copy
+
+    from atomic_flow.graph.adapter_resource import resource_kind
+    from atomic_flow.graph.enrichment import enrich
+    from atomic_flow.graph.project import project_files
+    from atomic_flow.graph.schema import GraphContractError
+
+    snapshot = project_files(Path(project), suffix=None, cancel_check=cancel_check)
+    supported = {p: raw for p, raw in snapshot.items() if p.endswith((".py", ".pyi")) or resource_kind(p)}
+    omitted = sorted(set(snapshot) - set(supported))
+    scoped = str(Path(project).resolve()) + "::" + project_scope
+    staged = copy.deepcopy(cache)
+    result = enrich(supported, project_scope=scoped, identity=identity, analyzer=analyzer,
+                    budget=budget, cache=staged, dependencies=dependencies, cancel_check=cancel_check)
+    if project_files(Path(project), suffix=None, cancel_check=cancel_check) != snapshot:
+        raise GraphContractError("source changed during semantic analysis")
+    cancel_check()
+    cache.update(staged)
+    result["review"]["omitted_unsupported_adapters"] = omitted
+    return result

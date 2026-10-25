@@ -4,7 +4,7 @@ from __future__ import annotations
 import stat
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from atomic_flow.agents import file_transaction
 from atomic_flow.agents.base import Tool, ToolContract
@@ -28,6 +28,16 @@ class ExistingFileArgs(FileArgs):
 class PatchFileArgs(ExistingFileArgs):
     old_text: str = Field(min_length=1, max_length=1_000_000, description="Exact unique UTF-8 fragment to replace.")
     new_text: str = Field(max_length=1_000_000)
+    start_line: int | None = Field(default=None, ge=1, strict=True, description="Optional inclusive line range, bound to expected_hash.")
+    end_line: int | None = Field(default=None, ge=1, strict=True)
+
+    @model_validator(mode="after")
+    def valid_range(self):
+        if (self.start_line is None) != (self.end_line is None):
+            raise ValueError("start_line and end_line must be supplied together")
+        if self.start_line is not None and self.end_line < self.start_line:
+            raise ValueError("end_line precedes start_line")
+        return self
 
 
 class CreateFileArgs(FileArgs):
@@ -145,9 +155,15 @@ class PatchFileTool(Tool):
         try:
             original = _read(ctx, args.path, args.expected_hash)
             text = original.decode("utf-8-sig")
-            if text.count(args.old_text) != 1:
-                return {"error": "old_text must match exactly one fragment; no source changed"}
-            updated = text_bytes(text.replace(args.old_text, args.new_text, 1))
+            if args.start_line is not None:
+                lines = text.splitlines(keepends=True)
+                if args.end_line > len(lines) or "".join(lines[args.start_line - 1:args.end_line]) != args.old_text:
+                    return {"error": "range/old_text precondition failed; reread current source"}
+                updated = text_bytes("".join(lines[:args.start_line - 1]) + args.new_text + "".join(lines[args.end_line:]))
+            else:
+                if text.count(args.old_text) != 1:
+                    return {"error": "old_text must match exactly one fragment; no source changed"}
+                updated = text_bytes(text.replace(args.old_text, args.new_text, 1))
             if original.startswith(b"\xef\xbb\xbf"):
                 updated = b"\xef\xbb\xbf" + updated
             if updated == original:

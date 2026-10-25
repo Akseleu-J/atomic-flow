@@ -11,7 +11,7 @@ import re
 from typing import Any
 
 GRAPH_SCHEMA_VERSION = 1
-NODE_KINDS = frozenset({"file", "module", "class", "function"})
+NODE_KINDS = frozenset({"file", "module", "class", "function", "config", "document", "pipeline"})
 EDGE_KINDS = frozenset({"contains", "imports", "calls", "references"})
 FACT_CLASSES = frozenset({"extracted", "inferred", "runtime_observed"})
 STATUS = frozenset({"fresh", "stale"})
