@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+Актуализация package 40 (25 октября): [P06 typed failures и durable repair ceiling](IMPLEMENTATION_STEP_40_P06_REPAIR.md). Runtime f9fd48d5bacce8b3c93bf9b15677df3f7edbc4b3: host-typed source/attempt-bound failure receipts и persisted repair allowance на physical admission/settlement/resume/publication. Предыдущий metadata-only cap заменён реальным guard. Полный P06 и четыре production gates остаются OPEN; CI 40219160156 / 40219160140 SUCCESS; по 1280 PASS / 14 SKIP на Python 3.11/3.12, 273 source hashes verified, real Docker/composition PASS. Границы evidence — в package 40. Новых provider calls=0.
+
 Обновлено 25 октября 2026 после сверки ночных пакетов и локального продолжения.
 Работать из этого репозитория `atomic-flow/`; внешний родитель — другой Git root.
 Ветка `experimental`, draft [PR №2](https://github.com/Akseleu-J/atomic-flow/pull/2),

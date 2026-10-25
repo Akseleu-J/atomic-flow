@@ -1,0 +1,8 @@
+{
+  "status": "aborted_host_resource_exhaustion",
+  "free_physical_kib": 7728,
+  "free_virtual_kib": 274144,
+  "selection": "tests/test_task.py tests/test_task_changeset.py tests/test_execution_confidentiality.py tests/test_repair_budget.py",
+  "junit": "recovered.xml may be absent or incomplete",
+  "new_provider_calls": 0
+}
