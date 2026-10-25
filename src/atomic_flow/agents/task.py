@@ -37,6 +37,7 @@ class Step:
     request_id: str = ""
     depends_on: list[int] = field(default_factory=list)
     blocked_reason: str = ""
+    invalidated_reason: str = ""
 
 
 @dataclass

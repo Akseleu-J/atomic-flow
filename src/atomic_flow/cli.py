@@ -104,7 +104,9 @@ def _parser() -> argparse.ArgumentParser:
     task_p.add_argument("--plan-digest", help="Digest from the reviewed plan and source manifest")
     task_p.add_argument("--scope-path", action="append", default=None, help="Exact approved relative path, repeatable; can name a new file")
     task_p.add_argument("--reconcile", metavar="CALL_ID", help="Settle one unknown charge/effect hold with host evidence; never replays a call")
-    task_p.add_argument("--task-id", metavar="TASK_ID", help="Task owning the call being reconciled")
+    task_p.add_argument("--invalidate-step", type=int, default=None, metavar="INDEX",
+                        help="Requeue one done step and its dependents; requires --task-id, --reason and --project")
+    task_p.add_argument("--task-id", metavar="TASK_ID", help="Task owning the call being reconciled or the step being invalidated")
     task_p.add_argument("--scope", choices=("charge", "effect"), default="charge", help="Reconciliation scope")
     task_p.add_argument("--cost-usd", type=float, default=None, help="Settled charge in USD (charge scope; 0.0 means confirmed free)")
     task_p.add_argument("--evidence-file", type=Path, default=None, help="File whose bytes hash as reconciliation evidence; content is never stored")
@@ -624,6 +626,16 @@ def cmd_task(args) -> int:
                                 actor=args.actor or "", reason=args.reason or "",
                                 cost_usd=args.cost_usd)
         print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+
+    if args.invalidate_step is not None:
+        from atomic_flow.agents.task_loop import TaskRunner
+        if not args.task_id or not (args.reason or "").strip() or not args.project:
+            raise ValueError("--invalidate-step requires --task-id, a non-empty --reason and --project")
+        runner = TaskRunner(config=None, project=Path(args.project).resolve(), backend=None)
+        task = runner.invalidate_step(args.task_id, args.invalidate_step, args.reason)
+        print(f"requeued steps: {', '.join(str(s.index) for s in task.steps if s.status == 'pending')}")
+        _print_task(task, verbose=False)
         return 0
 
     if args.task_list:
