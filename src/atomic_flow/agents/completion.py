@@ -14,6 +14,9 @@ from atomic_flow.output import sanitize_output
 def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dict:
     report = {"schema_version": 1, "ready_to_publish": False, "checked_at": time.time(),
               "checks": [], "diagnostics": [], "tests": "not_run", "model_calls": 0}
+    if task.goals or any(s.acceptance_criteria for s in task.steps):
+        report["declared_criteria"] = {"status": "not_assessed",
+                                       "scope": "declared checks only; no independent semantic requirement evaluator"}
     cancel_check()
     if not task.steps or task.current_index != len(task.steps) or not any(s.status == "done" for s in task.steps):
         report["checks"].append({"name": "completed_steps", "status": "failed"})
@@ -28,6 +31,15 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dic
     try:
         changeset.check_original()
         manifest = changeset.validate_workspace()
+        from atomic_flow.agents.step_evidence import receipt_matches
+        report["step_observations"] = [
+            {"index": step.index, "receipt": step.evidence.get("digest", ""),
+             "current": receipt_matches(step.evidence, step, manifest, task_id=task.id)[0],
+             "legacy_missing": not bool(step.evidence)} for step in task.steps if step.status == "done"]
+        if any(step.evidence and step.evidence["verification"]["outcome"] in {"failed", "unavailable"}
+               for step in task.steps if step.status == "done"):
+            report["checks"].append({"name": "step_observations", "status": "failed"})
+            return report
         changed = sorted(p for p in manifest.keys() | changeset.state["baseline"].keys()
                          if manifest.get(p) != changeset.state["baseline"].get(p))
         report["changed_paths"] = [{"path": p, "before_hash": changeset.state["baseline"].get(p),

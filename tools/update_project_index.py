@@ -78,7 +78,7 @@ def main() -> None:
               "symbol_count": sum(len(e.get("symbols", [])) for e in entries),
               "missing_absolute_internal_imports": missing, "files": entries}
     target = ROOT / "docs" / "project-index.json"
-    target.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    target.write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print(json.dumps({key: value for key, value in result.items() if key != "files"}, ensure_ascii=False))
 
 

@@ -13,7 +13,9 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from atomic_flow.durability import sync_directory
 from atomic_flow.graph.schema import GRAPH_SCHEMA_VERSION, GraphContractError, validate_edge, validate_node
+from atomic_flow.locking import exclusive_file
 
 
 class GraphGenerationConflict(GraphContractError):
@@ -61,7 +63,47 @@ class GraphStore:
     def commit(self, *, base_generation: int, put_nodes: list[dict] | None = None,
                put_edges: list[dict] | None = None, drop_node_ids: list[str] | None = None,
                drop_edge_ids: list[str] | None = None) -> int:
-        """Apply one transaction; refuse when the base generation moved."""
+        """CAS one persisted snapshot under a cooperating-writer OS lease.
+
+        Atomic replacement alone is not CAS: separately opened stale handles
+        must compare the persisted generation while holding the same lease.
+        The marker is persistent and is never unlinked to change lock identity.
+        """
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path = self.path.with_name(self.path.name + ".lock")
+        for path in (self.path, lock_path, *self.path.parents):
+            if path.is_symlink() or getattr(path, "is_junction", lambda: False)():
+                raise GraphContractError("graph storage paths may not contain links or junctions")
+        manager = exclusive_file(lock_path, busy_message="graph writer lease is held")
+        try:
+            manager.__enter__()
+        except ValueError as exc:
+            raise GraphGenerationConflict(str(exc)) from exc
+        try:
+            return self._commit_locked(base_generation=base_generation, put_nodes=put_nodes,
+                                       put_edges=put_edges, drop_node_ids=drop_node_ids,
+                                       drop_edge_ids=drop_edge_ids)
+        finally:
+            manager.__exit__(None, None, None)
+
+    def _commit_locked(self, *, base_generation: int, put_nodes: list[dict] | None,
+                       put_edges: list[dict] | None, drop_node_ids: list[str] | None,
+                       drop_edge_ids: list[str] | None) -> int:
+        if type(base_generation) is not int or base_generation < 0:
+            raise GraphContractError("base generation must be a non-negative integer")
+        try:
+            persisted = json.loads(self.path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            persisted_generation = 0
+        else:
+            if not isinstance(persisted, dict) or persisted.get("schema_version") != GRAPH_SCHEMA_VERSION:
+                raise GraphContractError("graph store schema mismatch; migrate explicitly")
+            persisted_generation = persisted.get("generation")
+            if type(persisted_generation) is not int or persisted_generation < 0:
+                raise GraphContractError("persisted graph generation is malformed")
+        if persisted_generation != base_generation:
+            raise GraphGenerationConflict(
+                f"persisted store generation moved to {persisted_generation}; re-read and retry")
         if base_generation != self._generation:
             raise GraphGenerationConflict(
                 f"store generation moved to {self._generation}; re-read and retry")
@@ -91,6 +133,7 @@ class GraphStore:
                 handle.flush()
                 os.fsync(handle.fileno())
             os.replace(name, self.path)
+            sync_directory(self.path.parent)
         except BaseException:
             Path(name).unlink(missing_ok=True)
             raise

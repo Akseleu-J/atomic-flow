@@ -1,0 +1,1244 @@
+diff --git a/src/atomic_flow/agents/envelope.py b/src/atomic_flow/agents/envelope.py
+index 0c669ac..93c2586 100644
+--- a/src/atomic_flow/agents/envelope.py
++++ b/src/atomic_flow/agents/envelope.py
+@@ -1,63 +1,157 @@
+-"""Formal replan envelope check and no-progress guard (roadmap P06 slice 1).
+-
+-`envelope_preserved` is the pure predicate the host will use to accept an
+-internal replan without a fresh human question: the plan may change, the
+-authorization envelope may not. Every rule is checked against the previously
+-approved payload — allowed paths, allowed tools, verification kinds, budget
+-caps — and any widening returns (False, reasons) so the caller pauses instead
+-of guessing. `no_progress` detects the oscillation case: the same step
+-description failing repeatedly across replans.
++"""Opt-in, bounded internal replans; summaries never grant execution authority.
++
++The predicate checks a host-created envelope. The runner must also enforce the
++approved source/scope, current runtime binding, accounting and effect holds.
+ """
+ from __future__ import annotations
+ 
++import hashlib
++import json
++import math
++import re
++from pathlib import Path
+ from typing import Any
+ 
+-MUTATING_TOOLS = frozenset({"edit_node", "patch_file", "notebook_edit", "write_file", "move_file", "delete_file"})
+-VERIFY_KINDS = frozenset({"none", "py_compile", "pytest"})
++MUTATING_TOOLS = frozenset({"edit_node", "patch_file", "notebook_edit", "create_file", "move_file", "delete_file"})
++SOURCE_TOOLS = frozenset({"read_node", "find_callers", "search_tree", "search_text", "read_result",
++                          "read_file", "find_files", "notebook_read"})
++SUPPORTED_TOOLS = SOURCE_TOOLS | MUTATING_TOOLS | {"run_command", "ask_user"}
++VERIFY_KINDS = {"none": 0, "py_compile": 1, "pytest": 2}
++ENVELOPE_FIELDS = {"version", "allowed_tools", "required_verify", "max_budget_usd", "max_model_calls",
++                   "max_replans", "runtime_digest", "replan_failures"}
++
++
++def validate_envelope(value: Any) -> None:
++    """Strict persisted shape; malformed, nonfinite or unbounded data is refused."""
++    if not isinstance(value, dict) or set(value) != ENVELOPE_FIELDS:
++        raise ValueError("invalid internal replan envelope fields")
++    if type(value["version"]) is not int or value["version"] != 1:
++        raise ValueError("invalid internal replan envelope version")
++    tools = value["allowed_tools"]
++    if (not isinstance(tools, list) or any(not isinstance(t, str) for t in tools)
++            or tools != sorted(set(tools)) or not set(tools) <= SUPPORTED_TOOLS):
++        raise ValueError("invalid internal replan allowed tools")
++    if not isinstance(value["required_verify"], str) or value["required_verify"] not in VERIFY_KINDS:
++        raise ValueError("invalid internal replan verification floor")
++    budget = value["max_budget_usd"]
++    if type(budget) not in (int, float) or not math.isfinite(budget) or budget <= 0:
++        raise ValueError("internal replans require a finite positive enforced budget")
++    for name, maximum in (("max_model_calls", 1000), ("max_replans", 5)):
++        if type(value[name]) is not int or not 1 <= value[name] <= maximum:
++            raise ValueError(f"invalid internal replan {name}")
++    if not isinstance(value["runtime_digest"], str) or not re.fullmatch(r"[a-f0-9]{64}", value["runtime_digest"]):
++        raise ValueError("invalid internal replan runtime digest")
++    history = value["replan_failures"]
++    if (not isinstance(history, list) or len(history) > 5
++            or any(not isinstance(item, str) or not item.strip() or len(item) > 500 for item in history)):
++        raise ValueError("invalid internal replan failure history")
++
++
++def runtime_digest(config, project: Path, backend=None) -> str:
++    """Bind declared runtime, trust and policies; never persist raw credentials."""
++    from atomic_flow.config import is_trusted, user_dir
++
++    settings = config.model_dump(mode="json")
++    for entry in settings.get("backends", {}).values():
++        entry.pop("api_key", None)
++    selected = None
++    if backend is not None:
++        actual = getattr(backend, "config", None)
++        if actual is None or not hasattr(actual, "model_dump") or hasattr(backend, "select_attempt"):
++            raise ValueError("internal replans require a fixed configured backend")
++        selected = actual.model_dump(mode="json", exclude={"api_key"})
++        selected["max_output_tokens"] = selected.get("max_output_tokens") or config.task.default_max_output_tokens
++        selected["max_retries"] = 0
++        selected = {"name": getattr(backend, "name", ""), "config": selected}
++    policies = []
++    for path in (user_dir() / "policy.yaml", project / ".atomic_flow" / "policy.yaml"):
++        if path.is_symlink() or getattr(path, "is_junction", lambda: False)():
++            raise ValueError("internal replan policy cannot be a link")
++        if path.exists():
++            with path.open("rb") as handle:
++                data = handle.read(1_000_001)
++            if len(data) > 1_000_000:
++                raise ValueError("internal replan policy exceeds byte limit")
++            policies.append(hashlib.sha256(data).hexdigest())
++        else:
++            policies.append(None)
++    raw = {"config": settings, "backend": selected, "trusted": is_trusted(project), "policies": policies}
++    return hashlib.sha256(json.dumps(raw, sort_keys=True, allow_nan=False).encode()).hexdigest()
++
++
++def make_envelope(task, config, project: Path, backend=None) -> dict:
++    if not config.task.fail_on_budget_exceeded:
++        raise ValueError("internal replans require enforced task budget")
++    if config.routing.mode != "fixed":
++        raise ValueError("internal replans require fixed backend routing in this version")
++    steps = [step for step in task.steps if step.status != "superseded"]
++    tools = set().union(*(set(step.tools_needed) for step in steps))
++    if not tools <= SUPPORTED_TOOLS:
++        raise ValueError("internal replans support built-in source/check tools only")
++    if not steps or any(step.verify_with not in VERIFY_KINDS for step in steps):
++        raise ValueError("internal replans need a valid verification obligation")
++    value = {"version": 1, "allowed_tools": sorted(tools | SOURCE_TOOLS),
++             "required_verify": max((step.verify_with for step in steps), key=VERIFY_KINDS.get),
++             "max_budget_usd": config.task.max_budget_usd, "max_model_calls": config.task.max_model_calls,
++             "max_replans": config.task.max_replans, "runtime_digest": runtime_digest(config, project, backend),
++             "replan_failures": []}
++    validate_envelope(value)
++    return value
++
++
++def failure_signature(failure: str) -> str:
++    lines = (failure or "").strip().splitlines()
++    return lines[0][:500] if lines else ""
++
++
++def no_progress(approval: dict[str, Any], failure: str, *, limit: int = 2) -> bool:
++    """Exact recurring first-line failures; the independent replan cap also applies."""
++    signature = failure_signature(failure)
++    if not signature:
++        return False
++    envelope = approval.get("internal_replan", approval)
++    history = envelope.get("replan_failures", []) if isinstance(envelope, dict) else []
++    return isinstance(history, list) and history.count(signature) >= limit
+ 
+ 
+ def envelope_preserved(approval: dict[str, Any], new_steps: list, *, failure: str,
+                        budget_spent: float) -> tuple[bool, list[str]]:
+-    """Pure check: does the new plan stay inside the approved envelope?
++    """Fail closed for legacy approval, tool widening or weaker verification.
+ 
+-    `new_steps` are planner Step objects (description/tools_needed/verify_with).
+-    Rules: schema valid; tools ⊆ approved plan's tools; no mutating tool may
+-    appear if the approved plan had none; verify kinds must be in the approved
+-    set; budget must remain under the approved caps; and the same failing
+-    description may not repeat beyond the oscillation limit.
++    This is not a source/sandbox check. The runner validates source and runtime
++    before calling it and applies its tool set to the actual dispatcher.
+     """
+-    reasons: list[str] = []
+-    if approval.get("schema_version") != 1 or "plan" not in approval:
+-        return False, ["previous approval is malformed; fresh review required"]
+-    approved_tools = {tool for step in approval["plan"]["steps"] for tool in step.get("tools_needed", [])}
+-    approved_verify = {step.get("verify_with") for step in approval["plan"]["steps"]} & VERIFY_KINDS
+-    if not approved_verify:
+-        approved_verify = {"py_compile"}
++    if not isinstance(approval, dict) or approval.get("schema_version") != 2:
++        return False, ["internal replan was not explicitly approved; fresh review required"]
++    try:
++        envelope = approval["internal_replan"]
++        validate_envelope(envelope)
++    except (KeyError, TypeError, ValueError) as exc:
++        return False, [f"invalid internal replan envelope: {exc}"]
++    reasons = []
++    if type(budget_spent) not in (int, float) or not math.isfinite(budget_spent) or budget_spent < 0:
++        reasons.append("invalid budget accounting")
++    elif budget_spent >= envelope["max_budget_usd"]:
++        reasons.append("budget reached the approved cap")
++    if not new_steps:
++        reasons.append("replan has no verifiable steps")
++    allowed = set(envelope["allowed_tools"])
++    proposed_tools = {tool for step in new_steps for tool in (step.tools_needed or [])}
++    if MUTATING_TOOLS & allowed and not MUTATING_TOOLS & proposed_tools:
++        reasons.append("replan would drop the approved verified edit obligation")
++    if "run_command" in allowed and "run_command" not in proposed_tools and not any(
++            step.verify_with == "pytest" for step in new_steps):
++        reasons.append("replan would drop the approved execution/check obligation")
+     for step in new_steps:
+-        unknown = set(step.tools_needed or []) - approved_tools
++        unknown = set(step.tools_needed or []) - allowed
+         if unknown:
+-            reasons.append(f"step {step.index}: tools outside approved plan: {sorted(unknown)}")
+-        if MUTATING_TOOLS & set(step.tools_needed or []) and not (MUTATING_TOOLS & approved_tools):
++            reasons.append(f"step {step.index}: tools outside approved envelope: {sorted(unknown)}")
++        if MUTATING_TOOLS & set(step.tools_needed or []) and not MUTATING_TOOLS & allowed:
+             reasons.append(f"step {step.index}: introduces a mutating tool the plan never had")
+-        if step.verify_with not in approved_verify:
+-            reasons.append(f"step {step.index}: verify_with {step.verify_with!r} outside approved {sorted(approved_verify)}")
+-    limits = approval.get("limits") or {}
+-    if "max_budget_usd" in limits and budget_spent >= float(limits["max_budget_usd"]):
+-        reasons.append(f"budget ${budget_spent:.4f} reached the approved cap")
++        if VERIFY_KINDS.get(step.verify_with, -1) < VERIFY_KINDS[envelope["required_verify"]]:
++            reasons.append(f"step {step.index}: verify_with would weaken the approved verification obligation")
++        if step.verify_with == "pytest" and envelope["required_verify"] != "pytest" and "run_command" not in allowed:
++            reasons.append(f"step {step.index}: pytest execution was not approved")
+     if no_progress(approval, failure):
+-        reasons.append(f"no-progress guard: {failure[:60]!r} keeps recurring")
+-    return (not reasons), reasons
+-
+-
+-def no_progress(approval: dict[str, Any], failure: str, *, limit: int = 2) -> bool:
+-    """True when the same failure signature already repeated `limit` times.
+-
+-    The signature is the failure text's first line; replan history lives in
+-    the approval's `replan_failures` list (the integrating caller records it;
+-    this function stays pure and side-effect free).
+-    """
+-    signature = (failure or "").strip().splitlines()[0] if failure else ""
+-    if not signature:
+-        return False
+-    history = [str(item) for item in approval.get("replan_failures", [])]
+-    return history.count(signature) >= limit
++        reasons.append("no-progress guard: recurring failure requires review")
++    return not reasons, reasons
+diff --git a/src/atomic_flow/agents/plan_review.py b/src/atomic_flow/agents/plan_review.py
+index d2f068c..ac7253c 100644
+--- a/src/atomic_flow/agents/plan_review.py
++++ b/src/atomic_flow/agents/plan_review.py
+@@ -39,7 +39,7 @@ def path_scope(project, paths):
+     return sorted(set(result))
+ 
+ 
+-def review_payload(task, project, allowed_paths=None):
++def review_payload(task, project, allowed_paths=None, *, internal_replan=None):
+     if Path(task.project).resolve() != project.resolve():
+         raise ChangeSetConflict("task belongs to another project")
+     source = _files(project, user_dir().resolve())
+@@ -58,6 +58,10 @@ def review_payload(task, project, allowed_paths=None):
+     payload = {"schema_version": 1, "task_id": task.id, "project": str(project.resolve()), "plan": canonical_plan(task),
+                "source_manifest": source, "allowed_paths": paths,
+                "scope_hashes": {p: source.get(p) for p in paths}, "workspace_manifest": workspace}
++    if internal_replan is not None:
++        from atomic_flow.agents.envelope import validate_envelope
++        validate_envelope(internal_replan)
++        payload.update(schema_version=2, internal_replan=internal_replan)
+     return {**payload, "digest": fingerprint(payload)}
+ 
+ 
+@@ -65,7 +69,7 @@ def require_approval(task, project):
+     approval = task.plan_approval
+     if not approval:
+         raise ChangeSetConflict("plan approval required; review and approve its current digest before execution")
+-    if (approval.get("schema_version") != 1 or not isinstance(approval.get("allowed_paths"), list)
++    if (approval.get("schema_version") not in {1, 2} or not isinstance(approval.get("allowed_paths"), list)
+             or not isinstance(approval.get("source_manifest"), dict)):
+         raise ChangeSetConflict("invalid plan approval state; review again")
+     payload = {k: v for k, v in approval.items() if k != "digest"}
+diff --git a/src/atomic_flow/agents/task.py b/src/atomic_flow/agents/task.py
+index 7502b7b..8e0ec40 100644
+--- a/src/atomic_flow/agents/task.py
++++ b/src/atomic_flow/agents/task.py
+@@ -152,7 +152,7 @@ def _decode(raw: object, task_id: str) -> Task:
+     for raw_step in raw_steps:
+         if not isinstance(raw_step, dict):
+             raise StateError("invalid task step: expected an object")
+-        for name in ("description", "expected_outcome", "verify_with", "result_summary", "request_id", "blocked_reason"):
++        for name in ("description", "expected_outcome", "verify_with", "result_summary", "request_id", "blocked_reason", "invalidated_reason"):
+             if name in raw_step and not isinstance(raw_step[name], str):
+                 raise StateError(f"invalid task step: {name} must be text")
+         if type(raw_step.get("index")) is not int or raw_step["index"] < 0:
+@@ -216,8 +216,17 @@ def _validate_approval(approval: dict) -> None:
+         return
+     required = {"schema_version", "task_id", "project", "plan", "source_manifest", "allowed_paths",
+                 "scope_hashes", "workspace_manifest", "digest"}
+-    if set(approval) != required or type(approval["schema_version"]) is not int or approval["schema_version"] != 1:
++    version = approval.get("schema_version")
++    if version == 2:
++        required.add("internal_replan")
++    if set(approval) != required or type(version) is not int or version not in {1, 2}:
+         raise StateError("invalid task plan approval fields/version")
++    if version == 2:
++        from atomic_flow.agents.envelope import validate_envelope
++        try:
++            validate_envelope(approval["internal_replan"])
++        except ValueError as exc:
++            raise StateError(str(exc)) from exc
+     if (any(not isinstance(approval[key], str) for key in ("task_id", "project", "digest"))
+             or not re.fullmatch(r"[a-f0-9]{64}", approval["digest"])
+             or not isinstance(approval["plan"], dict)
+diff --git a/src/atomic_flow/agents/task_loop.py b/src/atomic_flow/agents/task_loop.py
+index ebdb03b..b95f332 100644
+--- a/src/atomic_flow/agents/task_loop.py
++++ b/src/atomic_flow/agents/task_loop.py
+@@ -2,12 +2,14 @@
+ from __future__ import annotations
+ 
+ import time
++from copy import deepcopy
+ from dataclasses import dataclass
+ from pathlib import Path
+ 
+ from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
+ from atomic_flow.agents.control import check_cancel, task_lease
+ from atomic_flow.agents.effects import UnresolvedEffects
++from atomic_flow.agents.envelope import envelope_preserved, failure_signature, make_envelope, no_progress, runtime_digest
+ from atomic_flow.agents.execution import TaskCancelled, run_python
+ from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
+ from atomic_flow.agents.planner import Plan, plan_task, replan_task
+@@ -75,6 +77,9 @@ class TaskRunner:
+         self.changeset: ChangeSet | None = None
+         self.cancel_check = lambda: None
+         self.task_backend = backend
++        self._read_plan_index = None
++        self._read_plan_key = None
++        self.read_plan_report: dict = {}
+ 
+     @staticmethod
+     def _steps(plan: Plan, offset: int = 0) -> list[Step]:
+@@ -83,16 +88,25 @@ class TaskRunner:
+                      depends_on=[offset + d for d in (p.depends_on if p.depends_on is not None else ([i - 1] if i else []))])
+                 for i, p in enumerate(plan.steps)]
+ 
+-    def review(self, task: Task, *, allowed_paths: list[str] | None = None) -> dict:
++    def _review(self, task, allowed_paths, allow_internal_replan):
++        if type(allow_internal_replan) is not bool:
++            raise ValueError("allow_internal_replan must be an explicit boolean")
++        if allow_internal_replan and self.capability_factory is not None:
++            raise ValueError("internal replans do not support injected capabilities in this version")
++        envelope = make_envelope(task, self.config, self.project, self.backend) if allow_internal_replan else None
++        return review_payload(task, self.project, allowed_paths, internal_replan=envelope)
++
++    def review(self, task: Task, *, allowed_paths: list[str] | None = None, allow_internal_replan: bool = False) -> dict:
+         with task_lease(task.id):
+             task = load(task.id)
+-            return review_payload(task, self.project, allowed_paths)
++            return self._review(task, allowed_paths, allow_internal_replan)
+ 
+-    def approve(self, task: Task, expected_digest: str, *, allowed_paths: list[str] | None = None) -> Task:
++    def approve(self, task: Task, expected_digest: str, *, allowed_paths: list[str] | None = None,
++                allow_internal_replan: bool = False) -> Task:
+         with task_lease(task.id):
+             task = load(task.id)
+             self._editable_plan(task)
+-            review = review_payload(task, self.project, allowed_paths)
++            review = self._review(task, allowed_paths, allow_internal_replan)
+             if review["digest"] != expected_digest:
+                 raise ChangeSetConflict("review digest changed; inspect the current plan, scope and source before approving")
+             task.plan_approval = review
+@@ -169,12 +183,13 @@ class TaskRunner:
+             save(task)
+         return task
+ 
+-    def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None = None) -> Task:
++    def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None = None,
++                 allow_internal_replan: bool = False) -> Task:
+         steps = self._steps(plan)
+         task = Task.new(query=query, project=self.project, steps=steps, rationale=plan.rationale)
+         save(task)
+-        review = self.review(task, allowed_paths=allowed_paths)
+-        task = self.approve(task, review["digest"], allowed_paths=allowed_paths)
++        review = self.review(task, allowed_paths=allowed_paths, allow_internal_replan=allow_internal_replan)
++        task = self.approve(task, review["digest"], allowed_paths=allowed_paths, allow_internal_replan=allow_internal_replan)
+         return self.resume(task)
+ 
+     def invalidate_step(self, task_id: str, index: int, reason: str) -> Task:
+@@ -189,6 +204,8 @@ class TaskRunner:
+             raise ChangeSetConflict("step invalidation requires an explicit reason")
+         with task_lease(task_id):
+             task = load(task_id)
++            if Path(task.project).resolve() != self.project.resolve():
++                raise ChangeSetConflict("task belongs to another project")
+             if task.status == "done":
+                 raise ChangeSetConflict("completed task is immutable; create a new task instead of replay")
+             if task.changeset_id:
+@@ -250,6 +267,7 @@ class TaskRunner:
+                 if not recovery_only:
+                     try:
+                         require_approval(task, self.project)
++                        self._require_replan_runtime(task)
+                     except ChangeSetConflict as exc:
+                         task.status, task.error = "paused", str(exc)
+                         save(task)
+@@ -307,6 +325,7 @@ class TaskRunner:
+         if result.status == "running" and result.current_index == len(result.steps):
+             try:
+                 self._check_effects(result)
++                self._require_replan_runtime(result)
+                 from atomic_flow.agents.completion import assess_completion
+                 result.completion_report = assess_completion(result, self.changeset, self.config, self.cancel_check)
+                 save(result)
+@@ -373,26 +392,44 @@ class TaskRunner:
+ 
+         while task.current_index < len(task.steps):
+             self.cancel_check()
++            try:
++                self._require_replan_runtime(task)
++            except ChangeSetConflict as exc:
++                task.status, task.error = "paused", str(exc)
++                save(task)
++                return task
+             if (self.config.task.fail_on_budget_exceeded and self.config.task.max_budget_usd > 0
+                     and task.budget_spent >= self.config.task.max_budget_usd):
+                 task.status = "paused"
+                 task.error = "task budget exhausted before next step"
+                 save(task)
+                 return task
+-            by_id = {s.index: s for s in task.steps}
++            from atomic_flow.agents.frontier import task_frontier
++
++            frontier = task_frontier(task)
++            if frontier["running"]:
++                task.status = "paused"
++                task.error = "unfinished running step requires reconciliation before scheduling"
++                save(task)
++                return task
++            ready = set(frontier["ready"])
++            waiting = {item["index"]: item["waiting_for"] for item in frontier["blocked"]}
+             runnable = []
+             for candidate in task.steps:
+                 if candidate.status not in {"pending", "blocked"}:
+                     continue
+-                blocked = [d for d in candidate.depends_on if by_id[d].status != "done"]
++                blocked = waiting.get(candidate.index, [])
+                 candidate.blocked_reason = ("prerequisites not done: " + ", ".join(map(str, blocked))) if blocked else ""
+                 candidate.status = "blocked" if blocked else "pending"
+-                if not blocked:
++                if candidate.index in ready:
+                     runnable.append(candidate)
+             if not runnable:
+                 failed = next((s for s in task.steps if s.status == "failed"), None)
+                 if failed is not None:
+-                    return self._replan_failed_step(task, failed)
++                    result = self._replan_failed_step(task, failed)
++                    if result.status == "running":
++                        continue
++                    return result
+                 unresolved = [s for s in task.steps if s.status not in {"done", "superseded"}]
+                 if unresolved:
+                     task.status, task.error = "paused", "blocked work remains; review prerequisites or revise the plan"
+@@ -419,7 +456,8 @@ class TaskRunner:
+                 continue
+             except Exception as exc:
+                 step.status = "failed"
+-                step.result_summary = f"{type(exc).__name__}: {exc}"[:500]
++                message = exc.message if isinstance(exc, StepFailure) else str(exc)
++                step.result_summary = f"{type(exc).__name__}: {message}"[:500]
+                 step.finished_at = time.time()
+                 if isinstance(exc, UnresolvedEffects):
+                     self._hold_effects(task)  # Durable even when optional artifacts are disabled.
+@@ -453,18 +491,29 @@ class TaskRunner:
+ 
+             # Finish other independently authorized work before replanning a
+             # failed dependency. Blocked descendants remain explicit in state.
+-            if any(s.status in {"pending", "blocked"} and all(
+-                    next(d for d in task.steps if d.index == dep).status == "done" for dep in s.depends_on)
+-                   for s in task.steps):
++            if task_frontier(task)["ready"]:
+                 task.current_index = 0
+                 continue
+ 
+-            return self._replan_failed_step(task, step)
++            result = self._replan_failed_step(task, step)
++            if result.status == "running":
++                continue
++            return result
+ 
+         # Completion is recorded only after publishing the workspace successfully.
+         save(task)
+         return task
+ 
++    def _require_replan_runtime(self, task):
++        envelope = task.plan_approval.get("internal_replan")
++        if envelope is None:
++            return
++        try:
++            if self.capability_factory is not None or runtime_digest(self.config, self.project, self.backend) != envelope["runtime_digest"]:
++                raise ValueError("runtime, policy, trust or capabilities changed")
++        except (OSError, ValueError, KeyError) as exc:
++            raise ChangeSetConflict(f"internal replan runtime binding changed: {exc}; fresh review required") from exc
++
+     def _replan_failed_step(self, task: Task, step: Step) -> Task:
+         """Replan only after all independently runnable work has drained."""
+         if self.config is not None and self.config.task.max_budget_usd > 0 \
+@@ -484,6 +533,28 @@ class TaskRunner:
+ 
+         try:
+             self.cancel_check()
++            self._check_effects(task)
++            check_accounting(task)
++            require_scope(task, self.changeset)
++            self._require_replan_runtime(task)
++        except (ChangeSetConflict, BudgetExceeded, UnresolvedEffects) as exc:
++            task.status, task.error = "paused", str(exc)
++            save(task)
++            return task
++        previous_approval = deepcopy(task.plan_approval)
++        autonomous = previous_approval.get("schema_version") == 2
++        if autonomous:
++            envelope = previous_approval["internal_replan"]
++            signature = failure_signature(step.result_summary)
++            if signature and envelope["replan_failures"].count(signature) < 2:
++                envelope["replan_failures"].append(signature)
++            if no_progress(previous_approval, step.result_summary):
++                task.plan_approval = review_payload(task, self.project, previous_approval["allowed_paths"],
++                                                    internal_replan=envelope)
++                task.status, task.error = "paused", "no-progress guard: recurring failure requires fresh review"
++                save(task)
++                return task
++        try:
+             self.task_backend.phase = "replan"
+             new_plan = replan_task(
+                 task.query,
+@@ -516,50 +587,112 @@ class TaskRunner:
+             return task
+ 
+         base_index = max(s.index for s in task.steps) + 1
++        new_steps = self._steps(new_plan, base_index)
++        accepted, reasons = envelope_preserved(previous_approval, new_steps, failure=step.result_summary,
++                                               budget_spent=task.budget_spent)
+         for previous in task.steps:
+             if previous.status != "done":
+                 previous.status = "superseded"
+-        task.steps.extend(self._steps(new_plan, base_index))
++        task.steps.extend(new_steps)
+         task.rationale = new_plan.rationale
+         task.replan_count += 1
+         task.current_index = len(task.steps) - len(new_plan.steps)
+         task.plan_approval = {}
+         task.status, task.error = "paused", "replanned work requires fresh plan review and approval"
++        if autonomous and accepted:
++            try:
++                self.cancel_check()
++                check_accounting(task)
++                self._check_effects(task)
++                with source_mutation_lease(self.project):
++                    review = review_payload(task, self.project, previous_approval["allowed_paths"],
++                                            internal_replan=previous_approval["internal_replan"])
++                    if any(review[key] != previous_approval[key] for key in ("source_manifest", "scope_hashes", "allowed_paths")):
++                        raise ChangeSetConflict("source or path scope changed during replan")
++                    task.plan_approval = review
++                    self._require_replan_runtime(task)
++                    require_scope(task, self.changeset)
++                task.status, task.error = "running", ""
++            except (OSError, ValueError, BudgetExceeded, UnresolvedEffects) as exc:
++                task.plan_approval = {}
++                task.error = f"internal replan requires fresh review: {exc}"
++        elif autonomous:
++            task.error = "internal replan requires fresh review: " + "; ".join(reasons)
+         save(task)
+         return task
+ 
+ 
+-    def _read_plan(self, task: Task, workspace) -> str:
++    def _read_plan(self, task: Task, workspace, step: Step | None = None) -> str:
+         """Host-computed advisory read order for the approved paths (P04).
+ 
+         Bounded, deterministic, model-free; graph problems degrade to an
+         explicit notice instead of silently skipping the plan.
+         """
+         try:
+-            from atomic_flow.graph.impact import context_pack
++            from atomic_flow.graph.adapter_ast import EXTRACTOR
++            from atomic_flow.graph.impact import ContextPackIndex, context_pack_from_index, select_goals
+             from atomic_flow.graph.project import project_files
+ 
+-            goals = sorted({path for path in require_approval(task, self.project)
+-                            if (workspace / path).is_file()})
++            paths = require_approval(task, self.project)
++            limits = self.changeset.limits if self.changeset else self.resource_limits or ProjectLimits()
++            key = (task.id, str(workspace.resolve()), tuple(sorted(paths)), EXTRACTOR,
++                   tuple(self.config.tree.ignore), self.config.tree.respect_gitignore, limits, self.changeset is not None)
++            if key != self._read_plan_key:
++                self._read_plan_index, self._read_plan_key = ContextPackIndex(), key
++            files = project_files(workspace, tree_ignore=self.config.tree.ignore,
++                                  respect_gitignore=self.config.tree.respect_gitignore,
++                                  private_workspace=self.changeset is not None, limits=limits,
++                                  cancel_check=self.cancel_check)
++            self._read_plan_index.update(files, cancel_check=self.cancel_check, max_nodes=limits.max_nodes)
++            description = (step.description + " " + step.expected_outcome) if step is not None else getattr(task, "query", "")
++            goals, omitted_goals = select_goals(self._read_plan_index, paths, description)
++            # The index was already reconciled above, so pack construction must
++            # preserve those counters instead of claiming a second warm update.
++            stats = dict(self._read_plan_index.stats)
+             if not goals:
+-                return ""
+-            files = project_files(workspace)
+-            pack = context_pack(files, goals)
++                self.read_plan_report = {"revision": self._read_plan_index.revision, "stats": stats, "goals": [],
++                                         "reason": "no step-specific approved Python target matched"}
++                return "Host read plan: no step-specific approved Python target matched; search admitted source before editing."
++            pack = context_pack_from_index(self._read_plan_index, goals, cancel_check=self.cancel_check)
++            self.read_plan_report = {"revision": pack["revision"], "stats": stats, "goals": goals,
++                                     "omitted_goal_candidates": omitted_goals, "parse_failures": pack["parse_failures"]}
+             lines = ["Host read plan (advisory, name-level; read goal files completely, "
+                      "following read_file/read_node next_offset, before any edit):"]
+             for entry in pack["entries"][:12]:
+                 note = " [over byte cap: read selectively]" if entry.get("truncated") else ""
+                 lines.append(f"- {entry['file']} ({entry['bytes']} bytes) - {entry['reason']}{note}")
++            omitted = max(0, len(pack["entries"]) - 12)
++            if omitted or omitted_goals or pack["parse_failures"]:
++                lines.append(f"Partial advisory plan: {omitted} entries / {omitted_goals} goal candidates omitted; "
++                             f"{len(pack['parse_failures'])} parse failures. Use source tools; this is not read proof.")
+             text = "\n".join(lines)
+             return text if len(text) <= 2000 else text[:1997] + "\n..."
+-        except Exception as exc:  # advisory only; the step itself must proceed
++        except TaskCancelled:
++            self._read_plan_index = self._read_plan_key = None
++            self.read_plan_report = {"reason": "cancelled"}
++            raise
++        except Exception as exc:  # advisory only; no partial cache may survive
++            self._read_plan_index = self._read_plan_key = None
++            self.read_plan_report = {"reason": type(exc).__name__}
+             return f"Host read plan unavailable ({type(exc).__name__}); read approved files completely before editing."
+ 
++    def explain_next(self, task_id: str, *, horizon: int = 3) -> dict:
++        """Read-only structural readiness, never an execution authorization."""
++        from atomic_flow.agents.frontier import task_frontier
++
++        task = load(task_id)
++        if Path(task.project).resolve() != self.project.resolve():
++            raise ChangeSetConflict("task belongs to another project")
++        return task_frontier(task, horizon=horizon)
++
+     def _execute_step(self, task: Task, step: Step) -> None:
++        from atomic_flow.agents.frontier import frontier_context
++
+         base_query = f"[Step {step.index + 1}/{len(task.steps)}] {step.description}"
+         workspace = self.changeset.workspace if self.changeset else self.project
+         subquery = base_query
+-        plan_text = self._read_plan(task, workspace)
++        subquery += "\n" + frontier_context(task)
++        plan_text = self._read_plan(task, workspace, step)
+         if plan_text:
+             # The plan rides in the model-visible query only; retrieval keeps
+             # ranking on the pristine step description so context selection
+@@ -573,6 +706,12 @@ class TaskRunner:
+             capabilities = self.capability_factory(context)
+             if not isinstance(capabilities, TaskCapabilities):
+                 raise StepFailure(step.index, "capability factory must return TaskCapabilities")
++        envelope = task.plan_approval.get("internal_replan")
++        if envelope is not None:
++            from atomic_flow.agents.tools import ROLE_TOOLS
++            allowed = set(envelope["allowed_tools"])
++            capabilities.role_tools = {role: [tool for tool in tools if tool in allowed]
++                                       for role, tools in ROLE_TOOLS.items()}
+         orch = Orchestrator(self.config, workspace, self.task_backend, approval_callback=self.approval_callback,
+                             settings_project=self.project, cancel_check=self.cancel_check,
+                             question_callback=self.question_callback, private_workspace=self.changeset is not None,
+diff --git a/src/atomic_flow/cli.py b/src/atomic_flow/cli.py
+index d40befa..baa7a90 100644
+--- a/src/atomic_flow/cli.py
++++ b/src/atomic_flow/cli.py
+@@ -103,6 +103,8 @@ def _parser() -> argparse.ArgumentParser:
+     task_p.add_argument("--approve", metavar="TASK_ID", help="Approve exactly --plan-digest without starting execution")
+     task_p.add_argument("--plan-digest", help="Digest from the reviewed plan and source manifest")
+     task_p.add_argument("--scope-path", action="append", default=None, help="Exact approved relative path, repeatable; can name a new file")
++    task_p.add_argument("--allow-internal-replan", action="store_true",
++                        help="Opt in during --review and --approve to bounded internal replans; never implied by --yes")
+     task_p.add_argument("--reconcile", metavar="CALL_ID", help="Settle one unknown charge/effect hold with host evidence; never replays a call")
+     task_p.add_argument("--invalidate-step", type=int, default=None, metavar="INDEX",
+                         help="Requeue one done step and its dependents; requires --task-id, --reason and --project")
+@@ -574,13 +576,19 @@ def cmd_task(args) -> int:
+     from atomic_flow.agents.task_loop import TaskRunner
+ 
+     actions = ("recover", "task_list", "show", "cancel", "resume", "review", "revise", "approve")
+-    if sum(bool(getattr(args, name, None)) for name in actions) > 1:
++    if getattr(args, "allow_internal_replan", False) and not (getattr(args, "review", None) or getattr(args, "approve", None)):
++        raise ValueError("--allow-internal-replan requires --review or --approve")
++    if (sum(bool(getattr(args, name, None)) for name in actions)
++            + int(getattr(args, "reconcile", None) is not None)
++            + int(getattr(args, "invalidate_step", None) is not None) > 1):
+         raise ValueError("choose one task operation per invocation")
+     reviewed_task = getattr(args, "review", None) or getattr(args, "revise", None) or getattr(args, "approve", None)
+     if reviewed_task:
+         from atomic_flow.agents.planner import Plan
+         task = load(reviewed_task)
+-        runner = TaskRunner(load_config(task.project), Path(task.project), None)
++        config = load_config(task.project)
++        selected = make_backend(config, args.backend, args.model) if getattr(args, "allow_internal_replan", False) else None
++        runner = TaskRunner(config, Path(task.project), selected)
+         if args.revise:
+             if args.plan_file is None or args.plan_file.stat().st_size > 65536:
+                 raise ValueError("--revise requires a JSON --plan-file of at most 64 KiB")
+@@ -588,11 +596,13 @@ def cmd_task(args) -> int:
+         if args.approve:
+             if not args.plan_digest:
+                 raise ValueError("--approve requires --plan-digest from a reviewed plan")
+-            task = runner.approve(task, args.plan_digest, allowed_paths=args.scope_path)
++            task = runner.approve(task, args.plan_digest, allowed_paths=args.scope_path,
++                                  allow_internal_replan=getattr(args, "allow_internal_replan", False))
+             print(json.dumps({"task_id": task.id, "status": task.status, "approved_digest": task.plan_approval["digest"],
+                               "execution_started": False}, ensure_ascii=False, indent=2))
+             return 0
+-        print(json.dumps(runner.review(task, allowed_paths=args.scope_path), ensure_ascii=False, indent=2))
++        print(json.dumps(runner.review(task, allowed_paths=args.scope_path,
++                                      allow_internal_replan=getattr(args, "allow_internal_replan", False)), ensure_ascii=False, indent=2))
+         return 0
+ 
+     if args.recover:
+diff --git a/src/atomic_flow/graph/delta.py b/src/atomic_flow/graph/delta.py
+index 9c46efd..7821e81 100644
+--- a/src/atomic_flow/graph/delta.py
++++ b/src/atomic_flow/graph/delta.py
+@@ -17,18 +17,27 @@ from atomic_flow.graph.schema import GraphContractError, file_id
+ from atomic_flow.graph.store import GraphGenerationConflict, GraphStore
+ 
+ 
+-def file_delta(path: str, new_bytes: bytes | None, *, expected_old_digest: str | None):
+-    """Ops for one file: None bytes delete the file from the graph."""
++def file_delta(path: str, new_bytes: bytes | None, *, expected_old_digest: str | None,
++               base_generation: int | None = None):
++    """Ops for one file; optionally bind planning to a specific generation.
++
++    None/empty old digest means the file must be absent, never an unconditional
++    overwrite. Legacy callers without base_generation bind to the snapshot at
++    apply entry, while callers that retain a planned delta can bind it earlier.
++    """
++    if base_generation is not None and (type(base_generation) is not int or base_generation < 0):
++        raise GraphContractError("base generation must be a non-negative integer")
+     owned = file_id(path)
+     if new_bytes is None:
+         return {"path": path, "put_nodes": [], "put_edges": [],
+                 "drop_node_ids": [owned], "parsed_files": 0, "deleted": True,
+-                "new_digest": None, "expected_old_digest": expected_old_digest}
++                "new_digest": None, "expected_old_digest": expected_old_digest,
++                "base_generation": base_generation}
+     payload = adapt_file(path, new_bytes)
+     return {"path": path, "put_nodes": payload["nodes"], "put_edges": payload["edges"],
+             "drop_node_ids": [owned], "parsed_files": 1, "deleted": False,
+             "new_digest": payload["nodes"][0]["source"]["digest"],
+-            "expected_old_digest": expected_old_digest}
++            "expected_old_digest": expected_old_digest, "base_generation": base_generation}
+ 
+ 
+ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
+@@ -49,8 +58,36 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
+     modules = module_map(sorted(file_nodes))
+     exports = exports_by_file(post_nodes)
+ 
++    old_edges = store.edges()
+     affected = {path}
+-    for edge in store.edges():
++    # Add/delete can resolve a previously unresolved import or change module
++    # precedence (__init__.py vs a same-named module). The old resolved graph
++    # cannot describe such consumers. Inspect stored raw imports, but only run
++    # the resolver for files depending on changed module/export bindings.
++    pre_files = {n["path"]: n for n in nodes_pre if n["kind"] == "file"}
++    pre_modules = module_map(sorted(pre_files))
++    pre_exports = exports_by_file(nodes_pre)
++    changed_modules = {name for name in pre_modules.keys() | modules.keys()
++                       if pre_modules.get(name) != modules.get(name)}
++    changed_exports = {candidate for candidate in pre_exports.keys() | exports.keys()
++                       if pre_exports.get(candidate) != exports.get(candidate)}
++    for candidate_path, node in file_nodes.items():
++        if candidate_path not in pre_files:
++            affected.add(candidate_path)
++            continue
++        for name in node["facts"].get("imports", []):
++            parts = name.split(".")
++            prefixes = [".".join(parts[:size]) for size in range(len(parts), 0, -1)]
++            if any(prefix in changed_modules for prefix in prefixes):
++                affected.add(candidate_path)
++                break
++            imported = next((modules[prefix] for prefix in prefixes if prefix in modules
++                             and modules[prefix] != candidate_path), None)
++            if imported in changed_exports:
++                affected.add(candidate_path)
++                break
++    # Preserve the existing neighbour invalidation for the changed file.
++    for edge in old_edges:
+         if edge.get("facts_class") != "inferred" or edge["status"] != "active":
+             continue
+         src_file = edge["src"][len("file:"):] if edge["src"].startswith("file:") else edge["src"].split("::")[0][len("sym:"):]
+@@ -60,7 +97,7 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
+             affected.add(dst_file)
+ 
+     dropped: set[str] = set()
+-    for edge in store.edges():
++    for edge in old_edges:
+         if edge.get("facts_class") != "inferred":
+             continue
+         src_file = edge["src"][len("file:"):] if edge["src"].startswith("file:") else edge["src"].split("::")[0][len("sym:"):]
+@@ -82,24 +119,27 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
+ def apply_delta(store: GraphStore, delta: dict[str, Any]) -> dict[str, Any]:
+     """Validate digests, then commit; returns instrumentation for the report."""
+     path, expected = delta["path"], delta.get("expected_old_digest")
++    base_generation = delta.get("base_generation")
++    if base_generation is None:
++        base_generation = store.generation
++    if base_generation != store.generation:
++        raise GraphContractError("delta superseded: store generation moved since planning")
+     drop_ids = set(delta["drop_node_ids"])
+-    if expected is not None or not delta["deleted"]:
+-        # A file-level delta owns every node of that path; stale symbols of
+-        # the previous revision must not survive the replacement.
+-        drop_ids.update(node["id"] for node in store.nodes() if node["path"] == path)
+-    if expected is not None:
+-        node = next((n for n in store.nodes() if n["id"] == file_id(path)), None)
+-        stored_digest = node["source"]["digest"] if node else ""
+-        if stored_digest != expected:
+-            raise GraphContractError(
+-                f"source changed since delta was built: {path} (expected {expected[:12]}, "
+-                f"store has {stored_digest[:12] or 'no file'})")
++    # A file-level delta owns every node of that path; stale symbols of
++    # the previous revision must not survive the replacement.
++    drop_ids.update(node["id"] for node in store.nodes() if node["path"] == path)
++    node = next((n for n in store.nodes() if n["id"] == file_id(path)), None)
++    stored_digest = node["source"]["digest"] if node else ""
++    if stored_digest != (expected or ""):
++        raise GraphContractError(
++            f"source changed since delta was built: {path} (expected {(expected or '')[:12] or 'no file'}, "
++            f"store has {stored_digest[:12] or 'no file'})")
+     relink_edges, dropped_edges, relinked, unresolved = _relink(store, delta, drop_ids)
+     put_edges = list(delta["put_edges"])
+     put_edge_ids = {edge["id"] for edge in put_edges}
+     put_edges.extend(edge for edge in relink_edges if edge["id"] not in put_edge_ids)
+     try:
+-        generation = store.commit(base_generation=store.generation,
++        generation = store.commit(base_generation=base_generation,
+                                   put_nodes=delta["put_nodes"], put_edges=put_edges,
+                                   drop_node_ids=sorted(drop_ids), drop_edge_ids=dropped_edges)
+     except GraphGenerationConflict as exc:
+diff --git a/src/atomic_flow/graph/impact.py b/src/atomic_flow/graph/impact.py
+index 199557f..f3a7eec 100644
+--- a/src/atomic_flow/graph/impact.py
++++ b/src/atomic_flow/graph/impact.py
+@@ -8,49 +8,90 @@ resolved-dependency claims. Deterministic, model-free.
+ """
+ from __future__ import annotations
+ 
++import re
+ from typing import Any
+ 
+-from atomic_flow.graph.project import affected_by_name, clean_build
++from atomic_flow.activation.text import raw_terms
++from atomic_flow.graph import read_plan
++from atomic_flow.graph.project import affected_by_name
++from atomic_flow.graph.resolve import module_map
+ 
+-PACK_EXTRACTOR = "context-pack/1"
++ContextPackIndex = read_plan.ContextPackIndex
++# Preserve the public patch point for instrumentation without changing adapters.
++adapt_file = read_plan.adapt_file
++
++PACK_EXTRACTOR = "context-pack/2"
+ DEFAULT_BYTE_CAP = 96 * 1024
+ 
+ 
+-def context_pack(files: dict[str, bytes], goals: list[str], *, byte_cap: int = DEFAULT_BYTE_CAP) -> dict[str, Any]:
++def context_pack(files: dict[str, bytes], goals: list[str], *, byte_cap: int = DEFAULT_BYTE_CAP,
++                 index: ContextPackIndex | None = None, cancel_check=lambda: None, max_nodes=100_000) -> dict[str, Any]:
+     if not goals or any(g not in files for g in goals):
+         unknown = [g for g in goals if g not in files]
+         raise ValueError(f"unknown goal files: {unknown}")
+-    build = clean_build(files)
++    if type(byte_cap) is not int or byte_cap < 0:
++        raise ValueError("context-pack byte cap must be a non-negative integer")
++    index = index if index is not None else ContextPackIndex()
++    index.update(files, cancel_check=cancel_check, max_nodes=max_nodes, adapter=adapt_file)
++    return context_pack_from_index(index, goals, byte_cap=byte_cap, cancel_check=cancel_check)
++
++
++def context_pack_from_index(index: ContextPackIndex, goals: list[str], *, byte_cap=DEFAULT_BYTE_CAP,
++                             cancel_check=lambda: None) -> dict[str, Any]:
++    """Project a reconciled advisory snapshot; this does not validate source bytes."""
++    files = index.files
++    if not goals or any(goal not in files for goal in goals):
++        raise ValueError("unknown goal files in reconciled index")
++    if type(byte_cap) is not int or byte_cap < 0:
++        raise ValueError("context-pack byte cap must be a non-negative integer")
+     order: list[dict[str, Any]] = []
+     seen: set[str] = set()
+ 
+     def add(path: str, reason: str) -> None:
+         if path not in seen:
+             seen.add(path)
+-            order.append({"file": path, "reason": reason, "bytes": len(files[path])})
++            order.append({"file": path, "reason": reason, "bytes": files[path]["bytes"]})
+ 
+     for goal in sorted(goals):
++        cancel_check()
+         add(goal, "goal file")
+     goal_names: set[str] = set()
+     for goal in goals:
++        cancel_check()
+         module = goal_module(goal)
+         goal_names.add(module)
+-        for node in build["nodes"]:
++        for node in index.files[goal]["nodes"]:
+             if node["kind"] in {"class", "function"} and node["path"] == goal:
+                 leaf = node["symbol"].rsplit(".", 1)[-1]
+                 goal_names.add(leaf)
+                 goal_names.add(f"{module}.{leaf}")
+-        for imported, paths in build["reverse"]["imports"].items():
++        facts = index.files[goal]["nodes"][0]["facts"]
++        goal_names.update(facts["imports"])
++        goal_names.update(facts["raw_calls"])
++        for imported, paths in index.reverse["imports"].items():
+             if imported == module or imported.startswith(module + "."):
+                 goal_names.update(paths and [imported])
+     for name in sorted(goal_names):
+-        for path in affected_by_name(build["reverse"], [name]):
++        cancel_check()
++        for path in affected_by_name(index.reverse, [name]):
+             add(path, f"name match: {name}")
+-    for name in sorted(goal_names & set(build["exports"])):
+-        for node_id in build["exports"][name]:
++    modules = module_map(sorted(files))
++    for goal in sorted(goals):
++        cancel_check()
++        for imported in index.files[goal]["nodes"][0]["facts"]["imports"]:
++            parts = imported.split(".")
++            for size in range(len(parts), 0, -1):
++                candidate = modules.get(".".join(parts[:size]))
++                if candidate is not None:
++                    add(candidate, f"import name match: {imported}")
++                    break
++    for name in sorted(goal_names & set(index.exports)):
++        cancel_check()
++        for node_id in sorted(index.exports[name]):
+             add(node_id[len("sym:"):].split("::")[0], f"defines: {name}")
+     capped, total = [], 0
+     for entry in order:
++        cancel_check()
+         if total + entry["bytes"] > byte_cap:
+             entry = {**entry, "truncated": True, "reason": entry["reason"] + "; over byte cap"}
+             capped.append(entry)
+@@ -59,8 +100,34 @@ def context_pack(files: dict[str, bytes], goals: list[str], *, byte_cap: int = D
+         capped.append(entry)
+     return {"extractor": PACK_EXTRACTOR, "goals": sorted(goals), "entries": capped,
+             "included_bytes": total, "byte_cap": byte_cap,
++            "revision": index.revision, "stats": dict(index.stats),
++            "parse_failures": sorted(p for p, record in index.files.items() if not record["nodes"][0]["facts"]["parse_ok"]),
+             "method": "name-level advisory; not a resolution claim"}
+ 
+ 
++def select_goals(index: ContextPackIndex, allowed_paths, description: str, *, limit=4):
++    """Choose admitted approved targets, with explicit paths before lexical names."""
++    query = description.replace("\\", "/")
++    words = raw_terms(query)
++    ranked = []
++    for path in sorted(set(allowed_paths) & index.files.keys()):
++        explicit = bool(re.search(r"(?<![\w./-])" + re.escape(path) + r"(?![\w./-])", query))
++        score = 1000 if explicit else 0
++        stem = path.rsplit("/", 1)[-1].removesuffix(".py").lower()
++        if stem in words:
++            score += 20
++        for node in index.files[path]["nodes"][1:]:
++            leaf = node["symbol"].rsplit(".", 1)[-1]
++            if leaf.lower() in words:
++                score += 50
++            score += len(raw_terms(leaf) & words)
++        if score:
++            ranked.append((not explicit, -score, path))
++    ranked.sort()
++    if not ranked:
++        return [], 0
++    return [path for _, _, path in ranked[:limit]], max(0, len(ranked) - limit)
++
++
+ def goal_module(goal: str) -> str:
+     return goal[:-len(".py")].replace("/", ".") if goal.endswith(".py") else goal.replace("/", ".")
+diff --git a/src/atomic_flow/graph/project.py b/src/atomic_flow/graph/project.py
+index 0f48a72..3448923 100644
+--- a/src/atomic_flow/graph/project.py
++++ b/src/atomic_flow/graph/project.py
+@@ -46,14 +46,66 @@ def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
+             "parsed_files": len(files), "unresolved": sorted(unresolved)}
+ 
+ 
+-def project_files(root: Path, *, suffix: str = ".py") -> dict[str, bytes]:
+-    root = Path(root)
+-    files: dict[str, bytes] = {}
+-    for path in sorted(root.rglob(f"*{suffix}")):
+-        rel = path.relative_to(root).as_posix()
+-        if any(part.startswith(".") for part in Path(rel).parts[:-1]):
++def project_files(root: Path, *, suffix: str = ".py", tree_ignore=None, respect_gitignore=True,
++                  private_workspace=False, limits=None, cancel_check=lambda: None) -> dict[str, bytes]:
++    """Read a bounded, admitted snapshot; the same bytes are hashed and returned.
++
++    A scan/event is not read authority. Tool reads and edits still need their own
++    current source checks. Any failed read refuses this entire advisory snapshot.
++    """
++    from io import BytesIO
++    from types import SimpleNamespace
++
++    from atomic_flow.agents.source import SourceConflict, confined_path
++    from atomic_flow.agents.tools.file_paths import admitted_path
++    from atomic_flow.config import user_dir
++    from atomic_flow.execution_inputs import private_credential_path
++    from atomic_flow.project_resources import ProjectLimits, ResourceLimitError, source_files, stream_source
++    from atomic_flow.tree.builder import _Ignore
++    from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES
++
++    root = Path(root).absolute()
++    if any(p.is_symlink() or getattr(p, "is_junction", lambda: False)() for p in (root, *root.parents)):
++        raise SourceConflict("read-plan root may not contain links")
++    limits = limits or ProjectLimits()
++    cancel_check()
++    def ignore_bytes():
++        ignore_path = confined_path(root, ".gitignore")
++        if not respect_gitignore or not ignore_path.exists():
++            return None
++        with ignore_path.open("rb") as handle:
++            raw = handle.read(min(limits.max_file_bytes, MAX_FILE_BYTES) + 1)
++        if len(raw) > min(limits.max_file_bytes, MAX_FILE_BYTES):
++            raise ResourceLimitError("read-plan ignore policy exceeds byte limit")
++        raw.decode("utf-8-sig")  # Invalid policy must not silently admit ignored source.
++        return raw
++
++    policy = ignore_bytes()
++    ignore = _Ignore(root, list(DEFAULT_IGNORE) + list(tree_ignore or []), respect_gitignore)
++
++    def skip(rel, is_dir):
++        if ignore(rel, is_dir) or private_credential_path(rel):
++            return True
++        confined_path(root, rel)
++        return False
++
++    ctx = SimpleNamespace(project_root=root, tree_ignore=tree_ignore,
++                          respect_gitignore=respect_gitignore, private_workspace=private_workspace)
++    files, total = {}, 0
++    for rel, _ in source_files(root, skip, limits, cancel_check, private_root=user_dir().resolve()):
++        if not rel.endswith(suffix):
+             continue
+-        files[rel] = path.read_bytes()
++        if len(files) >= limits.max_files:
++            raise ResourceLimitError("read-plan source file limit exceeded")
++        path = admitted_path(ctx, rel, existing=True)
++        sink = BytesIO()
++        _, size = stream_source(path, limits, cancel_check, sink=sink,
++                                remaining_bytes=limits.max_total_bytes - total)
++        total += size
++        files[rel] = sink.getvalue()
++    cancel_check()
++    if ignore_bytes() != policy:
++        raise SourceConflict("ignore policy changed during read-plan scan")
+     return files
+ 
+ 
+diff --git a/src/atomic_flow/graph/store.py b/src/atomic_flow/graph/store.py
+index c96571f..2feae57 100644
+--- a/src/atomic_flow/graph/store.py
++++ b/src/atomic_flow/graph/store.py
+@@ -13,7 +13,9 @@ import tempfile
+ from pathlib import Path
+ from typing import Any
+ 
++from atomic_flow.durability import sync_directory
+ from atomic_flow.graph.schema import GRAPH_SCHEMA_VERSION, GraphContractError, validate_edge, validate_node
++from atomic_flow.locking import exclusive_file
+ 
+ 
+ class GraphGenerationConflict(GraphContractError):
+@@ -61,7 +63,47 @@ class GraphStore:
+     def commit(self, *, base_generation: int, put_nodes: list[dict] | None = None,
+                put_edges: list[dict] | None = None, drop_node_ids: list[str] | None = None,
+                drop_edge_ids: list[str] | None = None) -> int:
+-        """Apply one transaction; refuse when the base generation moved."""
++        """CAS one persisted snapshot under a cooperating-writer OS lease.
++
++        Atomic replacement alone is not CAS: separately opened stale handles
++        must compare the persisted generation while holding the same lease.
++        The marker is persistent and is never unlinked to change lock identity.
++        """
++        self.path.parent.mkdir(parents=True, exist_ok=True)
++        lock_path = self.path.with_name(self.path.name + ".lock")
++        for path in (self.path, lock_path, *self.path.parents):
++            if path.is_symlink() or getattr(path, "is_junction", lambda: False)():
++                raise GraphContractError("graph storage paths may not contain links or junctions")
++        manager = exclusive_file(lock_path, busy_message="graph writer lease is held")
++        try:
++            manager.__enter__()
++        except ValueError as exc:
++            raise GraphGenerationConflict(str(exc)) from exc
++        try:
++            return self._commit_locked(base_generation=base_generation, put_nodes=put_nodes,
++                                       put_edges=put_edges, drop_node_ids=drop_node_ids,
++                                       drop_edge_ids=drop_edge_ids)
++        finally:
++            manager.__exit__(None, None, None)
++
++    def _commit_locked(self, *, base_generation: int, put_nodes: list[dict] | None,
++                       put_edges: list[dict] | None, drop_node_ids: list[str] | None,
++                       drop_edge_ids: list[str] | None) -> int:
++        if type(base_generation) is not int or base_generation < 0:
++            raise GraphContractError("base generation must be a non-negative integer")
++        try:
++            persisted = json.loads(self.path.read_text(encoding="utf-8"))
++        except FileNotFoundError:
++            persisted_generation = 0
++        else:
++            if not isinstance(persisted, dict) or persisted.get("schema_version") != GRAPH_SCHEMA_VERSION:
++                raise GraphContractError("graph store schema mismatch; migrate explicitly")
++            persisted_generation = persisted.get("generation")
++            if type(persisted_generation) is not int or persisted_generation < 0:
++                raise GraphContractError("persisted graph generation is malformed")
++        if persisted_generation != base_generation:
++            raise GraphGenerationConflict(
++                f"persisted store generation moved to {persisted_generation}; re-read and retry")
+         if base_generation != self._generation:
+             raise GraphGenerationConflict(
+                 f"store generation moved to {self._generation}; re-read and retry")
+@@ -91,6 +133,7 @@ class GraphStore:
+                 handle.flush()
+                 os.fsync(handle.fileno())
+             os.replace(name, self.path)
++            sync_directory(self.path.parent)
+         except BaseException:
+             Path(name).unlink(missing_ok=True)
+             raise
+diff --git a/tests/test_envelope.py b/tests/test_envelope.py
+index 0323ccc..f59e02c 100644
+--- a/tests/test_envelope.py
++++ b/tests/test_envelope.py
+@@ -3,18 +3,20 @@ from atomic_flow.agents.envelope import envelope_preserved, no_progress
+ from atomic_flow.agents.task import Step
+ 
+ APPROVAL = {
+-    "schema_version": 1,
++    "schema_version": 2,
+     "plan": {"steps": [
+         {"index": 0, "tools_needed": ["read_file", "edit_node"], "verify_with": "py_compile"},
+         {"index": 1, "tools_needed": ["run_command"], "verify_with": "pytest"},
+     ]},
+-    "limits": {"max_budget_usd": 0.05},
+-    "replan_failures": [],
++    "internal_replan": {"version": 1, "allowed_tools": ["edit_node", "read_file", "run_command"],
++                        "required_verify": "py_compile", "max_budget_usd": 0.05,
++                        "max_model_calls": 100, "max_replans": 2, "runtime_digest": "a" * 64,
++                        "replan_failures": []},
+ }
+ 
+ 
+ def test_in_scope_replan_is_preserved():
+-    steps = [Step(index=0, description="retry edit", tools_needed=["edit_node"], verify_with="py_compile")]
++    steps = [Step(index=0, description="retry edit", tools_needed=["edit_node", "run_command"], verify_with="py_compile")]
+     ok, reasons = envelope_preserved(APPROVAL, steps, failure="syntax check failed", budget_spent=0.01)
+     assert ok, reasons
+ 
+@@ -27,9 +29,8 @@ def test_widening_is_refused_with_reasons():
+ 
+ 
+ def test_mutating_tool_introduction_is_refused():
+-    read_only = {"schema_version": 1,
+-                 "plan": {"steps": [{"index": 0, "tools_needed": ["read_file"], "verify_with": "none"}]},
+-                 "limits": {}, "replan_failures": []}
++    read_only = {**APPROVAL, "internal_replan": {**APPROVAL["internal_replan"],
++                                                "allowed_tools": ["read_file"], "required_verify": "none"}}
+     steps = [Step(index=0, description="quick fix", tools_needed=["read_file", "patch_file"],
+                   verify_with="none")]
+     ok, reasons = envelope_preserved(read_only, steps, failure="", budget_spent=0.0)
+@@ -38,11 +39,10 @@ def test_mutating_tool_introduction_is_refused():
+ 
+ def test_new_verify_kind_is_refused():
+     steps = [Step(index=0, description="try tests", tools_needed=["run_command"], verify_with="pytest")]
+-    read_only = {"schema_version": 1,
+-                 "plan": {"steps": [{"index": 0, "tools_needed": ["run_command"], "verify_with": "py_compile"}]},
+-                 "limits": {}, "replan_failures": []}
++    read_only = {**APPROVAL, "internal_replan": {**APPROVAL["internal_replan"],
++                                                "allowed_tools": ["read_file"], "required_verify": "py_compile"}}
+     ok, reasons = envelope_preserved(read_only, steps, failure="", budget_spent=0.0)
+-    assert not ok and any("verify_with" in r for r in reasons)
++    assert not ok and any("execution" in r for r in reasons)
+ 
+ 
+ def test_budget_cap_blocks_replan_continuation():
+@@ -52,11 +52,29 @@ def test_budget_cap_blocks_replan_continuation():
+ 
+ 
+ def test_no_progress_guard_trips_on_recurring_signature():
+-    approval = {**APPROVAL, "replan_failures": ["edit rolled back: py_compile failed",
+-                                                "edit rolled back: py_compile failed"]}
++    approval = {**APPROVAL, "internal_replan": {**APPROVAL["internal_replan"],
++                "replan_failures": ["edit rolled back: py_compile failed", "edit rolled back: py_compile failed"]}}
+     assert no_progress(approval, "edit rolled back: py_compile failed\nextra line")
+     assert not no_progress(approval, "a different failure entirely")
+     steps = [Step(index=0, description="same again", tools_needed=["edit_node"], verify_with="py_compile")]
+     ok, reasons = envelope_preserved(approval, steps, failure="edit rolled back: py_compile failed",
+                                      budget_spent=0.01)
+     assert not ok and any("no-progress" in r for r in reasons)
++
++
++def test_legacy_missing_envelope_and_nonfinite_accounting_fail_closed():
++    for approval in ({"schema_version": 1}, {"schema_version": 2}, None):
++        assert not envelope_preserved(approval, [Step(0, "retry")], failure="", budget_spent=0)[0]
++    for spent in (float("nan"), float("inf"), -1, True):
++        assert not envelope_preserved(APPROVAL, [Step(0, "retry")], failure="", budget_spent=spent)[0]
++
++
++def test_whitespace_failure_is_not_a_crash():
++    assert not no_progress(APPROVAL, " \n\t ")
++
++
++def test_replan_cannot_discard_edit_or_execution_obligations():
++    read_only = [Step(0, "only read", tools_needed=["read_file"], verify_with="py_compile")]
++    ok, reasons = envelope_preserved(APPROVAL, read_only, failure="", budget_spent=0)
++    assert not ok and any("edit obligation" in r for r in reasons)
++    assert any("execution/check obligation" in r for r in reasons)
+diff --git a/tests/test_step_invalidation.py b/tests/test_step_invalidation.py
+index 27cfefe..3e13723 100644
+--- a/tests/test_step_invalidation.py
++++ b/tests/test_step_invalidation.py
+@@ -74,3 +74,26 @@ def test_invalidated_done_step_is_rerunnable_state(tmp_path, isolated_home):
+     from atomic_flow.agents.task import load
+     reloaded = load("task_aa4000000004")
+     assert reloaded.steps[0].status == "pending" and reloaded.steps[0].invalidated_reason
++
++
++def test_invalidation_cannot_requeue_a_different_project(tmp_path):
++    from atomic_flow.agents.changeset import ChangeSetConflict
++    from atomic_flow.config import user_dir
++
++    task = _task(tmp_path)
++    path = user_dir() / "tasks" / f"{task.id}.json"
++    before = path.read_bytes()
++    other = tmp_path / "other"
++    other.mkdir()
++    with pytest.raises(ChangeSetConflict, match="another project"):
++        TaskRunner(None, other, None).invalidate_step(task.id, 0, "wrong root")
++    assert path.read_bytes() == before
++
++
++def test_invalidation_reason_in_persisted_state_must_be_text(tmp_path):
++    from atomic_flow.state import StateError
++
++    task = _task(tmp_path)
++    task.steps[0].invalidated_reason = {"not": "text"}
++    with pytest.raises(StateError, match="invalidated_reason"):
++        save(task)
+diff --git a/tests/test_task_read_plan.py b/tests/test_task_read_plan.py
+index 355672e..33265df 100644
+--- a/tests/test_task_read_plan.py
++++ b/tests/test_task_read_plan.py
+@@ -29,6 +29,7 @@ def test_step_query_includes_read_plan_with_reasons(monkeypatch, isolated_home,
+ 
+         def answer(self, query, *a, **kw):
+             captured["query"] = query
++            captured["retrieval_query"] = kw["retrieval_query"]
+             return R()
+ 
+     monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
+@@ -38,6 +39,8 @@ def test_step_query_includes_read_plan_with_reasons(monkeypatch, isolated_home,
+     task = runner.run_plan("fix helper", plan)
+     assert task.status == "done", task.error
+     query = captured["query"]
++    assert "Host task frontier" in query and "current_step_running" in query
++    assert captured["retrieval_query"] == "[Step 1/1] edit helper"
+     assert "Host read plan" in query
+     assert "- lib.py (" in query and "goal file" in query
+     assert "- app.py (" in query  # included with a reason (goal file or name match)
+@@ -53,5 +56,5 @@ def test_read_plan_degrades_explicitly_when_graph_fails(monkeypatch, isolated_ho
+     monkeypatch.setattr(task_loop, "require_approval", lambda task, project: ["lib.py"])
+     monkeypatch.setattr("atomic_flow.graph.project.project_files", broken)
+     runner = task_loop.TaskRunner(config=None, project=project, backend=None)
+-    text = runner._read_plan(type("T", (), {"plan_approval": {}})(), project)
++    text = runner._read_plan(type("T", (), {"plan_approval": {}, "id": "task_aaaaaaaaaaaa"})(), project)
+     assert text.startswith("Host read plan unavailable (RuntimeError)")

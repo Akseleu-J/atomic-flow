@@ -46,14 +46,66 @@ def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
             "parsed_files": len(files), "unresolved": sorted(unresolved)}
 
 
-def project_files(root: Path, *, suffix: str = ".py") -> dict[str, bytes]:
-    root = Path(root)
-    files: dict[str, bytes] = {}
-    for path in sorted(root.rglob(f"*{suffix}")):
-        rel = path.relative_to(root).as_posix()
-        if any(part.startswith(".") for part in Path(rel).parts[:-1]):
+def project_files(root: Path, *, suffix: str = ".py", tree_ignore=None, respect_gitignore=True,
+                  private_workspace=False, limits=None, cancel_check=lambda: None) -> dict[str, bytes]:
+    """Read a bounded, admitted snapshot; the same bytes are hashed and returned.
+
+    A scan/event is not read authority. Tool reads and edits still need their own
+    current source checks. Any failed read refuses this entire advisory snapshot.
+    """
+    from io import BytesIO
+    from types import SimpleNamespace
+
+    from atomic_flow.agents.source import SourceConflict, confined_path
+    from atomic_flow.agents.tools.file_paths import admitted_path
+    from atomic_flow.config import user_dir
+    from atomic_flow.execution_inputs import private_credential_path
+    from atomic_flow.project_resources import ProjectLimits, ResourceLimitError, source_files, stream_source
+    from atomic_flow.tree.builder import _Ignore
+    from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES
+
+    root = Path(root).absolute()
+    if any(p.is_symlink() or getattr(p, "is_junction", lambda: False)() for p in (root, *root.parents)):
+        raise SourceConflict("read-plan root may not contain links")
+    limits = limits or ProjectLimits()
+    cancel_check()
+    def ignore_bytes():
+        ignore_path = confined_path(root, ".gitignore")
+        if not respect_gitignore or not ignore_path.exists():
+            return None
+        with ignore_path.open("rb") as handle:
+            raw = handle.read(min(limits.max_file_bytes, MAX_FILE_BYTES) + 1)
+        if len(raw) > min(limits.max_file_bytes, MAX_FILE_BYTES):
+            raise ResourceLimitError("read-plan ignore policy exceeds byte limit")
+        raw.decode("utf-8-sig")  # Invalid policy must not silently admit ignored source.
+        return raw
+
+    policy = ignore_bytes()
+    ignore = _Ignore(root, list(DEFAULT_IGNORE) + list(tree_ignore or []), respect_gitignore)
+
+    def skip(rel, is_dir):
+        if ignore(rel, is_dir) or private_credential_path(rel):
+            return True
+        confined_path(root, rel)
+        return False
+
+    ctx = SimpleNamespace(project_root=root, tree_ignore=tree_ignore,
+                          respect_gitignore=respect_gitignore, private_workspace=private_workspace)
+    files, total = {}, 0
+    for rel, _ in source_files(root, skip, limits, cancel_check, private_root=user_dir().resolve()):
+        if not rel.endswith(suffix):
             continue
-        files[rel] = path.read_bytes()
+        if len(files) >= limits.max_files:
+            raise ResourceLimitError("read-plan source file limit exceeded")
+        path = admitted_path(ctx, rel, existing=True)
+        sink = BytesIO()
+        _, size = stream_source(path, limits, cancel_check, sink=sink,
+                                remaining_bytes=limits.max_total_bytes - total)
+        total += size
+        files[rel] = sink.getvalue()
+    cancel_check()
+    if ignore_bytes() != policy:
+        raise SourceConflict("ignore policy changed during read-plan scan")
     return files
 
 

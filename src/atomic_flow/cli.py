@@ -99,10 +99,14 @@ def _parser() -> argparse.ArgumentParser:
     task_p.add_argument("--cancel", metavar="TASK_ID")
     task_p.add_argument("--review", metavar="TASK_ID", help="Offline plan and source-bound approval digest")
     task_p.add_argument("--revise", metavar="TASK_ID", help="Replace an unexecuted plan from --plan-file")
+    task_p.add_argument("--expand-step", type=int, default=None, metavar="INDEX", help="Refine one pending step using --task-id and --plan-file; requires fresh review")
+    task_p.add_argument("--explain-next", metavar="TASK_ID", help="Read-only frontier, revisions and evidence observations")
     task_p.add_argument("--plan-file", type=Path, help="JSON Plan for an explicit revision; never executed as code")
     task_p.add_argument("--approve", metavar="TASK_ID", help="Approve exactly --plan-digest without starting execution")
     task_p.add_argument("--plan-digest", help="Digest from the reviewed plan and source manifest")
     task_p.add_argument("--scope-path", action="append", default=None, help="Exact approved relative path, repeatable; can name a new file")
+    task_p.add_argument("--allow-internal-replan", action="store_true",
+                        help="Opt in during --review and --approve to bounded internal replans; never implied by --yes")
     task_p.add_argument("--reconcile", metavar="CALL_ID", help="Settle one unknown charge/effect hold with host evidence; never replays a call")
     task_p.add_argument("--invalidate-step", type=int, default=None, metavar="INDEX",
                         help="Requeue one done step and its dependents; requires --task-id, --reason and --project")
@@ -573,14 +577,36 @@ def cmd_task(args) -> int:
     from atomic_flow.agents.task import list_tasks, load, save
     from atomic_flow.agents.task_loop import TaskRunner
 
-    actions = ("recover", "task_list", "show", "cancel", "resume", "review", "revise", "approve")
-    if sum(bool(getattr(args, name, None)) for name in actions) > 1:
+    actions = ("recover", "task_list", "show", "cancel", "resume", "review", "revise", "approve", "explain_next")
+    if getattr(args, "allow_internal_replan", False) and not (getattr(args, "review", None) or getattr(args, "approve", None)):
+        raise ValueError("--allow-internal-replan requires --review or --approve")
+    if (sum(bool(getattr(args, name, None)) for name in actions)
+            + int(getattr(args, "reconcile", None) is not None)
+            + int(getattr(args, "expand_step", None) is not None)
+            + int(getattr(args, "invalidate_step", None) is not None) > 1):
         raise ValueError("choose one task operation per invocation")
+    if getattr(args, "explain_next", None):
+        task = load(args.explain_next)
+        result = TaskRunner(load_config(task.project), Path(task.project), None).explain_next(task.id)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if getattr(args, "expand_step", None) is not None:
+        from atomic_flow.agents.planner import Plan
+        if not args.task_id or args.plan_file is None or args.plan_file.stat().st_size > 65536:
+            raise ValueError("--expand-step requires --task-id and --plan-file of at most 64 KiB")
+        task = load(args.task_id)
+        runner = TaskRunner(load_config(task.project), Path(task.project), None)
+        task = runner.expand_plan(task, args.expand_step, Plan.model_validate_json(args.plan_file.read_text(encoding="utf-8")))
+        print(json.dumps({"task_id": task.id, "status": task.status, "execution_started": False,
+                          "approval_required": True, "expansion_count": task.expansion_count}, indent=2))
+        return 0
     reviewed_task = getattr(args, "review", None) or getattr(args, "revise", None) or getattr(args, "approve", None)
     if reviewed_task:
         from atomic_flow.agents.planner import Plan
         task = load(reviewed_task)
-        runner = TaskRunner(load_config(task.project), Path(task.project), None)
+        config = load_config(task.project)
+        selected = make_backend(config, args.backend, args.model) if getattr(args, "allow_internal_replan", False) else None
+        runner = TaskRunner(config, Path(task.project), selected)
         if args.revise:
             if args.plan_file is None or args.plan_file.stat().st_size > 65536:
                 raise ValueError("--revise requires a JSON --plan-file of at most 64 KiB")
@@ -588,11 +614,13 @@ def cmd_task(args) -> int:
         if args.approve:
             if not args.plan_digest:
                 raise ValueError("--approve requires --plan-digest from a reviewed plan")
-            task = runner.approve(task, args.plan_digest, allowed_paths=args.scope_path)
+            task = runner.approve(task, args.plan_digest, allowed_paths=args.scope_path,
+                                  allow_internal_replan=getattr(args, "allow_internal_replan", False))
             print(json.dumps({"task_id": task.id, "status": task.status, "approved_digest": task.plan_approval["digest"],
                               "execution_started": False}, ensure_ascii=False, indent=2))
             return 0
-        print(json.dumps(runner.review(task, allowed_paths=args.scope_path), ensure_ascii=False, indent=2))
+        print(json.dumps(runner.review(task, allowed_paths=args.scope_path,
+                                      allow_internal_replan=getattr(args, "allow_internal_replan", False)), ensure_ascii=False, indent=2))
         return 0
 
     if args.recover:

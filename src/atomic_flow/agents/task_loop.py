@@ -2,18 +2,21 @@
 from __future__ import annotations
 
 import time
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 
 from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
 from atomic_flow.agents.control import check_cancel, task_lease
 from atomic_flow.agents.effects import UnresolvedEffects
+from atomic_flow.agents.envelope import envelope_preserved, failure_signature, make_envelope, no_progress, runtime_digest
 from atomic_flow.agents.execution import TaskCancelled, run_python
+from atomic_flow.agents.goals import Goal, goal_context, replan_requirements, step_scope, validate_goals
 from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
 from atomic_flow.agents.planner import Plan, plan_task, replan_task
 from atomic_flow.agents.task import Step, Task, load, save
 from atomic_flow.agents.task_budget import TaskBudgetBackend, check_accounting
-from atomic_flow.config import AtomicConfig
+from atomic_flow.config import AtomicConfig, user_dir
 from atomic_flow.errors import BudgetExceeded, TreeError
 from atomic_flow.llm.orchestrator import Orchestrator
 from atomic_flow.project_resources import ProjectLimits
@@ -75,24 +78,48 @@ class TaskRunner:
         self.changeset: ChangeSet | None = None
         self.cancel_check = lambda: None
         self.task_backend = backend
+        self._read_plan_index = None
+        self._read_plan_key = None
+        self.read_plan_report: dict = {}
+        self._step_tool_calls: dict[int, list] = {}
 
     @staticmethod
     def _steps(plan: Plan, offset: int = 0) -> list[Step]:
         return [Step(index=offset + i, description=p.description, tools_needed=list(p.tools_needed),
                      expected_outcome=p.expected_outcome, verify_with=p.verify_with,
+                     parent_goal=f"p{offset}:{p.parent_goal}" if p.parent_goal else "",
+                     acceptance_criteria=list(p.acceptance_criteria),
+                     scope_paths=list(p.scope_paths), linked_code_nodes=list(p.linked_code_nodes),
+                     linked_test_nodes=list(p.linked_test_nodes),
                      depends_on=[offset + d for d in (p.depends_on if p.depends_on is not None else ([i - 1] if i else []))])
                 for i, p in enumerate(plan.steps)]
 
-    def review(self, task: Task, *, allowed_paths: list[str] | None = None) -> dict:
+    @staticmethod
+    def _goals(plan: Plan, offset: int = 0) -> list[Goal]:
+        return [Goal(f"p{offset}:{g.id}", g.description,
+                     f"p{offset}:{g.parent_id}" if g.parent_id else "", list(g.acceptance_criteria),
+                     deepcopy(g.scope_paths), g.max_model_calls, g.max_budget_usd)
+                for g in plan.goals]
+
+    def _review(self, task, allowed_paths, allow_internal_replan):
+        if type(allow_internal_replan) is not bool:
+            raise ValueError("allow_internal_replan must be an explicit boolean")
+        if allow_internal_replan and self.capability_factory is not None:
+            raise ValueError("internal replans do not support injected capabilities in this version")
+        envelope = make_envelope(task, self.config, self.project, self.backend) if allow_internal_replan else None
+        return review_payload(task, self.project, allowed_paths, internal_replan=envelope)
+
+    def review(self, task: Task, *, allowed_paths: list[str] | None = None, allow_internal_replan: bool = False) -> dict:
         with task_lease(task.id):
             task = load(task.id)
-            return review_payload(task, self.project, allowed_paths)
+            return self._review(task, allowed_paths, allow_internal_replan)
 
-    def approve(self, task: Task, expected_digest: str, *, allowed_paths: list[str] | None = None) -> Task:
+    def approve(self, task: Task, expected_digest: str, *, allowed_paths: list[str] | None = None,
+                allow_internal_replan: bool = False) -> Task:
         with task_lease(task.id):
             task = load(task.id)
             self._editable_plan(task)
-            review = review_payload(task, self.project, allowed_paths)
+            review = self._review(task, allowed_paths, allow_internal_replan)
             if review["digest"] != expected_digest:
                 raise ChangeSetConflict("review digest changed; inspect the current plan, scope and source before approving")
             task.plan_approval = review
@@ -106,12 +133,17 @@ class TaskRunner:
             self._editable_plan(task)
             completed = [s for s in task.steps if s.status == "done"]
             if completed or task.changeset_id:
+                offset = max((s.index for s in task.steps), default=-1) + 1
+                new_steps, new_goals = self._steps(plan, offset), self._goals(plan, offset)
+                validate_goals(task.goals + new_goals, task.steps + new_steps)
                 for step in task.steps:
                     if step.status != "done":
                         step.status = "superseded"
-                task.steps.extend(self._steps(plan, max((s.index for s in task.steps), default=-1) + 1))
+                task.steps.extend(new_steps)
+                task.goals.extend(new_goals)
             else:
                 task.steps = self._steps(plan)
+                task.goals = self._goals(plan)
             task.rationale, task.plan_ready, task.plan_approval = plan.rationale, True, {}
             task.current_index = next((i for i, s in enumerate(task.steps) if s.status == "pending"), len(task.steps))
             task.status, task.error, task.completion_report = "paused", "revised plan requires review and approval", {}
@@ -120,8 +152,29 @@ class TaskRunner:
 
     @staticmethod
     def _editable_plan(task):
-        if task.status in {"done", "failed"} or any(s.status == "running" for s in task.steps):
+        if task.status in {"done", "failed", "cancelled"} or any(s.status == "running" for s in task.steps):
             raise ChangeSetConflict("active/interrupted side effects or a closed task require recovery, not plan reset")
+
+    def expand_plan(self, task: Task, index: int, plan: Plan) -> Task:
+        """Refine one pending step under lease; execution always needs new review."""
+        from atomic_flow.agents.rolling_plan import propose_expansion
+
+        with task_lease(task.id):
+            task = load(task.id)
+            if Path(task.project).resolve() != self.project.resolve():
+                raise ChangeSetConflict("task belongs to another project")
+            self._editable_plan(task)
+            check_accounting(task)
+            self._check_effects(task)
+            if task.changeset_id:
+                change = ChangeSet.open(self.project, task.changeset_id)
+                if change.state["status"] != "active":
+                    raise ChangeSetConflict("closed changeset cannot be expanded")
+                change.check_original()
+                change.validate_workspace()
+            expanded = propose_expansion(task, index, plan)
+            save(expanded)
+            return expanded
 
     @staticmethod
     def _check_effects(task):
@@ -156,6 +209,7 @@ class TaskRunner:
                 plan = plan_task(query, project_root=self.project, backend=backend,
                                  candidates=candidates, n_files=n_files)
                 task.steps = self._steps(plan)
+                task.goals = self._goals(plan)
                 task.rationale = plan.rationale
                 task.plan_ready = True
                 task.status = "paused"
@@ -163,18 +217,20 @@ class TaskRunner:
             except BudgetExceeded as exc:
                 task.status, task.error = "paused", str(exc)
             except TaskCancelled as exc:
-                task.status, task.error = "failed", str(exc)
+                task.status, task.error = "cancelled", str(exc)
             except Exception as exc:
                 task.status, task.error = "failed", f"planning failed: {type(exc).__name__}"
             save(task)
         return task
 
-    def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None = None) -> Task:
+    def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None = None,
+                 allow_internal_replan: bool = False) -> Task:
         steps = self._steps(plan)
         task = Task.new(query=query, project=self.project, steps=steps, rationale=plan.rationale)
+        task.goals = self._goals(plan)
         save(task)
-        review = self.review(task, allowed_paths=allowed_paths)
-        task = self.approve(task, review["digest"], allowed_paths=allowed_paths)
+        review = self.review(task, allowed_paths=allowed_paths, allow_internal_replan=allow_internal_replan)
+        task = self.approve(task, review["digest"], allowed_paths=allowed_paths, allow_internal_replan=allow_internal_replan)
         return self.resume(task)
 
     def invalidate_step(self, task_id: str, index: int, reason: str) -> Task:
@@ -189,7 +245,9 @@ class TaskRunner:
             raise ChangeSetConflict("step invalidation requires an explicit reason")
         with task_lease(task_id):
             task = load(task_id)
-            if task.status == "done":
+            if Path(task.project).resolve() != self.project.resolve():
+                raise ChangeSetConflict("task belongs to another project")
+            if task.status in {"done", "cancelled"}:
                 raise ChangeSetConflict("completed task is immutable; create a new task instead of replay")
             if task.changeset_id:
                 state = ChangeSet.open(self.project, task.changeset_id).state["status"]
@@ -219,6 +277,7 @@ class TaskRunner:
                 step.invalidated_reason = f"step {index}: {reason.strip()}"
                 step.result_summary = ""
                 step.request_id = ""
+                step.evidence = {}
                 step.started_at = step.finished_at = None
             task.current_index = min(task.current_index, targets[0])
             if task.status in {"failed", "paused"}:
@@ -233,7 +292,7 @@ class TaskRunner:
             except FileNotFoundError:
                 save(task)
             self.changeset = None
-            if task.status in {"done", "failed"}:
+            if task.status in {"done", "failed", "cancelled"}:
                 return task
             self.cancel_check = lambda: check_cancel(task.id)
             try:
@@ -250,6 +309,7 @@ class TaskRunner:
                 if not recovery_only:
                     try:
                         require_approval(task, self.project)
+                        self._require_replan_runtime(task)
                     except ChangeSetConflict as exc:
                         task.status, task.error = "paused", str(exc)
                         save(task)
@@ -262,7 +322,10 @@ class TaskRunner:
             except TaskCancelled as exc:
                 if self.changeset and self.changeset.state["status"] == "active":
                     self.changeset.abort()
-                task.status = "failed"
+                task.status = "cancelled"
+                for step in task.steps:
+                    if step.status in {"pending", "blocked", "running", "failed"}:
+                        step.status = "cancelled"
                 task.error = str(exc)
                 task.finished_at = time.time()
                 save(task)
@@ -297,7 +360,8 @@ class TaskRunner:
                 self.changeset = ChangeSet.create(self.project, backend=self.config.task.workspace_backend,
                                                   limits=self.resource_limits, cancel_check=self.cancel_check)
                 task.changeset_id = self.changeset.id
-            self._refresh_index(self.changeset.workspace, seed_root=self.project)
+            indexed = self._refresh_index(self.changeset.workspace, seed_root=self.project)
+            task.tree_fingerprint = indexed["fingerprint"]
         except (OSError, ValueError, TreeError) as exc:
             task.status = "failed"
             task.error = str(exc)
@@ -307,6 +371,7 @@ class TaskRunner:
         if result.status == "running" and result.current_index == len(result.steps):
             try:
                 self._check_effects(result)
+                self._require_replan_runtime(result)
                 from atomic_flow.agents.completion import assess_completion
                 result.completion_report = assess_completion(result, self.changeset, self.config, self.cancel_check)
                 save(result)
@@ -373,26 +438,44 @@ class TaskRunner:
 
         while task.current_index < len(task.steps):
             self.cancel_check()
+            try:
+                self._require_replan_runtime(task)
+            except ChangeSetConflict as exc:
+                task.status, task.error = "paused", str(exc)
+                save(task)
+                return task
             if (self.config.task.fail_on_budget_exceeded and self.config.task.max_budget_usd > 0
                     and task.budget_spent >= self.config.task.max_budget_usd):
                 task.status = "paused"
                 task.error = "task budget exhausted before next step"
                 save(task)
                 return task
-            by_id = {s.index: s for s in task.steps}
+            from atomic_flow.agents.frontier import task_frontier
+
+            frontier = task_frontier(task)
+            if frontier["running"]:
+                task.status = "paused"
+                task.error = "unfinished running step requires reconciliation before scheduling"
+                save(task)
+                return task
+            ready = set(frontier["ready"])
+            waiting = {item["index"]: item["waiting_for"] for item in frontier["blocked"]}
             runnable = []
             for candidate in task.steps:
                 if candidate.status not in {"pending", "blocked"}:
                     continue
-                blocked = [d for d in candidate.depends_on if by_id[d].status != "done"]
+                blocked = waiting.get(candidate.index, [])
                 candidate.blocked_reason = ("prerequisites not done: " + ", ".join(map(str, blocked))) if blocked else ""
                 candidate.status = "blocked" if blocked else "pending"
-                if not blocked:
+                if candidate.index in ready:
                     runnable.append(candidate)
             if not runnable:
                 failed = next((s for s in task.steps if s.status == "failed"), None)
                 if failed is not None:
-                    return self._replan_failed_step(task, failed)
+                    result = self._replan_failed_step(task, failed)
+                    if result.status == "running":
+                        continue
+                    return result
                 unresolved = [s for s in task.steps if s.status not in {"done", "superseded"}]
                 if unresolved:
                     task.status, task.error = "paused", "blocked work remains; review prerequisites or revise the plan"
@@ -401,16 +484,42 @@ class TaskRunner:
                 save(task)
                 return task
             step = runnable[0]
+            # A receipt is provenance, never authority. Changed prerequisites
+            # pause for explicit invalidation/review instead of action replay.
+            from atomic_flow.agents.step_evidence import receipt_matches
+            manifest = self.changeset.validate_workspace()
+            for dependency in step.depends_on:
+                premise = next(s for s in task.steps if s.index == dependency)
+                if premise.evidence:
+                    matches, reasons = receipt_matches(premise.evidence, premise, manifest, task_id=task.id,
+                                                       approved_scope=step_scope(task, premise, require_approval(task, self.project)))
+                    if not matches or premise.evidence["verification"]["outcome"] in {"failed", "unavailable"}:
+                        task.status, task.error = "paused", f"step {dependency} evidence needs explicit invalidation/review: {reasons}"
+                        save(task)
+                        return task
             task.current_index = task.steps.index(step)
             step.status = "running"
+            step.evidence = {}
             step.started_at = time.time()
             save(task)
             checkpoint = None
             try:
                 checkpoint = self.changeset.checkpoint()
+                self.task_backend.bind_steps([step.index])
+                effective_scope = step_scope(task, step, require_approval(task, self.project))
                 self._execute_step(task, step)
                 require_scope(task, self.changeset)
+                after_manifest = self.changeset.validate_workspace()
+                step_delta = {path for path in checkpoint["files"].keys() | after_manifest.keys()
+                              if checkpoint["files"].get(path) != after_manifest.get(path)}
+                if step_delta - effective_scope:
+                    raise ChangeSetConflict("step mutations exceed reviewed goal scope")
                 self.cancel_check()
+                indexed = self._refresh_index(self.changeset.workspace)
+                task.tree_fingerprint = indexed["fingerprint"]
+                if self.changeset.validate_workspace() != after_manifest:
+                    raise ChangeSetConflict("workspace changed while binding step evidence")
+                self._record_step_evidence(task, step, checkpoint["files"], after_manifest, effective_scope)
                 step.status = "done"
                 step.result_summary = step.result_summary or "ok"
                 step.finished_at = time.time()
@@ -419,7 +528,8 @@ class TaskRunner:
                 continue
             except Exception as exc:
                 step.status = "failed"
-                step.result_summary = f"{type(exc).__name__}: {exc}"[:500]
+                message = exc.message if isinstance(exc, StepFailure) else str(exc)
+                step.result_summary = f"{type(exc).__name__}: {message}"[:500]
                 step.finished_at = time.time()
                 if isinstance(exc, UnresolvedEffects):
                     self._hold_effects(task)  # Durable even when optional artifacts are disabled.
@@ -430,7 +540,7 @@ class TaskRunner:
                     self._refresh_index(self.changeset.workspace, recovering=True)
                 except Exception as restore_error:
                     task.status = "failed"
-                    task.error = f"workspace rollback failed: {restore_error}"
+                    task.error = f"workspace rollback failed: {type(restore_error).__name__}: {restore_error}"
                     save(task)
                     return task
                 save(task)
@@ -453,17 +563,28 @@ class TaskRunner:
 
             # Finish other independently authorized work before replanning a
             # failed dependency. Blocked descendants remain explicit in state.
-            if any(s.status in {"pending", "blocked"} and all(
-                    next(d for d in task.steps if d.index == dep).status == "done" for dep in s.depends_on)
-                   for s in task.steps):
+            if task_frontier(task)["ready"]:
                 task.current_index = 0
                 continue
 
-            return self._replan_failed_step(task, step)
+            result = self._replan_failed_step(task, step)
+            if result.status == "running":
+                continue
+            return result
 
         # Completion is recorded only after publishing the workspace successfully.
         save(task)
         return task
+
+    def _require_replan_runtime(self, task):
+        envelope = task.plan_approval.get("internal_replan")
+        if envelope is None:
+            return
+        try:
+            if self.capability_factory is not None or runtime_digest(self.config, self.project, self.backend) != envelope["runtime_digest"]:
+                raise ValueError("runtime, policy, trust or capabilities changed")
+        except (OSError, ValueError, KeyError) as exc:
+            raise ChangeSetConflict(f"internal replan runtime binding changed: {exc}; fresh review required") from exc
 
     def _replan_failed_step(self, task: Task, step: Step) -> Task:
         """Replan only after all independently runnable work has drained."""
@@ -484,7 +605,48 @@ class TaskRunner:
 
         try:
             self.cancel_check()
+            self._check_effects(task)
+            check_accounting(task)
+            require_scope(task, self.changeset)
+            self._require_replan_runtime(task)
+        except (ChangeSetConflict, BudgetExceeded, UnresolvedEffects) as exc:
+            task.status, task.error = "paused", str(exc)
+            save(task)
+            return task
+        previous_approval = deepcopy(task.plan_approval)
+        autonomous = previous_approval.get("schema_version") == 2
+        if autonomous:
+            envelope = previous_approval["internal_replan"]
+            signature = failure_signature(step.result_summary)
+            if signature and envelope["replan_failures"].count(signature) < 2:
+                envelope["replan_failures"].append(signature)
+            if no_progress(previous_approval, step.result_summary):
+                task.plan_approval = review_payload(task, self.project, previous_approval["allowed_paths"],
+                                                    internal_replan=envelope)
+                task.status, task.error = "paused", "no-progress guard: recurring failure requires fresh review"
+                save(task)
+                return task
+        try:
+            requirements_context = replan_requirements(task.goals, task.steps)
+        except ValueError as exc:
+            task.status, task.error = "paused", str(exc)
+            save(task)
+            return task
+        try:
             self.task_backend.phase = "replan"
+            self.task_backend.bind_steps([s.index for s in task.steps if s.status not in {"done", "superseded"}])
+            import json
+
+            from atomic_flow.agents.step_evidence import manifest_digest
+            planning_context = json.dumps({
+                "workspace_revision": manifest_digest(self.changeset.validate_workspace()),
+                "graph_revision": task.tree_fingerprint, "context_revision": self.read_plan_report.get("revision", ""),
+                "remaining_model_calls": max(0, self.config.task.max_model_calls - sum(
+                    not e.get("not_sent") for e in task.budget_events)),
+                "budget_spent_usd": task.budget_spent,
+                "task_budget_cap_usd": self.config.task.max_budget_usd,
+                "observations": [{"index": s.index, "status": s.status, "receipt": s.evidence.get("digest", "")}
+                                 for s in task.steps][-16:]}, ensure_ascii=False)
             new_plan = replan_task(
                 task.query,
                 completed=[f"{s.index + 1}. {s.description}" for s in task.steps if s.status == "done"],
@@ -496,6 +658,8 @@ class TaskRunner:
                 project_root=self.changeset.workspace,
                 backend=self.task_backend,
                 settings_project=self.project,
+                requirements_context=requirements_context,
+                planning_context=planning_context,
             )
         except BudgetExceeded as exc:
             task.status, task.error = "paused", str(exc)
@@ -516,50 +680,158 @@ class TaskRunner:
             return task
 
         base_index = max(s.index for s in task.steps) + 1
+        new_steps = self._steps(new_plan, base_index)
+        if len(task.steps) + len(new_steps) > 128:
+            task.status, task.error = "paused", "task history exceeds 128 steps; start a reviewed continuation"
+            save(task)
+            return task
+        new_goals = self._goals(new_plan, base_index)
+        try:
+            validate_goals(task.goals + new_goals, task.steps + new_steps)
+        except ValueError as exc:
+            task.status, task.error = "paused", f"replan goal bounds require fresh plan: {exc}"
+            save(task)
+            return task
+        accepted, reasons = envelope_preserved(previous_approval, new_steps, failure=step.result_summary,
+                                               budget_spent=task.budget_spent)
+        if task.goals or new_goals or any(s.acceptance_criteria or s.scope_paths or s.linked_code_nodes or s.linked_test_nodes
+                                        for s in task.steps + new_steps):
+            accepted = False
+            reasons.append("goal/acceptance obligations require fresh review after replanning")
         for previous in task.steps:
             if previous.status != "done":
                 previous.status = "superseded"
-        task.steps.extend(self._steps(new_plan, base_index))
+        task.steps.extend(new_steps)
+        task.goals.extend(new_goals)
         task.rationale = new_plan.rationale
         task.replan_count += 1
         task.current_index = len(task.steps) - len(new_plan.steps)
         task.plan_approval = {}
         task.status, task.error = "paused", "replanned work requires fresh plan review and approval"
+        if autonomous and accepted:
+            try:
+                self.cancel_check()
+                check_accounting(task)
+                self._check_effects(task)
+                with source_mutation_lease(self.project):
+                    review = review_payload(task, self.project, previous_approval["allowed_paths"],
+                                            internal_replan=previous_approval["internal_replan"])
+                    if any(review[key] != previous_approval[key] for key in ("source_manifest", "scope_hashes", "allowed_paths")):
+                        raise ChangeSetConflict("source or path scope changed during replan")
+                    task.plan_approval = review
+                    self._require_replan_runtime(task)
+                    require_scope(task, self.changeset)
+                task.status, task.error = "running", ""
+            except (OSError, ValueError, BudgetExceeded, UnresolvedEffects) as exc:
+                task.plan_approval = {}
+                task.error = f"internal replan requires fresh review: {exc}"
+        elif autonomous:
+            task.error = "internal replan requires fresh review: " + "; ".join(reasons)
         save(task)
         return task
 
 
-    def _read_plan(self, task: Task, workspace) -> str:
+    def _read_plan(self, task: Task, workspace, step: Step | None = None) -> str:
         """Host-computed advisory read order for the approved paths (P04).
 
         Bounded, deterministic, model-free; graph problems degrade to an
         explicit notice instead of silently skipping the plan.
         """
         try:
-            from atomic_flow.graph.impact import context_pack
+            from atomic_flow.graph.adapter_ast import EXTRACTOR
+            from atomic_flow.graph.impact import ContextPackIndex, context_pack_from_index, select_goals
             from atomic_flow.graph.project import project_files
 
-            goals = sorted({path for path in require_approval(task, self.project)
-                            if (workspace / path).is_file()})
+            paths = require_approval(task, self.project)
+            limits = self.changeset.limits if self.changeset else self.resource_limits or ProjectLimits()
+            key = (task.id, str(workspace.resolve()), tuple(sorted(paths)), EXTRACTOR,
+                   tuple(self.config.tree.ignore), self.config.tree.respect_gitignore, limits, self.changeset is not None)
+            if key != self._read_plan_key:
+                self._read_plan_index, self._read_plan_key = ContextPackIndex(), key
+            files = project_files(workspace, tree_ignore=self.config.tree.ignore,
+                                  respect_gitignore=self.config.tree.respect_gitignore,
+                                  private_workspace=self.changeset is not None, limits=limits,
+                                  cancel_check=self.cancel_check)
+            self._read_plan_index.update(files, cancel_check=self.cancel_check, max_nodes=limits.max_nodes)
+            description = (step.description + " " + step.expected_outcome) if step is not None else getattr(task, "query", "")
+            goals, omitted_goals = select_goals(self._read_plan_index, paths, description)
+            # The index was already reconciled above, so pack construction must
+            # preserve those counters instead of claiming a second warm update.
+            stats = dict(self._read_plan_index.stats)
             if not goals:
-                return ""
-            files = project_files(workspace)
-            pack = context_pack(files, goals)
+                self.read_plan_report = {"revision": self._read_plan_index.revision, "stats": stats, "goals": [],
+                                         "reason": "no step-specific approved Python target matched"}
+                return "Host read plan: no step-specific approved Python target matched; search admitted source before editing."
+            pack = context_pack_from_index(self._read_plan_index, goals, cancel_check=self.cancel_check)
+            self.read_plan_report = {"revision": pack["revision"], "stats": stats, "goals": goals,
+                                     "omitted_goal_candidates": omitted_goals, "parse_failures": pack["parse_failures"]}
             lines = ["Host read plan (advisory, name-level; read goal files completely, "
                      "following read_file/read_node next_offset, before any edit):"]
             for entry in pack["entries"][:12]:
                 note = " [over byte cap: read selectively]" if entry.get("truncated") else ""
                 lines.append(f"- {entry['file']} ({entry['bytes']} bytes) - {entry['reason']}{note}")
+            omitted = max(0, len(pack["entries"]) - 12)
+            if omitted or omitted_goals or pack["parse_failures"]:
+                lines.append(f"Partial advisory plan: {omitted} entries / {omitted_goals} goal candidates omitted; "
+                             f"{len(pack['parse_failures'])} parse failures. Use source tools; this is not read proof.")
             text = "\n".join(lines)
             return text if len(text) <= 2000 else text[:1997] + "\n..."
-        except Exception as exc:  # advisory only; the step itself must proceed
+        except TaskCancelled:
+            self._read_plan_index = self._read_plan_key = None
+            self.read_plan_report = {"reason": "cancelled"}
+            raise
+        except Exception as exc:  # advisory only; no partial cache may survive
+            self._read_plan_index = self._read_plan_key = None
+            self.read_plan_report = {"reason": type(exc).__name__}
             return f"Host read plan unavailable ({type(exc).__name__}); read approved files completely before editing."
 
+    def explain_next(self, task_id: str, *, horizon: int = 3) -> dict:
+        """Read-only structural readiness, never an execution authorization."""
+        from atomic_flow.agents.frontier import task_frontier
+
+        task = load(task_id)
+        if Path(task.project).resolve() != self.project.resolve():
+            raise ChangeSetConflict("task belongs to another project")
+        view = task_frontier(task, horizon=horizon)
+        view["graph_revision"] = task.tree_fingerprint
+        from atomic_flow.agents.changeset import _files
+        from atomic_flow.agents.step_evidence import receipt_matches
+        manifest = (ChangeSet.open(self.project, task.changeset_id).validate_workspace()
+                    if task.changeset_id and task.status not in {"done", "failed", "cancelled"}
+                    else _files(self.project, user_dir().resolve()))
+        view["evidence"] = [{"index": s.index, "current": receipt_matches(s.evidence, s, manifest, task_id=task.id,
+                             approved_scope=step_scope(task, s, task.plan_approval.get("allowed_paths", []))
+                             if task.plan_approval else None)[0],
+                             "receipt": s.evidence.get("digest", ""), "legacy_missing": not bool(s.evidence)}
+                            for s in task.steps if s.status == "done"]
+        return view
+
+    def _record_step_evidence(self, task, step, before_manifest, after_manifest, effective_scope):
+        from atomic_flow.agents.step_evidence import build_receipt
+        calls = self._step_tool_calls.pop(step.index, [])
+        # Retrieval skeletons, role context and host auto-pytest can observe
+        # files absent from tool transcripts. Until coverage is host-proven,
+        # bind the whole snapshot; declared node links cannot narrow it.
+        step.evidence = build_receipt(task.id, step, before_manifest=before_manifest, after_manifest=after_manifest,
+                                      approved_scope=effective_scope, tool_calls=calls,
+                                      verification_outcome="not_run" if step.verify_with == "none" else "passed",
+                                      graph_revision=task.tree_fingerprint,
+                                      context_revision=self.read_plan_report.get("revision", ""),
+                                      premise_paths=None)
+
     def _execute_step(self, task: Task, step: Step) -> None:
+        from atomic_flow.agents.frontier import frontier_context
+
         base_query = f"[Step {step.index + 1}/{len(task.steps)}] {step.description}"
         workspace = self.changeset.workspace if self.changeset else self.project
         subquery = base_query
-        plan_text = self._read_plan(task, workspace)
+        subquery += "\n" + frontier_context(task)
+        if step.parent_goal or step.acceptance_criteria:
+            import json
+            requirements = {"ancestor_goals": goal_context(task.goals, step),
+                            "step_acceptance_criteria": step.acceptance_criteria}
+            subquery += "\nReviewed requirements (criteria are not proof of completion):\n" + json.dumps(requirements, ensure_ascii=False)
+        plan_text = self._read_plan(task, workspace, step)
         if plan_text:
             # The plan rides in the model-visible query only; retrieval keeps
             # ranking on the pristine step description so context selection
@@ -573,14 +845,22 @@ class TaskRunner:
             capabilities = self.capability_factory(context)
             if not isinstance(capabilities, TaskCapabilities):
                 raise StepFailure(step.index, "capability factory must return TaskCapabilities")
+        envelope = task.plan_approval.get("internal_replan")
+        if envelope is not None:
+            from atomic_flow.agents.tools import ROLE_TOOLS
+            allowed = set(envelope["allowed_tools"])
+            capabilities.role_tools = {role: [tool for tool in tools if tool in allowed]
+                                       for role, tools in ROLE_TOOLS.items()}
+        effective_scope = step_scope(task, step, require_approval(task, self.project))
         orch = Orchestrator(self.config, workspace, self.task_backend, approval_callback=self.approval_callback,
                             settings_project=self.project, cancel_check=self.cancel_check,
                             question_callback=self.question_callback, private_workspace=self.changeset is not None,
-                            mutation_scope=require_approval(task, self.project),
+                            mutation_scope=effective_scope,
                             workspace_session=capabilities.workspace_session, lsp_client=capabilities.lsp_client,
                             documentation_client=capabilities.documentation_client, hooks=capabilities.hooks,
                             tool_registry=capabilities.tool_registry, role_tools=capabilities.role_tools)
         result = orch.answer(subquery, mode="medium", approve_edits=True, retrieval_query=base_query)
+        self._step_tool_calls[step.index] = result.tool_calls or []
         step.request_id = result.ledger_id
         if self.changeset:
             edits = {}
@@ -593,7 +873,7 @@ class TaskRunner:
                     else:
                         edits[summary["path"]] = summary.get("content_hash")
             for path, expected_hash in edits.items():
-                if path not in require_approval(task, self.project):
+                if path not in effective_scope:
                     raise ChangeSetConflict("mutation path exceeds reviewed plan scope")
                 self.changeset.track(path, expected_hash)
         self._verify_step(step, result)

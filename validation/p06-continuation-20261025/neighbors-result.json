@@ -1,0 +1,19 @@
+{
+  "capture": "write_stdin session 79430 final tool output",
+  "exit_code": 0,
+  "passed": 85,
+  "skipped": 2,
+  "seconds": 153.81,
+  "files": [
+    "tests/test_task.py",
+    "tests/test_task_changeset.py",
+    "tests/test_task_budget.py",
+    "tests/test_cli.py",
+    "tests/test_execution.py",
+    "tests/test_completion_diagnostics.py",
+    "tests/test_task_execution.py",
+    "tests/test_composition_acceptance.py"
+  ],
+  "stdout_summary": "85 passed, 2 skipped in 153.81s (0:02:33)",
+  "not_a_raw_stdout_file": true
+}

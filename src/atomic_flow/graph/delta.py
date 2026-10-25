@@ -17,18 +17,27 @@ from atomic_flow.graph.schema import GraphContractError, file_id
 from atomic_flow.graph.store import GraphGenerationConflict, GraphStore
 
 
-def file_delta(path: str, new_bytes: bytes | None, *, expected_old_digest: str | None):
-    """Ops for one file: None bytes delete the file from the graph."""
+def file_delta(path: str, new_bytes: bytes | None, *, expected_old_digest: str | None,
+               base_generation: int | None = None):
+    """Ops for one file; optionally bind planning to a specific generation.
+
+    None/empty old digest means the file must be absent, never an unconditional
+    overwrite. Legacy callers without base_generation bind to the snapshot at
+    apply entry, while callers that retain a planned delta can bind it earlier.
+    """
+    if base_generation is not None and (type(base_generation) is not int or base_generation < 0):
+        raise GraphContractError("base generation must be a non-negative integer")
     owned = file_id(path)
     if new_bytes is None:
         return {"path": path, "put_nodes": [], "put_edges": [],
                 "drop_node_ids": [owned], "parsed_files": 0, "deleted": True,
-                "new_digest": None, "expected_old_digest": expected_old_digest}
+                "new_digest": None, "expected_old_digest": expected_old_digest,
+                "base_generation": base_generation}
     payload = adapt_file(path, new_bytes)
     return {"path": path, "put_nodes": payload["nodes"], "put_edges": payload["edges"],
             "drop_node_ids": [owned], "parsed_files": 1, "deleted": False,
             "new_digest": payload["nodes"][0]["source"]["digest"],
-            "expected_old_digest": expected_old_digest}
+            "expected_old_digest": expected_old_digest, "base_generation": base_generation}
 
 
 def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
@@ -49,8 +58,36 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
     modules = module_map(sorted(file_nodes))
     exports = exports_by_file(post_nodes)
 
+    old_edges = store.edges()
     affected = {path}
-    for edge in store.edges():
+    # Add/delete can resolve a previously unresolved import or change module
+    # precedence (__init__.py vs a same-named module). The old resolved graph
+    # cannot describe such consumers. Inspect stored raw imports, but only run
+    # the resolver for files depending on changed module/export bindings.
+    pre_files = {n["path"]: n for n in nodes_pre if n["kind"] == "file"}
+    pre_modules = module_map(sorted(pre_files))
+    pre_exports = exports_by_file(nodes_pre)
+    changed_modules = {name for name in pre_modules.keys() | modules.keys()
+                       if pre_modules.get(name) != modules.get(name)}
+    changed_exports = {candidate for candidate in pre_exports.keys() | exports.keys()
+                       if pre_exports.get(candidate) != exports.get(candidate)}
+    for candidate_path, node in file_nodes.items():
+        if candidate_path not in pre_files:
+            affected.add(candidate_path)
+            continue
+        for name in node["facts"].get("imports", []):
+            parts = name.split(".")
+            prefixes = [".".join(parts[:size]) for size in range(len(parts), 0, -1)]
+            if any(prefix in changed_modules for prefix in prefixes):
+                affected.add(candidate_path)
+                break
+            imported = next((modules[prefix] for prefix in prefixes if prefix in modules
+                             and modules[prefix] != candidate_path), None)
+            if imported in changed_exports:
+                affected.add(candidate_path)
+                break
+    # Preserve the existing neighbour invalidation for the changed file.
+    for edge in old_edges:
         if edge.get("facts_class") != "inferred" or edge["status"] != "active":
             continue
         src_file = edge["src"][len("file:"):] if edge["src"].startswith("file:") else edge["src"].split("::")[0][len("sym:"):]
@@ -60,7 +97,7 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
             affected.add(dst_file)
 
     dropped: set[str] = set()
-    for edge in store.edges():
+    for edge in old_edges:
         if edge.get("facts_class") != "inferred":
             continue
         src_file = edge["src"][len("file:"):] if edge["src"].startswith("file:") else edge["src"].split("::")[0][len("sym:"):]
@@ -82,24 +119,27 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
 def apply_delta(store: GraphStore, delta: dict[str, Any]) -> dict[str, Any]:
     """Validate digests, then commit; returns instrumentation for the report."""
     path, expected = delta["path"], delta.get("expected_old_digest")
+    base_generation = delta.get("base_generation")
+    if base_generation is None:
+        base_generation = store.generation
+    if base_generation != store.generation:
+        raise GraphContractError("delta superseded: store generation moved since planning")
     drop_ids = set(delta["drop_node_ids"])
-    if expected is not None or not delta["deleted"]:
-        # A file-level delta owns every node of that path; stale symbols of
-        # the previous revision must not survive the replacement.
-        drop_ids.update(node["id"] for node in store.nodes() if node["path"] == path)
-    if expected is not None:
-        node = next((n for n in store.nodes() if n["id"] == file_id(path)), None)
-        stored_digest = node["source"]["digest"] if node else ""
-        if stored_digest != expected:
-            raise GraphContractError(
-                f"source changed since delta was built: {path} (expected {expected[:12]}, "
-                f"store has {stored_digest[:12] or 'no file'})")
+    # A file-level delta owns every node of that path; stale symbols of
+    # the previous revision must not survive the replacement.
+    drop_ids.update(node["id"] for node in store.nodes() if node["path"] == path)
+    node = next((n for n in store.nodes() if n["id"] == file_id(path)), None)
+    stored_digest = node["source"]["digest"] if node else ""
+    if stored_digest != (expected or ""):
+        raise GraphContractError(
+            f"source changed since delta was built: {path} (expected {(expected or '')[:12] or 'no file'}, "
+            f"store has {stored_digest[:12] or 'no file'})")
     relink_edges, dropped_edges, relinked, unresolved = _relink(store, delta, drop_ids)
     put_edges = list(delta["put_edges"])
     put_edge_ids = {edge["id"] for edge in put_edges}
     put_edges.extend(edge for edge in relink_edges if edge["id"] not in put_edge_ids)
     try:
-        generation = store.commit(base_generation=store.generation,
+        generation = store.commit(base_generation=base_generation,
                                   put_nodes=delta["put_nodes"], put_edges=put_edges,
                                   drop_node_ids=sorted(drop_ids), drop_edge_ids=dropped_edges)
     except GraphGenerationConflict as exc:
