@@ -43,3 +43,13 @@ def test_original_bounds_remain_unchanged_and_diagnostic_is_bounded():
     assert pilot.PROFILES["original"] == {"calls": 6, "input": 240_000, "wall": 600, "cost": .05}
     assert pilot.PROFILES["p05-diagnostic"]["calls"] == 20
     assert pilot.PROFILES["p05-diagnostic"]["cost"] == 1.8
+
+
+def test_long_wall_profile_builds_schema_valid_backend_config():
+    from atomic_flow.config import BackendConfig
+    wall = pilot.PROFILES["p05-diagnostic"]["wall"]  # 1200 s aggregate deadline
+    config = BackendConfig(type="kaggle", name="host_model_proxy", model=pilot.MODEL,
+                           base_url="http://127.0.0.1:9/openapi", api_key_env="MODEL_PROXY_API_KEY",
+                           max_retries=0, timeout_seconds=min(wall, 600),
+                           max_output_tokens=2048, price_in_per_mtok=0.10, price_out_per_mtok=0.40)
+    assert config.timeout_seconds == 600  # per-call cap; aggregate wall stays on the backend

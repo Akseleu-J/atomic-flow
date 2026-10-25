@@ -319,7 +319,10 @@ def main():
     write_json(output / "report.json", report)
     config = BackendConfig(type="kaggle", name="host_model_proxy", model=args.model,
                            base_url=endpoint.rstrip("/") if endpoint.rstrip("/").endswith("/openapi") else endpoint.rstrip("/") + "/openapi",
-                           api_key_env="MODEL_PROXY_API_KEY", max_retries=0, timeout_seconds=args.max_wall_seconds,
+                           api_key_env="MODEL_PROXY_API_KEY", max_retries=0,
+                           # Per-call transport timeout is schema-capped at 600 s;
+                           # the aggregate wall deadline stays on PilotBackend.
+                           timeout_seconds=min(args.max_wall_seconds, 600),
                            max_output_tokens=args.max_output_tokens, price_in_per_mtok=args.price_in, price_out_per_mtok=args.price_out)
     backend = PilotBackend(OpenAICompatibleBackend(config, backend_name="host_model_proxy"), output, limits, started + args.max_wall_seconds)
     previous_home = os.environ.get("ATOMIC_FLOW_HOME")
