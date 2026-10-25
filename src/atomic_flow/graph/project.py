@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from atomic_flow.graph.adapter_ast import adapt_file
+from atomic_flow.graph.resolve import exports_by_file, infer_file_edges, module_map
 
 
 def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
@@ -32,8 +33,17 @@ def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
         if node["kind"] in {"class", "function"}:
             leaf = node["symbol"].rsplit(".", 1)[-1]
             exports.setdefault(leaf, []).append(node["id"])
+    modules = module_map(sorted(files))
+    by_file_exports = exports_by_file(nodes)
+    unresolved: list[str] = []
+    for node in nodes:
+        if node["kind"] != "file":
+            continue
+        inferred = infer_file_edges(node, modules=modules, exports=by_file_exports)
+        edges.extend(inferred["edges"])
+        unresolved.extend(f"{node['path']}: {item}" for item in inferred["unresolved"])
     return {"nodes": nodes, "edges": edges, "reverse": reverse, "exports": exports,
-            "parsed_files": len(files)}
+            "parsed_files": len(files), "unresolved": sorted(unresolved)}
 
 
 def project_files(root: Path, *, suffix: str = ".py") -> dict[str, bytes]:
