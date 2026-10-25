@@ -151,7 +151,12 @@ def test_failed_orchestrator_response_does_not_lose_cost(tmp_path):
     cfg = AtomicConfig()
     cfg.task.max_replans = 0
     task = TaskRunner(cfg, project, backend).run_plan("report", Plan(steps=[PlanStep(description="Report sample", verify_with="none")]))
-    assert task.status == "failed"
+    # Unclassified orchestration exceptions pause fail-closed under P06.
+    # A pause must still settle every completed response and never trigger replay.
+    assert task.status == "paused"
+    assert task.last_failure_decision["action"] == "stop"
+    assert "unclassified" in task.error
+    assert task.replan_count == 0
     assert task.budget_spent == pytest.approx(len(backend.calls) * 0.001)
     assert SpendLedger(10).today_total() == pytest.approx(task.budget_spent)
 
