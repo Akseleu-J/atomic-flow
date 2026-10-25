@@ -22,7 +22,13 @@ Base SHA → result SHA / PR:
   - Publication hot path delta-syncs .atomic_flow/graph.json (content-CAS +
     closure relink; reasoned fallback; failures recorded, never flip a
     completed publication). Task.graph_sync field; budget_events untouched.
-  - §7.7 scripted journey green: edit→checks→publish→graph parity.
+  - §7.7 scripted journey green: edit→checks→publish→graph parity; adversarial
+    sync-crash row green (publication stays done).
+  - lineage_preserved() WIRED into the live internal-replan path: an
+    obligation-keeping hierarchical replan continues autonomously; a replan
+    that drops any criterion/scope/check pauses naming each lost obligation
+    (replaces the old blanket pause; test_goal_hierarchy updated to the
+    stronger message).
 
 Local checks:
   tests/test_replan_lineage.py 6, test_failure_policy.py 15,
@@ -48,10 +54,10 @@ Real executor / protocol / live model evidence: отдельно:
 Независимый review: PENDING (reviewer session running; self-review не считается).
 
 Известные ограничения и внешний blocker:
-  - lineage/failure-table not yet consulted by task_loop replan path
-    (schema-2 checks remain authoritative) — wiring is the next slice.
-  - crash-during-sync and malicious-instruction-during-repair rows not yet
-    scripted; graph sync does not feed retrieval.
+  - failure_policy table still a contract, not the sole decision source in
+    task_loop (envelope+lineage are; classification wiring remains).
+  - malicious-instruction-during-repair row relies on existing policy suites,
+    no new dedicated journey yet; graph sync does not feed retrieval.
   - live diagnostic blocked by host RAM (3.4 GiB) for SymPy-scale runs.
 
 Решение: OPEN — awaiting independent review + remaining slices above.

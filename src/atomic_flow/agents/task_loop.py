@@ -14,6 +14,7 @@ from atomic_flow.agents.execution import TaskCancelled, run_python
 from atomic_flow.agents.goals import Goal, goal_context, replan_requirements, step_scope, validate_goals
 from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
 from atomic_flow.agents.planner import Plan, plan_task, replan_task
+from atomic_flow.agents.replan_lineage import lineage_preserved
 from atomic_flow.agents.task import Step, Task, load, save
 from atomic_flow.agents.task_budget import TaskBudgetBackend, check_accounting
 from atomic_flow.config import AtomicConfig, user_dir
@@ -719,8 +720,23 @@ class TaskRunner:
                                                budget_spent=task.budget_spent)
         if task.goals or new_goals or any(s.acceptance_criteria or s.scope_paths or s.linked_code_nodes or s.linked_test_nodes
                                         for s in task.steps + new_steps):
-            accepted = False
-            reasons.append("goal/acceptance obligations require fresh review after replanning")
+            # Formal lineage gate (ADR-0001): obligations may be carried by a
+            # replacement plan only when the pure predicate proves nothing is
+            # lost; anything else still needs fresh review.
+            envelope = previous_approval.get("internal_replan") or {}
+            obligations = {
+                "criteria": sorted({criterion for holder in [*task.goals, *new_goals, *task.steps, *new_steps]
+                                    for criterion in getattr(holder, "acceptance_criteria", ())}),
+                "scope_paths": previous_approval.get("allowed_paths"),
+                "max_budget_usd": envelope.get("max_budget_usd"),
+                "required_checks": {envelope["required_verify"]} if envelope.get("required_verify") else set(),
+            }
+            lineage_ok, lineage_reasons = lineage_preserved(obligations, [
+                {"criteria": list(s.acceptance_criteria), "scope_paths": s.scope_paths or None,
+                 "checks": [s.verify_with], "budget_usd": None} for s in new_steps])
+            if not lineage_ok:
+                accepted = False
+                reasons.extend(lineage_reasons)
         for previous in task.steps:
             if previous.status != "done":
                 previous.status = "superseded"
