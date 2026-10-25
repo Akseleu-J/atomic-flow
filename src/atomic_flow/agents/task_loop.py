@@ -177,6 +177,55 @@ class TaskRunner:
         task = self.approve(task, review["digest"], allowed_paths=allowed_paths)
         return self.resume(task)
 
+    def invalidate_step(self, task_id: str, index: int, reason: str) -> Task:
+        """Host-explicit requeue of a done step (roadmap P05).
+
+        Re-running succeeded work requires an explicit, recorded reason. The
+        invalidation cascades to done steps whose premises (transitive
+        depends_on) include the target. Published/completed tasks are refused:
+        their external effects must never be replayed; start a new task.
+        """
+        if not reason or not reason.strip():
+            raise ChangeSetConflict("step invalidation requires an explicit reason")
+        with task_lease(task_id):
+            task = load(task_id)
+            if task.status == "done":
+                raise ChangeSetConflict("completed task is immutable; create a new task instead of replay")
+            if task.changeset_id:
+                state = ChangeSet.open(self.project, task.changeset_id).state["status"]
+                if state in {"published", "publishing", "recovery_conflict"}:
+                    raise ChangeSetConflict("published effects cannot be replayed; create a new task")
+            by_index = {step.index: step for step in task.steps}
+            if index not in by_index:
+                raise ChangeSetConflict(f"unknown step index: {index}")
+            if by_index[index].status != "done":
+                raise ChangeSetConflict(f"step {index} is {by_index[index].status}; only done steps are invalidated")
+
+            dependents: set[int] = set()
+            frontier = [index]
+            while frontier:
+                current = frontier.pop()
+                for step in task.steps:
+                    if step.index in dependents or step.status != "done":
+                        continue
+                    if current in step.depends_on:
+                        dependents.add(step.index)
+                        frontier.append(step.index)
+            targets = sorted({index, *dependents})
+            for target in targets:
+                step = by_index[target]
+                step.status = "pending"
+                step.blocked_reason = ""
+                step.invalidated_reason = f"step {index}: {reason.strip()}"
+                step.result_summary = ""
+                step.request_id = ""
+                step.started_at = step.finished_at = None
+            task.current_index = min(task.current_index, targets[0])
+            if task.status in {"failed", "paused"}:
+                task.status, task.error = "paused", ""
+            save(task)
+            return task
+
     def resume(self, task: Task) -> Task:
         with task_lease(task.id):
             try:
