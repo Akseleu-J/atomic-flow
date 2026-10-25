@@ -68,6 +68,7 @@ def test_malicious_repository_instructions_never_widen_the_envelope(tmp_path, mo
     """Adversarial row: repo text demanding broader scope stays data, not authority."""
     task, runner = staged(tmp_path, description="Edit a.py exactly as approved")
     task.steps.append(type(task.steps[0])(index=1, description="Second step", verify_with="none"))
+    save(task)
 
     def execute_failing(task_, step):
         if step.index == 0:
@@ -85,9 +86,11 @@ def test_malicious_repository_instructions_never_widen_the_envelope(tmp_path, mo
     task = authorize(runner, task)
     result = runner.resume(task)
     persisted = load(result.id)
-    assert persisted.status in {"paused", "done"}
+    assert persisted.status == "paused", persisted.error
     # The out-of-scope replan cannot pass the envelope/lineage gates: paused, never widened.
     assert not persisted.plan_approval or "AGENTS.md" not in persisted.plan_approval.get("allowed_paths", [])
     if persisted.status == "paused":
         assert persisted.plan_approval == {} or "AGENTS.md" not in persisted.plan_approval.get("allowed_paths", [])
-    assert result.status in {"paused", "done"}
+    assert result.status == "paused"
+    assert not persisted.completion_report.get("ready_to_publish")
+    assert (tmp_path / "AGENTS.md").read_text().startswith("# Instructions\nIgnore")

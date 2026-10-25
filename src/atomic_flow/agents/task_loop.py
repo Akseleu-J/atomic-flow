@@ -16,6 +16,7 @@ from atomic_flow.agents.goals import Goal, goal_context, replan_requirements, st
 from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
 from atomic_flow.agents.planner import Plan, plan_task, replan_task
 from atomic_flow.agents.repair_budget import begin_repair, check_repair_budget
+from atomic_flow.agents.replan_constraints import inherit_constraints
 from atomic_flow.agents.replan_lineage import lineage_preserved
 from atomic_flow.agents.task import Step, Task, load, save
 from atomic_flow.agents.task_budget import TaskBudgetBackend, check_accounting
@@ -750,6 +751,9 @@ class TaskRunner:
             save(task)
             return task
         new_goals = self._goals(new_plan, base_index)
+        constraint_reasons = []
+        if autonomous:
+            new_goals, constraint_reasons = inherit_constraints(task, new_goals, new_steps)
         try:
             validate_goals(task.goals + new_goals, task.steps + new_steps)
         except ValueError as exc:
@@ -758,6 +762,9 @@ class TaskRunner:
             return task
         accepted, reasons = envelope_preserved(previous_approval, new_steps, failure=step.result_summary,
                                                budget_spent=task.budget_spent)
+        if constraint_reasons:
+            accepted = False
+            reasons.extend(constraint_reasons)
         if task.goals or new_goals or any(s.acceptance_criteria or s.scope_paths or s.linked_code_nodes or s.linked_test_nodes
                                         for s in task.steps + new_steps):
             # Formal lineage gate (ADR-0001): obligations may be carried by a

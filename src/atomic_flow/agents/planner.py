@@ -191,6 +191,9 @@ RULES
   return exactly ONE step: description="STOP: <reason>", verify_with="none".
 - Otherwise produce 1-6 concrete steps for the remaining work.
 - Preserve unresolved goal/step acceptance criteria explicitly in the new plan.
+  For unchanged goals retain the local ID (after the pN: prefix), exact description,
+  parent, criteria, scope and caps from REVIEWED REQUIREMENTS. A renamed or changed
+  goal needs fresh owner review. Preserve linked code/test nodes and step scopes.
   Goals use local id, optional parent_id, description, acceptance_criteria; each
   hierarchical step names parent_goal. Max 32 goals, depth 4, 8 criteria per node.
   Criteria are requirements, not proof of successful verification.

@@ -166,10 +166,14 @@ def replan_requirements(goals, steps):
     needed.update(key for key, item in observations.items() if item["step_counts"])
     payload = {"goals": [{"id": goal.id, "parent_id": goal.parent_id,
                            "description": goal.description, "acceptance_criteria": goal.acceptance_criteria,
+                           "scope_paths": goal.scope_paths, "max_model_calls": goal.max_model_calls,
+                           "max_budget_usd": goal.max_budget_usd,
                            "observations": observations[goal.id]}
                           for goal in goals if goal.id in needed],
                "steps": [{"index": step.index, "parent_goal": step.parent_goal,
-                          "acceptance_criteria": step.acceptance_criteria} for step in active
+                          "acceptance_criteria": step.acceptance_criteria, "scope_paths": step.scope_paths,
+                          "linked_code_nodes": step.linked_code_nodes,
+                          "linked_test_nodes": step.linked_test_nodes} for step in active
                          if step.parent_goal or step.acceptance_criteria]}
     text = json.dumps(payload, ensure_ascii=False)
     if len(text) > 32000:
