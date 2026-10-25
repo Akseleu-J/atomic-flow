@@ -13,7 +13,14 @@ Package 39 реализует оставшиеся host contracts P05:
 Revision-bound receipts, conservative stale-premise pause, bounded 1–3 child
 expansion/max8/history128, descendant horizon, goal scopes/caps и terminal cancelled
 встроены в прежний runtime. Local JUnit: **208 PASS / 2 SKIP**, 210 unique cases;
-Ruff/compile PASS. Exact-source CI gate ещё должен быть принят на новом commit.
+Ruff/compile PASS. P05 ядра ACCEPTED для `91d22e2d1ed3e4d415bbb72076503cc4c6bf2fe3`:
+оба workflow `40175334384` / `40175334261` SUCCESS. Python 3.11 и 3.12:
+1197 PASS / 14 SKIP каждый; real Docker, 12 installed-wheel jobs и три real
+LSP/MCP composition scenarios PASS. Скачанные host artifacts проверены по ZIP
+checksum, JUnit и normalized SHA256 всех 255 src/tests Python files. Tested PR
+merge `be9fb63` имеет тот же tree `c95e2db`, что опубликованный head.
+Evidence: `validation/p05-ci-20261025/verified.json` (individual 12 wheel archives
+не скачивались этим пакетом; CI jobs passed).
 Evidence: `validation/p05-closure-20261025/`. Docker-free core не означает isolated
 local execution; quality/scale/release/isolated-worker production gates сохраняются.
 

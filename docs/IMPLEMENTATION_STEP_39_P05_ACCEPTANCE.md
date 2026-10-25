@@ -2,7 +2,9 @@
 
 25 октября 2026. Локальный пакет собирает ранее не опубликованные packages 35–38
 и завершает host contracts P05 поверх HEAD `20cdd7767ad846ad42dd9d08fcd709c4d5c11b0d`.
-CI acceptance для нового commit фиксируется отдельно после публикации.
+CI acceptance принят для `91d22e2d1ed3e4d415bbb72076503cc4c6bf2fe3`:
+[Project/container](https://github.com/Akseleu-J/atomic-flow/actions/runs/40175334384),
+[External/installed release](https://github.com/Akseleu-J/atomic-flow/actions/runs/40175334261).
 
 ## Что закрыто в ядре
 
@@ -79,8 +81,13 @@ artifacts для точного tested checkout. Непубликованный 
 
 ## Граница принятия
 
-P05 functional host contracts реализованы; exact-source CI остаётся обязательным
-последним gate этого пакета. Automatic invocation/approval of hierarchical rolling
+P05 functional host contracts ACCEPTED. Exact-source CI: Python 3.11/3.12 каждый
+1197 PASS / 14 SKIP, real Docker acceptance, 12 installed-wheel combinations и
+3 real composition scenarios PASS. ZIP checksums, JUnit и все 255 src/tests Python
+hashes проверены в `validation/p05-ci-20261025/verified.json`. Tested merge SHA
+`be9fb63a075274bdbf7dd8e40671053f01daf34a` и published head имеют одинаковый tree
+`c95e2dbdd4dfb90098a6e7f1601e8b64c1d1978a`. Wheel jobs PASS, индивидуальные 12
+wheel archives не скачивались этим пакетом. Automatic invocation/approval of hierarchical rolling
 expansions, независимый semantic requirement evaluator, measured model utility,
 скорость и scale, полный graph delta hot path, release и isolated-worker acceptance
 не подменяются этим результатом: это следующие P06–P14 и прежние production gates.
