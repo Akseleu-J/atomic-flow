@@ -427,3 +427,8 @@ SymPy: USD 0.001608 — known lower bound, accepted patch/oracle PASS нет.
 Последний MemoryError report имеет request_outcome=unknown; полную стоимость
 не считать нулевой/известной и неизвестный запрос не повторять вслепую.
 В новом пакете live calls=0. Сначала reconciliation и host с достаточной памятью.
+
+P06 конкретный остаток по source-review: repair_budget_usd сейчас metadata;
+per-repair cap ещё не enforced отдельно от общих task/call/replan bounds.
+StepFailure mapping слишком общий: нужны typed host kinds и fresh check evidence.
+Эти пункты обязательны до полного P06 acceptance; CI не доказывает их наличие.
