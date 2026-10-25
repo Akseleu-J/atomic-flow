@@ -62,3 +62,32 @@ def test_publication_hot_path_delta_syncs_graph_to_parity(tmp_path, isolated_hom
     live_edges = sorted((e["kind"], e["src"], e["dst"]) for e in document["edges"])
     clean_edges = sorted((e["kind"], e["src"], e["dst"]) for e in expected["edges"])
     assert live_edges == clean_edges
+
+
+def test_graph_sync_crash_never_flips_completed_publication(tmp_path, isolated_home, monkeypatch):
+    """Adversarial row: the sync leg fails after publish — publication stays done."""
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "sample.py").write_text("def sample():\n    return 1\n", encoding="utf-8")
+    save_tree(project, build_tree(project))
+    new_source = "def sample():\n    return 2\n"
+    responses = iter([
+        {"tool": "edit_node", "args": {"node_id": "sample.py::sample", "new_source": new_source}},
+        {"text": "Done.", "confidence": "high"},
+    ])
+    backend = ScriptedBackend({
+        "parser": {"task_type": "modify", "focus_terms": ["sample"]},
+        "answerer": lambda _user: next(responses),
+        "critic": {"verdict": "ok"},
+    })
+    config = AtomicConfig()
+    config.task.max_replans = 0
+    import atomic_flow.graph.sync as sync_module
+    monkeypatch.setattr(sync_module, "sync_project_graph",
+                        lambda *a, **kw: (_ for _ in ()).throw(RuntimeError("disk died")))
+    runner = TaskRunner(config, project, backend, approval_callback=lambda *a, **k: True)
+    task = runner.run_plan("change sample", Plan(steps=[
+        PlanStep(description="Change sample value", verify_with="py_compile")]))
+    assert task.status == "done", task.error
+    assert (project / "sample.py").read_text(encoding="utf-8") == new_source
+    assert task.graph_sync.get("failed") is True and task.graph_sync.get("error_type") == "RuntimeError"

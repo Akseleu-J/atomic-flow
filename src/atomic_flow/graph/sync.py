@@ -63,7 +63,7 @@ def sync_project_graph(project: Path, changed: dict[str, Any], *, cancel_check=l
         try:
             cancel_check()
             files = project_files(project)
-            store = GraphStore(target) if target.exists() else GraphStore(target)
+            store = GraphStore(target)
             rebuild = fallback_rebuild(store, files, reason)
             _append(log, {"status": "fallback", "reason": reason,
                           "parsed_files": rebuild["parsed_files"],
