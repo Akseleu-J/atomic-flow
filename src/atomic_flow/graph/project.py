@@ -11,7 +11,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
-from atomic_flow.graph.adapter_ast import adapt_file
+from atomic_flow.graph.adapter_resource import adapt_source
 from atomic_flow.graph.resolve import exports_by_file, infer_file_edges, module_map
 
 
@@ -20,7 +20,7 @@ def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
     edges: list[dict] = []
     reverse: dict[str, dict[str, list[str]]] = {"imports": {}, "calls": {}}
     for path in sorted(files):
-        payload = adapt_file(path, files[path])
+        payload = adapt_source(path, files[path])
         nodes.extend(payload["nodes"])
         edges.extend(payload["edges"])
         file_node = payload["nodes"][0]
@@ -46,7 +46,7 @@ def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
             "parsed_files": len(files), "unresolved": sorted(unresolved)}
 
 
-def project_files(root: Path, *, suffix: str = ".py", tree_ignore=None, respect_gitignore=True,
+def project_files(root: Path, *, suffix: str | None = ".py", tree_ignore=None, respect_gitignore=True,
                   private_workspace=False, limits=None, cancel_check=lambda: None) -> dict[str, bytes]:
     """Read a bounded, admitted snapshot; the same bytes are hashed and returned.
 
@@ -93,7 +93,7 @@ def project_files(root: Path, *, suffix: str = ".py", tree_ignore=None, respect_
                           respect_gitignore=respect_gitignore, private_workspace=private_workspace)
     files, total = {}, 0
     for rel, _ in source_files(root, skip, limits, cancel_check, private_root=user_dir().resolve()):
-        if not rel.endswith(suffix):
+        if suffix is not None and not rel.endswith(suffix):
             continue
         if len(files) >= limits.max_files:
             raise ResourceLimitError("read-plan source file limit exceeded")
