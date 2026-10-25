@@ -153,7 +153,11 @@ def test_hierarchical_internal_replan_cannot_drop_original_requirements(tmp_path
 
     monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", replan)
     result = runner.resume(task)
-    assert result.status == "paused" and "goal/acceptance" in result.error
+    # Lineage gate names every dropped obligation (stronger than the old
+    # blanket "goal/acceptance obligations" message).
+    assert result.status == "paused"
+    assert all(f"criterion lost by replan: {criterion!r}" in result.error
+               for criterion in ("Report source facts", "Cite a.py", "Identify the current value"))
     assert calls == [0] and not result.plan_approval
     assert result.goals[0].acceptance_criteria == ["Report source facts"]
     assert planning["goals"][0]["acceptance_criteria"] == ["Report source facts"]
