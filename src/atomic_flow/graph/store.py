@@ -65,16 +65,16 @@ class GraphStore:
             raise GraphGenerationConflict(
                 f"store generation moved to {self._generation}; re-read and retry")
         nodes, edges = dict(self._nodes), dict(self._edges)
+        for node_id in drop_node_ids or []:
+            nodes.pop(node_id, None)
+            edges = {eid: edge for eid, edge in edges.items()
+                     if edge["src"] != node_id and edge["dst"] != node_id}
         for node in put_nodes or []:
             validate_node(node)
             nodes[node["id"]] = node
         for edge in put_edges or []:
             validate_edge(edge)
             edges[edge["id"]] = edge
-        for node_id in drop_node_ids or []:
-            nodes.pop(node_id, None)
-            edges = {eid: edge for eid, edge in edges.items()
-                     if edge["src"] != node_id and edge["dst"] != node_id}
         candidate = GraphStore.__new__(GraphStore)
         candidate.path, candidate._nodes, candidate._edges = self.path, nodes, edges
         candidate._generation = base_generation + 1
