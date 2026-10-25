@@ -48,9 +48,10 @@ def test_publication_hot_path_delta_syncs_graph_to_parity(tmp_path, isolated_hom
     assert task.status == "done", task.error
     assert (project / "sample.py").read_text(encoding="utf-8") == new_source
 
-    # Publication recorded the graph sync on the task.
-    events = [e for e in task.budget_events if e.get("event") == "graph_sync"]
-    assert events and not events[-1].get("failed") and not events[-1].get("fallback")
+    # Publication recorded the graph sync on the task (own field, never
+    # polluting budget_events whose entries must all be charge records).
+    assert task.graph_sync and not task.graph_sync.get("failed") and not task.graph_sync.get("fallback")
+    assert all(event.get("status") == "completed" for event in task.budget_events)
 
     # Delta-synced store equals a clean build of the published sources.
     document = json.loads(store_path(project).read_text(encoding="utf-8"))
