@@ -109,6 +109,8 @@ class TreeConfig(BaseModel):
 
 class TaskConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    max_duration_seconds: float = Field(default=3600, ge=1, le=604800, allow_inf_nan=False,
+                                       description="Reviewed opt-in task envelope duration, measured from task creation")
     max_replans: int = Field(default=2, ge=0, le=5)
     max_budget_usd: float = Field(default=2.0, ge=0)
     fail_on_budget_exceeded: bool = True

@@ -1,0 +1,18 @@
+{
+  "reviewed_head": "5c8de452fa4b6e3c962c84469e2369ae3c257e3b",
+  "runtime_base": "da67d89a86c917249216747f44e82b9239b72ca2",
+  "uncommitted_patch": true,
+  "normalized_sha256": {
+    "src/atomic_flow/agents/envelope.py": "e84cae50cc743b779df4b7a6887bec314c274443b330eefced872b839918ba76",
+    "src/atomic_flow/agents/task_budget.py": "e20751b9e02e57562fedd3a1dfc4c3fadbbe20ea2f55d9e87426106fa5740bbc",
+    "src/atomic_flow/agents/task_loop.py": "da46c58af367cc7a49f1560a725833b40a7aacd9ffc50812abbaf3e89bfe034b",
+    "src/atomic_flow/config.py": "1b4088c42ce27a94a61ebb88451936830d9dc889a614be326e7cddf332188f12",
+    "tests/test_envelope.py": "d6ad1b977595fef01a09dce3dbef1283ebc3a49f05cfb422cdb813c714a8c91c",
+    "tests/test_p06_deadline.py": "10e3018949b25f83ec6dd88c74eb739ca81365213c4d78331485307bb05dbc3b"
+  },
+  "new_paid_calls": 0,
+  "additional_independently_reviewed": {
+    "src/atomic_flow/job_worker.py": "bab45da41fe7fe8b43460b399158b2906c5dd855b679aa98f0bb61a90876c766",
+    "tests/test_job_claim.py": "9adc073b316906cd36625d72f74ce0435b5da45cfcf9e2c2b21215ad6286f8b0"
+  }
+}

@@ -16,7 +16,10 @@ from atomic_flow.locking import exclusive_file
 
 def run_worker(store: JobStore, job_id: str):
     directory = store._directory(job_id)
-    with exclusive_file(directory / "worker.lock", busy_message="worker active"):
+    # Status reconciliation briefly takes the same lease even while queued.
+    # Wait for that observer; then re-read state under the metadata lease so a
+    # late worker cannot replay an already terminal/reconciled request.
+    with exclusive_file(directory / "worker.lock", blocking=True, busy_message="worker active"):
         with store._lease(job_id):
             state = store._read(job_id)
             if state["status"] in TERMINAL:

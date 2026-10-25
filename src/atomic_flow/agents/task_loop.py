@@ -9,7 +9,7 @@ from pathlib import Path
 from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
 from atomic_flow.agents.control import check_cancel, task_lease
 from atomic_flow.agents.effects import UnresolvedEffects
-from atomic_flow.agents.envelope import envelope_preserved, failure_signature, make_envelope, no_progress, runtime_digest
+from atomic_flow.agents.envelope import check_deadline, envelope_preserved, failure_signature, make_envelope, no_progress, runtime_digest
 from atomic_flow.agents.execution import TaskCancelled, run_python
 from atomic_flow.agents.failure_policy import classify
 from atomic_flow.agents.goals import Goal, goal_context, replan_requirements, step_scope, validate_goals
@@ -321,7 +321,10 @@ class TaskRunner:
             self.changeset = None
             if task.status in {"done", "failed", "cancelled"}:
                 return task
-            self.cancel_check = lambda: check_cancel(task.id)
+            def check():
+                check_cancel(task.id)
+                check_deadline(task)
+            self.cancel_check = check
             try:
                 check_accounting(task)  # Preserve precise charge diagnostics before effect-journal checks.
                 self._check_effects(task)
@@ -630,6 +633,7 @@ class TaskRunner:
         return task
 
     def _require_replan_runtime(self, task):
+        check_deadline(task)
         envelope = task.plan_approval.get("internal_replan")
         if envelope is None:
             return

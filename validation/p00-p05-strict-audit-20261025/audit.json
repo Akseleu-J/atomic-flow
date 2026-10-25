@@ -1,0 +1,27 @@
+{
+  "snapshot": "5c8de452fa4b6e3c962c84469e2369ae3c257e3b",
+  "all_p00_p05_fully_closed": false,
+  "method": "roadmap/report status audit; graph/watching/activation unchanged since 395b8ac; not a new full module review",
+  "chapters": {
+    "P00": "baseline_accepted_full_extended_gate_unverified",
+    "P01": "open",
+    "P02": "open",
+    "P03": "open",
+    "P04": "open",
+    "P05": "functional_core_accepted_prerequisite_chain_open"
+  },
+  "host_skips": {
+    "total": 14,
+    "docker_opt_in": 10,
+    "windows": 4
+  },
+  "docker_failure": {
+    "run": 40222460255,
+    "job": 121256776428,
+    "artifact": 12610221339,
+    "digest": "sha256:7203a1f3aa4c0598dc5d99e2fe4b92df9d08aab3a1167263b25e52b8e264a020",
+    "cases": "25 PASS / 1 FAIL",
+    "resolution": "pending worker claim investigation"
+  },
+  "new_provider_calls": 0
+}

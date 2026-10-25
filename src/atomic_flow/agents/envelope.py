@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import re
+import time
 from pathlib import Path
 from typing import Any
 
@@ -17,16 +18,24 @@ SOURCE_TOOLS = frozenset({"read_node", "find_callers", "search_tree", "search_te
                           "read_file", "find_files", "notebook_read"})
 SUPPORTED_TOOLS = SOURCE_TOOLS | MUTATING_TOOLS | {"run_command", "ask_user"}
 VERIFY_KINDS = {"none": 0, "py_compile": 1, "pytest": 2}
-ENVELOPE_FIELDS = {"version", "allowed_tools", "required_verify", "max_budget_usd", "max_model_calls",
-                   "max_replans", "runtime_digest", "replan_failures"}
+LEGACY_ENVELOPE_FIELDS = {"version", "allowed_tools", "required_verify", "max_budget_usd", "max_model_calls",
+                          "max_replans", "runtime_digest", "replan_failures"}
+ENVELOPE_FIELDS = LEGACY_ENVELOPE_FIELDS | {"deadline_at"}
 
 
 def validate_envelope(value: Any) -> None:
     """Strict persisted shape; malformed, nonfinite or unbounded data is refused."""
-    if not isinstance(value, dict) or set(value) != ENVELOPE_FIELDS:
+    if not isinstance(value, dict):
         raise ValueError("invalid internal replan envelope fields")
-    if type(value["version"]) is not int or value["version"] != 1:
+    version = value.get("version")
+    if type(version) is not int or version not in {1, 2}:
         raise ValueError("invalid internal replan envelope version")
+    if set(value) != (LEGACY_ENVELOPE_FIELDS if version == 1 else ENVELOPE_FIELDS):
+        raise ValueError("invalid internal replan envelope fields")
+    if version == 2:
+        deadline = value["deadline_at"]
+        if type(deadline) not in (int, float) or not math.isfinite(deadline) or deadline <= 0:
+            raise ValueError("invalid internal replan deadline")
     tools = value["allowed_tools"]
     if (not isinstance(tools, list) or any(not isinstance(t, str) for t in tools)
             or tools != sorted(set(tools)) or not set(tools) <= SUPPORTED_TOOLS):
@@ -90,13 +99,35 @@ def make_envelope(task, config, project: Path, backend=None) -> dict:
         raise ValueError("internal replans support built-in source/check tools only")
     if not steps or any(step.verify_with not in VERIFY_KINDS for step in steps):
         raise ValueError("internal replans need a valid verification obligation")
-    value = {"version": 1, "allowed_tools": sorted(tools | SOURCE_TOOLS),
+    value = {"version": 2, "deadline_at": task.created_at + config.task.max_duration_seconds,
+             "allowed_tools": sorted(tools | SOURCE_TOOLS),
              "required_verify": max((step.verify_with for step in steps), key=VERIFY_KINDS.get),
              "max_budget_usd": config.task.max_budget_usd, "max_model_calls": config.task.max_model_calls,
              "max_replans": config.task.max_replans, "runtime_digest": runtime_digest(config, project, backend),
              "replan_failures": []}
     validate_envelope(value)
     return value
+
+
+def check_deadline(task) -> None:
+    """Enforce the reviewed absolute UTC deadline; never renew it on resume.
+
+    Legacy envelopes can be inspected/decoded but cannot silently acquire a new
+    duration grant. The host wall clock is trusted, as for persisted spending.
+    """
+    from atomic_flow.errors import BudgetExceeded
+
+    envelope = task.plan_approval.get("internal_replan")
+    if envelope is None:
+        return
+    try:
+        validate_envelope(envelope)
+    except ValueError as exc:
+        raise BudgetExceeded(str(exc)) from exc
+    if envelope["version"] != 2:
+        raise BudgetExceeded("legacy internal replan envelope has no deadline; fresh review required")
+    if time.time() >= envelope["deadline_at"]:
+        raise BudgetExceeded("reviewed task deadline reached; no automatic continuation")
 
 
 def failure_signature(failure: str) -> str:
@@ -129,6 +160,8 @@ def envelope_preserved(approval: dict[str, Any], new_steps: list, *, failure: st
     except (KeyError, TypeError, ValueError) as exc:
         return False, [f"invalid internal replan envelope: {exc}"]
     reasons = []
+    if envelope["version"] != 2 or time.time() >= envelope["deadline_at"]:
+        reasons.append("reviewed task deadline missing or reached; fresh review required")
     if type(budget_spent) not in (int, float) or not math.isfinite(budget_spent) or budget_spent < 0:
         reasons.append("invalid budget accounting")
     elif budget_spent >= envelope["max_budget_usd"]:

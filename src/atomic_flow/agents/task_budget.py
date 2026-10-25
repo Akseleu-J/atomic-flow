@@ -15,6 +15,7 @@ from collections.abc import Callable
 from contextlib import contextmanager
 from pathlib import Path
 
+from atomic_flow.agents.envelope import check_deadline
 from atomic_flow.agents.repair_budget import check_repair_budget
 from atomic_flow.agents.task import Task, save
 from atomic_flow.budget import SpendLedger
@@ -158,6 +159,7 @@ class TaskBudgetBackend:
         backend = selected if selected is not None else self.backend
         backend_config = backend.config if selected is not None else self.config
         backend_name = backend.name if selected is not None else self.name
+        check_deadline(self.task)
         self.cancel_check()
         if backend is None:
             raise BackendError("No model backend configured")
@@ -206,6 +208,7 @@ class TaskBudgetBackend:
             save(self.task)
             raise BudgetExceeded(f"model call not sent: {exc}") from exc
         try:
+            check_deadline(self.task)
             self.cancel_check()
         except BaseException:
             event.update(status="completed", cost_usd=0.0, not_sent=True)
@@ -281,6 +284,7 @@ class TaskBudgetBackend:
                                 "cost_usd": cost, "tokens_in": response.tokens_in, "tokens_out": response.tokens_out},
                                 call_id=event["id"], outcome="success")
         self.cancel_check()
+        check_deadline(self.task)
         self._check_goal_settlement(cost, reservation)
         check_repair_budget(self.task)
         if enforce and (self.task.budget_spent > self.settings.task.max_budget_usd or cost > reservation):
