@@ -11,7 +11,7 @@ from atomic_flow.agents.goals import Goal, replan_requirements
 from atomic_flow.agents.plan_review import canonical_plan, require_approval
 from atomic_flow.agents.planner import Plan, PlanGoal, PlanStep
 from atomic_flow.agents.task import Step, Task, load, save
-from atomic_flow.agents.task_loop import StepFailure, TaskRunner
+from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.state import StateError
 
 
@@ -143,7 +143,7 @@ def test_hierarchical_internal_replan_cannot_drop_original_requirements(tmp_path
 
     def execute(task, step):
         calls.append(step.index)
-        raise StepFailure(step.index, "first approach failed")
+        raise runner._check_failure(step, "first approach failed", "pytest", 1)
 
     monkeypatch.setattr(runner, "_execute_step", execute)
     def replan(*args, **kwargs):

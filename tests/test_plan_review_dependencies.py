@@ -7,7 +7,7 @@ import pytest
 from atomic_flow.agents.changeset import ChangeSetConflict
 from atomic_flow.agents.planner import Plan, PlanStep
 from atomic_flow.agents.task import Step, Task, load, save
-from atomic_flow.agents.task_loop import StepFailure, TaskRunner
+from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.config import AtomicConfig
 
 
@@ -88,7 +88,7 @@ def test_independent_work_finishes_before_failed_dependency_is_replanned(tmp_pat
     def execute(task, step):
         seen.append(step.index)
         if step.index == 0:
-            raise StepFailure(step.index, "prerequisite failed")
+            raise runner._check_failure(step, "prerequisite failed", "pytest", 1)
     monkeypatch.setattr(runner, "_execute_step", execute)
     def replan(*args, **kwargs):
         replans.append(kwargs)
@@ -115,7 +115,7 @@ def test_replanned_work_pauses_before_any_new_execution(tmp_path, monkeypatch):
     calls = []
     def execute(task, step):
         calls.append(step.index)
-        raise StepFailure(step.index, "failed")
+        raise runner._check_failure(step, "failed", "pytest", 1)
     monkeypatch.setattr(runner, "_execute_step", execute)
     monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", lambda *a, **kw: Plan(
         steps=[PlanStep(description="Alternative source approach")]))

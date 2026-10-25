@@ -3,7 +3,7 @@ from conftest import ScriptedBackend  # noqa: F401  (fixture family consistency)
 
 from atomic_flow.agents.planner import Plan, PlanStep
 from atomic_flow.agents.task import Task, load, save
-from atomic_flow.agents.task_loop import StepFailure, TaskRunner
+from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.config import AtomicConfig
 
 
@@ -43,7 +43,7 @@ def test_inherit_preserving_replan_with_obligations_continues(tmp_path, monkeypa
     def execute(task_, step):
         seen.append(step.index)
         if len(seen) == 1:
-            raise StepFailure(step.index, "first approach failed")
+            raise runner._check_failure(step, "first approach failed", "pytest", 1)
         step.result_summary = "independent read completed"
 
     monkeypatch.setattr(runner, "_execute_step", execute)
@@ -62,7 +62,7 @@ def test_replan_dropping_criterion_pauses_with_lineage_reason(tmp_path, monkeypa
 
     def execute(task_, step):
         seen.append(step.index)
-        raise StepFailure(step.index, "first approach failed")
+        raise runner._check_failure(step, "first approach failed", "pytest", 1)
 
     monkeypatch.setattr(runner, "_execute_step", execute)
     monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", lineage_dropped_plan)

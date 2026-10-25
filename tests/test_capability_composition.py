@@ -127,5 +127,7 @@ def test_capability_factory_must_return_task_capabilities(tmp_path, monkeypatch)
     backend = ScriptedBackend({"parser": {}, "answerer": [{"text": PLAN}]})
     _, task = run_probe_task(tmp_path, factory=lambda ctx: {"tool_registry": "not-a-capabilities"},
                              backend=backend, max_replans=0)
-    assert task.status == "failed" and "TaskCapabilities" in task.error
+    assert task.status == "paused" and "TaskCapabilities" in task.error
+    assert task.last_failure_decision["kind"] == "verification_contract_failure"
+    assert task.replan_count == 0
     assert not constructed            # refused before any orchestrator/model work

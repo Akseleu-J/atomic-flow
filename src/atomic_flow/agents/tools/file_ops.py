@@ -77,6 +77,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
     checks = ["filesystem"]
     verification = {"filesystem": "not_run", "syntax": "not_run", "pytest": "not_run"}
     diagnostics = []
+    verdict = None
     try:
         file_transaction.apply(storage, ctx.project_root, edit_id, state, after, ctx.cancel_check, after_modes)
         verification["filesystem"] = "passed"
@@ -134,6 +135,10 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
             raise
         return {"status": "rolled_back" if restored else "rollback_failed", "reason": str(exc),
                 "edit_id": edit_id, "checks": checks, "verification": verification,
+                "check_timed_out": bool(verdict and verdict.timed_out),
+                "check_exit_code": verdict.exit_code if verdict else None,
+                "check_source_changed": bool(verdict and verdict.source_changed),
+                "checked_source_revision": verdict.checked_source_revision if verdict else "",
                 "index_refresh_error": refresh_error, "diagnostics": diagnostics}
     changes = [{"path": path, "before_hash": hashes["before"], "after_hash": hashes["after"]}
                for path, hashes in state["changes"].items()]

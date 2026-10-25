@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import time
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from atomic_flow.agents.changeset import ChangeSet, ChangeSetConflict
@@ -15,6 +15,7 @@ from atomic_flow.agents.failure_policy import classify
 from atomic_flow.agents.goals import Goal, goal_context, replan_requirements, step_scope, validate_goals
 from atomic_flow.agents.plan_review import require_approval, require_scope, review_payload
 from atomic_flow.agents.planner import Plan, plan_task, replan_task
+from atomic_flow.agents.repair_budget import begin_repair, check_repair_budget
 from atomic_flow.agents.replan_lineage import lineage_preserved
 from atomic_flow.agents.task import Step, Task, load, save
 from atomic_flow.agents.task_budget import TaskBudgetBackend, check_accounting
@@ -63,6 +64,8 @@ class TaskCapabilities:
 class StepFailure(Exception):
     step_index: int
     message: str
+    kind: str = "unclassified"
+    evidence: dict = field(default_factory=dict)
 
 
 class TaskRunner:
@@ -393,6 +396,7 @@ class TaskRunner:
         result = self._resume_steps(task)
         if result.status == "running" and result.current_index == len(result.steps):
             try:
+                check_repair_budget(result)
                 self._check_effects(result)
                 self._require_replan_runtime(result)
                 from atomic_flow.agents.completion import assess_completion
@@ -463,6 +467,7 @@ class TaskRunner:
 
         while task.current_index < len(task.steps):
             self.cancel_check()
+            check_repair_budget(task)
             try:
                 self._require_replan_runtime(task)
             except ChangeSetConflict as exc:
@@ -525,6 +530,7 @@ class TaskRunner:
             task.current_index = task.steps.index(step)
             step.status = "running"
             step.evidence = {}
+            step.failure = {}
             step.started_at = time.time()
             save(task)
             checkpoint = None
@@ -556,6 +562,14 @@ class TaskRunner:
                 message = exc.message if isinstance(exc, StepFailure) else str(exc)
                 step.result_summary = f"{type(exc).__name__}: {message}"[:500]
                 step.finished_at = time.time()
+                failure = ({"kind": exc.kind, "evidence": deepcopy(exc.evidence)} if isinstance(exc, StepFailure)
+                           else {"kind": "unclassified", "evidence": {}})
+                if failure.get("evidence"):
+                    from atomic_flow.agents.step_evidence import manifest_digest
+                    proof = failure["evidence"]
+                    if (proof.get("step_index") != step.index or proof.get("started_at") != step.started_at
+                            or proof.get("source_revision") != manifest_digest(self.changeset.validate_workspace())):
+                        failure = {"kind": "source_conflict", "evidence": {}}
                 if isinstance(exc, UnresolvedEffects):
                     self._hold_effects(task)  # Durable even when optional artifacts are disabled.
                 try:
@@ -585,18 +599,11 @@ class TaskRunner:
                     return task
                 if isinstance(exc, TaskCancelled):
                     raise
-                # P06 failure classification: deterministic host-observed
-                # StepFailure may enter bounded repair; anything else is an
-                # unclassified failure with potentially unknown effects and
-                # stops fail-closed until the contract names it.
-                if isinstance(exc, StepFailure):
-                    remaining = None
-                    if self.config is not None and self.config.task.max_budget_usd > 0:
-                        remaining = self.config.task.max_budget_usd - task.budget_spent
-                    decision = classify({"kind": "deterministic_test_failure",
-                                         "remaining_budget_usd": remaining})
-                else:
-                    decision = classify({})
+                from atomic_flow.agents.step_evidence import manifest_digest
+                failure["rollback_revision"] = manifest_digest(self.changeset.validate_workspace())
+                step.failure = failure
+                remaining = self.config.task.max_budget_usd - task.budget_spent if self.config.task.max_budget_usd > 0 else None
+                decision = classify({**failure, "remaining_budget_usd": remaining})
                 task.last_failure_decision = decision
                 save(task)
                 if decision["action"] != "continue_bounded_repair":
@@ -633,6 +640,14 @@ class TaskRunner:
 
     def _replan_failed_step(self, task: Task, step: Step) -> Task:
         """Replan only after all independently runnable work has drained."""
+        from atomic_flow.agents.step_evidence import manifest_digest
+        remaining = self.config.task.max_budget_usd - task.budget_spent if self.config.task.max_budget_usd > 0 else None
+        decision = classify({**step.failure, "remaining_budget_usd": remaining})
+        if (decision["action"] != "continue_bounded_repair"
+                or step.failure.get("rollback_revision") != manifest_digest(self.changeset.validate_workspace())):
+            task.status, task.error = "paused", "repair requires fresh host failing-check evidence and unchanged rollback source"
+            save(task)
+            return task
         if self.config is not None and self.config.task.max_budget_usd > 0 \
                 and task.budget_spent >= self.config.task.max_budget_usd \
                 and self.config.task.fail_on_budget_exceeded:
@@ -679,6 +694,10 @@ class TaskRunner:
             return task
         try:
             self.task_backend.phase = "replan"
+            begin_repair(task, decision["repair_budget_usd"], step.index)
+            task.last_failure_decision = {**decision, "effective_repair_cap_usd": task.repair_budget["cap_usd"],
+                                          "repair_id": task.repair_budget["id"]}
+            save(task)
             self.task_backend.bind_steps([s.index for s in task.steps if s.status not in {"done", "superseded"}])
             import json
 
@@ -904,7 +923,7 @@ class TaskRunner:
             context = TaskCapabilityContext(task_id=task.id, project=self.project, workspace=workspace, phase="step")
             capabilities = self.capability_factory(context)
             if not isinstance(capabilities, TaskCapabilities):
-                raise StepFailure(step.index, "capability factory must return TaskCapabilities")
+                raise StepFailure(step.index, "capability factory must return TaskCapabilities", "verification_contract_failure")
         envelope = task.plan_approval.get("internal_replan")
         if envelope is not None:
             from atomic_flow.agents.tools import ROLE_TOOLS
@@ -938,20 +957,57 @@ class TaskRunner:
                 self.changeset.track(path, expected_hash)
         self._verify_step(step, result)
 
+    def _check_failure(self, step: Step, message: str, check: str, exit_code: int, *, checked_revision=None) -> StepFailure:
+        """Trusted host check result for this attempt; never inferred from text."""
+        from atomic_flow.agents.step_evidence import manifest_digest
+        if type(exit_code) is not int or exit_code != 1 or check not in {"syntax", "pytest", "ruff", "mypy"}:
+            return StepFailure(step.index, message, "check_unavailable")
+        if self.changeset is None or step.started_at is None:
+            return StepFailure(step.index, message, "verification_contract_failure")
+        evidence = {"version": 1, "check": check, "exit_code": exit_code, "step_index": step.index,
+                    "started_at": step.started_at, "outcome": "failed",
+                    "source_revision": manifest_digest(self.changeset.validate_workspace())}
+        evidence["checked_source_revision"] = checked_revision or evidence["source_revision"]
+        return StepFailure(step.index, message,
+                           "deterministic_test_failure" if check == "pytest" else "deterministic_check_failure", evidence)
+
     def _verify_step(self, step: Step, result) -> None:
         calls = result.tool_calls or []
         if step.verify_with not in {"none", "py_compile", "pytest"}:
-            raise StepFailure(step.index, f"unknown verification method: {step.verify_with}")
+            raise StepFailure(step.index, f"unknown verification method: {step.verify_with}", "verification_contract_failure")
         edits = []
         last_edit = -1
+        last_mutation = max((i for i, call in enumerate(calls) if call.get("tool") in MUTATING_TOOLS), default=-1)
         for i, call in enumerate(calls):
             summary = call.get("result_summary")
             if not isinstance(summary, dict) or not summary:
                 raise StepFailure(step.index, f"{call.get('tool')}: missing tool result")
+            if summary.get("check_source_changed"):
+                raise StepFailure(step.index, "source changed during host check", "source_conflict")
+            if summary.get("check_timed_out") or summary.get("timed_out"):
+                raise StepFailure(step.index, "host check timed out", "check_timeout")
             if summary.get("status") == "rolled_back":
+                failed = [check for check in ("syntax", "pytest") if summary.get("verification", {}).get(check) == "failed"]
+                if failed and i >= last_mutation:
+                    code = 1 if failed[-1] == "syntax" else summary.get("check_exit_code")
+                    if code == 1 and not summary.get("checked_source_revision"):
+                        raise StepFailure(step.index, "host check lacks source revision", "verification_contract_failure")
+                    raise self._check_failure(step, "host check failed; edit rolled back", failed[-1], code,
+                                              checked_revision=summary.get("checked_source_revision"))
                 raise StepFailure(step.index, f"edit rolled back: {summary.get('reason', 'verification failed')}")
+            if (call.get("tool") == "run_command" and type(summary.get("exit_code")) is int
+                    and summary["exit_code"] != 0 and summary.get("outcome") != "denied"):
+                if i >= last_mutation:
+                    from atomic_flow.agents.step_evidence import manifest_digest
+                    if (not self.changeset or summary.get("checked_source_revision") !=
+                            manifest_digest(self.changeset.validate_workspace())):
+                        raise StepFailure(step.index, "host check source revision is missing or stale", "source_conflict")
+                    raise self._check_failure(step, "host command check failed", call.get("args", {}).get("command"), summary["exit_code"],
+                                              checked_revision=summary["checked_source_revision"])
+                raise StepFailure(step.index, "failing command predates a later mutation", "verification_contract_failure")
             if summary.get("outcome") in {"error", "denied"} or summary.get("error"):
-                raise StepFailure(step.index, f"{call.get('tool')}: {summary.get('error') or summary['outcome']}")
+                kind = "scope_violation_detected" if summary.get("outcome") == "denied" else "tool_precondition_failure"
+                raise StepFailure(step.index, f"{call.get('tool')}: {summary.get('error') or summary['outcome']}", kind)
             if summary.get("outcome") != "success":
                 raise StepFailure(step.index, f"{call.get('tool')}: missing successful tool outcome")
             if call.get("tool") in MUTATING_TOOLS:
@@ -968,10 +1024,12 @@ class TaskRunner:
             if call.get("tool") == "run_command" and (
                 type(summary.get("exit_code")) is not int or summary["exit_code"] != 0
             ):
-                raise StepFailure(step.index, f"command failed or missing exit_code: {summary.get('exit_code')}")
+                if i >= last_mutation:
+                    raise self._check_failure(step, "host command check failed", call.get("args", {}).get("command"), summary.get("exit_code"))
+                raise StepFailure(step.index, "failing command predates a later mutation", "verification_contract_failure")
 
         if getattr(result, "verdict", "unverified") in {"wrong_answer", "needs_retry", "needs_more_context"}:
-            raise StepFailure(step.index, f"Unresolved step critique: {result.verdict}")
+            raise StepFailure(step.index, f"Unresolved step critique: {result.verdict}", "model_critique")
         if (step.verify_with == "py_compile" or MUTATING_TOOLS.intersection(step.tools_needed)) and not edits:
             raise StepFailure(step.index, "step requires a verified edit, but no edit was applied")
         if "run_command" in step.tools_needed and not any(call.get("tool") == "run_command" for call in calls):
@@ -998,13 +1056,16 @@ class TaskRunner:
                 step.result_summary = "ok (pytest passed after last edit)"
                 return
 
+            before_check = self.changeset.validate_workspace() if self.changeset else None
             proc = run_python(["-m", "pytest", "-q", "--no-header", "-x"],
                               self.changeset.workspace if self.changeset else self.project,
                               config=self.config.execution, timeout=180, cancel_check=self.cancel_check)
+            if self.changeset and self.changeset.validate_workspace() != before_check:
+                raise StepFailure(step.index, "source changed during pytest", "source_conflict")
             if proc.timed_out:
-                raise StepFailure(step.index, "pytest timed out after 180s")
+                raise StepFailure(step.index, "pytest timed out after 180s", "check_timeout")
             if proc.returncode != 0:
                 out = (proc.stdout + proc.stderr)[-1500:]
-                raise StepFailure(step.index, f"pytest exit_code={proc.returncode}\n{out}")
+                raise self._check_failure(step, f"pytest exit_code={proc.returncode}\n{out}", "pytest", proc.returncode)
             step.result_summary = "ok (pytest auto-run by TaskRunner)"
             return

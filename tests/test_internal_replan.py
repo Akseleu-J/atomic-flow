@@ -8,7 +8,7 @@ from conftest import ScriptedBackend
 from atomic_flow.agents.changeset import ChangeSetConflict
 from atomic_flow.agents.planner import Plan, PlanStep
 from atomic_flow.agents.task import Task, load, save
-from atomic_flow.agents.task_loop import StepFailure, TaskRunner
+from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.config import AtomicConfig, BackendConfig, user_dir
 
 
@@ -52,7 +52,7 @@ def test_authorized_repair_continues_in_same_resume_and_preserves_scope(tmp_path
     def execute(task, step):
         seen.append(step.index)
         if len(seen) == 1:
-            raise StepFailure(step.index, "first approach failed")
+            raise runner._check_failure(step, "first approach failed", "pytest", 1)
         step.result_summary = "independent read completed"
 
     monkeypatch.setattr(runner, "_execute_step", execute)
@@ -76,7 +76,7 @@ def test_legacy_approval_still_pauses_before_replanned_execution(tmp_path, monke
 
     def execute(task, step):
         seen.append(step.index)
-        raise StepFailure(step.index, "first approach failed")
+        raise runner._check_failure(step, "first approach failed", "pytest", 1)
 
     monkeypatch.setattr(runner, "_execute_step", execute)
     monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", repaired_plan)
@@ -97,7 +97,7 @@ def test_replan_cannot_drop_pytest_obligation_from_mixed_plan(tmp_path, monkeypa
     def execute(task, step):
         seen.append(step.index)
         if step.index == 0:
-            raise StepFailure(step.index, "pytest requirement failed")
+            raise runner._check_failure(step, "pytest requirement failed", "pytest", 1)
 
     monkeypatch.setattr(runner, "_execute_step", execute)
     monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", repaired_plan)
@@ -114,7 +114,7 @@ def test_replan_cannot_introduce_new_execution_tool(tmp_path, monkeypatch):
 
     def execute(task, step):
         seen.append(step.index)
-        raise StepFailure(step.index, "read failed")
+        raise runner._check_failure(step, "read failed", "pytest", 1)
 
     monkeypatch.setattr(runner, "_execute_step", execute)
     monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", lambda *a, **kw: Plan(steps=[
@@ -169,7 +169,7 @@ def test_repeated_failure_pauses_before_global_replan_cap(tmp_path, monkeypatch)
 
     def execute(task, step):
         seen.append(step.index)
-        raise StepFailure(step.index, "the same failing precondition")
+        raise runner._check_failure(step, "the same failing precondition", "pytest", 1)
 
     monkeypatch.setattr(runner, "_execute_step", execute)
     monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", repaired_plan)
@@ -214,7 +214,9 @@ def test_real_dispatcher_denies_undeclared_execution_before_tool_implementation(
         PlanStep(description="STOP: tool request was unauthorized", verify_with="none")]))
     source_before = (tmp_path / "a.py").read_bytes()
     result = runner.resume(authorize(runner, task))
-    assert result.status == "failed", result.error
+    assert result.status == "paused", result.error
+    assert result.last_failure_decision["kind"] == "scope_violation_detected"
+    assert result.replan_count == 0
     assert (tmp_path / "a.py").read_bytes() == source_before
     request = result.steps[0].request_id
     assert request

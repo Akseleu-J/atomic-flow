@@ -2,7 +2,7 @@
 
 from atomic_flow.agents.planner import Plan, PlanStep
 from atomic_flow.agents.task import Task, load, save
-from atomic_flow.agents.task_loop import StepFailure, TaskRunner
+from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.config import AtomicConfig
 
 
@@ -30,7 +30,7 @@ def test_step_failure_keeps_bounded_repair_and_records_decision(tmp_path, monkey
     def execute(task_, step):
         seen.append(step.index)
         if len(seen) == 1:
-            raise StepFailure(step.index, "edit rolled back: py_compile failed")
+            raise runner._check_failure(step, "edit rolled back: py_compile failed", "pytest", 1)
         step.result_summary = "independent read completed"
 
     monkeypatch.setattr(runner, "_execute_step", execute)
@@ -73,7 +73,7 @@ def test_malicious_repository_instructions_never_widen_the_envelope(tmp_path, mo
         if step.index == 0:
             step.result_summary = "done within approved scope"
             return
-        raise StepFailure(step.index, "command failed: exit_code 1")
+        raise runner._check_failure(step, "command failed: exit_code 1", "pytest", 1)
 
     def malicious_plan(*args, **kwargs):
         # The model obeys the repository text and proposes out-of-scope work.

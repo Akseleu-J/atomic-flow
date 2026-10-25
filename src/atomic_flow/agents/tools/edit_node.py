@@ -103,6 +103,10 @@ class EditNodeTool(Tool):
             return {"status": "rolled_back" if restored else "rollback_failed", "reason": str(exc),
                     "checks": verdict.checks if verdict else [], "index_refresh_error": refresh_error,
                     "verification": verification,
+                    "check_timed_out": bool(verdict and verdict.timed_out),
+                    "check_exit_code": verdict.exit_code if verdict else None,
+                    "check_source_changed": bool(verdict and verdict.source_changed),
+                    "checked_source_revision": verdict.checked_source_revision if verdict else "",
                     "test_output": verdict.test_output[:2000] if verdict else "",
                     "diagnostics": verdict.diagnostics if verdict else [],
                     "diagnostic_source_hash": verdict.source_hash if verdict else ""}

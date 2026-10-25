@@ -161,7 +161,7 @@ def test_failed_orchestrator_response_does_not_lose_cost(tmp_path):
     assert SpendLedger(10).today_total() == pytest.approx(task.budget_spent)
 
 
-def test_replanner_calls_share_task_spend_and_daily_ledger(tmp_path):
+def test_replanner_calls_share_task_spend_and_daily_ledger(tmp_path, monkeypatch):
     project = sample_project(tmp_path)
 
     class Replanning(ScriptedBackend):
@@ -174,11 +174,14 @@ def test_replanner_calls_share_task_spend_and_daily_ledger(tmp_path):
     backend = Replanning({
         "parser": [{"task_type": "modify", "focus_terms": ["sample"]}, {}],
         "answerer": [
-            {"tool": "edit_node", "args": {"node_id": "sample.py::sample", "new_source": "def sample(:"}},
+            {"tool": "edit_node", "args": {"node_id": "sample.py::sample", "new_source": "def sample():\n    return 2"}},
             {"text": "failed edit"}, {"text": "Report sample"},
         ],
         "critic": {"verdict": "ok"},
     })
+    from atomic_flow.agents.verify import VerificationResult
+    monkeypatch.setattr("atomic_flow.agents.tools.edit_node.verify_edit", lambda *a, **kw:
+                        VerificationResult(False, ["syntax", "pytest"], "fixture pytest failed", exit_code=1, checked_source_revision="a" * 64))
     runner = TaskRunner(AtomicConfig(), project, backend, approval_callback=lambda *a: True)
     task = runner.run_plan(
         "update sample", Plan(steps=[PlanStep(description="Update sample", verify_with="py_compile")]))

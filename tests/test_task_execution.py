@@ -103,7 +103,10 @@ def test_task_uses_real_orchestrator_and_approval_channel(tmp_path, approved):
         description="Change sample return value", tools_needed=["edit_node"], verify_with="py_compile",
     )]))
     assert approvals and approvals[0][0] == "edit_node"
-    assert task.status == ("done" if approved else "failed")
+    assert task.status == ("done" if approved else "paused")
+    if not approved:
+        assert task.last_failure_decision["kind"] == "scope_violation_detected"
+        assert task.replan_count == 0
     assert ("return 2" in source.read_text()) == approved
     from atomic_flow.config import user_dir
     meta = json.loads((user_dir() / "runs" / task.steps[0].request_id / "meta.json").read_text())

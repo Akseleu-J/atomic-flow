@@ -15,6 +15,7 @@ from collections.abc import Callable
 from contextlib import contextmanager
 from pathlib import Path
 
+from atomic_flow.agents.repair_budget import check_repair_budget
 from atomic_flow.agents.task import Task, save
 from atomic_flow.budget import SpendLedger
 from atomic_flow.config import AtomicConfig, BackendConfig
@@ -182,12 +183,15 @@ class TaskBudgetBackend:
         if enforce and self.task.budget_spent + reservation > self.settings.task.max_budget_usd:
             raise BudgetExceeded("remaining task budget cannot cover the next model-call reservation")
         self._check_goal_reservation(reservation, known_prices)
+        check_repair_budget(self.task, reservation, known_prices=known_prices)
         event = {"id": "call_" + uuid.uuid4().hex, "phase": self.phase, "status": "in_flight",
                  "reserved_usd": reservation, "created_at": time.time(), "backend": backend_name,
                  "model": backend_config.model, "input_allowance": input_allowance,
                  "max_output_tokens": backend_config.max_output_tokens,
                  "price_in_per_mtok": prices[0], "price_out_per_mtok": prices[1]}
         event.update(step_index=self.active_step_index, goal_ids=list(self.active_goal_ids))
+        if self.task.repair_budget:
+            event["repair_id"] = self.task.repair_budget["id"]
         if selected is not None:
             event.update(route_attempt_id=selected.route_attempt_id, logical_call_id=selected.logical_call_id,
                          quota_scope=selected.quota_scope)
@@ -278,6 +282,7 @@ class TaskBudgetBackend:
                                 call_id=event["id"], outcome="success")
         self.cancel_check()
         self._check_goal_settlement(cost, reservation)
+        check_repair_budget(self.task)
         if enforce and (self.task.budget_spent > self.settings.task.max_budget_usd or cost > reservation):
             raise BudgetExceeded("reported model cost exceeded its reservation; task paused before further calls/publication")
         if response_error is not None:

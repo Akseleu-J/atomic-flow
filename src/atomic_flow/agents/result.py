@@ -56,6 +56,8 @@ class ToolResult:
         out = {key: self.payload[key] for key in (
             "status", "error", "exit_code", "command", "reason", "node_id", "path", "symbol", "checks", "edit_id",
             "content_hash", "index_revision", "changes", "paths", "result_id", "next_offset",
+            "check_timed_out", "check_exit_code", "timed_out",
+            "check_source_changed", "checked_source_revision",
             "read_complete", "source_complete", "instruction_sources",
             "provenance",
             "side_effects_may_have_occurred",

@@ -45,6 +45,7 @@ class Step:
     linked_code_nodes: list[str] = field(default_factory=list)
     linked_test_nodes: list[str] = field(default_factory=list)
     evidence: dict = field(default_factory=dict)
+    failure: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -70,6 +71,7 @@ class Task:
     plan_approval: dict = field(default_factory=dict)
     graph_sync: dict = field(default_factory=dict)
     last_failure_decision: dict = field(default_factory=dict)
+    repair_budget: dict = field(default_factory=dict)
     goals: list[Goal] = field(default_factory=list)
     expansion_count: int = 0
 
@@ -158,6 +160,11 @@ def _decode(raw: object, task_id: str) -> Task:
         if name in data and not isinstance(data[name], dict):
             raise StateError(f"invalid task state: {name} must be an object")
     _validate_approval(data.get("plan_approval", {}))
+    from atomic_flow.agents.repair_budget import validate_repair
+    try:
+        validate_repair(data.get("repair_budget", {}))
+    except ValueError as exc:
+        raise StateError(str(exc)) from exc
     raw_goals = data.pop("goals", [])
     if not isinstance(raw_goals, list) or len(raw_goals) > 128:
         raise StateError("invalid task goals")
@@ -196,6 +203,22 @@ def _decode(raw: object, task_id: str) -> Task:
         from atomic_flow.agents.step_evidence import validate_receipt
         try:
             validate_receipt(steps[-1].evidence)
+            failure = steps[-1].failure
+            if not isinstance(failure, dict):
+                raise ValueError("step failure must be an object")
+            if failure:
+                if (set(failure) != {"kind", "evidence", "rollback_revision"}
+                        or not isinstance(failure["kind"], str) or len(failure["kind"]) > 100
+                        or not isinstance(failure["evidence"], dict)
+                        or not isinstance(failure["rollback_revision"], str)
+                        or not re.fullmatch(r"[a-f0-9]{64}", failure["rollback_revision"])):
+                    raise ValueError("invalid step failure record")
+                if failure["evidence"]:
+                    from atomic_flow.agents.failure_policy import validate_failure_evidence
+                    validate_failure_evidence(failure["evidence"])
+                    if (failure["evidence"]["step_index"] != steps[-1].index
+                            or failure["evidence"]["started_at"] != steps[-1].started_at):
+                        raise ValueError("step failure evidence attempt mismatch")
         except ValueError as exc:
             raise StateError(str(exc)) from exc
     validate_dependencies(steps)

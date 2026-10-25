@@ -5,7 +5,7 @@ from atomic_flow.agents.failure_policy import ASK_USER, CONTINUE_REPAIR, RECONCI
 
 
 def test_deterministic_test_failure_allows_bounded_repair():
-    decision = classify({"kind": "deterministic_test_failure", "remaining_budget_usd": 1.0})
+    decision = classify({"kind": "deterministic_test_failure", "remaining_budget_usd": 1.0, "evidence": {"version": 1, "check": "pytest", "exit_code": 1, "step_index": 0, "started_at": 1.0, "source_revision": "a" * 64, "checked_source_revision": "a" * 64, "outcome": "failed"}})
     assert decision["action"] == CONTINUE_REPAIR
     assert decision["repair_budget_usd"] == 0.25
     assert "envelope_preserved" in decision["requires"]
