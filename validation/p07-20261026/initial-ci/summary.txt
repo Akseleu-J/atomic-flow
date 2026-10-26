@@ -1,0 +1,1 @@
+{"tasks": 30, "calibrated": 0, "model_calls": 0, "errors": {"image source does not match pinned task base": 30, "patch modifies protected tests": 6}}

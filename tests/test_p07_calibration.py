@@ -23,6 +23,13 @@ def test_sympy_uses_its_own_runner_without_requiring_host_pytest():
     assert "import pytest,_pytest" in p07.runner_identity_command("pytest-dev/pytest")
 
 
+def test_framework_source_paths_are_not_mistaken_for_oracle_files():
+    for path in ["src/_pytest/main.py", "src/_pytest/assertion/rewrite.py", "src/pytest/__init__.py"]:
+        assert not stage4.protected_test_path(path)
+    for path in ["tests/test_kind.py", "testing/acceptance_test.py", "pkg/test_a.py", "pkg/a_test.py", "conftest.py", "pytest.ini"]:
+        assert stage4.protected_test_path(path)
+
+
 @pytest.mark.parametrize("observed,exit_code", [
     ({}, 0), ({"required": "ERROR", "regression": "PASSED"}, 1),
     ({"required": "SKIPPED", "regression": "PASSED"}, 0),
@@ -51,6 +58,7 @@ def test_historical_test_command_and_exit_receipt_survive_without_reinstall():
     assert "pip install ." not in script
     assert script.index("pytest -rA tests") < script.index("p07_test_exit=$?") < script.index(": '>>>>> End Test Output'")
     assert "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1" in script
+    assert script.index("exec 2>&1") < script.index("set -uxo pipefail")
 
 
 def test_all_thirty_wrong_controls_are_unique_source_changes():

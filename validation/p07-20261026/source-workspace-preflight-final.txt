@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File ".local-tools/p07-source-preflight.py", line 16, in <module>
+    graph=inspect_graph(work,'inspect',byte_cap=65536)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\src\atomic_flow\sdk.py", line 261, in inspect_graph
+    return graph_operation(Path(project), operation, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\src\atomic_flow\graph\operations.py", line 133, in graph_operation
+    raise GraphContractError("graph metadata exceeds output byte cap; narrow request")
+atomic_flow.graph.schema.GraphContractError: graph metadata exceeds output byte cap; narrow request

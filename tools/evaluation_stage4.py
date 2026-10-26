@@ -23,6 +23,15 @@ MAX_PATCH = 2_000_000
 MAX_LOG = 1_000_000
 
 
+def protected_test_path(path):
+    """Test locations, not incidental names such as the production _pytest package."""
+    parts = PurePosixPath(path).parts
+    name = parts[-1].lower()
+    return (any(part.lower() in {"test", "tests", "testing"} for part in parts[:-1])
+            or name in {"test.py", "pytest.ini", "conftest.py"}
+            or name.startswith("test_") or name.endswith("_test.py"))
+
+
 def digest(value):
     raw = value if isinstance(value, bytes) else json.dumps(value, sort_keys=True, ensure_ascii=False).encode()
     return hashlib.sha256(raw).hexdigest()
@@ -117,7 +126,7 @@ def grade(task, mirror, patch, evaluator, output, *, label="candidate", timeout=
         protected = patch_paths(task["test_patch"])
         if patch:
             changed = patch_paths(patch)
-            if changed & protected or any("test" in p.lower() or p.endswith(("pytest.ini", "conftest.py")) for p in changed):
+            if changed & protected or any(protected_test_path(p) for p in changed):
                 raise ValueError("candidate modifies protected test/grader paths")
         with tempfile.TemporaryDirectory(prefix="stage4-") as temp:
             work = Path(temp) / "repo"

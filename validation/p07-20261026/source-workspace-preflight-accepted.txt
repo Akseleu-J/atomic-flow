@@ -1,0 +1,1 @@
+{"source_bytes": 115499, "graph_inspected": true, "plan_ready": false, "status": "paused", "scripted_calls": 0, "new_provider_calls": 0, "wall_seconds": 3.75}

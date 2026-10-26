@@ -145,7 +145,7 @@ def main():
             if args.arm == "atomic":
                 from atomic_flow.sdk import inspect_graph
 
-                inspection = inspect_graph(work, "inspect", byte_cap=16384)
+                inspection = inspect_graph(work, "inspect", byte_cap=1_000_000)
                 write_json(args.output / "understanding.json", inspection)
                 options = SimpleNamespace(profile="p05-diagnostic", max_calls=20, max_reported_cost=.15, max_output_tokens=2048)
                 patch, details = atomic(task, work, original, backend, options)

@@ -1,0 +1,1 @@
+[{"label": "base", "status": "infrastructure_error", "error": "missing or duplicate test exit receipt", "tests": 0}, {"label": "gold", "status": "infrastructure_error", "error": "missing or duplicate test exit receipt", "tests": 0}, {"label": "wrong", "status": "infrastructure_error", "error": "missing or duplicate test exit receipt", "tests": 0}]

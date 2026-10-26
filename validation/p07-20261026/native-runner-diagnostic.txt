@@ -1,0 +1,128 @@
+{"status": "completed", "calibrated": false, "test_command": "PYTHONWARNINGS='ignore::UserWarning,ignore::SyntaxWarning' bin/test -C --verbose", "error": null, "rows": [{"label": "base", "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "status": "infrastructure_error", "verified_success": false, "container_name": "p07-sympy__sympy-21614-f50cebf8fb", "isolation": {"network": "none", "caps": "ALL dropped", "host_mounts": [], "memory_bytes": 6442450944, "pids": 256, "no_new_privileges": true, "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"}, "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf", "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145", "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]", "process_exit": 0, "error_type": "ValueError", "error": "missing or duplicate test exit receipt", "cleanup_exit": 0, "wall_seconds": 3.7963741810000045, "log_sha256": "d0f8fb08d548e7b51c83d8a6224a4ba332711dd9bdb3c8e226e1b5dca01c70cd"}, {"label": "gold", "patch_sha256": "5a20f33fdb0a731064a81dc26e925e91557900bb7edbfce84463de6280e8e3cd", "status": "infrastructure_error", "verified_success": false, "container_name": "p07-sympy__sympy-21614-2c0372836c", "isolation": {"network": "none", "caps": "ALL dropped", "host_mounts": [], "memory_bytes": 6442450944, "pids": 256, "no_new_privileges": true, "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"}, "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf", "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145", "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]", "process_exit": 0, "error_type": "ValueError", "error": "missing or duplicate test exit receipt", "cleanup_exit": 0, "wall_seconds": 3.961585659000008, "log_sha256": "444b1553437bc0ec63fb2bf55b4ac4305688742a1913edbd2b9fddca422037bf"}, {"label": "wrong", "patch_sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15", "status": "infrastructure_error", "verified_success": false, "container_name": "p07-sympy__sympy-21614-0df2be7643", "isolation": {"network": "none", "caps": "ALL dropped", "host_mounts": [], "memory_bytes": 6442450944, "pids": 256, "no_new_privileges": true, "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"}, "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf", "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145", "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]", "process_exit": 0, "error_type": "ValueError", "error": "missing or duplicate test exit receipt", "cleanup_exit": 0, "wall_seconds": 4.0062403839999945, "log_sha256": "de51869d3962fbcabc7a3a914eae5b43ad978acc61aa57213509b565e1f2a1f4"}]}
+REFIX='\''/opt/miniconda3'\''
+export CONDA_SHLVL='\''3'\''
+export CONDA_DEFAULT_ENV='\''base'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_PREFIX_2='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
++++ PS1='(base) '
++++ export PATH=/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++++ PATH=/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++++ export CONDA_PREFIX=/opt/miniconda3
++++ CONDA_PREFIX=/opt/miniconda3
++++ export CONDA_SHLVL=3
++++ CONDA_SHLVL=3
++++ export CONDA_DEFAULT_ENV=base
++++ CONDA_DEFAULT_ENV=base
++++ export 'CONDA_PROMPT_MODIFIER=(base) '
++++ CONDA_PROMPT_MODIFIER='(base) '
++++ export CONDA_PREFIX_2=/opt/miniconda3/envs/testbed
++++ CONDA_PREFIX_2=/opt/miniconda3/envs/testbed
++++ export CONDA_EXE=/opt/miniconda3/bin/conda
++++ CONDA_EXE=/opt/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
+++ __conda_hashr
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
++ conda activate testbed
++ local cmd=activate
++ case "$cmd" in
++ __conda_activate activate testbed
++ '[' -n '' ']'
++ local ask_conda
+++ PS1='(base) '
+++ __conda_exe shell.posix activate testbed
+++ /opt/miniconda3/bin/conda shell.posix activate testbed
++ ask_conda='PS1='\''(testbed) '\''
+export PATH='\''/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_SHLVL='\''4'\''
+export CONDA_DEFAULT_ENV='\''testbed'\''
+export CONDA_PROMPT_MODIFIER='\''(testbed) '\''
+export CONDA_PREFIX_3='\''/opt/miniconda3'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
++ eval 'PS1='\''(testbed) '\''
+export PATH='\''/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_SHLVL='\''4'\''
+export CONDA_DEFAULT_ENV='\''testbed'\''
+export CONDA_PROMPT_MODIFIER='\''(testbed) '\''
+export CONDA_PREFIX_3='\''/opt/miniconda3'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
+++ PS1='(testbed) '
+++ export PATH=/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ PATH=/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ export CONDA_PREFIX=/opt/miniconda3/envs/testbed
+++ CONDA_PREFIX=/opt/miniconda3/envs/testbed
+++ export CONDA_SHLVL=4
+++ CONDA_SHLVL=4
+++ export CONDA_DEFAULT_ENV=testbed
+++ CONDA_DEFAULT_ENV=testbed
+++ export 'CONDA_PROMPT_MODIFIER=(testbed) '
+++ CONDA_PROMPT_MODIFIER='(testbed) '
+++ export CONDA_PREFIX_3=/opt/miniconda3
+++ CONDA_PREFIX_3=/opt/miniconda3
+++ export CONDA_EXE=/opt/miniconda3/bin/conda
+++ CONDA_EXE=/opt/miniconda3/bin/conda
+++ export _CE_M=
+++ _CE_M=
+++ export _CE_CONDA=
+++ _CE_CONDA=
+++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
+++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++ __conda_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ git checkout b4777fdcef467b7132c055f8ac2c9a5059e6a145 sympy/core/tests/test_kind.py
+Updated 0 paths from 5de537ff25
++ git apply -v -
+Checking patch sympy/core/tests/test_kind.py...
+Applied patch sympy/core/tests/test_kind.py cleanly.
++ : '>>>>> Start Test Output'
++ PYTHONWARNINGS=ignore::UserWarning,ignore::SyntaxWarning
++ bin/test -C --verbose sympy/core/tests/test_kind.py
+============================= test process starts ==============================
+executable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]
+architecture:       64-bit
+cache:              no
+ground types:       python 
+numpy:              None
+random seed:        23579986
+hash randomization: on (PYTHONHASHSEED=1597709956)
+
+sympy/core/tests/test_kind.py[8] 
+test_NumberKind ok
+test_Add_kind ok
+test_mul_kind ok
+test_Symbol_kind ok
+test_Integral_kind ok
+test_Derivative_kind ok
+test_Matrix_kind ok
+test_MatMul_kind ok                                                         [OK]
+
+
+================== tests finished: 8 passed, in 0.09 seconds ===================
++ p07_test_exit=0
++ printf '\nP07_TEST_EXIT=%s\n' 0
++ : '>>>>> End Test Output'
++ git checkout b4777fdcef467b7132c055f8ac2c9a5059e6a145 sympy/core/tests/test_kind.py
+
+P07_TEST_EXIT=0
+Updated 1 path from 5de537ff25
+

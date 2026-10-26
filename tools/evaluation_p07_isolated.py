@@ -15,7 +15,7 @@ import time
 import uuid
 from pathlib import Path
 
-from evaluation_stage4 import load_manifest, patch_paths
+from evaluation_stage4 import load_manifest, patch_paths, protected_test_path
 
 HARNESS_VERSION = "3.0.15"
 TASK_ID = re.compile(r"^[A-Za-z0-9_-]+$")
@@ -53,7 +53,7 @@ def evaluation_script(spec, install):
     commands = [line for line in spec.eval_script_list if line != install]
     end = next(i for i, line in enumerate(commands) if ">>>>> End Test Output" in line)
     commands.insert(end, "p07_test_exit=$?; printf '\\nP07_TEST_EXIT=%s\\n' \"$p07_test_exit\"")
-    return "\n".join(["#!/bin/bash", "set -uxo pipefail", "export PYTHONPATH=/testbed:/testbed/src",
+    return "\n".join(["#!/bin/bash", "exec 2>&1", "set -uxo pipefail", "export PYTHONPATH=/testbed:/testbed/src",
                        "export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", *commands]) + "\n"
 
 
@@ -84,7 +84,7 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
     log = output / (label + ".log")
     try:
         if patch and (patch_paths(patch) & patch_paths(task["test_patch"])
-                      or any("test" in p.lower() for p in patch_paths(patch))):
+                      or any(protected_test_path(p) for p in patch_paths(patch))):
             raise ValueError("patch modifies protected tests")
         command(["docker", "create", "--name", name, "--network", "none", "--cap-drop", "ALL",
                  "--security-opt", "no-new-privileges", "--memory", "6g", "--cpus", "2",
