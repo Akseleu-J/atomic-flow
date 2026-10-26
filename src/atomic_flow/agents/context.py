@@ -144,6 +144,13 @@ class ToolContext:
         self.invalidate_sources(set(event.paths) - self.invalidated_paths)
         if not event.ready:
             return False
+        from atomic_flow.graph.ingest import ingest_source_changes
+        from atomic_flow.graph.store import GraphStore
+        from atomic_flow.graph.sync import store_path
+        if store_path(self.project_root).exists():
+            ingest_source_changes(GraphStore(store_path(self.project_root)), self.project_root,
+                                  event=event, use_git=(self.project_root / ".git").exists(),
+                                  reason="watch event reconciliation", cancel_check=self.cancel_check)
         self.refresh()
         try:
             self.source_watcher.acknowledge(event)
@@ -153,13 +160,17 @@ class ToolContext:
         self.invalidated_paths.clear()
         return True
 
-    def refresh(self) -> None:
+    def refresh(self, changed_paths=None) -> None:
         """Reparse after a verified edit; preserve aliases, never recycle removed ids."""
         from atomic_flow.activation.activate import ActivationIndex
-        from atomic_flow.tree.builder import build_tree, save_tree
+        from atomic_flow.tree.builder import build_tree, refresh_tree, save_tree
 
-        tree = build_tree(self.project_root, self.tree_ignore, respect_gitignore=self.respect_gitignore,
-                          cancel_check=self.cancel_check)
+        if changed_paths is not None and (self.project_root / ".atomic_flow" / "tree.json").exists():
+            tree, _changed = refresh_tree(self.project_root, self.tree_ignore, respect_gitignore=self.respect_gitignore,
+                                          cancel_check=self.cancel_check, changed_paths=changed_paths)
+        else:
+            tree = build_tree(self.project_root, self.tree_ignore, respect_gitignore=self.respect_gitignore,
+                              cancel_check=self.cancel_check)
         fresh = {item["node_id"]: TreeNode.model_validate(item) for item in tree["nodes"]}
         next_alias = max((int(a[1:]) for a in self.alias_to_id if a.startswith("n") and a[1:].isdigit()), default=0) + 1
         for nid in fresh:
@@ -191,6 +202,7 @@ class ToolContext:
         self.nodes_by_id.clear()
         self.nodes_by_id.update(fresh)
         self.sources.clear()
-        self.index = ActivationIndex(list(fresh.values()))
+        self.index = (self.index.updated(list(fresh.values())) if self.index is not None and hasattr(self.index, "updated")
+                      else ActivationIndex(list(fresh.values())))
         save_tree(self.project_root, tree)
         self.revision += 1

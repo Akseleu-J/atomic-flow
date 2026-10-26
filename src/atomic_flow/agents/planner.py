@@ -114,6 +114,9 @@ Files indexed: {n_files}
 Top candidates for this task:
 {candidates}
 
+HOST PLANNING OBSERVATIONS (advisory; no source-read proof or execution authority)
+{planning_context}
+
 OUTPUT
 Return ONE JSON object:
 {{
@@ -133,6 +136,7 @@ def plan_task(
     backend: LLMBackend,
     candidates: list[str],
     n_files: int,
+    planning_context: str = "",
 ) -> Plan:
     """Ask the model for a plan. Returns a validated Plan; on parse failure retries once."""
     prompt = PLANNER_PROMPT.format(
@@ -140,6 +144,7 @@ def plan_task(
         project=project_root,
         n_files=n_files,
         candidates="\n".join(f"  - {c}" for c in candidates[:30]) or "  (none)",
+        planning_context=planning_context or "(unavailable)",
     )
     messages = [
         {"role": "system", "content": "Reply with ONE JSON object. No prose."},

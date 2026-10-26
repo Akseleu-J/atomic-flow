@@ -158,3 +158,20 @@ class SourceWatcher:
             raise WatchConflict("source changed during refresh; watch event remains unacknowledged")
         self._baseline = current.copy()
         self._pending.clear()
+
+    def reconcile_graph(self, store, event: SourceChange | None = None):
+        """Host-explicit graph refresh, followed by freshness-checked event ack.
+
+        The store is Python-only; polling also sees other source resources.
+        Passing no event performs a dropped-event/recovery content audit.
+        """
+        from atomic_flow.graph.ingest import ingest_source_changes
+        if event is not None and (not isinstance(event, SourceChange) or not event.ready
+                                  or event.sequence != self._sequence):
+            raise WatchConflict("watch graph refresh requires the current ready event")
+        report = ingest_source_changes(store, self.project, use_git=(self.project / ".git").exists(),
+                                       event=event, reason="watch event reconciliation" if event else "dropped-event recovery audit",
+                                       cancel_check=self.cancel_check)
+        if event is not None:
+            self.acknowledge(event)
+        return report

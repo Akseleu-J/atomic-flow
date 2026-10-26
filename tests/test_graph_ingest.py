@@ -64,7 +64,10 @@ def test_clean_tree_is_noop_and_non_git_root_refused(tmp_path):
     root = repo(tmp_path)
     sync_project_graph(root, {})
     store = GraphStore(root / ".atomic_flow" / "graph.json")
-    assert ingest_git_changes(store, root) == {"deltas": 0, "unchanged": True}
+    report = ingest_git_changes(store, root)
+    assert report["deltas"] == 0 and report["unchanged"] is True
+    assert report["parsed_files"] == report["audit_parsed_files"] == 0
+    assert report["scanned_files"] == 2 and report["reason"] == "external source reconciliation"
     plain = tmp_path / "plain"
     plain.mkdir()
     with pytest.raises(GraphContractError, match="Git root"):

@@ -13,7 +13,7 @@ import tempfile
 import threading
 import uuid
 from collections import OrderedDict
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, TypeVar
@@ -28,7 +28,7 @@ from atomic_flow.errors import BudgetExceeded, ResponseFormatError
 from atomic_flow.llm.history import RequestHistory
 from atomic_flow.llm.prompts import PromptRegistry
 from atomic_flow.llm.schemas import Answer, AnswerCritique, AnswerResult, ContextPlan, QueryIntent
-from atomic_flow.llm.verify import grounding_score, unknown_identifiers
+from atomic_flow.llm.verify import citation_span, grounding_score, unknown_identifiers, verification_report
 from atomic_flow.tree.builder import load_tree, refresh_tree
 from atomic_flow.tree.node import TreeNode
 
@@ -630,13 +630,16 @@ class _Attempt:
     answer: Answer
     verdict: str
     coverage: float
-    grounding: float
+    grounding: float | None
     unknown: list[str]
     dropped: int
+    checked: int = 0
+    span_reports: list = field(default_factory=list)
 
     @property
     def score(self) -> tuple:
-        return (self.verdict == "ok", self.grounding, self.coverage, _CONF_RANK[self.answer.confidence])
+        return (self.verdict == "ok", self.grounding if self.grounding is not None else -1,
+                self.coverage, _CONF_RANK[self.answer.confidence])
 
 
 class Orchestrator:
@@ -885,11 +888,24 @@ class Orchestrator:
             evidence_context = sync_context()
             valid = {m["node_id"] for m in meta} | set(run.tool_ctx.evidence)
             valid_aliases = sorted(aliases.alias_of[i] for i in valid)
-            kept, seen, dropped = [], set(), 0
+            kept, seen, dropped, span_reports = [], set(), 0, []
             for citation in answer.citations:
                 nid = aliases.resolve(citation.node_id)
                 if nid and nid in valid:
                     if nid not in seen:
+                        node = by_id[nid]
+                        complete = run.tool_ctx.read_coverage(
+                            node.path, run.tool_ctx.file_hashes.get(node.path, ""), nid)["read_complete"]
+                        try:
+                            current_source = run.tool_ctx.read_source(node.path) if citation.lines is not None else None
+                        except OSError:
+                            current_source = None
+                        span = citation_span(citation, node, current_hash=run.tool_ctx.file_hashes.get(node.path, ""),
+                                             shown_complete=complete, source=current_source)
+                        span_reports.append(span)
+                        if span["status"] == "failed":
+                            dropped += 1
+                            continue
                         seen.add(nid)
                         kept.append(citation.model_copy(update={"node_id": nid}))
                 else:
@@ -898,7 +914,7 @@ class Orchestrator:
             unknown, checked = unknown_identifiers(answer.text, evidence_context)
             grounding = grounding_score(unknown, checked)
             if mode == "simple":
-                best = _Attempt(answer, "unverified", 0.0, grounding, unknown, dropped)
+                best = _Attempt(answer, "unverified", 0.0, grounding, unknown, dropped, checked, span_reports)
                 break
             shown = answer.model_dump()
             shown["citations"] = [{**c.model_dump(), "node_id": aliases.alias_of[c.node_id]} for c in answer.citations]
@@ -918,7 +934,9 @@ class Orchestrator:
                     verdict = "needs_retry"
                     critique.verdict = verdict
                     critique.feedback = (critique.feedback + f" Remove or justify identifiers absent from context: {unknown}.").strip()
-            current = _Attempt(answer, verdict, critique.citation_coverage, grounding, unknown, dropped)
+            if any(span["status"] == "failed" for span in span_reports) and verdict == "ok":
+                verdict = "needs_retry"
+            current = _Attempt(answer, verdict, critique.citation_coverage, grounding, unknown, dropped, checked, span_reports)
             if best is None or current.score > best.score:
                 best = current
             ledger.append({"attempt": attempt, "verdict": verdict, "coverage": critique.citation_coverage,
@@ -962,6 +980,16 @@ class Orchestrator:
             cost_usd=run.cost if (run.cost or not run.cost_missing) else None, cost_complete=not run.cost_missing,
             latency_ms=run.latency_ms, backend_used=self.backend.name, model_used=self.backend.config.model,
             verdict=best.verdict, citation_coverage=best.coverage, grounding=best.grounding,
+            verification_report={**verification_report(best.unknown, best.checked, dropped_citations=best.dropped,
+                                                       retrieval_weak=search.weak),
+                "context_coverage": {"status": ("partial" if any(not m.get("source_complete") for m in meta) else
+                                                "shown_sources_complete" if meta else "not_assessed"),
+                    "repository_completeness": "not_assessed", "shown_nodes": len(meta),
+                    "omitted_or_partial": [{"node_id": m["node_id"], "reason": "partial_source_representation"}
+                                           for m in meta if not m.get("source_complete")]}, "citation_spans": {
+                "status": "failed" if any(s["status"] == "failed" for s in best.span_reports) else
+                          ("passed" if any(s["status"] == "passed" for s in best.span_reports) else "not_assessed"),
+                "checked": sum(s["status"] != "not_assessed" for s in best.span_reports), "items": best.span_reports}},
             unknown_identifiers=best.unknown, dropped_citations=best.dropped, retrieval_weak=search.weak,
             warnings=warnings, tool_calls=run.tool_calls, usage=run.usage_report())
         run.write("final.md", best.answer.text + "\n")

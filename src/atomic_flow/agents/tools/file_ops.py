@@ -116,7 +116,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
             current = digest(target.read_bytes()) if target.exists() else None
             if current != hashes["after"]:
                 raise SourceConflict(f"source changed during verification: {path}")
-        ctx.refresh()
+        ctx.refresh(changed_paths=list(state["changes"]))
         for path, hashes in state["changes"].items():
             target = admitted_path(ctx, path)
             current = digest(target.read_bytes()) if target.exists() else None
@@ -128,7 +128,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
         refresh_error = ""
         if restored:
             try:
-                ctx.refresh()
+                ctx.refresh(changed_paths=list(state["changes"]))
             except Exception as refresh_exc:
                 refresh_error = str(refresh_exc)
         if isinstance(exc, TaskCancelled):

@@ -1,0 +1,12 @@
+{
+  "schema": "acceptance-audit-source/1",
+  "review_date": "2026-10-26",
+  "reviewer": "subagent acceptance_audit",
+  "sha256": {
+    "docs/PRODUCTION_ROADMAP.md": "e0953b3911ef57f79eb23f4dc9d25398d5f0d362090684ef529ea0cbf351df10",
+    "tools/verify_chapter_acceptance.py": "bccb9061b85713ae91fb50ed2380060e5889df1f454d1041214d0ec8b687cca2",
+    "tests/test_chapter_acceptance_verifier.py": "29c0f950ec3f9ff20efd42d8101729270ea9ce97750c1d94d1ff359bf0bbf7f6",
+    "validation/p00-p06-final-20261026/acceptance-matrix.json": "2c2b1f4dc2ec195e4c0a3bf2ddb51173f2620eca369bc09446e29b3b21b201e1"
+  },
+  "limits": "Raw working-file hashes; integrator must bind final committed source and rerun after edits."
+}

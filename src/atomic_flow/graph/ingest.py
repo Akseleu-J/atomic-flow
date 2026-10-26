@@ -12,6 +12,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from atomic_flow.graph.adapter_resource import resource_kind
 from atomic_flow.graph.delta import apply_delta, file_delta
 from atomic_flow.graph.project import clean_build, project_files
 from atomic_flow.graph.schema import GraphContractError
@@ -45,21 +46,60 @@ def _structure(document):
             sorted(document["edges"], key=lambda e: e["id"]))
 
 
+def _admitted_graph_files(root, cancel_check):
+    files = project_files(root, suffix=None, cancel_check=cancel_check)
+    return {path: raw for path, raw in files.items()
+            if path.endswith((".py", ".pyi")) or resource_kind(path)}
+
+
+def _git_move_hints(root):
+    entries = _git(root, "status", "--porcelain=v1", "-z", "--find-renames", "--untracked-files=all").split(b"\0")
+    moves, index = {}, 0
+    while index < len(entries):
+        entry = entries[index]
+        index += 1
+        if not entry:
+            continue
+        if b"R" in entry[:2]:
+            if index >= len(entries) or not entries[index]:
+                raise GraphContractError("malformed Git rename hint")
+            moves[os.fsdecode(entries[index])] = os.fsdecode(entry[3:])
+            index += 1
+    return moves
+
+
 def ingest_git_changes(store: GraphStore, root: Path, *, cancel_check=lambda: None) -> dict:
     root = Path(root).absolute()
     if not (root / ".git").exists():
         raise GraphContractError("ingestion requires a Git root; non-Git projects use explicit rebuilds")
-    if any(n["kind"] == "file" and not n["path"].endswith(".py") for n in store.nodes()):
-        raise GraphContractError("Python Git ingestion requires a Python-only store; resource ingestion is explicit")
+    return ingest_source_changes(store, root, use_git=True, cancel_check=cancel_check)
+
+
+def ingest_source_changes(store: GraphStore, root: Path, *, use_git=False, event=None,
+                          reason="external source reconciliation", cancel_check=lambda: None, moves=None) -> dict:
+    """Reconcile arbitrary external writers; watcher and Git paths remain hints.
+
+    A full admitted content audit is intentional at this trust boundary. It
+    catches dropped events, same-size edits and clean Git branch switches.
+    """
+    root = Path(root).absolute()
+    if not isinstance(reason, str) or not reason.strip():
+        raise GraphContractError("external reconciliation requires a reason")
     cancel_check()
-    _git(root, "rev-parse", "--is-inside-work-tree")
-    files = project_files(root, cancel_check=cancel_check)
-    hints = changed_paths(root, files=files)
+    if use_git:
+        _git(root, "rev-parse", "--is-inside-work-tree")
+    files = _admitted_graph_files(root, cancel_check)
+    hints = changed_paths(root, files=files) if use_git else {p: None for p in getattr(event, "paths", ())}
     old = {n["path"]: n["source"]["digest"] for n in store.nodes() if n["kind"] == "file"}
+    before_document = store.document()
+    if moves is None and use_git:
+        moves = {a: b for a, b in _git_move_hints(root).items() if a in old and a not in files and b in files and b not in old}
     changed = {p: files.get(p) for p in old.keys() | files.keys()
                if old.get(p) != (hashlib.sha256(files[p]).hexdigest() if p in files else None)}
     if not changed:
-        return {"deltas": 0, "unchanged": True}
+        return {"deltas": 0, "unchanged": True, "reason": reason,
+                "scanned_files": len(files), "parsed_files": 0, "audit_parsed_files": 0}
+    reconciliation_reason = reason
     base, reason, reports = store.generation, "", []
     with tempfile.TemporaryDirectory(prefix="atomic-graph-ingest-") as temp:
         staged = GraphStore(Path(temp) / "graph.json")
@@ -75,12 +115,16 @@ def ingest_git_changes(store: GraphStore, root: Path, *, cancel_check=lambda: No
         if reason or _structure(candidate) != _structure(expected):
             reason = reason or "external ingestion parity mismatch"
             candidate = expected
-        if project_files(root, cancel_check=cancel_check) != files:
+        from atomic_flow.graph.relocation import relocation_report
+        relocation = relocation_report(before_document, candidate, moves)
+        if _admitted_graph_files(root, cancel_check) != files:
             raise GraphContractError("source changed during external reconciliation")
         cancel_check()
         store.commit(base_generation=base, drop_node_ids=[n["id"] for n in store.nodes()],
                      put_nodes=candidate["nodes"], put_edges=candidate["edges"])
     return {"deltas": len(changed), "fallback": bool(reason), "reason": reason,
+            "relocation": relocation,
+            "reconciliation_reason": reconciliation_reason,
             "git_hints": len(hints), "scanned_files": len(files),
             "parsed_files": sum(r["parsed_files"] for r in reports),
             "audit_parsed_files": expected["parsed_files"]}

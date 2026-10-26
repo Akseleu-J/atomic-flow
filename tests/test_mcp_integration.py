@@ -30,7 +30,10 @@ def test_actual_stdio_server_tools_resources_and_clean_environment(tmp_path, mon
     with MCPClient(project, [sys.executable, str(FIXTURE.resolve()), str(project), str(capture)], approved=True,
                    allowed_resources=("atomic://source/demo.py",), approval=lambda method, params: calls.append((method, params)) or True) as remote:
         tools = remote.list_tools()
-        assert {tool["name"] for tool in tools} == {"source_tree", "source_read"}
+        assert {tool["name"] for tool in tools} == {
+            "source_tree", "source_read", "graph_inspect", "graph_search",
+            "graph_explain", "graph_chat", "graph_impact", "graph_tour",
+        }
         remote.allowed_tools["source_read"] = schema_hash(next(tool for tool in tools if tool["name"] == "source_read"))
         result = remote.call_tool("source_read", {"path": "demo.py"})
         assert result["data_only"] and not result["remote_verified"] and result["verification"] == {}

@@ -8,11 +8,103 @@ semantic facts are detectable (P03 invalidation contract).
 """
 from __future__ import annotations
 
+import ast
+import hashlib
+import json
 from typing import Any
 
 from atomic_flow.graph.project import clean_build
 
 SEMANTIC_EXTRACTOR = "structural-semantic/1"
+
+
+def semantic_hashes(source: bytes) -> dict[str, str]:
+    """Separate executable, API/import and documentation invalidation reasons."""
+    def hashed(value):
+        return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
+    result = {"bytes": hashlib.sha256(source).hexdigest()}
+    try:
+        tree = ast.parse(source)
+    except (SyntaxError, UnicodeError):
+        return {**result, "body": result["bytes"], "api": result["bytes"], "docs": result["bytes"],
+                "references": result["bytes"], "parse_status": "unavailable"}
+    docs, api, references = [], [], []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            docs.append(ast.get_docstring(node, clean=False))
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            api.append((node.name, ast.dump(node.args), ast.dump(node.returns) if node.returns else None,
+                        [ast.dump(d) for d in node.decorator_list]))
+        elif isinstance(node, ast.ClassDef):
+            api.append((node.name, [ast.dump(base) for base in node.bases]))
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            api.append(ast.dump(node))
+        if isinstance(node, (ast.Call, ast.Import, ast.ImportFrom)):
+            references.append(ast.dump(node))
+    # Strip docstrings from the executable representation, not comments from bytes.
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and node.body:
+            first = node.body[0]
+            if isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant) and isinstance(first.value.value, str):
+                node.body = node.body[1:]
+    return {**result, "body": hashed(ast.dump(tree)), "api": hashed(api), "docs": hashed(docs),
+            "references": hashed(references), "parse_status": "parsed"}
+
+
+def file_dependencies(build: dict) -> dict[str, list[str]]:
+    """Conservative resolved file dependency closure; unresolved stays explicit."""
+    paths = {n["id"]: n["path"] for n in build["nodes"]}
+    direct = {n["path"]: set() for n in build["nodes"] if n["kind"] == "file"}
+    for edge in build["edges"]:
+        if edge["kind"] not in {"imports", "calls", "references"}:
+            continue
+        left, right = paths.get(edge["src"]), paths.get(edge["dst"])
+        if left in direct and right in direct and left != right:
+            direct[left].add(right)
+    closure = {}
+    for path in sorted(direct):
+        seen, pending = set(), list(direct[path])
+        while pending:
+            candidate = pending.pop()
+            if candidate in seen or candidate == path:
+                continue
+            seen.add(candidate)
+            pending.extend(direct[candidate] - seen)
+        closure[path] = sorted(seen)
+    return closure
+
+
+def assemble(files, build, artifacts) -> dict:
+    """Source-bound narrative fragments and flows, without semantic truth claims."""
+    digests = _digests(build)
+    entry = entry_points(files)
+    structural_tour = tour(files)
+    steps = []
+    for item in structural_tour["steps"]:
+        path = item["file"]
+        artifact = artifacts[path]
+        steps.append({**item, "source_digest": digests[path], "node_id": "file:" + path,
+                      "summary": artifact["result"]["summary"], "evidence": artifact["result"]["evidence"],
+                      "cache_key": artifact["cache_key"], "status": artifact["status"]})
+    node_paths = {n["id"]: n["path"] for n in build["nodes"]}
+    flows = [{"src": e["src"], "dst": e["dst"], "kind": e["kind"],
+              "source_digests": {p: digests[p] for p in sorted({node_paths[e["src"]], node_paths[e["dst"]]})},
+              "facts_class": "inferred", "semantic_correctness": "not_assessed"}
+             for e in build["edges"] if e["kind"] in {"calls", "imports"}]
+    domains = {}
+    for path, artifact in sorted(artifacts.items()):
+        for tag in artifact["result"]["tags"]:
+            domains.setdefault(tag, []).append({"node_id": "file:" + path, "source_digest": digests[path],
+                                               "cache_key": artifact["cache_key"]})
+    architecture = {"method": "structural packages plus inferred source-evidenced domain tags",
+                    "source_digests": digests, "domains": domains,
+                    "fragments": [{"path": path, "source_digest": digests[path],
+                                   "summary": artifact["result"]["summary"], "evidence": artifact["result"]["evidence"],
+                                   "cache_key": artifact["cache_key"]} for path, artifact in sorted(artifacts.items())],
+                    "semantic_correctness": "not_assessed"}
+    return {"layers": layers(files), "entry_points": entry,
+            "tour": {**structural_tour, "steps": steps, "note": "Evidence-bound inferred narrative; semantic truth not assessed"},
+            "flows": flows, "architecture": architecture, "unresolved": build["unresolved"]}
 
 
 def layers(files: dict[str, bytes]) -> dict[str, Any]:

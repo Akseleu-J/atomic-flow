@@ -46,7 +46,7 @@ def test_sync_never_raises_and_logs_fallback(tmp_path, monkeypatch):
     project = _project(tmp_path)
     sync_project_graph(project, {})  # create
     import atomic_flow.graph.sync as sync_module
-    monkeypatch.setattr(sync_module, "apply_delta",
+    monkeypatch.setattr(sync_module, "apply_changes",
                         lambda *a, **kw: (_ for _ in ()).throw(ValueError("boom")))
     (project / "lib.py").write_bytes(b"x = 1\n")  # publication already wrote the file
     result = sync_project_graph(project, {"lib.py": b"x = 1\n"})

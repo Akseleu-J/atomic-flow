@@ -212,8 +212,26 @@ class TaskRunner:
                 check_cancel(task.id)
             backend = TaskBudgetBackend(self.backend, task, self.config, check, phase="plan")
             try:
+                import json
+
+                from atomic_flow.agents.changeset import _files
+                from atomic_flow.agents.step_evidence import manifest_digest
+                with source_mutation_lease(self.project):
+                    revision = manifest_digest(_files(self.project, limits=self.resource_limits, cancel_check=check))
+                    try:
+                        graph_revision = load_tree(self.project).get("fingerprint")
+                    except TreeError:
+                        graph_revision = None
+                planning_context = json.dumps({
+                    "phase": "initial_plan", "workspace_revision": revision,
+                    "graph_revision": graph_revision, "graph_status": "advisory_not_read_proof",
+                    "remaining_model_calls": self.config.task.max_model_calls,
+                    "remaining_budget_usd": (self.config.task.max_budget_usd - task.budget_spent
+                                             if self.config.task.max_budget_usd > 0 else None),
+                    "known_failures": [], "completed_effects": [],
+                })
                 plan = plan_task(query, project_root=self.project, backend=backend,
-                                 candidates=candidates, n_files=n_files)
+                                 candidates=candidates, n_files=n_files, planning_context=planning_context)
                 task.steps = self._steps(plan)
                 task.goals = self._goals(plan)
                 task.rationale = plan.rationale
@@ -252,11 +270,19 @@ class TaskRunner:
             changed = {path: (self.project / path).read_bytes()
                        if (self.project / path).is_file() else None
                        for path in changed_paths}
-            report = sync_project_graph(self.project, changed, cancel_check=self.cancel_check)
+            baseline = self.changeset.state["baseline"] if self.changeset else {}
+            hints = self.changeset.state.get("graph_moves", {}) if self.changeset else {}
+            moves = {left: right for left, right in hints.items()
+                     if left in baseline and left in changed and changed[left] is None
+                     and right not in baseline and changed.get(right) is not None}
+            # Conflicting observations must remain ambiguous, not guessed identities.
+            moves = {left: right for left, right in moves.items() if list(moves.values()).count(right) == 1}
+            report = sync_project_graph(self.project, changed, cancel_check=self.cancel_check, moves=moves)
             task.graph_sync = {"deltas": report.get("deltas", 0),
                                "created": report.get("created", False),
                                "fallback": bool(report.get("fallback")),
-                               "failed": bool(report.get("failed"))}
+                               "failed": bool(report.get("failed")),
+                               "relocation": report.get("relocation", {})}
         except Exception as exc:  # publication already succeeded; record only
             task.graph_sync = {"failed": True, "error_type": type(exc).__name__}
 
@@ -412,9 +438,12 @@ class TaskRunner:
                     save(result)
                     return result
                 require_scope(result, self.changeset)
-                changed_paths = sorted(self.changeset.validate_workspace())
+                publication_manifest = self.changeset.validate_workspace()
+                baseline = self.changeset.state["baseline"]
+                changed_paths = sorted(path for path in publication_manifest.keys() | baseline.keys()
+                                       if publication_manifest.get(path) != baseline.get(path))
                 self.changeset.publish(cancel_check=self.cancel_check,
-                                       finalize=lambda: self._refresh_index(self.project))
+                                       finalize=lambda: self._refresh_index(self.project, changed_paths=changed_paths))
                 self._sync_graph(result, changed_paths)
                 result.status = "done"
                 result.finished_at = time.time()
@@ -431,18 +460,17 @@ class TaskRunner:
         save(result)
         return result
 
-    def _refresh_index(self, root: Path, *, seed_root: Path | None = None, recovering=False):
-        """Reuse syntax only after hashing current bytes; never reuse read authority.
+    def _refresh_index(self, root: Path, *, seed_root: Path | None = None, recovering=False, changed_paths=None):
+        """Incrementally refresh exact host mutation paths; never mint read proof.
 
-        The task lease serializes this runner's staged source. A new workspace
-        may seed its parse cache from the source index, but build_tree still
-        traverses and hashes every admitted file, rebuilds links, and save_tree
-        compares the destination's generation before committing.
+        Creation/resume/recovery use full content audits. Validated step deltas
+        identify owned mutations between trust boundaries. Policy/schema drift
+        triggers a reasoned audit; save_tree still compares store generations.
         """
         with source_mutation_lease(root):
-            return self._refresh_index_locked(root, seed_root=seed_root, recovering=recovering)
+            return self._refresh_index_locked(root, seed_root=seed_root, recovering=recovering, changed_paths=changed_paths)
 
-    def _refresh_index_locked(self, root, *, seed_root, recovering):
+    def _refresh_index_locked(self, root, *, seed_root, recovering, changed_paths=None):
         current = None
         try:
             current = load_tree(root)
@@ -455,6 +483,7 @@ class TaskRunner:
             except TreeError:
                 pass
         tree = build_tree(root, self.config.tree.ignore, previous=previous,
+                          changed_paths=changed_paths,
                           respect_gitignore=self.config.tree.respect_gitignore,
                           limits=self.changeset.limits if self.changeset else self.resource_limits,
                           cancel_check=None if recovering else self.cancel_check)
@@ -550,7 +579,7 @@ class TaskRunner:
                 if step_delta - effective_scope:
                     raise ChangeSetConflict("step mutations exceed reviewed goal scope")
                 self.cancel_check()
-                indexed = self._refresh_index(self.changeset.workspace)
+                indexed = self._refresh_index(self.changeset.workspace, changed_paths=sorted(step_delta))
                 task.tree_fingerprint = indexed["fingerprint"]
                 if self.changeset.validate_workspace() != after_manifest:
                     raise ChangeSetConflict("workspace changed while binding step evidence")
@@ -908,6 +937,12 @@ class TaskRunner:
                                       graph_revision=task.tree_fingerprint,
                                       context_revision=self.read_plan_report.get("revision", ""),
                                       premise_paths=None)
+        if self.changeset:
+            from atomic_flow.graph.relocation import owned_move_hints
+
+            self.changeset.state["graph_moves"] = owned_move_hints(
+                self.changeset.state.get("graph_moves", {}), calls, before_manifest, after_manifest)
+            self.changeset._save()
 
     def _execute_step(self, task: Task, step: Step) -> None:
         from atomic_flow.agents.frontier import frontier_context

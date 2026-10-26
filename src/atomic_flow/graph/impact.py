@@ -98,8 +98,11 @@ def context_pack_from_index(index: ContextPackIndex, goals: list[str], *, byte_c
             continue
         total += entry["bytes"]
         capped.append(entry)
+    omissions = [{"path": entry["file"], "reason": "context_byte_cap"} for entry in capped if entry.get("truncated")]
     return {"extractor": PACK_EXTRACTOR, "goals": sorted(goals), "entries": capped,
             "included_bytes": total, "byte_cap": byte_cap,
+            "estimated_token_cap": byte_cap, "omissions": omissions, "coverage_complete": not omissions,
+            "read_proof": False, "runtime_coverage": "not_assessed",
             "revision": index.revision, "stats": dict(index.stats),
             "parse_failures": sorted(p for p, record in index.files.items() if not record["nodes"][0]["facts"]["parse_ok"]),
             "method": "name-level advisory; not a resolution claim"}
@@ -131,3 +134,37 @@ def select_goals(index: ContextPackIndex, allowed_paths, description: str, *, li
 
 def goal_module(goal: str) -> str:
     return goal[:-len(".py")].replace("/", ".") if goal.endswith(".py") else goal.replace("/", ".")
+
+
+def verification_plan(files: dict[str, bytes], changed_paths: list[str]) -> dict:
+    """Advisory targeted checks; unresolved/config/deletion always broadens final gate.
+
+    This does not execute tests or mark requirements verified. Every plan has a
+    final full-regression obligation even when a narrow target can run in-loop.
+    """
+    from atomic_flow.graph.adapter_resource import resource_kind
+    from atomic_flow.graph.project import clean_build
+    from atomic_flow.graph.semantic import file_dependencies
+    supported = {p: raw for p, raw in files.items() if p.endswith((".py", ".pyi")) or resource_kind(p)}
+    omitted = sorted(set(files) - set(supported))
+    build = clean_build(supported)
+    deps = file_dependencies(build)
+    affected = set(changed_paths)
+    while True:
+        expanded = affected | {path for path, dependencies in deps.items() if set(dependencies) & affected}
+        if expanded == affected:
+            break
+        affected = expanded
+    targets = sorted(p for p in files if p.endswith(".py") and
+                     (p in affected and (p.startswith("tests/") or p.rsplit("/", 1)[-1].startswith("test_"))))
+    for path in changed_paths:
+        stem = path.rsplit("/", 1)[-1].removesuffix(".py")
+        targets.extend(p for p in files if p.endswith(".py") and p.rsplit("/", 1)[-1] == "test_" + stem + ".py")
+    unknown = bool(omitted or build["unresolved"] or any(p not in files or not p.endswith((".py", ".pyi")) for p in changed_paths))
+    return {"schema_version": 1, "changed_paths": sorted(set(changed_paths)), "affected_paths": sorted(affected),
+            "targeted_tests": sorted(set(targets)), "impact_status": "unknown" if unknown else "static_inferred",
+            "unresolved": build["unresolved"], "runtime_coverage": "not_assessed",
+            "omitted_unsupported": omitted,
+            "loop_check": "full_pytest" if unknown or not targets else "targeted_pytest",
+            "required_final_check": "full_pytest", "checks_executed": False,
+            "source_digests": {p: __import__("hashlib").sha256(raw).hexdigest() for p, raw in sorted(files.items())}}

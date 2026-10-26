@@ -1,0 +1,22 @@
+........................F..................                              [100%]
+================================== FAILURES ===================================
+_____ test_stale_separate_store_handle_cannot_overwrite_persisted_commit ______
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-146/test_stale_separate_store_hand0')
+
+    def test_stale_separate_store_handle_cannot_overwrite_persisted_commit(tmp_path):
+        files = {"a.py": b"def helper(): return 1\n"}
+        first = _seed(tmp_path, files)
+        stale = GraphStore(first.path)
+        apply_delta(first, file_delta("b.py", b"def other(): return 2\n", expected_old_digest=None))
+        before = first.path.read_bytes()
+>       with pytest.raises(GraphGenerationConflict, match="persisted store generation"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'persisted store generation'
+E         Actual message: 'graph bytes changed since snapshot; reopen before commit'
+
+tests\test_graph_cas_review.py:37: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_graph_cas_review.py::test_stale_separate_store_handle_cannot_overwrite_persisted_commit
+1 failed, 42 passed in 38.03s

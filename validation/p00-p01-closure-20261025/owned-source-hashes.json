@@ -1,0 +1,20 @@
+{
+  "source_head": "995e3bb5cdc07bec4b56005c937187a1408645e6",
+  "working_patch": true,
+  "normalization": "CRLF to LF for source code",
+  "normalized_sha256": {
+    "src/atomic_flow/graph/schema.py": "670ab0d517e4303e69bfa33a0d681bf05f145608228b5562cc563c85e82942e3",
+    "src/atomic_flow/graph/store.py": "2184c1f549a5234dc68ddb49025ca20344f8c37854e776bb00553008f7caf886",
+    "src/atomic_flow/graph/identity.py": "15c8aaa4575ab6fea22e0a8749907510d77bf4b4e8914cae9d8106ae4f0fff69",
+    "src/atomic_flow/graph/compat.py": "0e0b7b40b9b16665c98140fb10ad3040a1bbbbeb28929bb629a5493d337d6bd8",
+    "src/atomic_flow/graph/migrate.py": "1fa4a73c06a9c3e93fddb4775fd70af1ee09db85186996f86d33e6c2bcc48dd3",
+    "src/atomic_flow/graph/adapter_ast.py": "4c9e48ab7da72d86c5555d728cf5a57b961517e9d1d41713a8b17dcf9d7c90c0",
+    "src/atomic_flow/graph/adapter_resource.py": "ba6cb7790b231301809ca1bc42694db7f5701f83bf493b6f80b51f7e6b9a0409",
+    "src/atomic_flow/graph/__init__.py": "ea8c86ae98ab11ca0782bc8874ad3c62414d30fb4145665bf1115574ae02e5b0",
+    "tests/test_p01_contract.py": "e4704c00eb205bc18e378808e2538e600f996a1b43d45a52e2d56f0a4c183126",
+    "tests/test_graph_contract.py": "33c1772a19e466f6d9da254ea40b79c8f92cf8bdbbdf554959663610cc8117a6",
+    "tests/test_p00_contracts.py": "a630ea4270cda055eea628d504ab50350448e06d02f240c9872fc44151cb5d67",
+    "tools/p00_contracts.py": "729d5b8c110b57c477e11e74c03aacfb413ed4589abfa889f052f60cc80dcc60",
+    "tools/p00_baseline.py": "2b3da87f9eb3787062bb507502b6b0f233d7bae6cf6fe941bd93ca466034b844"
+  }
+}

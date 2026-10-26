@@ -116,3 +116,37 @@ def affected_by_name(reverse: dict[str, dict[str, list[str]]], names: Iterable[s
         for kind in ("imports", "calls"):
             mentioned.update(reverse[kind].get(name, ()))
     return sorted(mentioned)
+
+
+def project_paths(root: Path, paths, *, tree_ignore=None, respect_gitignore=True,
+                  private_workspace=False, limits=None, cancel_check=lambda: None) -> dict[str, bytes | None]:
+    """Admit exact host-owned changed paths without enumerating other source files."""
+    from types import SimpleNamespace
+
+    from atomic_flow.agents.source import confined_path
+    from atomic_flow.agents.tools.file_paths import admitted_path
+    from atomic_flow.graph.schema import file_id
+    from atomic_flow.project_resources import ProjectLimits, ResourceLimitError
+
+    limits = limits or ProjectLimits()
+    if len(paths) > limits.max_files:
+        raise ResourceLimitError("delta path count exceeds project limit")
+    ctx = SimpleNamespace(project_root=Path(root).absolute(), tree_ignore=tree_ignore,
+                          respect_gitignore=respect_gitignore, private_workspace=private_workspace)
+    result, total = {}, 0
+    for path in sorted(set(paths)):
+        cancel_check()
+        file_id(path)
+        target = confined_path(ctx.project_root, path)
+        if not target.exists():
+            result[path] = None
+            continue
+        target = admitted_path(ctx, path, existing=True)
+        with target.open("rb") as handle:
+            data = handle.read(limits.max_file_bytes + 1)
+        total += len(data)
+        if len(data) > limits.max_file_bytes or total > limits.max_total_bytes:
+            raise ResourceLimitError("delta source byte limit exceeded")
+        result[path] = data
+    cancel_check()
+    return result

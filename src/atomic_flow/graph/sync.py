@@ -13,8 +13,11 @@ import time
 from pathlib import Path
 from typing import Any
 
-from atomic_flow.graph.delta import apply_delta, fallback_rebuild, file_delta
-from atomic_flow.graph.project import clean_build, project_files
+from atomic_flow.graph.adapter_ast import EXTRACTOR
+from atomic_flow.graph.adapter_resource import RESOURCE_EXTRACTOR, resource_kind
+from atomic_flow.graph.delta import apply_changes, fallback_rebuild
+from atomic_flow.graph.project import clean_build, project_files, project_paths
+from atomic_flow.graph.resolve import RESOLVER
 from atomic_flow.graph.schema import GraphContractError
 from atomic_flow.graph.store import GraphStore
 
@@ -23,7 +26,12 @@ def store_path(project: Path) -> Path:
     return project / ".atomic_flow" / "graph.json"
 
 
-def sync_project_graph(project: Path, changed: dict[str, Any], *, cancel_check=lambda: None) -> dict[str, Any]:
+def _graph_files(project, cancel_check):
+    return {p: raw for p, raw in project_files(project, suffix=None, cancel_check=cancel_check).items()
+            if p.endswith((".py", ".pyi")) or resource_kind(p)}
+
+
+def sync_project_graph(project: Path, changed: dict[str, Any], *, cancel_check=lambda: None, moves=None) -> dict[str, Any]:
     """Apply per-file deltas for `changed` ({path: new bytes | None=deleted}).
 
     Never raises for graph-internal problems: a failed sync degrades to a
@@ -34,37 +42,45 @@ def sync_project_graph(project: Path, changed: dict[str, Any], *, cancel_check=l
     target = store_path(project)
     log = target.parent / "graph-sync.jsonl"
     started = time.monotonic()
+    def validate_snapshot(files):
+        if _graph_files(project, cancel_check) != files:
+            raise GraphContractError("published source drifted during graph synchronization")
     try:
         cancel_check()
         if not target.exists():
-            files = project_files(project)
+            files = _graph_files(project, cancel_check)
             clean = clean_build(files)
             store = GraphStore(target)
+            validate_snapshot(files)
+            cancel_check()
             store.commit(base_generation=0, put_nodes=clean["nodes"], put_edges=clean["edges"])
             result = {"created": True, "parsed_files": clean["parsed_files"], "deltas": 0}
         else:
             store = GraphStore(target)
-            reports = []
-            for path in sorted(changed):
-                cancel_check()
-                new_bytes = changed[path]
-                current = next((n["source"]["digest"] for n in store.nodes()
-                                if n["kind"] == "file" and n["path"] == path), "")
-                reports.append(apply_delta(store, file_delta(path, new_bytes,
-                                                             expected_old_digest=current)))
-            result = {"created": False, "deltas": len(reports),
-                      "parsed_files": sum(r["parsed_files"] for r in reports),
-                      "relinked_files": max((r["relinked_files"] for r in reports), default=0)}
+            if any(node["facts"].get("extractor") != (
+                    EXTRACTOR if node["path"].endswith((".py", ".pyi")) else RESOURCE_EXTRACTOR)
+                   for node in store.nodes() if node["kind"] == "file"):
+                raise GraphContractError("parser/extractor version changed")
+            if any(edge.get("facts_class") == "inferred" and edge["facts"].get("resolver") != RESOLVER
+                   for edge in store.edges()):
+                raise GraphContractError("resolver version changed")
+            def validate_source():
+                if project_paths(project, changed, cancel_check=cancel_check) != changed:
+                    raise GraphContractError("published source drifted during graph synchronization")
+            result = {"created": False, **apply_changes(store, changed, cancel_check=cancel_check,
+                                                        source_check=validate_source, moves=moves)}
         result["seconds"] = round(time.monotonic() - started, 4)
         _append(log, {**result, "changed": sorted(changed), "status": "ok"})
         return result
     except (GraphContractError, OSError, ValueError) as exc:
-        reason = f"delta sync failed: {type(exc).__name__}"
+        reason = (str(exc) if str(exc) in {"parser/extractor version changed", "resolver version changed"}
+                  else f"delta sync failed: {type(exc).__name__}")
         try:
             cancel_check()
-            files = project_files(project)
+            files = _graph_files(project, cancel_check)
             store = GraphStore(target)
-            rebuild = fallback_rebuild(store, files, reason)
+            rebuild = fallback_rebuild(store, files, reason,
+                                       source_check=lambda: validate_snapshot(files), cancel_check=cancel_check)
             _append(log, {"status": "fallback", "reason": reason,
                           "parsed_files": rebuild["parsed_files"],
                           "seconds": round(time.monotonic() - started, 4)})

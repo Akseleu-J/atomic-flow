@@ -11,6 +11,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from atomic_flow.llm.verification import VerificationReport
+
 
 class LLMModel(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -110,7 +112,8 @@ class AnswerResult(StrictModel):
     model_used: str
     verdict: str = "unverified"                    # critic verdict, downgraded by deterministic checks
     citation_coverage: float = 0.0                 # critic's estimate (model opinion)
-    grounding: float = 1.0                         # deterministic: share of `identifiers` found in the context
+    grounding: float | None = None                # nullable when no identifiers were checked; never semantic proof
+    verification_report: VerificationReport = Field(default_factory=VerificationReport)
     unknown_identifiers: list[str] = Field(default_factory=list)
     dropped_citations: int = 0                     # citations to nodes that were not in the context
     retrieval_weak: bool = False

@@ -13,9 +13,9 @@ from dataclasses import dataclass
 from atomic_flow.activation.redact import redact
 from atomic_flow.graph.project import clean_build
 from atomic_flow.graph.schema import GraphContractError
-from atomic_flow.graph.semantic import layers, tour
+from atomic_flow.graph.semantic import assemble, file_dependencies, semantic_hashes
 
-PIPELINE_VERSION = "semantic-pipeline/1"
+PIPELINE_VERSION = "semantic-pipeline/2"
 
 
 def _hash(value):
@@ -53,6 +53,7 @@ def _validate(result, source, nodes):
         node = nodes.get(span["node_id"])
         if (node is None or type(start) is not int or type(end) is not int
                 or not 1 <= start <= end <= len(lines)
+                or not isinstance(span["quote"], str) or not span["quote"].strip()
                 or span["quote"] != "".join(lines[start - 1:end])):
             raise GraphContractError("semantic evidence is not exact current source")
         if node["kind"] != "file" and not node["start_line"] <= start <= end <= node["end_line"]:
@@ -76,17 +77,24 @@ def enrich(files: dict[str, bytes], *, project_scope: str, identity: dict,
         raise GraphContractError("semantic admitted-source byte/file cap exceeded")
     cancel_check()
     build = clean_build(files)
+    inferred_dependencies = file_dependencies(build)
+    hashes = {path: semantic_hashes(raw) for path, raw in files.items()}
     digests = {n["path"]: n["source"]["digest"] for n in build["nodes"] if n["kind"] == "file"}
     staged, artifacts = {}, {}
     before_calls = budget.calls
     for path in sorted(files):
         cancel_check()
-        deps = sorted({path, *(dependencies or {}).get(path, [])})
+        deps = sorted({path, *inferred_dependencies.get(path, []), *(dependencies or {}).get(path, [])})
+        # Unknown/dynamic relations cannot justify a narrow invalidation claim.
+        # Conservatively bind every file until the resolver can prove a closure.
+        if build["unresolved"]:
+            deps = sorted(files)
         if any(dep not in files for dep in deps):
             raise GraphContractError("semantic dependency missing from admitted snapshot")
         nodes = [n for n in build["nodes"] if n["path"] == path]
         binding = {"pipeline": PIPELINE_VERSION, "scope": project_scope, "path": path,
                    "identity": identity, "dependencies": {p: digests[p] for p in deps},
+                   "semantic_hashes": hashes[path], "resolver": "resolved-file-closure/1",
                    "structure": nodes}
         key = _hash(binding)
         if key in cache:
@@ -98,13 +106,18 @@ def enrich(files: dict[str, bytes], *, project_scope: str, identity: dict,
         _validate(result, files[path], {n["id"]: n for n in nodes})
         staged[key] = copy.deepcopy(result)
         artifacts[path] = {"cache_key": key, "source_digest": digests[path], "status": "fresh",
+                           "semantic_hashes": hashes[path], "dependencies": deps,
+                           "dependency_digests": {p: digests[p] for p in deps},
                            "facts_class": "inferred", "verification": "evidence_only",
                            "result": copy.deepcopy(result)}
     # Assembly/architecture/tour/review remain deterministic and digest-bound.
-    structural = {"layers": layers(files), "tour": tour(files), "unresolved": build["unresolved"]}
+    structural = assemble(files, build, artifacts)
     cancel_check()
     cache.update(staged)
     return {"pipeline": PIPELINE_VERSION, "scope": project_scope, "artifacts": artifacts,
             "structural": structural, "calls": budget.calls - before_calls,
             "review": {"evidence": "passed", "semantic_correctness": "not_assessed",
-                       "coverage": sorted(files), "dependency_scope": "explicit host dependencies"}}
+                       "coverage": sorted(files), "omissions": [],
+                       "surviving_symbols": sorted(n["id"] for n in build["nodes"] if n["kind"] != "file"),
+                       "dependency_scope": "all admitted files when unresolved; otherwise resolved closure plus explicit host dependencies",
+                       "unresolved": build["unresolved"]}}

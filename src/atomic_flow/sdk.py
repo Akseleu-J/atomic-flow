@@ -253,3 +253,15 @@ def understand_project(project: str | Path, *, project_scope: str, identity: dic
     cache.update(staged)
     result["review"]["omitted_unsupported_adapters"] = omitted
     return result
+
+
+def inspect_graph(project: str | Path, operation="inspect", **kwargs):
+    """Versioned read-only inspect/search/explain/chat/impact/tour operations."""
+    from atomic_flow.graph.operations import graph_operation
+    return graph_operation(Path(project), operation, **kwargs)
+
+
+def semantic_provider(project: str | Path, backend, config, *, cancel_check=lambda: None):
+    """Explicit provider adapter sharing durable physical-call accounting."""
+    from atomic_flow.graph.provider import SemanticProvider
+    return SemanticProvider(Path(project), backend, config, cancel_check=cancel_check)

@@ -1,0 +1,86 @@
+{
+  "schema": "p00-p01-acceptance/1",
+  "original_source": "docs/PRODUCTION_ROADMAP.md P00/P01 plus E00/E01 prerequisite design",
+  "rows": [
+    {
+      "id": "P00.1",
+      "criterion": "frozen identities and offline zero-call contract",
+      "tests": [
+        "tests.test_p00_contracts::test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+      ]
+    },
+    {
+      "id": "P00.2",
+      "criterion": "complete static test inventory and W1-W9 mapping",
+      "tests": [
+        "tests.test_p00_contracts::test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+      ]
+    },
+    {
+      "id": "P00.3",
+      "criterion": "baseline measurements retain historical bytes and isolated future I/O",
+      "tests": [
+        "tests.test_p00_contracts::test_baseline_cache_measurement_never_replaces_existing_project_tree"
+      ]
+    },
+    {
+      "id": "P00.4",
+      "criterion": "versioned acceptance/evidence contract and read-only inventory",
+      "tests": [
+        "tests.test_p00_contracts::test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+      ]
+    },
+    {
+      "id": "P00.5",
+      "criterion": "preregistered comparison and explicit no-paid-run budget",
+      "tests": [
+        "tests.test_p00_contracts::test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+      ]
+    },
+    {
+      "id": "P01.1",
+      "criterion": "all selected UA kinds and explicit parser/unsupported omission",
+      "tests": [
+        "tests.test_p01_contract::test_resource_kinds_parse_failures_and_legacy_omissions_are_explicit",
+        "tests.test_p01_contract::test_graph_review_reports_unresolved_dependencies_instead_of_complete_claim"
+      ]
+    },
+    {
+      "id": "P01.2",
+      "criterion": "source digest/span/provenance/freshness strictness",
+      "tests": [
+        "tests.test_p01_contract::test_graph_source_provenance_and_freshness_are_strict"
+      ]
+    },
+    {
+      "id": "P01.3",
+      "criterion": "duplicate symbols canonical identity and project/root namespace",
+      "tests": [
+        "tests.test_p01_contract::test_root_principal_policy_namespaces_reject_cross_project_reads",
+        "tests.test_p01_contract::test_legacy_roundtrip_preserves_supported_records_duplicate_symbols_and_omissions"
+      ]
+    },
+    {
+      "id": "P01.4",
+      "criterion": "CAS transaction/read port/legacy export migration",
+      "tests": [
+        "tests.test_p01_contract::test_store_snapshots_do_not_grant_mutable_handles_and_detect_same_generation_tamper",
+        "tests.test_p01_contract::test_store_strict_document_decode_never_silently_collapses_records",
+        "tests.test_p01_contract::test_legacy_roundtrip_preserves_supported_records_duplicate_symbols_and_omissions",
+        "tests.test_p01_contract::test_duplicate_transaction_ids_do_not_silently_replace_records",
+        "tests.test_p01_contract::test_graph_read_port_feeds_existing_tree_search_without_read_authority"
+      ]
+    },
+    {
+      "id": "P01.5",
+      "criterion": "independent adapter decision pinned reference and attribution",
+      "artifacts": [
+        "docs/P01_GRAPH_COMPATIBILITY.md",
+        "docs/UNDERSTAND_ANYTHING_REFERENCE_2026-10-24.md"
+      ],
+      "tests": [
+        "tests.test_graph_contract::test_adapter_extracts_symbols_imports_and_calls_with_stable_identity"
+      ]
+    }
+  ]
+}

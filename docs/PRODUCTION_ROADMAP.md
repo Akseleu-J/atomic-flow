@@ -82,7 +82,11 @@ Structural graph — источник извлечённых фактов. Seman
 Task DAG — другой граф: goal/subgoal/step/dependencies/checks, связанный с code nodes,
 но не смешанный с ними. Информация и authorization хранятся раздельно.
 
-Для нового graph store выбран начальный design: SQLite в WAL mode с schema
+Актуальное решение для локального P01: [ADR-0002](ADR_0002_GRAPH_STORAGE.md).
+Принят bounded canonical JSON с generation/content CAS за versioned read port;
+производительность и crash/scale acceptance проверяются отдельно.
+Следующее исходное предложение сохранено как история, заменённая ADR-0002:
+для нового graph store был выбран начальный design: SQLite в WAL mode с schema
 migrations, single-writer transaction и согласованными reader snapshots;
 canonical JSON export для portability/inspection. Перед принятием — Windows/Linux
 locking, corruption/crash и workload проверки. SQLite не отменяет integrity checks,

@@ -81,7 +81,7 @@ class EditNodeTool(Tool):
                                   private_workspace=ctx.private_workspace)
             if verdict.ok:
                 read_checked(ctx.project_root, node.path, digest(updated))
-                ctx.refresh()
+                ctx.refresh(changed_paths=[node.path])
                 read_checked(ctx.project_root, node.path, digest(updated))
             else:
                 raise ValueError(verdict.message)
@@ -90,7 +90,7 @@ class EditNodeTool(Tool):
             refresh_error = ""
             if restored:
                 try:
-                    ctx.refresh()
+                    ctx.refresh(changed_paths=[node.path])
                 except Exception as refresh_exc:
                     refresh_error = str(refresh_exc)
             from atomic_flow.agents.execution import TaskCancelled

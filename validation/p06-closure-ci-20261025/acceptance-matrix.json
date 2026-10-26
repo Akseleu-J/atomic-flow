@@ -1,0 +1,231 @@
+{
+  "scope": "P06 trusted-host mechanics; scripted providers; OS kill/deployment and independent review excluded",
+  "rows": [
+    {
+      "id": "M01",
+      "title": "Hierarchical multi-file repair and publication",
+      "cases": [
+        {
+          "classname": "tests.test_p06_public_repair",
+          "test": "test_hierarchical_multifile_failure_repair_publish_without_new_plan_review"
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "title": "Authority expansion refused",
+      "cases": [
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_replan_cannot_introduce_new_execution_tool"
+        },
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_real_dispatcher_denies_undeclared_execution_before_tool_implementation"
+        },
+        {
+          "classname": "tests.test_p06_constraints",
+          "test": "test_replacement_cannot_silently_relax_original_constraints"
+        },
+        {
+          "classname": "tests.test_envelope",
+          "test": "test_widening_is_refused_with_reasons"
+        }
+      ]
+    },
+    {
+      "id": "M03",
+      "title": "Verification criteria and oracle links retained",
+      "cases": [
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_replan_cannot_drop_pytest_obligation_from_mixed_plan"
+        },
+        {
+          "classname": "tests.test_replan_lineage_wiring",
+          "test": "test_replan_dropping_criterion_pauses_with_lineage_reason"
+        },
+        {
+          "classname": "tests.test_p06_constraints",
+          "test": "test_replacement_cannot_silently_relax_original_constraints"
+        },
+        {
+          "classname": "tests.test_repair_budget",
+          "test": "test_later_mutation_invalidates_earlier_failed_check"
+        },
+        {
+          "classname": "tests.test_checker_bytecode",
+          "test": "test_pytest_checks_current_source_despite_valid_timestamp_bytecode"
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "title": "Budgets call limits no-progress and original goal accounting",
+      "cases": [
+        {
+          "classname": "tests.test_p06_constraints",
+          "test": "test_original_goal_cap_survives_replan_and_restart"
+        },
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_repeated_failure_pauses_before_global_replan_cap"
+        },
+        {
+          "classname": "tests.test_repair_budget",
+          "test": "test_cap_admits_first_call_blocks_next_before_send_and_survives_restart"
+        },
+        {
+          "classname": "tests.test_repair_budget",
+          "test": "test_reported_overspend_is_persisted_and_blocks_all_continuation"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expired_resume_does_not_call_backend_or_execute_step"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_reservation_releases_unsent_hold"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_known_response_keeps_cost_and_blocks_next_call"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_replan_preserves_original_absolute_deadline"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_legacy_envelope_requires_review_without_minting_deadline"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_final_check_blocks_publication"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_during_replan_never_renews_automatic_authority"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_deadline_is_bound_to_review_digest_and_task_creation"
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "title": "Runtime policy source and capability drift",
+      "cases": [
+        {
+          "classname": "tests.test_p06_constraints",
+          "test": "test_opted_in_runtime_drift_pauses_before_any_call_or_effect"
+        },
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_actual_backend_change_with_same_runner_config_pauses_before_inference"
+        }
+      ]
+    },
+    {
+      "id": "M06",
+      "title": "Unknown charge effect response without replay",
+      "cases": [
+        {
+          "classname": "tests.test_task_budget",
+          "test": "test_uncertain_charge_is_held_and_not_replayed"
+        },
+        {
+          "classname": "tests.test_unresolved_effects",
+          "test": "test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval"
+        },
+        {
+          "classname": "tests.test_repair_budget",
+          "test": "test_unknown_usage_keeps_hold_and_never_refreshes_repair"
+        }
+      ]
+    },
+    {
+      "id": "M07",
+      "title": "Cancel before send and after known response",
+      "cases": [
+        {
+          "classname": "tests.test_task_budget",
+          "test": "test_cancel_after_reservation_sends_no_call_and_releases_hold"
+        },
+        {
+          "classname": "tests.test_task_budget",
+          "test": "test_cancel_after_response_keeps_known_cost"
+        }
+      ]
+    },
+    {
+      "id": "M08",
+      "title": "Persisted interruption resume and legacy authority",
+      "cases": [
+        {
+          "classname": "tests.test_task_budget",
+          "test": "test_process_interruption_preserves_call_reservation"
+        },
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_legacy_approval_still_pauses_before_replanned_execution"
+        },
+        {
+          "classname": "tests.test_p05_acceptance",
+          "test": "test_done_step_receipt_survives_resume_and_stale_premise_never_replays"
+        },
+        {
+          "classname": "tests.test_p06_public_repair",
+          "test": "test_hierarchical_multifile_failure_repair_publish_without_new_plan_review"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expired_resume_does_not_call_backend_or_execute_step"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_reservation_releases_unsent_hold"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_known_response_keeps_cost_and_blocks_next_call"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_replan_preserves_original_absolute_deadline"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_legacy_envelope_requires_review_without_minting_deadline"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_final_check_blocks_publication"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_during_replan_never_renews_automatic_authority"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_deadline_is_bound_to_review_digest_and_task_creation"
+        },
+        {
+          "classname": "tests.test_job_claim",
+          "test": "test_worker_waits_for_reconcile_lease_and_rechecks_terminal_state"
+        }
+      ]
+    },
+    {
+      "id": "M09",
+      "title": "Malicious repository instruction",
+      "cases": [
+        {
+          "classname": "tests.test_failure_wiring_and_malicious",
+          "test": "test_malicious_repository_instructions_never_widen_the_envelope"
+        }
+      ]
+    }
+  ]
+}

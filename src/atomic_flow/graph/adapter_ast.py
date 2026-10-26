@@ -12,9 +12,9 @@ import ast
 import hashlib
 from typing import Any
 
-from atomic_flow.graph.schema import edge_id, file_id, symbol_id
+from atomic_flow.graph.schema import GraphContractError, _posix, edge_id, file_id, symbol_id
 
-EXTRACTOR = "python-ast/1"
+EXTRACTOR = "python-ast/2"
 
 
 def _qualified(parent: str, name: str) -> str:
@@ -23,6 +23,9 @@ def _qualified(parent: str, name: str) -> str:
 
 def adapt_file(path: str, source: bytes) -> dict[str, Any]:
     """Build nodes/edges for one Python file; parser failure is reported, not raised."""
+    _posix(path)
+    if not isinstance(source, bytes) or len(source) > 1_000_000:
+        raise GraphContractError("Python source must be bounded bytes")
     digest = hashlib.sha256(source).hexdigest()
     file_node = {"id": file_id(path), "kind": "file", "path": path,
                  "source": {"digest": digest, "algorithm": "sha256"},
@@ -36,11 +39,15 @@ def adapt_file(path: str, source: bytes) -> dict[str, Any]:
     seen: dict[str, int] = {}
     try:
         tree = ast.parse(source)
-    except SyntaxError as exc:
+    except (SyntaxError, UnicodeError, ValueError) as exc:
         file_node["facts"]["parse_ok"] = False
-        file_node["facts"]["parse_error"] = f"line {exc.lineno}: {exc.msg}"
+        file_node["facts"]["parse_error"] = f"line {getattr(exc, 'lineno', '?')}: {getattr(exc, 'msg', type(exc).__name__)}"
         file_node["fact_status"]["parse_error"] = "fresh"
         return {"nodes": nodes, "edges": edges}
+
+    from atomic_flow.graph.python_bindings import extract_bindings
+    file_node["facts"].update(extract_bindings(tree))
+    file_node["fact_status"].update({key: "fresh" for key in file_node["facts"]})
 
     def walk(node: ast.AST, parent_symbol: str, parent_id: str) -> None:
         for child in ast.iter_child_nodes(node):

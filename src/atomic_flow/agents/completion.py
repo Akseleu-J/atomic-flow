@@ -70,10 +70,32 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dic
                                  "scope": "Changed surviving Python files only"})
         if report["diagnostics"]:
             return report
-        if config.task.final_check == "pytest" or any(s.verify_with == "pytest" and s.status == "done" for s in task.steps):
+        impact_requires_tests = False
+        if changed:
+            from atomic_flow.graph.impact import verification_plan
+
+            # Final publication is an explicit full-content boundary. A targeted
+            # in-loop selection never replaces the final regression obligation.
+            files = {}
+            for path, expected in manifest.items():
+                cancel_check()
+                raw = confined_path(changeset.workspace, path).read_bytes()
+                if digest(raw) != expected:
+                    raise ValueError("Workspace changed during impact assessment")
+                files[path] = raw
+            report["impact_check_plan"] = verification_plan(files, changed)
+            impact_requires_tests = any(path.endswith(".py") and (
+                path.startswith("tests/") or path.rsplit("/", 1)[-1].startswith("test_")
+                or path.rsplit("/", 1)[-1].endswith("_test.py")) for path in files)
+            report["impact_check_plan"]["final_gate_applicable"] = impact_requires_tests
+            if not impact_requires_tests:
+                report["impact_check_plan"]["test_coverage"] = "not_assessed_no_test_files"
+        if (impact_requires_tests or config.task.final_check == "pytest"
+                or any(s.verify_with == "pytest" and s.status == "done" for s in task.steps)):
             result = run_python(["-m", "pytest", "-q", "--no-header", "-x"], changeset.workspace,
                                 config=config.execution, timeout=180, cancel_check=cancel_check)
-            report["tests"] = "passed" if result.returncode == 0 and not result.timed_out else "failed"
+            report["tests"] = ("unavailable" if result.returncode == 5 else
+                               "passed" if result.returncode == 0 and not result.timed_out else "failed")
             report["test_exit_code"] = result.returncode
             report["test_timed_out"] = result.timed_out
             report["test_output_tail"] = sanitize_output((result.stdout + result.stderr)[-3000:])

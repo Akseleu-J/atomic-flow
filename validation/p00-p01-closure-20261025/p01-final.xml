@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="40" time="53.693" timestamp="2026-10-26T07:18:12.450908+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_p00_contracts" name="test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits" time="11.147"><failure message="  File &quot;&lt;unknown&gt;&quot;, line 37&#10;    remote.allowed_tools[&quot;source_read&quot;] = schema_hash(next(tool for tool in tools if tool[&quot;name&quot;] == &quot;source_read&quot;))&#10;IndentationError: unexpected indent">def test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits():
+        root = Path(__file__).resolve().parents[1]
+        spec = importlib.util.spec_from_file_location("p00_contracts", root / "tools/p00_contracts.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        paths = [root / "validation/p00-baseline-20261024/card.json",
+                 root / "validation/p00-baseline-20261024/acceptance-registry.json"]
+        before = [p.read_bytes() for p in paths]
+&gt;       report = module.collect(root)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_p00_contracts.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\p00_contracts.py:35: in collect
+    module = ast.parse(raw)
+             ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+source = b'import io\nimport json\nimport sys\nimport threading\nfrom pathlib import Path\nfrom types import SimpleNamespace\n\...remote, "_send", send)\n    with pytest.raises(TaskCancelled):\n        remote._request("test", cancel_check=cancel)\n'
+filename = '&lt;unknown&gt;', mode = 'exec', type_comments = False
+feature_version = -1
+
+    def parse(source, filename='&lt;unknown&gt;', mode='exec', *,
+              type_comments=False, feature_version=None):
+        """
+        Parse the source into an AST node.
+        Equivalent to compile(source, filename, mode, PyCF_ONLY_AST).
+        Pass type_comments=True to get back type comments where the syntax allows.
+        """
+        flags = PyCF_ONLY_AST
+        if type_comments:
+            flags |= PyCF_TYPE_COMMENTS
+        if feature_version is None:
+            feature_version = -1
+        elif isinstance(feature_version, tuple):
+            major, minor = feature_version  # Should be a 2-tuple.
+            if major != 3:
+                raise ValueError(f"Unsupported major version: {major}")
+            feature_version = minor
+        # Else it should be an int giving the minor version for 3.x.
+&gt;       return compile(source, filename, mode, flags,
+                       _feature_version=feature_version)
+E         File "&lt;unknown&gt;", line 37
+E           remote.allowed_tools["source_read"] = schema_hash(next(tool for tool in tools if tool["name"] == "source_read"))
+E       IndentationError: unexpected indent
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\ast.py:52: IndentationError</failure></testcase><testcase classname="tests.test_p00_contracts" name="test_baseline_cache_measurement_never_replaces_existing_project_tree" time="9.513" /><testcase classname="tests.test_p01_contract" name="test_unsafe_graph_paths_are_refused_before_adapter_or_storage[../a.py]" time="0.084" /><testcase classname="tests.test_p01_contract" name="test_unsafe_graph_paths_are_refused_before_adapter_or_storage[/a.py]" time="0.036" /><testcase classname="tests.test_p01_contract" name="test_unsafe_graph_paths_are_refused_before_adapter_or_storage[C:/a.py]" time="0.099" /><testcase classname="tests.test_p01_contract" name="test_unsafe_graph_paths_are_refused_before_adapter_or_storage[a\\b.py]" time="0.088" /><testcase classname="tests.test_p01_contract" name="test_unsafe_graph_paths_are_refused_before_adapter_or_storage[a//b.py]" time="0.022" /><testcase classname="tests.test_p01_contract" name="test_unsafe_graph_paths_are_refused_before_adapter_or_storage[./a.py]" time="0.023" /><testcase classname="tests.test_p01_contract" name="test_unsafe_graph_paths_are_refused_before_adapter_or_storage[a/../b.py]" time="0.012" /><testcase classname="tests.test_p01_contract" name="test_graph_source_provenance_and_freshness_are_strict[bad_hash]" time="0.099" /><testcase classname="tests.test_p01_contract" name="test_graph_source_provenance_and_freshness_are_strict[nonfinite]" time="0.017" /><testcase classname="tests.test_p01_contract" name="test_graph_source_provenance_and_freshness_are_strict[bad_span]" time="0.013" /><testcase classname="tests.test_p01_contract" name="test_graph_source_provenance_and_freshness_are_strict[missing_status]" time="0.010" /><testcase classname="tests.test_p01_contract" name="test_graph_source_provenance_and_freshness_are_strict[unknown_field]" time="0.010" /><testcase classname="tests.test_p01_contract" name="test_store_snapshots_do_not_grant_mutable_handles_and_detect_same_generation_tamper" time="0.268" /><testcase classname="tests.test_p01_contract" name="test_duplicate_transaction_ids_do_not_silently_replace_records" time="0.043" /><testcase classname="tests.test_p01_contract" name="test_store_strict_document_decode_never_silently_collapses_records[duplicate_id]" time="2.092" /><testcase classname="tests.test_p01_contract" name="test_store_strict_document_decode_never_silently_collapses_records[duplicate_key]" time="0.776" /><testcase classname="tests.test_p01_contract" name="test_store_strict_document_decode_never_silently_collapses_records[unknown_field]" time="0.685" /><testcase classname="tests.test_p01_contract" name="test_store_strict_document_decode_never_silently_collapses_records[bad_generation]" time="1.573" /><testcase classname="tests.test_p01_contract" name="test_root_principal_policy_namespaces_reject_cross_project_reads" time="2.334" /><testcase classname="tests.test_p01_contract" name="test_legacy_roundtrip_preserves_supported_records_duplicate_symbols_and_omissions" time="1.161" /><testcase classname="tests.test_p01_contract" name="test_resource_kinds_parse_failures_and_legacy_omissions_are_explicit" time="1.018" /><testcase classname="tests.test_p01_contract" name="test_graph_read_port_feeds_existing_tree_search_without_read_authority" time="2.927" /><testcase classname="tests.test_p01_contract" name="test_graph_review_reports_unresolved_dependencies_instead_of_complete_claim" time="0.172" /><testcase classname="tests.test_graph_contract" name="test_adapter_extracts_symbols_imports_and_calls_with_stable_identity" time="0.065" /><testcase classname="tests.test_graph_contract" name="test_adapter_reports_parser_failure_without_raising" time="0.046" /><testcase classname="tests.test_graph_contract" name="test_store_commit_is_generation_cas_and_export_is_canonical" time="0.506" /><testcase classname="tests.test_graph_contract" name="test_store_refuses_dangling_edges_and_forged_identity" time="0.540" /><testcase classname="tests.test_graph_contract" name="test_migration_preserves_supported_facts_and_reports_unsupported" time="1.006" /><testcase classname="tests.test_graph_cas_review" name="test_stale_separate_store_handle_cannot_overwrite_persisted_commit" time="0.860" /><testcase classname="tests.test_graph_cas_review" name="test_cooperating_processes_cannot_both_commit_same_generation" time="5.815" /><testcase classname="tests.test_graph_cas_review" name="test_held_writer_lease_refuses_without_replacing_store" time="0.158" /><testcase classname="tests.test_graph_cas_review" name="test_planned_delta_generation_cannot_follow_unrelated_commit" time="0.324" /><testcase classname="tests.test_graph_cas_review" name="test_delta_captures_generation_before_relink_work" time="0.416" /><testcase classname="tests.test_graph_cas_review" name="test_absent_digest_is_never_unconditional_overwrite_or_delete[VALUE = 2\n]" time="0.051" /><testcase classname="tests.test_graph_cas_review" name="test_absent_digest_is_never_unconditional_overwrite_or_delete[None]" time="0.045" /><testcase classname="tests.test_graph_cas_review" name="test_added_module_resolves_old_unresolved_consumer_without_reparse" time="0.489" /><testcase classname="tests.test_graph_cas_review" name="test_added_package_changes_module_precedence_without_stale_import_edges" time="0.683" /><testcase classname="tests.test_graph_cas_review" name="test_removing_package_restores_fallback_module_bindings" time="0.550" /></testsuite></testsuites>

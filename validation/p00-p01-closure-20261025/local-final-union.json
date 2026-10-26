@@ -1,0 +1,251 @@
+{
+  "deduplication": "latest source-correction rerun overrides same classname/name, historical red kept",
+  "stats": {
+    "cases": 40,
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0
+  },
+  "cases": [
+    {
+      "classname": "tests.test_p00_contracts",
+      "name": "test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits",
+      "artifact": "p00-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p00_contracts",
+      "name": "test_baseline_cache_measurement_never_replaces_existing_project_tree",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_unsafe_graph_paths_are_refused_before_adapter_or_storage[../a.py]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_unsafe_graph_paths_are_refused_before_adapter_or_storage[/a.py]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_unsafe_graph_paths_are_refused_before_adapter_or_storage[C:/a.py]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_unsafe_graph_paths_are_refused_before_adapter_or_storage[a\\\\b.py]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_unsafe_graph_paths_are_refused_before_adapter_or_storage[a//b.py]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_unsafe_graph_paths_are_refused_before_adapter_or_storage[./a.py]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_unsafe_graph_paths_are_refused_before_adapter_or_storage[a/../b.py]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_graph_source_provenance_and_freshness_are_strict[bad_hash]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_graph_source_provenance_and_freshness_are_strict[nonfinite]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_graph_source_provenance_and_freshness_are_strict[bad_span]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_graph_source_provenance_and_freshness_are_strict[missing_status]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_graph_source_provenance_and_freshness_are_strict[unknown_field]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_store_snapshots_do_not_grant_mutable_handles_and_detect_same_generation_tamper",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_duplicate_transaction_ids_do_not_silently_replace_records",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_store_strict_document_decode_never_silently_collapses_records[duplicate_id]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_store_strict_document_decode_never_silently_collapses_records[duplicate_key]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_store_strict_document_decode_never_silently_collapses_records[unknown_field]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_store_strict_document_decode_never_silently_collapses_records[bad_generation]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_root_principal_policy_namespaces_reject_cross_project_reads",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_legacy_roundtrip_preserves_supported_records_duplicate_symbols_and_omissions",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_resource_kinds_parse_failures_and_legacy_omissions_are_explicit",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_graph_read_port_feeds_existing_tree_search_without_read_authority",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_p01_contract",
+      "name": "test_graph_review_reports_unresolved_dependencies_instead_of_complete_claim",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_contract",
+      "name": "test_adapter_extracts_symbols_imports_and_calls_with_stable_identity",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_contract",
+      "name": "test_adapter_reports_parser_failure_without_raising",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_contract",
+      "name": "test_store_commit_is_generation_cas_and_export_is_canonical",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_contract",
+      "name": "test_store_refuses_dangling_edges_and_forged_identity",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_contract",
+      "name": "test_migration_preserves_supported_facts_and_reports_unsupported",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_stale_separate_store_handle_cannot_overwrite_persisted_commit",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_cooperating_processes_cannot_both_commit_same_generation",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_held_writer_lease_refuses_without_replacing_store",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_planned_delta_generation_cannot_follow_unrelated_commit",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_delta_captures_generation_before_relink_work",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_absent_digest_is_never_unconditional_overwrite_or_delete[VALUE = 2\\n]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_absent_digest_is_never_unconditional_overwrite_or_delete[None]",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_added_module_resolves_old_unresolved_consumer_without_reparse",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_added_package_changes_module_precedence_without_stale_import_edges",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    },
+    {
+      "classname": "tests.test_graph_cas_review",
+      "name": "test_removing_package_restores_fallback_module_bindings",
+      "artifact": "p01-final.xml",
+      "status": "passed"
+    }
+  ]
+}

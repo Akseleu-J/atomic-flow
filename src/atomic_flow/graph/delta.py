@@ -9,6 +9,8 @@ full rebuild is an explicit operation with a recorded reason.
 """
 from __future__ import annotations
 
+import tempfile
+from pathlib import Path
 from typing import Any
 
 from atomic_flow.graph.adapter_resource import adapt_source as adapt_file
@@ -70,31 +72,17 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
     changed_modules = {name for name in pre_modules.keys() | modules.keys()
                        if pre_modules.get(name) != modules.get(name)}
     changed_exports = {candidate for candidate in pre_exports.keys() | exports.keys()
-                       if pre_exports.get(candidate) != exports.get(candidate)}
+                       if (pre_exports.get(candidate) != exports.get(candidate)
+                           or pre_exports.star_names.get(candidate) != exports.star_names.get(candidate)
+                           or (candidate in pre_exports.dynamic) != (candidate in exports.dynamic))}
+    from atomic_flow.graph.resolve import dependencies
     for candidate_path, node in file_nodes.items():
-        if candidate_path not in pre_files:
+        names, targets = dependencies(node, modules)
+        old_node = pre_files.get(candidate_path)
+        old_targets = dependencies(old_node, pre_modules)[1] if old_node else set()
+        if (old_node is None or names & changed_modules
+                or (targets | old_targets) & changed_exports):
             affected.add(candidate_path)
-            continue
-        for name in node["facts"].get("imports", []):
-            parts = name.split(".")
-            prefixes = [".".join(parts[:size]) for size in range(len(parts), 0, -1)]
-            if any(prefix in changed_modules for prefix in prefixes):
-                affected.add(candidate_path)
-                break
-            imported = next((modules[prefix] for prefix in prefixes if prefix in modules
-                             and modules[prefix] != candidate_path), None)
-            if imported in changed_exports:
-                affected.add(candidate_path)
-                break
-    # Preserve the existing neighbour invalidation for the changed file.
-    for edge in old_edges:
-        if edge.get("facts_class") != "inferred" or edge["status"] != "active":
-            continue
-        src_file = edge["src"][len("file:"):] if edge["src"].startswith("file:") else edge["src"].split("::")[0][len("sym:"):]
-        dst_file = edge["dst"][len("file:"):] if edge["dst"].startswith("file:") else edge["dst"].split("::")[0][len("sym:"):]
-        if path in {src_file, dst_file}:
-            affected.add(src_file)
-            affected.add(dst_file)
 
     dropped: set[str] = set()
     for edge in old_edges:
@@ -113,7 +101,7 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
         inferred = infer_file_edges(node, modules=modules, exports=exports)
         new_edges.extend(inferred["edges"])
         unresolved.extend(f"{affected_path}: {item}" for item in inferred["unresolved"])
-    return new_edges, sorted(dropped), len(affected), sorted(unresolved)
+    return new_edges, sorted(dropped), sorted(affected), sorted(unresolved)
 
 
 def apply_delta(store: GraphStore, delta: dict[str, Any]) -> dict[str, Any]:
@@ -134,29 +122,81 @@ def apply_delta(store: GraphStore, delta: dict[str, Any]) -> dict[str, Any]:
         raise GraphContractError(
             f"source changed since delta was built: {path} (expected {(expected or '')[:12] or 'no file'}, "
             f"store has {stored_digest[:12] or 'no file'})")
-    relink_edges, dropped_edges, relinked, unresolved = _relink(store, delta, drop_ids)
+    relink_edges, dropped_edges, affected, unresolved = _relink(store, delta, drop_ids)
+    relinked = len(affected)
     put_edges = list(delta["put_edges"])
     put_edge_ids = {edge["id"] for edge in put_edges}
     put_edges.extend(edge for edge in relink_edges if edge["id"] not in put_edge_ids)
+    # Retain incoming links to identities that survive a file replacement.
+    # Dropping every old node first erased unchanged callers/importers even
+    # when export bindings stayed identical and no relink was required.
+    new_ids = {item["id"] for item in delta["put_nodes"]}
+    stale_ids = drop_ids - new_ids
+    dropped_edges = sorted(set(dropped_edges) | {edge["id"] for edge in store.edges()
+                                                if edge["src"] in drop_ids})
     try:
         generation = store.commit(base_generation=base_generation,
                                   put_nodes=delta["put_nodes"], put_edges=put_edges,
-                                  drop_node_ids=sorted(drop_ids), drop_edge_ids=dropped_edges)
+                                  drop_node_ids=sorted(stale_ids), drop_edge_ids=dropped_edges)
     except GraphGenerationConflict as exc:
         raise GraphContractError(f"delta superseded: {exc}") from exc
     return {"path": path, "generation": generation, "deleted": delta["deleted"],
             "put_nodes": len(delta["put_nodes"]), "put_edges": len(put_edges),
             "dropped": len(drop_ids), "parsed_files": delta["parsed_files"],
-            "scanned_files": 1, "relinked_files": relinked, "unresolved": unresolved}
+            "scanned_files": 1, "read_files": 1 if not delta["deleted"] else 0,
+            "relinked_files": relinked, "reused_files": max(0, sum(n["kind"] == "file" for n in store.nodes()) - relinked),
+            "invalidated_paths": affected,
+            "global_algorithms_invalidated": ["pagerank"], "unresolved": unresolved}
 
 
-def fallback_rebuild(store: GraphStore, files: dict[str, bytes], reason: str) -> dict[str, Any]:
+def fallback_rebuild(store: GraphStore, files: dict[str, bytes], reason: str, *,
+                     source_check=lambda: None, cancel_check=lambda: None) -> dict[str, Any]:
     """Full rebuild inside one transaction; reason is recorded, never silent."""
     if not reason:
         raise GraphContractError("fallback rebuild requires an explicit reason")
     clean = clean_build(files)
     old_ids = [node["id"] for node in store.nodes()]
+    cancel_check()
+    source_check()
+    cancel_check()
     generation = store.commit(base_generation=store.generation, put_nodes=clean["nodes"],
                               put_edges=clean["edges"], drop_node_ids=old_ids)
     return {"generation": generation, "reason": reason, "parsed_files": clean["parsed_files"],
             "scanned_files": len(files)}
+
+
+def apply_changes(store: GraphStore, changed: dict[str, bytes | None], *, cancel_check=lambda: None,
+                  source_check=lambda: None, moves=None) -> dict:
+    """Private staged graph overlay followed by one visible generation CAS.
+
+    A cancelled/failed multi-file operation never exposes its intermediate graph.
+    source_check is a host validation callback immediately before publication.
+    """
+    base = store.generation
+    previous = store.document()
+    reports = []
+    from atomic_flow.graph.relocation import relocation_report
+    relocation = relocation_report(previous, previous, moves) if not changed else None
+    with tempfile.TemporaryDirectory(prefix="atomic-graph-overlay-") as directory:
+        staged = GraphStore(Path(directory) / "graph.json")
+        staged.commit(base_generation=0, put_nodes=previous["nodes"], put_edges=previous["edges"])
+        for path in sorted(changed):
+            cancel_check()
+            old = next((n["source"]["digest"] for n in staged.nodes()
+                        if n["kind"] == "file" and n["path"] == path), None)
+            reports.append(apply_delta(staged, file_delta(path, changed[path], expected_old_digest=old)))
+        cancel_check()
+        source_check()
+        cancel_check()
+        if changed:
+            candidate = staged.document()
+            relocation = relocation_report(previous, candidate, moves)
+            store.commit(base_generation=base, drop_node_ids=[n["id"] for n in previous["nodes"]],
+                         put_nodes=candidate["nodes"], put_edges=candidate["edges"])
+    return {"deltas": len(reports), "generation": store.generation, "reports": reports,
+            "relocation": relocation,
+            "parsed_files": sum(r["parsed_files"] for r in reports),
+            "scanned_files": len(changed), "read_files": sum(v is not None for v in changed.values()),
+            "relinked_files": sum(r["relinked_files"] for r in reports),
+            "invalidated_paths": sorted({path for report in reports for path in report["invalidated_paths"]}),
+            "global_algorithms_invalidated": ["pagerank"] if changed else []}

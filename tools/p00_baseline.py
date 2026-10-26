@@ -111,15 +111,19 @@ def main() -> int:
                                                     repeats=max(1, args.repeats // 5))
     import tempfile
 
+    # Benchmark cache I/O in an isolated temporary root. Never overwrite or
+    # delete the owner's existing project tree as a side effect of measurement.
     from atomic_flow.tree.builder import _tree_path
-    with tempfile.TemporaryDirectory(prefix="p00-tree-"):
-        marker = _tree_path(ROOT)
+    with tempfile.TemporaryDirectory(prefix="p00-tree-") as temp_root:
+        cache_root = Path(temp_root)
+        marker = _tree_path(cache_root)
         def save_measure():
             tree = build_tree(ROOT, None)
-            path = save_tree(ROOT, tree)
+            tree["_base_generation"] = None
+            path = save_tree(cache_root, tree)
             return path.stat().st_size
         card["indicators"]["tree_save_bytes"] = samples(save_measure, repeats=1)
-        card["indicators"]["tree_load"] = samples(lambda: len(load_tree(ROOT)["nodes"]), repeats=max(1, args.repeats // 5))
+        card["indicators"]["tree_load"] = samples(lambda: len(load_tree(cache_root)["nodes"]), repeats=max(1, args.repeats // 5))
         if marker.exists():
             card["indicators"]["tree_artifact_bytes"] = marker.stat().st_size
             card["indicators"]["tree_artifact_sha256"] = digest_file(marker)

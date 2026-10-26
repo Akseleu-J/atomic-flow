@@ -1,0 +1,9 @@
+{
+  "command": "pytest tests/test_p02_closure.py tests/test_graph_delta.py tests/test_graph_resolve.py tests/test_graph_ingest.py tests/test_graph_sync.py tests/test_graph_cas_review.py -q",
+  "result": "interrupted",
+  "exit_code": 1,
+  "stdout_bytes": 0,
+  "reason": "no progress for >180s; monitoring process also stalled; host paging suspected, not proven",
+  "source_changed_during_attempt": true,
+  "counts_not_accepted": true
+}

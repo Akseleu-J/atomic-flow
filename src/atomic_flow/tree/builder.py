@@ -209,7 +209,7 @@ def _module_keys(path: str) -> list[str]:
     return [".".join(parts[i:]) for i in range(len(parts))]
 
 
-def _link(nodes: list[TreeNode], cancel_check=lambda: None) -> None:
+def _link(nodes: list[TreeNode], cancel_check=lambda: None, *, affected_paths=None) -> None:
     """Resolve raw call *names* into call-graph *edges* between nodes.
 
     A bare-name counter (what v0.1 did) makes ``get``/``run``/``append`` look like the most
@@ -243,10 +243,14 @@ def _link(nodes: list[TreeNode], cancel_check=lambda: None) -> None:
     fan_in: Counter[str] = Counter()
     for n in nodes:
         cancel_check()
-        n.callees, n.reference_ids, n.fan_in, n.fan_out = [], [], 0, 0
+        if affected_paths is None or n.path in affected_paths:
+            n.callees, n.reference_ids, n.fan_in, n.fan_out = [], [], 0, 0
     for n in nodes:
         cancel_check()
         if n.kind not in {"function", "class"}:
+            continue
+        if affected_paths is not None and n.path not in affected_paths:
+            fan_in.update(n.callees)
             continue
         resolved: list[str] = []
         for name in n.calls:
@@ -266,6 +270,9 @@ def _link(nodes: list[TreeNode], cancel_check=lambda: None) -> None:
         fan_in.update(resolved)
     for n in nodes:
         cancel_check()
+        if affected_paths is not None and n.path not in affected_paths:
+            fan_in.update(n.reference_ids)
+            continue
         resolved: list[str] = []
         for name in n.reference_names:
             cancel_check()
@@ -287,6 +294,100 @@ def _link(nodes: list[TreeNode], cancel_check=lambda: None) -> None:
 
 
 # --------------------------------------------------------------------------- public API
+
+def _policy_fingerprint(root, ignore, respect_gitignore):
+    policy = None
+    path = root / ".gitignore"
+    if respect_gitignore and path.exists():
+        if path.is_symlink() or getattr(path, "is_junction", lambda: False)():
+            raise TreeError("ignore policy may not be a link")
+        with path.open("rb") as handle:
+            raw = handle.read(1_000_001)
+        if len(raw) > 1_000_000:
+            raise TreeError("ignore policy exceeds byte bound")
+        policy = hashlib.sha256(raw).hexdigest()
+    return hashlib.sha256(json.dumps({"ignore": DEFAULT_IGNORE if ignore is None else ignore,
+                                      "respect_gitignore": respect_gitignore, "policy": policy,
+                                      "tree": TREE_VERSION, "references": REFERENCE_FORMAT},
+                                     sort_keys=True).encode()).hexdigest()
+
+
+def _owned_tree_delta(root, old, previous, changed_paths, generation, policy, skip,
+                      limits, max_file_bytes, cancel_check):
+    """Trusted operation paths replace only their owned file records.
+
+    This is an advisory index overlay, not arbitrary-external-writer freshness
+    proof. Tools still verify current content before reads, edits and publish.
+    """
+    from atomic_flow.agents.source import confined_path
+    from atomic_flow.graph.schema import file_id
+
+    paths = set(changed_paths)
+    if len(paths) > limits.max_files:
+        raise ResourceLimitError("owned delta path count exceeded")
+    per_file = {path: [n.model_copy(deep=True) for n in items] for path, items in old.items()}
+    parsed = read_bytes = read_files = 0
+    for rel in sorted(paths):
+        cancel_check()
+        file_id(rel)
+        path = confined_path(root, rel)
+        per_file.pop(rel, None)
+        if not path.exists() or path.suffix.lower() not in SOURCE_SUFFIXES or skip(rel, False):
+            continue
+        if not path.is_file():
+            raise TreeError("owned delta source must be a regular file")
+        with path.open("rb") as handle:
+            data = handle.read(max_file_bytes + 1)
+        read_files += 1
+        read_bytes += len(data)
+        if len(data) > max_file_bytes or read_bytes > limits.max_total_bytes:
+            raise ResourceLimitError("owned delta source byte limit exceeded")
+        try:
+            source = data.decode("utf-8-sig")
+        except UnicodeError as exc:
+            raise TreeError("owned delta source is not UTF-8") from exc
+        content_hash = hashlib.sha1(data).hexdigest()
+        stat = path.stat()
+        if rel in old and old[rel][0].content_hash == content_hash:
+            per_file[rel] = [n.model_copy(deep=True) for n in old[rel]]
+            per_file[rel][0].mtime_ns = stat.st_mtime_ns
+        else:
+            per_file[rel] = _index_file(rel, source, content_hash, len(data), stat.st_mtime_ns,
+                                      path.suffix.lower() in PYTHON_SUFFIXES, cancel_check=cancel_check)
+            parsed += 1
+    if len(per_file) > limits.max_files or sum(len(items) for items in per_file.values()) > limits.max_nodes:
+        raise ResourceLimitError("owned delta project count limit exceeded")
+    if sum(items[0].size for items in per_file.values()) > limits.max_total_bytes:
+        raise ResourceLimitError("owned delta aggregate source limit exceeded")
+    def definitions(items):
+        return {(n.node_id, n.symbol) for n in items if n.kind in {"function", "class"}}
+    changed_names = set()
+    changed_modules = set()
+    for path in paths:
+        before, after = definitions(old.get(path, [])), definitions(per_file.get(path, []))
+        if before != after:
+            changed_names.update(symbol.rsplit(".", 1)[-1].split("#")[0] for _, symbol in before | after)
+        if (path in old) != (path in per_file):
+            changed_modules.update(_module_keys(path))
+    affected = set(paths)
+    for path, items in per_file.items():
+        if path in affected:
+            continue
+        if (any(set(n.calls + n.reference_names) & changed_names for n in items)
+                or any(entry.lstrip(".") in changed_modules for entry in items[0].imports)):
+            affected.add(path)
+    nodes = [n for path in sorted(per_file) for n in per_file[path]]
+    _link(nodes, cancel_check, affected_paths=affected)
+    fingerprint = hashlib.sha1("\n".join(f"{n.path}:{n.content_hash}" for n in nodes if n.kind == "file").encode()).hexdigest()
+    cancel_check()
+    return {"version": TREE_VERSION, "reference_format": REFERENCE_FORMAT, "root": root.name,
+            "files": len(per_file), "fingerprint": fingerprint, "policy_fingerprint": policy,
+            "_base_generation": generation,
+            "stats": {"parsed": parsed, "read_files": read_files, "scanned": len(paths),
+                      "reused": len(per_file) - parsed, "read_bytes": read_bytes, "skipped": 0,
+                      "relinked": len(affected & per_file.keys()), "invalidated": sorted(affected),
+                      "fallback_reason": "", "global_algorithms_invalidated": ["pagerank"] if paths else []},
+            "nodes": [n.model_dump() for n in nodes]}
 
 def _join(rel_dir: str, name: str) -> str:
     return name if rel_dir in {"", "."} else f"{rel_dir}/{name}"
@@ -318,7 +419,7 @@ def _group_by_path(previous: dict | None, cancel_check=lambda: None) -> dict[str
 
 def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: dict | None = None,
                respect_gitignore: bool = True, max_file_bytes: int = MAX_FILE_BYTES,
-               limits: ProjectLimits | None = None, cancel_check=None) -> dict:
+               limits: ProjectLimits | None = None, cancel_check=None, changed_paths=None) -> dict:
     """Index ``root``. With ``previous`` only files whose size/mtime/content changed are re-parsed."""
     root = Path(root).expanduser().resolve()
     limits = limits or ProjectLimits()
@@ -335,6 +436,20 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
         raise TreeError("Refusing to index atomic_flow private state as project source.")
     skip = _Ignore(root, list(DEFAULT_IGNORE if ignore is None else ignore), respect_gitignore)
     old = _group_by_path(previous, cancel_check)
+    policy = _policy_fingerprint(root, ignore, respect_gitignore)
+    fallback_reason = ""
+    if changed_paths is not None:
+        if not isinstance(changed_paths, (list, tuple, set, frozenset)):
+            raise TreeError("owned delta requires exact changed paths")
+        if not old:
+            fallback_reason = "missing/corrupt/old cache"
+        elif previous.get("policy_fingerprint") != policy:
+            fallback_reason = "ignore/config policy changed"
+        elif ".gitignore" in changed_paths:
+            fallback_reason = "ignore policy change event"
+        else:
+            return _owned_tree_delta(root, old, previous, changed_paths, generation, policy,
+                                     skip, limits, max_file_bytes, cancel_check)
     per_file: dict[str, list[TreeNode]] = {}
     parsed = reused = total_bytes = admitted_files = node_count = skipped = 0
     for rel, path in source_files(root, skip, limits, cancel_check, private_root=private_root):
@@ -398,8 +513,12 @@ def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: d
     fingerprint = hashlib.sha1("\n".join(f"{n.path}:{n.content_hash}" for n in nodes if n.kind == "file").encode()).hexdigest()
     return {"version": TREE_VERSION, "reference_format": REFERENCE_FORMAT,
             "root": root.name, "files": len(per_file), "fingerprint": fingerprint,
+            "policy_fingerprint": policy,
             "_base_generation": generation,
-            "stats": {"parsed": parsed, "reused": reused, "skipped": skipped, "read_bytes": total_bytes},
+            "stats": {"parsed": parsed, "reused": reused, "skipped": skipped, "read_bytes": total_bytes,
+                      "read_files": admitted_files, "scanned": admitted_files, "relinked": len(per_file),
+                      "invalidated": sorted(per_file), "fallback_reason": fallback_reason or "external/trust-boundary content audit",
+                      "global_algorithms_invalidated": ["pagerank"]},
             "nodes": [n.model_dump() for n in nodes]}
 
 
@@ -477,11 +596,11 @@ def load_tree(root: str | Path) -> dict:
 
 
 def refresh_tree(root: str | Path, ignore: list[str] | None = None, *, respect_gitignore: bool = True,
-                 save: bool = True, limits: ProjectLimits | None = None, cancel_check=None) -> tuple[dict, bool]:
+                 save: bool = True, limits: ProjectLimits | None = None, cancel_check=None, changed_paths=None) -> tuple[dict, bool]:
     """Bring an existing tree up to date. Returns ``(tree, changed)``."""
     previous = load_tree(root)
     tree = build_tree(root, ignore, previous=previous, respect_gitignore=respect_gitignore,
-                      limits=limits, cancel_check=cancel_check)
+                      limits=limits, cancel_check=cancel_check, changed_paths=changed_paths)
     changed = (tree["fingerprint"] != previous.get("fingerprint")
                or tree["reference_format"] != previous.get("reference_format")
                or tree["nodes"] != previous.get("nodes"))

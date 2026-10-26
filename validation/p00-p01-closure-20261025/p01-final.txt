@@ -1,0 +1,54 @@
+F.......................................                                 [100%]
+================================== FAILURES ===================================
+_ test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits _
+
+    def test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits():
+        root = Path(__file__).resolve().parents[1]
+        spec = importlib.util.spec_from_file_location("p00_contracts", root / "tools/p00_contracts.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        paths = [root / "validation/p00-baseline-20261024/card.json",
+                 root / "validation/p00-baseline-20261024/acceptance-registry.json"]
+        before = [p.read_bytes() for p in paths]
+>       report = module.collect(root)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_p00_contracts.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\p00_contracts.py:35: in collect
+    module = ast.parse(raw)
+             ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+source = b'import io\nimport json\nimport sys\nimport threading\nfrom pathlib import Path\nfrom types import SimpleNamespace\n\...remote, "_send", send)\n    with pytest.raises(TaskCancelled):\n        remote._request("test", cancel_check=cancel)\n'
+filename = '<unknown>', mode = 'exec', type_comments = False
+feature_version = -1
+
+    def parse(source, filename='<unknown>', mode='exec', *,
+              type_comments=False, feature_version=None):
+        """
+        Parse the source into an AST node.
+        Equivalent to compile(source, filename, mode, PyCF_ONLY_AST).
+        Pass type_comments=True to get back type comments where the syntax allows.
+        """
+        flags = PyCF_ONLY_AST
+        if type_comments:
+            flags |= PyCF_TYPE_COMMENTS
+        if feature_version is None:
+            feature_version = -1
+        elif isinstance(feature_version, tuple):
+            major, minor = feature_version  # Should be a 2-tuple.
+            if major != 3:
+                raise ValueError(f"Unsupported major version: {major}")
+            feature_version = minor
+        # Else it should be an int giving the minor version for 3.x.
+>       return compile(source, filename, mode, flags,
+                       _feature_version=feature_version)
+E         File "<unknown>", line 37
+E           remote.allowed_tools["source_read"] = schema_hash(next(tool for tool in tools if tool["name"] == "source_read"))
+E       IndentationError: unexpected indent
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\ast.py:52: IndentationError
+=========================== short test summary info ===========================
+FAILED tests/test_p00_contracts.py::test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits
+1 failed, 39 passed in 54.08s

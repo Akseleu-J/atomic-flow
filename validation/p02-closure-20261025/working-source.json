@@ -1,0 +1,17 @@
+{
+  "status": "unvalidated_working_source",
+  "host_attempt": "interrupted_after_180s_without_stdout; do not count as pass",
+  "normalized_sha256": {
+    "src/atomic_flow/graph/python_bindings.py": "a8fda58d495f578df4613e853cf84b35750f57e12b77c405267fb58fde691251",
+    "src/atomic_flow/graph/resolve.py": "3d67e658dce5fd368809eb5013a933da75ffc7e17b719d4260c7c7134c5b58c2",
+    "src/atomic_flow/graph/delta.py": "7b3014083bd93b4882b2dba33c3eec026e61afbc28ee73209764358212dcb294",
+    "src/atomic_flow/graph/ingest.py": "af8d215bd723158f6d9ce601fd8994a40cef5f0aacc2779d4abc18795a93bc78",
+    "src/atomic_flow/graph/sync.py": "f57ddc4d311356585c9602e9fe16febddad5a99ab4ec432b7fc458eee0461501",
+    "src/atomic_flow/graph/project.py": "4b963aac88e5bdb1e3bb59425c45f7d25e52f7a5539ff4c43d6ee4c4de4bb610",
+    "src/atomic_flow/tree/builder.py": "f40cdcb3f29f2d8fd9189d70bc219b551bff4ea6b08ea583fcbf023225f807bb",
+    "src/atomic_flow/activation/activate.py": "389dc8fd69c5de2f5a08d7958937cf25e74d702d8c4394c6aa76529aca78e1df",
+    "src/atomic_flow/watching.py": "bb179a8bb63a1a3be9746b3a2531b95889d813d6d09a7ec6c182fc31bef43f55",
+    "tests/test_p02_closure.py": "3a6c9144169e93deca147e232f7737bdf4563623a54b6b8e4f85d283da02c3c7"
+  },
+  "provider_calls": 0
+}

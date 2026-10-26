@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="5.236" timestamp="2026-10-26T08:24:06.663855+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_p02_owned_moves" name="test_only_verified_moves_compose_across_steps" time="0.027" /><testcase classname="tests.test_p02_owned_moves" name="test_public_move_then_edit_preserves_graph_identity_mapping" time="4.363"><failure message="AssertionError: failure policy: reread_and_fresh_review; step 0 outcome: StepFailure: move_file: SourcePreconditionFailed: expected_hash is not the current indexed revision; refresh/read first&#10;assert 'paused' == 'done'&#10;  &#10;  - done&#10;  + paused">tests\test_p02_owned_moves.py:51: in test_public_move_then_edit_preserves_graph_identity_mapping
+    assert task.status == "done", task.error
+E   AssertionError: failure policy: reread_and_fresh_review; step 0 outcome: StepFailure: move_file: SourcePreconditionFailed: expected_hash is not the current indexed revision; refresh/read first
+E   assert 'paused' == 'done'
+E     
+E     - done
+E     + paused</failure></testcase></testsuite></testsuites>

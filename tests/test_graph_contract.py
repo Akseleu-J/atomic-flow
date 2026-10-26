@@ -64,7 +64,7 @@ def test_store_refuses_dangling_edges_and_forged_identity(tmp_path):
     with pytest.raises(GraphContractError):
         store.commit(base_generation=0, put_edges=[orphan_edge])
     twin_a = {"id": symbol_id("a.py", "f"), "kind": "function", "path": "a.py", "symbol": "f",
-              "source": {"digest": "d", "algorithm": "sha256"}, "start_line": 1, "end_line": 1,
+              "source": {"digest": "d" * 64, "algorithm": "sha256"}, "start_line": 1, "end_line": 1,
               "facts": {}, "fact_status": {}, "facts_class": "extracted"}
     twin_b = dict(twin_a, id=symbol_id("a.py", "f", 2))
     store.commit(base_generation=0, put_nodes=[twin_a, twin_b])  # disambiguator separates them

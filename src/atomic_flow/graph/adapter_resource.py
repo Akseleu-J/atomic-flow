@@ -10,7 +10,7 @@ import json
 from pathlib import PurePosixPath
 
 from atomic_flow.graph.adapter_ast import adapt_file
-from atomic_flow.graph.schema import GraphContractError, edge_id, file_id, symbol_id
+from atomic_flow.graph.schema import GraphContractError, _posix, edge_id, file_id, symbol_id
 
 RESOURCE_EXTRACTOR = "resource-metadata/1"
 
@@ -27,6 +27,9 @@ def resource_kind(path: str) -> str | None:
 
 
 def adapt_source(path: str, source: bytes) -> dict:
+    _posix(path)
+    if not isinstance(source, bytes) or len(source) > 1_000_000:
+        raise GraphContractError("resource must be bounded source bytes")
     if path.endswith((".py", ".pyi")):
         return adapt_file(path, source)
     kind = resource_kind(path)

@@ -385,6 +385,13 @@ def serve_mcp(project: Path, input_stream=None, output_stream=None):
         {"name": "source_tree", "description": "List bounded admitted source paths", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
         {"name": "source_read", "description": "Read bounded redacted source text", "inputSchema": {"type": "object", "properties": {"path": {"type": "string"}, "offset": {"type": "integer", "minimum": 0}, "limit": {"type": "integer", "minimum": 1, "maximum": MAX_SOURCE_CHARS}}, "required": ["path"], "additionalProperties": False}},
     ]
+    for operation in ("inspect", "search", "explain", "chat", "impact", "tour"):
+        schemas.append({"name": "graph_" + operation, "description": "Read-only source-bound graph " + operation,
+                        "inputSchema": {"type": "object", "properties": {
+                            "query": {"type": "string", "maxLength": 4096}, "node_id": {"type": "string"},
+                            "paths": {"type": "array", "items": {"type": "string"}, "maxItems": 64},
+                            "byte_cap": {"type": "integer", "minimum": 1, "maximum": 1000000}},
+                            "additionalProperties": False}})
     while True:
         raw = reader.readline(MAX_FRAME_BYTES + 1)
         if not raw:
@@ -428,6 +435,9 @@ def serve_mcp(project: Path, input_stream=None, output_stream=None):
                     value = source.tree()
                 elif params.get("name") == "source_read" and set(arguments) <= {"path", "offset", "limit"}:
                     value = source.read(**arguments)
+                elif params.get("name") in {"graph_" + name for name in ("inspect", "search", "explain", "chat", "impact", "tour")} and set(arguments) <= {"query", "node_id", "paths", "byte_cap"}:
+                    from atomic_flow.graph.operations import graph_operation
+                    value = graph_operation(project, params["name"][len("graph_"):], **arguments)
                 else:
                     raise MCPError("operation unavailable")
                 result = {"content": [{"type": "text", "text": _json(value).decode("utf-8")}], "isError": False}

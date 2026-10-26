@@ -61,6 +61,14 @@ def _parser() -> argparse.ArgumentParser:
     diff.add_argument("commit")
     diff.add_argument("--path", default=".")
 
+    graph = cmd.add_parser("graph", help="Read-only source-bound Understand operations; no model calls")
+    graph.add_argument("graph_action", choices=["inspect", "search", "explain", "chat", "impact", "tour"])
+    graph.add_argument("--project", default=".")
+    graph.add_argument("--query", default="")
+    graph.add_argument("--node-id", default="")
+    graph.add_argument("--path", action="append", default=[])
+    graph.add_argument("--byte-cap", type=int, default=65536)
+
     ask = cmd.add_parser("ask", help="Ask a question about a project")
     ask.add_argument("query")
     ask.add_argument("--project", default=".")
@@ -567,7 +575,8 @@ def cmd_ask(args) -> int:
     for warning in result.warnings:
         print(f"! {warning}")
     cost = "n/a" if result.cost_usd is None else f"${result.cost_usd:.4f}{'+' if not result.cost_complete else ''}"
-    print(f"\nverdict={result.verdict} (model opinion); grounding={result.grounding:.0%} (deterministic); "
+    grounding = "not_assessed" if result.grounding is None else f"{result.grounding:.0%}"
+    print(f"\nverdict={result.verdict} (model opinion); identifier_presence={grounding}; "
           f"tokens={result.tokens_in}/{result.tokens_out}; cost={cost}; request={result.ledger_id}")
     return 0
 
@@ -1158,7 +1167,14 @@ def cmd_worker(args) -> int:
     return 0
 
 
-HANDLERS = {"docs": cmd_project, "components": cmd_project, "plugin": cmd_project, "workflow": cmd_project, "mcp": cmd_project, "ide": cmd_project,
+def cmd_graph(args):
+    from atomic_flow.sdk import inspect_graph
+    print(json.dumps(inspect_graph(args.project, args.graph_action, query=args.query, node_id=args.node_id,
+                                   paths=args.path, byte_cap=args.byte_cap), ensure_ascii=False))
+    return 0
+
+
+HANDLERS = {"graph": cmd_graph, "docs": cmd_project, "components": cmd_project, "plugin": cmd_project, "workflow": cmd_project, "mcp": cmd_project, "ide": cmd_project,
             "notebook": cmd_project, "workspace": cmd_project, "watch": cmd_project, "lsp": cmd_project,
             "job": cmd_job, "worker": cmd_worker, "memory": cmd_memory, "rewind": cmd_rewind, "policy": cmd_policy, "session": cmd_session, "init": cmd_init, "trust": cmd_trust, "tree": cmd_tree, "ask": cmd_ask, "task": cmd_task, "undo": cmd_undo, "doctor": cmd_doctor,
             "config": cmd_config, "up": cmd_up, "status": cmd_status, "runs": cmd_runs, "kaggle": cmd_kaggle,
