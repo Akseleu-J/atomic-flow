@@ -196,9 +196,29 @@ def calibration_decision(rows):
             and wrong.get("regressions_passed") is True)
 
 
-def evaluation_script(spec, install, repo=None):
+PYTEST_PYTHON_C = "python -c 'import sys,pytest; raise SystemExit(pytest.main(sys.argv[1:]))'"
+
+
+def validate_pytest_launcher(launcher, task, dependency):
+    if launcher not in {"console", "python-c"}:
+        raise ValueError("unreviewed pytest launcher")
+    if launcher == "python-c" and (task != "pylint-dev__pylint-7114" or not isinstance(dependency, dict)
+            or dependency.get("pins") != {"astroid": "2.12.2"}
+            or not re.fullmatch(r"sha256:[0-9a-f]{64}", dependency.get("image_id", ""))
+            or any(not re.fullmatch(r"[0-9a-f]{64}", dependency.get(key, ""))
+                   for key in ("profile_sha256", "build_receipt_sha256"))):
+        raise ValueError("python-c launcher requires task7114 and its admitted dependency overlay")
+
+
+def evaluation_script(spec, install, repo=None, *, pytest_launcher="console"):
     """Use the pinned repo's own test command; image already contains dependencies."""
     commands = [line for line in spec.eval_script_list if line != install]
+    if pytest_launcher not in {"console", "python-c"}:
+        raise ValueError("unreviewed pytest launcher")
+    if pytest_launcher == "python-c":
+        if repo != "pylint-dev/pylint" or sum(line.startswith("pytest ") for line in commands) != 1:
+            raise ValueError("python-c diagnostic requires exactly one native Pylint pytest command")
+        commands = [PYTEST_PYTHON_C + line[len("pytest"):] if line.startswith("pytest ") else line for line in commands]
     if repo == "sphinx-doc/sphinx":
         # These pinned tox commands otherwise print dots, making named PASS
         # receipts unavailable. Only pytest reporting flags are added after --;
@@ -565,17 +585,22 @@ def main():
     parser.add_argument("--dependency-image", help="Opt-in immutable ID of a separately built reviewed task-specific dependency overlay")
     parser.add_argument("--dependency-receipt", type=Path, help="Build output containing dependency-image.json")
     parser.add_argument("--dependency-profile", type=Path, help="Exact reviewed dependency profile for this task from this checkout")
+    parser.add_argument("--pytest-launcher", choices=("console", "python-c"), default="console",
+                        help="Prospective7114-only native Python startup diagnostic; console remains the default")
     args = parser.parse_args()
     if not TASK_ID.fullmatch(args.task) or not 10 <= args.timeout <= 600:
         raise ValueError("invalid task or execution timeout")
     if bool(args.httpbin_image) != bool(args.httpbin_receipt):
         raise ValueError("HTTPBin image and independent build/probe receipt must be supplied together")
     validate_dependency_options(args.dependency_image, args.dependency_receipt, args.dependency_profile, args.httpbin_image)
+    if args.pytest_launcher == "python-c" and (args.task != "pylint-dev__pylint-7114" or not args.dependency_image):
+        raise ValueError("python-c launcher requires task7114 and its admitted dependency overlay")
     if args.output.exists():
         raise ValueError("fresh output required; no implicit retries or report replacement")
     args.output.mkdir(parents=True)
     report = {"instance_id": args.task, "status": "infrastructure_error", "calibrated": False,
-              "model_calls": 0, "provider_credentials": "none", "harness": HARNESS_VERSION}
+              "model_calls": 0, "provider_credentials": "none", "harness": HARNESS_VERSION,
+              "pytest_launcher": args.pytest_launcher}
     try:
         if importlib.metadata.version("swebench") != HARNESS_VERSION:
             raise ValueError("unreviewed external evaluator version")
@@ -613,7 +638,11 @@ def main():
             report["dependency_overlay"] = dependency
             grade_image = args.dependency_image
         report["test_command"] = MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]]["test_cmd"]
-        script = evaluation_script(spec, MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]].get("install"), task["repo"])
+        validate_pytest_launcher(args.pytest_launcher, args.task, dependency)
+        report["pytest_launcher_command"] = (PYTEST_PYTHON_C if args.pytest_launcher == "python-c" else "pytest") \
+            if task["repo"] == "pylint-dev/pylint" else None
+        script = evaluation_script(spec, MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]].get("install"), task["repo"],
+                                   pytest_launcher=args.pytest_launcher)
         (args.output / "eval.sh").write_text(script)
         report["eval_script_sha256"] = sha(script.encode())
         rows = [grade(task, spec, grade_image, patch, args.output, label, MAP_REPO_TO_PARSER[task["repo"]], args.timeout, httpbin=httpbin, dependency=dependency)

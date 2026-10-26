@@ -9,9 +9,11 @@ ListBenchmarkTasks периодически возвращает HTTP500; paid s
 Общий разрешённый бюджет расширен до $20: фиксированные owner2 $9.50 и participant3
 $10, ранее учтено $0.035611375, резерв $0.464388625. Ключи только process-local;
 не переключать аккаунты после ошибки quota/authorization. Пилот до $4.80.
-P07 остаётся OPEN. Принято 17/30 отдельных калибровок: исходные10 v2,
-SymPy18057, пять controls-v3, Sphinx8474 с восстановленными зависимостями.
-Ещё три Sphinx gold теперь PASS, но их negative controls требуют v4.
+P07 остаётся OPEN. Принято 21/30 отдельных калибровок: исходные10 v2,
+SymPy18057, пять controls-v3, четыре Sphinx с восстановленными зависимостями
+и Pylint7080. Остались шесть Requests, pytest7168, Pylint7114 и SymPy13971.
+Sphinx controls-v4 проверены свежим изолированным запуском. Core CI на2c938a0:
+по1631 PASS/14 SKIP наPython3.11/3.12, Docker26 PASS и Windows4 PASS.
 Все исходные результаты сохраняются; сквозного paired-30/holdout/ablation ещё нет.
 Source-only пилот не исполняет target tests внутри agent loop и не заменяет
 полную приёмку. Текущее evidence и остаток работ:
