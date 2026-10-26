@@ -1,0 +1,58 @@
+name: P07 isolated corpus calibration
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/p07-calibration.yml'
+      - 'tools/evaluation_p07_isolated.py'
+      - 'benchmarks/stage4/p07-controls.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    runs-on: ubuntu-24.04
+    outputs:
+      tasks: ${{ steps.tasks.outputs.value }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - id: tasks
+        run: python -c 'import json,os; d=json.load(open("benchmarks/stage4/corpus.json")); print("value="+json.dumps([t["instance_id"] for t in d["tasks"]]),file=open(os.environ["GITHUB_OUTPUT"],"a"))'
+
+  calibrate:
+    needs: matrix
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        task: ${{ fromJSON(needs.matrix.outputs.tasks) }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Install pinned official evaluator (no model credentials)
+        run: python -m pip install swebench==3.0.15
+      - name: Record worker identity
+        run: |
+          mkdir -p p07-worker
+          git rev-parse HEAD > p07-worker/tested-commit.txt
+          python -m pip freeze > p07-worker/dependencies.txt
+          docker version > p07-worker/docker-version.txt
+      - name: Base assertion FAIL, gold PASS, wrong assertion FAIL
+        run: python tools/evaluation_p07_isolated.py --task '${{ matrix.task }}' --output 'p07-worker/result' --timeout 240
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-calibration-${{ matrix.task }}-${{ github.sha }}
+          path: p07-worker/
+          retention-days: 14
+          if-no-files-found: error
