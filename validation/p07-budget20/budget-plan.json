@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-26",
+  "authorized_combined_max_usd": 20,
+  "prior_booked_usd": 0.035611375,
+  "new_owner_allocations": [
+    {
+      "label": "owner2",
+      "username": "akseley",
+      "max_new_spend_usd": 9.5
+    },
+    {
+      "label": "participant3",
+      "username": "umirbayulgaisha",
+      "max_new_spend_usd": 10
+    }
+  ],
+  "unallocated_reserve_usd": 0.464388625,
+  "model": "anthropic/claude-sonnet-5@default",
+  "model_calls_this_phase": 0,
+  "policy": "fixed per-owner cohorts, no fallback/account rotation, aggregate reported plus unknown reservations never exceed20",
+  "p07": "OPEN"
+}

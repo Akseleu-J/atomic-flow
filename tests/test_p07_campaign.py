@@ -21,7 +21,8 @@ def config():
 
 
 @pytest.mark.parametrize("change", [{"model": "anthropic/claude-sonnet-5-5@default"},
-    {"total_budget_usd": float("nan")}, {"arm_budget_usd": -1}, {"max_calls": 31}])
+    {"total_budget_usd": float("nan")}, {"arm_budget_usd": -1}, {"max_calls": 31},
+    {"max_calls": True}, {"max_input_tokens": 100.5}, {"count": 2}, {"authorized_owner": "unapproved-account"}])
 def test_campaign_rejects_model_substitution_and_invalid_caps(change):
     with pytest.raises(ValueError):
         campaign.validate_config({**config(), **change})
@@ -100,6 +101,48 @@ def test_empty_selection_still_creates_all_30_separate_roots_and_archive(tmp_pat
     assert (tmp_path / "campaign-results.zip").is_file()
 
 
+def test_preflight_uses_same_snapshot_and_public_graph_without_model_or_child(tmp_path, monkeypatch):
+    settings = {**config(), "preflight_only": True, "total_budget_usd": 0, "arm_budget_usd": 0}
+    tasks = [{"instance_id": task_id, "source_path": "src/a.py"} for task_id in campaign.PILOT]
+    tasks.extend({"instance_id": "not-selected-" + str(i)} for i in range(27))
+    seen = []
+
+    def snapshot(task, mirror, destination):
+        seen.append(task["instance_id"])
+        path = destination / "src/a.py"
+        path.parent.mkdir()
+        path.write_bytes(b"def value():\n    return 1\n")
+        return {"src/a.py": campaign.sha(path.read_bytes())}
+
+    def forbid(*args, **kwargs):
+        raise AssertionError("preflight must not create a paid arm child")
+
+    monkeypatch.setattr(campaign, "source_snapshot", snapshot)
+    monkeypatch.setattr(campaign.subprocess, "run", forbid)
+    output = tmp_path / "preflight"
+    result = campaign.campaign({"config": settings, "tasks": tasks}, output)
+    assert seen == list(campaign.PILOT)
+    assert result["model_calls"] == 0 and result["confirmed_physical_calls"] == 0
+    assert result["known_provider_cost_usd"] == 0
+    assert len(result["rows"]) == 30
+    assert all(row["status"] == "source_preflight_ready" for row in result["rows"][:3])
+    assert all((output / "tasks" / task_id / "graph-preflight.json").exists() for task_id in campaign.PILOT)
+
+
+def test_builder_preflight_needs_no_calibration_or_paid_budget(tmp_path, monkeypatch):
+    monkeypatch.setattr(prepare, "catalog_model", lambda: {"version": {"slug": "claude-sonnet-5-default"}})
+    args = SimpleNamespace(slug="offline-zero-call-preflight", owner="umirbayulgaisha", count=3, budget=None, arm_budget=.8, preflight=True,
+        calibrations=tmp_path / "no-calibrations", output=tmp_path / "bundle")
+    prepare.prepare(args)
+    packet = json.loads((args.output / "packet.json").read_text())
+    manifest = json.loads((args.output / "launch-manifest.json").read_text())
+    assert packet["config"]["preflight_only"] is True
+    assert packet["config"]["total_budget_usd"] == packet["config"]["arm_budget_usd"] == 0
+    assert manifest["preflight_only"] is True and manifest["inference_started"] is False
+    assert manifest["authorized_owner"] == packet["config"]["authorized_owner"] == "umirbayulgaisha"
+    assert manifest["task_source_sha256"] == campaign.sha((args.output / "campaign_task.py").read_bytes())
+
+
 def test_builder_embeds_current_runtime_but_not_gold_or_hidden_tests(tmp_path, monkeypatch):
     monkeypatch.setattr(prepare, "catalog_model", lambda: {"displayName": "Claude Sonnet 5", "version": {
         "slug": "claude-sonnet-5-default", "modelProxySlug": campaign.MODEL, "allowModelProxy": True}})
@@ -119,6 +162,9 @@ def test_builder_embeds_current_runtime_but_not_gold_or_hidden_tests(tmp_path, m
     assert len(packet["tasks"]) == 30
     assert all(not ({"patch", "test_patch", "FAIL_TO_PASS", "PASS_TO_PASS"} & task.keys()) for task in packet["tasks"])
     assert json.loads((args.output / "launch-manifest.json").read_text())["inference_started"] is False
+    manifest = json.loads((args.output / "launch-manifest.json").read_text())
+    assert manifest["task_source_sha256"] == campaign.sha((args.output / "campaign_task.py").read_bytes())
+    assert b"\r\n" not in (args.output / "campaign_task.py").read_bytes()
 
 
 def test_campaign_baseline_performs_host_read_and_hash_bound_edit(tmp_path):
@@ -177,12 +223,15 @@ def test_schedule_disconnect_keeps_unknown_intent_and_never_replays(tmp_path, mo
     source = b"# prepared fixture"
     (bundle / "campaign_task.py").write_bytes(source)
     campaign.save(bundle / "launch-manifest.json", {"task_source_sha256": campaign.sha(source),
-        "task_slug": "offline-fixture", "schedule_model_slug": "claude-sonnet-5-default", "total_budget_usd": 4.8})
+        "task_slug": "offline-fixture", "schedule_model_slug": "claude-sonnet-5-default",
+        "authorized_owner": "akseley", "proxy_model_slug": campaign.MODEL, "total_budget_usd": 4.8})
     receipt = tmp_path / "intent.json"
     calls = []
 
     def request(method, body, *args):
         calls.append(method)
+        if method == "IntrospectToken":
+            return io.BytesIO(b'{"active":true,"username":"akseley"}')
         if method == "ListBenchmarkTaskRuns":
             return io.BytesIO(b'{"runs":[]}')
         if method == "GetModelProxyQuotas":
@@ -195,6 +244,39 @@ def test_schedule_disconnect_keeps_unknown_intent_and_never_replays(tmp_path, mo
         launch.main()
     assert json.loads(receipt.read_text())["status"] == "schedule_intent_outcome_unknown"
     assert calls.count("BatchScheduleBenchmarkTaskRuns") == 1
+    monkeypatch.setattr(sys, "argv", ["launch", "schedule", "--bundle", str(bundle),
+                                    "--receipt", str(tmp_path / "different-receipt.json"), "--yes"])
+    with pytest.raises(ValueError, match="already has a scheduling intent"):
+        launch.main()
+    assert calls.count("BatchScheduleBenchmarkTaskRuns") == 1
+    monkeypatch.setattr(sys, "argv", ["launch", "schedule", "--bundle", str(bundle), "--receipt", str(receipt), "--yes"])
     with pytest.raises(ValueError, match="fresh receipt"):
         launch.main()
     assert calls.count("BatchScheduleBenchmarkTaskRuns") == 1
+
+
+def test_launcher_refuses_wrong_account_before_scheduling(tmp_path, monkeypatch):
+    import io
+
+    launch = importlib.import_module("launch_p07_kaggle")
+    bundle = tmp_path / "bundle"
+    bundle.mkdir()
+    raw = b"# prepared fixture"
+    (bundle / "campaign_task.py").write_bytes(raw)
+    campaign.save(bundle / "launch-manifest.json", {"task_source_sha256": campaign.sha(raw),
+        "task_slug": "offline-owner-three", "schedule_model_slug": "claude-sonnet-5-default",
+        "authorized_owner": "umirbayulgaisha", "proxy_model_slug": campaign.MODEL, "total_budget_usd": 4.8})
+    calls = []
+
+    def request(method, body, *args):
+        calls.append(method)
+        assert method == "IntrospectToken"
+        return io.BytesIO(b'{"active":true,"username":"akseley"}')
+
+    monkeypatch.setattr(launch, "request", request)
+    monkeypatch.setattr(sys, "argv", ["launch", "schedule", "--bundle", str(bundle),
+        "--receipt", str(tmp_path / "receipt.json"), "--yes"])
+    with pytest.raises(ValueError, match="credential identity"):
+        launch.main()
+    assert calls == ["IntrospectToken"]
+    assert not (bundle / "schedule-v1.json").exists()

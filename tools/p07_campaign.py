@@ -21,6 +21,7 @@ from evaluation_p07_source_pilot import SourcePilotBackend, admit_calibration
 from evaluation_stage4 import patch_paths, protected_test_path
 
 MODEL = "anthropic/claude-sonnet-5@default"
+AUTHORIZED_OWNERS = ("akseley", "umirbayulgaisha")
 PILOT = ("pytest-dev__pytest-6116", "pylint-dev__pylint-6506", "sympy__sympy-20212")
 READ = {"read_node", "search_tree", "find_callers", "search_text", "read_file", "find_files", "read_result"}
 EDIT = {"patch_file", "edit_node"}
@@ -53,11 +54,21 @@ def select(tasks, count):
 
 
 def validate_config(config):
+    preflight = config.get("preflight_only", False)
+    if type(preflight) is not bool:
+        raise ValueError("preflight_only must be a boolean")
     if config["model"] != MODEL:
         raise ValueError("exact Sonnet 5 model required; no substitution")
+    if config.get("authorized_owner", "akseley") not in AUTHORIZED_OWNERS:
+        raise ValueError("campaign owner is not explicitly authorized")
     for key in ("total_budget_usd", "arm_budget_usd", "price_in_per_mtok", "price_out_per_mtok"):
-        if type(config[key]) not in (float, int) or not math.isfinite(config[key]) or config[key] <= 0:
+        minimum = 0 if preflight and key in {"total_budget_usd", "arm_budget_usd"} else 1e-300
+        if type(config[key]) not in (float, int) or not math.isfinite(config[key]) or config[key] < minimum:
             raise ValueError("invalid budget or tariff: " + key)
+    if any(type(config[key]) is not int for key in ("count", "max_calls", "max_output_tokens", "max_input_tokens", "deadline_seconds")):
+        raise ValueError("integer count/call/token/time caps required")
+    if config["count"] not in {3, 30}:
+        raise ValueError("campaign count must be 3 or 30")
     if not 1 <= config["max_calls"] <= 30 or not 16 <= config["max_output_tokens"] <= 4096:
         raise ValueError("physical call/output bounds")
     if not 1 <= config["max_input_tokens"] <= 600000 or not 10 <= config["deadline_seconds"] <= 900:
@@ -256,7 +267,11 @@ def arm_main(payload_path):
     backend = CampaignBackend(transport, out, limits, time.monotonic() + config["deadline_seconds"], payload["ledger"], config)
     original = (work / task["source_path"]).read_text(encoding="utf-8")
     report = {"instance_id": task["instance_id"], "arm": payload["arm"], "model": MODEL,
-              "oracle_status": "not_run", "status": "started", "semantic_correctness": "not_assessed"}
+              "oracle_status": "not_run", "status": "started", "semantic_correctness": "not_assessed",
+              "study": "source-scoped development; no in-loop target tests or internal replan",
+              "source_path": task["source_path"], "base_commit": task["base_commit"],
+              "initial_source_sha256": sha((work / task["source_path"]).read_bytes()),
+              "limits": limits, "max_wall_seconds": config["deadline_seconds"]}
     save(out / "report.json", report)
     try:
         if payload["arm"] == "atomic":
@@ -300,12 +315,24 @@ def campaign(packet, output):
             root = output / "tasks" / task["instance_id"]
             row = next(row for row in rows if row["instance_id"] == task["instance_id"])
             try:
-                admit_calibration(task["calibration"], task)
+                if not config.get("preflight_only", False):
+                    admit_calibration(task["calibration"], task)
                 snapshot = root / "source"
                 snapshot.mkdir()
                 files = source_snapshot(task, output / "mirrors" / task["instance_id"], snapshot)
                 save(root / "source-manifest.json", files)
                 row.update(status="source_ready", source_files=len(files))
+                if config.get("preflight_only", False):
+                    from atomic_flow.sdk import inspect_graph
+
+                    inspection = inspect_graph(snapshot, "inspect", node_id="file:" + task["source_path"], byte_cap=1_000_000)
+                    save(root / "graph-preflight.json", inspection)
+                    row.update(status="source_preflight_ready", model_calls=0,
+                               graph_source_revision=inspection["source_revision"],
+                               graph_output_complete=inspection.get("output_complete"),
+                               baseline="not_run_preflight_only", atomic="not_run_preflight_only")
+                    save(root / "status.json", row)
+                    continue
                 for arm in (("baseline", "atomic") if index % 2 == 0 else ("atomic", "baseline")):
                     ledger = load(output / "ledger.json")
                     if any(a.get("cost_usd") is None for a in ledger["attempts"]):
@@ -344,6 +371,8 @@ def campaign(packet, output):
             "attempt_intents": len(ledger["attempts"]), "confirmed_physical_calls": sum("physical" in a for a in ledger["attempts"]),
             "known_provider_cost_usd": sum(a.get("cost_usd") or 0 for a in ledger["attempts"]),
             "cost_complete": all(a.get("cost_usd") is not None for a in ledger["attempts"]),
+            "preflight_only": config.get("preflight_only", False),
+            "model_calls": sum(a.get("physical", {}).get("request_outcome") == "completed" for a in ledger["attempts"]),
             "oracle_status": "not_run", "scope": "source-only development; workspaces are not security isolation"}
         save(output / "summary.json", summary)
         scrub(output)

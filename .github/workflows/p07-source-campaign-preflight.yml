@@ -1,0 +1,54 @@
+name: P07 full source campaign preflight without inference
+
+on:
+  pull_request:
+    paths:
+      - 'tools/p07_campaign.py'
+      - 'tools/prepare_p07_kaggle.py'
+      - 'src/atomic_flow/graph/operations.py'
+      - '.github/workflows/p07-source-campaign-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-snapshots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install .
+      - name: Actual production-only snapshots and graph API; no model credentials
+        run: |
+          mkdir -p p07-preflight
+          git rev-parse HEAD > p07-preflight/tested-commit.txt
+          python -m pip freeze > p07-preflight/dependencies.txt
+          python tools/prepare_p07_kaggle.py --preflight --count 3 --slug ci-p07-source-preflight --output /tmp/p07-preflight-bundle > p07-preflight/launch.json
+          python - <<'PY'
+          import json, pathlib, shutil, sys
+          sys.path.insert(0, 'tools')
+          from p07_campaign import campaign, load
+          output = pathlib.Path('/tmp/p07-source-preflight')
+          result = campaign(load('/tmp/p07-preflight-bundle/packet.json'), output)
+          shutil.copyfile(output / 'summary.json', 'p07-preflight/summary.json')
+          selected = [r for r in result['rows'] if r['instance_id'] in result['selected']]
+          for row in selected:
+              source = output / 'tasks' / row['instance_id'] / 'source-manifest.json'
+              if source.exists():
+                  shutil.copyfile(source, pathlib.Path('p07-preflight') / (row['instance_id'] + '-sources.json'))
+          assert result['model_calls'] == 0 and not result['attempt_intents']
+          assert len(selected) == 3 and all(r['status'] == 'source_preflight_ready' and r['graph_output_complete'] for r in selected), json.dumps(selected)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-source-campaign-preflight-${{ github.sha }}
+          path: p07-preflight/
+          retention-days: 14
+          if-no-files-found: error
