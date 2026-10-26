@@ -3,6 +3,10 @@ name: P07 historical Pylint dependency calibration
 on:
   workflow_dispatch:
     inputs:
+      controls:
+        type: choice
+        default: benchmarks/stage4/p07-controls-v5.json
+        options: [benchmarks/stage4/p07-controls-v4.json, benchmarks/stage4/p07-controls-v5.json]
       tasks:
         type: choice
         default: all
@@ -46,9 +50,10 @@ jobs:
         env:
           TASK: ${{ matrix.task }}
           PYTEST_LAUNCHER: ${{ inputs.pytest_launcher }}
+          CONTROLS: ${{ inputs.controls }}
         run: |
           IMAGE=$(python -c "import json; print(json.load(open('p07-pylint-worker/build/dependency-image.json'))['image_id'])")
-          python tools/evaluation_p07_isolated.py --task "$TASK" --manifest benchmarks/stage4/corpus-p07-v2.json --controls benchmarks/stage4/p07-controls-v4.json --dependency-image "$IMAGE" --dependency-receipt p07-pylint-worker/build --dependency-profile benchmarks/stage4/p07-pylint-environment-profile.json --pytest-launcher "$PYTEST_LAUNCHER" --output p07-pylint-worker/calibration
+          python tools/evaluation_p07_isolated.py --task "$TASK" --manifest benchmarks/stage4/corpus-p07-v2.json --controls "$CONTROLS" --dependency-image "$IMAGE" --dependency-receipt p07-pylint-worker/build --dependency-profile benchmarks/stage4/p07-pylint-environment-profile.json --pytest-launcher "$PYTEST_LAUNCHER" --output p07-pylint-worker/calibration
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

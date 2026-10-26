@@ -1,0 +1,204 @@
+{
+  "version": 5,
+  "kind": "predeclared plausible wrong source controls",
+  "model_visible": false,
+  "tasks": {
+    "psf__requests-863": {
+      "old": "+        if isinstance(hook, (list, tuple, set)):",
+      "new": "+        if isinstance(hook, dict):",
+      "rationale": "Incorrectly admit only dictionary hook collections.",
+      "gold_sha256": "1fe8ef6f159643d4f5c4d06ef1ceddc6d8fa789dfcc58cd5e52eef98e43985d2"
+    },
+    "psf__requests-1963": {
+      "old": "+            req = prepared_request",
+      "new": "+            req = req",
+      "rationale": "Leave the previous request active across redirect hops.",
+      "gold_sha256": "deb8b9018ea0271b2b9dc2d883bf5fb0ca9a721ecc9a93718065926fbec4ed74"
+    },
+    "psf__requests-2317": {
+      "old": "+        method = to_native_string(method)",
+      "new": "+        method = method.encode(\"utf-8\")",
+      "rationale": "Convert method to bytes instead of native text.",
+      "gold_sha256": "e6f1e63850e2a5eefcfe6b4bbc6ba39038372415633a328ba7afea001fcbd50e"
+    },
+    "psf__requests-2674": {
+      "old": "+            raise ConnectionError(e, request=request)",
+      "new": "+            raise HTTPError(e, request=request)",
+      "rationale": "Translate a closed pool to the wrong public exception.",
+      "gold_sha256": "548962b377b03b6dc0095cc0336e26b7b9c52839e7be9383a50873ede44988c0"
+    },
+    "psf__requests-3362": {
+      "old": "+        encoding = r.apparent_encoding",
+      "new": "+        encoding = \"ascii\"",
+      "rationale": "Use a fixed fallback encoding instead of detected encoding.",
+      "gold_sha256": "23e64f2da841d5d49874221e915a084e9bb1def2fcd6d6a24fd8e7dce71fba8d"
+    },
+    "psf__requests-2148": {
+      "old": "+                    raise ConnectionError(e)",
+      "new": "+                    raise ContentDecodingError(e)",
+      "rationale": "Translate socket failure to a decoding exception.",
+      "gold_sha256": "0c773284a62e168b99a78a22c778e4366861e5dac37e7ffb4ae85a680843fab5"
+    },
+    "pytest-dev__pytest-6116": {
+      "old": "+        \"--co\",",
+      "new": "+        \"--collect\",",
+      "rationale": "Add a different collection alias without the required short alias.",
+      "gold_sha256": "2d80109efb3ae83bdebc1338be3407baebef89458fe00d4553397359d41ce611"
+    },
+    "pytest-dev__pytest-5227": {
+      "old": "+DEFAULT_LOG_FORMAT = \"%(levelname)-8s %(name)s:%(filename)s:%(lineno)d %(message)s\"",
+      "new": "+DEFAULT_LOG_FORMAT = \"%(filename)s:%(lineno)d %(levelname)-8s %(name)s %(message)s\"",
+      "rationale": "Incorrectly lead the revised format with source location instead of severity; retain logger name and message.",
+      "gold_sha256": "e8193ea0dee0989323f0f7756f492d73cdc2e584b61f9142b8695d9ed2737893"
+    },
+    "pytest-dev__pytest-7432": {
+      "old": "+    if (",
+      "new": "+    if not item.config.option.runxfail and (",
+      "rationale": "Keep skip-location correction disabled only under runxfail, while preserving ordinary skip handling.",
+      "gold_sha256": "fe1bcec846085b964928724c5e75591b1e0280ef37dd9cdb7faf31a89cfcf062"
+    },
+    "pytest-dev__pytest-11148": {
+      "old": "+            return sys.modules[module_name]",
+      "new": "+            sys.modules[module_name]",
+      "rationale": "Look up the cached module but forget to return it, so importlib still repeats import side effects; preserve missing-cache exception handling.",
+      "gold_sha256": "2ce6f1a00a78b5250cd1469fe57656b2902bc990179446189780997251af128e"
+    },
+    "pytest-dev__pytest-7168": {
+      "old": "+        exc_info, type(obj).__name__, id(obj)",
+      "new": "+        exc_info, \"object\", id(obj)",
+      "rationale": "Hide the concrete type in the repr failure description.",
+      "gold_sha256": "6461134e72ddd5997decb656090500402441f32d12bc9f583a9bce0e2f3e806b"
+    },
+    "pytest-dev__pytest-11143": {
+      "old": "+                and isinstance(item.value.value, str)",
+      "new": "+                and isinstance(item.value.value, (str, int))",
+      "rationale": "Mistakenly admit integral constants as module docstrings while retaining valid string docstrings.",
+      "gold_sha256": "fa7c8fe4ef668668432882ab3397c23349d57de6f54919aeccbc851a79c3aca9"
+    },
+    "pylint-dev__pylint-7080": {
+      "old": "+    element = os.path.normpath(element)",
+      "new": "+    element = os.path.abspath(element)",
+      "rationale": "Change relative path identity rather than normalize separators.",
+      "gold_sha256": "f908ad1f6d4b8df3755a634c6741abf8ae613bc59278a54c16560c16d255580f"
+    },
+    "pylint-dev__pylint-7993": {
+      "old": "+        arguments = re.findall(r\"\\{(\\w+?)(:.*)?\\}\", template)",
+      "new": "+        arguments = re.findall(r\"\\{([^}]+?)(:.*)?\\}\", template)",
+      "rationale": "Stop a field at its closing brace but still admit nested opening braces and JSON header text as a field name; ordinary multi-character unknown fields remain detected.",
+      "gold_sha256": "a56ae72f6b88f0a03865155b280af1dfa97592074bd5bedc9a91a642801e11d5"
+    },
+    "pylint-dev__pylint-5859": {
+      "old": "+            regex_string = rf\"#\\s*({notes})(?=(:|\\s|\\Z))\"",
+      "new": "+            regex_string = rf\"#\\s*({notes})\\b(?=(:|\\s|\\Z))\"",
+      "rationale": "Retain an erroneous word boundary alongside delimiter lookahead: word TODO controls remain supported but punctuation note ??? still fails the new requirement.",
+      "gold_sha256": "e7ec647093f251ba84dc511728af0ac5e7afafb0206bc826c343922d7afccebb"
+    },
+    "pylint-dev__pylint-6506": {
+      "old": "+        linter._arg_parser.error(f\"Unrecognized option found: {msg}\")",
+      "new": "+        linter._arg_parser.error(f\"Unsupported setting: {msg}\")",
+      "rationale": "Use argparse but emit the wrong required diagnostic.",
+      "gold_sha256": "d998b15278fc2bfaddeeb5d44319201298246247a7ed18c76203e9d27d12b12a"
+    },
+    "pylint-dev__pylint-7114": {
+      "old": "+        if os.path.isfile(something) or os.path.exists(",
+      "new": "+        if os.path.exists(something) or os.path.exists(",
+      "rationale": "Retain a generic existence check instead of distinguishing concrete files from namespace directories. This incomplete fix preserves ordinary existing-file handling but still misclassifies namespace directories; the separate ImportError cleanup remains from gold.",
+      "gold_sha256": "1089cc6d5d8cda7a9b882bf08403e799a317acfa0a82638665df736ea6c3a6c4"
+    },
+    "pylint-dev__pylint-7228": {
+      "old": "+        raise argparse.ArgumentTypeError(msg)",
+      "new": "+        raise ValueError(msg)",
+      "rationale": "Raise an exception that argparse does not classify as the intended argument error.",
+      "gold_sha256": "8b6796ff816cae34a8ba96c465e367f321f95931a64b9dff5932f0f9ab701d1b"
+    },
+    "sphinx-doc__sphinx-7738": {
+      "old": "+        if name.endswith('_') and getattr(self._config, 'strip_signature_backslash', False):",
+      "new": "+        if name.endswith('_') and getattr(self._config, 'strip_signature_backslash', True):",
+      "rationale": "Default to stripping backslashes when the configuration is absent.",
+      "gold_sha256": "3866a1c6c3971beecff7fd55b812932b7d907a8d7cbb06709a1e7a95ab5aab7b"
+    },
+    "sphinx-doc__sphinx-8721": {
+      "old": "+    if app.builder.name.startswith(\"epub\") and not env.config.viewcode_enable_epub:",
+      "new": "+    if app.builder.name.startswith(\"epub3\") and not env.config.viewcode_enable_epub:",
+      "gold_sha256": "b280454dbde68b9fd743d03c4d07172306c61477330f337287c48af6e8fced04",
+      "rationale": "Narrow the output-family guard incorrectly to epub3, leaving ordinary epub ungated. HTML output, the singlehtml guard and explicitly enabled epub behavior retain the gold path."
+    },
+    "sphinx-doc__sphinx-8595": {
+      "old": "+            if self.__all__ is None:",
+      "new": "+            if self.__all__ is not None:",
+      "rationale": "Invert empty __all__ handling.",
+      "gold_sha256": "e49e0193e868dbd51b26a9f09163ce7604090ed1676ff719f8dfb038424d6ad9"
+    },
+    "sphinx-doc__sphinx-8474": {
+      "old": "+            logger.warning(__(\"Failed to create a cross reference. Any number is not \"",
+      "new": "+            logger.warning(__(\"Cannot create a cross reference. Any number is not \"",
+      "rationale": "Change the required warning phrase.",
+      "gold_sha256": "5e40a28ed9b23a2b5a513bd4ebaaea85c1540d0006e92c9142ab51bb8522a82b"
+    },
+    "sphinx-doc__sphinx-8506": {
+      "old": "+option_desc_re = re.compile(r'((?:/|--|-|\\+)?[^\\s=]+)(=?\\s*.*)')",
+      "new": "+option_desc_re = re.compile(r'((?:/|--|-|\\+)?[^\\s=\\[][^\\s=]*)(=?\\s*.*)')",
+      "gold_sha256": "a99517671ca1aec8033a000c5212ab6f1a80afe4563e0e8c76889577e67e4a7b",
+      "rationale": "Incomplete bracket support permits brackets after the first option character, preserving optional-value handling, but rejects a leading bracket. The production grammar category is generic; no test-specific predicate is introduced."
+    },
+    "sphinx-doc__sphinx-8713": {
+      "old": "+            return self._format_docutils_params(fields)",
+      "new": "+            return self._format_fields(_('Other Parameters'), fields)",
+      "gold_sha256": "790ea5dc9611d778d1147d4eeb2945d413961932546340f910c9c0b41846ee8d",
+      "rationale": "Consume grouped Other Parameters correctly but return section-field formatting even when napoleon_use_param requires docutils parameter fields. Ordinary Parameters and the false configuration branch remain unchanged."
+    },
+    "sympy__sympy-18057": {
+      "old": "+            other = _sympify(other)",
+      "new": "+            other = sympify(other, strict=False)",
+      "rationale": "Retain permissive conversion in equality comparisons.",
+      "gold_sha256": "41aa404ea443113508e364903ba394e4f0fe8456097290e9234670230ef6289f"
+    },
+    "sympy__sympy-17139": {
+      "old": "+        if not rv.exp.is_real:",
+      "new": "+        if rv.exp.is_real is None:",
+      "rationale": "Guard only unknown exponent realness and forget explicitly nonreal exponents; preserve behavior for real exponents.",
+      "gold_sha256": "8d075ec2ca5d69a25b188b01bcc94733358cd360ebb782e6626edc89bc563e5e"
+    },
+    "sympy__sympy-20212": {
+      "old": "+                return S.ComplexInfinity",
+      "new": "+                return S.NegativeInfinity",
+      "rationale": "Return signed real infinity for zero to negative infinity.",
+      "gold_sha256": "07d36687d22f97e45425b5eab2cadc176f7a26753a2d0f5ff5953299b0c1adf0"
+    },
+    "sympy__sympy-16988": {
+      "old": "+        args = list(ordered(set(_sympify(args))))",
+      "new": "+        args = list(_sympify(args))",
+      "rationale": "Keep duplicate and input-order dependent intersection arguments.",
+      "gold_sha256": "7c9993d01cfa4a3bba61734d0b5235e3b70df8fd65b4818e59f78ff1582f70e1"
+    },
+    "sympy__sympy-21614": {
+      "old": "+        return self.args[0].kind",
+      "new": "+        return S.Zero.kind",
+      "rationale": "Hard-code scalar kind instead of preserving the expression kind.",
+      "gold_sha256": "5a20f33fdb0a731064a81dc26e925e91557900bb7edbfce84463de6280e8e3cd"
+    },
+    "sympy__sympy-13971": {
+      "old": "+        return (r\"\\left[\"",
+      "new": "+        return (r\"\\left(\"",
+      "rationale": "Use an opening parenthesis for a finite sequence.",
+      "gold_sha256": "b0cf52d9a48ea150b68bddbd0d3357123adc1c8113c833640768f2f6dae386a2"
+    }
+  },
+  "previous_controls_sha256": "e301135f5d6d866cfe553206b279235f9ad58a1509855993573ba0725e869038",
+  "migration_note": "Prospective7114-only control after native-startup probe: restore generic existence handling without breaking ordinary files. Preserve v4 and every prior run; fresh triple required.",
+  "status": "prospective_ungraded",
+  "previous_controls_git_lf_sha256": "e301135f5d6d866cfe553206b279235f9ad58a1509855993573ba0725e869038",
+  "changed_tasks": [
+    "pylint-dev__pylint-7114"
+  ],
+  "previous_controls_file": "benchmarks/stage4/p07-controls-v4.json",
+  "corpus_git_lf_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "calibration_evidence_directory": "validation/p07-budget20/pylint-native-probe/",
+  "calibration_evidence_runtime_prefix": "eb12cd7",
+  "calibration_result": "not_run",
+  "previous_controls_hash_contract": "git_text_lf_bytes",
+  "calibration_evidence_workflow": 40371778294,
+  "calibration_evidence_runtime": "eb12cd7aaa7ab52b028d66b0c43cf80cccd07645",
+  "calibration_evidence_artifact": 12673550474,
+  "calibration_evidence_archive_sha256": "f84534dae61922aae3abe6417fe936f276e53b4bc5ba63748948359674ade999"
+}
