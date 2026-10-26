@@ -1,0 +1,20 @@
+{
+  "http_status": 200,
+  "data": {
+    "runs": [
+      {
+        "taskSlug": {
+          "ownerSlug": "akseley",
+          "taskSlug": "atomic-p07-sympy-source-pair-20261026-r1",
+          "versionNumber": 1
+        },
+        "modelVersionSlug": "gemini-3.8-flash",
+        "id": 5496321,
+        "state": "BENCHMARK_TASK_RUN_STATE_COMPLETED",
+        "startTime": "2026-10-26T08:05:58.110845Z",
+        "endTime": "2026-10-26T08:05:58.110942Z"
+      }
+    ],
+    "totalResults": 1
+  }
+}

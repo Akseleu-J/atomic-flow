@@ -28,16 +28,26 @@ def sha(value):
 def classify(task, observed, *, completed, exit_code):
     """Missing/error/skipped requirements cannot be accepted as assertion FAIL."""
     required = task["FAIL_TO_PASS"] + task["PASS_TO_PASS"]
-    if (not completed or exit_code not in {0, 1} or not observed
+    if (not completed or exit_code not in {0, 1} or not observed or "ERROR" in observed.values()
             or any(observed.get(test) not in {"PASSED", "FAILED"} for test in required)):
         return {"status": "infrastructure_error", "verified_success": False}
-    regressions = all(observed[test] == "PASSED" for test in task["PASS_TO_PASS"])
+    regressions = (all(observed[test] == "PASSED" for test in task["PASS_TO_PASS"])
+                   and not any(value == "FAILED" and test not in task["FAIL_TO_PASS"]
+                               for test, value in observed.items()))
     all_pass = all(observed[test] == "PASSED" for test in required)
     unexpected_failure = any(value in {"FAILED", "ERROR"} for value in observed.values())
     success = exit_code == 0 and all_pass and not unexpected_failure
     return {"status": "verified_success" if success else "requirement_failed",
             "verified_success": success, "regressions_passed": regressions,
             "assertion_failures": [t for t in task["FAIL_TO_PASS"] if observed[t] == "FAILED"]}
+
+
+def normalize_observations(task, observed):
+    """Keep v3 SymPy failure-header aliases as diagnostics, not extra test cases."""
+    diagnostics = {}
+    if task["repo"] == "sympy/sympy":
+        diagnostics = {key: value for key, value in observed.items() if re.fullmatch(r".*\.py:\d+", key)}
+    return {key: value for key, value in observed.items() if key not in diagnostics}, diagnostics
 
 
 def calibration_decision(rows):
@@ -136,8 +146,9 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         exits = re.findall(r"^P07_TEST_EXIT=(\d+)$", body, re.MULTILINE)
         if len(exits) != 1:
             raise ValueError("missing or duplicate test exit receipt")
-        observed = parser(body, spec)
+        observed, diagnostics = normalize_observations(task, parser(body, spec))
         row["tests"] = observed
+        row["parser_diagnostics"] = diagnostics
         row.update(classify(task, observed, completed=True, exit_code=int(exits[0])))
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
         row.update(error_type=type(exc).__name__, error=str(exc)[:500])

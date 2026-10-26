@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import time
 from typing import Any
@@ -16,9 +17,10 @@ __all__ = ["ChatResult", "OpenAICompatibleBackend"]
 
 
 class OpenAICompatibleBackend:
-    def __init__(self, config: BackendConfig, *, backend_name: str | None = None):
+    def __init__(self, config: BackendConfig, *, backend_name: str | None = None, response_observer=None):
         self.config = config
         self.name = backend_name or config.name
+        self.response_observer = response_observer
 
     def chat(self, messages: list[dict[str, str]], *, json_mode: bool = False, model: str | None = None) -> ChatResult:
         return self._chat(messages, json_mode=json_mode, model=model)
@@ -73,6 +75,14 @@ class OpenAICompatibleBackend:
         usage_result = ChatResult("", tokens_in, tokens_out, cost, int((time.monotonic() - started) * 1000),
                                   cache_read_tokens=cached, cost_source=cost_source,
                                   resolved_backend=self.name, resolved_model=model or self.config.model)
+        if self.response_observer is not None:
+            try:
+                # Host-owned diagnostics receive the response body only, never
+                # auth headers or endpoint. Mutation cannot change decoding.
+                self.response_observer(copy.deepcopy(payload))
+            except BaseException as exc:
+                exc.usage_result = usage_result
+                raise
         try:
             choice = payload["choices"][0]
             content = choice["message"].get("content")

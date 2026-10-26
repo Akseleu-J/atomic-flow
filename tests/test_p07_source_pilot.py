@@ -56,6 +56,12 @@ def test_missing_or_failed_calibration_cannot_start_paid_generation():
         pilot.admit_calibration({**task, "calibrated": True, "model_calls": 0, "rows": []}, task)
 
 
+def test_read_only_context_does_not_expand_write_scope():
+    assert pilot.decode_action(json.dumps({"tool": "read_file", "args": {"path": "sympy/core/basic.py"}}))["tool"] == "read_file"
+    with pytest.raises(ValueError):
+        pilot.decode_action(json.dumps({"tool": "patch_file", "args": {"path": "sympy/core/basic.py"}}))
+
+
 def test_iterative_baseline_uses_exact_read_then_verified_edit(tmp_path):
     from atomic_flow.agents.source import digest
     from atomic_flow.backends.base import ChatResult

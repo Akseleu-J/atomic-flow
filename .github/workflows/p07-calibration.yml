@@ -16,14 +16,35 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       tasks: ${{ steps.tasks.outputs.value }}
+      should_run: ${{ steps.scope.outputs.value }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           persist-credentials: false
+      - name: Admit calibration only when its inputs changed
+        id: scope
+        env:
+          BEFORE: ${{ github.event.before || github.event.pull_request.base.sha }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import os, subprocess
+          before = os.environ.get('BEFORE', '')
+          admitted = {'tools/evaluation_p07_isolated.py', 'benchmarks/stage4/p07-controls.json', '.github/workflows/p07-calibration.yml', 'tools/evaluation_stage4.py'}
+          if os.environ['EVENT'] == 'workflow_dispatch' or not before:
+              changed = admitted
+          else:
+              subprocess.run(['git', 'fetch', '--no-tags', 'origin', before], check=True)
+              changed = set(subprocess.check_output(['git', 'diff', '--name-only', before, 'HEAD']).decode().splitlines())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print('value=' + str(bool(changed & admitted)).lower(), file=output)
+          PY
       - id: tasks
         run: python -c 'import json,os; d=json.load(open("benchmarks/stage4/corpus.json")); print("value="+json.dumps([t["instance_id"] for t in d["tasks"] if t["instance_id"] != "sympy__sympy-21614"]),file=open(os.environ["GITHUB_OUTPUT"],"a"))'
 
   canary:
+    needs: matrix
+    if: needs.matrix.outputs.should_run == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:

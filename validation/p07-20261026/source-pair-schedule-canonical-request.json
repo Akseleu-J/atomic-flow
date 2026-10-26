@@ -1,0 +1,16 @@
+{
+  "intent": "one canonical-slug scheduling call after no-run reconciliation",
+  "request": {
+    "taskSlugs": [
+      {
+        "ownerSlug": "akseley",
+        "taskSlug": "atomic-p07-sympy-source-pair-20261026-r1",
+        "versionNumber": 1
+      }
+    ],
+    "modelVersionSlugs": [
+      "gemini-3.1-flash-lite-preview"
+    ]
+  },
+  "previous_attempt": "HTTPError; no frozen-model run in state reconciliation"
+}

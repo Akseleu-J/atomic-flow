@@ -1,0 +1,1 @@
+{"owner": "owner-account-2", "balances": [{"period": "ModelProxyQuotaRefillPeriod.DAILY", "used": 0.0007999999999999119, "allowed": 10}, {"period": "ModelProxyQuotaRefillPeriod.MONTHLY", "used": 8.024414975, "allowed": 100}], "model_calls": 0}

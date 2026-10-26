@@ -50,6 +50,19 @@ def test_calibration_requires_real_assertion_failures_and_preserved_regressions(
 def test_gold_cannot_pass_with_unexpected_regression_failure():
     result = p07.classify(TASK, {"required": "PASSED", "regression": "PASSED", "extra": "FAILED"}, completed=True, exit_code=0)
     assert not result["verified_success"]
+    assert not result["regressions_passed"]
+
+
+def test_unrelated_fixture_error_cannot_masquerade_as_valid_negative_control():
+    result = p07.classify(TASK, {"required": "FAILED", "regression": "PASSED", "extra": "ERROR"}, completed=True, exit_code=1)
+    assert result["status"] == "infrastructure_error"
+
+
+def test_sympy_failure_header_diagnostics_do_not_invent_extra_tests():
+    raw = {"required": "FAILED", "regression": "PASSED", "sympy/core/tests/test_kind.py:62": "FAILED"}
+    observed, diagnostics = p07.normalize_observations({"repo": "sympy/sympy"}, raw)
+    assert observed == {"required": "FAILED", "regression": "PASSED"}
+    assert diagnostics == {"sympy/core/tests/test_kind.py:62": "FAILED"}
 
 
 def test_historical_test_command_and_exit_receipt_survive_without_reinstall():

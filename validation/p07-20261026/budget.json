@@ -5,9 +5,9 @@
   "authorized_owner": "owner-account-2",
   "authorized_total_usd": 6,
   "observed_prior_daily_usd": 0.0008,
-  "new_calls": 0,
-  "new_reported_cost_usd": 0,
-  "remaining_session_ceiling_usd": 5.9992,
+  "new_calls": 7,
+  "new_reported_cost_usd": 0.011418825,
+  "remaining_session_ceiling_usd": 5.987781175,
   "provider": "Kaggle Model Proxy",
   "model": "google/gemini-3.1-flash-lite-preview",
   "max_retries": 0,
@@ -18,5 +18,6 @@
     "output": 1.5
   },
   "price_limit_note": "Public direct API reference, not a Kaggle billing guarantee; provider usage and quota are authoritative observations",
-  "phase": "oracle calibration; inference not started"
+  "phase": "R1 measured no candidates; R2 prepared separately with same per-arm caps",
+  "booked_today_usd": 0.012218825
 }
