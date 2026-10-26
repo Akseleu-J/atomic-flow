@@ -238,7 +238,101 @@ def command(args, *, timeout=60, log=None):
     return result.stdout.decode(errors="replace").strip()
 
 
-def grade(task, spec, image, patch, output, label, parser, timeout):
+def validate_httpbin_receipt(task, image_id, base_digest, actual_image, receipt_dir):
+    """Admit a separately built/probed fixture without trusting a mutable tag."""
+    if task["repo"] != "psf/requests" or not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id):
+        raise ValueError("HTTPBin override requires a Requests task and immutable image ID")
+    report = json.loads((receipt_dir / "build-probe.json").read_text())
+    lock = json.loads((receipt_dir / "runtime-lock.json").read_text())
+    health = json.loads((receipt_dir / "health.json").read_text())
+    if (report.get("status") != "image_built_and_network_none_fixture_health_verified"
+            or report.get("cleanup_exit") != 0 or report.get("task") != task["instance_id"]
+            or report.get("base_image") != base_digest or report.get("image_id") != image_id
+            or actual_image.get("Id") != image_id
+            or actual_image.get("Config", {}).get("Labels", {}).get("atomic.p07.fixture.base") != base_digest
+            or not actual_image.get("RootFS", {}).get("Layers")
+            or actual_image.get("RootFS") != report.get("image_inspect", {}).get("RootFS")
+            or lock.get("base_image") != base_digest or lock.get("schema_version") != 1
+            or report.get("health") != health):
+        raise ValueError("fixture image, base or independently completed build receipt mismatch")
+    tools = Path(__file__).resolve().parent
+    expected_sources = {name: sha((tools / name).read_bytes())
+                        for name in ("p07_httpbin_fixture.py", "p07_httpbin_pytest.py")}
+    requirements = (tools.parent / "benchmarks/stage4/httpbin-fixture-requirements.lock").read_text().splitlines()
+    expected_packages, expected_hashes = {}, {}
+    for line in requirements:
+        match = re.fullmatch(r"([a-z0-9-]+)==([^ ]+) --hash=sha256:([0-9a-f]{64})", line)
+        if not match or match[1] in expected_packages:
+            raise ValueError("reviewed fixture dependency lock malformed")
+        expected_packages[match[1]], expected_hashes[match[1]] = match[2], match[3]
+    wheels = lock.get("wheels", {})
+    if (lock.get("fixture_sources_sha256") != expected_sources or lock.get("packages") != expected_packages
+            or set(wheels) != set(expected_packages) or not expected_packages
+            or any(wheels[name].get("version") != version
+                   or wheels[name].get("sha256") != expected_hashes[name]
+                   or lock.get("wheel_hashes", {}).get(wheels[name].get("filename")) != expected_hashes[name]
+                   for name, version in expected_packages.items())):
+        raise ValueError("fixture source or wheel bytes differ from the reviewed checkout")
+    mappings = {"httpbin.org": "127.0.0.1"}
+    if task["instance_id"] == "psf__requests-3362":
+        # Exact reviewed test preserves a real different-host redirect; it has
+        # no assertion about Google's content. No other hosts are admitted.
+        mappings["www.google.co.uk"] = "127.0.0.1"
+    if lock.get("host_mappings") != mappings:
+        raise ValueError("unreviewed HTTPBin transport mapping")
+    validate_httpbin_health(health, lock)
+    return {"image_id": image_id, "runtime_lock": lock,
+            "build_receipt_sha256": sha((receipt_dir / "build-probe.json").read_bytes()),
+            "runtime_lock_sha256": sha((receipt_dir / "runtime-lock.json").read_bytes()),
+            "host_mappings": mappings}
+
+
+def validate_httpbin_health(health, lock):
+    if (health.get("status") != "real_httpbin_started" or health.get("probes") != {"http": 204, "https": 204}
+            or health.get("bind") != ["127.0.0.1:80", "127.0.0.1:443"]
+            or health.get("fixture_sources_sha256") != lock.get("fixture_sources_sha256")
+            or health.get("packages") != lock.get("packages")
+            or not re.fullmatch(r"[0-9a-f]{64}", lock.get("certificate_sha256", ""))
+            or health.get("certificate_sha256") != lock.get("certificate_sha256")
+            or health.get("resolved_addresses") != {host: [ip] for host, ip in lock.get("host_mappings", {}).items()}
+            or health.get("fixture_venv") != "/opt/p07-httpbin"
+            or set(health.get("application_module_paths", {})) != {"httpbin", "werkzeug"}
+            or any(not path.startswith("/opt/p07-httpbin/")
+                   for path in health.get("application_module_paths", {}).values())):
+        raise ValueError("real HTTPBin health, TLS or application identity mismatch")
+
+
+def start_httpbin(name, fixture, output, label):
+    runtime = json.loads(command(["docker", "exec", name, "cat", "/opt/p07-fixture/fixture-lock.json"]))
+    if runtime != fixture["runtime_lock"]:
+        raise ValueError("container runtime fixture lock differs from admitted build")
+    identity = command(["docker", "exec", name, "/opt/miniconda3/envs/testbed/bin/python", "-I", "-c",
+        "import hashlib,importlib.util,pathlib; p=pathlib.Path(importlib.util.find_spec('p07_httpbin_pytest').origin); "
+        "print(p); print(hashlib.sha256(p.read_bytes()).hexdigest())"]).splitlines()
+    if (len(identity) != 2 or not identity[0].startswith("/opt/miniconda3/envs/testbed/lib/")
+            or not identity[0].endswith("/site-packages/p07_httpbin_pytest.py")
+            or identity[1] != runtime["fixture_sources_sha256"]["p07_httpbin_pytest.py"]):
+        raise ValueError("target plugin import path or installed source differs from reviewed adapter")
+    command(["docker", "exec", "-d", name, "/bin/bash", "-c",
+        "exec /opt/p07-httpbin/bin/python /opt/p07-fixture/p07_httpbin_fixture.py --serve "
+        "--expected-lock /opt/p07-fixture/fixture-lock.json --certificate /opt/p07-fixture/httpbin-cert.pem "
+        "--test-key /opt/p07-fixture/httpbin-key.pem --output /tmp/p07-httpbin-ready.json "
+        "> /tmp/p07-httpbin-service.log 2>&1"])
+    deadline = time.monotonic() + 40
+    while time.monotonic() < deadline:
+        probe = subprocess.run(["docker", "exec", name, "cat", "/tmp/p07-httpbin-ready.json"],
+                               capture_output=True, timeout=5, check=False)
+        if probe.returncode == 0:
+            health = json.loads(probe.stdout)
+            validate_httpbin_health(health, runtime)
+            (output / (label + "-httpbin-health.json")).write_bytes(probe.stdout)
+            health["target_plugin_identity"] = {"path": identity[0], "sha256": identity[1]}
+            return health
+        time.sleep(.25)
+    raise ValueError("real HTTPBin failed to become healthy in this fresh grading container")
+
+
+def grade(task, spec, image, patch, output, label, parser, timeout, *, httpbin=None):
     name = "p07-" + task["instance_id"].lower() + "-" + uuid.uuid4().hex[:10]
     row = {"label": label, "patch_sha256": sha(patch.encode()), "status": "infrastructure_error",
            "verified_success": False, "container_name": name}
@@ -248,19 +342,28 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         if patch and (patch_paths(patch) & patch_paths(task["test_patch"])
                       or any(protected_test_path(p) for p in patch_paths(patch))):
             raise ValueError("patch modifies protected tests")
+        additions = [] if httpbin is None else ["--sysctl", "net.ipv4.ip_unprivileged_port_start=0",
+            *[part for host, address in sorted(httpbin["host_mappings"].items()) for part in ("--add-host", host + ":" + address)]]
         command(["docker", "create", "--name", name, "--network", "none", "--cap-drop", "ALL",
                  "--security-opt", "no-new-privileges", "--memory", "6g", "--cpus", "2",
-                 "--pids-limit", "256", "--entrypoint", "/bin/bash", image, "-c", "sleep infinity"])
+                 "--pids-limit", "256", *additions, "--entrypoint", "/bin/bash", image, "-c", "sleep infinity"])
         command(["docker", "start", name])
         config = json.loads(command(["docker", "inspect", name]))[0]
         host = config["HostConfig"]
-        if (host["NetworkMode"] != "none" or host["Privileged"] or host.get("Binds")
+        if (host["NetworkMode"] != "none" or host["Privileged"] or host.get("Binds") or config.get("Mounts")
                 or host["CapDrop"] != ["ALL"] or "no-new-privileges" not in host["SecurityOpt"]
                 or host["Memory"] != 6 * 1024**3 or host["PidsLimit"] != 256):
             raise ValueError("container isolation contract mismatch")
         row["isolation"] = {"network": "none", "caps": "ALL dropped", "host_mounts": [],
                             "memory_bytes": host["Memory"], "pids": host["PidsLimit"],
                             "no_new_privileges": True, "image": image}
+        if httpbin is not None:
+            if (host.get("Sysctls") != {"net.ipv4.ip_unprivileged_port_start": "0"}
+                    or set(host.get("ExtraHosts", [])) != {key + ":" + value for key, value in httpbin["host_mappings"].items()}):
+                raise ValueError("fixture container transport isolation mismatch")
+            row["httpbin"] = {"build_receipt_sha256": httpbin["build_receipt_sha256"],
+                "runtime_lock_sha256": httpbin["runtime_lock_sha256"],
+                "health": start_httpbin(name, httpbin, output, label)}
         row["image_checkout_head"] = command(["docker", "exec", name, "git", "-C", "/testbed", "rev-parse", "HEAD"])
         # Official images can have a synthetic environment/setup commit. Prepare
         # the requested immutable revision before checking or applying any patch.
@@ -288,7 +391,10 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
             command(["docker", "exec", "-w", "/testbed", name, "git", "apply", "--check", "/tmp/p07-candidate.patch"])
             command(["docker", "exec", "-w", "/testbed", name, "git", "apply", "/tmp/p07-candidate.patch"])
         before = command(["docker", "exec", "-w", "/testbed", name, "git", "diff", "--binary"])
-        row["process_exit"] = command(["docker", "exec", name, "/bin/bash", "/tmp/p07-eval.sh"], timeout=timeout, log=log)
+        fixture_env = [] if httpbin is None else ["-e", "HTTPBIN_URL=http://httpbin.org/",
+            "-e", "REQUESTS_CA_BUNDLE=/opt/p07-fixture/httpbin-cert.pem", "-e", "CURL_CA_BUNDLE=/opt/p07-fixture/httpbin-cert.pem",
+            "-e", "PYTEST_PLUGINS=p07_httpbin_pytest"]
+        row["process_exit"] = command(["docker", "exec", *fixture_env, name, "/bin/bash", "/tmp/p07-eval.sh"], timeout=timeout, log=log)
         after = command(["docker", "exec", "-w", "/testbed", name, "git", "diff", "--binary"])
         if before != after:
             raise ValueError("test execution modified tracked source or protected tests")
@@ -312,9 +418,21 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
         row.update(error_type=type(exc).__name__, error=str(exc)[:500])
     finally:
-        cleanup = subprocess.run(["docker", "rm", "-f", name], capture_output=True, timeout=30, check=False)
-        row["cleanup_exit"] = cleanup.returncode
-        if cleanup.returncode and "No such container" not in cleanup.stderr.decode(errors="replace"):
+        if httpbin is not None:
+            try:
+                service_log = subprocess.run(["docker", "exec", name, "cat", "/tmp/p07-httpbin-service.log"],
+                                             capture_output=True, timeout=15, check=False)
+                (output / (label + "-httpbin-service.log")).write_bytes(service_log.stdout + service_log.stderr)
+            except (OSError, subprocess.SubprocessError) as exc:
+                row["httpbin_service_log_error"] = type(exc).__name__
+        try:
+            cleanup = subprocess.run(["docker", "rm", "-f", name], capture_output=True, timeout=30, check=False)
+            row["cleanup_exit"] = cleanup.returncode
+            if cleanup.returncode and "No such container" not in cleanup.stderr.decode(errors="replace"):
+                row.update(status="infrastructure_error", verified_success=False, cleanup_uncertain=True)
+        except (OSError, subprocess.SubprocessError) as exc:
+            row["cleanup_exit"] = None
+            row["cleanup_error_type"] = type(exc).__name__
             row.update(status="infrastructure_error", verified_success=False, cleanup_uncertain=True)
         row["wall_seconds"] = time.monotonic() - started
         if log.exists():
@@ -331,9 +449,13 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=240)
     parser.add_argument("--candidate", type=Path, help="Independent grading after fresh base/gold/wrong calibration")
+    parser.add_argument("--httpbin-image", help="Opt-in immutable ID of independently built/probed real HTTPBin image")
+    parser.add_argument("--httpbin-receipt", type=Path, help="Build/probe output containing build-probe.json, runtime-lock.json and health.json")
     args = parser.parse_args()
     if not TASK_ID.fullmatch(args.task) or not 10 <= args.timeout <= 600:
         raise ValueError("invalid task or execution timeout")
+    if bool(args.httpbin_image) != bool(args.httpbin_receipt):
+        raise ValueError("HTTPBin image and independent build/probe receipt must be supplied together")
     if args.output.exists():
         raise ValueError("fresh output required; no implicit retries or report replacement")
     args.output.mkdir(parents=True)
@@ -361,11 +483,18 @@ def main():
         report.update(image_tag=image, image_digest=digest, image_id=info["Id"], base_commit=task["base_commit"],
                       manifest_sha256=sha(Path(args.manifest).read_bytes()),
                       controls_sha256=sha(Path(args.controls).read_bytes()), negative_control_rationale=control["rationale"])
+        httpbin = None
+        grade_image = digest
+        if args.httpbin_image:
+            actual = json.loads(command(["docker", "image", "inspect", args.httpbin_image]))[0]
+            httpbin = validate_httpbin_receipt(task, args.httpbin_image, digest, actual, args.httpbin_receipt)
+            report["httpbin"] = httpbin
+            grade_image = args.httpbin_image
         report["test_command"] = MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]]["test_cmd"]
         script = evaluation_script(spec, MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]].get("install"), task["repo"])
         (args.output / "eval.sh").write_text(script)
         report["eval_script_sha256"] = sha(script.encode())
-        rows = [grade(task, spec, digest, patch, args.output, label, MAP_REPO_TO_PARSER[task["repo"]], args.timeout)
+        rows = [grade(task, spec, grade_image, patch, args.output, label, MAP_REPO_TO_PARSER[task["repo"]], args.timeout, httpbin=httpbin)
                 for label, patch in (("base", ""), ("gold", task["patch"]), ("wrong", wrong))]
         report.update(rows=rows, calibrated=calibration_decision(rows), status="completed")
         if args.candidate:
@@ -378,8 +507,8 @@ def main():
                 raise ValueError("candidate has empty or protected scope")
             report["candidate_input_sha256"] = sha(candidate_bytes)
             if report["calibrated"]:
-                report["candidate"] = grade(task, spec, digest, candidate, args.output, "candidate",
-                                            MAP_REPO_TO_PARSER[task["repo"]], args.timeout)
+                report["candidate"] = grade(task, spec, grade_image, candidate, args.output, "candidate",
+                                            MAP_REPO_TO_PARSER[task["repo"]], args.timeout, httpbin=httpbin)
             else:
                 report["candidate"] = {"status": "not_admitted_calibration_failed", "verified_success": False}
     except Exception as exc:

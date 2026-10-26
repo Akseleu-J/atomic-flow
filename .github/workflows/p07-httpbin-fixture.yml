@@ -2,6 +2,11 @@ name: P07 real HTTPBin fixture image acceptance
 
 on:
   workflow_dispatch:
+    inputs:
+      calibrate:
+        description: 'Run all three Requests3362 oracle rows after fixture health acceptance'
+        type: boolean
+        default: false
   pull_request:
     paths:
       - 'tools/p07_httpbin_fixture.py'
@@ -35,6 +40,12 @@ jobs:
           cmp benchmarks/stage4/httpbin-fixture-requirements.lock /tmp/p07-httpbin-context/requirements.lock
       - name: Build trusted fixture layer and prove network-none real HTTP and HTTPS
         run: python tools/p07_requests_fixture_calibrate.py --context /tmp/p07-httpbin-context --output p07-httpbin-worker/build-probe --task psf__requests-3362
+      - name: Independently grade source rows using the admitted real fixture
+        if: inputs.calibrate == true
+        run: |
+          python -m pip install swebench==3.0.15
+          IMAGE=$(python -c "import json; print(json.load(open('p07-httpbin-worker/build-probe/build-probe.json'))['image_id'])")
+          python tools/evaluation_p07_isolated.py --task psf__requests-3362 --manifest benchmarks/stage4/corpus-p07-v2.json --controls benchmarks/stage4/p07-controls-v3.json --httpbin-image "$IMAGE" --httpbin-receipt p07-httpbin-worker/build-probe --output p07-httpbin-worker/calibration
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

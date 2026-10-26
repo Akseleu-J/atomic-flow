@@ -123,8 +123,9 @@ def build_and_probe(context, output, task):
         save(output / "health.json", ready)
         report.update(status="image_built_and_network_none_fixture_health_verified", health=ready,
             evaluator_command=["python", "tools/evaluation_p07_isolated.py", "--task", task,
-                               "--httpbin-image", image_id, "--output", str(output.parent / (output.name + "-calibration"))],
-            evaluator_status="not_run_requires_evaluator_adapter")
+                               "--httpbin-image", image_id, "--httpbin-receipt", str(output),
+                               "--output", str(output.parent / (output.name + "-calibration"))],
+            evaluator_status="not_run_requires_independent_evaluator_admission")
     finally:
         if created:
             logs = subprocess.run(["docker", "logs", name], capture_output=True, timeout=15)

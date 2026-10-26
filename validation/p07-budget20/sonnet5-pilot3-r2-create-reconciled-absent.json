@@ -1,0 +1,83 @@
+{
+  "time": "2026-10-26T12:20:46.079Z",
+  "list": {
+    "status": 200,
+    "data": {
+      "tasks": [
+        {
+          "slug": {
+            "ownerSlug": "akseley",
+            "taskSlug": "atomic-p07-sonnet5-source-preflight-20261026-v1",
+            "versionNumber": 1
+          },
+          "url": "/benchmarks/tasks/akseley/atomic-p07-sonnet5-source-preflight-20261026-v1/1",
+          "creationState": "BENCHMARK_TASK_VERSION_CREATION_STATE_COMPLETED",
+          "createTime": "2026-10-26T10:39:54.190Z",
+          "source": "CLI",
+          "candidateType": "BENCHMARK_CANDIDATE_TYPE_MODEL_VERSIONS"
+        },
+        {
+          "slug": {
+            "ownerSlug": "akseley",
+            "taskSlug": "atomic-p07-sympy-source-pair-20261026-r4",
+            "versionNumber": 1
+          },
+          "url": "/benchmarks/tasks/akseley/atomic-p07-sympy-source-pair-20261026-r4/1",
+          "creationState": "BENCHMARK_TASK_VERSION_CREATION_STATE_COMPLETED",
+          "createTime": "2026-10-26T09:14:05.953333300Z",
+          "source": "CLI",
+          "candidateType": "BENCHMARK_CANDIDATE_TYPE_MODEL_VERSIONS"
+        },
+        {
+          "slug": {
+            "ownerSlug": "akseley",
+            "taskSlug": "atomic-p07-sympy-source-pair-20261026-r3",
+            "versionNumber": 1
+          },
+          "url": "/benchmarks/tasks/akseley/atomic-p07-sympy-source-pair-20261026-r3/1",
+          "creationState": "BENCHMARK_TASK_VERSION_CREATION_STATE_COMPLETED",
+          "createTime": "2026-10-26T09:03:39.073333300Z",
+          "source": "CLI",
+          "candidateType": "BENCHMARK_CANDIDATE_TYPE_MODEL_VERSIONS"
+        },
+        {
+          "slug": {
+            "ownerSlug": "akseley",
+            "taskSlug": "atomic-p07-sympy-source-pair-20261026-r2",
+            "versionNumber": 1
+          },
+          "url": "/benchmarks/tasks/akseley/atomic-p07-sympy-source-pair-20261026-r2/1",
+          "creationState": "BENCHMARK_TASK_VERSION_CREATION_STATE_COMPLETED",
+          "createTime": "2026-10-26T08:41:47.486666700Z",
+          "source": "CLI",
+          "candidateType": "BENCHMARK_CANDIDATE_TYPE_MODEL_VERSIONS"
+        },
+        {
+          "slug": {
+            "ownerSlug": "akseley",
+            "taskSlug": "atomic-p07-sympy-source-pair-20261026-r1",
+            "versionNumber": 1
+          },
+          "url": "/benchmarks/tasks/akseley/atomic-p07-sympy-source-pair-20261026-r1/1",
+          "creationState": "BENCHMARK_TASK_VERSION_CREATION_STATE_COMPLETED",
+          "createTime": "2026-10-26T08:05:36.510Z",
+          "source": "CLI",
+          "candidateType": "BENCHMARK_CANDIDATE_TYPE_MODEL_VERSIONS"
+        },
+        {
+          "slug": {
+            "ownerSlug": "akseley",
+            "taskSlug": "atomic-p07-source-preflight-20261026",
+            "versionNumber": 1
+          },
+          "url": "/benchmarks/tasks/akseley/atomic-p07-source-preflight-20261026/1",
+          "creationState": "BENCHMARK_TASK_VERSION_CREATION_STATE_COMPLETED",
+          "createTime": "2026-10-26T07:47:35.350Z",
+          "source": "CLI",
+          "candidateType": "BENCHMARK_CANDIDATE_TYPE_MODEL_VERSIONS"
+        }
+      ],
+      "totalResults": 6
+    }
+  }
+}

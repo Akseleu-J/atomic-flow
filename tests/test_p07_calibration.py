@@ -19,6 +19,111 @@ spec.loader.exec_module(p07)
 TASK = {"FAIL_TO_PASS": ["required"], "PASS_TO_PASS": ["regression"]}
 
 
+def _httpbin_receipt(tmp_path):
+    image_id, base = "sha256:" + "a" * 64, "swebench/requests@sha256:" + "b" * 64
+    packages, wheels, hashes = {}, {}, {}
+    for line in (ROOT / "benchmarks/stage4/httpbin-fixture-requirements.lock").read_text().splitlines():
+        name, version, digest = re.fullmatch(r"([^=]+)==([^ ]+) --hash=sha256:(\w+)", line).groups()
+        packages[name] = version
+        wheels[name] = {"version": version, "filename": name + ".whl", "sha256": digest}
+        hashes[name + ".whl"] = digest
+    sources = {name: p07.sha((ROOT / "tools" / name).read_bytes())
+               for name in ("p07_httpbin_fixture.py", "p07_httpbin_pytest.py")}
+    lock = {"schema_version": 1, "base_image": base, "packages": packages, "wheels": wheels,
+            "wheel_hashes": hashes, "fixture_sources_sha256": sources, "certificate_sha256": "c" * 64,
+            "host_mappings": {"httpbin.org": "127.0.0.1", "www.google.co.uk": "127.0.0.1"}}
+    health = {"status": "real_httpbin_started", "probes": {"http": 204, "https": 204}, "packages": packages,
+              "fixture_sources_sha256": sources, "certificate_sha256": "c" * 64,
+              "resolved_addresses": {name: [ip] for name, ip in lock["host_mappings"].items()},
+              "fixture_venv": "/opt/p07-httpbin", "bind": ["127.0.0.1:80", "127.0.0.1:443"],
+              "application_module_paths": {name: "/opt/p07-httpbin/lib/" + name + "/__init__.py" for name in ("httpbin", "werkzeug")}}
+    image = {"Id": image_id, "Config": {"Labels": {"atomic.p07.fixture.base": base}}, "RootFS": {"Layers": ["sha256:" + "d" * 64]}}
+    report = {"status": "image_built_and_network_none_fixture_health_verified", "cleanup_exit": 0,
+              "task": "psf__requests-3362", "base_image": base, "image_id": image_id, "image_inspect": image, "health": health}
+    for name, value in (("build-probe", report), ("runtime-lock", lock), ("health", health)):
+        (tmp_path / (name + ".json")).write_text(json.dumps(value))
+    return {"repo": "psf/requests", "instance_id": "psf__requests-3362"}, image_id, base, image
+
+
+def test_httpbin_admission_binds_completed_probe_to_checkout_and_immutable_base(tmp_path):
+    args = _httpbin_receipt(tmp_path)
+    result = p07.validate_httpbin_receipt(*args, tmp_path)
+    assert result["image_id"] == args[1]
+    assert result["host_mappings"] == {"httpbin.org": "127.0.0.1", "www.google.co.uk": "127.0.0.1"}
+
+
+@pytest.mark.parametrize("record,path,value", [
+    ("build-probe", ("cleanup_exit",), 1),
+    ("build-probe", ("base_image",), "different-base"),
+    ("build-probe", ("image_id",), "sha256:" + "e" * 64),
+    ("runtime-lock", ("fixture_sources_sha256", "p07_httpbin_fixture.py"), "e" * 64),
+    ("runtime-lock", ("packages", "httpbin"), "unreviewed"),
+    ("runtime-lock", ("host_mappings", "outside.example"), "127.0.0.1"),
+    ("health", ("probes", "https"), 500),
+    ("health", ("certificate_sha256",), "e" * 64),
+    ("health", ("application_module_paths", "httpbin"), "/testbed/httpbin.py"),
+])
+def test_httpbin_admission_rejects_unbound_or_unhealthy_fixture(tmp_path, record, path, value):
+    args = _httpbin_receipt(tmp_path)
+    destination = tmp_path / (record + ".json")
+    document = json.loads(destination.read_text())
+    current = document
+    for key in path[:-1]:
+        current = current[key]
+    current[path[-1]] = value
+    destination.write_text(json.dumps(document))
+    with pytest.raises(ValueError):
+        p07.validate_httpbin_receipt(*args, tmp_path)
+
+
+def test_httpbin_admission_rejects_mutable_tag_and_wrong_target(tmp_path):
+    task, image_id, base, image = _httpbin_receipt(tmp_path)
+    with pytest.raises(ValueError):
+        p07.validate_httpbin_receipt(task, "fixture:latest", base, image, tmp_path)
+    with pytest.raises(ValueError):
+        p07.validate_httpbin_receipt({**task, "repo": "sympy/sympy"}, image_id, base, image, tmp_path)
+
+
+def test_httpbin_runtime_lock_is_checked_before_service_or_target_execution(tmp_path, monkeypatch):
+    calls = []
+    def fake_command(args):
+        calls.append(args)
+        return "{}"
+    monkeypatch.setattr(p07, "command", fake_command)
+    with pytest.raises(ValueError, match="runtime fixture lock"):
+        p07.start_httpbin("fresh-container", {"runtime_lock": {"expected": True}}, tmp_path, "base")
+    assert calls == [["docker", "exec", "fresh-container", "cat", "/opt/p07-fixture/fixture-lock.json"]]
+
+
+def test_httpbin_target_plugin_source_must_match_reviewed_lock_before_start(tmp_path, monkeypatch):
+    _httpbin_receipt(tmp_path)
+    lock = json.loads((tmp_path / "runtime-lock.json").read_text())
+    calls = []
+    def fake_command(args):
+        calls.append(args)
+        return json.dumps(lock) if args[-1] == "/opt/p07-fixture/fixture-lock.json" else "/testbed/p07_httpbin_pytest.py\nwrong"
+    monkeypatch.setattr(p07, "command", fake_command)
+    with pytest.raises(ValueError, match="target plugin import path"):
+        p07.start_httpbin("fresh-container", {"runtime_lock": lock}, tmp_path, "base")
+    assert len(calls) == 2
+    assert not any("-d" in call for call in calls)
+
+
+def test_cleanup_timeout_retains_failed_grade_receipt_and_never_success(tmp_path, monkeypatch):
+    def creation_failure(args):
+        raise RuntimeError("creation uncertain")
+    def cleanup_timeout(args, **kwargs):
+        raise p07.subprocess.TimeoutExpired(args, 30)
+    monkeypatch.setattr(p07, "command", creation_failure)
+    monkeypatch.setattr(p07.subprocess, "run", cleanup_timeout)
+    row = p07.grade({"instance_id": "psf__requests-3362"}, None, "image", "", tmp_path, "base", None, 10)
+    assert row["status"] == "infrastructure_error"
+    assert row["cleanup_uncertain"] and row["cleanup_exit"] is None
+    assert row["cleanup_error_type"] == "TimeoutExpired"
+    assert not row["verified_success"]
+    assert json.loads((tmp_path / "base.json").read_text())["cleanup_uncertain"]
+
+
 def test_sympy_uses_its_own_runner_without_requiring_host_pytest():
     assert "import pytest" not in p07.runner_identity_command("sympy/sympy")
 

@@ -1,7 +1,9 @@
 """No fixture package availability or TLS/network semantics are fabricated."""
+import ast
 import hashlib
 import importlib.util
 import json
+import sysconfig
 import zipfile
 from pathlib import Path
 
@@ -131,3 +133,32 @@ def test_preparation_json_hashes_exact_bytes_on_windows(tmp_path):
     raw = path.read_bytes()
     assert b"\r\n" not in raw and raw.endswith(b"\n")
     assert json.loads(raw) == {"fixture": "value"}
+
+
+def test_generated_finalizer_writes_parseable_runtime_lock_and_identical_adapter(tmp_path, monkeypatch):
+    # Execute the actual generated image-build program, rather than checking
+    # that it merely compiles: escaping mistakes can produce invalid JSON.
+    tree = ast.parse(Path(builder.__file__).read_text())
+    assignment = next(node for node in ast.walk(tree) if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "finalize" for target in node.targets))
+    program = ast.literal_eval(assignment.value)
+    marker = "pathlib.Path('/opt/p07-fixture')"
+    assert program.count(marker) == 1
+    program = program.replace(marker, "pathlib.Path(" + repr(str(tmp_path)) + ")")
+    plugin = b"# reviewed host-owned pytest fixture adapter\n"
+    (tmp_path / "p07_httpbin_pytest.py").write_bytes(plugin)
+    (tmp_path / "httpbin-cert.pem").write_bytes(b"benchmark test certificate")
+    (tmp_path / "httpbin-key.pem").write_bytes(b"benchmark test key")
+    lock = {"fixture_sources_sha256": {"p07_httpbin_pytest.py": hashlib.sha256(plugin).hexdigest()}}
+    builder.json_write(tmp_path / "fixture-lock.build.json", lock)
+    site_packages = tmp_path / "target-site-packages"
+    site_packages.mkdir()
+    monkeypatch.setattr(sysconfig, "get_paths", lambda: {"purelib": str(site_packages)})
+    exec(compile(program, "finalize_fixture.py", "exec"), {})
+    raw = (tmp_path / "fixture-lock.json").read_bytes()
+    actual = json.loads(raw)
+    assert raw.endswith(b"\n") and not raw.endswith(b"\\n")
+    assert actual["fixture_sources_sha256"] == lock["fixture_sources_sha256"]
+    for key, name in (("certificate_sha256", "httpbin-cert.pem"), ("test_key_sha256", "httpbin-key.pem")):
+        assert actual[key] == hashlib.sha256((tmp_path / name).read_bytes()).hexdigest()
+    assert (site_packages / "p07_httpbin_pytest.py").read_bytes() == plugin
