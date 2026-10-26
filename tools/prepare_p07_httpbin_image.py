@@ -96,7 +96,10 @@ def validate_wheels(wheel_dir, pins, fetch_json):
         requirements.append(f"{name}=={version} --hash=sha256:{digest}")
     if set(wheels) != set(normalized):
         raise ValueError("missing locked wheels: " + str(sorted(set(normalized) - set(wheels))))
-    return wheels, requirements
+    # Path ordering folds case on Windows but not Linux. Wheel filenames retain
+    # publisher casing (Flask/Jinja2/etc.); serialize by canonical requirement
+    # names so the reviewed lock has identical bytes on both hosts.
+    return wheels, sorted(requirements)
 
 
 def prepare(output, image, *, download=True, wheel_source=None):

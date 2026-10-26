@@ -112,6 +112,19 @@ def test_wheel_digest_mismatch_cannot_be_accepted(tmp_path):
             "filename": path.name, "packagetype": "bdist_wheel", "digests": {"sha256": "a" * 64}}]})
 
 
+def test_lock_order_uses_canonical_package_names_not_platform_path_order(tmp_path):
+    paths = {name.lower(): wheel(tmp_path, name) for name in ("Zulu", "alpha")}
+
+    def metadata(url):
+        path = paths[url.split("/")[-3]]
+        return {"urls": [{"filename": path.name, "packagetype": "bdist_wheel",
+            "digests": {"sha256": hashlib.sha256(path.read_bytes()).hexdigest()},
+            "url": "https://files.pythonhosted.org/fixture.whl"}]}
+
+    _, requirements = builder.validate_wheels(tmp_path, {"Zulu": "1.0", "alpha": "1.0"}, metadata)
+    assert [line.split("==", 1)[0] for line in requirements] == ["alpha", "zulu"]
+
+
 def test_preparation_json_hashes_exact_bytes_on_windows(tmp_path):
     path = tmp_path / "lock.json"
     builder.json_write(path, {"fixture": "value"})

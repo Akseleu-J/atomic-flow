@@ -31,8 +31,8 @@ jobs:
           mkdir -p p07-httpbin-worker
           git rev-parse HEAD > p07-httpbin-worker/tested-commit.txt
           python tools/prepare_p07_httpbin_image.py --image swebench/sweb.eval.x86_64.psf_1776_requests-3362@sha256:c5dc4ba64a2d97d6cff6b82fe9c0561589df13f23df6883d05e99b630942bbd1 --output /tmp/p07-httpbin-context
-          cmp benchmarks/stage4/httpbin-fixture-requirements.lock /tmp/p07-httpbin-context/requirements.lock
           cp /tmp/p07-httpbin-context/preparation.json /tmp/p07-httpbin-context/fixture-lock.build.json /tmp/p07-httpbin-context/requirements.lock p07-httpbin-worker/
+          cmp benchmarks/stage4/httpbin-fixture-requirements.lock /tmp/p07-httpbin-context/requirements.lock
       - name: Build trusted fixture layer and prove network-none real HTTP and HTTPS
         run: python tools/p07_requests_fixture_calibrate.py --context /tmp/p07-httpbin-context --output p07-httpbin-worker/build-probe --task psf__requests-3362
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
