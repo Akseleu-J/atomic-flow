@@ -1,0 +1,129 @@
+{
+  "artifact": {
+    "id": 12639055202,
+    "name": "p07-calibration-sphinx-doc__sphinx-8595-2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+    "size_in_bytes": 17889,
+    "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12639055202",
+    "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12639055202/zip",
+    "expired": false,
+    "created_at": "2026-10-26T08:57:29Z",
+    "expires_at": "2026-11-09T08:57:28Z",
+    "updated_at": "2026-10-26T08:57:29Z",
+    "digest": "sha256:bf0eec72e764daaa93eb9f1c4107ea9618e2e250c614eb7929b30e50366c5149",
+    "workflow_run": {
+      "id": 40294478109,
+      "repository_id": 1373027250,
+      "head_repository_id": 1373027250,
+      "head_branch": "experimental",
+      "head_sha": "b0f87b676b1e8152c5bdfad7545ab96dde3e2a99"
+    }
+  },
+  "sha256": "bf0eec72e764daaa93eb9f1c4107ea9618e2e250c614eb7929b30e50366c5149",
+  "tested_commit": "2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+  "report": {
+    "instance_id": "sphinx-doc__sphinx-8595",
+    "status": "completed",
+    "calibrated": false,
+    "model_calls": 0,
+    "provider_credentials": "none",
+    "harness": "3.0.15",
+    "image_tag": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8595:latest",
+    "image_digest": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8595@sha256:d24f9894d781546578028592ad7630cb40973b69af4705582b5e274afc573628",
+    "image_id": "sha256:071dd9ae3a49e1601f4692167f53550aa7b87e04fcb283e9a78478fa5950038c",
+    "base_commit": "b19bce971e82f2497d67fdacdeca8db08ae0ba56",
+    "manifest_sha256": "77f4d869139672f1d66690303097a8eb2ec97bbbb520d4870c4ba0c8f8e9c1cf",
+    "controls_sha256": "a7894c776a279735c36a7a71cf1eef8ce94c32cb5a4a642b77b1dd369e134505",
+    "negative_control_rationale": "Invert empty __all__ handling.",
+    "test_command": "tox --current-env -epy39 -v --",
+    "eval_script_sha256": "8a19d20835f642a506f8649a328536b68fc2fd209f5ade6d8a193e28b375a3f9",
+    "rows": [
+      {
+        "label": "base",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-sphinx-doc__sphinx-8595-12e2effa9f",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8595@sha256:d24f9894d781546578028592ad7630cb40973b69af4705582b5e274afc573628"
+        },
+        "image_checkout_head": "9d57ddaa21fe27db8df8effc099bee07cadebbf5",
+        "base_verified": "b19bce971e82f2497d67fdacdeca8db08ae0ba56",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/test_ext_autodoc_automodule.py::test_empty_all": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [
+          "tests/test_ext_autodoc_automodule.py::test_empty_all"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.568520264,
+        "log_sha256": "2e5ba3f48f64282a0629f41cdfb888cb1d3076047eb3b88715027308a826d184"
+      },
+      {
+        "label": "gold",
+        "patch_sha256": "e49e0193e868dbd51b26a9f09163ce7604090ed1676ff719f8dfb038424d6ad9",
+        "status": "infrastructure_error",
+        "verified_success": false,
+        "container_name": "p07-sphinx-doc__sphinx-8595-9eed4c4e9c",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8595@sha256:d24f9894d781546578028592ad7630cb40973b69af4705582b5e274afc573628"
+        },
+        "image_checkout_head": "9d57ddaa21fe27db8df8effc099bee07cadebbf5",
+        "base_verified": "b19bce971e82f2497d67fdacdeca8db08ae0ba56",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {},
+        "parser_diagnostics": {},
+        "cleanup_exit": 0,
+        "wall_seconds": 3.605381823000002,
+        "log_sha256": "a550e51c3e486c1ab83b515595dd465016881b0ad6a70c494398c63e0530709a"
+      },
+      {
+        "label": "wrong",
+        "patch_sha256": "78137903437c3a7df332860c8ca4ff0865ee401bc108b2505a4c4f45469c743e",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-sphinx-doc__sphinx-8595-7d116fecc1",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8595@sha256:d24f9894d781546578028592ad7630cb40973b69af4705582b5e274afc573628"
+        },
+        "image_checkout_head": "9d57ddaa21fe27db8df8effc099bee07cadebbf5",
+        "base_verified": "b19bce971e82f2497d67fdacdeca8db08ae0ba56",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/test_ext_autodoc_automodule.py::test_empty_all": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [
+          "tests/test_ext_autodoc_automodule.py::test_empty_all"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.596978237000002,
+        "log_sha256": "b8db17f9a7a0148c5f3ff1518c02b9ab85fb4d77a4b81398dcfa71589a0e8ecc"
+      }
+    ]
+  }
+}

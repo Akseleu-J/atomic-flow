@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-26T09:04:10.411Z",
+  "body": {
+    "taskSlugs": [
+      {
+        "ownerSlug": "akseley",
+        "taskSlug": "atomic-p07-sympy-source-pair-20261026-r3",
+        "versionNumber": 1
+      }
+    ],
+    "modelVersionSlugs": [
+      "gemini-3.1-flash-lite-preview"
+    ]
+  }
+}

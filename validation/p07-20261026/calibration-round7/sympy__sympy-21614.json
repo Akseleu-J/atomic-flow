@@ -1,0 +1,155 @@
+{
+  "artifact": {
+    "id": 12637767779,
+    "name": "p07-calibration-sympy__sympy-21614-2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+    "size_in_bytes": 13936,
+    "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12637767779",
+    "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12637767779/zip",
+    "expired": false,
+    "created_at": "2026-10-26T08:46:51Z",
+    "expires_at": "2026-11-09T08:46:50Z",
+    "updated_at": "2026-10-26T08:46:51Z",
+    "digest": "sha256:90a68aca1a1ba8ab69545d6931e633249726be5b8f62f4e8ce0b16c5318dfe0d",
+    "workflow_run": {
+      "id": 40294478109,
+      "repository_id": 1373027250,
+      "head_repository_id": 1373027250,
+      "head_branch": "experimental",
+      "head_sha": "b0f87b676b1e8152c5bdfad7545ab96dde3e2a99"
+    }
+  },
+  "sha256": "90a68aca1a1ba8ab69545d6931e633249726be5b8f62f4e8ce0b16c5318dfe0d",
+  "tested_commit": "2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+  "report": {
+    "instance_id": "sympy__sympy-21614",
+    "status": "completed",
+    "calibrated": true,
+    "model_calls": 0,
+    "provider_credentials": "none",
+    "harness": "3.0.15",
+    "image_tag": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614:latest",
+    "image_digest": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861",
+    "image_id": "sha256:82017070db0eaee9d28e721400d4505fe83832bdcfaf4d17a9bbb3128fcb622b",
+    "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+    "manifest_sha256": "77f4d869139672f1d66690303097a8eb2ec97bbbb520d4870c4ba0c8f8e9c1cf",
+    "controls_sha256": "a7894c776a279735c36a7a71cf1eef8ce94c32cb5a4a642b77b1dd369e134505",
+    "negative_control_rationale": "Hard-code scalar kind instead of preserving the expression kind.",
+    "test_command": "PYTHONWARNINGS='ignore::UserWarning,ignore::SyntaxWarning' bin/test -C --verbose",
+    "eval_script_sha256": "a23d57faddc67f55751145a86df1019d50b31416ed06331d820996562dc4c099",
+    "rows": [
+      {
+        "label": "base",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-sympy__sympy-21614-ad5cfc0f4e",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"
+        },
+        "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf",
+        "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "test_NumberKind": "PASSED",
+          "test_Add_kind": "PASSED",
+          "test_mul_kind": "PASSED",
+          "test_Symbol_kind": "PASSED",
+          "test_Integral_kind": "PASSED",
+          "test_Derivative_kind": "FAILED",
+          "test_Matrix_kind": "PASSED"
+        },
+        "parser_diagnostics": {
+          "sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED"
+        },
+        "regressions_passed": true,
+        "assertion_failures": [
+          "test_Derivative_kind"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.810059186999993,
+        "log_sha256": "3436c89cbd2fd2ec2a9cc1060c949d72717d8cb2b6e764841ef6972c8818d71c"
+      },
+      {
+        "label": "gold",
+        "patch_sha256": "5a20f33fdb0a731064a81dc26e925e91557900bb7edbfce84463de6280e8e3cd",
+        "status": "verified_success",
+        "verified_success": true,
+        "container_name": "p07-sympy__sympy-21614-98bf05b038",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"
+        },
+        "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf",
+        "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "test_NumberKind": "PASSED",
+          "test_Add_kind": "PASSED",
+          "test_mul_kind": "PASSED",
+          "test_Symbol_kind": "PASSED",
+          "test_Integral_kind": "PASSED",
+          "test_Derivative_kind": "PASSED",
+          "test_Matrix_kind": "PASSED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.975587513000008,
+        "log_sha256": "1cc79d9b944376cd07522a89882f6b169ec561dabfe9e803b516cb27e1847dcf"
+      },
+      {
+        "label": "wrong",
+        "patch_sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-sympy__sympy-21614-fc7fe47a53",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"
+        },
+        "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf",
+        "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "test_NumberKind": "PASSED",
+          "test_Add_kind": "PASSED",
+          "test_mul_kind": "PASSED",
+          "test_Symbol_kind": "PASSED",
+          "test_Integral_kind": "PASSED",
+          "test_Derivative_kind": "FAILED",
+          "test_Matrix_kind": "PASSED"
+        },
+        "parser_diagnostics": {
+          "sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED"
+        },
+        "regressions_passed": true,
+        "assertion_failures": [
+          "test_Derivative_kind"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.972277254000005,
+        "log_sha256": "5a6f1babb6b3d1a8d63afd4fbe5a462e53908d4d99123c072314ea52826b5194"
+      }
+    ]
+  }
+}

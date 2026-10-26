@@ -1,0 +1,12 @@
+[{"stream_name":"stdout","time":0.738080834,"data":"{\"status\":\"BOUND\",\"bound_ip\":\"35.254.48.171\",\"bound_time\":\"2026-10-26T09:05:19Z\",\"effective_expire_time\":\"2026-10-26T21:05:19Z\"}\n"}
+,{"stream_name":"stderr","time":46.882135606,"data":"/benchmarks/.venv/lib/python3.12/site-packages/traitlets/traitlets.py:2930: FutureWarning: --Exporter.preprocessors=[\"remove_papermill_header.RemovePapermillHeader\"] for containers is deprecated in traitlets 5.0. You can pass `--Exporter.preprocessors item` ... multiple times to add items to a list.\n"}
+,{"stream_name":"stderr","time":46.882191678,"data":"  warn(\n"}
+,{"stream_name":"stderr","time":46.915905159,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":47.025764153,"data":"[NbConvertApp] Writing 504902 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":50.249649152,"data":"/benchmarks/.venv/lib/python3.12/site-packages/traitlets/traitlets.py:2930: FutureWarning: --Exporter.preprocessors=[\"nbconvert.preprocessors.ExtractOutputPreprocessor\"] for containers is deprecated in traitlets 5.0. You can pass `--Exporter.preprocessors item` ... multiple times to add items to a list.\n"}
+,{"stream_name":"stderr","time":50.249692138,"data":"  warn(\n"}
+,{"stream_name":"stderr","time":50.281054228,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":51.127090464,"data":"/benchmarks/.venv/share/jupyter/nbconvert/templates/base/display_priority.j2:32: UserWarning: Your element with mimetype(s) dict_keys([]) is not able to be represented.\n"}
+,{"stream_name":"stderr","time":51.127139884,"data":"  {%- elif type == 'text/vnd.mermaid' -%}\n"}
+,{"stream_name":"stderr","time":51.240152763,"data":"[NbConvertApp] Writing 355333 bytes to __results__.html\n"}
+]

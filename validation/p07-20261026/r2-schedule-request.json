@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-26T08:55:05.978Z",
+  "body": {
+    "taskSlugs": [
+      {
+        "ownerSlug": "akseley",
+        "taskSlug": "atomic-p07-sympy-source-pair-20261026-r2",
+        "versionNumber": 1
+      }
+    ],
+    "modelVersionSlugs": [
+      "gemini-3.1-flash-lite-preview"
+    ]
+  },
+  "canary_run": 40294478109,
+  "canary_job": 121477122589,
+  "canary_status": "success"
+}

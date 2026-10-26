@@ -1,0 +1,42 @@
+{
+  "status": "launch_intent_recorded",
+  "task": "atomic-p07-sympy-source-pair-20261026-r3",
+  "task_version": 1,
+  "owner": "owner-account-2",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "framework": "013caf01cf148eaa5915d153ec0d1d85ea36c9c8",
+  "source_sha256": "17da85e68a4b325c339a7094fe049624ce8da20aa48db2488bb13587e66ca0a6",
+  "calibration_sha256": "e1d4d7d22ab3b9e7a5110bd867ae64a031c46d29a5f181f143a2d6752b4662c8",
+  "arms": [
+    "baseline",
+    "atomic"
+  ],
+  "max_calls_per_arm": 30,
+  "max_input_estimate_per_arm": 600000,
+  "max_output_per_call": 4096,
+  "deadline_seconds_per_arm": 900,
+  "max_reported_cost_per_arm": 0.4,
+  "planned_pair_cost_ceiling": 0.8,
+  "today_authorized_total_usd": 6,
+  "prior_daily_spend_usd": 0.0008,
+  "model_retries": 0,
+  "scheduling_policy": "one direct SDK scheduling call; no CLI with_retry wrapper",
+  "unknown_policy": "inspect status/quota/output before any repeat",
+  "utc": "2026-10-26T09:03:26.850Z",
+  "booked_today_usd": 0.012218825,
+  "remaining_session_ceiling_usd": 5.987781175,
+  "read_paths": [
+    "sympy/core/function.py",
+    "sympy/core/kind.py",
+    "sympy/core/basic.py",
+    "sympy/core/expr.py",
+    "sympy/matrices/expressions/matexpr.py"
+  ],
+  "write_paths": [
+    "sympy/core/function.py"
+  ],
+  "change_reason": "Read-only grounding context and original provider envelope retention; no check or authority relaxation",
+  "preflight_run": 40296369775,
+  "preflight_status": "source_workspace_ready; 0 calls; five source hashes verified",
+  "prior_attempt": "R2 stopped on absent pinned source file; 0 calls, $0"
+}

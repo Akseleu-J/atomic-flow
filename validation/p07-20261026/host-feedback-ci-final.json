@@ -1,0 +1,44 @@
+{
+  "workflow_runs": [
+    {
+      "id": 40297823177,
+      "name": "P07 isolated corpus calibration",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 9,
+      "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297823177/jobs",
+      "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297823177/logs",
+      "workflow_id": 396713907
+    },
+    {
+      "id": 40297823048,
+      "name": "P07 independent generated candidate oracle",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 2,
+      "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297823048/jobs",
+      "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297823048/logs",
+      "workflow_id": 396840781
+    },
+    {
+      "id": 40297822965,
+      "name": "External interoperability and installed release",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 96,
+      "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297822965/jobs",
+      "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297822965/logs",
+      "workflow_id": 394926526
+    },
+    {
+      "id": 40297822949,
+      "name": "Project and container checks",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 148,
+      "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297822949/jobs",
+      "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40297822949/logs",
+      "workflow_id": 388210223
+    }
+  ]
+}
