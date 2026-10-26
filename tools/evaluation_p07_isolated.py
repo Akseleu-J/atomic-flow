@@ -91,6 +91,11 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         row["isolation"] = {"network": "none", "caps": "ALL dropped", "host_mounts": [],
                             "memory_bytes": host["Memory"], "pids": host["PidsLimit"],
                             "no_new_privileges": True, "image": image}
+        row["image_checkout_head"] = command(["docker", "exec", name, "git", "-C", "/testbed", "rev-parse", "HEAD"])
+        # Official images can have a synthetic environment/setup commit. Prepare
+        # the requested immutable revision before checking or applying any patch.
+        command(["docker", "exec", name, "git", "-C", "/testbed", "reset", "--hard", task["base_commit"]])
+        command(["docker", "exec", name, "git", "-C", "/testbed", "clean", "-fd"])
         base = command(["docker", "exec", name, "git", "-C", "/testbed", "rev-parse", "HEAD"])
         if base != task["base_commit"]:
             raise ValueError("image source does not match pinned task base")
