@@ -1,6 +1,6 @@
-"""Prepare/build a narrow historical Sphinx dependency overlay, never grade tests.
+"""Prepare/build reviewed historical Sphinx/Pylint overlays, never grade tests.
 
-Only reviewed universal Docutils/Pygments wheels enter an offline Docker build.
+Only reviewed universal wheels for exact task-specific pins enter an offline build.
 Build/probe requires an approved Linux worker; no target setup/import/test runs.
 """
 from __future__ import annotations
@@ -21,6 +21,16 @@ from pathlib import Path, PurePosixPath
 
 PINS = {"docutils": "0.16", "pygments": "2.7.4"}
 TASKS = {"sphinx-doc__sphinx-" + number for number in ("8721", "8474", "8506", "8713")}
+PYLINT_PINS = {"pylint-dev__pylint-7080": {"astroid": "2.11.6", "tomlkit": "0.10.1"},
+               "pylint-dev__pylint-7114": {"astroid": "2.12.2"}}
+ASTROID_REQUIRES = {
+    "2.11.6": ["lazy-object-proxy (>=1.4.0)", "wrapt (<2,>=1.11)", "setuptools (>=20.0)",
+               'typed-ast (<2.0,>=1.4.0) ; implementation_name == "cpython" and python_version < "3.8"',
+               'typing-extensions (>=3.10) ; python_version < "3.10"'],
+    "2.12.2": ["lazy-object-proxy (>=1.4.0)", "wrapt (<2,>=1.11)",
+               'typed-ast (<2.0,>=1.4.0) ; implementation_name == "cpython" and python_version < "3.8"',
+               'typing-extensions (>=3.10) ; python_version < "3.10"'],
+}
 PYTHON = "/opt/miniconda3/envs/testbed/bin/python"
 LIMIT = 12 * 1024 * 1024
 
@@ -31,6 +41,112 @@ def sha(raw):
 
 def save(path, value):
     path.write_bytes((json.dumps(value, sort_keys=True, indent=2) + "\n").encode())
+
+
+def task_pins(task):
+    if task in TASKS:
+        return dict(PINS)
+    if task in PYLINT_PINS:
+        return dict(PYLINT_PINS[task])
+    raise ValueError("task has no reviewed dependency overlay")
+
+
+def image_prefix(task):
+    task_pins(task)
+    repository = "sphinx-doc_1776_sphinx-" if task in TASKS else "pylint-dev_1776_pylint-"
+    return "swebench/sweb.eval.x86_64." + repository + task.rsplit("-", 1)[1]
+
+
+def profile_filename(task):
+    task_pins(task)
+    return "p07-sphinx-environment-profile.json" if task in TASKS else "p07-pylint-environment-profile.json"
+
+
+def selected_wheels(config, task):
+    pins = task_pins(task)
+    matches = [item for item in config["tasks"] if item["instance_id"] == task]
+    if len(matches) != 1:
+        raise ValueError("ambiguous profile task")
+    declared = matches[0].get("pins", config.get("pins", {}))
+    if {name.lower(): value for name, value in declared.items()} != pins:
+        raise ValueError("profile base or dependency pins not admitted")
+    records = [item for item in config["wheels"] if pins.get(item["name"].lower()) == item["version"]]
+    if len(records) != len(pins) or {item["name"].lower() for item in records} != set(pins):
+        raise ValueError("exact task-specific wheel overlay required")
+    return matches[0], pins, records
+
+
+def declared_requirements(record):
+    declared = [value for value in record.get("requires_dist", []) or [] if value is not None]
+    expected = ASTROID_REQUIRES.get(record.get("version"), []) if record.get("name", "").lower() == "astroid" else []
+    if sorted(declared) != sorted(expected):
+        raise ValueError("wheel requires undeclared runtime dependencies")
+    return declared
+
+
+def serialized_wheel(record):
+    result = {key: record[key] for key in ("name", "version", "filename", "url", "sha256")}
+    requires = declared_requirements(record)
+    if requires:
+        result["requires_dist"] = requires
+    return result
+
+
+def requirements_probe_source(wheels, *, strict):
+    planned = {item["name"].lower(): declared_requirements(item) for item in wheels if declared_requirements(item)}
+    return """import importlib.metadata as m,json
+from packaging.markers import default_environment
+from packaging.requirements import Requirement
+planned=json.loads(PLANNED)
+environment=default_environment()
+environment['extra']=''
+proof={'environment':environment,'packages':{}}
+for name,expected in planned.items():
+    actual=m.requires(name) or []
+    if STRICT and sorted(actual)!=sorted(expected):
+        raise ValueError('Installed wheel requirements differ from reviewed metadata')
+    checks=[]
+    for text in sorted(set(actual+expected)):
+        requirement=Requirement(text)
+        active=requirement.marker is None or requirement.marker.evaluate(environment)
+        version=m.version(requirement.name) if active else None
+        if active and (requirement.url or requirement.extras or not requirement.specifier.contains(version,prereleases=True)):
+            raise ValueError('Unsatisfied runtime requirement: '+text)
+        checks.append({'requirement':text,'active':active,'version':version})
+    proof['packages'][name]={'installed_requires_dist':actual,'planned_requires_dist':expected,'checks':checks}
+print(json.dumps(proof))
+""".replace("PLANNED", repr(json.dumps(planned))).replace("STRICT", repr(strict))
+
+
+def validate_requirements_proof(proof, wheels, *, strict):
+    from packaging.markers import default_environment
+    from packaging.requirements import Requirement
+
+    planned = {item["name"].lower(): declared_requirements(item) for item in wheels if declared_requirements(item)}
+    environment = proof.get("environment", {})
+    if (set(environment) != set(default_environment()) | {"extra"}
+            or not all(isinstance(value, str) for value in environment.values())
+            or environment["extra"] != "" or environment["python_version"] != "3.9"
+            or not environment["python_full_version"].startswith("3.9.")
+            or environment["implementation_name"] != "cpython" or environment["sys_platform"] != "linux"
+            or set(proof.get("packages", {})) != set(planned)):
+        raise ValueError("runtime requirement proof has an unexpected target environment")
+    for name, expected in planned.items():
+        observed = proof["packages"][name]
+        actual = observed.get("installed_requires_dist", [])
+        checks = observed.get("checks", [])
+        if (observed.get("planned_requires_dist") != expected or not isinstance(actual, list)
+                or strict and sorted(actual) != sorted(expected)
+                or len(checks) != len(set(actual + expected))
+                or {item.get("requirement") for item in checks} != set(actual + expected)):
+            raise ValueError("runtime requirement proof differs from reviewed metadata")
+        for item in checks:
+            requirement = Requirement(item["requirement"])
+            active = requirement.marker is None or requirement.marker.evaluate(environment)
+            if (item.get("active") is not active or not active and item.get("version") is not None
+                    or active and (requirement.url or requirement.extras or not isinstance(item.get("version"), str)
+                                   or not requirement.specifier.contains(item["version"], prereleases=True))):
+                raise ValueError("runtime dependency requirement is unsatisfied or unproven")
 
 
 def checked_url(url, host):
@@ -57,7 +173,8 @@ def validate_wheel(record, raw):
     name = record.get("name", "").lower()
     version = record.get("version")
     filename = record.get("filename", "")
-    if (PINS.get(name) != version or not re.fullmatch(
+    allowed = {**{key: {value} for key, value in PINS.items()}, "astroid": set(ASTROID_REQUIRES), "tomlkit": {"0.10.1"}}
+    if (version not in allowed.get(name, set()) or not re.fullmatch(
             r"[A-Za-z0-9_.]+-[0-9.]+-(?:py2\.)?py3-none-any\.whl", filename)
             or Path(filename).name != filename or len(raw) > LIMIT
             or not re.fullmatch(r"[0-9a-f]{64}", record.get("sha256", ""))
@@ -77,7 +194,7 @@ def validate_wheel(record, raw):
             raise ValueError("ambiguous wheel metadata")
         message = email.message_from_bytes(archive.read(metadata[0]))
         if (message.get("Name", "").lower() != name or message.get("Version") != version
-                or message.get_all("Requires-Dist", [])):
+                or sorted(message.get_all("Requires-Dist", [])) != sorted(declared_requirements(record))):
             raise ValueError("wheel metadata differs or requires unreviewed dependencies")
     return name
 
@@ -90,23 +207,24 @@ def dockerfile_for(image):
             "-r /opt/p07-dependency-overlay/requirements.lock\n")
 
 
+def requirements_lock(wheels):
+    return "".join(f"{item['name'].lower()}=={item['version']} --hash=sha256:{item['sha256']}\n"
+                   for item in sorted(wheels, key=lambda item: item["name"].lower()))
+
+
 def prepare(profile, task, output, *, fetch=fetch_bytes):
     raw_profile = profile.read_bytes().replace(b"\r\n", b"\n")
     config = json.loads(raw_profile)
-    if task not in TASKS or output.exists():
+    if task not in TASKS | set(PYLINT_PINS) or output.exists():
         raise ValueError("reviewed exact task and fresh output required")
-    matches = [item for item in config["tasks"] if item["instance_id"] == task]
-    if len(matches) != 1:
-        raise ValueError("ambiguous profile task")
-    selected = matches[0]
+    selected, pins, records = selected_wheels(config, task)
     image = selected["base_image_digest"]
-    expected = "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-" + task.rsplit("-", 1)[1]
+    expected = image_prefix(task)
     if (not re.fullmatch(re.escape(expected) + r"@sha256:[0-9a-f]{64}", image)
-            or not re.fullmatch(r"[0-9a-f]{40}", selected["base_commit"])
-            or {name.lower(): version for name, version in config["pins"].items()} != PINS):
+            or not re.fullmatch(r"[0-9a-f]{40}", selected["base_commit"])):
         raise ValueError("profile base or dependency pins not admitted")
     wheels, payloads, seen = [], {}, set()
-    for record in config["wheels"]:
+    for record in records:
         name = record["name"].lower()
         checked_url(record["url"], "files.pythonhosted.org")
         checked_url(record["primary_metadata_url"], "pypi.org")
@@ -122,16 +240,15 @@ def prepare(profile, task, output, *, fetch=fetch_bytes):
         if validate_wheel(record, wheel) != name or name in seen:
             raise ValueError("duplicate wheel dependency")
         seen.add(name)
-        wheels.append({key: record[key] for key in ("name", "version", "filename", "url", "sha256")})
+        wheels.append(serialized_wheel(record))
         payloads[record["filename"]] = wheel
-    if seen != set(PINS):
-        raise ValueError("exact reviewed two-wheel overlay required")
+    if seen != set(pins):
+        raise ValueError("exact reviewed task-specific wheel overlay required")
     output.mkdir(parents=True)
     (output / "wheels").mkdir()
     for name, wheel in payloads.items():
         (output / "wheels" / name).write_bytes(wheel)
-    requirements = "".join(f"{item['name'].lower()}=={item['version']} --hash=sha256:{item['sha256']}\n"
-                           for item in sorted(wheels, key=lambda item: item["name"].lower()))
+    requirements = requirements_lock(wheels)
     dockerfile = dockerfile_for(image)
     (output / "requirements.lock").write_bytes(requirements.encode())
     (output / "Dockerfile").write_bytes(dockerfile.encode())
@@ -147,16 +264,18 @@ def build(context, output):
     if platform.system() != "Linux" or output.exists():
         raise ValueError("approved Linux Docker worker and fresh output required")
     prepared = json.loads((context / "preparation.json").read_text())
-    expected = "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-" + prepared["task"].rsplit("-", 1)[1]
-    if (prepared["task"] not in TASKS or not re.fullmatch(re.escape(expected) + r"@sha256:[0-9a-f]{64}", prepared["base_image"])
+    pins = task_pins(prepared["task"])
+    expected = image_prefix(prepared["task"])
+    if (not re.fullmatch(re.escape(expected) + r"@sha256:[0-9a-f]{64}", prepared["base_image"])
             or not re.fullmatch(r"[0-9a-f]{64}", prepared["profile_sha256"])
             or not re.fullmatch(r"[0-9a-f]{40}", prepared["base_commit"])
             or (context / "Dockerfile").read_bytes() != dockerfile_for(prepared["base_image"]).encode()
+            or (context / "requirements.lock").read_bytes() != requirements_lock(prepared["wheels"]).encode()
             or sha((context / "Dockerfile").read_bytes()) != prepared["dockerfile_sha256"]
             or sha((context / "requirements.lock").read_bytes()) != prepared["requirements_sha256"]):
         raise ValueError("prepared context differs")
-    if {item["name"].lower(): item["version"] for item in prepared["wheels"]} != PINS or len(prepared["wheels"]) != 2:
-        raise ValueError("exact two-wheel overlay required")
+    if {item["name"].lower(): item["version"] for item in prepared["wheels"]} != pins or len(prepared["wheels"]) != len(pins):
+        raise ValueError("exact task-specific wheel overlay required")
     for item in prepared["wheels"]:
         if Path(item["filename"]).name != item["filename"] or "\\" in item["filename"]:
             raise ValueError("unsafe wheel filename")
@@ -177,7 +296,7 @@ def build(context, output):
             raise RuntimeError("dependency probe command failed: " + args[0])
         return process.stdout.decode().strip()
 
-    def probe(image):
+    def probe(image, *, strict):
         name = "p07-dependencies-" + uuid.uuid4().hex[:12]
         active.append(name)  # Includes uncertain create outcomes for unconditional cleanup.
         command(["docker", "create", "--name", name, "--network", "none", "--cap-drop", "ALL",
@@ -194,18 +313,23 @@ def build(context, output):
         if not re.fullmatch(r"[0-9a-f]{40}", head):
             raise ValueError("invalid image source HEAD")
         command(["docker", "exec", name, "git", "-C", "/testbed", "cat-file", "-e", prepared["base_commit"] + "^{commit}"])
-        return {"head": head,
+        result = {"head": head,
                 "diff": command(["docker", "exec", name, "git", "-C", "/testbed", "diff", "--binary", "HEAD"]),
                 "status": command(["docker", "exec", name, "git", "-C", "/testbed", "status", "--porcelain", "--untracked-files=all"]),
                 "pip_freeze": command(["docker", "exec", name, PYTHON, "-I", "-m", "pip", "freeze"]),
                 "overlay_versions": json.loads(command(["docker", "exec", name, PYTHON, "-I", "-c",
-                    "import importlib.metadata,json;print(json.dumps({n:importlib.metadata.version(n) for n in ('docutils','pygments')}))"]))}
+                    "import importlib.metadata,json;print(json.dumps({n:importlib.metadata.version(n) for n in " + repr(tuple(sorted(pins))) + "}))"]))}
+        if any(declared_requirements(item) for item in prepared["wheels"]):
+            result["runtime_requirements"] = json.loads(command(["docker", "exec", name, PYTHON, "-I", "-c",
+                requirements_probe_source(prepared["wheels"], strict=strict)]))
+            validate_requirements_proof(result["runtime_requirements"], prepared["wheels"], strict=strict)
+        return result
 
     try:
         command(["docker", "pull", prepared["base_image"]], timeout=600, log="base-pull.log")
         base = json.loads(command(["docker", "image", "inspect", prepared["base_image"]]))[0]
         report["base_image_inspect"] = base
-        report["before"] = probe(prepared["base_image"])
+        report["before"] = probe(prepared["base_image"], strict=False)
         tag = "p07-dependencies:" + uuid.uuid4().hex
         command(["docker", "build", "--network", "none", "--tag", tag,
                  "--label", "atomic.p07.dependencies.base=" + prepared["base_image"],
@@ -214,14 +338,14 @@ def build(context, output):
         image_id = image["Id"]
         if not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id):
             raise ValueError("immutable overlay image unavailable")
-        report.update(image_id=image_id, image_inspect=image, after=probe(image_id))
+        report.update(image_id=image_id, image_inspect=image, after=probe(image_id, strict=True))
         if any(report["before"][key] != report["after"][key] for key in ("head", "diff", "status")):
             raise ValueError("dependency overlay altered target source")
-        if report["after"]["overlay_versions"] != PINS:
+        if report["after"]["overlay_versions"] != pins:
             raise ValueError("overlay package version mismatch")
         before = set(report["before"]["pip_freeze"].splitlines())
         after = set(report["after"]["pip_freeze"].splitlines())
-        allowed = re.compile(r"^(docutils|pygments)==", re.IGNORECASE)
+        allowed = re.compile(r"^(" + "|".join(map(re.escape, pins)) + r")==", re.IGNORECASE)
         if any(not allowed.match(line) for line in before ^ after):
             raise ValueError("overlay altered undeclared target dependency")
         report["status"] = "dependency_overlay_built_source_unchanged"

@@ -2,7 +2,7 @@
   "date": "2026-10-26",
   "p07": "OPEN",
   "kind": "Union of independently retained task calibrations, not a new 30-task batch",
-  "accepted": 16,
+  "accepted": 17,
   "total": 30,
   "model_calls": 0,
   "rows": [
@@ -831,6 +831,33 @@
               "verified_success": false
             }
           ]
+        },
+        {
+          "report": "validation/p07-budget20/sphinx-profile-v1/sphinx-doc__sphinx-8721.json",
+          "report_sha256": "4d3346b457ad5d80d32f2acda8a95243fd079e3ba2e350966c275e6d58046fb8",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
         }
       ]
     },
@@ -872,8 +899,8 @@
     {
       "instance_id": "sphinx-doc__sphinx-8474",
       "base_commit": "3ea1ec84cc610f7a9f4f6b354e264565254923ff",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/sphinx-profile-v1/sphinx-doc__sphinx-8474.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8474.json",
@@ -898,6 +925,33 @@
               "label": "wrong",
               "status": "requirement_failed",
               "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/sphinx-profile-v1/sphinx-doc__sphinx-8474.json",
+          "report_sha256": "296db11a623fbcf1931183ce35bcdb5c682eb9e3c539fd3419b6f9269ae6a917",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
               "verified_success": false
             }
           ]
@@ -928,6 +982,33 @@
               "status": "requirement_failed",
               "regressions_passed": false,
               "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/sphinx-profile-v1/sphinx-doc__sphinx-8506.json",
+          "report_sha256": "2e795c85b90df11082f92b7a486b7b4ea93eb70b07c3b85602b5d95075aa20ea",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
             },
             {
               "label": "wrong",
@@ -969,6 +1050,33 @@
               "status": "requirement_failed",
               "regressions_passed": false,
               "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/sphinx-profile-v1/sphinx-doc__sphinx-8713.json",
+          "report_sha256": "d985cd669b86a71a936d8543c6c71ad3b04c0eac2c4492a2cbb67420df173413",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
             }
           ]
         }

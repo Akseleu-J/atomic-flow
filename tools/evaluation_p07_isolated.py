@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.metadata
+import importlib.util
 import json
 import re
 import subprocess
@@ -340,19 +341,26 @@ def validate_dependency_options(dependency_image, dependency_receipt, dependency
         raise ValueError("dependency and HTTPBin image overrides cannot be combined")
 
 
+def dependency_helpers():
+    """Load this checkout's trusted helper, without importing target packages."""
+    spec = importlib.util.spec_from_file_location("p07_dependency_helpers", Path(__file__).with_name("p07_dependency_image.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def validate_dependency_receipt(task, image_id, base_digest, base_image, actual_image, receipt_dir, profile_path):
-    """Admit only the reviewed two-package overlay on its exact official base."""
+    """Admit only an exact task-specific overlay on its official base."""
+    helper = dependency_helpers()
     profile_bytes = profile_path.read_bytes().replace(b"\r\n", b"\n")
-    reviewed = Path(__file__).resolve().parents[1] / "benchmarks/stage4/p07-sphinx-environment-profile.json"
+    reviewed = Path(__file__).resolve().parents[1] / "benchmarks/stage4" / helper.profile_filename(task["instance_id"])
     if profile_bytes != reviewed.read_bytes().replace(b"\r\n", b"\n"):
         raise ValueError("dependency profile differs from the reviewed checkout")
     profile = json.loads(profile_bytes)
-    pins = {"docutils": "0.16", "pygments": "2.7.4"}
-    selected = [row for row in profile["tasks"] if row["instance_id"] == task["instance_id"]]
-    if (task["repo"] != "sphinx-doc/sphinx" or len(selected) != 1
-            or selected[0]["base_commit"] != task["base_commit"]
-            or selected[0]["base_image_digest"] != base_digest
-            or {name.lower(): value for name, value in profile["pins"].items()} != pins
+    selected, pins, wheels = helper.selected_wheels(profile, task["instance_id"])
+    expected_repo = "sphinx-doc/sphinx" if task["instance_id"] in helper.TASKS else "pylint-dev/pylint"
+    if (task["repo"] != expected_repo or selected["base_commit"] != task["base_commit"]
+            or selected["base_image_digest"] != base_digest
             or not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id)):
         raise ValueError("dependency overlay task, base or immutable image identity mismatch")
     receipt_bytes = (receipt_dir / "dependency-image.json").read_bytes()
@@ -380,10 +388,8 @@ def validate_dependency_receipt(task, image_id, base_digest, base_image, actual_
             or report.get("image_inspect", {}).get("Id") != image_id
             or report.get("image_inspect", {}).get("RootFS") != actual_image.get("RootFS")):
         raise ValueError("dependency build, image ancestry or completed cleanup receipt mismatch")
-    expected_wheels = [{key: wheel[key] for key in ("name", "version", "filename", "url", "sha256")}
-                       for wheel in profile["wheels"]]
-    requirements = "".join(f"{item['name'].lower()}=={item['version']} --hash=sha256:{item['sha256']}\n"
-                           for item in sorted(expected_wheels, key=lambda item: item["name"].lower()))
+    expected_wheels = [helper.serialized_wheel(wheel) for wheel in wheels]
+    requirements = helper.requirements_lock(expected_wheels)
     before, after = report.get("before", {}), report.get("after", {})
     if (report.get("wheels") != expected_wheels or report.get("requirements_sha256") != sha(requirements.encode())
             or not isinstance(before, dict) or not isinstance(after, dict)
@@ -395,11 +401,19 @@ def validate_dependency_receipt(task, image_id, base_digest, base_image, actual_
             or after.get("overlay_versions") != pins):
         raise ValueError("dependency overlay changed target source or does not match the reviewed wheel lock")
     changes = set(before["pip_freeze"].splitlines()) ^ set(after["pip_freeze"].splitlines())
-    if any(not re.match(r"^(docutils|pygments)==", line, re.IGNORECASE) for line in changes):
+    allowed = re.compile(r"^(" + "|".join(map(re.escape, pins)) + r")==", re.IGNORECASE)
+    if any(not allowed.match(line) for line in changes):
         raise ValueError("dependency overlay changed an undeclared target package")
-    return {"image_id": image_id, "profile_sha256": sha(profile_bytes), "pins": pins,
+    if any(helper.declared_requirements(item) for item in expected_wheels):
+        helper.validate_requirements_proof(before.get("runtime_requirements", {}), expected_wheels, strict=False)
+        helper.validate_requirements_proof(after.get("runtime_requirements", {}), expected_wheels, strict=True)
+    result = {"image_id": image_id, "profile_sha256": sha(profile_bytes), "pins": pins,
             "build_receipt_sha256": sha(receipt_bytes), "source": {key: after[key] for key in ("head", "diff", "status")},
             "pip_freeze": after["pip_freeze"]}
+    if any(helper.declared_requirements(item) for item in expected_wheels):
+        result["wheels"] = expected_wheels
+        result["runtime_requirements"] = after["runtime_requirements"]
+    return result
 
 
 def check_dependency_container(name, dependency):
@@ -411,10 +425,18 @@ def check_dependency_container(name, dependency):
         raise ValueError("fresh dependency container source differs from admitted build")
     python = "/opt/miniconda3/envs/testbed/bin/python"
     versions = json.loads(command(["docker", "exec", name, python, "-I", "-c",
-        "import importlib.metadata,json;print(json.dumps({n:importlib.metadata.version(n) for n in ('docutils','pygments')}))"]))
+        "import importlib.metadata,json;print(json.dumps({n:importlib.metadata.version(n) for n in "
+        + repr(tuple(sorted(dependency["pins"]))) + "}))"]))
     freeze = command(["docker", "exec", name, python, "-I", "-m", "pip", "freeze"])
     if versions != dependency["pins"] or set(freeze.splitlines()) != set(dependency["pip_freeze"].splitlines()):
         raise ValueError("fresh dependency container packages differ from admitted build")
+    if dependency.get("wheels"):
+        helper = dependency_helpers()
+        proof = json.loads(command(["docker", "exec", name, python, "-I", "-c",
+            helper.requirements_probe_source(dependency["wheels"], strict=True)]))
+        helper.validate_requirements_proof(proof, dependency["wheels"], strict=True)
+        if proof != dependency["runtime_requirements"]:
+            raise ValueError("fresh runtime dependency constraints differ from admitted build")
     return {"source": source, "overlay_versions": versions, "pip_freeze_sha256": sha(freeze.encode()),
             "profile_sha256": dependency["profile_sha256"], "build_receipt_sha256": dependency["build_receipt_sha256"]}
 
@@ -540,9 +562,9 @@ def main():
     parser.add_argument("--candidate", type=Path, help="Independent grading after fresh base/gold/wrong calibration")
     parser.add_argument("--httpbin-image", help="Opt-in immutable ID of independently built/probed real HTTPBin image")
     parser.add_argument("--httpbin-receipt", type=Path, help="Build/probe output containing build-probe.json, runtime-lock.json and health.json")
-    parser.add_argument("--dependency-image", help="Opt-in immutable ID of a separately built reviewed Sphinx dependency overlay")
+    parser.add_argument("--dependency-image", help="Opt-in immutable ID of a separately built reviewed task-specific dependency overlay")
     parser.add_argument("--dependency-receipt", type=Path, help="Build output containing dependency-image.json")
-    parser.add_argument("--dependency-profile", type=Path, help="Exact reviewed Sphinx dependency profile from this checkout")
+    parser.add_argument("--dependency-profile", type=Path, help="Exact reviewed dependency profile for this task from this checkout")
     args = parser.parse_args()
     if not TASK_ID.fullmatch(args.task) or not 10 <= args.timeout <= 600:
         raise ValueError("invalid task or execution timeout")

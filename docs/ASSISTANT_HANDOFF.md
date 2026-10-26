@@ -1,12 +1,21 @@
 # Atomic-flow: справочник основного исполнителя
 
-Текущее поручение владельца: подготовить одну Kaggle-кампанию с 30 отдельными
+Текущее поручение владельца: полностью довести P07; Kaggle-кампания с 30 отдельными
 workspace, сперва пилот из 3 задач на **Claude Sonnet 5**. Готовые scripts,
 команды и ограничения: [P07_KAGGLE_CAMPAIGN.md](P07_KAGGLE_CAMPAIGN.md).
-Актуальный standalone Task — `validation/p07-sonnet5-prepared/pilot3-final/campaign_task.py`.
-Новый платный запуск не выполнялся; 41 offline PASS/Ruff PASS не являются remote
-приёмкой. Пилот до $4.80, расширение на 30 автоматически не разрешено.
-P07 остаётся OPEN; 24/30 environment calibrations пока не приняты.
+Актуальный подготовленный Task — `validation/p07-budget20/sonnet5-pilot3-r2/campaign_task.py`.
+Две create-попытки вернули HTTP499; не повторять без сверки remote state.
+ListBenchmarkTasks периодически возвращает HTTP500; paid schedule не отправлялся.
+Общий разрешённый бюджет расширен до $20: фиксированные owner2 $9.50 и participant3
+$10, ранее учтено $0.035611375, резерв $0.464388625. Ключи только process-local;
+не переключать аккаунты после ошибки quota/authorization. Пилот до $4.80.
+P07 остаётся OPEN. Принято 17/30 отдельных калибровок: исходные10 v2,
+SymPy18057, пять controls-v3, Sphinx8474 с восстановленными зависимостями.
+Ещё три Sphinx gold теперь PASS, но их negative controls требуют v4.
+Все исходные результаты сохраняются; сквозного paired-30/holdout/ablation ещё нет.
+Source-only пилот не исполняет target tests внутри agent loop и не заменяет
+полную приёмку. Текущее evidence и остаток работ:
+[P07_PROGRESS_2026-10-26.md](P07_PROGRESS_2026-10-26.md).
 
 26 октября — **P00–P06 host contracts ACCEPTED** на runtime `a5e5a31764231683e0741cfe7c5488d5dd408251`.
 [Финальная приёмка](P00_P06_FINAL_INTEGRATION_2026-10-26.md): 44/44 критериев,
