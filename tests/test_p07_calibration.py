@@ -18,6 +18,11 @@ spec.loader.exec_module(p07)
 TASK = {"FAIL_TO_PASS": ["required"], "PASS_TO_PASS": ["regression"]}
 
 
+def test_sympy_uses_its_own_runner_without_requiring_host_pytest():
+    assert "import pytest" not in p07.runner_identity_command("sympy/sympy")
+    assert "import pytest,_pytest" in p07.runner_identity_command("pytest-dev/pytest")
+
+
 @pytest.mark.parametrize("observed,exit_code", [
     ({}, 0), ({"required": "ERROR", "regression": "PASSED"}, 1),
     ({"required": "SKIPPED", "regression": "PASSED"}, 0),

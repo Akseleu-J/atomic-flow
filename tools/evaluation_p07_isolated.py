@@ -57,6 +57,14 @@ def evaluation_script(spec, install):
                        "export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", *commands]) + "\n"
 
 
+def runner_identity_command(repo):
+    code = "import sys; print(sys.version)"
+    if repo == "pytest-dev/pytest":
+        code += "; import pytest,_pytest; print(pytest.__file__); print(_pytest.__file__)"
+    return "source /opt/miniconda3/bin/activate && conda activate testbed && cd /testbed && " \
+           "PYTHONPATH=/testbed:/testbed/src python -c '" + code + "'"
+
+
 def command(args, *, timeout=60, log=None):
     if log:
         with Path(log).open("wb") as stream:
@@ -100,12 +108,10 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         if base != task["base_commit"]:
             raise ValueError("image source does not match pinned task base")
         row["base_verified"] = base
-        identity = "source /opt/miniconda3/bin/activate && conda activate testbed && cd /testbed && " \
-                   "PYTHONPATH=/testbed:/testbed/src python -c " \
-                   "'import sys,pytest,_pytest; print(sys.version); print(pytest.__file__); print(_pytest.__file__)'"
-        row["pytest_identity"] = command(["docker", "exec", name, "/bin/bash", "-c", identity])
+        identity = runner_identity_command(task["repo"])
+        row["runner_identity"] = command(["docker", "exec", name, "/bin/bash", "-c", identity])
         if task["repo"] == "pytest-dev/pytest" and sum(
-                line.startswith("/testbed/") for line in row["pytest_identity"].splitlines()) != 2:
+                line.startswith("/testbed/") for line in row["runner_identity"].splitlines()) != 2:
             raise ValueError("historical pytest runner is not imported from pinned workspace")
         command(["docker", "cp", str(output / "eval.sh"), name + ":/tmp/p07-eval.sh"])
         if patch:
@@ -182,6 +188,7 @@ def main():
         report.update(image_tag=image, image_digest=digest, image_id=info["Id"], base_commit=task["base_commit"],
                       manifest_sha256=sha(Path(args.manifest).read_bytes()),
                       controls_sha256=sha(Path(args.controls).read_bytes()), negative_control_rationale=control["rationale"])
+        report["test_command"] = MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]]["test_cmd"]
         script = evaluation_script(spec, MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]].get("install"))
         (args.output / "eval.sh").write_text(script)
         report["eval_script_sha256"] = sha(script.encode())
