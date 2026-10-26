@@ -1,8 +1,21 @@
 # P00–P06 final integration — 26 October 2026
 
-Status: implementation and local integration checks prepared; mandatory common-
-commit CI and downloaded artifact verification pending. No chapter-wide PASS is
-inferred from an older commit or this working tree.
+> Final acceptance, 26 October 2026: P00–P06 host contracts ACCEPTED on runtime
+> `a5e5a31764231683e0741cfe7c5488d5dd408251`, tested merge
+> `ae892d61bafb5e2bd8a89c18034d6f59872baa10`, tree
+> `6f6e64123d7a6db191a1899fdcd8d69538d5961c`. Both mandatory workflows
+> 40274519228 / 40274519212 SUCCESS. All 44 original numbered criteria pass on
+> both Python host versions; 1423 PASS / 14 SKIP each. All 14 distinct skipped
+> cases have actual alternate-executor PASS (Windows4, Docker26 total executed).
+> Exact 301 source/test hashes, five ZIP digests and JUnit digests verified.
+> Evidence: `validation/p00-p06-ci-20261026/verified.json`. Earlier pending/OPEN
+> statements below are chronological history, superseded for these host contracts.
+> P07 live utility, P08+ and the four production blocks remain OPEN.
+
+
+Status: all 44 numbered P00–P06 host criteria accepted by the source-bound
+verification above. The independent review findings were resolved and retested.
+The evidence refers to the exact runtime SHA; this follow-up changes reports only.
 
 The original 44 numbered criteria are mapped in
 validation/p00-p06-final-20261026/acceptance-matrix.json. The verifier requires

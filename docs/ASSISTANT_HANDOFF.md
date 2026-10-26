@@ -1,5 +1,15 @@
 # Atomic-flow: справочник основного исполнителя
 
+26 октября — **P00–P06 host contracts ACCEPTED** на runtime `a5e5a31764231683e0741cfe7c5488d5dd408251`.
+[Финальная приёмка](P00_P06_FINAL_INTEGRATION_2026-10-26.md): 44/44 критериев,
+по 1423 PASS на Python 3.11/3.12, все 14 SKIP реально покрыты Windows/Docker,
+301 source/test hash и пять CI-архивов проверены. Следующая глава — P07:
+оставшиеся калибровки, равные лимиты baseline/atomic и независимая оценка utility;
+до запуска чужих setup/tests требуется принятый изолированный executor.
+Новых платных вызовов=0. Четыре production-блока остаются OPEN.
+Нижние записи — история; их OPEN-статусы P00–P06 заменены этой приёмкой.
+
+
 Package 41 (25 октября): [P06 matrix и original goal accounting](IMPLEMENTATION_STEP_41_P06_MATRIX.md). Runtime da67d89 сохраняет исходные goal IDs/caps/scopes/links при доказуемой замене и устраняет stale project bytecode в pytest checker. Полная public multi-file failure→repair→publish→graph journey реализована; CI 40221853531 / 40221853379 SUCCESS: по 1296 PASS / 14 SKIP, 277 source hashes verified; 9/9 host rows PASS на обеих Python versions, real Docker/composition и wheel matrix PASS. Evidence — в отчёте. Независимый P06 review и четыре production-блока остаются OPEN.
 
 Актуализация package 40 (25 октября): [P06 typed failures и durable repair ceiling](IMPLEMENTATION_STEP_40_P06_REPAIR.md). Runtime f9fd48d5bacce8b3c93bf9b15677df3f7edbc4b3: host-typed source/attempt-bound failure receipts и persisted repair allowance на physical admission/settlement/resume/publication. Предыдущий metadata-only cap заменён реальным guard. Полный P06 и четыре production gates остаются OPEN; CI 40219160156 / 40219160140 SUCCESS; по 1280 PASS / 14 SKIP на Python 3.11/3.12, 273 source hashes verified, real Docker/composition PASS. Границы evidence — в package 40. Новых provider calls=0.
