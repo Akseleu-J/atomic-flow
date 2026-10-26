@@ -1,6 +1,7 @@
 """Oracle infrastructure errors must never calibrate an agent task."""
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -86,7 +87,7 @@ def test_historical_test_command_and_exit_receipt_survive_without_reinstall():
 
 
 def _summary_parser(body, unused):
-    return {node: state for state, node in __import__("re").findall(r"^(PASSED|FAILED|ERROR) (\S+)", body, __import__("re").MULTILINE)}
+    return {node: state for state, node in re.findall(r"^(PASSED|FAILED|ERROR) (\S+)", body, re.MULTILINE)}
 
 
 def test_nested_pytest_self_test_failures_are_diagnostics_not_outer_cases():
@@ -129,6 +130,22 @@ def test_pylint_subprocesses_do_not_receive_forced_source_pythonpath():
     spec = SimpleNamespace(eval_script_list=[": '>>>>> Start Test Output'", "pytest -rA tests", ": '>>>>> End Test Output'"])
     assert "unset PYTHONPATH" in p07.evaluation_script(spec, None, "pylint-dev/pylint")
     assert "export PYTHONPATH=/testbed:/testbed/src" in p07.evaluation_script(spec, None, "pytest-dev/pytest")
+    assert "export PYTHONPATH=/testbed:/testbed/src" in p07.evaluation_script(spec, None, "psf/requests")
+
+
+def test_sphinx_only_adds_reporting_flags_without_changing_selectors():
+    command = "tox --current-env -epy39 -v -- tests/test_build_html.py"
+    spec = SimpleNamespace(eval_script_list=[": '>>>>> Start Test Output'", command, ": '>>>>> End Test Output'"])
+    assert command + " -rA -vv --color=no" in p07.evaluation_script(spec, None, "sphinx-doc/sphinx")
+    assert command + " -rA -vv --color=no" not in p07.evaluation_script(spec, None, "psf/requests")
+
+
+@pytest.mark.parametrize("repo,module", [("psf/requests", "requests"), ("pylint-dev/pylint", "pylint"),
+    ("sphinx-doc/sphinx", "sphinx"), ("sympy/sympy", "sympy")])
+def test_runner_identity_records_historical_target_package_path(repo, module):
+    assert "print(" + module + ".__file__)" in p07.runner_identity_command(repo)
+    if repo == "pylint-dev/pylint":
+        assert "PYTHONPATH=" not in p07.runner_identity_command(repo)
 
 
 def test_all_thirty_wrong_controls_are_unique_source_changes():
@@ -141,3 +158,34 @@ def test_all_thirty_wrong_controls_are_unique_source_changes():
         wrong = task["patch"].replace(control["old"], control["new"])
         assert wrong != task["patch"] and control["rationale"]
         assert stage4.patch_paths(wrong) == stage4.patch_paths(task["patch"])
+
+
+def test_v2_controls_are_prospective_exact_gold_mutants_with_v1_provenance():
+    v1 = (ROOT / "benchmarks/stage4/p07-controls.json").read_bytes()
+    v2 = json.loads((ROOT / "benchmarks/stage4/p07-controls-v2.json").read_text())
+    assert v2["version"] == 2 and v2["previous_controls_sha256"] == p07.sha(v1)
+    old = json.loads(v1)["tasks"]
+    assert {task_id for task_id, value in v2["tasks"].items() if value != old[task_id]} == {
+        "pylint-dev__pylint-5859", "pylint-dev__pylint-7993"}
+    for task in stage4.load_manifest(ROOT / "benchmarks/stage4/corpus.json")["tasks"]:
+        control = v2["tasks"][task["instance_id"]]
+        assert task["patch"].count(control["old"]) == 1
+        assert p07.sha(task["patch"].encode()) == control["gold_sha256"]
+
+
+def test_v2_punctuation_control_preserves_word_notes_but_rejects_bug_requirement():
+    row = json.loads((ROOT / "benchmarks/stage4/p07-controls-v2.json").read_text())["tasks"]["pylint-dev__pylint-5859"]
+    pattern = re.search(r'rf"(.*)"', row["new"])[1]
+    assert re.search(pattern.replace("{notes}", "TODO"), "# TODO: message")
+    assert re.search(pattern.replace("{notes}", "TODO"), "# TODO")
+    assert not re.search(pattern.replace("{notes}", "TODO"), "# TODOist")
+    assert not re.search(pattern.replace("{notes}", re.escape("???")), "# ???: message")
+
+
+def test_v2_template_control_keeps_unknown_names_but_misparses_escaped_header():
+    row = json.loads((ROOT / "benchmarks/stage4/p07-controls-v2.json").read_text())["tasks"]["pylint-dev__pylint-7993"]
+    pattern = re.search(r're.findall\(r"(.*)", template\)', row["new"])[1]
+    ordinary = [match[0] for match in re.findall(pattern, "{path}:{line}:{categ}:({a_second_new_option:03d})")]
+    assert ordinary == ["path", "line", "categ", "a_second_new_option"]
+    header = [match[0] for match in re.findall(pattern, '{{ "Category": "{category}" }}')]
+    assert header != ["category"]

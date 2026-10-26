@@ -99,12 +99,18 @@ def calibration_decision(rows):
 def evaluation_script(spec, install, repo=None):
     """Use the pinned repo's own test command; image already contains dependencies."""
     commands = [line for line in spec.eval_script_list if line != install]
+    if repo == "sphinx-doc/sphinx":
+        # These pinned tox commands otherwise print dots, making named PASS
+        # receipts unavailable. Only pytest reporting flags are added after --;
+        # selectors, test bodies, fixtures and assertions remain untouched.
+        commands = [line + " -rA -vv --color=no" if line.startswith("tox ") and " -- " in line else line
+                    for line in commands]
     end = next(i for i, line in enumerate(commands) if ">>>>> End Test Output" in line)
     commands.insert(end, "p07_test_exit=$?; printf '\\nP07_TEST_EXIT=%s\\n' \"$p07_test_exit\"")
     # Pytest self-tests must use their source checkout. For other repositories
     # rely on the official image's installed editable checkout: inherited forced
     # PYTHONPATH changes subprocess import semantics tested by pylint itself.
-    pythonpath = "export PYTHONPATH=/testbed:/testbed/src" if repo in {None, "pytest-dev/pytest"} else "unset PYTHONPATH"
+    pythonpath = "unset PYTHONPATH" if repo == "pylint-dev/pylint" else "export PYTHONPATH=/testbed:/testbed/src"
     return "\n".join(["#!/bin/bash", "exec 2>&1", "set -uxo pipefail", pythonpath,
                        "export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", *commands]) + "\n"
 
@@ -113,8 +119,13 @@ def runner_identity_command(repo):
     code = "import sys; print(sys.version)"
     if repo == "pytest-dev/pytest":
         code += "; import pytest,_pytest; print(pytest.__file__); print(_pytest.__file__)"
+    elif repo in {"psf/requests", "pylint-dev/pylint", "sphinx-doc/sphinx", "sympy/sympy"}:
+        module = {"psf/requests": "requests", "pylint-dev/pylint": "pylint", "sphinx-doc/sphinx": "sphinx",
+                  "sympy/sympy": "sympy"}[repo]
+        code += "; import " + module + "; print(" + module + ".__file__)"
+    pythonpath = "" if repo == "pylint-dev/pylint" else "PYTHONPATH=/testbed:/testbed/src "
     return "source /opt/miniconda3/bin/activate && conda activate testbed && cd /testbed && " \
-           "PYTHONPATH=/testbed:/testbed/src python -c '" + code + "'"
+           + pythonpath + "python -c '" + code + "'"
 
 
 def command(args, *, timeout=60, log=None):
@@ -167,6 +178,9 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         if task["repo"] == "pytest-dev/pytest" and sum(
                 line.startswith("/testbed/") for line in row["runner_identity"].splitlines()) != 2:
             raise ValueError("historical pytest runner is not imported from pinned workspace")
+        if task["repo"] != "pytest-dev/pytest" and not any(
+                line.startswith("/testbed/") for line in row["runner_identity"].splitlines()):
+            raise ValueError("historical target package is not imported from pinned workspace")
         command(["docker", "cp", str(output / "eval.sh"), name + ":/tmp/p07-eval.sh"])
         if patch:
             path = output / (label + ".patch")
@@ -233,6 +247,8 @@ def main():
 
         task = next(t for t in load_manifest(args.manifest)["tasks"] if t["instance_id"] == args.task)
         control = json.loads(Path(args.controls).read_text())["tasks"][args.task]
+        if control.get("gold_sha256") != sha(task["patch"].encode()):
+            raise ValueError("negative control was not reviewed for this exact gold source patch")
         wrong = task["patch"].replace(control["old"], control["new"])
         if wrong == task["patch"] or not control["rationale"] or task["patch"].count(control["old"]) != 1:
             raise ValueError("reviewed negative control does not match exact task gold")

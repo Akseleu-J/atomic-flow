@@ -6,6 +6,9 @@ on:
       - '.github/workflows/p07-calibration.yml'
       - 'tools/evaluation_p07_isolated.py'
       - 'benchmarks/stage4/p07-controls.json'
+      - 'benchmarks/stage4/p07-controls-v2.json'
+      - 'benchmarks/stage4/corpus-p07-v2.json'
+      - 'benchmarks/stage4/p07-manifest-migrations.json'
   workflow_dispatch:
     inputs:
       tasks:
@@ -19,6 +22,18 @@ on:
         default: '3'
         type: choice
         options: ['1', '3', '6']
+      controls:
+        description: 'Versioned prospective negative controls; old results remain unchanged'
+        required: true
+        default: 'benchmarks/stage4/p07-controls.json'
+        type: choice
+        options: ['benchmarks/stage4/p07-controls.json', 'benchmarks/stage4/p07-controls-v2.json']
+      manifest:
+        description: 'Versioned task labels; select v2 only after metadata migration review'
+        required: true
+        default: 'benchmarks/stage4/corpus.json'
+        type: choice
+        options: ['benchmarks/stage4/corpus.json', 'benchmarks/stage4/corpus-p07-v2.json']
 
 permissions:
   contents: read
@@ -42,7 +57,7 @@ jobs:
           python - <<'PY'
           import os, subprocess
           before = os.environ.get('BEFORE', '')
-          admitted = {'tools/evaluation_p07_isolated.py', 'benchmarks/stage4/p07-controls.json', '.github/workflows/p07-calibration.yml', 'tools/evaluation_stage4.py'}
+          admitted = {'tools/evaluation_p07_isolated.py', 'benchmarks/stage4/p07-controls.json', 'benchmarks/stage4/p07-controls-v2.json', 'benchmarks/stage4/corpus-p07-v2.json', 'benchmarks/stage4/p07-manifest-migrations.json', '.github/workflows/p07-calibration.yml', 'tools/evaluation_stage4.py'}
           if os.environ['EVENT'] == 'workflow_dispatch' or not before:
               changed = admitted
           else:
@@ -92,7 +107,7 @@ jobs:
           python -m pip freeze > p07-worker/dependencies.txt
           docker version > p07-worker/docker-version.txt
       - name: Base assertion FAIL, gold PASS, wrong assertion FAIL
-        run: python tools/evaluation_p07_isolated.py --task '${{ matrix.task }}' --output 'p07-worker/result' --timeout 240
+        run: python tools/evaluation_p07_isolated.py --task '${{ matrix.task }}' --manifest '${{ inputs.manifest || 'benchmarks/stage4/corpus.json' }}' --controls '${{ inputs.controls || 'benchmarks/stage4/p07-controls.json' }}' --output 'p07-worker/result' --timeout 240
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -127,7 +142,7 @@ jobs:
           python -m pip freeze > p07-worker/dependencies.txt
           docker version > p07-worker/docker-version.txt
       - name: Base assertion FAIL, gold PASS, wrong assertion FAIL
-        run: python tools/evaluation_p07_isolated.py --task '${{ matrix.task }}' --output 'p07-worker/result' --timeout 240
+        run: python tools/evaluation_p07_isolated.py --task '${{ matrix.task }}' --manifest '${{ inputs.manifest || 'benchmarks/stage4/corpus.json' }}' --controls '${{ inputs.controls || 'benchmarks/stage4/p07-controls.json' }}' --output 'p07-worker/result' --timeout 240
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
