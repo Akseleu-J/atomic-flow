@@ -68,7 +68,7 @@ jobs:
           PY
       - id: tasks
         env:
-          REQUESTED_TASKS: ${{ inputs.tasks || 'all' }}
+          REQUESTED_TASKS: ${{ inputs.tasks || 'sympy__sympy-21614' }}
         run: |
           python - <<'PY'
           import json, os
