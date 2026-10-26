@@ -1,5 +1,13 @@
 # Atomic-flow: справочник основного исполнителя
 
+Текущее поручение владельца: подготовить одну Kaggle-кампанию с 30 отдельными
+workspace, сперва пилот из 3 задач на **Claude Sonnet 5**. Готовые scripts,
+команды и ограничения: [P07_KAGGLE_CAMPAIGN.md](P07_KAGGLE_CAMPAIGN.md).
+Актуальный standalone Task — `validation/p07-sonnet5-prepared/pilot3-final/campaign_task.py`.
+Новый платный запуск не выполнялся; 41 offline PASS/Ruff PASS не являются remote
+приёмкой. Пилот до $4.80, расширение на 30 автоматически не разрешено.
+P07 остаётся OPEN; 24/30 environment calibrations пока не приняты.
+
 26 октября — **P00–P06 host contracts ACCEPTED** на runtime `a5e5a31764231683e0741cfe7c5488d5dd408251`.
 [Финальная приёмка](P00_P06_FINAL_INTEGRATION_2026-10-26.md): 44/44 критериев,
 по 1423 PASS на Python 3.11/3.12, все 14 SKIP реально покрыты Windows/Docker,
