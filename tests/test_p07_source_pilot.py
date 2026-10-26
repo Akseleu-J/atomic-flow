@@ -62,6 +62,27 @@ def test_read_only_context_does_not_expand_write_scope():
         pilot.decode_action(json.dumps({"tool": "patch_file", "args": {"path": "sympy/core/basic.py"}}))
 
 
+def test_source_workspace_checks_all_immutable_objects_before_writing(tmp_path, monkeypatch):
+    import subprocess
+
+    work = tmp_path / "workspace"
+    work.mkdir()
+    seen = []
+
+    def read(args, **kwargs):
+        seen.append(args[-1])
+        if len(seen) == len(pilot.READ_PATHS):
+            raise subprocess.CalledProcessError(128, args)
+        return b"source bytes\r\n"
+
+    monkeypatch.setattr(pilot.subprocess, "check_output", read)
+    with pytest.raises(subprocess.CalledProcessError):
+        pilot.prepare_source_workspace(tmp_path, "a" * 40, work)
+    assert len(seen) == len(pilot.READ_PATHS)
+    assert all(obj.startswith("a" * 40 + ":") for obj in seen)
+    assert not list(work.rglob("*"))
+
+
 def test_iterative_baseline_uses_exact_read_then_verified_edit(tmp_path):
     from atomic_flow.agents.source import digest
     from atomic_flow.backends.base import ChatResult

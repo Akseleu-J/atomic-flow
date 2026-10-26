@@ -174,6 +174,7 @@ def main():
     parser.add_argument("--controls", default="benchmarks/stage4/p07-controls.json")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=240)
+    parser.add_argument("--candidate", type=Path, help="Independent grading after fresh base/gold/wrong calibration")
     args = parser.parse_args()
     if not TASK_ID.fullmatch(args.task) or not 10 <= args.timeout <= 600:
         raise ValueError("invalid task or execution timeout")
@@ -209,11 +210,26 @@ def main():
         rows = [grade(task, spec, digest, patch, args.output, label, MAP_REPO_TO_PARSER[task["repo"]], args.timeout)
                 for label, patch in (("base", ""), ("gold", task["patch"]), ("wrong", wrong))]
         report.update(rows=rows, calibrated=calibration_decision(rows), status="completed")
+        if args.candidate:
+            candidate_bytes = args.candidate.read_bytes()
+            if not candidate_bytes or len(candidate_bytes) > 1_000_000:
+                raise ValueError("candidate size outside admission bounds")
+            candidate = candidate_bytes.decode("utf-8")
+            paths = patch_paths(candidate)
+            if not paths or any(protected_test_path(path) for path in paths):
+                raise ValueError("candidate has empty or protected scope")
+            report["candidate_input_sha256"] = sha(candidate_bytes)
+            if report["calibrated"]:
+                report["candidate"] = grade(task, spec, digest, candidate, args.output, "candidate",
+                                            MAP_REPO_TO_PARSER[task["repo"]], args.timeout)
+            else:
+                report["candidate"] = {"status": "not_admitted_calibration_failed", "verified_success": False}
     except Exception as exc:
         report.update(error_type=type(exc).__name__, error=str(exc)[:500])
     (args.output / "calibration.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({k: report[k] for k in ("instance_id", "status", "calibrated", "model_calls")}))
-    return 0 if report["calibrated"] else 1
+    accepted = report["calibrated"] and (not args.candidate or report.get("candidate", {}).get("verified_success"))
+    return 0 if accepted else 1
 
 
 if __name__ == "__main__":

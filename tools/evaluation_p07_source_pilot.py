@@ -23,7 +23,23 @@ from evaluation_stage4 import digest, load_manifest
 from atomic_flow.backends.openai_compatible import OpenAICompatibleBackend
 from atomic_flow.config import BackendConfig
 
-READ_PATHS = frozenset({SOURCE, "sympy/core/kind.py", "sympy/core/basic.py", "sympy/core/expr.py", "sympy/matrices/kind.py"})
+READ_PATHS = frozenset({SOURCE, "sympy/core/kind.py", "sympy/core/basic.py", "sympy/core/expr.py", "sympy/matrices/expressions/matexpr.py"})
+
+
+def prepare_source_workspace(mirror, revision, work):
+    """Read immutable Git objects without importing or executing target code."""
+    git_env = {k: v for k, v in os.environ.items() if k.upper() in {
+        "PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "TEMP", "TMP"}}
+    contents = {}
+    for relative in sorted(READ_PATHS):
+        contents[relative] = subprocess.check_output([
+            "git", "--no-pager", "-C", str(Path(mirror).resolve()), "show", revision + ":" + relative],
+            env=git_env, timeout=60)
+    for relative, raw in contents.items():
+        path = work / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    return contents[SOURCE].decode("utf-8")
 
 
 class SourcePilotBackend(PilotBackend):
@@ -163,23 +179,10 @@ def main():
     os.environ["ATOMIC_FLOW_HOME"] = str(args.output.resolve() / "atomic-state")
     write_json(args.output / "report.json", report)
     try:
-        # git show reads bytes only. No repository code is loaded or executed.
-        git_env = {k: v for k, v in os.environ.items() if k.upper() in {
-            "PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "TEMP", "TMP"}}
-        raw = subprocess.check_output(["git", "--no-pager", "-C", str(Path(args.mirror).resolve()),
-                                       "show", task["base_commit"] + ":" + SOURCE], env=git_env, timeout=60)
-        original = raw.decode("utf-8")
         with tempfile.TemporaryDirectory(prefix="p07-source-only-") as directory:
             work = Path(directory)
+            original = prepare_source_workspace(args.mirror, task["base_commit"], work)
             path = work / SOURCE
-            path.parent.mkdir(parents=True)
-            path.write_bytes(original.encode())
-            for relative in sorted(READ_PATHS - {SOURCE}):
-                context_raw = subprocess.check_output(["git", "--no-pager", "-C", str(Path(args.mirror).resolve()),
-                    "show", task["base_commit"] + ":" + relative], env=git_env, timeout=60)
-                context_path = work / relative
-                context_path.parent.mkdir(parents=True, exist_ok=True)
-                context_path.write_bytes(context_raw)
             report["source_file_sha256"] = digest(path.read_bytes())
             if args.arm == "atomic":
                 from atomic_flow.sdk import inspect_graph
