@@ -85,6 +85,52 @@ def test_historical_test_command_and_exit_receipt_survive_without_reinstall():
     assert script.index("exec 2>&1") < script.index("set -uxo pipefail")
 
 
+def _summary_parser(body, unused):
+    return {node: state for state, node in __import__("re").findall(r"^(PASSED|FAILED|ERROR) (\S+)", body, __import__("re").MULTILINE)}
+
+
+def test_nested_pytest_self_test_failures_are_diagnostics_not_outer_cases():
+    body = "\n".join(["FAILED nested/test_fake.py::test_bad", "=== short test summary info ===",
+        "FAILED nested/test_fake.py::test_bad", "=== 1 failed in 0.1s ===", "captured subprocess output ends",
+        "=== short test summary info ===", "PASSED testing/test_outer.py::test_regression",
+        "FAILED testing/test_outer.py::test_required", "=== 1 failed, 1 passed in 1.0s ===", "P07_TEST_EXIT=1"])
+    observed, diagnostics = p07.parse_observations({"repo": "pytest-dev/pytest"}, body, _summary_parser, None)
+    assert observed == {"testing/test_outer.py::test_regression": "PASSED", "testing/test_outer.py::test_required": "FAILED"}
+    assert diagnostics["discarded_nested_or_alias_observations"] == {"nested/test_fake.py::test_bad": "FAILED"}
+    assert diagnostics["scope"] == "final_outer_pytest_short_summary"
+
+
+def test_outer_collection_error_survives_summary_selection():
+    body = "=== short test summary info ===\nERROR testing/test_outer.py::test_required\n=== 1 error in 0.1s ===\n"
+    observed, diagnostics = p07.parse_observations({"repo": "pytest-dev/pytest"}, body, _summary_parser, None)
+    assert observed["testing/test_outer.py::test_required"] == "ERROR"
+    assert p07.classify({"FAIL_TO_PASS": ["testing/test_outer.py::test_required"], "PASS_TO_PASS": []},
+                        observed, completed=True, exit_code=2)["status"] == "infrastructure_error"
+
+
+def test_color_codes_do_not_corrupt_pytest_node_identity():
+    body = "\x1b[31mFAILED\x1b[0m tests/test_a.py::\x1b[1mtest_required\x1b[0m\n"
+    observed, diagnostics = p07.parse_observations({"repo": "sphinx-doc/sphinx"}, body, _summary_parser, None)
+    assert observed == {"tests/test_a.py::test_required": "FAILED"}
+    assert diagnostics["ansi_removed"]
+
+
+def test_sphinx_verbose_progress_preserves_passes_outside_failure_only_summary():
+    body = "\n".join(["tests/test_a.py::test_regression PASSED [ 50%]",
+        "tests/test_a.py::test_required FAILED [100%]", "=== short test summary info ===",
+        "FAILED tests/test_a.py::test_required", "=== 1 failed, 1 passed in 1.0s ==="])
+    observed, diagnostics = p07.parse_observations({"repo": "sphinx-doc/sphinx"}, body, _summary_parser, None)
+    assert observed == {"tests/test_a.py::test_regression": "PASSED", "tests/test_a.py::test_required": "FAILED"}
+    assert diagnostics["scope"] == "complete_test_output"
+    assert diagnostics["verbose_status_normalized"]
+
+
+def test_pylint_subprocesses_do_not_receive_forced_source_pythonpath():
+    spec = SimpleNamespace(eval_script_list=[": '>>>>> Start Test Output'", "pytest -rA tests", ": '>>>>> End Test Output'"])
+    assert "unset PYTHONPATH" in p07.evaluation_script(spec, None, "pylint-dev/pylint")
+    assert "export PYTHONPATH=/testbed:/testbed/src" in p07.evaluation_script(spec, None, "pytest-dev/pytest")
+
+
 def test_all_thirty_wrong_controls_are_unique_source_changes():
     corpus = stage4.load_manifest(ROOT / "benchmarks/stage4/corpus.json")
     controls = json.loads((ROOT / "benchmarks/stage4/p07-controls.json").read_text())["tasks"]

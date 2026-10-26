@@ -19,6 +19,7 @@ from evaluation_stage4 import load_manifest, patch_paths, protected_test_path
 
 HARNESS_VERSION = "3.0.15"
 TASK_ID = re.compile(r"^[A-Za-z0-9_-]+$")
+ANSI = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 
 
 def sha(value):
@@ -53,6 +54,40 @@ def normalize_observations(task, observed):
     return {key: value for key, value in observed.items() if key not in diagnostics}, diagnostics
 
 
+def parse_observations(task, body, parser, spec):
+    """Use the outer pytest summary, not intentionally failing nested self-tests.
+
+    Keep original logs and discarded observations for audit. Missing required
+    outer tests and collection errors still fail admission in classify().
+    """
+    clean = ANSI.sub("", body)
+    normalized = clean
+    if task["repo"] != "sympy/sympy":
+        # Official old-version parsers miss verbose statuses followed by pytest
+        # progress percentages. Change presentation only, keeping the node ID.
+        normalized = re.sub(r"^(\S+::.*?)\s+(PASSED|FAILED|ERROR|SKIPPED|XFAIL|XPASS)(?:\s+\[\s*\d+%\])?\s*$",
+                            lambda match: match[2] + " " + match[1], clean, flags=re.MULTILINE)
+    source, scope = normalized, "complete_test_output"
+    if task["repo"] == "pytest-dev/pytest":
+        summaries = list(re.finditer(r"^=+ short test summary info =+\s*$", normalized, re.MULTILINE))
+        if summaries:
+            tail = normalized[summaries[-1].end():]
+            # A completed outer terminal summary is necessary; a captured inner
+            # summary without an outer summary cannot turn an aborted run green.
+            footer = re.search(r"^=+ [^\n]*(?:passed|failed|error|skipped|xfailed|xpassed)[^\n]* in [^\n]*=+\s*$",
+                               tail, re.MULTILINE)
+            if footer:
+                source = tail[:footer.start()]
+                scope = "final_outer_pytest_short_summary"
+    observed, aliases = normalize_observations(task, parser(source, spec))
+    raw = parser(normalized, spec)
+    diagnostics = {"scope": scope, "ansi_removed": clean != body, "verbose_status_normalized": normalized != clean,
+                   "failure_header_aliases": aliases,
+                   "discarded_nested_or_alias_observations": {key: value for key, value in raw.items()
+                        if key not in observed or observed[key] != value}}
+    return observed, diagnostics
+
+
 def calibration_decision(rows):
     base, gold, wrong = rows
     return (base["status"] == "requirement_failed" and bool(base.get("assertion_failures"))
@@ -61,12 +96,16 @@ def calibration_decision(rows):
             and wrong.get("regressions_passed") is True)
 
 
-def evaluation_script(spec, install):
+def evaluation_script(spec, install, repo=None):
     """Use the pinned repo's own test command; image already contains dependencies."""
     commands = [line for line in spec.eval_script_list if line != install]
     end = next(i for i, line in enumerate(commands) if ">>>>> End Test Output" in line)
     commands.insert(end, "p07_test_exit=$?; printf '\\nP07_TEST_EXIT=%s\\n' \"$p07_test_exit\"")
-    return "\n".join(["#!/bin/bash", "exec 2>&1", "set -uxo pipefail", "export PYTHONPATH=/testbed:/testbed/src",
+    # Pytest self-tests must use their source checkout. For other repositories
+    # rely on the official image's installed editable checkout: inherited forced
+    # PYTHONPATH changes subprocess import semantics tested by pylint itself.
+    pythonpath = "export PYTHONPATH=/testbed:/testbed/src" if repo in {None, "pytest-dev/pytest"} else "unset PYTHONPATH"
+    return "\n".join(["#!/bin/bash", "exec 2>&1", "set -uxo pipefail", pythonpath,
                        "export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", *commands]) + "\n"
 
 
@@ -121,6 +160,8 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         if base != task["base_commit"]:
             raise ValueError("image source does not match pinned task base")
         row["base_verified"] = base
+        row["environment_packages"] = command(["docker", "exec", name, "/bin/bash", "-c",
+            "source /opt/miniconda3/bin/activate && conda activate testbed && python -m pip freeze"])
         identity = runner_identity_command(task["repo"])
         row["runner_identity"] = command(["docker", "exec", name, "/bin/bash", "-c", identity])
         if task["repo"] == "pytest-dev/pytest" and sum(
@@ -149,7 +190,7 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         exits = re.findall(r"^P07_TEST_EXIT=(\d+)$", body, re.MULTILINE)
         if len(exits) != 1:
             raise ValueError("missing or duplicate test exit receipt")
-        observed, diagnostics = normalize_observations(task, parser(body, spec))
+        observed, diagnostics = parse_observations(task, body, parser, spec)
         row["tests"] = observed
         row["parser_diagnostics"] = diagnostics
         row.update(classify(task, observed, completed=True, exit_code=int(exits[0])))
@@ -204,7 +245,7 @@ def main():
                       manifest_sha256=sha(Path(args.manifest).read_bytes()),
                       controls_sha256=sha(Path(args.controls).read_bytes()), negative_control_rationale=control["rationale"])
         report["test_command"] = MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]]["test_cmd"]
-        script = evaluation_script(spec, MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]].get("install"))
+        script = evaluation_script(spec, MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]].get("install"), task["repo"])
         (args.output / "eval.sh").write_text(script)
         report["eval_script_sha256"] = sha(script.encode())
         rows = [grade(task, spec, digest, patch, args.output, label, MAP_REPO_TO_PARSER[task["repo"]], args.timeout)

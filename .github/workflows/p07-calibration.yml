@@ -7,6 +7,18 @@ on:
       - 'tools/evaluation_p07_isolated.py'
       - 'benchmarks/stage4/p07-controls.json'
   workflow_dispatch:
+    inputs:
+      tasks:
+        description: 'Comma-separated exact corpus IDs, or all; SymPy canary always runs first'
+        required: true
+        default: all
+        type: string
+      parallel:
+        description: 'Independent Linux workers; each container retains its resource limits'
+        required: true
+        default: '3'
+        type: choice
+        options: ['1', '3', '6']
 
 permissions:
   contents: read
@@ -40,7 +52,20 @@ jobs:
               print('value=' + str(bool(changed & admitted)).lower(), file=output)
           PY
       - id: tasks
-        run: python -c 'import json,os; d=json.load(open("benchmarks/stage4/corpus.json")); print("value="+json.dumps([t["instance_id"] for t in d["tasks"] if t["instance_id"] != "sympy__sympy-21614"]),file=open(os.environ["GITHUB_OUTPUT"],"a"))'
+        env:
+          REQUESTED_TASKS: ${{ inputs.tasks || 'all' }}
+        run: |
+          python - <<'PY'
+          import json, os
+          known = [t['instance_id'] for t in json.load(open('benchmarks/stage4/corpus.json'))['tasks']]
+          request = os.environ['REQUESTED_TASKS']
+          selected = known if request == 'all' else [value.strip() for value in request.split(',')]
+          if not selected or any(value not in known for value in selected) or len(set(selected)) != len(selected):
+              raise SystemExit('Requested tasks must be unique, exact declared corpus IDs')
+          selected = [value for value in selected if value != 'sympy__sympy-21614']
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print('value=' + json.dumps(selected), file=output)
+          PY
 
   canary:
     needs: matrix
@@ -78,11 +103,12 @@ jobs:
 
   calibrate:
     needs: [matrix, canary]
+    if: needs.matrix.outputs.tasks != '[]'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: ${{ fromJSON(inputs.parallel || '3') }}
       matrix:
         task: ${{ fromJSON(needs.matrix.outputs.tasks) }}
     steps:
