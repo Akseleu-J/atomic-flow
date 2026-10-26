@@ -332,7 +332,94 @@ def start_httpbin(name, fixture, output, label):
     raise ValueError("real HTTPBin failed to become healthy in this fresh grading container")
 
 
-def grade(task, spec, image, patch, output, label, parser, timeout, *, httpbin=None):
+def validate_dependency_options(dependency_image, dependency_receipt, dependency_profile, httpbin_image):
+    supplied = tuple(bool(value) for value in (dependency_image, dependency_receipt, dependency_profile))
+    if any(supplied) and not all(supplied):
+        raise ValueError("dependency image, build receipt and reviewed profile must be supplied together")
+    if any(supplied) and httpbin_image:
+        raise ValueError("dependency and HTTPBin image overrides cannot be combined")
+
+
+def validate_dependency_receipt(task, image_id, base_digest, base_image, actual_image, receipt_dir, profile_path):
+    """Admit only the reviewed two-package overlay on its exact official base."""
+    profile_bytes = profile_path.read_bytes().replace(b"\r\n", b"\n")
+    reviewed = Path(__file__).resolve().parents[1] / "benchmarks/stage4/p07-sphinx-environment-profile.json"
+    if profile_bytes != reviewed.read_bytes().replace(b"\r\n", b"\n"):
+        raise ValueError("dependency profile differs from the reviewed checkout")
+    profile = json.loads(profile_bytes)
+    pins = {"docutils": "0.16", "pygments": "2.7.4"}
+    selected = [row for row in profile["tasks"] if row["instance_id"] == task["instance_id"]]
+    if (task["repo"] != "sphinx-doc/sphinx" or len(selected) != 1
+            or selected[0]["base_commit"] != task["base_commit"]
+            or selected[0]["base_image_digest"] != base_digest
+            or {name.lower(): value for name, value in profile["pins"].items()} != pins
+            or not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id)):
+        raise ValueError("dependency overlay task, base or immutable image identity mismatch")
+    receipt_bytes = (receipt_dir / "dependency-image.json").read_bytes()
+    report = json.loads(receipt_bytes)
+    base_layers = base_image.get("RootFS", {}).get("Layers", [])
+    layers = actual_image.get("RootFS", {}).get("Layers", [])
+    labels = actual_image.get("Config", {}).get("Labels", {})
+    cleanup = report.get("cleanup", [])
+    if (report.get("status") != "dependency_overlay_built_source_unchanged"
+            or report.get("model_calls") != 0 or report.get("provider_credentials") != "none"
+            or report.get("target_setup_or_tests_executed") is not False
+            or report.get("task") != task["instance_id"] or report.get("base_image") != base_digest
+            or report.get("base_commit") != task["base_commit"] or report.get("profile_sha256") != sha(profile_bytes)
+            or report.get("image_id") != image_id or actual_image.get("Id") != image_id
+            or report.get("cleanup_exit") != 0 or len(cleanup) != 2
+            or any(item.get("confirmed") is not True for item in cleanup)
+            or len({item.get("container") for item in cleanup}) != 2
+            or labels.get("atomic.p07.dependencies.base") != base_digest
+            or labels.get("atomic.p07.dependencies.profile") != sha(profile_bytes)
+            or not re.fullmatch(r"sha256:[0-9a-f]{64}", base_image.get("Id", ""))
+            or base_digest not in base_image.get("RepoDigests", [])
+            or not base_layers or layers[:len(base_layers)] != base_layers or len(layers) <= len(base_layers)
+            or report.get("base_image_inspect", {}).get("Id") != base_image.get("Id")
+            or report.get("base_image_inspect", {}).get("RootFS") != base_image.get("RootFS")
+            or report.get("image_inspect", {}).get("Id") != image_id
+            or report.get("image_inspect", {}).get("RootFS") != actual_image.get("RootFS")):
+        raise ValueError("dependency build, image ancestry or completed cleanup receipt mismatch")
+    expected_wheels = [{key: wheel[key] for key in ("name", "version", "filename", "url", "sha256")}
+                       for wheel in profile["wheels"]]
+    requirements = "".join(f"{item['name'].lower()}=={item['version']} --hash=sha256:{item['sha256']}\n"
+                           for item in sorted(expected_wheels, key=lambda item: item["name"].lower()))
+    before, after = report.get("before", {}), report.get("after", {})
+    if (report.get("wheels") != expected_wheels or report.get("requirements_sha256") != sha(requirements.encode())
+            or not isinstance(before, dict) or not isinstance(after, dict)
+            or not re.fullmatch(r"[0-9a-f]{40}", before.get("head", ""))
+            or any(not isinstance(before.get(key), str) or before[key] != after.get(key)
+                   for key in ("head", "diff", "status"))
+            or not isinstance(before.get("pip_freeze"), str) or not isinstance(after.get("pip_freeze"), str)
+            or set(before.get("overlay_versions", {})) != set(pins)
+            or after.get("overlay_versions") != pins):
+        raise ValueError("dependency overlay changed target source or does not match the reviewed wheel lock")
+    changes = set(before["pip_freeze"].splitlines()) ^ set(after["pip_freeze"].splitlines())
+    if any(not re.match(r"^(docutils|pygments)==", line, re.IGNORECASE) for line in changes):
+        raise ValueError("dependency overlay changed an undeclared target package")
+    return {"image_id": image_id, "profile_sha256": sha(profile_bytes), "pins": pins,
+            "build_receipt_sha256": sha(receipt_bytes), "source": {key: after[key] for key in ("head", "diff", "status")},
+            "pip_freeze": after["pip_freeze"]}
+
+
+def check_dependency_container(name, dependency):
+    """Check this fresh container before resetting source or running target code."""
+    source = {"head": command(["docker", "exec", name, "git", "-C", "/testbed", "rev-parse", "HEAD"]),
+              "diff": command(["docker", "exec", name, "git", "-C", "/testbed", "diff", "--binary", "HEAD"]),
+              "status": command(["docker", "exec", name, "git", "-C", "/testbed", "status", "--porcelain", "--untracked-files=all"])}
+    if source != dependency["source"]:
+        raise ValueError("fresh dependency container source differs from admitted build")
+    python = "/opt/miniconda3/envs/testbed/bin/python"
+    versions = json.loads(command(["docker", "exec", name, python, "-I", "-c",
+        "import importlib.metadata,json;print(json.dumps({n:importlib.metadata.version(n) for n in ('docutils','pygments')}))"]))
+    freeze = command(["docker", "exec", name, python, "-I", "-m", "pip", "freeze"])
+    if versions != dependency["pins"] or set(freeze.splitlines()) != set(dependency["pip_freeze"].splitlines()):
+        raise ValueError("fresh dependency container packages differ from admitted build")
+    return {"source": source, "overlay_versions": versions, "pip_freeze_sha256": sha(freeze.encode()),
+            "profile_sha256": dependency["profile_sha256"], "build_receipt_sha256": dependency["build_receipt_sha256"]}
+
+
+def grade(task, spec, image, patch, output, label, parser, timeout, *, httpbin=None, dependency=None):
     name = "p07-" + task["instance_id"].lower() + "-" + uuid.uuid4().hex[:10]
     row = {"label": label, "patch_sha256": sha(patch.encode()), "status": "infrastructure_error",
            "verified_success": False, "container_name": name}
@@ -357,6 +444,8 @@ def grade(task, spec, image, patch, output, label, parser, timeout, *, httpbin=N
         row["isolation"] = {"network": "none", "caps": "ALL dropped", "host_mounts": [],
                             "memory_bytes": host["Memory"], "pids": host["PidsLimit"],
                             "no_new_privileges": True, "image": image}
+        if dependency is not None:
+            row["dependency_overlay"] = check_dependency_container(name, dependency)
         if httpbin is not None:
             if (host.get("Sysctls") != {"net.ipv4.ip_unprivileged_port_start": "0"}
                     or set(host.get("ExtraHosts", [])) != {key + ":" + value for key, value in httpbin["host_mappings"].items()}):
@@ -451,11 +540,15 @@ def main():
     parser.add_argument("--candidate", type=Path, help="Independent grading after fresh base/gold/wrong calibration")
     parser.add_argument("--httpbin-image", help="Opt-in immutable ID of independently built/probed real HTTPBin image")
     parser.add_argument("--httpbin-receipt", type=Path, help="Build/probe output containing build-probe.json, runtime-lock.json and health.json")
+    parser.add_argument("--dependency-image", help="Opt-in immutable ID of a separately built reviewed Sphinx dependency overlay")
+    parser.add_argument("--dependency-receipt", type=Path, help="Build output containing dependency-image.json")
+    parser.add_argument("--dependency-profile", type=Path, help="Exact reviewed Sphinx dependency profile from this checkout")
     args = parser.parse_args()
     if not TASK_ID.fullmatch(args.task) or not 10 <= args.timeout <= 600:
         raise ValueError("invalid task or execution timeout")
     if bool(args.httpbin_image) != bool(args.httpbin_receipt):
         raise ValueError("HTTPBin image and independent build/probe receipt must be supplied together")
+    validate_dependency_options(args.dependency_image, args.dependency_receipt, args.dependency_profile, args.httpbin_image)
     if args.output.exists():
         raise ValueError("fresh output required; no implicit retries or report replacement")
     args.output.mkdir(parents=True)
@@ -484,17 +577,24 @@ def main():
                       manifest_sha256=sha(Path(args.manifest).read_bytes()),
                       controls_sha256=sha(Path(args.controls).read_bytes()), negative_control_rationale=control["rationale"])
         httpbin = None
+        dependency = None
         grade_image = digest
         if args.httpbin_image:
             actual = json.loads(command(["docker", "image", "inspect", args.httpbin_image]))[0]
             httpbin = validate_httpbin_receipt(task, args.httpbin_image, digest, actual, args.httpbin_receipt)
             report["httpbin"] = httpbin
             grade_image = args.httpbin_image
+        if args.dependency_image:
+            actual = json.loads(command(["docker", "image", "inspect", args.dependency_image]))[0]
+            dependency = validate_dependency_receipt(task, args.dependency_image, digest, info, actual,
+                                                     args.dependency_receipt, args.dependency_profile)
+            report["dependency_overlay"] = dependency
+            grade_image = args.dependency_image
         report["test_command"] = MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]]["test_cmd"]
         script = evaluation_script(spec, MAP_REPO_VERSION_TO_SPECS[task["repo"]][task["version"]].get("install"), task["repo"])
         (args.output / "eval.sh").write_text(script)
         report["eval_script_sha256"] = sha(script.encode())
-        rows = [grade(task, spec, grade_image, patch, args.output, label, MAP_REPO_TO_PARSER[task["repo"]], args.timeout, httpbin=httpbin)
+        rows = [grade(task, spec, grade_image, patch, args.output, label, MAP_REPO_TO_PARSER[task["repo"]], args.timeout, httpbin=httpbin, dependency=dependency)
                 for label, patch in (("base", ""), ("gold", task["patch"]), ("wrong", wrong))]
         report.update(rows=rows, calibrated=calibration_decision(rows), status="completed")
         if args.candidate:
@@ -508,7 +608,7 @@ def main():
             report["candidate_input_sha256"] = sha(candidate_bytes)
             if report["calibrated"]:
                 report["candidate"] = grade(task, spec, grade_image, candidate, args.output, "candidate",
-                                            MAP_REPO_TO_PARSER[task["repo"]], args.timeout, httpbin=httpbin)
+                                            MAP_REPO_TO_PARSER[task["repo"]], args.timeout, httpbin=httpbin, dependency=dependency)
             else:
                 report["candidate"] = {"status": "not_admitted_calibration_failed", "verified_success": False}
     except Exception as exc:

@@ -1,0 +1,20 @@
+{
+  "id": 12650631538,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY1MDYzMTUzOA==",
+  "name": "p07-calibration-pytest-dev__pytest-11143-74c13402af13fa424ebfd61fcd1503f4771b3d42",
+  "size_in_bytes": 42425,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12650631538",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12650631538/zip",
+  "expired": false,
+  "digest": "sha256:c707cf123174099feacdca5a33117ce3789771be741d0fb8e9bd537e392648b6",
+  "created_at": "2026-10-26T12:40:50Z",
+  "updated_at": "2026-10-26T12:40:50Z",
+  "expires_at": "2026-11-09T12:40:49Z",
+  "workflow_run": {
+    "id": 40324018472,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "74c13402af13fa424ebfd61fcd1503f4771b3d42"
+  }
+}

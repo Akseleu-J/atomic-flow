@@ -1,0 +1,20 @@
+{
+  "id": 12644377152,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY0NDM3NzE1Mg==",
+  "name": "p07-calibration-pylint-dev__pylint-7228-71c97802544472e105035c1561fb3d9259a4e582",
+  "size_in_bytes": 23933,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12644377152",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12644377152/zip",
+  "expired": false,
+  "digest": "sha256:46681f7a91e2238bfa4be2aea18f62564b6ca47fd1325df8297d55894bf5ca4c",
+  "created_at": "2026-10-26T10:50:02Z",
+  "updated_at": "2026-10-26T10:50:02Z",
+  "expires_at": "2026-11-09T10:50:01Z",
+  "workflow_run": {
+    "id": 40309674235,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "71c97802544472e105035c1561fb3d9259a4e582"
+  }
+}

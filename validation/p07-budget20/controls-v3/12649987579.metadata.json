@@ -1,0 +1,20 @@
+{
+  "id": 12649987579,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY0OTk4NzU3OQ==",
+  "name": "p07-calibration-sympy__sympy-21614-74c13402af13fa424ebfd61fcd1503f4771b3d42",
+  "size_in_bytes": 15457,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12649987579",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12649987579/zip",
+  "expired": false,
+  "digest": "sha256:c2f6918dac137916f3814bcbeb6265bb14d087f4931ac861cf8c59d0abb0edb5",
+  "created_at": "2026-10-26T12:39:16Z",
+  "updated_at": "2026-10-26T12:39:16Z",
+  "expires_at": "2026-11-09T12:39:15Z",
+  "workflow_run": {
+    "id": 40324018472,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "74c13402af13fa424ebfd61fcd1503f4771b3d42"
+  }
+}

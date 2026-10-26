@@ -1,0 +1,1314 @@
+{
+  "date": "2026-10-26",
+  "p07": "OPEN",
+  "kind": "Union of independently retained task calibrations, not a new 30-task batch",
+  "accepted": 16,
+  "total": 30,
+  "model_calls": 0,
+  "rows": [
+    {
+      "instance_id": "psf__requests-863",
+      "base_commit": "a0df2cbb10419037d11d04352b3175405ab52941",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/psf__requests-863.json",
+          "report_sha256": "e7b4cc07381867c4487bf883f2ea74cc3922f406723bf043cc81c1a388f4761c",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "psf__requests-1963",
+      "base_commit": "110048f9837f8441ea536804115e80b69f400277",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/psf__requests-1963.json",
+          "report_sha256": "dc1d6c54eeb3a79837f3de2bf61130922204860717beb7dfbb739591d256a080",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "base_commit": "091991be0da19de9108dbe5e3752917fea3d7fdc",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/psf__requests-2317.json",
+          "report_sha256": "eddc81e5318e80ccdca1e1b04e1122601984bf650a03f20ce7e41379d78c7009",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "psf__requests-2674",
+      "base_commit": "0be38a0c37c59c4b66ce908731da15b401655113",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/psf__requests-2674.json",
+          "report_sha256": "09ccfb44e40be0148f7b826ce322c1c8ef159ae6b42ef08acb1ee9aa234100ea",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "psf__requests-3362",
+      "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/psf__requests-3362.json",
+          "report_sha256": "3e9fd9c37a4ebe3e6972372083edd8e433807950e91cae331962c17612f870d5",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/httpbin-oracle/requests3362.json",
+          "report_sha256": "cb1d1faac89551f3ba259ed16b4b43a509a10c11a2431853f5b46740d99f5b83",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "psf__requests-2148",
+      "base_commit": "fe693c492242ae532211e0c173324f09ca8cf227",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/psf__requests-2148.json",
+          "report_sha256": "4e59ec4c50cc6b2667fdcf4fb2b21ae80b72edd0d170cf8b686e10857a55b945",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6116",
+      "base_commit": "e670ff76cbad80108bde9bab616b66771b8653cf",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-6116.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-6116.json",
+          "report_sha256": "b98f6e53c349c6d43421c448d0aabc3aefaa84c003dac274da3a24a8c11fd8e4",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5227",
+      "base_commit": "2051e30b9b596e944524ccb787ed20f9f5be93e3",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/controls-v3/pytest-dev__pytest-5227.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-5227.json",
+          "report_sha256": "3aca8196eed5979cd9d6002eac6e53d7a99ecdf2e3e027943cbc133e80ab17ca",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-5227.json",
+          "report_sha256": "52481b44b08d1f5ab30afa2fcca848deb22f063b20432fc20e6cbe480fea6572",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "base_commit": "e6e300e729dd33956e5448d8be9a0b1540b4e53a",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/controls-v3/pytest-dev__pytest-7432.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-7432.json",
+          "report_sha256": "3c3a7e2d8defb6c22c56afbcfd63f68dff07f5fa38c2ce928b4c8ff716ca82f4",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-7432.json",
+          "report_sha256": "920ce4dae2973e50110f3488f44ac831a8bbde54559dcf13b20f80b3d97ac1b3",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pytest-dev__pytest-11148",
+      "base_commit": "2f7415cfbc4b6ca62f9013f1abd27136f46b9653",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/controls-v3/pytest-dev__pytest-11148.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-11148.json",
+          "report_sha256": "36da9131d61a9fdaf95efa89b2d11b9a41b855c088c139b48231bc4d0c61a37a",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-11148.json",
+          "report_sha256": "01011e3973e75c191614a4ad1e98d7aa7cbd37a068faf7af9112baff1c29bab6",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7168",
+      "base_commit": "4787fd64a4ca0dba5528b5651bddd254102fe9f3",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-7168.json",
+          "report_sha256": "a8f0e472c211f5a81e441e6dae56cd6412c7639823306d95d8ef476e5ac0d6b9",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pytest-dev__pytest-11143",
+      "base_commit": "6995257cf470d2143ad1683824962de4071c0eb7",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/controls-v3/pytest-dev__pytest-11143.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-11143.json",
+          "report_sha256": "5b5172c085aab7bce6219f39ffb0580313afb44513e334e3d49ea8df66d42510",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-11143.json",
+          "report_sha256": "ad56fd3f62336bb951d3f2b72a89ccb59c2cbfb1a7dc5169b5edb68c6f02d610",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7080",
+      "base_commit": "3c5eca2ded3dd2b59ebaf23eb289453b5d2930f0",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7080.json",
+          "report_sha256": "6c35699bf43750b0673aa79d803052f328b88a930c8d555382be556abc58db15",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7993",
+      "base_commit": "e90702074e68e20dc8e5df5013ee3ecf22139c3e",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7993.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7993.json",
+          "report_sha256": "45c933fe5eebc53ceaa86f02d27442365fe44d4780a966c05778b18383e02e73",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pylint-dev__pylint-5859",
+      "base_commit": "182cc539b8154c0710fcea7e522267e42eba8899",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-5859.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-5859.json",
+          "report_sha256": "497f9e303d9e97ed10dcdb0bb91c525377d3187da9001b57e582c5b00ba26f7a",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pylint-dev__pylint-6506",
+      "base_commit": "0a4204fd7555cfedd43f43017c94d24ef48244a5",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-6506.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-6506.json",
+          "report_sha256": "62c51aa52004a32dd04603ef74b1e47f944deab2f690953dfdc64ce5cf15cf4b",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7114",
+      "base_commit": "397c1703e8ae6349d33f7b99f45b2ccaf581e666",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7114.json",
+          "report_sha256": "06ff94c807a577a6a958e8c13eaf69637603a52f090efb44c3cbab1041fcc8a8",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7228",
+      "base_commit": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7228.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7228.json",
+          "report_sha256": "b7e7722c6c3f31cf5d819bf65ee88ca8ad80249d1bbcb750db2d6e21119b0df5",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7738",
+      "base_commit": "c087d717f6ed183dd422359bf91210dc59689d63",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-7738.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-7738.json",
+          "report_sha256": "25ec74efcdc66e1732d940e942fcf7acf355928a2fac66a0e4b5121e93bd4b7b",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8721",
+      "base_commit": "82ef497a8c88f0f6e50d84520e7276bfbf65025d",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8721.json",
+          "report_sha256": "0bede5a84297d6def794de669e654990bdeed96105558ed93b4e935e85b0ce9b",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8595",
+      "base_commit": "b19bce971e82f2497d67fdacdeca8db08ae0ba56",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8595.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8595.json",
+          "report_sha256": "e35f210393a4d1b9166afc28628ca88a4ee6dbd32ab68e612e704edb05cf436c",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8474",
+      "base_commit": "3ea1ec84cc610f7a9f4f6b354e264565254923ff",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8474.json",
+          "report_sha256": "e88973931a6363db3b24cdc46c7cb3d2508a56f8c4d4b78c20c9aad322af3602",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8506",
+      "base_commit": "e4bd3bd3ddd42c6642ff779a4f7381f219655c2c",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8506.json",
+          "report_sha256": "bf642d5f0aba1b8e888e1f77691b48aa28679bdcb3f110e3c78e4666a954191e",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8713",
+      "base_commit": "3ed7590ed411bd93b26098faab4f23619cdb2267",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8713.json",
+          "report_sha256": "b40226db0e9fdafb4566d5bf4b7f123860dd99ac4d6d68821ca693d92a32b9b3",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sympy__sympy-18057",
+      "base_commit": "62000f37b8821573ba00280524ffb4ac4a380875",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/sympy-focused/sympy__sympy-18057.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sympy__sympy-18057.json",
+          "report_sha256": "38d056bcdbe0ecb21ac565ac645e02f3db72311bb727f23bcebcda5b10aaf085",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/sympy-focused/sympy__sympy-18057.json",
+          "report_sha256": "01b6d9d00ee049fe7c08d100308e52d018f63640f1b0eb7ee15a529c7c507afe",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sympy__sympy-17139",
+      "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/controls-v3/sympy__sympy-17139.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sympy__sympy-17139.json",
+          "report_sha256": "822cfc460e504697d9396662199be96f0c4eb2eba561d50ed8902b8468f4394a",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/sympy-focused/sympy__sympy-17139.json",
+          "report_sha256": "9abdd2ace04067cce7607b9e00321fb4214d811897c8a626a7d2f2a376d12cfd",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_exception_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/controls-v3/sympy__sympy-17139.json",
+          "report_sha256": "131ead7eb9d2169c8d429e81b2eb1b8c3825ecf27b5ddffaefce669c24be024c",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_exception_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_exception_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sympy__sympy-20212",
+      "base_commit": "a106f4782a9dbe7f8fd16030f15401d977e03ae9",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/sympy__sympy-20212.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sympy__sympy-20212.json",
+          "report_sha256": "a350ee6ce2f7b0108eb58632a57925ff5dc6be9338bb7ffa371e0aaee70af817",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sympy__sympy-16988",
+      "base_commit": "e727339af6dc22321b00f52d971cda39e4ce89fb",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/calibration-v2/sympy__sympy-16988.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sympy__sympy-16988.json",
+          "report_sha256": "951981efcb3759e361ac31e7eafe9dacb8201726dedf210a889e9062dab329f7",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sympy__sympy-21614",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/controls-v3/sympy__sympy-21614.json",
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sympy__sympy-21614.json",
+          "report_sha256": "b3c0109b05517774d6311befee49616dbf8bbb7ea6f4cda6d58b1b34e9739d10",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/sympy-focused/sympy__sympy-21614.json",
+          "report_sha256": "d940acca2a2d5b508b1dea6d2d02e6726565cfc987f69b2099e246b967d83e71",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/controls-v3/sympy__sympy-21614.json",
+          "report_sha256": "68837ebd59239c955b07b3252e38a1599a0cf2cbd33040f078e2af47b3416128",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_id": "sympy__sympy-13971",
+      "base_commit": "84c125972ad535b2dfb245f8d311d347b45e5b8a",
+      "status": "OPEN",
+      "accepted_evidence": null,
+      "attempts": [
+        {
+          "report": "validation/p07-budget20/calibration-v2/sympy__sympy-13971.json",
+          "report_sha256": "c05e99ea2f960275e9fd04d0af852df9ee4e2467230da6bbdf98c6fdc20ce0ae",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

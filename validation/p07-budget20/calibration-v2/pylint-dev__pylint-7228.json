@@ -1,0 +1,166 @@
+{
+  "instance_id": "pylint-dev__pylint-7228",
+  "status": "completed",
+  "calibrated": true,
+  "model_calls": 0,
+  "provider_credentials": "none",
+  "harness": "3.0.15",
+  "image_tag": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228:latest",
+  "image_digest": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088",
+  "image_id": "sha256:3f4313283113069730c2705fa9af760fd48cf4d34af3495cac19f17e3c63e824",
+  "base_commit": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+  "negative_control_rationale": "Raise an exception that argparse does not classify as the intended argument error.",
+  "test_command": "pytest -rA",
+  "eval_script_sha256": "e7e056cdb0c7b750a3c450f2180a0f04737f636dddb750d7e876aff4c148e175",
+  "rows": [
+    {
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-pylint-dev__pylint-7228-a2a4ec97c9",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088"
+      },
+      "image_checkout_head": "6758bef9b7fc7bb2e6311fe2698939c903a6df88",
+      "base_verified": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+      "environment_packages": "astroid==2.12.13\nblack==22.6.0\ncachetools==5.5.0\ncertifi==2024.8.30\ncfgv==3.4.0\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncli-ui==0.17.2\nclick==8.1.7\nclick-default-group==1.2.4\ncolorama==0.4.6\ncontributors-txt==1.0.0\ncoverage==6.5.0\ncoveralls==3.3.1\ndill==0.3.9\ndistlib==0.3.9\ndocopt==0.6.2\nexceptiongroup==1.2.2\nexecnet==2.1.1\nfilelock==3.16.1\nflake8==5.0.4\nflake8-typing-imports==1.13.0\ngprof2dot==2024.6.6\nidentify==2.6.1\nidna==3.10\nincremental==24.7.2\niniconfig==2.0.0\nisort==5.10.1\nJinja2==3.1.4\nlazy-object-proxy==1.10.0\nMarkupSafe==3.0.2\nmccabe==0.7.0\nmypy==0.971\nmypy-extensions==1.0.0\nnodeenv==1.9.1\npackaging==24.1\npathspec==0.12.1\nplatformdirs==4.3.6\npluggy==1.5.0\npre-commit==2.21.0\npy==1.11.0\npy-cpuinfo==9.0.0\npycodestyle==2.9.1\npyflakes==2.5.0\n# Editable Git install with no remote (pylint==2.15.0a0)\n-e /testbed\npyproject-api==1.8.0\npytest==7.4.4\npytest-benchmark==4.0.0\npytest-cov==3.0.0\npytest-forked==1.6.0\npytest-profiling==1.7.0\npytest-timeout==2.3.1\npytest-xdist==2.5.0\nPyYAML==6.0.2\nrequests==2.32.3\nschema==0.7.7\nsix==1.16.0\ntabulate==0.8.10\ntbump==6.9.0\ntomli==2.0.2\ntomlkit==0.13.2\ntowncrier==22.12.0\ntox==4.23.2\ntypes-pkg-resources==0.1.3\ntyping_extensions==4.12.2\nUnidecode==1.3.8\nurllib3==2.2.3\nvirtualenv==20.27.0\nwrapt==1.16.0",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/pylint/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+        "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+        "tests/config/test_config.py::test_unknown_option_name": "PASSED",
+        "tests/config/test_config.py::test_unknown_short_option_name": "PASSED",
+        "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+        "tests/config/test_config.py::test_empty_confidence": "PASSED",
+        "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+        "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+        "tests/config/test_config.py::test_short_verbose": "PASSED",
+        "tests/config/test_config.py::test_argument_separator": "PASSED",
+        "tests/config/test_config.py::test_regex_error": "FAILED",
+        "tests/config/test_config.py::test_csv_regex_error": "FAILED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "regressions_passed": true,
+      "assertion_failures": [
+        "tests/config/test_config.py::test_regex_error",
+        "tests/config/test_config.py::test_csv_regex_error"
+      ],
+      "cleanup_exit": 0,
+      "wall_seconds": 4.410782793999999,
+      "log_sha256": "318eb2722ee888661ea7031663db5b36986f8711cb5430285b8152ec8add3b99"
+    },
+    {
+      "label": "gold",
+      "patch_sha256": "8b6796ff816cae34a8ba96c465e367f321f95931a64b9dff5932f0f9ab701d1b",
+      "status": "verified_success",
+      "verified_success": true,
+      "container_name": "p07-pylint-dev__pylint-7228-8494b9e539",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088"
+      },
+      "image_checkout_head": "6758bef9b7fc7bb2e6311fe2698939c903a6df88",
+      "base_verified": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+      "environment_packages": "astroid==2.12.13\nblack==22.6.0\ncachetools==5.5.0\ncertifi==2024.8.30\ncfgv==3.4.0\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncli-ui==0.17.2\nclick==8.1.7\nclick-default-group==1.2.4\ncolorama==0.4.6\ncontributors-txt==1.0.0\ncoverage==6.5.0\ncoveralls==3.3.1\ndill==0.3.9\ndistlib==0.3.9\ndocopt==0.6.2\nexceptiongroup==1.2.2\nexecnet==2.1.1\nfilelock==3.16.1\nflake8==5.0.4\nflake8-typing-imports==1.13.0\ngprof2dot==2024.6.6\nidentify==2.6.1\nidna==3.10\nincremental==24.7.2\niniconfig==2.0.0\nisort==5.10.1\nJinja2==3.1.4\nlazy-object-proxy==1.10.0\nMarkupSafe==3.0.2\nmccabe==0.7.0\nmypy==0.971\nmypy-extensions==1.0.0\nnodeenv==1.9.1\npackaging==24.1\npathspec==0.12.1\nplatformdirs==4.3.6\npluggy==1.5.0\npre-commit==2.21.0\npy==1.11.0\npy-cpuinfo==9.0.0\npycodestyle==2.9.1\npyflakes==2.5.0\n# Editable Git install with no remote (pylint==2.15.0a0)\n-e /testbed\npyproject-api==1.8.0\npytest==7.4.4\npytest-benchmark==4.0.0\npytest-cov==3.0.0\npytest-forked==1.6.0\npytest-profiling==1.7.0\npytest-timeout==2.3.1\npytest-xdist==2.5.0\nPyYAML==6.0.2\nrequests==2.32.3\nschema==0.7.7\nsix==1.16.0\ntabulate==0.8.10\ntbump==6.9.0\ntomli==2.0.2\ntomlkit==0.13.2\ntowncrier==22.12.0\ntox==4.23.2\ntypes-pkg-resources==0.1.3\ntyping_extensions==4.12.2\nUnidecode==1.3.8\nurllib3==2.2.3\nvirtualenv==20.27.0\nwrapt==1.16.0",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/pylint/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+        "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+        "tests/config/test_config.py::test_unknown_option_name": "PASSED",
+        "tests/config/test_config.py::test_unknown_short_option_name": "PASSED",
+        "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+        "tests/config/test_config.py::test_empty_confidence": "PASSED",
+        "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+        "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+        "tests/config/test_config.py::test_regex_error": "PASSED",
+        "tests/config/test_config.py::test_csv_regex_error": "PASSED",
+        "tests/config/test_config.py::test_short_verbose": "PASSED",
+        "tests/config/test_config.py::test_argument_separator": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "regressions_passed": true,
+      "assertion_failures": [],
+      "cleanup_exit": 0,
+      "wall_seconds": 4.148884598999999,
+      "log_sha256": "aaf05b7eedf14f6a7d27517157cab991ce7a6aee0265f70287224bc9cee73c4b"
+    },
+    {
+      "label": "wrong",
+      "patch_sha256": "b0dec5a1ddcc913df67e9a1b9ee859fb9213b8dcd9c6db313b8e5a5d3f5e7163",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-pylint-dev__pylint-7228-5c03cb7df5",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088"
+      },
+      "image_checkout_head": "6758bef9b7fc7bb2e6311fe2698939c903a6df88",
+      "base_verified": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+      "environment_packages": "astroid==2.12.13\nblack==22.6.0\ncachetools==5.5.0\ncertifi==2024.8.30\ncfgv==3.4.0\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncli-ui==0.17.2\nclick==8.1.7\nclick-default-group==1.2.4\ncolorama==0.4.6\ncontributors-txt==1.0.0\ncoverage==6.5.0\ncoveralls==3.3.1\ndill==0.3.9\ndistlib==0.3.9\ndocopt==0.6.2\nexceptiongroup==1.2.2\nexecnet==2.1.1\nfilelock==3.16.1\nflake8==5.0.4\nflake8-typing-imports==1.13.0\ngprof2dot==2024.6.6\nidentify==2.6.1\nidna==3.10\nincremental==24.7.2\niniconfig==2.0.0\nisort==5.10.1\nJinja2==3.1.4\nlazy-object-proxy==1.10.0\nMarkupSafe==3.0.2\nmccabe==0.7.0\nmypy==0.971\nmypy-extensions==1.0.0\nnodeenv==1.9.1\npackaging==24.1\npathspec==0.12.1\nplatformdirs==4.3.6\npluggy==1.5.0\npre-commit==2.21.0\npy==1.11.0\npy-cpuinfo==9.0.0\npycodestyle==2.9.1\npyflakes==2.5.0\n# Editable Git install with no remote (pylint==2.15.0a0)\n-e /testbed\npyproject-api==1.8.0\npytest==7.4.4\npytest-benchmark==4.0.0\npytest-cov==3.0.0\npytest-forked==1.6.0\npytest-profiling==1.7.0\npytest-timeout==2.3.1\npytest-xdist==2.5.0\nPyYAML==6.0.2\nrequests==2.32.3\nschema==0.7.7\nsix==1.16.0\ntabulate==0.8.10\ntbump==6.9.0\ntomli==2.0.2\ntomlkit==0.13.2\ntowncrier==22.12.0\ntox==4.23.2\ntypes-pkg-resources==0.1.3\ntyping_extensions==4.12.2\nUnidecode==1.3.8\nurllib3==2.2.3\nvirtualenv==20.27.0\nwrapt==1.16.0",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/pylint/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+        "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+        "tests/config/test_config.py::test_unknown_option_name": "PASSED",
+        "tests/config/test_config.py::test_unknown_short_option_name": "PASSED",
+        "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+        "tests/config/test_config.py::test_empty_confidence": "PASSED",
+        "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+        "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+        "tests/config/test_config.py::test_short_verbose": "PASSED",
+        "tests/config/test_config.py::test_argument_separator": "PASSED",
+        "tests/config/test_config.py::test_regex_error": "FAILED",
+        "tests/config/test_config.py::test_csv_regex_error": "FAILED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "regressions_passed": true,
+      "assertion_failures": [
+        "tests/config/test_config.py::test_regex_error",
+        "tests/config/test_config.py::test_csv_regex_error"
+      ],
+      "cleanup_exit": 0,
+      "wall_seconds": 4.20444758299999,
+      "log_sha256": "b8183b4ba2fe963570e2aac693c13691b6abd2def4ef5b810740943951c2c3bf"
+    }
+  ]
+}

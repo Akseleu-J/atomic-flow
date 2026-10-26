@@ -1,0 +1,161 @@
+{
+  "instance_id": "pylint-dev__pylint-5859",
+  "status": "completed",
+  "calibrated": true,
+  "model_calls": 0,
+  "provider_credentials": "none",
+  "harness": "3.0.15",
+  "image_tag": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859:latest",
+  "image_digest": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf",
+  "image_id": "sha256:ca7caf3a52bd6923ae77e5fad1e6e6faa1caaf9112486638567e98aea0cd2010",
+  "base_commit": "182cc539b8154c0710fcea7e522267e42eba8899",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+  "negative_control_rationale": "Retain an erroneous word boundary alongside delimiter lookahead: word TODO controls remain supported but punctuation note ??? still fails the new requirement.",
+  "test_command": "pytest -rA",
+  "eval_script_sha256": "62166418b00109c1666554d50ded375a39cbdc303eca1b17cd6d0c9ee91d33b7",
+  "rows": [
+    {
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-pylint-dev__pylint-5859-454de05dd5",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf"
+      },
+      "image_checkout_head": "e60d064d597e181942a954573dc7556616eab7a5",
+      "base_verified": "182cc539b8154c0710fcea7e522267e42eba8899",
+      "environment_packages": "astroid==2.9.3\nattrs==24.2.0\nblack==22.3.0\ncertifi==2024.8.30\ncfgv==3.4.0\ncharset-normalizer==3.4.0\ncli-ui==0.17.2\nclick==8.1.7\ncolorama==0.4.6\ncontributors-txt==1.0.0\ncoverage==6.5.0\ncoveralls==3.3.1\ndill==0.3.9\ndistlib==0.3.9\ndocopt==0.6.2\nexceptiongroup==1.2.2\nexecnet==2.1.1\nfilelock==3.16.1\nflake8==4.0.1\nflake8-typing-imports==1.12.0\ngprof2dot==2024.6.6\nidentify==2.6.1\nidna==3.10\niniconfig==2.0.0\nisort==5.10.1\nlazy-object-proxy==1.10.0\nmccabe==0.6.1\nmypy==0.941\nmypy-extensions==1.0.0\nnodeenv==1.9.1\npackaging==24.1\npathspec==0.12.1\nplatformdirs==4.3.6\npluggy==1.5.0\npre-commit==2.21.0\npy==1.11.0\npy-cpuinfo==9.0.0\npycodestyle==2.8.0\npyenchant==3.2.2\npyflakes==2.4.0\n# Editable Git install with no remote (pylint==2.13.0.dev0)\n-e /testbed\npytest==7.4.4\npytest-benchmark==3.4.1\npytest-cov==3.0.0\npytest-forked==1.6.0\npytest-profiling==1.7.0\npytest-timeout==2.3.1\npytest-xdist==2.5.0\nPyYAML==6.0.2\nrequests==2.32.3\nschema==0.7.7\nsix==1.16.0\ntabulate==0.8.10\ntbump==6.6.1\ntoml==0.10.2\ntomli==2.0.2\ntomlkit==0.13.2\ntypes-pkg-resources==0.1.3\ntyping_extensions==4.12.2\nUnidecode==1.3.8\nurllib3==2.2.3\nvirtualenv==20.27.0\nwrapt==1.13.3",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/pylint/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_todo_without_message": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_xxx_without_space": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_xxx_middle": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_without_space_fixme": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_absent_codetag": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_other_present_codetag": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_not_trigger": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_trigger": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_dont_trigger_on_todoist": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag": "FAILED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "regressions_passed": true,
+      "assertion_failures": [
+        "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag"
+      ],
+      "cleanup_exit": 0,
+      "wall_seconds": 3.2528854529999762,
+      "log_sha256": "1e7a75bfc4f9e99619b87f8063b3302d2003446b3cdcc749511e8b9a049a08f8"
+    },
+    {
+      "label": "gold",
+      "patch_sha256": "e7ec647093f251ba84dc511728af0ac5e7afafb0206bc826c343922d7afccebb",
+      "status": "verified_success",
+      "verified_success": true,
+      "container_name": "p07-pylint-dev__pylint-5859-2f8797111b",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf"
+      },
+      "image_checkout_head": "e60d064d597e181942a954573dc7556616eab7a5",
+      "base_verified": "182cc539b8154c0710fcea7e522267e42eba8899",
+      "environment_packages": "astroid==2.9.3\nattrs==24.2.0\nblack==22.3.0\ncertifi==2024.8.30\ncfgv==3.4.0\ncharset-normalizer==3.4.0\ncli-ui==0.17.2\nclick==8.1.7\ncolorama==0.4.6\ncontributors-txt==1.0.0\ncoverage==6.5.0\ncoveralls==3.3.1\ndill==0.3.9\ndistlib==0.3.9\ndocopt==0.6.2\nexceptiongroup==1.2.2\nexecnet==2.1.1\nfilelock==3.16.1\nflake8==4.0.1\nflake8-typing-imports==1.12.0\ngprof2dot==2024.6.6\nidentify==2.6.1\nidna==3.10\niniconfig==2.0.0\nisort==5.10.1\nlazy-object-proxy==1.10.0\nmccabe==0.6.1\nmypy==0.941\nmypy-extensions==1.0.0\nnodeenv==1.9.1\npackaging==24.1\npathspec==0.12.1\nplatformdirs==4.3.6\npluggy==1.5.0\npre-commit==2.21.0\npy==1.11.0\npy-cpuinfo==9.0.0\npycodestyle==2.8.0\npyenchant==3.2.2\npyflakes==2.4.0\n# Editable Git install with no remote (pylint==2.13.0.dev0)\n-e /testbed\npytest==7.4.4\npytest-benchmark==3.4.1\npytest-cov==3.0.0\npytest-forked==1.6.0\npytest-profiling==1.7.0\npytest-timeout==2.3.1\npytest-xdist==2.5.0\nPyYAML==6.0.2\nrequests==2.32.3\nschema==0.7.7\nsix==1.16.0\ntabulate==0.8.10\ntbump==6.6.1\ntoml==0.10.2\ntomli==2.0.2\ntomlkit==0.13.2\ntypes-pkg-resources==0.1.3\ntyping_extensions==4.12.2\nUnidecode==1.3.8\nurllib3==2.2.3\nvirtualenv==20.27.0\nwrapt==1.13.3",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/pylint/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_todo_without_message": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_xxx_without_space": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_xxx_middle": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_without_space_fixme": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_absent_codetag": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_other_present_codetag": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_not_trigger": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_trigger": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_dont_trigger_on_todoist": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "regressions_passed": true,
+      "assertion_failures": [],
+      "cleanup_exit": 0,
+      "wall_seconds": 3.313849366999989,
+      "log_sha256": "9c00b5df4c3a3eae77faa2ec73c4986669f98fde7d7b570e643fdcab3ed592f9"
+    },
+    {
+      "label": "wrong",
+      "patch_sha256": "1b023373e6757bd122f855da4e84a38baf6337218e11d536ee4456b15d518673",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-pylint-dev__pylint-5859-972221fd88",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf"
+      },
+      "image_checkout_head": "e60d064d597e181942a954573dc7556616eab7a5",
+      "base_verified": "182cc539b8154c0710fcea7e522267e42eba8899",
+      "environment_packages": "astroid==2.9.3\nattrs==24.2.0\nblack==22.3.0\ncertifi==2024.8.30\ncfgv==3.4.0\ncharset-normalizer==3.4.0\ncli-ui==0.17.2\nclick==8.1.7\ncolorama==0.4.6\ncontributors-txt==1.0.0\ncoverage==6.5.0\ncoveralls==3.3.1\ndill==0.3.9\ndistlib==0.3.9\ndocopt==0.6.2\nexceptiongroup==1.2.2\nexecnet==2.1.1\nfilelock==3.16.1\nflake8==4.0.1\nflake8-typing-imports==1.12.0\ngprof2dot==2024.6.6\nidentify==2.6.1\nidna==3.10\niniconfig==2.0.0\nisort==5.10.1\nlazy-object-proxy==1.10.0\nmccabe==0.6.1\nmypy==0.941\nmypy-extensions==1.0.0\nnodeenv==1.9.1\npackaging==24.1\npathspec==0.12.1\nplatformdirs==4.3.6\npluggy==1.5.0\npre-commit==2.21.0\npy==1.11.0\npy-cpuinfo==9.0.0\npycodestyle==2.8.0\npyenchant==3.2.2\npyflakes==2.4.0\n# Editable Git install with no remote (pylint==2.13.0.dev0)\n-e /testbed\npytest==7.4.4\npytest-benchmark==3.4.1\npytest-cov==3.0.0\npytest-forked==1.6.0\npytest-profiling==1.7.0\npytest-timeout==2.3.1\npytest-xdist==2.5.0\nPyYAML==6.0.2\nrequests==2.32.3\nschema==0.7.7\nsix==1.16.0\ntabulate==0.8.10\ntbump==6.6.1\ntoml==0.10.2\ntomli==2.0.2\ntomlkit==0.13.2\ntypes-pkg-resources==0.1.3\ntyping_extensions==4.12.2\nUnidecode==1.3.8\nurllib3==2.2.3\nvirtualenv==20.27.0\nwrapt==1.13.3",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/pylint/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_todo_without_message": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_xxx_without_space": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_xxx_middle": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_without_space_fixme": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_absent_codetag": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_other_present_codetag": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_not_trigger": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_trigger": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_dont_trigger_on_todoist": "PASSED",
+        "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag": "FAILED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "regressions_passed": true,
+      "assertion_failures": [
+        "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag"
+      ],
+      "cleanup_exit": 0,
+      "wall_seconds": 3.3484734009999784,
+      "log_sha256": "cdbd3d64b8ee50927fa7c29ded00fc83fa9aa286949f479e08ec464b26e21fdf"
+    }
+  ]
+}
