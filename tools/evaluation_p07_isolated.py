@@ -26,11 +26,19 @@ def sha(value):
     return hashlib.sha256(value).hexdigest()
 
 
-def classify(task, observed, *, completed, exit_code):
-    """Missing/error/skipped requirements cannot be accepted as assertion FAIL."""
+def classify(task, observed, *, completed, exit_code, requirement_exceptions=None):
+    """Keep unproven errors infrastructural; never relabel exceptions as assertions."""
+    requirement_exceptions = requirement_exceptions or {}
+    exception_tests = set(requirement_exceptions)
+    if (exception_tests and exit_code != 1 or not exception_tests <= set(task["FAIL_TO_PASS"])
+            or any(not _valid_requirement_exception(task, test, observed, receipt)
+                   for test, receipt in requirement_exceptions.items())):
+        return {"status": "infrastructure_error", "verified_success": False}
     required = task["FAIL_TO_PASS"] + task["PASS_TO_PASS"]
-    if (not completed or exit_code not in {0, 1} or not observed or "ERROR" in observed.values()
-            or any(observed.get(test) not in {"PASSED", "FAILED"} for test in required)):
+    if (not completed or exit_code not in {0, 1} or not observed
+            or any(value == "ERROR" and test not in exception_tests for test, value in observed.items())
+            or any(observed.get(test) not in {"PASSED", "FAILED"}
+                   and not (test in exception_tests and observed.get(test) == "ERROR") for test in required)):
         return {"status": "infrastructure_error", "verified_success": False}
     regressions = (all(observed[test] == "PASSED" for test in task["PASS_TO_PASS"])
                    and not any(value == "FAILED" and test not in task["FAIL_TO_PASS"]
@@ -38,9 +46,80 @@ def classify(task, observed, *, completed, exit_code):
     all_pass = all(observed[test] == "PASSED" for test in required)
     unexpected_failure = any(value in {"FAILED", "ERROR"} for value in observed.values())
     success = exit_code == 0 and all_pass and not unexpected_failure
-    return {"status": "verified_success" if success else "requirement_failed",
+    return {"status": "verified_success" if success else "requirement_exception_failed" if exception_tests else "requirement_failed",
             "verified_success": success, "regressions_passed": regressions,
-            "assertion_failures": [t for t in task["FAIL_TO_PASS"] if observed[t] == "FAILED"]}
+            "assertion_failures": [t for t in task["FAIL_TO_PASS"] if observed[t] == "FAILED"],
+            "requirement_exception_failures": sorted(exception_tests),
+            "requirement_exception_evidence": requirement_exceptions}
+
+
+def _valid_requirement_exception(task, test, observed, receipt):
+    """Only a completed native SymPy test body can supply this narrow receipt."""
+    if not isinstance(receipt, dict) or task.get("repo") != "sympy/sympy" or observed.get(test) != "ERROR":
+        return False
+    frame = receipt.get("test_frame", {})
+    sources = receipt.get("production_frames", [])
+    if not isinstance(frame, dict):
+        return False
+    try:
+        test_paths = patch_paths(task.get("test_patch", ""))
+        production_paths = patch_paths(task.get("patch", ""))
+    except (TypeError, ValueError):
+        return False
+    return (receipt.get("kind") == "requirement_test_body_exception" and receipt.get("test_id") == test
+            and receipt.get("observed_status") == "ERROR" and receipt.get("exception_type") in {"TypeError", "ValueError"}
+            and bool(task.get("base_commit")) and receipt.get("base_commit") == task["base_commit"]
+            and receipt.get("native_runner_completed") is True and receipt.get("test_exit") == 1
+            and frame.get("function") == test and frame.get("path") in test_paths
+            and type(frame.get("line")) is int and frame["line"] > 0
+            and isinstance(sources, list) and bool(sources)
+            and all(isinstance(item, dict) and item.get("path") in production_paths
+                    and type(item.get("line")) is int and item["line"] > 0 for item in sources)
+            and all(isinstance(receipt.get(key), str) and re.fullmatch(r"[0-9a-f]{64}", receipt[key])
+                    for key in ("raw_body_sha256", "traceback_sha256")))
+
+
+def test_body_exception_receipts(task, body, observed):
+    """Corroborate ERROR using native runner header, exact test and changed-source frames.
+
+    A fixture/setup/import/collection error has no such first test-body frame and
+    is not admitted. Raw ERROR remains in the test map and can never be success.
+    """
+    if task.get("repo") != "sympy/sympy":
+        return {}
+    clean = ANSI.sub("", body)
+    if (len(re.findall(r"^\s*(?:=+\s*)?tests finished:[^\n]*\bin [0-9.]+ seconds[^\n]*$", clean, re.MULTILINE)) != 1
+            or re.findall(r"^P07_TEST_EXIT=(\d+)$", clean, re.MULTILINE) != ["1"]):
+        return {}
+    try:
+        production_paths = patch_paths(task.get("patch", ""))
+    except (TypeError, ValueError):
+        return {}
+    headers = list(re.finditer(r"^_+\s+(sympy/[A-Za-z0-9_./]+\.py):(test\w+)\s+_+\s*$", clean, re.MULTILINE))
+    receipts = {}
+    for index, header in enumerate(headers):
+        path, test = header.groups()
+        if (test not in task["FAIL_TO_PASS"] or observed.get(test) != "ERROR"
+                or sum(candidate[2] == test for candidate in headers) != 1):
+            continue
+        block = clean[header.end():headers[index + 1].start() if index + 1 < len(headers) else len(clean)]
+        if block.count("Traceback (most recent call last):") != 1:
+            continue
+        frames = [{"path": path, "line": int(line), "function": function}
+                  for path, line, function in re.findall(
+                      r'^  File "/testbed/([A-Za-z0-9_./]+)", line ([1-9][0-9]*), in ([A-Za-z_]\w*)$', block, re.MULTILINE)]
+        exceptions = re.findall(r"^(TypeError|ValueError):[^\n]*$", block, re.MULTILINE)
+        if not frames or frames[0]["path"] != path or frames[0]["function"] != test or len(exceptions) != 1:
+            continue
+        production = [frame for frame in frames[1:] if frame["path"] in production_paths]
+        receipt = {"kind": "requirement_test_body_exception", "test_id": test, "observed_status": "ERROR",
+                   "exception_type": exceptions[0], "base_commit": task.get("base_commit"), "test_frame": frames[0],
+                   "native_runner_completed": True, "test_exit": 1,
+                   "production_frames": production, "raw_body_sha256": sha(body.encode()),
+                   "traceback_sha256": sha(block.encode())}
+        if _valid_requirement_exception(task, test, observed, receipt):
+            receipts[test] = receipt
+    return receipts
 
 
 def normalize_observations(task, observed):
@@ -49,7 +128,8 @@ def normalize_observations(task, observed):
     if task["repo"] == "sympy/sympy":
         for key, value in observed.items():
             match = re.fullmatch(r".*\.py:([^:]+)", key)
-            if match and (match[1].isdigit() or observed.get(match[1]) == value):
+            if match and (match[1].isdigit() or observed.get(match[1]) == value
+                          or value == "FAILED" and observed.get(match[1]) == "ERROR"):
                 diagnostics[key] = value
     return {key: value for key, value in observed.items() if key not in diagnostics}, diagnostics
 
@@ -67,6 +147,12 @@ def parse_observations(task, body, parser, spec):
         # progress percentages. Change presentation only, keeping the node ID.
         normalized = re.sub(r"^(\S+::.*?)\s+(PASSED|FAILED|ERROR|SKIPPED|XFAIL|XPASS)(?:\s+\[\s*\d+%\])?\s*$",
                             lambda match: match[2] + " " + match[1], clean, flags=re.MULTILINE)
+    else:
+        # Native SymPy appends the file's aggregate [OK]/[FAIL] marker to its
+        # final testcase line. It is not that testcase's own result. Preserve
+        # the testcase token and remove presentation suffix before v3 parsing.
+        normalized = re.sub(r"^(test\w+)\s+(ok|F|E|f|s|w)\s+\[(?:OK|FAIL)\]\s*$",
+                            lambda match: match[1] + " " + match[2], clean, flags=re.MULTILINE)
     source, scope = normalized, "complete_test_output"
     if task["repo"] == "pytest-dev/pytest":
         summaries = list(re.finditer(r"^=+ short test summary info =+\s*$", normalized, re.MULTILINE))
@@ -81,8 +167,14 @@ def parse_observations(task, body, parser, spec):
                 scope = "final_outer_pytest_short_summary"
     observed, aliases = normalize_observations(task, parser(source, spec))
     raw = parser(normalized, spec)
-    diagnostics = {"scope": scope, "ansi_removed": clean != body, "verbose_status_normalized": normalized != clean,
+    diagnostics = {"scope": scope, "ansi_removed": clean != body,
+                   "verbose_status_normalized": task["repo"] != "sympy/sympy" and normalized != clean,
+                   "native_status_normalized": task["repo"] == "sympy/sympy" and normalized != clean,
                    "failure_header_aliases": aliases,
+                   "header_status_mismatches": {key: {"header": value, "test": observed.get(key.rsplit(":", 1)[-1])}
+                        for key, value in aliases.items()
+                        if observed.get(key.rsplit(":", 1)[-1]) is not None
+                        and observed.get(key.rsplit(":", 1)[-1]) != value},
                    "discarded_nested_or_alias_observations": {key: value for key, value in raw.items()
                         if key not in observed or observed[key] != value}}
     return observed, diagnostics
@@ -90,9 +182,16 @@ def parse_observations(task, body, parser, spec):
 
 def calibration_decision(rows):
     base, gold, wrong = rows
-    return (base["status"] == "requirement_failed" and bool(base.get("assertion_failures"))
+
+    def negative(row):
+        exceptions = row.get("requirement_exception_failures", [])
+        return (row["status"] in {"requirement_failed", "requirement_exception_failed"}
+                and bool(row.get("assertion_failures") or exceptions)
+                and (not exceptions or set(exceptions) == set(row.get("requirement_exception_evidence", {}))))
+
+    return (negative(base)
             and base.get("regressions_passed") is True and gold["verified_success"]
-            and wrong["status"] == "requirement_failed" and bool(wrong.get("assertion_failures"))
+            and negative(wrong)
             and wrong.get("regressions_passed") is True)
 
 
@@ -207,7 +306,9 @@ def grade(task, spec, image, patch, output, label, parser, timeout):
         observed, diagnostics = parse_observations(task, body, parser, spec)
         row["tests"] = observed
         row["parser_diagnostics"] = diagnostics
-        row.update(classify(task, observed, completed=True, exit_code=int(exits[0])))
+        exceptions = test_body_exception_receipts(task, body, observed)
+        row["test_body_exception_receipts"] = exceptions
+        row.update(classify(task, observed, completed=True, exit_code=int(exits[0]), requirement_exceptions=exceptions))
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
         row.update(error_type=type(exc).__name__, error=str(exc)[:500])
     finally:

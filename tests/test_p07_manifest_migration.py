@@ -10,8 +10,9 @@ ROOT = Path(__file__).resolve().parents[1] / "benchmarks/stage4"
 def test_versioned_labels_preserve_all_task_code_and_match_audited_hashes():
     migration = json.loads((ROOT / "p07-manifest-migrations.json").read_text())
     old_raw, new_raw = (ROOT / "corpus.json").read_bytes(), (ROOT / "corpus-p07-v2.json").read_bytes()
-    assert hashlib.sha256(old_raw).hexdigest() == migration["original_sha256"]
-    assert hashlib.sha256(new_raw).hexdigest() == migration["new_sha256"]
+    assert migration["hash_contract"] == "git_text_lf_bytes"
+    assert hashlib.sha256(old_raw.replace(b"\r\n", b"\n")).hexdigest() == migration["original_sha256"]
+    assert hashlib.sha256(new_raw.replace(b"\r\n", b"\n")).hexdigest() == migration["new_sha256"]
     old, new = json.loads(old_raw), json.loads(new_raw)
     assert len(old["tasks"]) == len(new["tasks"]) == 30
     permitted = {"pytest-dev__pytest-5227", "sympy__sympy-18057"}

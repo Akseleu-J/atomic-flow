@@ -189,3 +189,90 @@ def test_v2_template_control_keeps_unknown_names_but_misparses_escaped_header():
     assert ordinary == ["path", "line", "categ", "a_second_new_option"]
     header = [match[0] for match in re.findall(pattern, '{{ "Category": "{category}" }}')]
     assert header != ["category"]
+
+
+def _exception_case():
+    return {"repo": "sympy/sympy", "base_commit": "a" * 40,
+            "FAIL_TO_PASS": ["test_required"], "PASS_TO_PASS": ["test_regression"],
+            "test_patch": "--- a/sympy/tests/test_example.py\n+++ b/sympy/tests/test_example.py\n",
+            "patch": "--- a/sympy/example.py\n+++ b/sympy/example.py\n"}
+
+
+def _exception_output():
+    return '\n'.join([
+        '________________ sympy/tests/test_example.py:test_required ________________',
+        'Traceback (most recent call last):',
+        '  File "/testbed/sympy/tests/test_example.py", line 12, in test_required',
+        '    assert operation() == expected',
+        '  File "/testbed/sympy/example.py", line 40, in operation',
+        '    raise TypeError("actual requirement bug")',
+        'TypeError: actual requirement bug',
+        ' tests finished: 1 passed, 1 exceptions, in 0.1 seconds =',
+        'P07_TEST_EXIT=1', ''])
+
+
+def test_native_requirement_exception_preserves_error_and_typed_negative_receipt():
+    task = _exception_case()
+    observed = {"test_required": "ERROR", "test_regression": "PASSED"}
+    receipts = p07.test_body_exception_receipts(task, _exception_output(), observed)
+    row = p07.classify(task, observed, completed=True, exit_code=1, requirement_exceptions=receipts)
+    assert row["status"] == "requirement_exception_failed" and not row["verified_success"]
+    assert observed["test_required"] == "ERROR" and row["assertion_failures"] == []
+    assert row["requirement_exception_failures"] == ["test_required"]
+    assert receipts["test_required"]["test_frame"]["function"] == "test_required"
+    assert receipts["test_required"]["production_frames"][0]["path"] == "sympy/example.py"
+    assert receipts["test_required"]["raw_body_sha256"] == p07.sha(_exception_output().encode())
+    gold = p07.classify(task, {"test_required": "PASSED", "test_regression": "PASSED"}, completed=True, exit_code=0)
+    assert p07.calibration_decision([row, gold, row])
+    assert not p07.calibration_decision([{**row, "requirement_exception_evidence": {}}, gold, row])
+
+
+@pytest.mark.parametrize("old,new", [
+    ('in test_required', 'in setup_method'),
+    ('/testbed/sympy/example.py', '/testbed/sympy/unrelated.py'),
+    ('/testbed/sympy/tests/test_example.py', '/testbed/sympy/tests/conftest.py'),
+    ('TypeError: actual requirement bug', 'ModuleNotFoundError: missing dependency'),
+    (' tests finished: 1 passed, 1 exceptions, in 0.1 seconds =', ''),
+    ('P07_TEST_EXIT=1', 'P07_TEST_EXIT=2'),
+])
+def test_setup_stale_source_dependency_and_incomplete_runner_errors_stay_infrastructure(old, new):
+    task = _exception_case()
+    observed = {"test_required": "ERROR", "test_regression": "PASSED"}
+    receipts = p07.test_body_exception_receipts(task, _exception_output().replace(old, new), observed)
+    assert not receipts
+    assert p07.classify(task, observed, completed=True, exit_code=1,
+                        requirement_exceptions=receipts)["status"] == "infrastructure_error"
+
+
+def test_typed_requirement_exception_does_not_mask_other_error_or_pass_on_zero_exit():
+    task = _exception_case()
+    observed = {"test_required": "ERROR", "test_regression": "PASSED"}
+    receipts = p07.test_body_exception_receipts(task, _exception_output(), observed)
+    assert p07.classify(task, {**observed, "other": "ERROR"}, completed=True, exit_code=1,
+                        requirement_exceptions=receipts)["status"] == "infrastructure_error"
+    assert p07.classify(task, observed, completed=True, exit_code=0,
+                        requirement_exceptions=receipts)["status"] == "infrastructure_error"
+    assert p07.classify(task, observed, completed=False, exit_code=1,
+                        requirement_exceptions=receipts)["status"] == "infrastructure_error"
+    stale = {"test_required": {**receipts["test_required"], "base_commit": "b" * 40}}
+    assert p07.classify(task, observed, completed=True, exit_code=1,
+                        requirement_exceptions=stale)["status"] == "infrastructure_error"
+
+
+def test_exception_header_alias_is_diagnostic_but_error_is_not_relabelled_failed():
+    task = _exception_case()
+    raw = {"sympy/tests/test_example.py:test_required": "FAILED", "test_required": "ERROR"}
+    observed, diagnostics = p07.normalize_observations(task, raw)
+    assert observed == {"test_required": "ERROR"}
+    assert diagnostics == {"sympy/tests/test_example.py:test_required": "FAILED"}
+
+
+def test_sympy_file_summary_marker_does_not_erase_last_test_or_change_its_result():
+    def native_parser(body, unused):
+        return {name: {"ok": "PASSED", "F": "FAILED", "E": "ERROR"}[state]
+                for name, state in re.findall(r"^(test\w+) (ok|F|E)$", body, re.MULTILINE)}
+
+    body = "test_first F\ntest_last ok                       [FAIL]\n\ntest_requirement F   [FAIL]\n"
+    observed, diagnostics = p07.parse_observations({"repo": "sympy/sympy"}, body, native_parser, None)
+    assert observed == {"test_first": "FAILED", "test_last": "PASSED", "test_requirement": "FAILED"}
+    assert diagnostics["native_status_normalized"] and not diagnostics["verbose_status_normalized"]

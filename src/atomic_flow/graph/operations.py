@@ -16,6 +16,62 @@ from atomic_flow.graph.semantic import entry_points, file_dependencies, layers, 
 OPERATIONS = ("inspect", "search", "explain", "chat", "impact", "tour")
 
 
+def _scope_inspection(result, node, build, files):
+    """Scope the projection, retaining the revision of the full admitted graph.
+
+    Global diagnostics are counted rather than attached to a one-node request.
+    Entry-point membership still comes from the complete graph, never a rebuild
+    of the selected file that would change the meaning of the heuristic.
+    """
+    path = node["path"]
+    unresolved = [item for item in build["unresolved"] if item.startswith(path + ": ")]
+    omissions = [item for item in result["omissions"] if item.get("path") == path]
+    excluded = {"nodes": len(build["nodes"]) - 1,
+                "edges": len(build["edges"]) - len(result["edges"]),
+                "unresolved": len(build["unresolved"]) - len(unresolved),
+                "unsupported_files": len(result["omissions"]) - len(omissions)}
+    result["projection_scope"] = {"kind": "node", "node_id": node["id"], "paths": [path],
+        "source_revision_scope": "all_admitted_files", "global_counts": {
+            "files": len(files), "nodes": len(build["nodes"]), "edges": len(build["edges"]),
+            "unresolved": len(build["unresolved"]), "unsupported_files": len(result["omissions"])}}
+    result["unresolved"] = unresolved
+    result["omissions"] = omissions
+    if any(excluded.values()):
+        result["omissions"].append({"reason": "outside_requested_scope", "counts": excluded})
+    for metadata in (result["layers"], result["entry_points"]):
+        metadata["source_digests"] = {key: value for key, value in metadata["source_digests"].items() if key == path}
+        metadata["projection_scope"] = "requested_node_file; classification computed over full graph"
+    result["layers"]["groups"] = {key: [path] for key, paths in result["layers"]["groups"].items() if path in paths}
+    result["entry_points"]["entry_files"] = [item for item in result["entry_points"]["entry_files"] if item == path]
+
+
+def _bound_scoped_inspection(result, byte_cap):
+    """Drop whole projection records only, with explicit per-field accounting."""
+    result["output_complete"] = True
+    for field in ("edges", "unresolved", "nodes"):
+        if len(json.dumps(result, ensure_ascii=False).encode()) <= byte_cap:
+            return
+        original = result[field]
+        omission = {"reason": "output_byte_cap", "field": field, "items": 0}
+        result["omissions"].append(omission)
+        result["output_complete"] = False
+        low, high = 0, len(original)
+        while low < high:
+            count = (low + high + 1) // 2
+            result[field] = original[:count]
+            omission["items"] = len(original) - count
+            if len(json.dumps(result, ensure_ascii=False).encode()) <= byte_cap:
+                low = count
+            else:
+                high = count - 1
+        result[field] = original[:low]
+        omission["items"] = len(original) - low
+        if omission["items"] == 0:
+            result["omissions"].remove(omission)
+    if len(json.dumps(result, ensure_ascii=False).encode()) > byte_cap:
+        raise GraphContractError("graph metadata exceeds output byte cap; narrow request")
+
+
 def graph_operation(project: Path, operation: str, *, query="", node_id="", paths=None,
                     byte_cap=65536, semantic=None, cancel_check=lambda: None) -> dict:
     """No implicit model calls, executables, read-proof grants or mutations.
@@ -81,6 +137,8 @@ def graph_operation(project: Path, operation: str, *, query="", node_id="", path
         result["edges"] = [e for e in build["edges"] if not node_id or node_id in {e["src"], e["dst"]}]
         result["layers"] = layers(files)
         result["entry_points"] = entry_points(files)
+        if node_id:
+            _scope_inspection(result, nodes[node_id], build, files)
     elif operation == "impact":
         selected = list(paths or [])
         if not selected or any(path not in files for path in selected):
@@ -116,6 +174,9 @@ def graph_operation(project: Path, operation: str, *, query="", node_id="", path
         result["answer_method"] = "extractive current-source evidence; no inferred semantic verdict"
     if project_files(Path(project), suffix=None, cancel_check=cancel_check) != snapshot:
         raise GraphContractError("source changed during graph operation")
+    if operation == "inspect" and node_id:
+        _bound_scoped_inspection(result, byte_cap)
+        return result
     encoded = json.dumps(result, ensure_ascii=False).encode()
     if len(encoded) > byte_cap:
         # Never trim inside an evidence span and leave a misleading complete flag.
