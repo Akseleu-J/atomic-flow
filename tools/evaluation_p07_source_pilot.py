@@ -24,6 +24,32 @@ from atomic_flow.backends.openai_compatible import OpenAICompatibleBackend
 from atomic_flow.config import BackendConfig
 
 
+class SourcePilotBackend(PilotBackend):
+    """Keep original requests/responses before the consumer parses model text."""
+
+    def checkpoint(self):
+        if self.calls and getattr(self, "active_messages", None) is not None:
+            write_json(self.output / f"physical-request-{len(self.calls)}.json", self.active_messages)
+        super().checkpoint()
+
+    def chat(self, messages, *, json_mode=False, model=None):
+        self.active_messages = messages
+        response = None
+        before = len(self.calls)
+        try:
+            response = super().chat(messages, json_mode=json_mode, model=model)
+            return response
+        except BaseException as exc:
+            response = getattr(exc, "usage_result", None)
+            raise
+        finally:
+            if response is not None and len(self.calls) > before:
+                write_json(self.output / f"physical-response-{len(self.calls)}.json", {
+                    "content": response.content, "tokens_in": response.tokens_in,
+                    "tokens_out": response.tokens_out, "cost_usd": response.cost_usd,
+                    "cost_source": response.cost_source, "truncated": response.truncated})
+
+
 def admit_calibration(report, task):
     if (report.get("instance_id") != task["instance_id"] or report.get("calibrated") is not True
             or report.get("base_commit") != task["base_commit"] or report.get("model_calls") != 0
@@ -115,11 +141,11 @@ def main():
     config = BackendConfig(type="kaggle", name="host_model_proxy", model=MODEL,
                            base_url=endpoint.rstrip("/") if endpoint.rstrip("/").endswith("/openapi") else endpoint.rstrip("/") + "/openapi",
                            api_key_env="MODEL_PROXY_API_KEY", max_retries=0, timeout_seconds=120,
-                           max_output_tokens=2048, price_in_per_mtok=.25, price_out_per_mtok=1.5)
-    limits = {"max_calls": 20, "max_input_tokens": 240_000, "max_output_tokens": 2048,
-              "max_wall_seconds": 600, "max_reported_cost_usd": .15}
+                           max_output_tokens=4096, price_in_per_mtok=.25, price_out_per_mtok=1.5)
+    limits = {"max_calls": 30, "max_input_tokens": 600_000, "max_output_tokens": 4096,
+              "max_wall_seconds": 900, "max_reported_cost_usd": .4}
     started = time.monotonic()
-    backend = PilotBackend(OpenAICompatibleBackend(config, backend_name="host_model_proxy"), args.output, limits, started + 600)
+    backend = SourcePilotBackend(OpenAICompatibleBackend(config, backend_name="host_model_proxy"), args.output, limits, started + 900)
     root = Path(__file__).resolve().parents[1]
     report = {"instance_id": TASK_ID, "arm": args.arm, "model": MODEL, "provider": "host_model_proxy",
               "base_commit": task["base_commit"], "framework_before": source_state(root), "limits": limits,
@@ -147,7 +173,7 @@ def main():
 
                 inspection = inspect_graph(work, "inspect", byte_cap=1_000_000)
                 write_json(args.output / "understanding.json", inspection)
-                options = SimpleNamespace(profile="p05-diagnostic", max_calls=20, max_reported_cost=.15, max_output_tokens=2048)
+                options = SimpleNamespace(profile="p05-diagnostic", max_calls=30, max_reported_cost=.4, max_output_tokens=4096)
                 patch, details = atomic(task, work, original, backend, options)
             else:
                 patch, details = baseline(task, work, original, backend, args.output)

@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,27 @@ for name in ("evaluation_stage4", "evaluation_provenance", "evaluation_live_pilo
     spec.loader.exec_module(module)
     sys.modules.setdefault(name, module)
 pilot = sys.modules["evaluation_p07_source_pilot"]
+
+
+def test_raw_response_survives_consumer_json_failure(tmp_path):
+    from atomic_flow.backends.base import ChatResult
+    from atomic_flow.config import BackendConfig
+
+    class Transport:
+        name = "scripted"
+        config = BackendConfig(type="openai-compatible", model="frozen", max_retries=0, max_output_tokens=16)
+
+        def chat(self, messages, **kwargs):
+            return ChatResult(content="not JSON", tokens_in=10, tokens_out=2, cost_usd=.0000055, cost_source="provider")
+
+    backend = pilot.SourcePilotBackend(Transport(), tmp_path, {"max_calls": 1, "max_input_tokens": 1000,
+        "max_output_tokens": 16, "max_reported_cost_usd": .01}, time.monotonic() + 30)
+    result = backend.chat([{"role": "user", "content": "public source"}])
+    with pytest.raises(ValueError):
+        pilot.decode_action(result.content)
+    assert json.loads((tmp_path / "physical-response-1.json").read_text())["content"] == "not JSON"
+    assert json.loads((tmp_path / "attempts.json").read_text())[0]["cost_usd"] == .0000055
+    assert json.loads((tmp_path / "physical-request-1.json").read_text())[0]["content"] == "public source"
 
 
 @pytest.mark.parametrize("action", [
