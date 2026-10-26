@@ -178,21 +178,40 @@ def container_identity() -> str:
 
 
 def docker_command(engine: str, image: str, workspace: Path, name: str, args: list[str], *,
-                   profile: str = "checks", container_id_file: Path | None = None) -> list[str]:
+                   profile: str = "checks", container_id_file: Path | None = None,
+                   host_spec=None, host_spec_nonce: str | None = None) -> list[str]:
     bounds = execution_profile(profile)
     root = str(workspace.resolve())
     if any(character in root for character in (",", "\n", "\r", "\0")):
         raise ExecutionUnavailable("Workspace path cannot be represented safely as a Docker bind mount")
-    mount = f"type=bind,src={root},dst=/workspace" + (",readonly" if bounds.workspace_read_only else "")
+    target_root = "/workspace"
+    interpreter = "python"
+    checker = _trusted_checker_args(args)
+    resource_args = [f"--pids-limit={bounds.pids}", f"--memory={bounds.memory}", f"--cpus={bounds.cpus}"]
+    tmpfs_size = bounds.tmpfs_size
+    if host_spec is not None:
+        from atomic_flow.check_execution import checker_args
+        from atomic_flow.check_spec import CheckSpec
+        if (type(host_spec) is not CheckSpec or host_spec.image != image or profile != "checks"
+                or args != list(host_spec.argv[1:])):
+            raise ExecutionUnavailable("Docker command differs from the host CheckSpec")
+        target_root, interpreter = host_spec.target_root, host_spec.interpreter
+        checker = checker_args(host_spec, host_spec_nonce)
+        resources = host_spec.resources
+        resource_args = [f"--pids-limit={resources.pids}", f"--memory={resources.memory_bytes}", f"--cpus={resources.cpus}"]
+        tmpfs_size = str(resources.tmpfs_bytes)
+    elif host_spec_nonce is not None:
+        raise ExecutionUnavailable("CheckSpec nonce requires a host specification")
+    mount = f"type=bind,src={root},dst={target_root}" + (",readonly" if bounds.workspace_read_only else "")
     cid_args = ["--cidfile", str(container_id_file.absolute())] if container_id_file is not None else []
     return [engine, "run", *cid_args, "--name", name, "--rm", "--pull=never", "--network=none",
             "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges",
-            f"--pids-limit={bounds.pids}", f"--memory={bounds.memory}", f"--cpus={bounds.cpus}",
+            *resource_args,
             f"--user={container_identity()}",
-            f"--tmpfs=/tmp:rw,noexec,nosuid,size={bounds.tmpfs_size},mode=1777", "--workdir=/workspace",
+            f"--tmpfs=/tmp:rw,noexec,nosuid,size={tmpfs_size},mode=1777", f"--workdir={target_root}",
             "--mount", mount,
             "--env=HOME=/tmp", "--env=PYTHONDONTWRITEBYTECODE=1",
-            "--env=PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", "--", image, "python", *_trusted_checker_args(args)]
+            "--env=PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", "--", image, interpreter, *checker]
 
 
 def _kill_tree(proc: subprocess.Popen):
@@ -253,13 +272,20 @@ def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None
                timeout: float = 120, cancel_check: Callable[[], None] | None = None,
                output_callback: Callable[[str, bytes], None] | None = None,
                container_name: str | None = None, container_id_file: Path | None = None,
-               requirements: ExecutionRequirements | None = None) -> CommandResult:
+               requirements: ExecutionRequirements | None = None,
+               host_spec=None, host_spec_nonce: str | None = None) -> CommandResult:
     """Execute Python arguments; docker mode fails closed without an engine/image.
 
     Cancel checks raise TaskCancelled. Output retains only a bounded tail per stream.
     Local mode reduces accidental credential inheritance but permits host file/network access.
     """
     config = config or ExecutionConfig()
+    if host_spec is not None:
+        from atomic_flow.check_execution import admit_check_spec, checker_args
+        admit_check_spec(host_spec, project, config, timeout, args, cancel_check=cancel_check)
+        checker_args(host_spec, host_spec_nonce)
+    elif host_spec_nonce is not None:
+        raise ExecutionUnavailable("CheckSpec nonce requires a host specification")
     execution_manifest(config, requirements, probe=True)
     check = cancel_check or (lambda: None)
     check()
@@ -279,7 +305,9 @@ def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None
         engine = shutil.which("docker")
         if engine is None:
             raise ExecutionUnavailable("Docker unavailable; no local fallback. See docs/EXECUTION.md.")
-        cmd = docker_command(engine, config.image, project, name, args, profile=config.profile, container_id_file=container_id_file)
+        options = {} if host_spec is None else {"host_spec": host_spec, "host_spec_nonce": host_spec_nonce}
+        cmd = docker_command(engine, config.image, project, name, args, profile=config.profile,
+                             container_id_file=container_id_file, **options)
     else:
         cmd = [sys.executable, *_trusted_checker_args(args)]
     tails = [bytearray(), bytearray()]

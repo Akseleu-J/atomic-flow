@@ -1,0 +1,20 @@
+{
+  "id": 12675091890,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY3NTA5MTg5MA==",
+  "name": "p07-legacy-runtime-8516b05b3c9f90c0511c09deb4ce2c8407d7818c",
+  "size_in_bytes": 5962,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12675091890",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12675091890/zip",
+  "expired": false,
+  "digest": "sha256:2864989a127af1b39b51a963b442bbde0f74f17db670aef5fe2b113a866ee751",
+  "created_at": "2026-10-26T18:17:50Z",
+  "updated_at": "2026-10-26T18:17:50Z",
+  "expires_at": "2026-11-09T18:17:50Z",
+  "workflow_run": {
+    "id": 40376444491,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "8516b05b3c9f90c0511c09deb4ce2c8407d7818c"
+  }
+}

@@ -1,0 +1,356 @@
+{
+  "calibrated": false,
+  "cleanup_confirmed": true,
+  "cleanup_exit": 0,
+  "container_inspect": {
+    "AppArmorProfile": "",
+    "Args": [
+      "-I",
+      "-B",
+      "-c",
+      "\nimport ast, importlib, json, sys, sysconfig, warnings\nresult = {\"version\": sys.version, \"version_info\": list(sys.version_info[:3]),\n          \"executable\": sys.executable, \"prefix\": sys.prefix,\n          \"soabi\": sysconfig.get_config_var(\"SOABI\"),\n          \"libdir\": sysconfig.get_config_var(\"LIBDIR\"),\n          \"ldlibrary\": sysconfig.get_config_var(\"LDLIBRARY\"), \"probes\": {}}\nfor name in (\"ssl\", \"ctypes\", \"sqlite3\", \"bz2\", \"lzma\"):\n    try:\n        module = importlib.import_module(name)\n        item = {\"status\": \"imported\", \"path\": getattr(module, \"__file__\", None)}\n        if name == \"ssl\": item[\"openssl_version\"] = module.OPENSSL_VERSION\n        result[\"probes\"][name] = item\n    except Exception as exc:\n        result[\"probes\"][name] = {\"status\": \"exception\", \"exception_type\": type(exc).__name__}\ntry:\n    # Mirrors the historical transform's exact ast.Name(id='False', Load())\n    # keyword value, without importing any target package.\n    tree = ast.Expression(body=ast.Call(func=ast.Name(id='capture', ctx=ast.Load()),\n        args=[], keywords=[ast.keyword(arg='evaluate', value=ast.Name(id='False', ctx=ast.Load()))]))\n    tree = ast.fix_missing_locations(tree)\n    code = compile(tree, '<p07-legacy-ast>', 'eval')\n    observed = eval(code, {\"capture\": lambda **kwargs: kwargs})\n    result[\"probes\"][\"ast_name_false\"] = {\"status\": \"evaluated\", \"value\": observed,\n        \"expected_value_matches\": observed == {\"evaluate\": False}}\nexcept Exception as exc:\n    result[\"probes\"][\"ast_name_false\"] = {\"status\": \"exception\", \"exception_type\": type(exc).__name__}\ntry:\n    with warnings.catch_warnings(record=True) as caught:\n        warnings.simplefilter('always')\n        import collections\n        mapping = collections.Mapping\n    result[\"probes\"][\"collections_mapping\"] = {\"status\": \"resolved\", \"module\": mapping.__module__,\n        \"warnings\": [{\"category\": item.category.__name__, \"message\": str(item.message)} for item in caught]}\nexcept Exception as exc:\n    result[\"probes\"][\"collections_mapping\"] = {\"status\": \"exception\", \"exception_type\": type(exc).__name__}\nprint(json.dumps(result, sort_keys=True))\n"
+    ],
+    "Config": {
+      "AttachStderr": true,
+      "AttachStdin": false,
+      "AttachStdout": true,
+      "Cmd": [
+        "-I",
+        "-B",
+        "-c",
+        "\nimport ast, importlib, json, sys, sysconfig, warnings\nresult = {\"version\": sys.version, \"version_info\": list(sys.version_info[:3]),\n          \"executable\": sys.executable, \"prefix\": sys.prefix,\n          \"soabi\": sysconfig.get_config_var(\"SOABI\"),\n          \"libdir\": sysconfig.get_config_var(\"LIBDIR\"),\n          \"ldlibrary\": sysconfig.get_config_var(\"LDLIBRARY\"), \"probes\": {}}\nfor name in (\"ssl\", \"ctypes\", \"sqlite3\", \"bz2\", \"lzma\"):\n    try:\n        module = importlib.import_module(name)\n        item = {\"status\": \"imported\", \"path\": getattr(module, \"__file__\", None)}\n        if name == \"ssl\": item[\"openssl_version\"] = module.OPENSSL_VERSION\n        result[\"probes\"][name] = item\n    except Exception as exc:\n        result[\"probes\"][name] = {\"status\": \"exception\", \"exception_type\": type(exc).__name__}\ntry:\n    # Mirrors the historical transform's exact ast.Name(id='False', Load())\n    # keyword value, without importing any target package.\n    tree = ast.Expression(body=ast.Call(func=ast.Name(id='capture', ctx=ast.Load()),\n        args=[], keywords=[ast.keyword(arg='evaluate', value=ast.Name(id='False', ctx=ast.Load()))]))\n    tree = ast.fix_missing_locations(tree)\n    code = compile(tree, '<p07-legacy-ast>', 'eval')\n    observed = eval(code, {\"capture\": lambda **kwargs: kwargs})\n    result[\"probes\"][\"ast_name_false\"] = {\"status\": \"evaluated\", \"value\": observed,\n        \"expected_value_matches\": observed == {\"evaluate\": False}}\nexcept Exception as exc:\n    result[\"probes\"][\"ast_name_false\"] = {\"status\": \"exception\", \"exception_type\": type(exc).__name__}\ntry:\n    with warnings.catch_warnings(record=True) as caught:\n        warnings.simplefilter('always')\n        import collections\n        mapping = collections.Mapping\n    result[\"probes\"][\"collections_mapping\"] = {\"status\": \"resolved\", \"module\": mapping.__module__,\n        \"warnings\": [{\"category\": item.category.__name__, \"message\": str(item.message)} for item in caught]}\nexcept Exception as exc:\n    result[\"probes\"][\"collections_mapping\"] = {\"status\": \"exception\", \"exception_type\": type(exc).__name__}\nprint(json.dumps(result, sort_keys=True))\n"
+      ],
+      "Domainname": "",
+      "Entrypoint": [
+        "/usr/local/bin/python3.6"
+      ],
+      "Env": [
+        "HOME=/tmp",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=C.UTF-8",
+        "GPG_KEY=0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D",
+        "PYTHON_VERSION=3.6.15",
+        "PYTHON_PIP_VERSION=21.2.4",
+        "PYTHON_SETUPTOOLS_VERSION=57.5.0",
+        "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/3cb8888cc2869620f57d5d2da64da38f516078c7/public/get-pip.py",
+        "PYTHON_GET_PIP_SHA256=c518250e91a70d7b20cceb15272209a4ded2a0c263ae5776f129e0d9b5674309"
+      ],
+      "Hostname": "511d1da22abd",
+      "Image": "sha256:dc468cf655a42fccd7f2bb1549e9d43d69c1e0a7dbff5457fb45de19e124ed6d",
+      "Labels": {},
+      "OnBuild": null,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Tty": false,
+      "User": "65534:65534",
+      "Volumes": null,
+      "WorkingDir": "/tmp"
+    },
+    "Created": "2026-10-26T18:17:49.58892781Z",
+    "Driver": "overlay2",
+    "ExecIDs": null,
+    "GraphDriver": {
+      "Data": {
+        "ID": "511d1da22abd1da1b15da4844e3c686e81405c655cf83a2844238c40cfc3991a",
+        "LowerDir": "/var/lib/docker/overlay2/4b97fad589fa47d4a05149a5235fb7bbde5820cb095e6ebdef169e86eb14f150-init/diff:/var/lib/docker/overlay2/7e19769c776b3a6d61fe798d081a565bce5eed1741ab3e8639383bbbe9092b4c/diff:/var/lib/docker/overlay2/f463a380db4d326532982f76fd5b52bdbe1ad9dd7101e24ba3ec3653ecf762f0/diff:/var/lib/docker/overlay2/7eef195745a064992d246547ea13389254869aa7d8373e4f39f63d980ee2ddf1/diff:/var/lib/docker/overlay2/b2ee43d0db932fb7eef3c7f441cb6d719f8584172b808b945e7cb4bc3e93a349/diff:/var/lib/docker/overlay2/c339dfb6352e19a2eaf39b3992e69d3a8e763a6f7fa4eca63b9935073e0afd94/diff",
+        "MergedDir": "/var/lib/docker/overlay2/4b97fad589fa47d4a05149a5235fb7bbde5820cb095e6ebdef169e86eb14f150/merged",
+        "UpperDir": "/var/lib/docker/overlay2/4b97fad589fa47d4a05149a5235fb7bbde5820cb095e6ebdef169e86eb14f150/diff",
+        "WorkDir": "/var/lib/docker/overlay2/4b97fad589fa47d4a05149a5235fb7bbde5820cb095e6ebdef169e86eb14f150/work"
+      },
+      "Name": "overlay2"
+    },
+    "HostConfig": {
+      "AutoRemove": false,
+      "Binds": null,
+      "BlkioDeviceReadBps": [],
+      "BlkioDeviceReadIOps": [],
+      "BlkioDeviceWriteBps": [],
+      "BlkioDeviceWriteIOps": [],
+      "BlkioWeight": 0,
+      "BlkioWeightDevice": [],
+      "CapAdd": null,
+      "CapDrop": [
+        "ALL"
+      ],
+      "Cgroup": "",
+      "CgroupParent": "",
+      "CgroupnsMode": "private",
+      "ConsoleSize": [
+        0,
+        0
+      ],
+      "ContainerIDFile": "",
+      "CpuCount": 0,
+      "CpuPercent": 0,
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpuRealtimePeriod": 0,
+      "CpuRealtimeRuntime": 0,
+      "CpuShares": 0,
+      "CpusetCpus": "",
+      "CpusetMems": "",
+      "DeviceCgroupRules": null,
+      "DeviceRequests": null,
+      "Devices": [],
+      "Dns": [],
+      "DnsOptions": [],
+      "DnsSearch": [],
+      "ExtraHosts": null,
+      "GroupAdd": null,
+      "IOMaximumBandwidth": 0,
+      "IOMaximumIOps": 0,
+      "IpcMode": "private",
+      "Isolation": "",
+      "Links": null,
+      "LogConfig": {
+        "Config": {},
+        "Type": "json-file"
+      },
+      "MaskedPaths": [
+        "/proc/asound",
+        "/proc/acpi",
+        "/proc/interrupts",
+        "/proc/kcore",
+        "/proc/keys",
+        "/proc/latency_stats",
+        "/proc/timer_list",
+        "/proc/timer_stats",
+        "/proc/sched_debug",
+        "/proc/scsi",
+        "/sys/firmware",
+        "/sys/devices/virtual/powercap"
+      ],
+      "Memory": 1073741824,
+      "MemoryReservation": 0,
+      "MemorySwap": 2147483648,
+      "MemorySwappiness": null,
+      "NanoCpus": 2000000000,
+      "NetworkMode": "none",
+      "OomKillDisable": false,
+      "OomScoreAdj": 0,
+      "PidMode": "",
+      "PidsLimit": 128,
+      "PortBindings": {},
+      "Privileged": false,
+      "PublishAllPorts": false,
+      "ReadonlyPaths": [
+        "/proc/bus",
+        "/proc/fs",
+        "/proc/irq",
+        "/proc/sys",
+        "/proc/sysrq-trigger"
+      ],
+      "ReadonlyRootfs": true,
+      "RestartPolicy": {
+        "MaximumRetryCount": 0,
+        "Name": "no"
+      },
+      "Runtime": "runc",
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "ShmSize": 67108864,
+      "Tmpfs": {
+        "/tmp": "rw,noexec,nosuid,size=128m,mode=1777"
+      },
+      "UTSMode": "",
+      "Ulimits": [],
+      "UsernsMode": "",
+      "VolumeDriver": "",
+      "VolumesFrom": null
+    },
+    "HostnamePath": "",
+    "HostsPath": "",
+    "Id": "511d1da22abd1da1b15da4844e3c686e81405c655cf83a2844238c40cfc3991a",
+    "Image": "sha256:dc468cf655a42fccd7f2bb1549e9d43d69c1e0a7dbff5457fb45de19e124ed6d",
+    "LogPath": "",
+    "MountLabel": "",
+    "Mounts": [],
+    "Name": "/p07-legacy-10c6144f4198421fba46fe04",
+    "NetworkSettings": {
+      "Bridge": "",
+      "EndpointID": "",
+      "Gateway": "",
+      "GlobalIPv6Address": "",
+      "GlobalIPv6PrefixLen": 0,
+      "HairpinMode": false,
+      "IPAddress": "",
+      "IPPrefixLen": 0,
+      "IPv6Gateway": "",
+      "LinkLocalIPv6Address": "",
+      "LinkLocalIPv6PrefixLen": 0,
+      "MacAddress": "",
+      "Networks": {
+        "none": {
+          "Aliases": null,
+          "DNSNames": null,
+          "DriverOpts": null,
+          "EndpointID": "",
+          "Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "GwPriority": 0,
+          "IPAMConfig": null,
+          "IPAddress": "",
+          "IPPrefixLen": 0,
+          "IPv6Gateway": "",
+          "Links": null,
+          "MacAddress": "",
+          "NetworkID": ""
+        }
+      },
+      "Ports": {},
+      "SandboxID": "",
+      "SandboxKey": "",
+      "SecondaryIPAddresses": null,
+      "SecondaryIPv6Addresses": null
+    },
+    "Path": "/usr/local/bin/python3.6",
+    "Platform": "linux",
+    "ProcessLabel": "",
+    "ResolvConfPath": "",
+    "RestartCount": 0,
+    "State": {
+      "Dead": false,
+      "Error": "",
+      "ExitCode": 0,
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "OOMKilled": false,
+      "Paused": false,
+      "Pid": 0,
+      "Restarting": false,
+      "Running": false,
+      "StartedAt": "0001-01-01T00:00:00Z",
+      "Status": "created"
+    }
+  },
+  "image": "library/python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2",
+  "image_id": "sha256:dc468cf655a42fccd7f2bb1549e9d43d69c1e0a7dbff5457fb45de19e124ed6d",
+  "image_inspect": {
+    "Architecture": "amd64",
+    "Author": "",
+    "Comment": "",
+    "Config": {
+      "AttachStderr": false,
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "Cmd": [
+        "python3"
+      ],
+      "Domainname": "",
+      "Entrypoint": null,
+      "Env": [
+        "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=C.UTF-8",
+        "GPG_KEY=0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D",
+        "PYTHON_VERSION=3.6.15",
+        "PYTHON_PIP_VERSION=21.2.4",
+        "PYTHON_SETUPTOOLS_VERSION=57.5.0",
+        "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/3cb8888cc2869620f57d5d2da64da38f516078c7/public/get-pip.py",
+        "PYTHON_GET_PIP_SHA256=c518250e91a70d7b20cceb15272209a4ded2a0c263ae5776f129e0d9b5674309"
+      ],
+      "Hostname": "",
+      "Image": "sha256:9da4cb957bd5a34666322bdd7ac329c52cc6f546bc1ae946b19e1091711a2244",
+      "Labels": null,
+      "OnBuild": null,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Tty": false,
+      "User": "",
+      "Volumes": null,
+      "WorkingDir": ""
+    },
+    "Created": "2021-12-21T12:29:38.036669692Z",
+    "DockerVersion": "20.10.7",
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/f463a380db4d326532982f76fd5b52bdbe1ad9dd7101e24ba3ec3653ecf762f0/diff:/var/lib/docker/overlay2/7eef195745a064992d246547ea13389254869aa7d8373e4f39f63d980ee2ddf1/diff:/var/lib/docker/overlay2/b2ee43d0db932fb7eef3c7f441cb6d719f8584172b808b945e7cb4bc3e93a349/diff:/var/lib/docker/overlay2/c339dfb6352e19a2eaf39b3992e69d3a8e763a6f7fa4eca63b9935073e0afd94/diff",
+        "MergedDir": "/var/lib/docker/overlay2/7e19769c776b3a6d61fe798d081a565bce5eed1741ab3e8639383bbbe9092b4c/merged",
+        "UpperDir": "/var/lib/docker/overlay2/7e19769c776b3a6d61fe798d081a565bce5eed1741ab3e8639383bbbe9092b4c/diff",
+        "WorkDir": "/var/lib/docker/overlay2/7e19769c776b3a6d61fe798d081a565bce5eed1741ab3e8639383bbbe9092b4c/work"
+      },
+      "Name": "overlay2"
+    },
+    "Id": "sha256:dc468cf655a42fccd7f2bb1549e9d43d69c1e0a7dbff5457fb45de19e124ed6d",
+    "Metadata": {
+      "LastTagTime": "0001-01-01T00:00:00Z"
+    },
+    "Os": "linux",
+    "Parent": "",
+    "RepoDigests": [
+      "python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2"
+    ],
+    "RepoTags": [],
+    "RootFS": {
+      "Layers": [
+        "sha256:ad6b69b549193f81b039a1d478bc896f6e460c77c1849a4374ab95f9a3d2cea2",
+        "sha256:c42229255bc94b196a4d5aeb50642c842815cc0352baa851d1c65cbe365b384b",
+        "sha256:82baccdbb0707481406c96e8f95bbbf50c5c8b6705182a59b9b0228fbecbb96a",
+        "sha256:64978906fbf179110fdca2b0cfa439da3260951e3b3528ddd89ce36a48e690d6",
+        "sha256:e30df7d241f6e0435d003652dab5d7804dcbd5822a7deafbc337e85227bd0fcc"
+      ],
+      "Type": "layers"
+    },
+    "Size": 111818893
+  },
+  "legacy_transplant": "not_attempted",
+  "model_calls": 0,
+  "observed": {
+    "executable": "/usr/local/bin/python3.6",
+    "ldlibrary": "libpython3.6m.so",
+    "libdir": "/usr/local/lib",
+    "prefix": "/usr/local",
+    "probes": {
+      "ast_name_false": {
+        "expected_value_matches": true,
+        "status": "evaluated",
+        "value": {
+          "evaluate": false
+        }
+      },
+      "bz2": {
+        "path": "/usr/local/lib/python3.6/bz2.py",
+        "status": "imported"
+      },
+      "collections_mapping": {
+        "module": "collections.abc",
+        "status": "resolved",
+        "warnings": []
+      },
+      "ctypes": {
+        "path": "/usr/local/lib/python3.6/ctypes/__init__.py",
+        "status": "imported"
+      },
+      "lzma": {
+        "path": "/usr/local/lib/python3.6/lzma.py",
+        "status": "imported"
+      },
+      "sqlite3": {
+        "path": "/usr/local/lib/python3.6/sqlite3/__init__.py",
+        "status": "imported"
+      },
+      "ssl": {
+        "openssl_version": "OpenSSL 1.1.1d  10 Sep 2019",
+        "path": "/usr/local/lib/python3.6/ssl.py",
+        "status": "imported"
+      }
+    },
+    "soabi": "cpython-36m-x86_64-linux-gnu",
+    "version": "3.6.15 (default, Dec 21 2021, 12:28:02) \n[GCC 8.3.0]",
+    "version_info": [
+      3,
+      6,
+      15
+    ]
+  },
+  "probe_compatible": true,
+  "probe_source_sha256": "ceced0238af652824eab60c0cb7df9dbf00c501cbfcc4bbfe155c66d23c2abe0",
+  "process_exit": 0,
+  "provider_credentials": "none",
+  "status": "donor_probes_compatible",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "b60090e42668537f63623175703894c5dad47c5f4f552e41b9107545158b3ee5",
+  "target_setup_or_tests_executed": false,
+  "target_source_present": false
+}
