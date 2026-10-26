@@ -934,8 +934,17 @@ class Orchestrator:
                     verdict = "needs_retry"
                     critique.verdict = verdict
                     critique.feedback = (critique.feedback + f" Remove or justify identifiers absent from context: {unknown}.").strip()
-            if any(span["status"] == "failed" for span in span_reports) and verdict == "ok":
-                verdict = "needs_retry"
+            failed_spans = [span for span in span_reports if span["status"] == "failed"]
+            if failed_spans:
+                if verdict == "ok":
+                    verdict = "needs_retry"
+                critique.verdict = verdict
+                reasons = [{"node_id": span["node_id"], "lines": span["lines"], "reason": span["reason"]}
+                           for span in failed_spans[:8]]
+                critique.feedback = (critique.feedback + " Host rejected citation spans: "
+                    + json.dumps(reasons, ensure_ascii=False)
+                    + ". Read complete current source with read_node/read_file before claiming line ranges; "
+                    "revise unsupported claims. Existing read and evidence requirements still apply.").strip()
             current = _Attempt(answer, verdict, critique.citation_coverage, grounding, unknown, dropped, checked, span_reports)
             if best is None or current.score > best.score:
                 best = current
