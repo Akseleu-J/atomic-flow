@@ -20,6 +20,17 @@ TASK = {"FAIL_TO_PASS": ["required"], "PASS_TO_PASS": ["regression"]}
 
 def test_sympy_uses_its_own_runner_without_requiring_host_pytest():
     assert "import pytest" not in p07.runner_identity_command("sympy/sympy")
+
+
+def test_sympy_named_failure_alias_requires_matching_bare_test():
+    raw = {"test_Derivative_kind": "FAILED", "test_other": "PASSED",
+           "sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED",
+           "sympy/core/tests/test_kind.py:test_unmatched": "FAILED",
+           "sympy/core/tests/test_kind.py:test_other": "FAILED"}
+    observed, diagnostics = p07.normalize_observations({"repo": "sympy/sympy"}, raw)
+    assert diagnostics == {"sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED"}
+    assert observed["sympy/core/tests/test_kind.py:test_unmatched"] == "FAILED"
+    assert observed["sympy/core/tests/test_kind.py:test_other"] == "FAILED"
     assert "import pytest,_pytest" in p07.runner_identity_command("pytest-dev/pytest")
 
 

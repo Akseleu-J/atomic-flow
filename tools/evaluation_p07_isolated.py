@@ -46,7 +46,10 @@ def normalize_observations(task, observed):
     """Keep v3 SymPy failure-header aliases as diagnostics, not extra test cases."""
     diagnostics = {}
     if task["repo"] == "sympy/sympy":
-        diagnostics = {key: value for key, value in observed.items() if re.fullmatch(r".*\.py:\d+", key)}
+        for key, value in observed.items():
+            match = re.fullmatch(r".*\.py:([^:]+)", key)
+            if match and (match[1].isdigit() or observed.get(match[1]) == value):
+                diagnostics[key] = value
     return {key: value for key, value in observed.items() if key not in diagnostics}, diagnostics
 
 
