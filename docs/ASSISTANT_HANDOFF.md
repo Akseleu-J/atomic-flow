@@ -9,9 +9,13 @@ ListBenchmarkTasks периодически возвращает HTTP500; paid s
 Общий разрешённый бюджет расширен до $20: фиксированные owner2 $9.50 и participant3
 $10, ранее учтено $0.035611375, резерв $0.464388625. Ключи только process-local;
 не переключать аккаунты после ошибки quota/authorization. Пилот до $4.80.
-P07 остаётся OPEN. Принято 21/30 отдельных калибровок: исходные10 v2,
+P07 остаётся OPEN. Принято 22/30 отдельных калибровок: исходные10 v2,
 SymPy18057, пять controls-v3, четыре Sphinx с восстановленными зависимостями
-и Pylint7080. Остались шесть Requests, pytest7168, Pylint7114 и SymPy13971.
+и Pylint7080/7114. Остались шесть Requests, pytest7168 и SymPy13971.
+Pylint7114: v5 workflow40375188505, исходный SHA419b40d, originalZIP SHA проверен.
+Следующие независимые ветки: legacy runtime по P07_LEGACY_RUNTIME_PLAN.md;
+подключение host-owned CheckSpec ко всем четырём runtime check consumers по
+P07_FULL_LOOP_LINUX_PATH.md. Сам CheckSpec пока лишь контракт; 56 local PASS.
 Sphinx controls-v4 проверены свежим изолированным запуском. Core CI на2c938a0:
 по1631 PASS/14 SKIP наPython3.11/3.12, Docker26 PASS и Windows4 PASS.
 Все исходные результаты сохраняются; сквозного paired-30/holdout/ablation ещё нет.

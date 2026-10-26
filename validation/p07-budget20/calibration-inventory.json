@@ -2,7 +2,7 @@
   "date": "2026-10-26",
   "p07": "OPEN",
   "kind": "Union of independently retained task calibrations, not a new 30-task batch",
-  "accepted": 21,
+  "accepted": 22,
   "total": 30,
   "model_calls": 0,
   "rows": [
@@ -724,8 +724,8 @@
     {
       "instance_id": "pylint-dev__pylint-7114",
       "base_commit": "397c1703e8ae6349d33f7b99f45b2ccaf581e666",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/pylint-controls-v5/pylint-dev__pylint-7114.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7114.json",
@@ -777,6 +777,33 @@
               "label": "wrong",
               "status": "requirement_failed",
               "regressions_passed": false,
+              "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/pylint-controls-v5/pylint-dev__pylint-7114.json",
+          "report_sha256": "c7cce3238c8be176d6d95babe8f22dc3d7620fc6887937c3b9caaf8dea1ca7f4",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "f4c8fba47a90f4cbc653d732b001969b0bb7e9a01f8ccb5c109ce1217d0698d1",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "regressions_passed": true,
+              "verified_success": false
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "regressions_passed": true,
+              "verified_success": true
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "regressions_passed": true,
               "verified_success": false
             }
           ]
