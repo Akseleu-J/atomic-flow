@@ -113,7 +113,7 @@ def test_wheel_digest_mismatch_cannot_be_accepted(tmp_path):
 
 
 def test_lock_order_uses_canonical_package_names_not_platform_path_order(tmp_path):
-    paths = {name.lower(): wheel(tmp_path, name) for name in ("Zulu", "alpha")}
+    paths = {name.lower().replace("_", "-"): wheel(tmp_path, name) for name in ("Zulu", "alpha", "alpha_extra")}
 
     def metadata(url):
         path = paths[url.split("/")[-3]]
@@ -121,8 +121,8 @@ def test_lock_order_uses_canonical_package_names_not_platform_path_order(tmp_pat
             "digests": {"sha256": hashlib.sha256(path.read_bytes()).hexdigest()},
             "url": "https://files.pythonhosted.org/fixture.whl"}]}
 
-    _, requirements = builder.validate_wheels(tmp_path, {"Zulu": "1.0", "alpha": "1.0"}, metadata)
-    assert [line.split("==", 1)[0] for line in requirements] == ["alpha", "zulu"]
+    _, requirements = builder.validate_wheels(tmp_path, {"Zulu": "1.0", "alpha": "1.0", "alpha-extra": "1.0"}, metadata)
+    assert [line.split("==", 1)[0] for line in requirements] == ["alpha", "alpha-extra", "zulu"]
 
 
 def test_preparation_json_hashes_exact_bytes_on_windows(tmp_path):
