@@ -16,7 +16,7 @@ api = ["fastapi>=0.110", "uvicorn[standard]>=0.27"]
 encoder = ["numpy>=1.26", "torch>=2.2", "transformers>=4.40"]
 kaggle = ["kaggle>=2.1.0"]
 benchmarks = ["kaggle-benchmarks"]
-dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.4", "mypy>=1.10", "fastapi>=0.110"]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.4", "mypy>=1.10", "fastapi>=0.110", "cryptography==46.0.3"]
 
 [project.scripts]
 atomic = "atomic_flow.cli:main"
