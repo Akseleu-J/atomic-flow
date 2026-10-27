@@ -14,6 +14,12 @@ from pathlib import Path
 IMAGE = "library/python@sha256:c934af72b8bd03b9804d5bde2569c320926e70392d708d113a2e71bcf98c8a20"
 DIGEST = IMAGE.split("@", 1)[1]
 SSLV3_IMAGE = "library/python@sha256:f644f2f797711ee82575b6644eba0f914c2bcc8137dafdb1b39cc6fa3b70cfa2"
+SSLV3_PROFILES = {
+    "python2713-sslv3": (SSLV3_IMAGE, [2, 7, 13]),
+    "python2713-wheezy-sslv3": ("library/python@sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8", [2, 7, 13]),
+    "python2712-sslv3": ("library/python@sha256:4f5e0adc60fda1c34c6a2759a44942c62bc6e930b91787a688a44f81d342fef0", [2, 7, 12]),
+    "python2711-sslv3": ("library/python@sha256:53ececa6c98c67079fc019644b364608f7fa4ae06cff372a5cb2fc82c90961d4", [2, 7, 11]),
+}
 PROBE = r'''
 import collections, importlib, json, sys, sysconfig
 result={"version":sys.version,"version_info":list(sys.version_info[:3]),"executable":sys.executable,"prefix":sys.prefix,"unicode_size":sysconfig.get_config_var('Py_UNICODE_SIZE'),"ldlibrary":sysconfig.get_config_var('LDLIBRARY'),"libdir":sysconfig.get_config_var('LIBDIR'),"probes":{}}
@@ -39,14 +45,15 @@ print(json.dumps(result,sort_keys=True))
 def profile_inputs(profile):
     if profile == "python2718":
         return IMAGE, PROBE, [2, 7, 18]
-    if profile == "python2713-sslv3":
+    if profile in SSLV3_PROFILES:
         probe = PROBE.replace(
             "if name=='ssl':item['openssl_version']=module.OPENSSL_VERSION",
             "if name=='ssl':\n            item['openssl_version']=module.OPENSSL_VERSION\n"
             "            context=module.SSLContext(module.PROTOCOL_SSLv3)\n"
             "            item['sslv3_context_constructed']=context.protocol==module.PROTOCOL_SSLv3",
         )
-        return SSLV3_IMAGE, probe, [2, 7, 13]
+        image, version = SSLV3_PROFILES[profile]
+        return image, probe, version
     raise ValueError("fixed historical donor profile required")
 
 
@@ -87,7 +94,7 @@ def validate_observed(observed, *, profile="python2718"):
     probes = observed.get("probes", {})
     expected = {"ssl", "ctypes", "sqlite3", "bz2", "zlib", "exception_message", "collections_mapping"}
     return (observed.get("version_info") == version
-            and (profile != "python2713-sslv3" or probes.get("ssl", {}).get("sslv3_context_constructed") is True)
+            and (profile == "python2718" or probes.get("ssl", {}).get("sslv3_context_constructed") is True)
             and observed.get("executable") == "/usr/local/bin/python2.7"
             and observed.get("prefix") == "/usr/local" and observed.get("unicode_size") == 4
             and set(probes) == expected
@@ -189,7 +196,7 @@ def qualify(output, *, profile="python2718"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--profile", choices=("python2718", "python2713-sslv3"), default="python2718")
+    parser.add_argument("--profile", choices=("python2718", *SSLV3_PROFILES), default="python2718")
     args = parser.parse_args()
     result = qualify(args.output, profile=args.profile)
     print(json.dumps(result, indent=2))

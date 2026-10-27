@@ -26,7 +26,7 @@ def test_launcher_is_fixed_private_python2_and_confines_import_search_before_pip
 def test_own_task_and_native_abi_wheels_remain_distinct():
     raw,target,dep,profile=image.frozen_task('psf__requests-2674')
     assert target['base_commit']=='0be38a0c37c59c4b66ce908731da15b401655113'
-    assert target['oracle_obligations']['required_count']==154
+    assert target['oracle_obligations']['required_count']==155
     assert profile['installed_inventory']['count']==244
     assert 'cp27-cp27mu' in next(x['filename'] for x in profile['wheels'] if x['name']=='MarkupSafe')
     assert 'py27-none-any' in next(x['filename'] for x in profile['wheels'] if x['name']=='PySocks')

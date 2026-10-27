@@ -1,0 +1,5 @@
+127.0.0.1 - - [27/Oct/2026 11:31:52] "GET /get?health=p07 HTTP/1.1" 200 326
+127.0.0.1 - - [27/Oct/2026 11:31:52] "GET /get?health=p07 HTTP/1.1" 200 326
+127.0.0.1 - - [27/Oct/2026 11:31:52] "GET /basic-auth/p07/fixture HTTP/1.1" 200 46
+127.0.0.1 - - [27/Oct/2026 11:31:52] "GET /redirect-to?url=http%3A%2F%2Fwww.google.co.uk%2Fget%3Fhealth%3Dp07 HTTP/1.1" 302 0
+127.0.0.1 - - [27/Oct/2026 11:31:52] "GET /get?health=p07 HTTP/1.1" 200 336

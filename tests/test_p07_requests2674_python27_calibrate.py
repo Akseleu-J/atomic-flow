@@ -1,4 +1,5 @@
 import ast
+import json
 import sys
 from pathlib import Path
 
@@ -23,6 +24,8 @@ def test_generated_programs_support_python2_grammar_without_target_import_on_hos
         assert ',daemon=True' not in source
         assert ',flush=True)' not in source
     assert code.count('pytest.main(') == 1
+    assert "argv=[str(value) for value in payload['plugins']]" in code
+    assert 'try:\n    exit_code=pytest.main(argv,plugins=[recorder])\nfinally:' in code
     assert "['-rA','-v']" in code
     assert code.index("import httpbin,pkg_resources") < code.index("sys.path.insert(0,'/testbed')")
     assert "sys.flags.ignore_environment" in code
@@ -46,3 +49,21 @@ def test_native_health_is_bound_to_prospective_profile():
     assert worker.PROFILE_SHA256 == runtime.PROFILE_SHA
     with pytest.raises(ValueError):
         health.bound_inputs('psf__requests-863', {'a.py': 'a' * 64}, {p: 'b' * 64 for p in health.CERTIFICATE_PATHS})
+
+
+def test_v3_adds_only_omitted_protected_requirements_and_preserves_all_source_bytes():
+    root = Path(__file__).resolve().parents[1]
+    old = json.loads((root / 'benchmarks/stage4/corpus-p07-v2.json').read_bytes())
+    new = json.loads((root / 'benchmarks/stage4/corpus-p07-v3.json').read_bytes())
+    additions = {
+        'psf__requests-863': 'tests/test_requests.py::RequestsTestSuite::test_allow_list_of_hooks_to_register_hook',
+        'psf__requests-2674': 'test_requests.py::test_urllib3_pool_connection_closed',
+    }
+    assert len(old['tasks']) == len(new['tasks']) == 30
+    for before, after in zip(old['tasks'], new['tasks'], strict=True):
+        expected = dict(before)
+        if before['instance_id'] in additions:
+            node = additions[before['instance_id']]
+            assert '+    def ' + node.rsplit('::', 1)[-1] in before['test_patch'] or '+def ' + node.rsplit('::', 1)[-1] in before['test_patch']
+            expected['FAIL_TO_PASS'] = before['FAIL_TO_PASS'] + [node]
+        assert after == expected

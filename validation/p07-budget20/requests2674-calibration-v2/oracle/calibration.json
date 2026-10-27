@@ -1,0 +1,509 @@
+{
+  "base_commit": "0be38a0c37c59c4b66ce908731da15b401655113",
+  "calibrated": false,
+  "candidate_scope": "not_supported",
+  "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+  "dependency_profile_sha256": "aa01c11fb2de42aa64e46abcd535d1a0472e21f27398ea2a926b40fcf474d69e",
+  "harness": "3.0.15",
+  "image_id": "sha256:7d02e2216e4f7a2719d8ba9dce1e66e9ee5fc8798877e5364b2efb21947447e8",
+  "instance_id": "psf__requests-2674",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "model_calls": 0,
+  "native_command": "pytest -rA",
+  "provider_credentials": "none",
+  "reporting_only_flags": [
+    "-v"
+  ],
+  "required_tests": 154,
+  "rows": [
+    {
+      "abi_stdout_sha256": "89a308ab5961d6e5619abbd2ea2f04bfc0c064ae09080cbc3c2821210a8a9d61",
+      "bootstrap_sha256": "b2c0764fbed6f5b46e55b362ad2f57ecbabe834a70a1dba3abda5c8c9a06fb88",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests-function-c84196f3482c4fb8a954",
+      "default_ca_overlay": {
+        "fixture_sha256": "aa6ceab023efcdf0aba86805828391c4f8a6d8b7def9f0e74420c90e004675b5",
+        "operation": "append_admitted_fixture_CA",
+        "original_bytes_preserved": true,
+        "original_sha256": "6a4eeafeaf28cc7750f5f7f6ed4f84d6f08dacb8ac151412332f732647694253",
+        "path": "requests/cacert.pem",
+        "result_sha256": "0318eb42af5a027e28c645892d9064629715e06ae8a41df8becd525298c4fb06",
+        "verification_disabled": false
+      },
+      "default_ca_overlay_stdout_sha256": "6f502efa2e790418dae3a0bd1d93e3c5356c1afce8dd3a6f93650029098d16f1",
+      "error": "same-worker function server shutdown unconfirmed",
+      "error_type": "ValueError",
+      "function_health": {
+        "bootstrap_sha256": "54e98e8d81cb8292323f07aefb63d52c0ca020cf6c2fb4337f5c665623d08735",
+        "observed": {
+          "calibrated": false,
+          "checks": {
+            "basic_auth": {
+              "authenticated": true,
+              "status": 200,
+              "user": "p07"
+            },
+            "http": {
+              "args": {
+                "health": "p07"
+              },
+              "status": 200
+            },
+            "https": {
+              "args": {
+                "health": "p07"
+              },
+              "status": 200
+            },
+            "mapped_http_alias": {
+              "host": "www.google.co.uk",
+              "status": 200
+            },
+            "port1": "connection_refused",
+            "redirect_location": "http://www.google.co.uk/get?health=p07",
+            "wrong_ca": "certificate_verification_failed"
+          },
+          "confinement": {
+            "ignore_environment": 1,
+            "no_site": 1,
+            "no_user_site": 1
+          },
+          "executable": "/opt/p07-python27/bin/python2.7",
+          "host_mappings": {
+            "httpbin.org": [
+              "127.0.0.1"
+            ],
+            "www.google.co.uk": [
+              "127.0.0.1"
+            ]
+          },
+          "httpbin_module": "/opt/p07-python27/lib/python2.7/site-packages/httpbin/__init__.py",
+          "httpbin_version": "0.5.0",
+          "input_sha256": "0931b029af834524f5785ae3f5b6817c45b32122a81261b4c4d5fabbc586b229",
+          "ports": [
+            80,
+            443
+          ],
+          "prefix": "/opt/p07-python27",
+          "profile_sha256": "a646d64d575e5f32fb96192aa31eedbae8f7d1bf10c3f8634b43b09d2d79233d",
+          "requests_imported": false,
+          "server_host": "127.0.0.1",
+          "servers_stopped": true,
+          "target_imports": [],
+          "target_setup_or_tests_executed": false,
+          "task_id": "psf__requests-2674",
+          "urls": {
+            "http": "http://httpbin.org/",
+            "https": "https://httpbin.org/"
+          },
+          "verified_success": false,
+          "version_info": [
+            2,
+            7,
+            18
+          ]
+        },
+        "stderr_sha256": "bae7466b7e5485df2feda8bedf6743a0c380b4366894e35bf77ca94a3b7d40a8",
+        "stdout_sha256": "d533880cf3c3fe6f17af6fb0b82310e7de5e8187baf4f7b30c9a9bbb6f0ecc80"
+      },
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "post_certificate_stdout_sha256": "8089b53f83aae0a4bc91ed6aa76a336c7ab31664d7490131ee16ce836cae11e4",
+      "post_inventory_stdout_sha256": "ba428b5230b46e310fcf20d1bcfa4fd622bf24aa6ab58d9a4f35b30cb0e27c6e",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "3817ff97145450cc01193796485aca60340230b5b2dcf69a8d63466a75c04272",
+      "stdout_sha256": "906c679a99d3f1794fd8bd55797c204e13263465ecda4d7fc258d06592d65570",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10015702247619629,
+        "executable": "/opt/p07-python27/bin/python2.7",
+        "ignore_environment": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "89a308ab5961d6e5619abbd2ea2f04bfc0c064ae09080cbc3c2821210a8a9d61",
+      "bootstrap_sha256": "b2c0764fbed6f5b46e55b362ad2f57ecbabe834a70a1dba3abda5c8c9a06fb88",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests-function-c36a9b064d194178a1ef",
+      "default_ca_overlay": {
+        "fixture_sha256": "aa6ceab023efcdf0aba86805828391c4f8a6d8b7def9f0e74420c90e004675b5",
+        "operation": "append_admitted_fixture_CA",
+        "original_bytes_preserved": true,
+        "original_sha256": "6a4eeafeaf28cc7750f5f7f6ed4f84d6f08dacb8ac151412332f732647694253",
+        "path": "requests/cacert.pem",
+        "result_sha256": "0318eb42af5a027e28c645892d9064629715e06ae8a41df8becd525298c4fb06",
+        "verification_disabled": false
+      },
+      "default_ca_overlay_stdout_sha256": "6f502efa2e790418dae3a0bd1d93e3c5356c1afce8dd3a6f93650029098d16f1",
+      "error": "same-worker function server shutdown unconfirmed",
+      "error_type": "ValueError",
+      "function_health": {
+        "bootstrap_sha256": "54e98e8d81cb8292323f07aefb63d52c0ca020cf6c2fb4337f5c665623d08735",
+        "observed": {
+          "calibrated": false,
+          "checks": {
+            "basic_auth": {
+              "authenticated": true,
+              "status": 200,
+              "user": "p07"
+            },
+            "http": {
+              "args": {
+                "health": "p07"
+              },
+              "status": 200
+            },
+            "https": {
+              "args": {
+                "health": "p07"
+              },
+              "status": 200
+            },
+            "mapped_http_alias": {
+              "host": "www.google.co.uk",
+              "status": 200
+            },
+            "port1": "connection_refused",
+            "redirect_location": "http://www.google.co.uk/get?health=p07",
+            "wrong_ca": "certificate_verification_failed"
+          },
+          "confinement": {
+            "ignore_environment": 1,
+            "no_site": 1,
+            "no_user_site": 1
+          },
+          "executable": "/opt/p07-python27/bin/python2.7",
+          "host_mappings": {
+            "httpbin.org": [
+              "127.0.0.1"
+            ],
+            "www.google.co.uk": [
+              "127.0.0.1"
+            ]
+          },
+          "httpbin_module": "/opt/p07-python27/lib/python2.7/site-packages/httpbin/__init__.py",
+          "httpbin_version": "0.5.0",
+          "input_sha256": "0931b029af834524f5785ae3f5b6817c45b32122a81261b4c4d5fabbc586b229",
+          "ports": [
+            80,
+            443
+          ],
+          "prefix": "/opt/p07-python27",
+          "profile_sha256": "a646d64d575e5f32fb96192aa31eedbae8f7d1bf10c3f8634b43b09d2d79233d",
+          "requests_imported": false,
+          "server_host": "127.0.0.1",
+          "servers_stopped": true,
+          "target_imports": [],
+          "target_setup_or_tests_executed": false,
+          "task_id": "psf__requests-2674",
+          "urls": {
+            "http": "http://httpbin.org/",
+            "https": "https://httpbin.org/"
+          },
+          "verified_success": false,
+          "version_info": [
+            2,
+            7,
+            18
+          ]
+        },
+        "stderr_sha256": "f437bcdbaaa1a7070bf1089cd33b39f4b6d6364b11e0fb957c15d4c0a5d40175",
+        "stdout_sha256": "d533880cf3c3fe6f17af6fb0b82310e7de5e8187baf4f7b30c9a9bbb6f0ecc80"
+      },
+      "label": "gold",
+      "patch_sha256": "548962b377b03b6dc0095cc0336e26b7b9c52839e7be9383a50873ede44988c0",
+      "post_certificate_stdout_sha256": "8089b53f83aae0a4bc91ed6aa76a336c7ab31664d7490131ee16ce836cae11e4",
+      "post_inventory_stdout_sha256": "ba428b5230b46e310fcf20d1bcfa4fd622bf24aa6ab58d9a4f35b30cb0e27c6e",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "3817ff97145450cc01193796485aca60340230b5b2dcf69a8d63466a75c04272",
+      "stdout_sha256": "906c679a99d3f1794fd8bd55797c204e13263465ecda4d7fc258d06592d65570",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.1001589298248291,
+        "executable": "/opt/p07-python27/bin/python2.7",
+        "ignore_environment": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "89a308ab5961d6e5619abbd2ea2f04bfc0c064ae09080cbc3c2821210a8a9d61",
+      "bootstrap_sha256": "b2c0764fbed6f5b46e55b362ad2f57ecbabe834a70a1dba3abda5c8c9a06fb88",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests-function-cd96497e2cb14791856b",
+      "default_ca_overlay": {
+        "fixture_sha256": "aa6ceab023efcdf0aba86805828391c4f8a6d8b7def9f0e74420c90e004675b5",
+        "operation": "append_admitted_fixture_CA",
+        "original_bytes_preserved": true,
+        "original_sha256": "6a4eeafeaf28cc7750f5f7f6ed4f84d6f08dacb8ac151412332f732647694253",
+        "path": "requests/cacert.pem",
+        "result_sha256": "0318eb42af5a027e28c645892d9064629715e06ae8a41df8becd525298c4fb06",
+        "verification_disabled": false
+      },
+      "default_ca_overlay_stdout_sha256": "6f502efa2e790418dae3a0bd1d93e3c5356c1afce8dd3a6f93650029098d16f1",
+      "error": "same-worker function server shutdown unconfirmed",
+      "error_type": "ValueError",
+      "function_health": {
+        "bootstrap_sha256": "54e98e8d81cb8292323f07aefb63d52c0ca020cf6c2fb4337f5c665623d08735",
+        "observed": {
+          "calibrated": false,
+          "checks": {
+            "basic_auth": {
+              "authenticated": true,
+              "status": 200,
+              "user": "p07"
+            },
+            "http": {
+              "args": {
+                "health": "p07"
+              },
+              "status": 200
+            },
+            "https": {
+              "args": {
+                "health": "p07"
+              },
+              "status": 200
+            },
+            "mapped_http_alias": {
+              "host": "www.google.co.uk",
+              "status": 200
+            },
+            "port1": "connection_refused",
+            "redirect_location": "http://www.google.co.uk/get?health=p07",
+            "wrong_ca": "certificate_verification_failed"
+          },
+          "confinement": {
+            "ignore_environment": 1,
+            "no_site": 1,
+            "no_user_site": 1
+          },
+          "executable": "/opt/p07-python27/bin/python2.7",
+          "host_mappings": {
+            "httpbin.org": [
+              "127.0.0.1"
+            ],
+            "www.google.co.uk": [
+              "127.0.0.1"
+            ]
+          },
+          "httpbin_module": "/opt/p07-python27/lib/python2.7/site-packages/httpbin/__init__.py",
+          "httpbin_version": "0.5.0",
+          "input_sha256": "0931b029af834524f5785ae3f5b6817c45b32122a81261b4c4d5fabbc586b229",
+          "ports": [
+            80,
+            443
+          ],
+          "prefix": "/opt/p07-python27",
+          "profile_sha256": "a646d64d575e5f32fb96192aa31eedbae8f7d1bf10c3f8634b43b09d2d79233d",
+          "requests_imported": false,
+          "server_host": "127.0.0.1",
+          "servers_stopped": true,
+          "target_imports": [],
+          "target_setup_or_tests_executed": false,
+          "task_id": "psf__requests-2674",
+          "urls": {
+            "http": "http://httpbin.org/",
+            "https": "https://httpbin.org/"
+          },
+          "verified_success": false,
+          "version_info": [
+            2,
+            7,
+            18
+          ]
+        },
+        "stderr_sha256": "dd99202c3da41a1ea7f77ebcc62856e03f6e16a69c089ae4f2c87dfb06efaa0c",
+        "stdout_sha256": "d533880cf3c3fe6f17af6fb0b82310e7de5e8187baf4f7b30c9a9bbb6f0ecc80"
+      },
+      "label": "wrong",
+      "patch_sha256": "00865cb4f421758454ee27c9e43dd9251f1ffe128f9e047dc4612f70c6586bb4",
+      "post_certificate_stdout_sha256": "8089b53f83aae0a4bc91ed6aa76a336c7ab31664d7490131ee16ce836cae11e4",
+      "post_inventory_stdout_sha256": "ba428b5230b46e310fcf20d1bcfa4fd622bf24aa6ab58d9a4f35b30cb0e27c6e",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "3817ff97145450cc01193796485aca60340230b5b2dcf69a8d63466a75c04272",
+      "stdout_sha256": "906c679a99d3f1794fd8bd55797c204e13263465ecda4d7fc258d06592d65570",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10014605522155762,
+        "executable": "/opt/p07-python27/bin/python2.7",
+        "ignore_environment": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    }
+  ],
+  "runtime_receipt_sha256": "05a367b335c7e140d27b7c161d924678e34ff63a401fc332789f0d79901934bc",
+  "service_profile_sha256": "a646d64d575e5f32fb96192aa31eedbae8f7d1bf10c3f8634b43b09d2d79233d",
+  "status": "completed"
+}
