@@ -1,0 +1,16 @@
+{
+  "check_passed": false,
+  "result": {
+    "returncode": 1,
+    "stderr": "/testbed/sympy/utilities/pytest.py:3: SymPyDeprecationWarning: \n\nImport sympy.utilities.pytest has been deprecated since SymPy 1.6. Use\nImport from sympy.testing.pytest instead. See\nhttps://github.com/sympy/sympy/issues/18095 for more info.\n\n  SymPyDeprecationWarning(\nTraceback (most recent call last):\n  File \"<string>\", line 124, in <module>\n  File \"<string>\", line 60, in _parse_sympy_output\nValueError: unsupported native verbose testcase shape\n",
+    "stderr_truncated": false,
+    "stdout": "ATOMIC_SYMPY_BEGIN:013091ba84dd480d9d26e391990b6791\n============================= test process starts ==============================\nexecutable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]\narchitecture:       64-bit\ncache:              no\nground types:       python \nnumpy:              None\nrandom seed:        76019182\nhash randomization: on (PYTHONHASHSEED=974209010)\n\nsympy/core/tests/test_p07_native_check.py[2] \ntest_native_identity ok\ntest_native_probe synthetic required ordinary obligation s                  [OK]\n\n\n============= tests finished: 1 passed, 1 skipped, in 0.00 seconds =============\nATOMIC_SYMPY_END:013091ba84dd480d9d26e391990b6791\n",
+    "stdout_truncated": false,
+    "timed_out": false
+  },
+  "runner_receipt": null,
+  "source_after": "50ddcc15229f709381002ddfa3f4e295cef75b83657edf95221d178477f2bb69",
+  "source_before": "50ddcc15229f709381002ddfa3f4e295cef75b83657edf95221d178477f2bb69",
+  "spec_digest": "edcc21fb84c14f5cb43790b99aefe5a16d15b78da1e2b65228a1672a8f7bce57",
+  "verified_success": false
+}

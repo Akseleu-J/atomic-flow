@@ -116,6 +116,10 @@ def _parse_sympy_output(text, paths, exit_code):
             files[active] = []
             continue
         status = re.fullmatch(r"(test[A-Za-z0-9_]+)\s+(ok|F|E|f|X|s)(?:\s+\[(OK|FAIL)\])?\s*", line)
+        if status is None:
+            # Native verbose skip output includes a human reason before the
+            # status token. Preserve its skipped category, never infer PASS.
+            status = re.fullmatch(r"(test[A-Za-z0-9_]+)\s+[^\r\n]{1,500}\s+(s)(?:\s+\[(OK|FAIL)\])?\s*", line)
         if status:
             if active is None or status[1] in files[active]:
                 raise ValueError("native testcase lacks a unique file identity")

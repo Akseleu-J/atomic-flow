@@ -28,7 +28,7 @@ INTERPRETER = "/opt/miniconda3/envs/testbed/bin/python"
 TEST_PATH = "sympy/core/tests/test_p07_native_check.py"
 MODULE_PATH = "sympy/p07_probe.py"
 ORDINARY_TEST = "from sympy.p07_probe import value\n\ndef test_native_identity():\n    assert 1 + 1 == 2\n\ndef test_native_probe():\n    assert value == 42\n"
-SKIP_TEST = "from sympy.utilities.pytest import skip\n\ndef test_native_identity():\n    assert 1 + 1 == 2\n\ndef test_native_probe():\n    skip('synthetic required ordinary obligation')\n"
+SKIP_TEST = "from sympy.testing.pytest import skip\n\ndef test_native_identity():\n    assert 1 + 1 == 2\n\ndef test_native_probe():\n    skip('synthetic required ordinary obligation')\n"
 MARKER = "ATOMIC_CHECK_SPEC_RECEIPT:"
 
 
