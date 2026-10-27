@@ -1,0 +1,455 @@
+//! af-llm: the model backends plane (port of `backends/`): the chat contract
+//! with per-call usage accounting, and fixed routing that follows the
+//! project's spending contract — switching backends is allowed only on a
+//! confirmed pre-inference refusal; an unknown outcome after send holds the
+//! route and is never retried or failed over.
+
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+use serde_json::{json, Value};
+
+#[derive(Debug, Clone)]
+pub struct Cancel(Arc<AtomicBool>);
+
+impl Cancel {
+    pub fn new() -> Cancel {
+        Cancel(Arc::new(AtomicBool::new(false)))
+    }
+
+    pub fn cancel(&self) {
+        self.0.store(true, Ordering::SeqCst);
+    }
+
+    pub fn is_cancelled(&self) -> bool {
+        self.0.load(Ordering::SeqCst)
+    }
+}
+
+impl Default for Cancel {
+    fn default() -> Self {
+        Cancel::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ChatMessage {
+    pub role: String,
+    pub content: String,
+}
+
+impl ChatMessage {
+    pub fn new(role: &str, content: &str) -> ChatMessage {
+        ChatMessage { role: role.to_string(), content: content.to_string() }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatRequest {
+    pub model: String,
+    pub messages: Vec<ChatMessage>,
+    pub max_output_tokens: Option<u64>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Usage {
+    pub tokens_in: Option<u64>,
+    pub tokens_out: Option<u64>,
+    pub cost_usd: Option<f64>,
+    pub latency_ms: Option<u64>,
+}
+
+impl Usage {
+    fn unknown() -> Usage {
+        Usage { tokens_in: None, tokens_out: None, cost_usd: None, latency_ms: None }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ChatResult {
+    pub content: String,
+    pub usage: Usage,
+    pub truncated: bool,
+}
+
+/// Outcome of one physical call. `sent` decides failover per the contract:
+/// a confirmed pre-send refusal may route elsewhere; anything after send is a
+/// hold — the accounting never assumes it was free.
+#[derive(Debug, Clone, PartialEq)]
+pub enum BackendOutcome {
+    Completed(ChatResult),
+    Refused { sent: bool, reason: String },
+    Unknown { sent: bool, detail: String },
+}
+
+pub trait ChatBackend: Send + Sync {
+    fn name(&self) -> &str;
+    fn chat(&self, request: &ChatRequest, cancel: &Cancel) -> BackendOutcome;
+}
+
+/// Deterministic scripted backend (the `fake backend` of the Python tests).
+#[derive(Default)]
+pub struct ScriptedBackend {
+    name: String,
+    script: std::sync::Mutex<Vec<BackendOutcome>>,
+}
+
+impl ScriptedBackend {
+    pub fn new(name: &str, script: Vec<BackendOutcome>) -> ScriptedBackend {
+        ScriptedBackend { name: name.to_string(), script: std::sync::Mutex::new(script) }
+    }
+
+    pub fn echo() -> ScriptedBackend {
+        ScriptedBackend::new(
+            "scripted",
+            vec![BackendOutcome::Completed(ChatResult {
+                content: "scripted-echo".to_string(),
+                usage: Usage { tokens_in: Some(1), tokens_out: Some(1), cost_usd: Some(0.0), latency_ms: Some(0) },
+                truncated: false,
+            })],
+        )
+    }
+}
+
+impl ChatBackend for ScriptedBackend {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn chat(&self, _request: &ChatRequest, cancel: &Cancel) -> BackendOutcome {
+        if cancel.is_cancelled() {
+            return BackendOutcome::Refused { sent: false, reason: "cancelled before send".into() };
+        }
+        let mut script = self.script.lock().expect("script lock");
+        if script.is_empty() {
+            return BackendOutcome::Completed(ChatResult {
+                content: String::new(),
+                usage: Usage { tokens_in: Some(0), tokens_out: Some(0), cost_usd: Some(0.0), latency_ms: Some(0) },
+                truncated: false,
+            });
+        }
+        script.remove(0)
+    }
+}
+
+/// OpenAI-compatible HTTP backend (the `openai_compatible.py` contract):
+/// one call per request, JSON in/out, bearer key from the process
+/// environment — never persisted, never logged.
+pub struct OpenAiBackend {
+    pub name: String,
+    pub base_url: String,
+    pub api_key_env: String,
+}
+
+impl OpenAiBackend {
+    pub fn new(name: &str, base_url: &str, api_key_env: &str) -> OpenAiBackend {
+        OpenAiBackend {
+            name: name.to_string(),
+            base_url: base_url.trim_end_matches('/').to_string(),
+            api_key_env: api_key_env.to_string(),
+        }
+    }
+
+    fn payload(&self, request: &ChatRequest) -> Value {
+        json!({
+            "model": request.model,
+            "messages": request.messages.iter()
+                .map(|message| json!({"role": message.role, "content": message.content}))
+                .collect::<Vec<_>>(),
+            "max_tokens": request.max_output_tokens,
+        })
+    }
+}
+
+impl ChatBackend for OpenAiBackend {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn chat(&self, request: &ChatRequest, cancel: &Cancel) -> BackendOutcome {
+        if cancel.is_cancelled() {
+            return BackendOutcome::Refused { sent: false, reason: "cancelled before send".into() };
+        }
+        let started = std::time::Instant::now();
+        let Ok(api_key) = std::env::var(&self.api_key_env) else {
+            return BackendOutcome::Refused {
+                sent: false,
+                reason: format!("api key environment variable {} is not set", self.api_key_env),
+            };
+        };
+        let agent = match ureq::AgentBuilder::new()
+            .timeout_connect(std::time::Duration::from_secs(15))
+            .build()
+        {
+            agent => agent,
+        };
+        let response = agent
+            .post(&format!("{}/chat/completions", self.base_url))
+            .set("Authorization", &format!("Bearer {api_key}"))
+            .set("Content-Type", "application/json")
+            .timeout(std::time::Duration::from_secs(600))
+            .send_json(self.payload(request));
+        let latency_ms = Some(started.elapsed().as_millis() as u64);
+        match response {
+            Ok(body) => match body.into_string() {
+                Ok(text) => {
+                    let parsed: Result<Value, _> = serde_json::from_str(&text);
+                    match parsed {
+                        Ok(document) => {
+                            let content = document
+                                .pointer("/choices/0/message/content")
+                                .and_then(Value::as_str)
+                                .unwrap_or_default()
+                                .to_string();
+                            let finish = document
+                                .pointer("/choices/0/finish_reason")
+                                .and_then(Value::as_str)
+                                .unwrap_or("unknown")
+                                .to_string();
+                            let usage = Usage {
+                                tokens_in: document.pointer("/usage/prompt_tokens").and_then(Value::as_u64),
+                                tokens_out: document.pointer("/usage/completion_tokens").and_then(Value::as_u64),
+                                cost_usd: None, // tariff table is a later, separately accepted change
+                                latency_ms,
+                            };
+                            BackendOutcome::Completed(ChatResult {
+                                content,
+                                usage,
+                                truncated: finish == "length",
+                            })
+                        }
+                        Err(error) => BackendOutcome::Unknown {
+                            sent: true,
+                            detail: format!("response is not valid JSON: {error}"),
+                        },
+                    }
+                }
+                Err(error) => BackendOutcome::Unknown {
+                    sent: true,
+                    detail: format!("response body unreadable: {error}"),
+                },
+            },
+            Err(ureq::Error::Status(code, _)) => {
+                // The provider answered: the call happened, cost is real.
+                if (400..500).contains(&code) {
+                    BackendOutcome::Refused {
+                        sent: true,
+                        reason: format!("provider refused with status {code}"),
+                    }
+                } else {
+                    BackendOutcome::Unknown {
+                        sent: true,
+                        detail: format!("provider error status {code}"),
+                    }
+                }
+            }
+            Err(ureq::Error::Transport(transport)) => {
+                let sent = !matches!(transport.kind(), ureq::ErrorKind::Dns | ureq::ErrorKind::ConnectionFailed);
+                if cancel.is_cancelled() && sent {
+                    BackendOutcome::Unknown {
+                        sent: true,
+                        detail: "cancelled after send; charge unknown until reconciled".into(),
+                    }
+                } else {
+                    BackendOutcome::Unknown {
+                        sent,
+                        detail: format!("transport error: {transport}"),
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Result of routing one logical request across the fixed route.
+#[derive(Debug, Clone, PartialEq)]
+pub enum RouteOutcome {
+    /// Served by the named backend with settled usage.
+    Completed { backend: String, result: ChatResult },
+    /// A hold: unknown or post-send refusal on the named backend. The route
+    /// stops here and the caller must reconcile before any further calls.
+    Hold { backend: String, detail: String },
+    /// Every candidate refused before inference; nothing was spent.
+    Exhausted { refusals: Vec<String> },
+}
+
+/// Fixed-order router: explicit backend > configured order. No retry, no
+/// failover after send, no account rotation.
+pub struct Router {
+    backends: Vec<Box<dyn ChatBackend>>,
+}
+
+impl Router {
+    pub fn new(backends: Vec<Box<dyn ChatBackend>>) -> Router {
+        Router { backends }
+    }
+
+    pub fn route(&self, request: &ChatRequest, cancel: &Cancel) -> RouteOutcome {
+        let mut refusals: Vec<String> = Vec::new();
+        for backend in &self.backends {
+            match backend.chat(request, cancel) {
+                BackendOutcome::Completed(result) => {
+                    return RouteOutcome::Completed { backend: backend.name().to_string(), result };
+                }
+                BackendOutcome::Refused { sent: false, reason } => {
+                    refusals.push(format!("{}: {reason}", backend.name()));
+                }
+                BackendOutcome::Refused { sent: true, reason } => {
+                    return RouteOutcome::Hold { backend: backend.name().to_string(), detail: format!("refused after send: {reason}") };
+                }
+                BackendOutcome::Unknown { sent, detail } => {
+                    if sent {
+                        return RouteOutcome::Hold { backend: backend.name().to_string(), detail };
+                    }
+                    refusals.push(format!("{}: {detail}", backend.name()));
+                }
+            }
+        }
+        RouteOutcome::Exhausted { refusals }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn request() -> ChatRequest {
+        ChatRequest {
+            model: "test-model".into(),
+            messages: vec![ChatMessage::new("user", "hello")],
+            max_output_tokens: Some(16),
+        }
+    }
+
+    #[test]
+    fn scripted_backend_echoes_with_settled_usage() {
+        let backend = ScriptedBackend::echo();
+        let outcome = backend.chat(&request(), &Cancel::new());
+        match outcome {
+            BackendOutcome::Completed(result) => {
+                assert_eq!(result.content, "scripted-echo");
+                assert_eq!(result.usage.cost_usd, Some(0.0));
+            }
+            other => panic!("expected completed, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn pre_send_refusal_fails_over_exhausted_route_is_reported() {
+        let router = Router::new(vec![
+            Box::new(ScriptedBackend::new(
+                "first",
+                vec![BackendOutcome::Refused { sent: false, reason: "no key".into() }],
+            )),
+            Box::new(ScriptedBackend::new(
+                "second",
+                vec![BackendOutcome::Completed(ChatResult {
+                    content: "ok".into(),
+                    usage: Usage { tokens_in: Some(2), tokens_out: Some(1), cost_usd: Some(0.01), latency_ms: Some(5) },
+                    truncated: false,
+                })],
+            )),
+        ]);
+        match router.route(&request(), &Cancel::new()) {
+            RouteOutcome::Completed { backend, result } => {
+                assert_eq!(backend, "second");
+                assert_eq!(result.content, "ok");
+            }
+            other => panic!("expected completed, got {other:?}"),
+        }
+        // Everything refused before send → exhausted with all refusals listed.
+        let empty = Router::new(vec![Box::new(ScriptedBackend::new(
+            "only",
+            vec![BackendOutcome::Refused { sent: false, reason: "down".into() }],
+        ))]);
+        match empty.route(&request(), &Cancel::new()) {
+            RouteOutcome::Exhausted { refusals } => assert_eq!(refusals.len(), 1),
+            other => panic!("expected exhausted, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn unknown_after_send_holds_and_never_fails_over() {
+        let router = Router::new(vec![
+            Box::new(ScriptedBackend::new(
+                "flaky",
+                vec![BackendOutcome::Unknown { sent: true, detail: "timeout after send".into() }],
+            )),
+            Box::new(ScriptedBackend::echo()),
+        ]);
+        match router.route(&request(), &Cancel::new()) {
+            RouteOutcome::Hold { backend, detail } => {
+                assert_eq!(backend, "flaky");
+                assert!(detail.contains("timeout after send"));
+            }
+            other => panic!("expected hold, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn post_send_refusal_also_holds() {
+        let router = Router::new(vec![
+            Box::new(ScriptedBackend::new(
+                "strict",
+                vec![BackendOutcome::Refused { sent: true, reason: "content policy after streaming started".into() }],
+            )),
+            Box::new(ScriptedBackend::echo()),
+        ]);
+        match router.route(&request(), &Cancel::new()) {
+            RouteOutcome::Hold { backend, detail } => {
+                assert_eq!(backend, "strict");
+                assert!(detail.contains("refused after send"));
+            }
+            other => panic!("expected hold, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn cancel_before_send_is_a_free_refusal() {
+        let backend = ScriptedBackend::echo();
+        let cancel = Cancel::new();
+        cancel.cancel();
+        match backend.chat(&request(), &cancel) {
+            BackendOutcome::Refused { sent, reason } => {
+                assert!(!sent);
+                assert!(reason.contains("cancelled before send"));
+            }
+            other => panic!("expected refusal, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn unknown_transport_without_send_allows_failover() {
+        let router = Router::new(vec![
+            Box::new(ScriptedBackend::new(
+                "unreachable",
+                vec![BackendOutcome::Unknown { sent: false, detail: "connection refused".into() }],
+            )),
+            Box::new(ScriptedBackend::echo()),
+        ]);
+        match router.route(&request(), &Cancel::new()) {
+            RouteOutcome::Completed { backend, .. } => assert_eq!(backend, "scripted"),
+            other => panic!("expected completed, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn openai_payload_shape() {
+        let backend = OpenAiBackend::new("api", "http://localhost:1", "MISSING_KEY");
+        let payload = backend.payload(&request());
+        assert_eq!(payload["model"], json!("test-model"));
+        assert_eq!(payload["messages"][0]["role"], json!("user"));
+        assert_eq!(payload["max_tokens"], json!(16));
+    }
+
+    #[test]
+    fn missing_api_key_is_a_pre_send_refusal() {
+        let backend = OpenAiBackend::new("api", "http://localhost:1", "AF_TEST_MISSING_KEY_XYZ");
+        match backend.chat(&request(), &Cancel::new()) {
+            BackendOutcome::Refused { sent, reason } => {
+                assert!(!sent);
+                assert!(reason.contains("AF_TEST_MISSING_KEY_XYZ"));
+            }
+            other => panic!("expected refusal, got {other:?}"),
+        }
+    }
+}

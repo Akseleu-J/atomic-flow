@@ -1,0 +1,10 @@
+[package]
+name = "af-agents"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Fail-closed agent authority contracts: internal replan envelope, no-progress guard (agents/envelope.py port)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true

@@ -1,0 +1,35 @@
+[workspace]
+resolver = "2"
+members = [
+    "af-entropy",
+    "af-graph",
+    "af-sandbox",
+    "af-journal",
+    "af-agents",
+    "af-exec",
+    "af-llm",
+    "af-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+sha2 = "0.10"
+sha1 = "0.10"
+regex = "1"
+af-entropy = { path = "af-entropy" }
+af-graph = { path = "af-graph" }
+af-sandbox = { path = "af-sandbox" }
+af-journal = { path = "af-journal" }
+af-agents = { path = "af-agents" }
+af-exec = { path = "af-exec" }
+af-llm = { path = "af-llm" }
+
+[profile.release]
+lto = "thin"

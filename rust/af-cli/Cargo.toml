@@ -1,0 +1,22 @@
+[package]
+name = "af-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "The atomic-flow product binary: graph, sandbox, sessions, jobs and backend plane in one native executable"
+
+[[bin]]
+name = "af"
+path = "src/main.rs"
+
+[dependencies]
+af-graph.workspace = true
+af-sandbox.workspace = true
+af-journal.workspace = true
+af-agents.workspace = true
+af-exec.workspace = true
+af-llm.workspace = true
+af-entropy.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+clap = { version = "4", features = ["derive"] }

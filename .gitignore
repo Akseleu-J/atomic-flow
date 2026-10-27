@@ -36,6 +36,10 @@ colab-results.zip
 # Temporary probe workspaces; compact logs/reports are tracked separately.
 /.test-*/
 /runtime-probe-*/
+
+# Rust standalone sandboxed crates (build artifacts only; sources are tracked)
+rust/*/target/
+Cargo.lock
 /docs/audit-2026-10-23/quality-probe-workspace/
 /docs/audit-2026-10-23/runtime-evidence-*/
 /validation/import-20261024/*.whl
