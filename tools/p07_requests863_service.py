@@ -14,6 +14,7 @@ import gunicorn,httpbin,pkg_resources
 from gunicorn.app.base import BaseApplication
 from gunicorn.workers.gthread import ThreadWorker
 from gunicorn import http
+from email.utils import formatdate
 config=CONFIG
 prefix='/opt/p07-python27/lib/python2.7/site-packages/'
 for module in (gunicorn,httpbin):
@@ -23,6 +24,12 @@ if gunicorn.__version__!='19.9.0' or pkg_resources.get_distribution('httpbin').v
 if any(str(path).startswith('/testbed') for path in sys.path):raise RuntimeError('target path exposed to fixture')
 WIRE_CONTRACTS
 class FixtureThreadWorker(ThreadWorker):
+    def handle_request(self,request,connection):
+        host=dict(request.headers).get('HOST','').split(':',1)[0]
+        if request.method=='HEAD' and request.path=='/NFrx0zLG' and host=='t.co':
+            connection.sock.sendall(b'HTTP/1.1 302 Found\r\nDate: '+formatdate(usegmt=True).encode('ascii')+b'\r\nLocation: http://httpbin.org/get\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n')
+            return False
+        return ThreadWorker.handle_request(self,request,connection)
     def enqueue_req(self,connection):
         if connection.parser is None and self.cfg.is_ssl:
             connection.sock.setblocking(True)
@@ -38,14 +45,14 @@ class FixtureThreadWorker(ThreadWorker):
 class FixedApplication(BaseApplication):
     def load_config(self):
         for key,value in config.items():self.cfg.set(key,value)
-        self.cfg.set('worker_class',FixtureThreadWorker)
+        self.cfg.set('worker_class','__main__.FixtureThreadWorker')
     def load(self):return historical_application
 FixedApplication().run()
 '''.replace('WIRE_CONTRACTS', WIRE_CONTRACTS)
 
 START = r'''import os,signal,socket,subprocess,time
 function_processes=[]
-def stop_function_servers():
+def stop_function_servers(require_complete=True):
     failures=[]
     for process in function_processes:
         try:os.killpg(process.pid,signal.SIGTERM)
@@ -62,7 +69,7 @@ def stop_function_servers():
         except OSError as error:
             if error.errno!=3:failures.append('group_state_unknown')
         else:failures.append('group_still_present')
-    if failures or len(function_processes)!=2:raise RuntimeError('WSGI process cleanup unconfirmed: '+repr(failures))
+    if failures or (require_complete and len(function_processes)!=2):raise RuntimeError('WSGI process cleanup unconfirmed: '+repr(failures))
 try:
     for port in (80,443):
         config={'bind':'127.0.0.1:'+str(port),'workers':1,'worker_class':'gthread','threads':2,
@@ -83,7 +90,7 @@ try:
             except socket.error:time.sleep(0.05)
         else:raise RuntimeError('WSGI listener startup timed out')
 except:
-    stop_function_servers()
+    stop_function_servers(require_complete=False)
     raise
 os.environ['HTTPBIN_URL']='http://httpbin.org/'
 os.environ['REQUESTS_CA_BUNDLE']='/opt/p07-function-fixture/cacert.pem'

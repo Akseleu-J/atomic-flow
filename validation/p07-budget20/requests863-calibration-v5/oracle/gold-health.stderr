@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+  File "<p07-host>", line 105, in <module>
+  File "/opt/p07-python27/lib/python2.7/site-packages/gunicorn/app/base.py", line 72, in run
+    Arbiter(self).run()
+  File "/opt/p07-python27/lib/python2.7/site-packages/gunicorn/arbiter.py", line 199, in run
+    self.start()
+  File "/opt/p07-python27/lib/python2.7/site-packages/gunicorn/arbiter.py", line 162, in start
+    self.log.info("Using worker: %s", self.cfg.worker_class_str)
+  File "/opt/p07-python27/lib/python2.7/site-packages/gunicorn/config.py", line 62, in __getattr__
+    raise AttributeError("No configuration setting for: %s" % name)
+AttributeError: No configuration setting for: worker_class_str
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+  File "<p07-host>", line 1, in <module>
+  File "<p07-fixed-host-bootstrap>", line 193, in <module>
+  File "<p07-fixed-host-bootstrap>", line 79, in stop_function_servers
+RuntimeError: WSGI process cleanup unconfirmed: []

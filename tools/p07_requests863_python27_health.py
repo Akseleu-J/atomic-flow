@@ -133,7 +133,9 @@ START_SERVERS
         with fetch(data['urls']['https']+'get?health=p07',wrong) as response:
             response.read(1)
     except urllib2.URLError as error:
-        if not isinstance(error.reason,(ssl.SSLError,ssl.CertificateError)):
+        if (not isinstance(error.reason,ssl.SSLError)
+            or ('CERTIFICATE_VERIFY_FAILED' not in str(error.reason)
+                and getattr(error.reason,'reason',None)!='CERTIFICATE_VERIFY_FAILED')):
             raise
         checks['wrong_ca']='certificate_verification_failed'
     else:
@@ -168,6 +170,23 @@ START_SERVERS
     connection.close()
     if response.status!=200 or payload.get('data')!='abc':raise RuntimeError('real chunked WSGI input differs: '+repr((response.status,payload)))
     checks['chunked_request']='abc'
+    connection=socket.create_connection(('t.co',80),3)
+    connection.sendall(b'HEAD /NFrx0zLG HTTP/1.1\r\nHost: t.co\r\nConnection: close\r\n\r\n')
+    wire=b''
+    try:
+        while True:
+            block=connection.recv(4096)
+            if not block:break
+            wire+=block
+            if len(wire)>16384:raise RuntimeError('chunked HEAD wire output exceeded bound')
+    finally:connection.close()
+    headers,separator,body=wire.partition(b'\r\n\r\n')
+    lines=headers.split(b'\r\n')
+    fields=dict(line.split(b': ',1) for line in lines[1:])
+    if (not separator or lines[0]!=b'HTTP/1.1 302 Found' or fields.get(b'Transfer-Encoding')!=b'chunked'
+        or fields.get(b'Location')!=b'http://httpbin.org/get' or b'Content-Length' in fields or body!=b''):
+        raise RuntimeError('actual chunked HEAD redirect wire contract differs')
+    checks['chunked_head_redirect']='real_302_chunked_header_no_HEAD_body'
     legacy=ssl.SSLContext(ssl.PROTOCOL_SSLv3)
     legacy.verify_mode=ssl.CERT_REQUIRED
     legacy.load_verify_locations(fixture+'cacert.pem')
@@ -191,8 +210,10 @@ START_SERVERS
     checks['digest']='real_response_hash_validated_wrong_password_rejected'
     try:
         with fetch('https://kennethreitz.com/',context) as response:response.read(1)
+    except ssl.CertificateError:
+        checks['wrong_hostname']='certificate_verification_failed'
     except urllib2.URLError as error:
-        if not isinstance(error.reason,(ssl.SSLError,ssl.CertificateError)):raise
+        if not isinstance(error.reason,ssl.CertificateError):raise
         checks['wrong_hostname']='certificate_verification_failed'
     else:raise RuntimeError('mismatched certificate hostname accepted')
 
@@ -227,7 +248,8 @@ def validate_health(text, task_id, installed_files, certificate_files):
     checks.update(github_cookie={"status": 200, "cookie": "p07_fixture=public; Path=/; HttpOnly"},
                   http11_keepalive_close="real_persistent_connection", chunked_request="abc",
                   legacy_sslv3="verified_chain_and_hostname", wrong_hostname="certificate_verification_failed",
-                  digest="real_response_hash_validated_wrong_password_rejected")
+                  digest="real_response_hash_validated_wrong_password_rejected",
+                  chunked_head_redirect="real_302_chunked_header_no_HEAD_body")
     if (result.get("task_id") != task_id or result.get("profile_sha256") != PROFILE_SHA256
             or result.get("input_sha256") != canonical_sha(bound)
             or result.get("version_info") != [2, 7, 13] or result.get("prefix") != "/opt/p07-python27"

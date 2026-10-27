@@ -28,7 +28,7 @@ def test_real_transport_is_separate_from_target_and_checked_before_exposing_sour
     assert "'worker_class':'gthread'" in code
     assert 'ssl.PROTOCOL_SSLv23' in code
     assert 'context.options &= ~ssl.OP_NO_SSLv3' in code
-    assert "self.cfg.set('worker_class',FixtureThreadWorker)" in service.CHILD
+    assert "self.cfg.set('worker_class','__main__.FixtureThreadWorker')" in service.CHILD
     assert 'ssl.wrap_socket=' not in code and 'ssl.SSLContext=' not in code
     assert 'os.killpg(process.pid,signal.SIGTERM)' in code
     assert 'group_still_present' in code
@@ -114,3 +114,30 @@ def test_legacy_tls_changes_only_a_fresh_fixture_context_and_preserves_parser_re
     assert calls.count(('context', 23)) == 1
     assert calls.count(('enqueue', 'original-gunicorn-parser')) == 2
     assert Context.options == 7
+
+
+@pytest.mark.parametrize('method,host,path,custom', [
+    ('HEAD', 't.co', '/NFrx0zLG', True),
+    ('GET', 't.co', '/NFrx0zLG', False),
+    ('HEAD', 'httpbin.org', '/NFrx0zLG', False),
+    ('HEAD', 't.co', '/different', False),
+])
+def test_chunked_head_fixture_is_confined_to_its_wire_scenario(method, host, path, custom):
+    class Parent:
+        def handle_request(self, request, connection):
+            return 'original-gunicorn-handler'
+
+    worker = next(node for node in ast.parse(service.CHILD.replace('CONFIG', '{}')).body
+                  if isinstance(node, ast.ClassDef) and node.name == 'FixtureThreadWorker')
+    namespace = {'ThreadWorker': Parent, 'formatdate': lambda **kwargs: 'fixed test date'}
+    exec(compile(ast.Module(body=[worker], type_ignores=[]), '<host-owned-wire-worker>', 'exec'), namespace)
+    wire = []
+    request = SimpleNamespace(method=method, path=path, headers=[('HOST', host)])
+    connection = SimpleNamespace(sock=SimpleNamespace(sendall=wire.append))
+    result = namespace['FixtureThreadWorker']().handle_request(request, connection)
+    if not custom:
+        assert result == 'original-gunicorn-handler' and not wire
+    else:
+        assert result is False
+        headers, body = b''.join(wire).split(b'\r\n\r\n', 1)
+        assert b'Transfer-Encoding: chunked' in headers and b'Content-Length' not in headers and body == b''
