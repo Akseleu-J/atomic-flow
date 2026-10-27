@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+  File "<p07-host>", line 1, in <module>
+  File "<p07-fixed-host-bootstrap>", line 161, in <module>
+RuntimeError: real chunked WSGI input differs

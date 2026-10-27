@@ -165,7 +165,7 @@ START_SERVERS
     response=connection.getresponse()
     payload=json.loads(response.read())
     connection.close()
-    if response.status!=200 or payload.get('data')!='abc':raise RuntimeError('real chunked WSGI input differs')
+    if response.status!=200 or payload.get('data')!='abc':raise RuntimeError('real chunked WSGI input differs: '+repr((response.status,payload)))
     checks['chunked_request']='abc'
 
 finally:

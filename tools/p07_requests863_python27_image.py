@@ -19,8 +19,8 @@ import p07_requests863_python27_support as transplant
 from p07_sympy13971_image import fetch
 
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile.json"
-PROFILE_SHA = "a79ca1e61dc695b4f7a1bdf6ea17982004c297a00aa4f00a21d560f78cb4a1fa"
+PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v2.json"
+PROFILE_SHA = "3f390a75e4f2791876a74d66fb914e85607fa84d4753962c5244b4dc167e1227"
 TASK_IDS = ("psf__requests-863",)
 CERT_ROOT = "/opt/p07-function-fixture"
 CERT_NAMES = ("cacert.pem", "cert.pem", "key.pem")

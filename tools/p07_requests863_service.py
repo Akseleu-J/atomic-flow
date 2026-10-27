@@ -18,6 +18,8 @@ if gunicorn.__version__!='19.9.0' or pkg_resources.get_distribution('httpbin').v
     raise RuntimeError('WSGI versions differ')
 if any(str(path).startswith('/testbed') for path in sys.path):raise RuntimeError('target path exposed to fixture')
 def application(environ,start_response):
+    if environ.get('HTTP_TRANSFER_ENCODING','').lower()=='chunked':
+        environ['wsgi.input_terminated']=True
     def fixture_response(status,headers,exc_info=None):
         if environ.get('HTTP_HOST','').split(':',1)[0]=='github.com' and environ.get('PATH_INFO')=='/':
             headers=list(headers)+[('Set-Cookie','p07_fixture=public; Path=/; HttpOnly')]
@@ -59,7 +61,7 @@ try:
             config.update(certfile='/opt/p07-function-fixture/cert.pem',keyfile='/opt/p07-function-fixture/key.pem',
                           ssl_version=ssl.PROTOCOL_SSLv23)
         child=CHILD_TEMPLATE.replace('CONFIG',repr(config))
-        process=subprocess.Popen(['/opt/p07-runtime/python27','-c',child],cwd='/tmp',preexec_fn=os.setsid)
+        process=subprocess.Popen(['/opt/p07-runtime/python27','-c',child],cwd='/tmp',preexec_fn=os.setsid,close_fds=True)
         function_processes.append(process)
         for attempt in range(60):
             if process.poll() is not None:raise RuntimeError('WSGI master exited during startup')

@@ -1,6 +1,8 @@
 import ast
+import io
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -27,6 +29,8 @@ def test_real_transport_is_separate_from_target_and_checked_before_exposing_sour
     assert 'group_still_present' in code
     assert 'requests.' not in service.CHILD and 'import requests' not in service.CHILD
     assert 'httpbin.app(environ,fixture_response)' in service.CHILD
+    assert "if environ.get('HTTP_TRANSFER_ENCODING','').lower()=='chunked':" in service.CHILD
+    assert "environ['wsgi.input_terminated']=True" in service.CHILD
     assert 'HTTP connection was silently reopened' in probe
     assert 'Transfer-Encoding' in probe and 'chunked' in probe
     assert "context.check_hostname" in probe and 'CERT_REQUIRED' in probe
@@ -42,3 +46,25 @@ def test_other_tasks_cannot_use_historical863_classifier(task):
 def test_fixture_refuses_unadmitted_certificate_paths():
     with pytest.raises(ValueError):
         service.server_source({'/tmp/cert.pem': 'a' * 64})
+
+
+@pytest.mark.parametrize('transfer', ['', 'chunked'])
+def test_wsgi_compatibility_passes_the_original_body_stream_through(transfer):
+    function = next(node for node in ast.parse(service.CHILD).body if isinstance(node, ast.FunctionDef) and node.name == 'application')
+    stream = io.BytesIO(b'actual-wire-body')
+    environ = {'wsgi.input': stream, 'HTTP_TRANSFER_ENCODING': transfer, 'HTTP_HOST': 'httpbin.org', 'PATH_INFO': '/post'}
+    observed = []
+
+    def app(actual, respond):
+        assert actual is environ and actual['wsgi.input'] is stream
+        observed.append(actual['wsgi.input'].read())
+        respond('200 OK', [('Content-Type', 'text/plain')])
+        return [b'original-application-response']
+
+    namespace = {'httpbin': SimpleNamespace(app=app)}
+    exec(compile(ast.Module(body=[function], type_ignores=[]), '<host-owned-fixture-function>', 'exec'), namespace)
+    headers = []
+    response = namespace['application'](environ, lambda status, fields, exc=None: headers.extend(fields))
+    assert observed == [b'actual-wire-body'] and response == [b'original-application-response']
+    assert ('wsgi.input_terminated' in environ) == (transfer == 'chunked')
+    assert headers == [('Content-Type', 'text/plain')]

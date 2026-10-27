@@ -1,0 +1,73 @@
+{
+  "abi_stdout_sha256": "3c84f7443746077da2f043c165fb1249f2f58aa0cabe2a82ab4ad31e3e9704cb",
+  "cleanup_confirmed": true,
+  "cleanup_exit": 0,
+  "container_name": "p07-requests-function-a1cff4c76cc44cdd976c",
+  "error": "same-worker function service health failed",
+  "error_type": "ValueError",
+  "label": "wrong",
+  "patch_sha256": "b62300cc3cccc5be5efc115535d697d124338ddcc5945756986165b492b26f61",
+  "routes": [
+    {
+      "dev": "lo",
+      "dst": "10.255.255.1",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "scope": "link"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.0.0.0/8",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.0.0.1",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.255.255.255",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "link",
+      "table": "local",
+      "type": "broadcast"
+    },
+    {
+      "dev": "lo",
+      "dst": "::1",
+      "flags": [],
+      "metric": 0,
+      "pref": "medium",
+      "protocol": "kernel",
+      "table": "local",
+      "type": "local"
+    }
+  ],
+  "status": "infrastructure_error",
+  "topology_probe": {
+    "blackhole": "socket.timeout",
+    "destination": [
+      "10.255.255.1",
+      80
+    ],
+    "elapsed": 0.10025191307067871,
+    "executable": "/opt/p07-python27/bin/python2.7",
+    "ignore_environment": 1,
+    "loopback": "real_socket_pass",
+    "requested_timeout": 0.1
+  },
+  "verified_success": false
+}
