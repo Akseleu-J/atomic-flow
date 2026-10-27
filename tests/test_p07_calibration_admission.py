@@ -13,6 +13,13 @@ INVENTORY = json.loads((ROOT / 'validation/p07-budget20/calibration-inventory.js
 TASKS = {task['instance_id']: task for task in json.loads((ROOT / 'benchmarks/stage4/corpus-p07-v3.json').read_bytes())['tasks']}
 
 
+def test_calibration_inventory_covers_every_current_task_once_without_silent_downgrades():
+    rows = INVENTORY['rows']
+    assert len(rows) == len(TASKS) == INVENTORY['accepted'] == INVENTORY['total'] == 30
+    assert {row['instance_id'] for row in rows} == set(TASKS)
+    assert all(row['status'] == 'accepted' for row in rows)
+
+
 @pytest.mark.parametrize('record', [row for row in INVENTORY['rows'] if row['status'] == 'accepted'],
                          ids=lambda row: row['instance_id'])
 def test_every_current_accepted_report_contains_all_current_obligations(record):

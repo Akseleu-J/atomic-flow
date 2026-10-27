@@ -135,3 +135,96 @@ def test_builder_redacts_calibrations_and_embeds_the_exact_binding_helper(tmp_pa
     assert packet["binding_helper_sha256"] == hashlib.sha256((ROOT / "tools/p07_calibration_binding.py").read_bytes()).hexdigest()
     assert "BINDING_HELPER = base64.b64decode" in (args.output / "campaign_task.py").read_text()
     assert not list(args.output.rglob("*calibration.json"))
+
+
+@pytest.mark.parametrize('field', ['schema_version', 'validator_version'])
+@pytest.mark.parametrize('value', [True, 1.0, '1'])
+def test_binding_versions_require_exact_integer_types_even_with_matching_hash(field, value):
+    public, receipt, options = admitted()
+    receipt[field] = value
+    with pytest.raises(ValueError, match='binding'):
+        binding.validate_host_binding(public, receipt, expected_digest=binding.canonical_sha(receipt), **options)
+
+
+@pytest.mark.parametrize('files', [[], None, True, {}, {'../a.py': 'a' * 64}, {'/a.py': 'a' * 64},
+    {'a\\b.py': 'a' * 64}, {'a:stream.py': 'a' * 64}, {'a//b.py': 'a' * 64}, {'a\nb.py': 'a' * 64},
+    {'a.txt': 'a' * 64}, {'a.py': True}, {'a.py': 'wrong'}, {False: 'a' * 64}])
+def test_source_binding_rejects_malformed_mapping_or_unconfined_paths(files):
+    public, receipt, options = admitted()
+    with pytest.raises(ValueError):
+        binding.create_source_binding(public, receipt, files,
+            **{key: value for key, value in options.items() if key != 'corpus_sha256'})
+
+
+def test_manifest_traversal_counts_directories_before_building_a_file_list(tmp_path, monkeypatch):
+    for name in ('a', 'b', 'c', 'd'):
+        (tmp_path / name).mkdir()
+    monkeypatch.setattr(binding, 'MAX_ENTRIES', 3)
+    with pytest.raises(ValueError, match='traversal entry bound'):
+        binding.source_manifest(tmp_path)
+
+
+def test_manifest_refuses_directory_depth_before_descending(tmp_path, monkeypatch):
+    (tmp_path / 'one/two/three').mkdir(parents=True)
+    monkeypatch.setattr(binding, 'MAX_DEPTH', 2)
+    with pytest.raises(ValueError, match='directory depth bound'):
+        binding.source_manifest(tmp_path)
+
+
+def test_manifest_refuses_links_and_junctions_before_reading(tmp_path, monkeypatch):
+    (tmp_path / 'linked').mkdir()
+    monkeypatch.setattr(binding, '_linked', lambda path: path.name == 'linked')
+    with pytest.raises(ValueError, match='links are not admitted'):
+        binding.source_manifest(tmp_path)
+
+
+def test_manifest_refuses_linked_ancestor(tmp_path, monkeypatch):
+    root = tmp_path / 'ordinary'
+    root.mkdir()
+    monkeypatch.setattr(binding, '_linked', lambda path: path == tmp_path)
+    with pytest.raises(ValueError, match='linked ancestors'):
+        binding.source_manifest(root)
+
+
+@pytest.mark.parametrize('limit', ['files', 'per_file', 'total'])
+def test_manifest_enforces_file_and_byte_bounds(tmp_path, monkeypatch, limit):
+    for name in ('a.py', 'b.py', 'c.py'):
+        (tmp_path / name).write_bytes(b'123')
+    if limit == 'files':
+        monkeypatch.setattr(binding, 'MAX_FILES', 2)
+    elif limit == 'per_file':
+        monkeypatch.setattr(binding, 'MAX_FILE_BYTES', 2)
+    else:
+        monkeypatch.setattr(binding, 'MAX_TOTAL_BYTES', 4)
+    with pytest.raises(ValueError, match='bounds'):
+        binding.source_manifest(tmp_path)
+
+
+def test_streaming_hash_caps_reads_when_file_grows_after_stat(tmp_path, monkeypatch):
+    path = tmp_path / 'a.py'
+    path.write_bytes(b'123')
+    monkeypatch.setattr(binding, 'MAX_FILE_BYTES', 8)
+    requested = []
+
+    def growth(fd, amount):
+        requested.append(amount)
+        return b'x' * amount
+
+    monkeypatch.setattr(binding.os, 'read', growth)
+    with pytest.raises(ValueError, match='byte bounds'):
+        binding._file_digest(path, path.stat(), 20)
+    assert requested == [9]
+
+
+def test_source_receipt_cannot_use_boolean_version_with_recomputed_index(tmp_path):
+    public, receipt, options = admitted()
+    path = tmp_path / public['source_path']
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b'original')
+    files = binding.source_manifest(tmp_path)
+    source_options = {key: value for key, value in options.items() if key != 'corpus_sha256'}
+    initial = binding.create_source_binding(public, receipt, files, **source_options)
+    initial['schema_version'] = True
+    with pytest.raises(ValueError, match='source snapshot/binding'):
+        binding.validate_source_binding(public, receipt, initial, expected_digest=binding.canonical_sha(initial),
+            files=files, workspace=tmp_path, **source_options)
