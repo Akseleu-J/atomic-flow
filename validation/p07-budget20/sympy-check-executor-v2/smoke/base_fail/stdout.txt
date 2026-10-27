@@ -1,0 +1,25 @@
+ATOMIC_SYMPY_BEGIN:95a1ab408bb64d199c3e2cb0f146c6c3
+============================= test process starts ==============================
+executable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]
+architecture:       64-bit
+cache:              no
+ground types:       python 
+numpy:              None
+random seed:        80667938
+hash randomization: on (PYTHONHASHSEED=1010698274)
+
+sympy/core/tests/test_p07_native_check.py[2] 
+test_native_identity ok
+test_native_probe F                                                       [FAIL]
+
+
+________________________________________________________________________________
+_________ sympy/core/tests/test_p07_native_check.py:test_native_probe __________
+Traceback (most recent call last):
+  File "/testbed/sympy/core/tests/test_p07_native_check.py", line 7, in test_native_probe
+    assert value == 42
+AssertionError
+
+============= tests finished: 1 passed, 1 failed, in 0.00 seconds ==============
+DO *NOT* COMMIT!
+ATOMIC_SYMPY_END:95a1ab408bb64d199c3e2cb0f146c6c3

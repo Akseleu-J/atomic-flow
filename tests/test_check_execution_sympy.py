@@ -148,6 +148,14 @@ def test_native_log_cannot_append_unaccounted_observations_or_contradict_its_fil
         checks._parse_sympy_output(body, (PATH,), 0)
 
 
+def test_only_the_real_failure_trailer_is_allowed_after_failed_native_summary():
+    failed = BODY.replace('test_known_failure f', 'test_known_failure F').replace('[OK]', '[FAIL]').replace(
+        '1 expected to fail', '1 failed')
+    assert checks._parse_sympy_output(failed + 'DO *NOT* COMMIT!\n', (PATH,), 1)['counts']['failed'] == 1
+    with pytest.raises(ValueError):
+        checks._parse_sympy_output(BODY + 'DO *NOT* COMMIT!\n', (PATH,), 0)
+
+
 @pytest.mark.parametrize('field', ['timed_out', 'stdout_truncated', 'stderr_truncated'])
 def test_native_timeout_or_output_truncation_never_passes(admitted, field):
     spec, _ = admitted

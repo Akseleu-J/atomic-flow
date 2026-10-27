@@ -1,0 +1,37 @@
+{
+  "calibration_sha256": "a350ee6ce2f7b0108eb58632a57925ff5dc6be9338bb7ffa371e0aaee70af817",
+  "cases": [],
+  "error": "Exactly one completed counted native observation required",
+  "error_type": "ValueError",
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626",
+  "image_id": "sha256:95d456bfbccf33f8cfa63d410bd7df2e73da60fb286d4c411d9c51fb73ffc27f",
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "native_identity": {
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "source_sha256": {
+      "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+      "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5",
+      "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"
+    },
+    "sympy_version": "1.7.dev"
+  },
+  "provider_calls": 0,
+  "provider_credentials": "not_forwarded",
+  "scope": "native CheckSpec synthetic ordinary-test boundary only",
+  "source_container_cleanup_confirmed": true,
+  "source_container_cleanup_exit": 0,
+  "status": "not_qualified",
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "8403700e2e950067567814845c6ac4bf0c0b22f2",
+  "verified_success": false,
+  "version_source": "sympy/release.py",
+  "version_source_sha256": "b277ce5aba24985577c9938485d8f9cc6819d75a64a5f7ecd37e0e02b6703ba6"
+}

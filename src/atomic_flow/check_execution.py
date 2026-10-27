@@ -87,7 +87,8 @@ def _parse_sympy_output(text, paths, exit_code):
     footer = re.search(r"(?:^|\n)\s*=*\s*tests finished:\s*(.*?)\bin ([0-9]+(?:\.[0-9]+)?) seconds\s*=*\s*(?:\n|$)", clean, re.S)
     if footer is None or len(footer.group(1)) > 2048:
         raise ValueError("native terminal summary shape differs")
-    if clean[footer.end():].strip():
+    trailer = clean[footer.end():].strip()
+    if trailer not in {"", "DO *NOT* COMMIT!"}:
         raise ValueError("unexpected output after native terminal summary")
     counts = {name: 0 for name in ("passed", "failed", "skipped", "xfailed", "xpassed", "exceptions")}
     names = {"passed": "passed", "failed": "failed", "skipped": "skipped", "expected to fail": "xfailed",
@@ -135,6 +136,8 @@ def _parse_sympy_output(text, paths, exit_code):
     actual = {name: list(tests.values()).count(name) for name in counts}
     if actual != counts:
         raise ValueError("native test identities disagree with aggregate counts")
+    if trailer and not (counts["failed"] or counts["exceptions"] or counts["xpassed"]):
+        raise ValueError("native failure trailer contradicts successful testcase counts")
     if exit_code == 0 and (counts["failed"] or counts["exceptions"]):
         raise ValueError("native zero exit disagrees with failed tests")
     return {"collection": sorted(tests), "test_statuses": dict(sorted(tests.items())),

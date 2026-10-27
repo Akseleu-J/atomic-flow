@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "<string>", line 121, in <module>
+  File "<string>", line 18, in _parse_sympy_output
+ValueError: unexpected output after native terminal summary
