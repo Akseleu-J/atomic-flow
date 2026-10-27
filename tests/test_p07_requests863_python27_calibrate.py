@@ -22,6 +22,8 @@ def test_real_transport_is_separate_from_target_and_checked_before_exposing_sour
         ast.parse(source)
         assert 'pathlib' not in source and ',flush=True)' not in source
     assert code.index('subprocess.Popen') < code.index("sys.path.insert(0,'/testbed')")
+    assert code.index("for plugin_name in ('pytest_httpbin.plugin','pytest_mock'):") < code.index('subprocess.Popen')
+    assert "sys.modules['six.moves']=" not in code and 'sys.modules["six.moves"]=' not in code
     assert 'try:\n    exit_code=pytest.main(argv,plugins=[recorder])\nfinally:' in code
     assert "'worker_class':'gthread'" in code
     assert 'ssl.PROTOCOL_SSLv23' in code

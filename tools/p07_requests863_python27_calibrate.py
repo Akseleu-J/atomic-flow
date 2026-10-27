@@ -25,7 +25,7 @@ from evaluation_stage4 import load_manifest, patch_paths, protected_test_path
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 16 * 1024**2
-PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v2.json"
+PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v3.json"
 MANIFEST = ROOT / "benchmarks/stage4/corpus-p07-v3.json"
 CONTROLS = ROOT / "benchmarks/stage4/p07-controls-v7.json"
 MANIFEST_SHA256 = "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920"
@@ -111,6 +111,12 @@ def server_source(certificate_files):
 
 SERVER_STOP = service.wsgi.STOP
 
+PLUGIN_PRELOAD = '''for plugin_name in ('pytest_httpbin.plugin','pytest_mock'):
+    plugin_module=__import__(plugin_name,fromlist=['*'])
+    if not os.path.realpath(plugin_module.__file__).startswith(prefix):
+        raise RuntimeError('preloaded host plugin outside admitted private prefix')
+'''
+
 
 def bootstrap_source(task_id, installed_files, certificate_files):
     service.bound_inputs(task_id, installed_files, certificate_files)
@@ -123,7 +129,7 @@ def bootstrap_source(task_id, installed_files, certificate_files):
     # function, module, assertion, test selection or model-controlled command.
     shutdown = "".join("    " + line + "\n" for line in SERVER_STOP.splitlines())
     guarded = "try:\n    " + finish + "finally:\n" + shutdown
-    return code.replace(start, server_source(certificate_files) + start, 1).replace(finish, guarded, 1)
+    return code.replace(start, PLUGIN_PRELOAD + server_source(certificate_files) + start, 1).replace(finish, guarded, 1)
 
 
 def classify_target(task, text, exit_code, parser, spec):

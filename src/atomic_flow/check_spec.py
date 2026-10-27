@@ -1,4 +1,4 @@
-"""Immutable host-owned target-test contract; no executor or runtime wiring.
+"""Immutable host-owned target-test contract used by the admitted check executor.
 
 Construct this only after host admission of the image, source and ordinary test
 inventory. Validation binds a contract; it does not attest its provenance, run
@@ -62,7 +62,7 @@ class CheckSpec:
 
     task_commit identifies the frozen task definition; base_commit identifies
     target source ancestry. source_revision identifies the actual edited snapshot.
-    test_paths are the complete host-declared ordinary-test obligation. A future
+    test_paths are the complete host-declared ordinary-test obligation. The
     executor must enforce their inventory and source/image import identities.
     """
 
@@ -106,7 +106,7 @@ class CheckSpec:
 
     @property
     def argv(self) -> tuple[str, ...]:
-        """Exact non-shell process argv; target runner discovery is not yet wired."""
+        """Exact non-shell argv; native SymPy remains a declaration until execution admission."""
         if self.runner == "pytest":
             return (self.interpreter, "-m", "pytest", "-q", "--no-header", "-x", *self.test_paths)
         return (self.interpreter, "bin/test", "-v", *self.test_paths)

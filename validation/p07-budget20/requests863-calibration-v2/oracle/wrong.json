@@ -1,0 +1,163 @@
+{
+  "abi_stdout_sha256": "3c84f7443746077da2f043c165fb1249f2f58aa0cabe2a82ab4ad31e3e9704cb",
+  "bootstrap_sha256": "cb86673fdd64af3b508e07c7bfc7125a52f0b5e20c636bf5983866ff81bab237",
+  "cleanup_confirmed": true,
+  "cleanup_exit": 0,
+  "container_name": "p07-requests-function-68179766348c41c8a4bf",
+  "default_ca_overlay": {
+    "fixture_sha256": "c34267e9fd3fb1336a0b9fd87b01ebe0973c05b3ce45e8a3a087c38452ab2fe6",
+    "operation": "append_admitted_fixture_CA",
+    "original_bytes_preserved": true,
+    "original_sha256": "0b22e91d530ad44a83bb12750ecf78dae29747a5f05faafba67ba92a6fd50100",
+    "path": "requests/cacert.pem",
+    "result_sha256": "14389879b6807d9b1f17793298fc8da128e7a06c956e7493e6b0319e4c9eb53c",
+    "verification_disabled": false
+  },
+  "default_ca_overlay_stdout_sha256": "d927af7f95540d9d40f361cf924ee6cf17ad9e44206cfb37f15faae8e85aa9fa",
+  "error": "complete unique target test markers required",
+  "error_type": "ValueError",
+  "function_health": {
+    "bootstrap_sha256": "1389566a93ff58f5d4c34a037e48f541c0481ef0a0dfc8c2536f94c1cf6f812c",
+    "observed": {
+      "calibrated": false,
+      "checks": {
+        "basic_auth": {
+          "authenticated": true,
+          "status": 200,
+          "user": "p07"
+        },
+        "chunked_request": "abc",
+        "github_cookie": {
+          "cookie": "p07_fixture=public; Path=/; HttpOnly",
+          "status": 200
+        },
+        "http": {
+          "args": {
+            "health": "p07"
+          },
+          "status": 200
+        },
+        "http11_keepalive_close": "real_persistent_connection",
+        "https": {
+          "args": {
+            "health": "p07"
+          },
+          "status": 200
+        },
+        "port1": "connection_refused",
+        "wrong_ca": "certificate_verification_failed"
+      },
+      "confinement": {
+        "ignore_environment": 1,
+        "no_site": 1,
+        "no_user_site": 1
+      },
+      "executable": "/opt/p07-python27/bin/python2.7",
+      "host_mappings": {
+        "github.com": [
+          "127.0.0.1"
+        ],
+        "httpbin.org": [
+          "127.0.0.1"
+        ]
+      },
+      "httpbin_module": "/opt/p07-python27/lib/python2.7/site-packages/httpbin/__init__.py",
+      "httpbin_version": "0.5.0",
+      "input_sha256": "41fa495dfac9cf9da4610dec613aa1776702cd049c99b17d6a116d5e2fc50150",
+      "ports": [
+        80,
+        443
+      ],
+      "prefix": "/opt/p07-python27",
+      "profile_sha256": "3f390a75e4f2791876a74d66fb914e85607fa84d4753962c5244b4dc167e1227",
+      "requests_imported": false,
+      "server_host": "127.0.0.1",
+      "servers_stopped": true,
+      "target_imports": [],
+      "target_setup_or_tests_executed": false,
+      "task_id": "psf__requests-863",
+      "urls": {
+        "http": "http://httpbin.org/",
+        "https": "https://httpbin.org/"
+      },
+      "verified_success": false,
+      "version_info": [
+        2,
+        7,
+        13
+      ]
+    },
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6d0e0c11967e28edc5d1d1ac5e261b46e6246fde8006df87fc34f78f0aba1b06"
+  },
+  "label": "wrong",
+  "patch_sha256": "b62300cc3cccc5be5efc115535d697d124338ddcc5945756986165b492b26f61",
+  "post_certificate_stdout_sha256": "d6afd2cd26d9369dc2647d104c0742593db6d2f8befd8def1b34cd029c16f6d7",
+  "post_inventory_stdout_sha256": "c0c260df42387eb2e9a496f0f4b4e059c729b2978a7e2b9a5d53b89768482351",
+  "process_exit": 1,
+  "routes": [
+    {
+      "dev": "lo",
+      "dst": "10.255.255.1",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "scope": "link"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.0.0.0/8",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.0.0.1",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.255.255.255",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "link",
+      "table": "local",
+      "type": "broadcast"
+    },
+    {
+      "dev": "lo",
+      "dst": "::1",
+      "flags": [],
+      "metric": 0,
+      "pref": "medium",
+      "protocol": "kernel",
+      "table": "local",
+      "type": "local"
+    }
+  ],
+  "status": "infrastructure_error",
+  "stderr_sha256": "a377fa0e655a04f09c5274f90b2bd82daa3431cb0d0c19f0788958b0f6905758",
+  "stdout_sha256": "e116bca6f487c2c25f992968983babdf7c62f038ead5feedf893a8718c140190",
+  "topology_probe": {
+    "blackhole": "socket.timeout",
+    "destination": [
+      "10.255.255.1",
+      80
+    ],
+    "elapsed": 0.10035109519958496,
+    "executable": "/opt/p07-python27/bin/python2.7",
+    "ignore_environment": 1,
+    "loopback": "real_socket_pass",
+    "requested_timeout": 0.1
+  },
+  "verified_success": false
+}

@@ -1,9 +1,9 @@
 """Execute an admitted pytest CheckSpec with the existing Docker lifecycle.
 
-This boundary is not connected to TaskRunner yet. A target process can lie about
-its own pytest hooks/output; its receipt is not an independent oracle grade or
-remote attestation. Native SymPy deliberately refuses until a counted native
-runner contract is implemented.
+TaskRunner's host CheckObligation uses this boundary for tool, edit, step and
+final checks. A target process can lie about its own pytest hooks/output; its
+receipt is not an independent oracle grade or remote attestation. Native SymPy
+deliberately refuses until a counted native runner contract is implemented.
 Historical pytest repository self-tests are also unsupported: this launcher
 deliberately imports an installed checker before permitting target imports.
 """
