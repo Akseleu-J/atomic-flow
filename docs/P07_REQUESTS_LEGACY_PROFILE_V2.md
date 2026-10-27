@@ -87,3 +87,21 @@ observations, native exits, source hashes, missing/skip/error outcomes and clean
 Do not reinterpret the previous nine-failure gold as success after this proposal.
 The existing function-service profile remains frozen against v1 until a separate
 review explicitly admits a different package set for those own-base targets.
+
+## Requests3362 accepted: inventory25/30
+
+Run `40486056394` on `8ed3abf2b9a5cd50798be6a487b1c55baf589a7d`
+completed successfully. Artifact `12725386677` SHA256
+`33cd9262cf0a48e6f2fbb2e0dee0e1536084535f2f237cd3ffa0810e3e267928`
+and all three raw stdout/stderr hashes checked independently. Every row retains
+349 ordinary tests and all76 required IDs; native exits1/0/1, base/wrong fail
+only the protected requirement, gold passes all76, all75P2P pass throughout.
+Native suite non-obligatory skip/XFAIL/XPASS remain explicit, never requiredPASS.
+Same-worker namespace,3DROPpackets per row,noexternalroute, sourcepreservation
+and cleanup confirmed. Qualified14wheelv2,TLS,plugins and complete opaque-ID
+parser maps are retained. Earlier failed attempts remain unchanged.
+
+AllCIon8ed3abf green. Verified hostarchives:2043PASS/14SKIP eachPython3.11/3.12,
+Windows4PASS,335sourcehashes andPR/source tree equality. New model calls0.
+Five Requests remain OPEN:863,1963,2148,2317,2674. FullP07 also still requires
+TaskRunner check/repair wiring, matchedbaseline/atomic, holdout and ablations.

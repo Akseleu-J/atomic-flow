@@ -2,7 +2,7 @@
   "date": "2026-10-27",
   "p07": "OPEN",
   "kind": "Union of independently retained task calibrations, not a new 30-task batch",
-  "accepted": 24,
+  "accepted": 25,
   "total": 30,
   "model_calls": 0,
   "rows": [
@@ -149,8 +149,8 @@
     {
       "instance_id": "psf__requests-3362",
       "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/requests3362-calibration-v4/calibration.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/psf__requests-3362.json",
@@ -197,6 +197,181 @@
               "label": "wrong",
               "status": "infrastructure_error",
               "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests3362-calibration-v1/calibration.json",
+          "report_sha256": "172b380bf457471de41101f134e1ac0a24fc4f36a2dcab3488e0075495a7be8e",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "04d3ade1fb573d44d364cb41ffdf4ed336ff40458bae67dedf60bc8bf10e20b2",
+          "runtime_commit": "5d57a0f3b4762c40be6c3441e63dfb524fe5e511",
+          "workflow_run": 40453010247,
+          "artifact_id": 12711726622,
+          "archive_sha256": "7a65e55c455da39e3e1da0d56b4b258aeb7ec9d26915b05a4802fdf5f4d4da50",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "ee3d9ede15916a17ce887786d115c75028692fdafb0239ffba63adaa8e41f214",
+              "stderr_sha256": "d1107d2b8c365599b4a6b3b3e8970096824211850935d01f95242ba423b21795"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "9b8517379313969079d512dab9538f2db418789fb1578c98b61d663f59547b79",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "56bf87a4a2e73d9ec90698af28b4fa10762af6e9bed11538973a7e00985393ee",
+              "stderr_sha256": "56499663c00d288b093a6ee41d28bc69cddaef849f2f116aea7e6633dee7d354"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests3362-calibration-v2/calibration.json",
+          "report_sha256": "2ebdbcc5681ed07e316e99a23cb80bb4720d6409cd835b0e6e54ffc9a4aba76d",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "04d3ade1fb573d44d364cb41ffdf4ed336ff40458bae67dedf60bc8bf10e20b2",
+          "runtime_commit": "82b42f085fd7a3edc443cf1db8ea995bf2d580b6",
+          "workflow_run": 40454290733,
+          "artifact_id": 12712042751,
+          "archive_sha256": "016ea7b8c740488b9ab95c4712e2d482401cebf161ced2f5ef1642dc4ee3b10d",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "2f78ed6d1f3b0f75f0123b2f4d492c1517c86f8a826412f70a25e2806e590665",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 0,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "7b4a903cd59abbfc08654e540405c0cd183c74517202aa79aba905990a1ec08f",
+              "stderr_sha256": "5893e2c5479dcf89b1eb3dec736b6b747f56b7a64f327d1125175b6e91f44735"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "e6cadadbd149c4b587aa684b7fbad45d8f1f7e989a86474da471bd2c6f7ab9ab",
+              "stderr_sha256": "a5cc260e34f65a20092a3c34f90fc52bebf555c3c5bd4a0b70e5d23c3b27f92d"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests3362-calibration-v3/calibration.json",
+          "report_sha256": "1f0ed89c7cacd16cc11d1f391459e41615dfe93b79f7908a669c1843559ea482",
+          "calibrated": false,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "04d3ade1fb573d44d364cb41ffdf4ed336ff40458bae67dedf60bc8bf10e20b2",
+          "runtime_commit": "9ef6d0503609e3154e9442ee3dbc03a50a015ca3",
+          "workflow_run": 40455083839,
+          "artifact_id": 12711513686,
+          "archive_sha256": "fb22ba0be15687c37d6b35e335867f17bc0fef5940a8e61135bae71aa881a383",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "416221b49e36ee8cf5ee9969c37f00e4e8c4c66cbba10c6301c965e1719c6431",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 0,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "e543d26351eb4227efeeedf58f22d30a5b62123354ec2c34ee9389b0cd7e9873",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "e2beac8a38ff27118d7262ff324b7694d4978e27eaf573a2597ffde93170b407",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests3362-calibration-v4/calibration.json",
+          "report_sha256": "85ff1fddba8c59a7078f86cd9685c77a604457ad560a147ce980e4dd34292847",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "04d3ade1fb573d44d364cb41ffdf4ed336ff40458bae67dedf60bc8bf10e20b2",
+          "runtime_commit": "8ed3abf2b9a5cd50798be6a487b1c55baf589a7d",
+          "workflow_run": 40486056394,
+          "artifact_id": 12725386677,
+          "archive_sha256": "33cd9262cf0a48e6f2fbb2e0dee0e1536084535f2f237cd3ffa0810e3e267928",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "a7b89bd266774189ca8c62784577ec558f0c51e2bdde3294f68f3f2c1425192a",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "verified_success": true,
+              "regressions_passed": true,
+              "process_exit": 0,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "6b442df112b7f5fee243e2fcb958b3ff1013e8fc69e88459891b3958e6a57d8f",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "process_exit": 1,
+              "cleanup_confirmed": true,
+              "cleanup_exit": 0,
+              "stdout_sha256": "69af410742056ff1343688c9eee11618e7e0e5c9a4311e28397ed7281b3751f0",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
             }
           ]
         }

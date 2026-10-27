@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-10-27T10:07:33.161Z",
+  "head": "8ed3abf2b9a5cd50798be6a487b1c55baf589a7d",
+  "workflow": "p07-requests3362-calibration.yml",
+  "ref": "experimental",
+  "profile": "p07-requests-legacy-profile-v2.json",
+  "change": "bijective full identity transport to pinned external parser; offline exact publisher replay passed",
+  "model_calls": 0
+}
