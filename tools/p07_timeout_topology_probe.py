@@ -86,6 +86,22 @@ def setup_commands(namespace):
             namespace_command(namespace, "iptables", "-w", "5", "-A", "OUTPUT", *RULE)]
 
 
+def dropped_tcp_packets(counters):
+    """Read only the exact fixed OUTPUT rule; numeric protocol6 is TCP."""
+    total = 0
+    for line in counters.splitlines():
+        fields = line.split()
+        if (len(fields) != 11 or not all(re.fullmatch(r"[0-9]+", field) for field in fields[:2])
+                or int(fields[0]) <= 0 or int(fields[1]) <= 0
+                or fields[2] != "DROP" or fields[3] not in {"tcp", "6"}
+                or fields[4:8] != ["--", "*", "*", "0.0.0.0/0"]
+                or fields[8] not in {"10.255.255.1", "10.255.255.1/32"}
+                or fields[9:] != ["tcp", "dpt:80"]):
+            continue
+        total += int(fields[0])
+    return total
+
+
 def inspect_policy(config, image_id):
     host = config["HostConfig"]
     if (config.get("Image") != image_id or config.get("Mounts") or host.get("Binds")
@@ -158,7 +174,8 @@ def qualify(output):
             raise ValueError("synthetic interpreter/probe mismatch")
         counters = checked(namespace_command(namespace, "iptables", "-w", "5", "-L", "OUTPUT", "-v", "-n", "-x")).decode()
         report["firewall_counters"] = counters
-        if not re.search(r"^\s*[1-9][0-9]*\s+[0-9]+\s+DROP\s+tcp\s+.*10\.255\.255\.1.*dpt:80", counters, re.MULTILINE):
+        report["dropped_tcp_packets"] = dropped_tcp_packets(counters)
+        if not report["dropped_tcp_packets"]:
             raise ValueError("no observed dropped TCP packet")
         if process_identity(pid) != identity or Path("/proc/self/ns/net").stat().st_ino != host_ns:
             raise ValueError("namespace identity changed")

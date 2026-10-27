@@ -2,7 +2,7 @@
   "date": "2026-10-27",
   "p07": "OPEN",
   "kind": "Union of independently retained task calibrations, not a new 30-task batch",
-  "accepted": 23,
+  "accepted": 24,
   "total": 30,
   "model_calls": 0,
   "rows": [
@@ -461,8 +461,8 @@
     {
       "instance_id": "pytest-dev__pytest-7168",
       "base_commit": "4787fd64a4ca0dba5528b5651bddd254102fe9f3",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/pytest7168-short/calibration.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-7168.json",
@@ -487,6 +487,47 @@
               "status": "requirement_failed",
               "regressions_passed": true,
               "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/pytest7168-short/calibration.json",
+          "report_sha256": "c1c97e76ad6d6d52ed34808e33a923699275789526faa1ed5429db108f1848a6",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "f4c8fba47a90f4cbc653d732b001969b0bb7e9a01f8ccb5c109ce1217d0698d1",
+          "command_profile": "pytest7168-full-file-short-traceback-v1",
+          "runtime_commit": "9c84294f1d3080ee2c7836e4c1d45880648ef0cb",
+          "workflow_run": 40448428457,
+          "artifact_id": 12709446550,
+          "archive_sha256": "bfc31475dcdbc0ca66f8fbf0b6080e0a0710004ccb9824fcac46ef03a2b54248",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_exit": 0,
+              "native_exit": 1,
+              "log_sha256": "08bb2da81ae9f9b40b2af8ff3b4be43933dc860fc48cc6f12a4b5698e1202012"
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "verified_success": true,
+              "regressions_passed": true,
+              "cleanup_exit": 0,
+              "native_exit": 0,
+              "log_sha256": "fb2bf3cdfc1c78b3c98ac8217c08d0096fede8c7d66afd4e8c06b5de33802aa8"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_exit": 0,
+              "native_exit": 1,
+              "log_sha256": "e2f3e30e6bf5a57708d842d441f7cd2edd9ca391c374b4f733519240b027b55a"
             }
           ]
         }

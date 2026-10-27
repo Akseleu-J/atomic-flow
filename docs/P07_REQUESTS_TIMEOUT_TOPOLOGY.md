@@ -54,3 +54,15 @@ calibrated and verified_success fields remain false. This profile is not yet
 integrated into any Requests oracle adapter. Fresh protected base/gold/wrong
 triples on the admitted legacy runtime, CN-only certificate qualification and
 negative-control review remain separate gates.
+
+## First actual probe and narrow counter-format correction
+
+Run40448432207 retained status unavailable and is not accepted retroactively.
+Its real loopback exchange passed, socket.timeout occurred after0.100199819seconds,
+route to1.1.1.1 was absent (exit2), and cleanup was confirmed. The counter parser
+rejected the actual iptables numeric TCP protocol6 even though the exact DROP
+rule had1packet/60bytes. The parser now accepts only protocol tcp or6 with the
+complete fixed source/destination/port rule and positive packet/byte counters.
+Tests retain the captured numeric-format line and reject zero counters, other
+protocols, addresses, ports, targets and trailing conditions. A fresh CI run is
+required; this correction changes no firewall rule or target behavior.

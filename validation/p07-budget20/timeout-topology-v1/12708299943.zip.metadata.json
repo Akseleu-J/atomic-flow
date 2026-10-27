@@ -1,0 +1,20 @@
+{
+  "id": 12708299943,
+  "node_id": "MDg6QXJ0aWZhY3QxMjcwODI5OTk0Mw==",
+  "name": "p07-timeout-topology-9c84294f1d3080ee2c7836e4c1d45880648ef0cb",
+  "size_in_bytes": 1322,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12708299943",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12708299943/zip",
+  "expired": false,
+  "digest": "sha256:0e90c673e105da635238146809ff3564189f02ee513d239b45665a163c1459be",
+  "created_at": "2026-10-27T04:13:10Z",
+  "updated_at": "2026-10-27T04:13:10Z",
+  "expires_at": "2026-11-10T04:13:09Z",
+  "workflow_run": {
+    "id": 40448432207,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "9c84294f1d3080ee2c7836e4c1d45880648ef0cb"
+  }
+}

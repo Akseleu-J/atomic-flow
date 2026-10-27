@@ -125,3 +125,26 @@ def test_existing_output_is_not_reused(monkeypatch, tmp_path):
     mocked_worker(monkeypatch)
     with pytest.raises(ValueError, match="fresh output"):
         probe.qualify(tmp_path)
+
+
+def test_actual_numeric_protocol_counter_is_tcp():
+    # Captured from CI40448432207, preserved in timeout-topology-v1/result.json.
+    actual = ("Chain OUTPUT (policy ACCEPT 9 packets, 501 bytes)\n"
+              "    pkts      bytes target     prot opt in     out     source               destination\n"
+              "       1       60 DROP       6    --  *      *       0.0.0.0/0            10.255.255.1         tcp dpt:80\n")
+    assert probe.dropped_tcp_packets(actual) == 1
+    assert probe.dropped_tcp_packets(actual.replace("DROP       6", "DROP     tcp")) == 1
+
+
+@pytest.mark.parametrize("row", [
+    "0 60 DROP 6 -- * * 0.0.0.0/0 10.255.255.1 tcp dpt:80",
+    "1 0 DROP 6 -- * * 0.0.0.0/0 10.255.255.1 tcp dpt:80",
+    "1 60 DROP 17 -- * * 0.0.0.0/0 10.255.255.1 tcp dpt:80",
+    "1 60 DROP 6 -- * * 0.0.0.0/0 10.255.255.10 tcp dpt:80",
+    "1 60 DROP 6 -- * * 0.0.0.0/0 10.255.255.1 tcp dpt:800",
+    "1 60 ACCEPT 6 -- * * 0.0.0.0/0 10.255.255.1 tcp dpt:80",
+    "1 60 DROP 6 -- * * 0.0.0.0/0 10.255.255.1 tcp dpt:80 extra",
+    "1 60 DROP 6 -- * * 10.0.0.0/8 10.255.255.1 tcp dpt:80",
+])
+def test_counter_requires_positive_exact_tcp_destination_rule(row):
+    assert probe.dropped_tcp_packets(row) == 0

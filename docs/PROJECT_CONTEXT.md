@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+27 октября: **24/30** индивидуальных калибровок приняты. Pytest7168: reporting-only --tb=short дал полные11 результатов, native exits1/0/1 и baseFAIL/goldPASS/wrongFAIL; CI40448428457 на9c84294, архив/3лога проверены. Осталось6Requests. Сетевая синтетическая проба дала реальный timeout0.1002s без внешнего маршрута, но отказала из-за numeric protocol6 в parser; требуется новый запуск после узкого исправления. P07 OPEN, новых model calls=0.
+
 27 октября: принято **23/30** индивидуальных калибровок. SymPy13971: свежая тройка base FAIL / gold PASS / wrong FAIL, все103 требования и очистка подтверждены; CI40447626567, runtime87ae817. Приватный Python3.6 использует неизменённый native fallback без subprocess hash randomization. Осталось6Requests+pytest7168. P07 OPEN; model calls в этом пакете=0.
 
 P07 начат 26 октября: [текущий протокол](P07_PROGRESS_2026-10-26.md).

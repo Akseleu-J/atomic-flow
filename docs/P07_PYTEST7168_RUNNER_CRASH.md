@@ -97,3 +97,7 @@ calibration to the current inventory.
 ## Prospective reporting-only profile
 
 A separate `p07_pytest7168_calibrate.py` now preserves the complete file and all11 IDs and changes only `pytest -rA` to `pytest -rA --tb=short`. The pinned source shows that short traceback formatting avoids repr_args(), the recursive reporting path. Seven runner/config/protected-file hashes are checked inside the image before tests. Strict classification remains unchanged: INTERNALERROR cannot be accepted. Local contract tests:23PASS,RuffPASS. A fresh actual base/gold/wrong run remains required; this is no acceptance claim.
+
+## Actual reporting-only calibration accepted,27 October2026
+
+Run40448428457 on9c84294f1d3080ee2c7836e4c1d45880648ef0cb completed successfully. Artifact12709446550 SHA256 bfc31475dcdbc0ca66f8fbf0b6080e0a0710004ccb9824fcac46ef03a2b54248 checked independently, along with all3rawlogs. All11 required IDs observed in every row; base fails broken_getattribute with nativeexit1, gold11PASS exit0, wrong3FAIL8PASS exit1. Cleanupexit0 for all. P2P remains empty; no extra regression suite claimed. No classifier change or target/test mutation. Historical failed attempt above remains retained. Inventory24/30; sixRequests OPEN, fullP07 OPEN.
