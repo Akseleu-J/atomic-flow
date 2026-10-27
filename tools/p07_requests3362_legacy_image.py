@@ -216,6 +216,24 @@ def validate_context(context):
     return prepared
 
 
+STDIN_BOOTSTRAP = "import sys; exec(compile(sys.stdin.buffer.read(), '<p07-inventory>', 'exec'))"
+
+
+def run_inventory(name, source, runner):
+    """Stream host-owned code into the private interpreter without filesystem writes."""
+    return runner(["docker", "exec", "-i", name, transplant.LAUNCHER, "-c", STDIN_BOOTSTRAP],
+                  60, input_bytes=source.encode())
+
+
+def command_failure(args, process):
+    """Keep bounded diagnostics for fixed, credential-free worker commands."""
+    return {"command": args[:2], "exit_code": process.returncode,
+            "stdout": process.stdout[:2000].decode(errors="replace"),
+            "stderr": process.stderr[:2000].decode(errors="replace"),
+            "stdout_sha256": sha(process.stdout), "stderr_sha256": sha(process.stderr),
+            "stdout_truncated": len(process.stdout) > 2000, "stderr_truncated": len(process.stderr) > 2000}
+
+
 def build(context, output):
     if platform.system() != "Linux" or output.exists():
         raise ValueError("approved Linux Docker worker and fresh output required")
@@ -231,13 +249,14 @@ def build(context, output):
               "dockerfile_sha256": sha(dockerfile().encode()), "launcher_sha256": sha(transplant.LAUNCHER_SOURCE.encode())}
     containers = []
 
-    def execute(args, timeout=60):
+    def execute(args, timeout=60, *, input_bytes=None):
         clean = {key: value for key, value in os.environ.items() if key.upper() in {"PATH", "LANG", "LC_ALL", "SYSTEMROOT", "WINDIR"}}
-        return subprocess.run(args, capture_output=True, timeout=timeout, check=False, env=clean)
+        return subprocess.run(args, input=input_bytes, capture_output=True, timeout=timeout, check=False, env=clean)
 
     def checked(args, timeout=60):
         process = execute(args, timeout)
         if process.returncode:
+            report["command_error"] = command_failure(args, process)
             raise RuntimeError("transplant command failed: " + args[1])
         return process.stdout.decode().strip()
 
@@ -320,11 +339,12 @@ def build(context, output):
             raise ValueError("private runtime ABI qualification failed")
         inventory_code = inventory_source(prepared["installed_files"])
         (output / "inventory.py").write_bytes(inventory_code.encode())
-        checked(["docker", "cp", str(output / "inventory.py"), after + ":/tmp/p07-inventory.py"])
-        process = execute(["docker", "exec", after, transplant.LAUNCHER, "/tmp/p07-inventory.py"], 60)
+        process = run_inventory(after, inventory_code, execute)
         (output / "inventory.stdout").write_bytes(process.stdout)
         (output / "inventory.stderr").write_bytes(process.stderr)
         report["inventory_probe_sha256"] = sha(inventory_code.encode())
+        report["inventory_transfer"] = "docker_exec_stdin_no_filesystem_write"
+        report["inventory_stdin_bootstrap_sha256"] = sha(STDIN_BOOTSTRAP.encode())
         report["inventory_exit"] = process.returncode
         report["inventory_stdout_sha256"] = sha(process.stdout)
         report["inventory_stderr_sha256"] = sha(process.stderr)

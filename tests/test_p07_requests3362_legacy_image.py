@@ -139,3 +139,35 @@ def test_windows_build_refused_before_reading_context(tmp_path, monkeypatch):
     monkeypatch.setattr(image.platform, "system", lambda: "Windows")
     with pytest.raises(ValueError, match="Linux"):
         image.build(tmp_path / "absent", tmp_path / "output")
+
+
+def test_large_inventory_is_streamed_to_existing_readonly_container_without_copy():
+    payload = image.inventory_source({"package/file" + str(index) + ".py": "a" * 64 for index in range(3000)})
+    assert len(payload.encode()) > 128 * 1024
+    calls = []
+    sentinel = object()
+
+    def runner(argv, timeout, *, input_bytes):
+        calls.append((argv, timeout, input_bytes))
+        return sentinel
+
+    assert image.run_inventory("p07-transplant-fixed", payload, runner) is sentinel
+    argv, timeout, data = calls[0]
+    assert data == payload.encode() and timeout == 60
+    assert argv[:4] == ["docker", "exec", "-i", "p07-transplant-fixed"]
+    assert argv[4] == image.transplant.LAUNCHER and argv[5] == "-c"
+    assert len(argv[-1]) < 200 and payload not in argv
+    assert "cp" not in argv and "/tmp/p07-inventory.py" not in argv
+    ast.parse(argv[-1])
+
+
+def test_fixed_worker_command_failure_retains_bounded_daemon_reason():
+    from types import SimpleNamespace
+
+    stderr = b"read-only filesystem: cannot write destination\n" + b"x" * 4000
+    process = SimpleNamespace(returncode=1, stdout=b"", stderr=stderr)
+    receipt = image.command_failure(["docker", "cp", "host-owned-code", "container:/tmp/file"], process)
+    assert receipt["exit_code"] == 1 and "read-only filesystem" in receipt["stderr"]
+    assert receipt["stderr_truncated"] and len(receipt["stderr"]) == 2000
+    assert receipt["stderr_sha256"] == image.sha(stderr)
+    assert receipt["command"] == ["docker", "cp"]

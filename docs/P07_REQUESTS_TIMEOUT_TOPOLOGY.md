@@ -66,3 +66,16 @@ complete fixed source/destination/port rule and positive packet/byte counters.
 Tests retain the captured numeric-format line and reject zero counters, other
 protocols, addresses, ports, targets and trailing conditions. A fresh CI run is
 required; this correction changes no firewall rule or target behavior.
+
+## Actual second qualification
+
+Run `40448994123` on `8ff50f633f6d9cc53ebc852d35cfd36271e1ecfd`
+completed successfully. Artifact `12709382609` has independently checked SHA256
+`d21de41d6fbf701ce0f8d8da317b9fb0bb3369a12750c5addbfd988700a559dc`.
+
+The real loopback exchange passed. Connecting to `10.255.255.1:80` timed out
+after 0.10018 seconds. The exact firewall rule dropped one TCP packet (60 bytes);
+there was no external route. The distinct namespace and PID identity remained
+stable, and cleanup was confirmed. Status: `synthetic_timeout_topology_qualified`;
+`calibrated=false`. Requests target tests were not run. Integration into their
+fresh complete base/gold/wrong triples remains OPEN.
