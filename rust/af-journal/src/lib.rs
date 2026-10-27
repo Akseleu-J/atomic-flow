@@ -12,6 +12,8 @@ use regex::Regex;
 use serde_json::{json, Map, Value};
 use sha2::{Digest, Sha256};
 
+pub mod segments;
+
 pub const SCHEMA_VERSION: i64 = 1;
 pub const MAX_EVENT_BYTES: usize = 256 * 1024;
 pub const MAX_SESSION_BYTES: u64 = 64 * 1024 * 1024;

@@ -9,6 +9,7 @@ pub mod canonical;
 pub mod delta;
 pub mod identity;
 pub mod project;
+pub mod relocation;
 pub mod resolve;
 pub mod schema;
 pub mod store;

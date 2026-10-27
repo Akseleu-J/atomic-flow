@@ -1,0 +1,15 @@
+[package]
+name = "af-program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Kernel contracts for the remaining roadmap chapters: eval (P07/E01), perf (P08), release (P11), rc (P12), publication (P14), corporate (E03/E05/E06/E08)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+af-entropy.workspace = true
+af-graph.workspace = true
+af-agents.workspace = true
+af-llm.workspace = true

@@ -14,6 +14,8 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use serde_json::{json, Value};
 
+pub mod queue;
+
 pub const STATUS_SCHEMA_VERSION: i64 = 1;
 const OUTPUT_CAP_BYTES: u64 = 1_000_000;
 
