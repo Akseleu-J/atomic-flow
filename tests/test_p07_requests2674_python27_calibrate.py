@@ -29,6 +29,7 @@ def test_generated_programs_support_python2_grammar_without_target_import_on_hos
     assert "urllib2.ProxyHandler({})" in health_code
     assert "except socket.error as error:" in health_code
     assert "error.errno!=errno.ECONNREFUSED" in health_code
+    assert "socket.getaddrinfo(host,None,0,0,socket.IPPROTO_TCP)" in health_code
     assert "context.check_hostname" in health_code and "CERT_REQUIRED" in health_code
     assert "wrong_ca" in health_code and "servers_stopped" in health_code
 

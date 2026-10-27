@@ -77,7 +77,7 @@ if common_names!=['httpbin.org'] or decoded.get('subjectAltName')!=(('DNS','http
     raise RuntimeError('fixed DNS-SAN service certificate identity mismatch')
 actual_hosts={}
 for host,address in data['host_mappings'].items():
-    actual=sorted(set(item[4][0] for item in socket.getaddrinfo(host,None,proto=socket.IPPROTO_TCP)))
+    actual=sorted(set(item[4][0] for item in socket.getaddrinfo(host,None,0,0,socket.IPPROTO_TCP)))
     if actual!=[address]:
         raise RuntimeError('fixed service host mapping mismatch')
     actual_hosts[host]=actual

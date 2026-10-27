@@ -55,3 +55,20 @@ def test_runtime_command_rejects_other_owned_names_and_floating_images():
         probe.runtime_command("other", "sha256:" + "b" * 64)
     with pytest.raises(ValueError):
         probe.runtime_command("p07-legacy-" + "a" * 24, "python:2.7")
+
+
+def test_historical_ssl_profile_requires_real_ssl3_context_and_exact_version():
+    image, source, version = probe.profile_inputs("python2713-sslv3")
+    assert image == probe.SSLV3_IMAGE and version == [2, 7, 13]
+    ast.parse(source)
+    assert 'context=module.SSLContext(module.PROTOCOL_SSLv3)' in source
+    assert 'import requests' not in source and '/testbed' not in source
+    observed = valid()
+    assert not probe.validate_observed(observed, profile="python2713-sslv3")
+    observed['version_info'] = version
+    assert not probe.validate_observed(observed, profile="python2713-sslv3")
+    observed['probes']['ssl']['sslv3_context_constructed'] = True
+    assert probe.validate_observed(observed, profile="python2713-sslv3")
+    assert not probe.validate_observed(observed)
+    with pytest.raises(ValueError, match='fixed historical donor'):
+        probe.profile_inputs('arbitrary')
