@@ -1,0 +1,40 @@
+docker.io/library/python@sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8: Pulling from library/python
+48b042a4691b: Pulling fs layer
+5d764e03a215: Pulling fs layer
+70c8c9cc9165: Pulling fs layer
+ace3c2be53cf: Pulling fs layer
+b6dabf4afd48: Pulling fs layer
+fac3a327a50c: Pulling fs layer
+b8675ea17c25: Pulling fs layer
+d710dd17ff3f: Pulling fs layer
+ace3c2be53cf: Waiting
+b6dabf4afd48: Waiting
+fac3a327a50c: Waiting
+b8675ea17c25: Waiting
+d710dd17ff3f: Waiting
+5d764e03a215: Verifying Checksum
+5d764e03a215: Download complete
+70c8c9cc9165: Verifying Checksum
+70c8c9cc9165: Download complete
+48b042a4691b: Verifying Checksum
+48b042a4691b: Download complete
+b6dabf4afd48: Verifying Checksum
+b6dabf4afd48: Download complete
+fac3a327a50c: Download complete
+d710dd17ff3f: Verifying Checksum
+d710dd17ff3f: Download complete
+48b042a4691b: Pull complete
+b8675ea17c25: Verifying Checksum
+b8675ea17c25: Download complete
+ace3c2be53cf: Verifying Checksum
+ace3c2be53cf: Download complete
+5d764e03a215: Pull complete
+70c8c9cc9165: Pull complete
+ace3c2be53cf: Pull complete
+b6dabf4afd48: Pull complete
+fac3a327a50c: Pull complete
+b8675ea17c25: Pull complete
+d710dd17ff3f: Pull complete
+Digest: sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8
+Status: Downloaded newer image for python@sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8
+docker.io/library/python@sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8

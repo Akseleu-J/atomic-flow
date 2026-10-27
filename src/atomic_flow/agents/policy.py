@@ -111,6 +111,18 @@ class PolicyEngine:
                    project_rules=cls._read_rules(project_root / ".atomic_flow" / "policy.yaml") if project_trusted else [])
 
     def decide(self, tool_name: str, args: dict[str, Any], *, project_trusted: bool) -> Decision:
+        decision = self._decide(tool_name, args, project_trusted=project_trusted)
+        if tool_name == "patch_files" and isinstance(args.get("patches"), list) and 1 <= len(args["patches"]) <= 16:
+            # A batch cannot bypass existing explicit single-file deny/ask.
+            # An explicit batch allow may supersede only the single-file default.
+            items = [self._decide("patch_file", patch, project_trusted=project_trusted)
+                     for patch in args["patches"] if isinstance(patch, dict)]
+            decisions = [decision, *(item for item in items if item.source != "default")]
+            return next((item for item in decisions if item.action == "forbid"),
+                        next((item for item in decisions if item.action == "ask"), decision))
+        return decision
+
+    def _decide(self, tool_name: str, args: dict[str, Any], *, project_trusted: bool) -> Decision:
         matches: list[tuple[str, Rule]] = []
         for source, rules in self.layers.items():
             matching = [rule for rule in rules if self._tool_matches(rule.tool, tool_name)
@@ -140,9 +152,14 @@ class PolicyEngine:
                     matches.append({"source": source, "index": index, "tool": rule.tool, "action": rule.action,
                                     "selected": choose})
                     selected |= choose
-        return {"tool": tool_name, "project_trusted": project_trusted, "action": decision.action,
-                "source": decision.source, "reason": decision.reason, "matches": matches,
-                "semantics": "All matching forbids win; otherwise first per layer, ask wins across layers. No tool was run."}
+        result = {"tool": tool_name, "project_trusted": project_trusted, "action": decision.action,
+                  "source": decision.source, "reason": decision.reason, "matches": matches,
+                  "semantics": "All matching forbids win; otherwise first per layer, ask wins across layers. No tool was run."}
+        if tool_name == "patch_files" and isinstance(args.get("patches"), list) and 1 <= len(args["patches"]) <= 16:
+            result["batch_items"] = [{"path": patch.get("path"), **self.explain("patch_file", patch, project_trusted=project_trusted)}
+                                     for patch in args["patches"] if isinstance(patch, dict)]
+            result["semantics"] += " Batch decisions also preserve every explicit single-file deny/ask."
+        return result
 
     def lint(self) -> list[dict]:
         """Conservative diagnostics only for identical predicates, not regex satisfiability."""
@@ -184,8 +201,16 @@ class PolicyEngine:
     def _context_matches(rule: Rule, args: dict[str, Any], trusted: bool) -> bool:
         if rule.when == "trusted" and not trusted or rule.when == "untrusted" and trusted:
             return False
-        if rule.lines_lt is not None and len(str(args.get("new_source", "")).splitlines()) >= rule.lines_lt:
-            return False
+        patches = args.get("patches")
+        if patches is not None and (not isinstance(patches, list) or not 1 <= len(patches) <= 16
+                                    or any(not isinstance(patch, dict) or not isinstance(patch.get("path"), str)
+                                           or not patch["path"] for patch in patches)):
+            return rule.action == "forbid"
+        if rule.lines_lt is not None:
+            lines = (sum(len(str(patch.get("new_text", "")).splitlines()) for patch in patches)
+                     if patches is not None else len(str(args.get("new_source", args.get("new_text", ""))).splitlines()))
+            if lines >= rule.lines_lt:
+                return False
         if rule.command_matches is not None:
             try:
                 if not re.search(rule.command_matches, str(args.get("command", "")), re.IGNORECASE):
@@ -196,6 +221,8 @@ class PolicyEngine:
             paths = [str(args[key]).replace("\\", "/") for key in (
                 "path", "source", "destination", "source_path", "destination_path", "old_path", "new_path", "target"
             ) if isinstance(args.get(key), str) and args[key]]
+            if patches is not None:
+                paths.extend(patch["path"].replace("\\", "/") for patch in patches)
             if not paths:
                 return False
 

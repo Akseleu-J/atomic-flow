@@ -7,11 +7,13 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
 import json
 import os
 import subprocess
 import tempfile
 import time
+from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -68,12 +70,49 @@ class SourcePilotBackend(PilotBackend):
                     "cost_source": response.cost_source, "truncated": response.truncated})
 
 
+@lru_cache(maxsize=1)
+def _calibration_corpora():
+    root = Path(__file__).resolve().parents[1] / "benchmarks/stage4"
+    output = {}
+    for name in ("corpus.json", "corpus-p07-v2.json", "corpus-p07-v3.json"):
+        path = root / name
+        if path.is_file():
+            raw = path.read_bytes().replace(b"\r\n", b"\n")
+            output[hashlib.sha256(raw).hexdigest()] = {row["instance_id"]: row for row in json.loads(raw)["tasks"]}
+    return output
+
+
 def admit_calibration(report, task):
+    # Native reports can omit the aggregate base_commit. Every individual
+    # base/gold/wrong row must still prove exactly the current source ancestry.
     if (report.get("instance_id") != task["instance_id"] or report.get("calibrated") is not True
-            or report.get("base_commit") != task["base_commit"] or report.get("model_calls") != 0
+            or report.get("base_commit", task["base_commit"]) != task["base_commit"] or report.get("model_calls") != 0
             or len(report.get("rows", [])) != 3 or not calibration_decision(report["rows"])
             or any(row.get("base_verified") != task["base_commit"] for row in report["rows"])):
         raise ValueError("matching successful isolated environment calibration required")
+    calibrated_task = _calibration_corpora().get(report.get("manifest_sha256"), {}).get(task["instance_id"])
+    if (calibrated_task is None or any(calibrated_task.get(key) != task.get(key) for key in (
+            "instance_id", "repo", "base_commit", "patch", "test_patch", "FAIL_TO_PASS", "PASS_TO_PASS"))):
+        raise ValueError("calibration corpus does not bind the current source, protected tests and requirements")
+    rows = report["rows"]
+    failures, regressions = task.get("FAIL_TO_PASS"), task.get("PASS_TO_PASS")
+    if (not isinstance(failures, list) or not failures or not isinstance(regressions, list)
+            or any(not isinstance(value, str) or not value for value in failures + regressions)
+            or len(set(failures + regressions)) != len(failures + regressions)
+            or [row.get("label") for row in rows] != ["base", "gold", "wrong"]
+            or any(not isinstance(row.get("tests"), dict) for row in rows)):
+        raise ValueError("calibration must contain the complete current test obligation")
+    required = set(failures + regressions)
+    if (any(not required <= row["tests"].keys() for row in rows)
+            or any(row["tests"].get(test) != "PASSED" for row in rows for test in regressions)
+            or any(rows[1]["tests"].get(test) != "PASSED" for test in required)
+            or any(not any(row["tests"].get(test) in {"FAILED", "ERROR"} for test in failures)
+                   for row in (rows[0], rows[2]))):
+        raise ValueError("calibration observations do not satisfy current requirements and regressions")
+    patch = task.get("patch")
+    if (not isinstance(patch, str)
+            or rows[1].get("patch_sha256") != hashlib.sha256(patch.encode()).hexdigest()):
+        raise ValueError("calibration gold patch differs from current task bytes")
 
 
 def decode_action(content):

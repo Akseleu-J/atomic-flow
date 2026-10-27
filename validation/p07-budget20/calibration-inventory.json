@@ -2,15 +2,15 @@
   "date": "2026-10-27",
   "p07": "OPEN",
   "kind": "Union of independently retained task calibrations, not a new 30-task batch",
-  "accepted": 29,
+  "accepted": 30,
   "total": 30,
   "model_calls": 0,
   "rows": [
     {
       "instance_id": "psf__requests-863",
       "base_commit": "a0df2cbb10419037d11d04352b3175405ab52941",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/requests863-calibration-v8/oracle/calibration.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/psf__requests-863.json",
@@ -158,6 +158,193 @@
               "cleanup_confirmed": true,
               "process_exit": 1,
               "stdout_sha256": "6ce186d4a82bb6357c0d9fa643d77506097c1ecab04a1126cb76c2834e419ad8",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v4/oracle/calibration.json",
+          "report_sha256": "63795180a1edfb26e77ca5463122e1ff07873e76cd1cded4f49ebcedeab57455",
+          "calibrated": false,
+          "workflow_run": 40502794081,
+          "artifact_id": 12733517604,
+          "archive_sha256": "333811fe068fc55a960a6077247931be8f378c8e12acd239283fca3d2c3eb0fd",
+          "runtime_commit": "c8e997a106ea079bedfa5b17442e5fbe54b2aba8",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "service_profile_sha256": "f1e8a383ad133e5f4ee753ac45c530f197ccc26b8e227ddb5b76ae8577f6657e",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v5/oracle/calibration.json",
+          "report_sha256": "9d2c14de5b3e9f2cb5b55872477912d715c17ec6eebcdc3c87257aba2e77e07b",
+          "calibrated": false,
+          "workflow_run": 40535639917,
+          "artifact_id": 12747568337,
+          "archive_sha256": "22ce2bde74fe5dcfe1308675ef083f60b7babebac26cc39b89fd3dea0e262f1c",
+          "runtime_commit": "b438c10e8772c85a67d0fc1c385d4b9843dff90a",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "service_profile_sha256": "0b60dd1630d3de84a348bd48f44fda0c7c9dc299a558d6788d40786956271114",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v6/oracle/calibration.json",
+          "report_sha256": "ae54109796bc01cf81857c0195caf9a1ca903bbd17f472ab47987fba9f85e7f8",
+          "calibrated": false,
+          "workflow_run": 40537669722,
+          "artifact_id": 12748932517,
+          "archive_sha256": "e5d1480c2c9fdc0ca928b048b89bb4e0186dabe8472fd410a17c43dd166b60c0",
+          "runtime_commit": "289b26798bbac0649f6f87c00ac1ccb441f6024f",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "service_profile_sha256": "6c8076b47794e34eadc9aeb896f10bab3329704e211c12366fff1882d221c793",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v7/oracle/calibration.json",
+          "report_sha256": "baac9b91e88cd781ede1d3bf2af42568a04e64801213314d594cc360404f0ac0",
+          "calibrated": false,
+          "workflow_run": 40539842844,
+          "artifact_id": 12750227100,
+          "archive_sha256": "5345ba185044d1303aafe4ef8846d854775ff2b72924fed122ed2e30ffb267e4",
+          "runtime_commit": "037e3fa5ad9bea95c51f08984f64eee41f160ad3",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "service_profile_sha256": "6c8076b47794e34eadc9aeb896f10bab3329704e211c12366fff1882d221c793",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v8/oracle/calibration.json",
+          "report_sha256": "39d08d4cd8a9dc008e74fcd110f35567f66ce3f15f45e79b9218dca28f7b9807",
+          "calibrated": true,
+          "workflow_run": 40541137888,
+          "artifact_id": 12751400315,
+          "archive_sha256": "013e9f71a49576dc5f3e5a6e9fc361a5bfba888e344c0de787f8628ffddd1d41",
+          "runtime_commit": "3101b3c1891219389874cb7305af7a8904482c9e",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "service_profile_sha256": "93b6a88a99cf04c62984c2404af94bf647c139f4f9f294576ea7b3505126f31c",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "source_preserved": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "528d539430c99d33276936b56147ac34d688354bc6189440b16ed3df941655f9",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "verified_success": true,
+              "regressions_passed": true,
+              "source_preserved": true,
+              "cleanup_confirmed": true,
+              "process_exit": 0,
+              "stdout_sha256": "fd0d3569df478817e208bc9c0f4e9507cad457e42ba70c97b67eed7a589a8df3",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "source_preserved": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "a7ca0d833f06e1d36a5526dee2cfb6420a0d33d8ac288c8d160fcff911349fd2",
               "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
             }
           ]

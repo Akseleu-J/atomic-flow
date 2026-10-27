@@ -9,8 +9,8 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-from evaluation_p07_source_pilot import admit_calibration
 from evaluation_stage4 import load_manifest, patch_paths, protected_test_path
+from p07_calibration_binding import canonical_sha, create_host_binding
 from p07_campaign import AUTHORIZED_OWNERS, MODEL, select, validate_config
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -152,37 +152,52 @@ def prepare(args):
                   price_note="Direct Anthropic reference 2026-10-26; not a Kaggle billing guarantee. Provider cost required.")
     validate_config(config)
     catalog = catalog_model()
-    tasks = []
-    for task in load_manifest(ROOT / "benchmarks/stage4/corpus.json")["tasks"]:
+    runtime = (ROOT / "tools/p07_campaign.py").read_bytes()
+    binding_helper = (ROOT / "tools/p07_calibration_binding.py").read_bytes()
+    runtime_sha = hashlib.sha256(runtime).hexdigest()
+    helper_sha = hashlib.sha256(binding_helper).hexdigest()
+    corpus_path = ROOT / "benchmarks/stage4/corpus-p07-v3.json"
+    corpus_sha = hashlib.sha256(corpus_path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+    full_tasks = load_manifest(corpus_path)["tasks"]
+    selected_ids = {task["instance_id"] for task in select(full_tasks, args.count)}
+    tasks, host_admissions = [], {}
+    for task in full_tasks:
         paths = patch_paths(task["patch"])
         if len(paths) != 1 or any(protected_test_path(p) for p in paths):
             raise ValueError("campaign currently requires one declared production source per task")
-        receipt = args.calibrations / (task["instance_id"] + ".json")
-        calibration = json.loads(receipt.read_text()) if receipt.exists() else {}
-        if "report" in calibration:
-            calibration = calibration["report"]
-        # No gold patch, wrong patch, hidden tests, or oracle source in generator input.
-        tasks.append({**{k: task[k] for k in ("instance_id", "repo", "base_commit", "problem_statement")},
-                      "source_path": next(iter(paths)), "calibration": calibration})
+        public = {**{k: task[k] for k in ("instance_id", "repo", "base_commit", "problem_statement")},
+                  "source_path": next(iter(paths))}
+        if not preflight and task["instance_id"] in selected_ids:
+            receipt = args.calibrations / (task["instance_id"] + ".json")
+            calibration = json.loads(receipt.read_text()) if receipt.exists() else {}
+            if "report" in calibration:
+                calibration = calibration["report"]
+            # Full evidence is checked only here, before any protected data is
+            # discarded. The generator receives digests/counts, never that report.
+            binding = create_host_binding(task, calibration, source_path=public["source_path"],
+                corpus_sha256=corpus_sha, config=config, runtime_sha256=runtime_sha,
+                binding_helper_sha256=helper_sha)
+            public["calibration_binding"] = binding
+            host_admissions[task["instance_id"]] = canonical_sha(binding)
+        tasks.append(public)
     chosen = select(tasks, args.count)
-    if not preflight:
-        for task in chosen:
-            admit_calibration(task["calibration"], task)
     if not preflight and len(chosen) * 2 * args.arm_budget > args.budget + 1e-9:
         raise ValueError("budget does not cover all selected paired arm caps; choose the 3-task pilot or revise explicit caps")
-    runtime = (ROOT / "tools/p07_campaign.py").read_bytes()
     packet = {"framework": FRAMEWORK, "model_catalog_record": catalog, "config": config, "tasks": tasks,
-              "runtime_sha256": hashlib.sha256(runtime).hexdigest(), "p07": "OPEN",
+              "runtime_sha256": runtime_sha, "binding_helper_sha256": helper_sha,
+              "calibration_corpus_sha256": corpus_sha, "host_admissions": host_admissions, "p07": "OPEN",
               "study": "exposed source-scoped development campaign; not blinded/full autonomous acceptance",
               "arm_order": "baseline/atomic on even selected index, atomic/baseline on odd selected index"}
     encoded_packet = base64.b64encode(json.dumps(packet).encode()).decode()
     encoded_runtime = base64.b64encode(runtime).decode()
+    encoded_binding_helper = base64.b64encode(binding_helper).decode()
     source = '''"""Private source-only P07 campaign. Creation warmup sends zero model prompts."""
 import base64, hashlib, json, os, re, signal, subprocess, sys, tempfile, uuid, zipfile
 from pathlib import Path
 import kaggle_benchmarks as kbench
 PACKET = json.loads(base64.b64decode("__PACKET__"))
 RUNTIME = base64.b64decode("__RUNTIME__")
+BINDING_HELPER = base64.b64decode("__BINDING_HELPER__")
 __EXPORT_HELPER__
 @kbench.task(name="__SLUG__", description="Source-only Sonnet 5 diagnostic; independent container oracle runs separately; P07 OPEN.")
 def run_campaign(llm) -> dict:
@@ -196,6 +211,8 @@ def run_campaign(llm) -> dict:
         return {"status":"proxy_environment_missing", "provider_calls":0, "p07":"OPEN"}
     if hashlib.sha256(RUNTIME).hexdigest() != PACKET["runtime_sha256"]:
         raise ValueError("runtime payload hash mismatch")
+    if hashlib.sha256(BINDING_HELPER).hexdigest() != PACKET["binding_helper_sha256"]:
+        raise ValueError("binding helper payload hash mismatch")
     output = Path("/kaggle/working") / ("p07-" + uuid.uuid4().hex[:12])
     needles = [os.environ.get(k, "").encode() for k in ("MODEL_PROXY_URL", "MODEL_PROXY_API_KEY", "KAGGLE_API_TOKEN")]
     safe_env = {k:v for k,v in os.environ.items() if k in {"PATH","HOME","LANG","LC_ALL","TMPDIR"}}
@@ -225,6 +242,7 @@ def run_campaign(llm) -> dict:
             command([python,"-m","pip","install",repo])
             execution_packet["framework_dependencies"] = command([python,"-m","pip","freeze"])
             (repo / "tools/p07_campaign.py").write_bytes(RUNTIME)
+            (repo / "tools/p07_calibration_binding.py").write_bytes(BINDING_HELPER)
             packet_path = Path(directory) / "packet.json"
             packet_path.write_text(json.dumps(execution_packet))
             driver = repo / "tools/campaign_driver.py"
@@ -262,7 +280,7 @@ def run_campaign(llm) -> dict:
             "provider_calls":summary.get("model_calls"), "preflight_only":PACKET["config"]["preflight_only"],
             "archive":str(output / "results.zip")}
 run_campaign.run(kbench.llm)
-'''.replace("__PACKET__", encoded_packet).replace("__RUNTIME__", encoded_runtime).replace("__SLUG__", args.slug).replace("__EXPORT_HELPER__", inspect.getsource(export_campaign))
+'''.replace("__PACKET__", encoded_packet).replace("__RUNTIME__", encoded_runtime).replace("__BINDING_HELPER__", encoded_binding_helper).replace("__SLUG__", args.slug).replace("__EXPORT_HELPER__", inspect.getsource(export_campaign))
     compile(source, "campaign_task.py", "exec")
     args.output.mkdir(parents=True)
     # Exact bytes on Windows too: text-mode newline translation otherwise makes

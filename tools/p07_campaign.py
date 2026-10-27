@@ -16,8 +16,9 @@ import time
 import zipfile
 from pathlib import Path
 
+import p07_calibration_binding as calibration_binding
 from evaluation_live_pilot import PilotLimit, plan_policy_violations
-from evaluation_p07_source_pilot import SourcePilotBackend, admit_calibration
+from evaluation_p07_source_pilot import SourcePilotBackend
 from evaluation_stage4 import patch_paths, protected_test_path
 
 MODEL = "anthropic/claude-sonnet-5@default"
@@ -44,6 +45,13 @@ def sha(raw):
 
 def load(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def validate_prepared_code(record):
+    """Integrity against the trusted prepared bundle; these hashes are not signatures."""
+    if (sha(Path(__file__).read_bytes()) != record.get("runtime_sha256")
+            or sha(Path(calibration_binding.__file__).read_bytes()) != record.get("binding_helper_sha256")):
+        raise ValueError("prepared development runtime/helper bytes differ")
 
 
 def select(tasks, count):
@@ -251,6 +259,15 @@ def arm_main(payload_path):
     payload = load(payload_path)
     config, task = payload["config"], payload["task"]
     validate_config(config)
+    if config.get("preflight_only", False):
+        raise ValueError("zero-call preflight cannot start a model arm")
+    validate_prepared_code(payload)
+    calibration_binding.validate_host_binding(task, payload["host_binding"],
+        expected_digest=payload["host_binding_sha256"], corpus_sha256=payload["calibration_corpus_sha256"],
+        config=config, runtime_sha256=payload["runtime_sha256"], binding_helper_sha256=payload["binding_helper_sha256"])
+    calibration_binding.validate_source_binding(task, payload["host_binding"], payload["source_binding"],
+        expected_digest=payload["source_binding_sha256"], files=payload["source_manifest"], workspace=payload["workspace"],
+        config=config, runtime_sha256=payload["runtime_sha256"], binding_helper_sha256=payload["binding_helper_sha256"])
     out, work = Path(payload["out"]), Path(payload["workspace"])
     os.environ["ATOMIC_FLOW_HOME"] = str(out / "atomic-state")
     limits = {"max_calls": config["max_calls"], "max_input_tokens": config["max_input_tokens"],
@@ -296,6 +313,9 @@ def arm_main(payload_path):
 def campaign(packet, output):
     config = packet["config"]
     validate_config(config)
+    protected = {"patch", "test_patch", "FAIL_TO_PASS", "PASS_TO_PASS", "calibration"}
+    if any(protected & set(task) for task in packet["tasks"]):
+        raise ValueError("protected calibration evidence must not enter a generator packet")
     output.mkdir(parents=True, exist_ok=False)
     save(output / "packet.json", packet)
     save(output / "ledger.json", {"attempts": [], "limit_usd": config["total_budget_usd"]})
@@ -316,7 +336,11 @@ def campaign(packet, output):
             row = next(row for row in rows if row["instance_id"] == task["instance_id"])
             try:
                 if not config.get("preflight_only", False):
-                    admit_calibration(task["calibration"], task)
+                    validate_prepared_code(packet)
+                    calibration_binding.validate_host_binding(task, task["calibration_binding"],
+                        expected_digest=packet["host_admissions"][task["instance_id"]],
+                        corpus_sha256=packet["calibration_corpus_sha256"], config=config,
+                        runtime_sha256=packet["runtime_sha256"], binding_helper_sha256=packet["binding_helper_sha256"])
                 snapshot = root / "source"
                 snapshot.mkdir()
                 files = source_snapshot(task, output / "mirrors" / task["instance_id"], snapshot)
@@ -333,6 +357,10 @@ def campaign(packet, output):
                                baseline="not_run_preflight_only", atomic="not_run_preflight_only")
                     save(root / "status.json", row)
                     continue
+                source_binding = calibration_binding.create_source_binding(task, task["calibration_binding"], files,
+                    config=config, runtime_sha256=packet["runtime_sha256"], binding_helper_sha256=packet["binding_helper_sha256"])
+                source_binding_sha = calibration_binding.canonical_sha(source_binding)
+                save(root / "source-binding.json", source_binding)
                 for arm in (("baseline", "atomic") if index % 2 == 0 else ("atomic", "baseline")):
                     ledger = load(output / "ledger.json")
                     if any(a.get("cost_usd") is None for a in ledger["attempts"]):
@@ -346,7 +374,11 @@ def campaign(packet, output):
                     shutil.copytree(snapshot, workspace)
                     payload = {"task": {k: task[k] for k in ("instance_id", "repo", "base_commit", "problem_statement", "source_path")},
                                "arm": arm, "config": config, "out": str(out), "workspace": str(workspace),
-                               "ledger": str(output / "ledger.json")}
+                               "ledger": str(output / "ledger.json"), "host_binding": task["calibration_binding"],
+                               "host_binding_sha256": packet["host_admissions"][task["instance_id"]],
+                               "calibration_corpus_sha256": packet["calibration_corpus_sha256"],
+                               "runtime_sha256": packet["runtime_sha256"], "binding_helper_sha256": packet["binding_helper_sha256"],
+                               "source_manifest": files, "source_binding": source_binding, "source_binding_sha256": source_binding_sha}
                     save(out / "input.json", payload)
                     # Never forward the Kaggle user token or unrelated environment.
                     env = {k: v for k, v in os.environ.items() if k in {

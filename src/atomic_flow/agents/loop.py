@@ -36,7 +36,7 @@ def render_tools_block(registry: ToolRegistry, names: list[str]) -> str:
         'Return ONLY this JSON to call a tool: {"tool": "<name>", "args": {<arguments>}}.',
         "**If the user's request asks to modify code (rename, add, remove, refactor, fix, update), "
         "this is an ACTION request. Your next response must be a tool call, not a final answer.**",
-        "For action requests, use an allowed mutation tool: edit_node, patch_file, create_file, delete_file, or move_file, as appropriate.",
+        "For action requests, use an allowed mutation tool: edit_node, patch_file, patch_files, create_file, delete_file, or move_file, as appropriate.",
         "Before calling `edit_node`, you MUST call `read_node` with zoom=2 to obtain the current full body. "
         "If read_node returns next_offset, read the remaining pages with that offset before editing. "
         "The context may contain only a signature. Do not call `read_node` repeatedly once the target body is visible.",
@@ -140,9 +140,10 @@ def execute_tool(parsed: dict[str, Any], registry: ToolRegistry, ctx: ToolContex
                 policy_args["path"] = node.path
         if "write" in contract.effects and ctx.mutation_scope is not None:
             from atomic_flow.agents.source import confined_path
-            if name not in {"edit_node", "patch_file", "create_file", "delete_file", "move_file", "notebook_edit"}:
+            if name not in {"edit_node", "patch_file", "patch_files", "create_file", "delete_file", "move_file", "notebook_edit"}:
                 return finish({"error": "write tool has no host-defined path contract for this approved plan"}, "denied")
-            paths = [policy_args.get("path")]
+            paths = ([patch["path"] for patch in policy_args["patches"]]
+                     if name == "patch_files" else [policy_args.get("path")])
             if name == "move_file":
                 paths.append(policy_args.get("destination"))
             if any(not isinstance(path, str) or confined_path(ctx.project_root, path).relative_to(

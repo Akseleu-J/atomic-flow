@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+27 октября: **30/30 сред калиброваны**. ПоследнийRequests863 CI40541137888 на3101b3c:106ordinarytests/65requirements, base/wrongFAIL толькоhook-тест, gold106PASS; source/hash/namespace/regressions/cleanup проверены. Архив12751400315 SHA256013e9f71a49576dc5f3e5a6e9fc361a5bfba888e344c0de787f8628ffddd1d41. P07OPEN: полныйhistoricalin-looprunner, matchedpairs/holdout/ablations/finalreview ещётребуются. Новыхprovidercalls/spendнет.
+
 27 октября: **29/30 калибровок приняты**. Requests2674 CI40497176497 на73751bf: nativePython2.7.18,162 ordinary tests/155 requirements, base/wrong FAIL и gold PASS, regression/source/cleanup/hash проверены. ОсталсяRequests863; реальныйSSLv3 donor2.7.13Wheezy квалифицирован отдельно. Public scripted TaskRunner journey принят; paid matched pairs/holdout/ablations ещё не выполнены, **P07 OPEN**.
 
 27 октября: public scripted TaskRunner journey CI40495395039 SUCCESS (failure→replan→repair→fresh final check→publish); provider_calls=0. Отдельный nativePython2.7 runtime Requests2674 CI40495398692 SUCCESS,244 файла и cleanup проверены. Полная2674 калибровка ещё ожидается; общий счёт28/30, P07 OPEN.

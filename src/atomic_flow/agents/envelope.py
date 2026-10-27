@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-MUTATING_TOOLS = frozenset({"edit_node", "patch_file", "notebook_edit", "create_file", "move_file", "delete_file"})
+MUTATING_TOOLS = frozenset({"edit_node", "patch_file", "patch_files", "notebook_edit", "create_file", "move_file", "delete_file"})
 SOURCE_TOOLS = frozenset({"read_node", "find_callers", "search_tree", "search_text", "read_result",
                           "read_file", "find_files", "notebook_read"})
 SUPPORTED_TOOLS = SOURCE_TOOLS | MUTATING_TOOLS | {"run_command", "ask_user"}

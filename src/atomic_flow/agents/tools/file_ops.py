@@ -40,6 +40,19 @@ class PatchFileArgs(ExistingFileArgs):
         return self
 
 
+class PatchFilesArgs(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    patches: list[PatchFileArgs] = Field(min_length=1, max_length=16,
+                                       description="Up to16 unique existing files; every current revision must be read before editing.")
+    reason: str = Field(default="", max_length=500)
+
+    @model_validator(mode="after")
+    def unique_paths(self):
+        if len({patch.path for patch in self.patches}) != len(self.patches):
+            raise ValueError("each file may appear only once in a patch transaction")
+        return self
+
+
 class CreateFileArgs(FileArgs):
     content: str = Field(max_length=1_000_000)
 
@@ -188,6 +201,49 @@ class PatchFileTool(Tool):
             # Do not classify exceptions after _mutate as safe refusals.
             raise SourcePreconditionFailed(str(exc)) from None
         return _mutate(ctx, {args.path: original}, {args.path: updated})
+
+
+class PatchFilesTool(Tool):
+    name = "patch_files"
+    description = "Apply patches=[{path, expected_hash, old_text, new_text, optional start_line/end_line}] for up to16 unique existing files as one journaled edit. Read every file first; verify combined source and roll back the whole set on failure."
+    args_schema = PatchFilesArgs
+    contract = ToolContract(effects=("read", "write", "execute"), timeout_seconds=300, idempotent=False)
+
+    @mutation_guard("ctx")
+    def run(self, args: PatchFilesArgs, ctx) -> dict[str, Any]:
+        if not ctx.edits_enabled:
+            return {"error": "edits disabled"}
+        before, after, resolved = {}, {}, set()
+        try:
+            for patch in args.patches:
+                ctx.cancel_check()
+                target = admitted_path(ctx, patch.path, existing=True).resolve()
+                if target in resolved:
+                    raise SourceConflict("patch transaction aliases the same source file")
+                resolved.add(target)
+                if ctx.mutation_scope is not None and patch.path not in ctx.mutation_scope:
+                    raise SourceConflict("mutation path is outside the approved plan scope")
+                original = _read(ctx, patch.path, patch.expected_hash)
+                text = original.decode("utf-8-sig")
+                if patch.start_line is not None:
+                    lines = text.splitlines(keepends=True)
+                    if patch.end_line > len(lines) or "".join(lines[patch.start_line - 1:patch.end_line]) != patch.old_text:
+                        raise SourceConflict("range/old_text precondition failed; reread current source")
+                    updated = text_bytes("".join(lines[:patch.start_line - 1]) + patch.new_text + "".join(lines[patch.end_line:]))
+                else:
+                    if text.count(patch.old_text) != 1:
+                        raise SourceConflict("old_text must match exactly one fragment; no source changed")
+                    updated = text_bytes(text.replace(patch.old_text, patch.new_text, 1))
+                if original.startswith(b"\xef\xbb\xbf"):
+                    updated = b"\xef\xbb\xbf" + updated
+                if updated == original:
+                    raise SourceConflict("patch does not change source")
+                before[patch.path], after[patch.path] = original, updated
+        except (OSError, UnicodeError) as exc:
+            # Every path, proof and replacement has to pass before the existing
+            # journal can perform the first write or start a check.
+            raise SourcePreconditionFailed(str(exc)) from None
+        return _mutate(ctx, before, after)
 
 
 class CreateFileTool(Tool):

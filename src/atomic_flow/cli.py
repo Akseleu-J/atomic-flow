@@ -356,6 +356,16 @@ def _make_approval_callback(auto_yes: bool):
                 print("    ...")
         elif tool == "run_command":
             print(f"  command: {args.get('command')}")
+        elif tool == "patch_files":
+            from atomic_flow.activation.redact import redact
+            print(f"  operation: patch_files; files: {len(args.get('patches', []))}")
+            for patch in args.get("patches", []):
+                print(f"  path: {patch.get('path')}; expected current hash: {patch.get('expected_hash')}")
+                if patch.get("start_line") is not None:
+                    print(f"  range: {patch['start_line']}..{patch['end_line']}")
+                for key in ("old_text", "new_text"):
+                    preview = redact(str(patch.get(key, "")))
+                    print(f"  {key} ({len(preview)} characters): {preview[:1500]}")
         elif tool in {"patch_file", "create_file", "delete_file", "move_file"}:
             print(f"  operation: {tool}; path: {args.get('path')}")
             if "destination" in args:

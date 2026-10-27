@@ -5,7 +5,7 @@ from atomic_flow.agents.base import ToolRegistry
 from atomic_flow.agents.tools.ask_user import AskUserTool
 from atomic_flow.agents.tools.documentation import DocumentationFetchTool, DocumentationSearchTool
 from atomic_flow.agents.tools.edit_node import EditNodeTool
-from atomic_flow.agents.tools.file_ops import CreateFileTool, DeleteFileTool, MoveFileTool, PatchFileTool
+from atomic_flow.agents.tools.file_ops import CreateFileTool, DeleteFileTool, MoveFileTool, PatchFilesTool, PatchFileTool
 from atomic_flow.agents.tools.find_callers import FindCallersTool
 from atomic_flow.agents.tools.find_files import FindFilesTool
 from atomic_flow.agents.tools.language import LSPDefinitionTool, LSPDiagnosticsTool, LSPReferencesTool
@@ -23,7 +23,7 @@ def default_registry(*, enable_parallel_reads: bool = False) -> ToolRegistry:
 	from atomic_flow.agents.tools.notebook import NotebookEditTool, NotebookReadTool
 	registry = ToolRegistry()
 	for tool in (ReadNodeTool(), FindCallersTool(), SearchTreeTool(), EditNodeTool(), RunCommandTool(),
-                 SearchTextTool(), ReadFileTool(), PatchFileTool(), CreateFileTool(), DeleteFileTool(), MoveFileTool(),
+                 SearchTextTool(), ReadFileTool(), PatchFileTool(), PatchFilesTool(), CreateFileTool(), DeleteFileTool(), MoveFileTool(),
                  AskUserTool(), ReadResultTool(), FindFilesTool(), ToolCatalogTool()):
 		registry.register(tool)
 	for kind in (NotebookReadTool, NotebookEditTool, WorkspaceReadTool, LSPDefinitionTool, LSPReferencesTool, LSPDiagnosticsTool,
@@ -39,7 +39,7 @@ ROLE_TOOLS: dict[str, list[str]] = {
 	"parser": [],
 	"refiner": ["search_tree", "read_node", "read_file", "search_text"],
 	"answerer": ["read_node", "find_callers", "search_tree", "edit_node", "run_command", "search_text",
-                 "patch_file", "create_file", "delete_file", "move_file", "read_file", "ask_user", "read_result"],
+                 "patch_file", "patch_files", "create_file", "delete_file", "move_file", "read_file", "ask_user", "read_result"],
 	"critic": ["read_node", "run_command", "read_file", "search_text"],
 	"expander": ["search_tree", "read_node", "find_callers", "read_file", "search_text"],
 	"reparser": [],

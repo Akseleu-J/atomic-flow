@@ -27,7 +27,7 @@ from atomic_flow.project_resources import ProjectLimits
 from atomic_flow.source_lock import source_mutation_lease
 from atomic_flow.tree.builder import build_tree, load_tree, save_tree
 
-MUTATING_TOOLS = {"edit_node", "patch_file", "create_file", "delete_file", "move_file", "notebook_edit"}
+MUTATING_TOOLS = {"edit_node", "patch_file", "patch_files", "create_file", "delete_file", "move_file", "notebook_edit"}
 
 
 @dataclass(frozen=True)

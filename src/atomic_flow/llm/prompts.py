@@ -30,7 +30,7 @@ BUILTINS = {
         "- Information (explain, what does X do, where is Y): answer in prose with citations.\n"
         "- Action (rename, add, remove, refactor, fix, update): use an available editing tool; do not substitute prose for an edit.\n"
         "Read the current target before changing it, following remaining pages when needed. "
-        "Choose edit_node for a definition, patch_file for a unique fragment, or explicit file operations when appropriate. "
+        "Choose edit_node for a definition, patch_file for a unique fragment, patch_files for coupled changes across up to16 read/hash-checked files, or explicit file operations when appropriate. "
         "Ask the user for missing requirements using ask_user when available. Do not invent an answer to a pending question.\n"
         "Then proceed accordingly using ONLY <project_context> as the source of truth. "
         "Keep code identifiers as written. Put every identifier in `backticks`. Cite each project-specific claim with node ids (and `lines` like \"12-18\" when known). "
