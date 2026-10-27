@@ -124,7 +124,7 @@ def test_missing_fixed_certificate_or_unreviewed_task_refused():
 
 
 def test_profile_hash_and_service_mappings_match_exact_frozen_profile():
-    profile_path = Path(__file__).resolve().parents[1] / "benchmarks/stage4/p07-requests-function-service-profile-v2.json"
+    profile_path = Path(__file__).resolve().parents[1] / "benchmarks/stage4/p07-requests-function-service-profile-v3.json"
     raw = profile_path.read_bytes().replace(b"\r\n", b"\n")
     assert health.sha(raw) == health.PROFILE_SHA256
     profile = json.loads(raw)

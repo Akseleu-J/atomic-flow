@@ -25,11 +25,11 @@ from evaluation_stage4 import load_manifest, patch_paths, protected_test_path
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 16 * 1024**2
-PROFILE = ROOT / "benchmarks/stage4/p07-requests-function-service-profile-v2.json"
+PROFILE = ROOT / "benchmarks/stage4/p07-requests-function-service-profile-v3.json"
 MANIFEST = ROOT / "benchmarks/stage4/corpus-p07-v2.json"
-CONTROLS = ROOT / "benchmarks/stage4/p07-controls-v6.json"
+CONTROLS = ROOT / "benchmarks/stage4/p07-controls-v7.json"
 MANIFEST_SHA256 = "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd"
-PROFILE_SHA256 = "cbeb060fc4e7272034112de1e94f6153a6f41fe92b4c1ab04ff5a2cd44dd86d1"
+PROFILE_SHA256 = "2be37770e20e5379d6e1cbed7b67808308a7903fefb3ca70726c70b9280ecfde"
 
 
 def save(path, value):
@@ -191,6 +191,32 @@ def admit_image(image, base, admitted):
         raise ValueError("actual own-base image ancestry differs from admission")
 
 
+def default_ca_overlay_source(original_sha256, fixture_sha256):
+    import re
+
+    if any(re.fullmatch(r"[0-9a-f]{64}", value) is None for value in (original_sha256, fixture_sha256)):
+        raise ValueError("exact original and fixture CA hashes required")
+    data = {"original": original_sha256, "fixture": fixture_sha256}
+    return r'''import hashlib,json,pathlib
+expected=json.loads(EXPECTED)
+path=pathlib.Path('/testbed/requests/cacert.pem')
+fixture=pathlib.Path('/opt/p07-function-fixture/cacert.pem')
+if path.is_symlink() or fixture.is_symlink() or str(path.resolve())!='/testbed/requests/cacert.pem':
+    raise RuntimeError('CA overlay path confinement failed')
+original=path.read_bytes()
+ca=fixture.read_bytes()
+if hashlib.sha256(original).hexdigest()!=expected['original'] or hashlib.sha256(ca).hexdigest()!=expected['fixture']:
+    raise RuntimeError('CA overlay original or fixture identity mismatch')
+if b'-----BEGIN CERTIFICATE-----' not in ca:
+    raise RuntimeError('fixture CA is not PEM')
+combined=original+b'\n'+ca
+path.write_bytes(combined)
+if path.read_bytes()!=combined or not combined.startswith(original):
+    raise RuntimeError('CA overlay bytes changed')
+print(json.dumps({'path':'requests/cacert.pem','operation':'append_admitted_fixture_CA','original_sha256':expected['original'],'fixture_sha256':expected['fixture'],'result_sha256':hashlib.sha256(combined).hexdigest(),'original_bytes_preserved':True,'verification_disabled':False},sort_keys=True))
+'''.replace("EXPECTED", repr(json.dumps(data, sort_keys=True)))
+
+
 def grade(task, spec, parser, admitted, patch, label, output):
     name = "p07-requests-function-" + uuid.uuid4().hex[:20]
     row = {"label": label, "status": "infrastructure_error", "verified_success": False, "container_name": name,
@@ -256,6 +282,18 @@ def grade(task, spec, parser, admitted, patch, label, output):
             checked(["docker", "cp", str(file), name + ":" + inside])
             checked([*git, "apply", "--check", inside])
             checked([*git, "apply", inside])
+        original_ca = execute([*git, "show", task["base_commit"] + ":requests/cacert.pem"])
+        if original_ca.returncode:
+            raise ValueError("original default CA bundle unavailable")
+        overlay_code = default_ca_overlay_source(oracle.sha(original_ca.stdout), admitted["certificate_files"]["/opt/p07-function-fixture/cacert.pem"])
+        overlay = execute(["docker", "exec", "-i", "-w", "/tmp", name, transplant.LAUNCHER, "-c", legacy.STDIN_BOOTSTRAP], 30,
+                          input_bytes=overlay_code.encode())
+        (output / (label + "-ca-overlay.stdout")).write_bytes(overlay.stdout)
+        (output / (label + "-ca-overlay.stderr")).write_bytes(overlay.stderr)
+        if overlay.returncode:
+            raise ValueError("explicit default CA trust overlay failed")
+        row["default_ca_overlay"] = json.loads(overlay.stdout)
+        row["default_ca_overlay_stdout_sha256"] = oracle.sha(overlay.stdout)
         before = checked([*git, "diff", "--binary", "HEAD"])
         bootstrap = bootstrap_source(task["instance_id"], admitted["installed_files"], admitted["certificate_files"])
         process = execute(["docker", "exec", "-i", "-w", "/testbed", name, transplant.LAUNCHER, "-c", legacy.STDIN_BOOTSTRAP],

@@ -21,7 +21,7 @@ TASK_HOSTS = {
 }
 URLS = {"http": "http://httpbin.org/", "https": "https://httpbin.org/"}
 RESULT_PREFIX = "P07_FUNCTION_HEALTH="
-PROFILE_SHA256 = "cbeb060fc4e7272034112de1e94f6153a6f41fe92b4c1ab04ff5a2cd44dd86d1"
+PROFILE_SHA256 = "2be37770e20e5379d6e1cbed7b67808308a7903fefb3ca70726c70b9280ecfde"
 
 
 def sha(raw):

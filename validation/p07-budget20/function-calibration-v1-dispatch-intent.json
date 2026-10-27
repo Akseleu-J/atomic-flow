@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-10-27T10:26:17.984Z",
+  "head": "5372b666b73e163899f10f76157e1c1485172f3f",
+  "workflow": "p07-requests-function-calibration.yml",
+  "ref": "experimental",
+  "parallel_tasks": [
+    "psf__requests-863",
+    "psf__requests-1963",
+    "psf__requests-2148",
+    "psf__requests-2317"
+  ],
+  "model_calls": 0
+}

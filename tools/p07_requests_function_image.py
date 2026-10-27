@@ -19,8 +19,8 @@ import p07_requests3362_legacy_image as legacy
 from p07_sympy13971_image import fetch
 
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE = ROOT / "benchmarks/stage4/p07-requests-function-service-profile-v2.json"
-PROFILE_SHA = "cbeb060fc4e7272034112de1e94f6153a6f41fe92b4c1ab04ff5a2cd44dd86d1"
+PROFILE = ROOT / "benchmarks/stage4/p07-requests-function-service-profile-v3.json"
+PROFILE_SHA = "2be37770e20e5379d6e1cbed7b67808308a7903fefb3ca70726c70b9280ecfde"
 TASK_IDS = tuple("psf__requests-" + number for number in ("863", "1963", "2148", "2317"))
 CERT_ROOT = "/opt/p07-function-fixture"
 CERT_NAMES = ("cacert.pem", "cert.pem", "key.pem")

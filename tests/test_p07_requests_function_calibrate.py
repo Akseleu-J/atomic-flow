@@ -185,3 +185,20 @@ def test_existing_output_refuses_before_any_remote_or_harness_call(tmp_path, mon
     monkeypatch.setattr(adapter.os, "geteuid", lambda: 0, raising=False)
     with pytest.raises(ValueError, match="fresh output"):
         adapter.main()
+
+
+def test_default_ca_overlay_is_fixed_trust_material_not_python_or_test_edit():
+    source = adapter.default_ca_overlay_source("a" * 64, "b" * 64)
+    ast.parse(source)
+    assert "/testbed/requests/cacert.pem" in source
+    assert "/opt/p07-function-fixture/cacert.pem" in source
+    assert "combined.startswith(original)" in source
+    assert "verification_disabled':False" in source
+    assert "import requests" not in source
+    assert "verify=False" not in source
+
+
+@pytest.mark.parametrize("bad", ["", "a" * 63, "G" * 64, "../path"])
+def test_default_ca_overlay_refuses_unbound_material(bad):
+    with pytest.raises(ValueError):
+        adapter.default_ca_overlay_source(bad, "a" * 64)
