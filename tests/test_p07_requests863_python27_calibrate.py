@@ -30,7 +30,8 @@ def test_real_transport_is_separate_from_target_and_checked_before_exposing_sour
     assert 'context.options &= ~ssl.OP_NO_SSLv3' in code
     assert "self.cfg.set('worker_class','__main__.FixtureThreadWorker')" in service.CHILD
     assert 'ssl.wrap_socket=' not in code and 'ssl.SSLContext=' not in code
-    assert 'os.killpg(process.pid,signal.SIGTERM)' in code
+    assert 'os.kill(process.pid,signal.SIGTERM)' in code
+    assert 'os.killpg(process.pid,signal.SIGKILL)' in code
     assert 'group_still_present' in code
     assert 'requests.' not in service.CHILD and 'import requests' not in service.CHILD
     assert 'httpbin.app(environ,fixture_response)' in service.CHILD

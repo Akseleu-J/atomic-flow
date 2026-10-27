@@ -219,6 +219,8 @@ START_SERVERS
 
 
 finally:
+    print('P07_SERVICE_HEALTH_PROGRESS='+json.dumps({'checks':checks,'active_error':getattr(sys.exc_info()[0],'__name__',None)},sort_keys=True))
+    sys.stdout.flush()
 STOP_SERVERS
 stopped=len(function_processes)==2 and all(process.poll() is not None for process in function_processes)
 if not stopped:

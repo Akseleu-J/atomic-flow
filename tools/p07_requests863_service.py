@@ -55,7 +55,7 @@ function_processes=[]
 def stop_function_servers(require_complete=True):
     failures=[]
     for process in function_processes:
-        try:os.killpg(process.pid,signal.SIGTERM)
+        try:os.kill(process.pid,signal.SIGTERM)
         except OSError:pass
     deadline=time.time()+5
     while any(process.poll() is None for process in function_processes) and time.time()<deadline:time.sleep(0.05)
@@ -65,10 +65,16 @@ def stop_function_servers(require_complete=True):
             except OSError:pass
             failures.append('forced_kill')
         process.wait()
-        try:os.killpg(process.pid,0)
-        except OSError as error:
-            if error.errno!=3:failures.append('group_state_unknown')
-        else:failures.append('group_still_present')
+        group_deadline=time.time()+2
+        while True:
+            try:os.killpg(process.pid,0)
+            except OSError as error:
+                if error.errno!=3:failures.append('group_state_unknown')
+                break
+            if time.time()>=group_deadline:
+                failures.append('group_still_present')
+                break
+            time.sleep(0.05)
     if failures or (require_complete and len(function_processes)!=2):raise RuntimeError('WSGI process cleanup unconfirmed: '+repr(failures))
 try:
     for port in (80,443):
