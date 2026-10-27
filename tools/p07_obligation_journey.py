@@ -78,7 +78,7 @@ def journey(output):
             runner = TaskRunner(config, project, backend, approval_callback=lambda *args: True, check_obligation=obligation)
             task = runner.run_plan("Verify and repair sample so its existing ordinary test passes",
                                    Plan(steps=[PlanStep(description="Check sample requirement and repair if needed",
-                                         tools_needed=["run_command"], verify_with="pytest", scope_paths=["sample.py"])]),
+                                         tools_needed=["read_node", "edit_node", "run_command"], verify_with="pytest", scope_paths=["sample.py"])]),
                                    allowed_paths=["sample.py"], allow_internal_replan=True)
             (output / "task.json").write_text(json.dumps(asdict(task), indent=2) + "\n")
             report.update(task_status=task.status, task_error=task.error, replan_count=task.replan_count,
