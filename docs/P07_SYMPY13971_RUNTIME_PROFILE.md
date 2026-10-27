@@ -117,3 +117,7 @@ fresh independent base/gold/wrong containers with complete ordinary oracle
 selection, source/test/control/runtime/image hashes and confirmed cleanup.
 Gold must have complete required success and no unexpected observed regressions.
 The qualified donor and this package profile do not close SymPy13971 or P07.
+
+## Actual qualification,27 October2026
+
+Workflow40447626567 on87ae817d8731581c20213871969c0b3b152452b0 completed all3native rows. Base/wrong fail the single F2P; gold passes all103required tests; all102P2P pass in every row.114total observations per row, cleanup confirmed, rawlogs/archive digests independently checked. Retained at `validation/p07-budget20/sympy13971-legacy/`. Inventory23/30,P07OPEN. Native direct child -RV exits127 (private libpython not on default loader path); original runner takes its same-process fallback without modified tests, flags or sys.executable. No subprocess hash-randomization qualification is claimed. No model inference performed.

@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-10-27T04:03:41.541Z",
+  "head": "87ae817d8731581c20213871969c0b3b152452b0",
+  "workflow": "p07-sympy13971-legacy.yml",
+  "ref": "experimental",
+  "model_calls": 0,
+  "kind": "base_gold_wrong_only"
+}

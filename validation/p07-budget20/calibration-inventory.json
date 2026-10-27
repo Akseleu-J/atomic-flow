@@ -1,8 +1,8 @@
 {
-  "date": "2026-10-26",
+  "date": "2026-10-27",
   "p07": "OPEN",
   "kind": "Union of independently retained task calibrations, not a new 30-task batch",
-  "accepted": 22,
+  "accepted": 23,
   "total": 30,
   "model_calls": 0,
   "rows": [
@@ -1551,8 +1551,8 @@
     {
       "instance_id": "sympy__sympy-13971",
       "base_commit": "84c125972ad535b2dfb245f8d311d347b45e5b8a",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/sympy13971-legacy/calibration.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/sympy__sympy-13971.json",
@@ -1577,6 +1577,51 @@
               "verified_success": false
             }
           ]
+        },
+        {
+          "report": "validation/p07-budget20/sympy13971-legacy/calibration.json",
+          "report_sha256": "ed0fad34eaa8816b288db958df5cff69cd5b39437d5a0c261607416d409e6c94",
+          "calibrated": true,
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "f4c8fba47a90f4cbc653d732b001969b0bb7e9a01f8ccb5c109ce1217d0698d1",
+          "runtime_profile_sha256": "821e48d06e7db5efd03bb59f3efc199826d1e83c23dc00d9e0ba98cc47eaee69",
+          "runtime_commit": "87ae817d8731581c20213871969c0b3b152452b0",
+          "workflow_run": 40447626567,
+          "artifact_id": 12709250963,
+          "archive_sha256": "d415e475ac81edbc4058902591d75e89ca27de5e227713091ebe233db446fc2f",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_exit": 0,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "log_sha256": "01af2713a91b9daec44c1455295adef6ab9f2c37e08fef2e7bf01e50ee77af2d"
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "verified_success": true,
+              "regressions_passed": true,
+              "cleanup_exit": 0,
+              "cleanup_confirmed": true,
+              "process_exit": 0,
+              "log_sha256": "df469b34b9ae576e9bf1328c0b9b51f9754bfbe90ea0c54391e785c8f19453a4"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_exit": 0,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "log_sha256": "1886fffbf12557e6297ec24670e5b628e9de8bd78a14a89e3d66d38967f68075"
+            }
+          ],
+          "runtime_limitation": "native subprocess hash randomization unavailable; unmodified native same-process fallback; all103 requirements observed"
         }
       ]
     }

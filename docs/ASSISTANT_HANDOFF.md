@@ -1,5 +1,7 @@
 # Atomic-flow: справочник основного исполнителя
 
+27 октября: принято **23/30** индивидуальных калибровок. SymPy13971: свежая тройка base FAIL / gold PASS / wrong FAIL, все103 требования и очистка подтверждены; CI40447626567, runtime87ae817. Приватный Python3.6 использует неизменённый native fallback без subprocess hash randomization. Осталось6Requests+pytest7168. P07 OPEN; model calls в этом пакете=0.
+
 Текущее поручение владельца: полностью довести P07; Kaggle-кампания с 30 отдельными
 workspace, сперва пилот из 3 задач на **Claude Sonnet 5**. Готовые scripts,
 команды и ограничения: [P07_KAGGLE_CAMPAIGN.md](P07_KAGGLE_CAMPAIGN.md).

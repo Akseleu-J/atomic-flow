@@ -93,3 +93,7 @@ This protocol is **not implemented or calibrated by this audit**. Existing
 manifest labels, original logs and classifications remain unchanged.
 `pytest-dev__pytest-7168` stays OPEN and contributes no additional accepted
 calibration to the current inventory.
+
+## Prospective reporting-only profile
+
+A separate `p07_pytest7168_calibrate.py` now preserves the complete file and all11 IDs and changes only `pytest -rA` to `pytest -rA --tb=short`. The pinned source shows that short traceback formatting avoids repr_args(), the recursive reporting path. Seven runner/config/protected-file hashes are checked inside the image before tests. Strict classification remains unchanged: INTERNALERROR cannot be accepted. Local contract tests:23PASS,RuffPASS. A fresh actual base/gold/wrong run remains required; this is no acceptance claim.
