@@ -33,6 +33,7 @@ class ToolContext:
     tree_ignore: list[str] | None = None
     respect_gitignore: bool = True
     execution: ExecutionConfig = field(default_factory=ExecutionConfig)
+    check_obligation: Any = None  # Host object only; never decoded from model tool arguments.
     cancel_check: Callable[[], None] = field(default=lambda: None)
     enforce_read_before_edit: bool = False
     reads: list[dict[str, Any]] = field(default_factory=list)

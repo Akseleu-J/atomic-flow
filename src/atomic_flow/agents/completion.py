@@ -11,7 +11,7 @@ from atomic_flow.agents.source import confined_path, digest
 from atomic_flow.output import sanitize_output
 
 
-def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dict:
+def assess_completion(task, changeset, config, cancel_check=lambda: None, *, check_obligation=None) -> dict:
     report = {"schema_version": 1, "ready_to_publish": False, "checked_at": time.time(),
               "checks": [], "diagnostics": [], "tests": "not_run", "model_calls": 0}
     if task.goals or any(s.acceptance_criteria for s in task.steps):
@@ -90,7 +90,18 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None) -> dic
             report["impact_check_plan"]["final_gate_applicable"] = impact_requires_tests
             if not impact_requires_tests:
                 report["impact_check_plan"]["test_coverage"] = "not_assessed_no_test_files"
-        if (impact_requires_tests or config.task.final_check == "pytest"
+        if check_obligation is not None:
+            from atomic_flow.check_obligation import check_observation, require_obligation_binding, run_obligation_check
+            require_obligation_binding(task.plan_approval, check_obligation)
+            spec, receipt = run_obligation_check(check_obligation, changeset.workspace, cancel_check=cancel_check)
+            report.update(check_observation(check_obligation, spec, receipt))
+            report["tests"] = "passed" if receipt.check_passed else "failed"
+            report["test_exit_code"] = receipt.result.returncode
+            report["test_timed_out"] = receipt.result.timed_out
+            report["test_output_tail"] = sanitize_output((receipt.result.stdout + receipt.result.stderr)[-3000:])
+            if not receipt.check_passed:
+                return report
+        elif (impact_requires_tests or config.task.final_check == "pytest"
                 or any(s.verify_with == "pytest" and s.status == "done" for s in task.steps)):
             result = run_python(["-m", "pytest", "-q", "--no-header", "-x"], changeset.workspace,
                                 config=config.execution, timeout=180, cancel_check=cancel_check)

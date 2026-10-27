@@ -646,8 +646,17 @@ class Orchestrator:
     def __init__(self, config: AtomicConfig, project: str | Path, backend: LLMBackend,
                  approval_callback=None, *, settings_project: str | Path | None = None, cancel_check=None,
                  question_callback=None, private_workspace=False, control=None, event_sink=None, mutation_scope=None,
-                 workspace_session=None, lsp_client=None, documentation_client=None, hooks=None, tool_registry=None, role_tools=None):
+                 workspace_session=None, lsp_client=None, documentation_client=None, hooks=None, tool_registry=None, role_tools=None,
+                 check_obligation=None):
         self.config = config
+        if check_obligation is not None:
+            from atomic_flow.check_obligation import CheckObligation
+            if type(check_obligation) is not CheckObligation:
+                raise TypeError("check_obligation must be a host-owned CheckObligation")
+            if (config.execution.mode != "docker" or config.execution.profile != "checks"
+                    or config.execution.image != check_obligation.template.image):
+                raise ValueError("ordinary-test obligation requires its reviewed Docker checks image")
+        self.check_obligation = check_obligation
         self.project = Path(project).expanduser().resolve()
         self.backend = backend
         self.approval_callback = approval_callback
@@ -773,6 +782,7 @@ class Orchestrator:
                        trusted=trusted, approval_callback=self.approval_callback,
                        tree_ignore=self.config.tree.ignore, respect_gitignore=self.config.tree.respect_gitignore,
                        execution=self.config.execution, cancel_check=self.cancel_check,
+                       check_obligation=self.check_obligation,
                        enforce_read_before_edit=True, question_callback=self.question_callback,
                        journal_event=run.event, private_workspace=self.private_workspace)
         run.tool_ctx.action_boundary = self.control.boundary if self.control is not None else None

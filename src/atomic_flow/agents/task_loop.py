@@ -71,11 +71,19 @@ class StepFailure(Exception):
 
 class TaskRunner:
     def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None,
-                 capability_factory=None, resource_limits: ProjectLimits | None = None):
+                 capability_factory=None, resource_limits: ProjectLimits | None = None, *, check_obligation=None):
         if resource_limits is not None and not isinstance(resource_limits, ProjectLimits):
             raise TypeError("resource_limits must be host-owned ProjectLimits")
         self.config = config if config is not None else AtomicConfig()
         self.project = project
+        from atomic_flow.check_obligation import CheckObligation
+        if check_obligation is not None:
+            if type(check_obligation) is not CheckObligation:
+                raise TypeError("check_obligation must be a host-owned CheckObligation")
+            if (self.config.execution.mode != "docker" or self.config.execution.profile != "checks"
+                    or self.config.execution.image != check_obligation.template.image):
+                raise ValueError("ordinary-test obligation requires its exact reviewed Docker checks image")
+        self.check_obligation = check_obligation
         self.backend = backend
         self.approval_callback = approval_callback
         self.question_callback = question_callback
@@ -112,8 +120,13 @@ class TaskRunner:
             raise ValueError("allow_internal_replan must be an explicit boolean")
         if allow_internal_replan and self.capability_factory is not None:
             raise ValueError("internal replans do not support injected capabilities in this version")
-        envelope = make_envelope(task, self.config, self.project, self.backend) if allow_internal_replan else None
-        return review_payload(task, self.project, allowed_paths, internal_replan=envelope)
+        if self.check_obligation is not None:
+            workspace = ChangeSet.open(self.project, task.changeset_id).workspace if task.changeset_id else self.project
+            self.check_obligation.derive(workspace)
+        envelope = make_envelope(task, self.config, self.project, self.backend,
+                                 check_obligation=self.check_obligation) if allow_internal_replan else None
+        return review_payload(task, self.project, allowed_paths, internal_replan=envelope,
+                              check_obligation=self.check_obligation)
 
     def review(self, task: Task, *, allowed_paths: list[str] | None = None, allow_internal_replan: bool = False) -> dict:
         with task_lease(task.id):
@@ -217,7 +230,7 @@ class TaskRunner:
                 from atomic_flow.agents.changeset import _files
                 from atomic_flow.agents.step_evidence import manifest_digest
                 with source_mutation_lease(self.project):
-                    revision = manifest_digest(_files(self.project, limits=self.resource_limits, cancel_check=check))
+                    revision = manifest_digest(_files(self.project, user_dir().resolve(), limits=self.resource_limits, cancel_check=check))
                     try:
                         graph_revision = load_tree(self.project).get("fingerprint")
                     except TreeError:
@@ -430,7 +443,8 @@ class TaskRunner:
                 self._check_effects(result)
                 self._require_replan_runtime(result)
                 from atomic_flow.agents.completion import assess_completion
-                result.completion_report = assess_completion(result, self.changeset, self.config, self.cancel_check)
+                result.completion_report = assess_completion(result, self.changeset, self.config, self.cancel_check,
+                                                            check_obligation=self.check_obligation)
                 save(result)
                 if not result.completion_report["ready_to_publish"]:
                     result.status = "paused"
@@ -662,12 +676,20 @@ class TaskRunner:
         return task
 
     def _require_replan_runtime(self, task):
+        from atomic_flow.check_obligation import require_obligation_binding
+        try:
+            require_obligation_binding(task.plan_approval, self.check_obligation)
+            if self.check_obligation is not None:
+                workspace = self.changeset.workspace if self.changeset else self.project
+                self.check_obligation.derive(workspace, cancel_check=self.cancel_check)
+        except ValueError as exc:
+            raise ChangeSetConflict(str(exc)) from exc
         check_deadline(task)
         envelope = task.plan_approval.get("internal_replan")
         if envelope is None:
             return
         try:
-            if self.capability_factory is not None or runtime_digest(self.config, self.project, self.backend) != envelope["runtime_digest"]:
+            if self.capability_factory is not None or runtime_digest(self.config, self.project, self.backend, check_obligation=self.check_obligation) != envelope["runtime_digest"]:
                 raise ValueError("runtime, policy, trust or capabilities changed")
         except (OSError, ValueError, KeyError) as exc:
             raise ChangeSetConflict(f"internal replan runtime binding changed: {exc}; fresh review required") from exc
@@ -716,7 +738,7 @@ class TaskRunner:
                 envelope["replan_failures"].append(signature)
             if no_progress(previous_approval, step.result_summary):
                 task.plan_approval = review_payload(task, self.project, previous_approval["allowed_paths"],
-                                                    internal_replan=envelope)
+                                                    internal_replan=envelope, check_obligation=self.check_obligation)
                 task.status, task.error = "paused", "no-progress guard: recurring failure requires fresh review"
                 save(task)
                 return task
@@ -834,7 +856,8 @@ class TaskRunner:
                 self._check_effects(task)
                 with source_mutation_lease(self.project):
                     review = review_payload(task, self.project, previous_approval["allowed_paths"],
-                                            internal_replan=previous_approval["internal_replan"])
+                                            internal_replan=previous_approval["internal_replan"],
+                                            check_obligation=self.check_obligation)
                     if any(review[key] != previous_approval[key] for key in ("source_manifest", "scope_hashes", "allowed_paths")):
                         raise ChangeSetConflict("source or path scope changed during replan")
                     task.plan_approval = review
@@ -983,7 +1006,8 @@ class TaskRunner:
                             mutation_scope=effective_scope,
                             workspace_session=capabilities.workspace_session, lsp_client=capabilities.lsp_client,
                             documentation_client=capabilities.documentation_client, hooks=capabilities.hooks,
-                            tool_registry=capabilities.tool_registry, role_tools=capabilities.role_tools)
+                            tool_registry=capabilities.tool_registry, role_tools=capabilities.role_tools,
+                            check_obligation=self.check_obligation)
         result = orch.answer(subquery, mode="medium", approve_edits=True, retrieval_query=base_query)
         self._step_tool_calls[step.index] = result.tool_calls or []
         step.request_id = result.ledger_id
@@ -1088,6 +1112,18 @@ class TaskRunner:
             step.result_summary = f"ok (file verification passed; syntax {syntax}; tests " + (
                 "passed)" if all("pytest" in edit.get("checks", []) for edit in edits) else "not run for all edits)"
             )
+            return
+
+        if step.verify_with == "pytest" and self.check_obligation is not None:
+            from atomic_flow.check_obligation import run_obligation_check
+            workspace = self.changeset.workspace if self.changeset else self.project
+            spec, receipt = run_obligation_check(self.check_obligation, workspace, cancel_check=self.cancel_check)
+            if receipt.result.timed_out:
+                raise StepFailure(step.index, "host obligation timed out", "check_timeout")
+            if not receipt.check_passed:
+                raise self._check_failure(step, "complete host ordinary-test obligation failed", "pytest",
+                                          receipt.result.returncode, checked_revision=spec.source_revision)
+            step.result_summary = "ok (complete source-bound ordinary-test obligation passed)"
             return
 
         if step.verify_with == "pytest":

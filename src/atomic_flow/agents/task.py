@@ -266,6 +266,13 @@ def _validate_approval(approval: dict) -> None:
     required = {"schema_version", "task_id", "project", "plan", "source_manifest", "allowed_paths",
                 "scope_hashes", "workspace_manifest", "digest"}
     version = approval.get("schema_version")
+    if "check_obligation" in approval:
+        from atomic_flow.check_obligation import validate_obligation_binding
+        try:
+            validate_obligation_binding(approval["check_obligation"])
+        except ValueError as exc:
+            raise StateError(str(exc)) from exc
+        required.add("check_obligation")
     if version == 2:
         required.add("internal_replan")
     if set(approval) != required or type(version) is not int or version not in {1, 2}:

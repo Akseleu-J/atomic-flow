@@ -33,6 +33,19 @@ class RunCommandTool(Tool):
     args_schema = RunCommandArgs
 
     def run(self, args: RunCommandArgs, ctx: ToolContext) -> dict[str, Any]:
+        if ctx.check_obligation is not None and args.command == "pytest":
+            from atomic_flow.check_obligation import check_observation, run_obligation_check
+            if args.target:
+                return {"command": "pytest", "error": "host ordinary-test obligation cannot be narrowed"}
+            ctx.cancel_check()
+            with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
+                spec, receipt = run_obligation_check(ctx.check_obligation, check_root, cancel_check=ctx.cancel_check)
+            result = receipt.result
+            observation = check_observation(ctx.check_obligation, spec, receipt)
+            return sanitize_output({"command": "pytest", "exit_code": result.returncode,
+                                    **observation, "timed_out": result.timed_out,
+                                    "error": "" if receipt.check_passed else "complete host test obligation failed or incomplete",
+                                    "stdout": result.stdout[-4000:], "stderr": result.stderr[-2000:], "index_revision": ctx.revision})
         command_parts = ALLOWED.get(args.command)
         if command_parts is None:
             return {"error": f"command not allowed: {args.command}"}

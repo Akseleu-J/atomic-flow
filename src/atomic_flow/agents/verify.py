@@ -24,12 +24,14 @@ class VerificationResult:
     exit_code: int | None = None
     checked_source_revision: str = ""
     source_changed: bool = False
+    check_observation: dict = field(default_factory=dict)
 
 
 def check_source_snapshot(root: Path, cancel_check=None) -> dict:
     """Execution-boundary audit over the same admitted snapshot as changesets."""
     from atomic_flow.agents.changeset import _files
-    return _files(root, cancel_check=cancel_check or (lambda: None))
+    from atomic_flow.config import user_dir
+    return _files(root, user_dir().resolve(), cancel_check=cancel_check or (lambda: None))
 
 
 def check_source_revision(root: Path, cancel_check=None) -> str:
@@ -60,7 +62,7 @@ def _matching_tests(project_root: Path, rel_path: str) -> list[str]:
 
 def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
                 timeout_seconds: int = 120, execution: ExecutionConfig | None = None,
-                cancel_check: Callable[[], None] | None = None, private_workspace: bool = False) -> VerificationResult:
+                cancel_check: Callable[[], None] | None = None, private_workspace: bool = False, check_obligation=None) -> VerificationResult:
     if cancel_check:
         cancel_check()
     try:
@@ -71,6 +73,24 @@ def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
         source_hash = digest(data)
     except OSError:
         return VerificationResult(ok=False, checks=["exists"], message=f"file missing, unsafe or oversized: {rel_path}")
+    if check_obligation is not None:
+        from atomic_flow.check_obligation import check_observation, run_obligation_check
+        if rel_path.endswith((".py", ".pyi")):
+            try:
+                compile(data, rel_path, "exec", dont_inherit=True)
+            except SyntaxError as exc:
+                return VerificationResult(ok=False, checks=["syntax"], message=str(exc)[:500],
+                                          diagnostics=[syntax_diagnostic(rel_path, data, exc)], source_hash=source_hash)
+        with checked_workspace(project_root, private_workspace=private_workspace, cancel_check=cancel_check) as check_root:
+            spec, receipt = run_obligation_check(check_obligation, check_root, cancel_check=cancel_check)
+        result = receipt.result
+        return VerificationResult(ok=receipt.check_passed, checks=["syntax", "pytest"],
+                                  message="complete host ordinary-test obligation " + ("passed" if receipt.check_passed else "failed or incomplete"),
+                                  test_output=(result.stdout + result.stderr)[-3000:], source_hash=source_hash,
+                                  timed_out=result.timed_out, exit_code=result.returncode,
+                                  checked_source_revision=spec.source_revision,
+                                  source_changed=receipt.source_before != receipt.source_after,
+                                  check_observation=check_observation(check_obligation, spec, receipt))
     if not rel_path.endswith((".py", ".pyi")):
         return VerificationResult(ok=True, checks=["skip"], message="non-Python file; only structural check", source_hash=source_hash)
 

@@ -88,7 +88,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
             if data is None:
                 continue
             verdict = verify_edit(ctx.project_root, path, execution=ctx.execution, cancel_check=ctx.cancel_check,
-                                  private_workspace=ctx.private_workspace)
+                                  private_workspace=ctx.private_workspace, check_obligation=ctx.check_obligation)
             diagnostics.extend(verdict.diagnostics)
             for check in verdict.checks:
                 if check != "skip":
@@ -102,7 +102,15 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
         # former path cannot be compiled. Run its matching tests when present.
         removed_tests = sorted({test for path, data in after.items() if data is None
                                 for test in _matching_tests(ctx.project_root, path)} - tested)
-        if removed_tests:
+        if ctx.check_obligation is not None and any(data is None for data in after.values()):
+            from atomic_flow.check_obligation import run_obligation_check
+            with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
+                _, receipt = run_obligation_check(ctx.check_obligation, check_root, cancel_check=ctx.cancel_check)
+            checks.append("pytest")
+            verification["pytest"] = "passed" if receipt.check_passed else "failed"
+            if not receipt.check_passed:
+                raise SourceConflict("complete host ordinary-test obligation failed after file removal/move")
+        elif removed_tests:
             with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
                 result = run_python(["-m", "pytest", "-q", "--no-header", "-x", *removed_tests], check_root,
                                     config=ctx.execution, timeout=120, cancel_check=ctx.cancel_check)
@@ -139,12 +147,14 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
                 "check_exit_code": verdict.exit_code if verdict else None,
                 "check_source_changed": bool(verdict and verdict.source_changed),
                 "checked_source_revision": verdict.checked_source_revision if verdict else "",
+                    **(verdict.check_observation if verdict else {}),
                 "index_refresh_error": refresh_error, "diagnostics": diagnostics}
     changes = [{"path": path, "before_hash": hashes["before"], "after_hash": hashes["after"]}
                for path, hashes in state["changes"].items()]
     return {"status": "applied", "edit_id": edit_id, "path": next(iter(after)), "paths": list(after),
             "changes": changes, "content_hash": changes[0]["after_hash"], "checks": checks,
             "verification": verification, "index_revision": ctx.revision, "diagnostics": diagnostics,
+            **(verdict.check_observation if verdict else {}),
             "undo_hint": f"atomic undo {edit_id}"}
 
 

@@ -247,3 +247,73 @@ class CheckObligation:
                 raise CheckObligationError("task verification deadline expired during admission")
             return replace(self.template, source_revision=manifest_digest(before),
                            timeout_seconds=min(self.template.timeout_seconds, remaining), resources=selected)
+
+
+def obligation_binding(obligation: CheckObligation | None) -> dict | None:
+    """Persist only the host contract identity, never a deserializable authority."""
+    if obligation is None:
+        return None
+    if type(obligation) is not CheckObligation:
+        raise CheckObligationError("host-owned CheckObligation required")
+    return {"digest": obligation.digest, "environment_digest": obligation.environment_digest,
+            "deadline_at": obligation.deadline_at}
+
+
+def validate_obligation_binding(value: dict) -> None:
+    if (type(value) is not dict or set(value) != {"digest", "environment_digest", "deadline_at"}
+            or any(type(value[name]) is not str or re.fullmatch(r"[0-9a-f]{64}", value[name]) is None
+                   for name in ("digest", "environment_digest"))):
+        raise CheckObligationError("invalid persisted ordinary-test obligation binding")
+    _finite("deadline", value["deadline_at"])
+
+
+def require_obligation_binding(approval: dict, obligation: CheckObligation | None) -> None:
+    expected = approval.get("check_obligation")
+    if expected is not None:
+        validate_obligation_binding(expected)
+    if expected != obligation_binding(obligation):
+        raise CheckObligationError("ordinary-test obligation is missing or changed; fresh review required")
+
+
+def run_obligation_check(obligation: CheckObligation, workspace: Path, *, cancel_check=None):
+    """Derive and execute one complete host check using the admitted Docker path."""
+    from atomic_flow.check_execution import run_check_spec
+
+    if type(obligation) is not CheckObligation:
+        raise CheckObligationError("host-owned CheckObligation required")
+    spec = obligation.derive(workspace, cancel_check=cancel_check)
+    return spec, run_check_spec(spec, workspace, cancel_check=cancel_check)
+
+
+def check_observation(obligation: CheckObligation, spec: CheckSpec, receipt) -> dict:
+    """Host result fields whose source and immutable contract can be checked later."""
+    return {"check_obligation_digest": obligation.digest, "check_spec_digest": spec.digest,
+            "check_spec": spec.as_dict(), "check_passed": receipt.check_passed,
+            "checked_source_revision": spec.source_revision}
+
+
+def observation_matches(obligation: CheckObligation, observation: dict, revision: str) -> bool:
+    """Validate a trusted tool receipt's complete contract, not model prose.
+
+    This is an integrity check over host tool observations. It is not a signature
+    or attestation against someone who can rewrite host task/journal state.
+    """
+    if (type(obligation) is not CheckObligation or not isinstance(observation, dict)
+            or observation.get("check_obligation_digest") != obligation.digest
+            or observation.get("checked_source_revision") != revision
+            or observation.get("check_passed") is not True):
+        return False
+    value = observation.get("check_spec")
+    if not isinstance(value, dict):
+        return False
+    try:
+        selected = CheckResources(**value["resources"])
+        if any(getattr(selected, name) > getattr(obligation.template.resources, name)
+               for name in selected.__dataclass_fields__):
+            return False
+        candidate = replace(obligation.template, source_revision=revision,
+                            timeout_seconds=value["timeout_seconds"], resources=selected)
+        return (candidate.timeout_seconds <= obligation.template.timeout_seconds
+                and candidate.as_dict() == value and candidate.digest == observation.get("check_spec_digest"))
+    except (KeyError, TypeError, ValueError):
+        return False

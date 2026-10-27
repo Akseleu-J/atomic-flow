@@ -78,7 +78,7 @@ class EditNodeTool(Tool):
         verdict = None
         try:
             verdict = verify_edit(ctx.project_root, node.path, execution=ctx.execution, cancel_check=ctx.cancel_check,
-                                  private_workspace=ctx.private_workspace)
+                                  private_workspace=ctx.private_workspace, check_obligation=ctx.check_obligation)
             if verdict.ok:
                 read_checked(ctx.project_root, node.path, digest(updated))
                 ctx.refresh(changed_paths=[node.path])
@@ -107,6 +107,7 @@ class EditNodeTool(Tool):
                     "check_exit_code": verdict.exit_code if verdict else None,
                     "check_source_changed": bool(verdict and verdict.source_changed),
                     "checked_source_revision": verdict.checked_source_revision if verdict else "",
+                    **(verdict.check_observation if verdict else {}),
                     "test_output": verdict.test_output[:2000] if verdict else "",
                     "diagnostics": verdict.diagnostics if verdict else [],
                     "diagnostic_source_hash": verdict.source_hash if verdict else ""}
@@ -114,4 +115,5 @@ class EditNodeTool(Tool):
                 "symbol": node.symbol, "old_lines": f"{node.start_line}-{node.end_line}",
                 "new_lines_count": len(new_body), "checks": verdict.checks,
                 "message": verdict.message, "index_revision": ctx.revision, "diagnostics": verdict.diagnostics,
+                **verdict.check_observation,
                 "content_hash": ctx.file_hashes[node.path], "undo_hint": f"atomic undo {record.edit_id}"}

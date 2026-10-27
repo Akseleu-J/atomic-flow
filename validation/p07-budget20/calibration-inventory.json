@@ -2,7 +2,7 @@
   "date": "2026-10-27",
   "p07": "OPEN",
   "kind": "Union of independently retained task calibrations, not a new 30-task batch",
-  "accepted": 25,
+  "accepted": 28,
   "total": 30,
   "model_calls": 0,
   "rows": [
@@ -44,8 +44,8 @@
     {
       "instance_id": "psf__requests-1963",
       "base_commit": "110048f9837f8441ea536804115e80b69f400277",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/function-calibration-v2/psf__requests-1963.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/psf__requests-1963.json",
@@ -73,14 +73,57 @@
               "verified_success": false
             }
           ]
+        },
+        {
+          "report": "validation/p07-budget20/function-calibration-v2/psf__requests-1963.json",
+          "report_sha256": "588601a468046381fbe6ad99272e876fcb18ef1c265b001e8548ad2eb49cfee7",
+          "calibrated": true,
+          "runtime_commit": "ecaaea6bc5992b648a2b6443af23c967c02a1562",
+          "workflow_run": 40491720928,
+          "artifact_id": 12727783550,
+          "archive_sha256": "e2d4c141f0fb2e074ea9a137827b95658f0e9e3ce6fc8fb65f7ff39ede1a9321",
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "683893b8ff610d0f9b67a6ace6733757d5a945b8e398fd393c9f25ce3996cea7",
+              "stderr_sha256": "5b550fdf076bd5f95aadd122e57a31b9c8ee3e535e17456f63e066355c81de33"
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "verified_success": true,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 0,
+              "stdout_sha256": "da46f7d8ce9ea2b6eec66a2a08f47505b8472179413a710585bc6238558ea479",
+              "stderr_sha256": "a2c14b8f3d2b3ebcd615a345ed40ae29a1e31924222340272b620f7f7052960c"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "8e39f0f9e04687863369b8ebebf3beb36cf8f931c0211be9ee13e01ac3b2b80d",
+              "stderr_sha256": "ddd896c625f14a0e6071d255547d44fb7bab738411784f569fbf73f3ebbb5f34"
+            }
+          ]
         }
       ]
     },
     {
       "instance_id": "psf__requests-2317",
       "base_commit": "091991be0da19de9108dbe5e3752917fea3d7fdc",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/function-calibration-v2/psf__requests-2317.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/psf__requests-2317.json",
@@ -106,6 +149,49 @@
               "status": "requirement_failed",
               "regressions_passed": false,
               "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/function-calibration-v2/psf__requests-2317.json",
+          "report_sha256": "59305e639e31234e437775f0d1fd49770f60f83643400e9299f5bb0fd4f2c583",
+          "calibrated": true,
+          "runtime_commit": "ecaaea6bc5992b648a2b6443af23c967c02a1562",
+          "workflow_run": 40491720928,
+          "artifact_id": 12728953571,
+          "archive_sha256": "74fe2878bd85f496b953a0dce8f04ce6a9dac6a513c174cc4b9570f4f7b81511",
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "c2b0c5808c7e91ac367bea3d78dccdea650260ea802ab77ec6eaa057594c46bd",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "verified_success": true,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 0,
+              "stdout_sha256": "b95d2cedb9a314b1087ba86cb771b44710cf4b6a47e44e98b3f7a7f31da1a5bc",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "d5edc2f9dbb5e319bb18d1fb605e1281883e9a9ebdde87850234dc77d2f3bdad",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
             }
           ]
         }
@@ -380,8 +466,8 @@
     {
       "instance_id": "psf__requests-2148",
       "base_commit": "fe693c492242ae532211e0c173324f09ca8cf227",
-      "status": "OPEN",
-      "accepted_evidence": null,
+      "status": "accepted",
+      "accepted_evidence": "validation/p07-budget20/function-calibration-v2/psf__requests-2148.json",
       "attempts": [
         {
           "report": "validation/p07-budget20/calibration-v2/psf__requests-2148.json",
@@ -407,6 +493,49 @@
               "status": "requirement_failed",
               "regressions_passed": false,
               "verified_success": false
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/function-calibration-v2/psf__requests-2148.json",
+          "report_sha256": "4fe4743a522cc9e46f2ae4d3bf6cf14812646e4ef8ff875312caea42a7719e3d",
+          "calibrated": true,
+          "runtime_commit": "ecaaea6bc5992b648a2b6443af23c967c02a1562",
+          "workflow_run": 40491720928,
+          "artifact_id": 12728058860,
+          "archive_sha256": "364c1924bf94b8423aed70534b57d5f1f05283beedd93ec708d97b666733dd2e",
+          "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "d74c20e267a07d756035ac5989bdae6f164e3fa2ced8f8e1c295616c6da50ac0",
+              "stderr_sha256": "b8b4ab81e8fe00021ac90c2b9e218e6e45736001e6562a96d9af895a6f9733b3"
+            },
+            {
+              "label": "gold",
+              "status": "verified_success",
+              "verified_success": true,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 0,
+              "stdout_sha256": "de6fd4a20850ae52c2bc4ff5035c5dc1bcc66dc5960d752083a8d5a241f12015",
+              "stderr_sha256": "d3d071cc1fadb48d04f7bb1e606767bb623a8cea76ab83fa71a8f04c43c13c64"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "23e36b7050963f8f4d9de7b12ecb5c54685860436c44949792ed82bfbe2ccaca",
+              "stderr_sha256": "148b77a3cc63d0f7f6cb0be6fa0317d8cf3d6aac6be7460edcb3d4f42aa23f9c"
             }
           ]
         }

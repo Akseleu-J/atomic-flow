@@ -57,7 +57,7 @@ def path_scope(project, paths):
     return sorted(set(result))
 
 
-def review_payload(task, project, allowed_paths=None, *, internal_replan=None):
+def review_payload(task, project, allowed_paths=None, *, internal_replan=None, check_obligation=None):
     if Path(task.project).resolve() != project.resolve():
         raise ChangeSetConflict("task belongs to another project")
     source = _files(project, user_dir().resolve())
@@ -79,6 +79,9 @@ def review_payload(task, project, allowed_paths=None, *, internal_replan=None):
     payload = {"schema_version": 1, "task_id": task.id, "project": str(project.resolve()), "plan": canonical_plan(task),
                "source_manifest": source, "allowed_paths": paths,
                "scope_hashes": {p: source.get(p) for p in paths}, "workspace_manifest": workspace}
+    if check_obligation is not None:
+        from atomic_flow.check_obligation import obligation_binding
+        payload["check_obligation"] = obligation_binding(check_obligation)
     if internal_replan is not None:
         from atomic_flow.agents.envelope import validate_envelope
         validate_envelope(internal_replan)

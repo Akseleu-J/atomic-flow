@@ -56,7 +56,7 @@ def validate_envelope(value: Any) -> None:
         raise ValueError("invalid internal replan failure history")
 
 
-def runtime_digest(config, project: Path, backend=None) -> str:
+def runtime_digest(config, project: Path, backend=None, *, check_obligation=None) -> str:
     """Bind declared runtime, trust and policies; never persist raw credentials."""
     from atomic_flow.config import is_trusted, user_dir
 
@@ -85,10 +85,13 @@ def runtime_digest(config, project: Path, backend=None) -> str:
         else:
             policies.append(None)
     raw = {"config": settings, "backend": selected, "trusted": is_trusted(project), "policies": policies}
+    if check_obligation is not None:
+        from atomic_flow.check_obligation import obligation_binding
+        raw["check_obligation"] = obligation_binding(check_obligation)
     return hashlib.sha256(json.dumps(raw, sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 
-def make_envelope(task, config, project: Path, backend=None) -> dict:
+def make_envelope(task, config, project: Path, backend=None, *, check_obligation=None) -> dict:
     if not config.task.fail_on_budget_exceeded:
         raise ValueError("internal replans require enforced task budget")
     if config.routing.mode != "fixed":
@@ -103,7 +106,7 @@ def make_envelope(task, config, project: Path, backend=None) -> dict:
              "allowed_tools": sorted(tools | SOURCE_TOOLS),
              "required_verify": max((step.verify_with for step in steps), key=VERIFY_KINDS.get),
              "max_budget_usd": config.task.max_budget_usd, "max_model_calls": config.task.max_model_calls,
-             "max_replans": config.task.max_replans, "runtime_digest": runtime_digest(config, project, backend),
+             "max_replans": config.task.max_replans, "runtime_digest": runtime_digest(config, project, backend, check_obligation=check_obligation),
              "replan_failures": []}
     validate_envelope(value)
     return value
@@ -117,6 +120,15 @@ def check_deadline(task) -> None:
     """
     from atomic_flow.errors import BudgetExceeded
 
+    bound = task.plan_approval.get("check_obligation")
+    if bound is not None:
+        from atomic_flow.check_obligation import validate_obligation_binding
+        try:
+            validate_obligation_binding(bound)
+        except ValueError as exc:
+            raise BudgetExceeded(str(exc)) from exc
+        if time.time() >= bound["deadline_at"]:
+            raise BudgetExceeded("ordinary-test task deadline reached; no automatic continuation")
     envelope = task.plan_approval.get("internal_replan")
     if envelope is None:
         return
