@@ -1,5 +1,7 @@
 # Atomic-flow: справочник основного исполнителя
 
+27 октября: **29/30 калибровок приняты**. Requests2674 CI40497176497 на73751bf: nativePython2.7.18,162 ordinary tests/155 requirements, base/wrong FAIL и gold PASS, regression/source/cleanup/hash проверены. ОсталсяRequests863; реальныйSSLv3 donor2.7.13Wheezy квалифицирован отдельно. Public scripted TaskRunner journey принят; paid matched pairs/holdout/ablations ещё не выполнены, **P07 OPEN**.
+
 27 октября: public scripted TaskRunner journey CI40495395039 SUCCESS (failure→replan→repair→fresh final check→publish); provider_calls=0. Отдельный nativePython2.7 runtime Requests2674 CI40495398692 SUCCESS,244 файла и cleanup проверены. Полная2674 калибровка ещё ожидается; общий счёт28/30, P07 OPEN.
 
 27 октября: **28/30 калибровок приняты**. Свежая матрица CI40491720928

@@ -1,0 +1,354 @@
+{
+  "calibrated": false,
+  "cleanup_confirmed": true,
+  "cleanup_exit": 0,
+  "container_inspect": {
+    "AppArmorProfile": "",
+    "Args": [
+      "-E",
+      "-s",
+      "-S",
+      "-B",
+      "-c",
+      "\nimport collections, importlib, json, sys, sysconfig\nresult={\"version\":sys.version,\"version_info\":list(sys.version_info[:3]),\"executable\":sys.executable,\"prefix\":sys.prefix,\"unicode_size\":sysconfig.get_config_var('Py_UNICODE_SIZE'),\"ldlibrary\":sysconfig.get_config_var('LDLIBRARY'),\"libdir\":sysconfig.get_config_var('LIBDIR'),\"probes\":{}}\nfor name in ('ssl','ctypes','sqlite3','bz2','zlib'):\n    try:\n        module=importlib.import_module(name)\n        item={'status':'imported','path':getattr(module,'__file__',None)}\n        if name=='ssl':\n            item['openssl_version']=module.OPENSSL_VERSION\n            context=module.SSLContext(module.PROTOCOL_SSLv3)\n            item['sslv3_context_constructed']=context.protocol==module.PROTOCOL_SSLv3\n        result['probes'][name]=item\n    except Exception as exc:\n        result['probes'][name]={'status':'exception','exception_type':type(exc).__name__}\nclass SyntheticRequestException(IOError):\n    pass\nclass SyntheticConnectionError(SyntheticRequestException):\n    pass\nexc=SyntheticConnectionError('p07-message-contract')\nresult['probes']['exception_message']={'status':'resolved','value':exc.message,'matches':exc.message=='p07-message-contract'}\nresult['probes']['collections_mapping']={'status':'resolved','module':collections.Mapping.__module__}\nprint(json.dumps(result,sort_keys=True))\n"
+    ],
+    "Config": {
+      "AttachStderr": true,
+      "AttachStdin": false,
+      "AttachStdout": true,
+      "Cmd": [
+        "-E",
+        "-s",
+        "-S",
+        "-B",
+        "-c",
+        "\nimport collections, importlib, json, sys, sysconfig\nresult={\"version\":sys.version,\"version_info\":list(sys.version_info[:3]),\"executable\":sys.executable,\"prefix\":sys.prefix,\"unicode_size\":sysconfig.get_config_var('Py_UNICODE_SIZE'),\"ldlibrary\":sysconfig.get_config_var('LDLIBRARY'),\"libdir\":sysconfig.get_config_var('LIBDIR'),\"probes\":{}}\nfor name in ('ssl','ctypes','sqlite3','bz2','zlib'):\n    try:\n        module=importlib.import_module(name)\n        item={'status':'imported','path':getattr(module,'__file__',None)}\n        if name=='ssl':\n            item['openssl_version']=module.OPENSSL_VERSION\n            context=module.SSLContext(module.PROTOCOL_SSLv3)\n            item['sslv3_context_constructed']=context.protocol==module.PROTOCOL_SSLv3\n        result['probes'][name]=item\n    except Exception as exc:\n        result['probes'][name]={'status':'exception','exception_type':type(exc).__name__}\nclass SyntheticRequestException(IOError):\n    pass\nclass SyntheticConnectionError(SyntheticRequestException):\n    pass\nexc=SyntheticConnectionError('p07-message-contract')\nresult['probes']['exception_message']={'status':'resolved','value':exc.message,'matches':exc.message=='p07-message-contract'}\nresult['probes']['collections_mapping']={'status':'resolved','module':collections.Mapping.__module__}\nprint(json.dumps(result,sort_keys=True))\n"
+      ],
+      "Domainname": "",
+      "Entrypoint": [
+        "/usr/local/bin/python2.7"
+      ],
+      "Env": [
+        "HOME=/tmp",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=C.UTF-8",
+        "GPG_KEY=C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF",
+        "PYTHON_VERSION=2.7.11",
+        "PYTHON_PIP_VERSION=8.1.2"
+      ],
+      "Hostname": "6d3514afa0fb",
+      "Image": "sha256:a047e3d0ae2b44c0c477958af42308b7005e314a58536aa2103404940997b2af",
+      "Labels": {},
+      "OnBuild": null,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Tty": false,
+      "User": "65534:65534",
+      "Volumes": null,
+      "WorkingDir": "/tmp"
+    },
+    "Created": "2026-10-27T11:35:02.490883518Z",
+    "Driver": "overlay2",
+    "ExecIDs": null,
+    "GraphDriver": {
+      "Data": {
+        "ID": "6d3514afa0fb0dde64d8c34825a7bc5bc0750661008de5c84dea56fa813633b4",
+        "LowerDir": "/var/lib/docker/overlay2/510a7a7ad2037c5eeb56e2ea34fdc4fc89df85082310300642f4dc50143c94a2-init/diff:/var/lib/docker/overlay2/7856f22f8b64c0af012de89b0902d7e9ca3eb5bf5bfc871361179d25c32d09bf/diff:/var/lib/docker/overlay2/1086b562c96a4fe9b4c8d750446ec1b60f924cf242ea92bcddb1fbd1da2ea640/diff:/var/lib/docker/overlay2/f3040b2ec82983d37ce9be9d1360edca3bda51bae2041af9c1c95ac3eb9db7ca/diff:/var/lib/docker/overlay2/ac227d5bd31e4f4a219272af4657b26037fe53d8a9ff044ad171276b18666f0c/diff:/var/lib/docker/overlay2/f2216213f5058bec6f2f03e5bfb388d48a8d711b02d63574c9669ed747bb2986/diff:/var/lib/docker/overlay2/131237758a2ffd8eb10bdf675c0d3c4de28d25b28f81a97bcce401ee15ce2fec/diff:/var/lib/docker/overlay2/c1dbc8d4ee6f4e4fe1aaa41e7302a0f1cc9b0036826ee8cbb8281711edeb101f/diff",
+        "MergedDir": "/var/lib/docker/overlay2/510a7a7ad2037c5eeb56e2ea34fdc4fc89df85082310300642f4dc50143c94a2/merged",
+        "UpperDir": "/var/lib/docker/overlay2/510a7a7ad2037c5eeb56e2ea34fdc4fc89df85082310300642f4dc50143c94a2/diff",
+        "WorkDir": "/var/lib/docker/overlay2/510a7a7ad2037c5eeb56e2ea34fdc4fc89df85082310300642f4dc50143c94a2/work"
+      },
+      "Name": "overlay2"
+    },
+    "HostConfig": {
+      "AutoRemove": false,
+      "Binds": null,
+      "BlkioDeviceReadBps": [],
+      "BlkioDeviceReadIOps": [],
+      "BlkioDeviceWriteBps": [],
+      "BlkioDeviceWriteIOps": [],
+      "BlkioWeight": 0,
+      "BlkioWeightDevice": [],
+      "CapAdd": null,
+      "CapDrop": [
+        "ALL"
+      ],
+      "Cgroup": "",
+      "CgroupParent": "",
+      "CgroupnsMode": "private",
+      "ConsoleSize": [
+        0,
+        0
+      ],
+      "ContainerIDFile": "",
+      "CpuCount": 0,
+      "CpuPercent": 0,
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpuRealtimePeriod": 0,
+      "CpuRealtimeRuntime": 0,
+      "CpuShares": 0,
+      "CpusetCpus": "",
+      "CpusetMems": "",
+      "DeviceCgroupRules": null,
+      "DeviceRequests": null,
+      "Devices": [],
+      "Dns": [],
+      "DnsOptions": [],
+      "DnsSearch": [],
+      "ExtraHosts": null,
+      "GroupAdd": null,
+      "IOMaximumBandwidth": 0,
+      "IOMaximumIOps": 0,
+      "IpcMode": "private",
+      "Isolation": "",
+      "Links": null,
+      "LogConfig": {
+        "Config": {},
+        "Type": "json-file"
+      },
+      "MaskedPaths": [
+        "/proc/asound",
+        "/proc/acpi",
+        "/proc/interrupts",
+        "/proc/kcore",
+        "/proc/keys",
+        "/proc/latency_stats",
+        "/proc/timer_list",
+        "/proc/timer_stats",
+        "/proc/sched_debug",
+        "/proc/scsi",
+        "/sys/firmware",
+        "/sys/devices/virtual/powercap"
+      ],
+      "Memory": 1073741824,
+      "MemoryReservation": 0,
+      "MemorySwap": 2147483648,
+      "MemorySwappiness": null,
+      "NanoCpus": 2000000000,
+      "NetworkMode": "none",
+      "OomKillDisable": false,
+      "OomScoreAdj": 0,
+      "PidMode": "",
+      "PidsLimit": 128,
+      "PortBindings": {},
+      "Privileged": false,
+      "PublishAllPorts": false,
+      "ReadonlyPaths": [
+        "/proc/bus",
+        "/proc/fs",
+        "/proc/irq",
+        "/proc/sys",
+        "/proc/sysrq-trigger"
+      ],
+      "ReadonlyRootfs": true,
+      "RestartPolicy": {
+        "MaximumRetryCount": 0,
+        "Name": "no"
+      },
+      "Runtime": "runc",
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "ShmSize": 67108864,
+      "Tmpfs": {
+        "/tmp": "rw,noexec,nosuid,size=128m,mode=1777"
+      },
+      "UTSMode": "",
+      "Ulimits": [],
+      "UsernsMode": "",
+      "VolumeDriver": "",
+      "VolumesFrom": null
+    },
+    "HostnamePath": "",
+    "HostsPath": "",
+    "Id": "6d3514afa0fb0dde64d8c34825a7bc5bc0750661008de5c84dea56fa813633b4",
+    "Image": "sha256:a047e3d0ae2b44c0c477958af42308b7005e314a58536aa2103404940997b2af",
+    "LogPath": "",
+    "MountLabel": "",
+    "Mounts": [],
+    "Name": "/p07-legacy-983485c67075404fbc4a36c6",
+    "NetworkSettings": {
+      "Bridge": "",
+      "EndpointID": "",
+      "Gateway": "",
+      "GlobalIPv6Address": "",
+      "GlobalIPv6PrefixLen": 0,
+      "HairpinMode": false,
+      "IPAddress": "",
+      "IPPrefixLen": 0,
+      "IPv6Gateway": "",
+      "LinkLocalIPv6Address": "",
+      "LinkLocalIPv6PrefixLen": 0,
+      "MacAddress": "",
+      "Networks": {
+        "none": {
+          "Aliases": null,
+          "DNSNames": null,
+          "DriverOpts": null,
+          "EndpointID": "",
+          "Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "GwPriority": 0,
+          "IPAMConfig": null,
+          "IPAddress": "",
+          "IPPrefixLen": 0,
+          "IPv6Gateway": "",
+          "Links": null,
+          "MacAddress": "",
+          "NetworkID": ""
+        }
+      },
+      "Ports": {},
+      "SandboxID": "",
+      "SandboxKey": "",
+      "SecondaryIPAddresses": null,
+      "SecondaryIPv6Addresses": null
+    },
+    "Path": "/usr/local/bin/python2.7",
+    "Platform": "linux",
+    "ProcessLabel": "",
+    "ResolvConfPath": "",
+    "RestartCount": 0,
+    "State": {
+      "Dead": false,
+      "Error": "",
+      "ExitCode": 0,
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "OOMKilled": false,
+      "Paused": false,
+      "Pid": 0,
+      "Restarting": false,
+      "Running": false,
+      "StartedAt": "0001-01-01T00:00:00Z",
+      "Status": "created"
+    }
+  },
+  "image": "library/python@sha256:53ececa6c98c67079fc019644b364608f7fa4ae06cff372a5cb2fc82c90961d4",
+  "image_id": "sha256:a047e3d0ae2b44c0c477958af42308b7005e314a58536aa2103404940997b2af",
+  "image_inspect": {
+    "Architecture": "amd64",
+    "Author": "",
+    "Comment": "",
+    "Config": {
+      "ArgsEscaped": true,
+      "AttachStderr": false,
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "Cmd": [
+        "python2"
+      ],
+      "Domainname": "",
+      "Entrypoint": null,
+      "Env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=C.UTF-8",
+        "GPG_KEY=C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF",
+        "PYTHON_VERSION=2.7.11",
+        "PYTHON_PIP_VERSION=8.1.2"
+      ],
+      "Hostname": "1640342e135b",
+      "Image": "sha256:ec39db9ed47d1f4abeae66c77d45dd84a10edd935e3f572c3d5fbd1bc770014f",
+      "Labels": {},
+      "OnBuild": [],
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Tty": false,
+      "User": "",
+      "Volumes": null,
+      "WorkingDir": ""
+    },
+    "Created": "2016-06-09T14:45:36.218952509Z",
+    "DockerVersion": "1.10.3",
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/1086b562c96a4fe9b4c8d750446ec1b60f924cf242ea92bcddb1fbd1da2ea640/diff:/var/lib/docker/overlay2/f3040b2ec82983d37ce9be9d1360edca3bda51bae2041af9c1c95ac3eb9db7ca/diff:/var/lib/docker/overlay2/ac227d5bd31e4f4a219272af4657b26037fe53d8a9ff044ad171276b18666f0c/diff:/var/lib/docker/overlay2/f2216213f5058bec6f2f03e5bfb388d48a8d711b02d63574c9669ed747bb2986/diff:/var/lib/docker/overlay2/131237758a2ffd8eb10bdf675c0d3c4de28d25b28f81a97bcce401ee15ce2fec/diff:/var/lib/docker/overlay2/c1dbc8d4ee6f4e4fe1aaa41e7302a0f1cc9b0036826ee8cbb8281711edeb101f/diff",
+        "MergedDir": "/var/lib/docker/overlay2/7856f22f8b64c0af012de89b0902d7e9ca3eb5bf5bfc871361179d25c32d09bf/merged",
+        "UpperDir": "/var/lib/docker/overlay2/7856f22f8b64c0af012de89b0902d7e9ca3eb5bf5bfc871361179d25c32d09bf/diff",
+        "WorkDir": "/var/lib/docker/overlay2/7856f22f8b64c0af012de89b0902d7e9ca3eb5bf5bfc871361179d25c32d09bf/work"
+      },
+      "Name": "overlay2"
+    },
+    "Id": "sha256:a047e3d0ae2b44c0c477958af42308b7005e314a58536aa2103404940997b2af",
+    "Metadata": {
+      "LastTagTime": "0001-01-01T00:00:00Z"
+    },
+    "Os": "linux",
+    "Parent": "",
+    "RepoDigests": [
+      "python@sha256:53ececa6c98c67079fc019644b364608f7fa4ae06cff372a5cb2fc82c90961d4"
+    ],
+    "RepoTags": [],
+    "RootFS": {
+      "Layers": [
+        "sha256:4dcab49015d47e8f300ec33400a02cebc7b54cadd09c37e49eccbc655279da90",
+        "sha256:c751e06f6a36fc952a52ec40c441072f52aa2f9a88ef8a6f6f2319f6634ec13e",
+        "sha256:35c3d573b3feb069e56ab4b2998a0cc8ee29bbf540d57f7098d6e673779558a7",
+        "sha256:60f7e2a91a587c0b8b150f4841e91cd4c22c1e40a8e7a4a8ad46b2fe5c363186",
+        "sha256:f5decf3b205f716ea71eadf4359dbdb2383b509021d18ef717b9518171e6f0fb",
+        "sha256:23e4abbbaaa8058c61f6ba316aabd56f4e3b8a8c5164321352aa12df2711b1dd",
+        "sha256:a78e8c30044bca866f620e47b443bd84a0421c2d3e721905733f4b78e1492643"
+      ],
+      "Type": "layers"
+    },
+    "Size": 688063037
+  },
+  "legacy_transplant": "not_attempted",
+  "model_calls": 0,
+  "observed": {
+    "executable": "/usr/local/bin/python2.7",
+    "ldlibrary": "libpython2.7.so",
+    "libdir": "/usr/local/lib",
+    "prefix": "/usr/local",
+    "probes": {
+      "bz2": {
+        "path": "/usr/local/lib/python2.7/lib-dynload/bz2.so",
+        "status": "imported"
+      },
+      "collections_mapping": {
+        "module": "_abcoll",
+        "status": "resolved"
+      },
+      "ctypes": {
+        "path": "/usr/local/lib/python2.7/ctypes/__init__.pyc",
+        "status": "imported"
+      },
+      "exception_message": {
+        "matches": true,
+        "status": "resolved",
+        "value": "p07-message-contract"
+      },
+      "sqlite3": {
+        "path": "/usr/local/lib/python2.7/sqlite3/__init__.py",
+        "status": "imported"
+      },
+      "ssl": {
+        "exception_type": "AttributeError",
+        "status": "exception"
+      },
+      "zlib": {
+        "path": "/usr/local/lib/python2.7/lib-dynload/zlib.so",
+        "status": "imported"
+      }
+    },
+    "unicode_size": 4,
+    "version": "2.7.11 (default, Jun  9 2016, 14:42:54) \n[GCC 4.9.2]",
+    "version_info": [
+      2,
+      7,
+      11
+    ]
+  },
+  "probe_compatible": false,
+  "probe_source_sha256": "095a412b6313c129075a201401312ebdc04e3c3b37f80222338cf937cee77970",
+  "process_exit": 0,
+  "profile": "python2711-sslv3",
+  "provider_credentials": "none",
+  "status": "donor_probe_incompatibility",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "c27475fa10536e54bdfdf4321a87edea85812b0f5701847456eba6f2a164d853",
+  "target_setup_or_tests_executed": false,
+  "target_source_present": false
+}
