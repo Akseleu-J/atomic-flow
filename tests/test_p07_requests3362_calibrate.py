@@ -255,3 +255,56 @@ def test_verbose_output_requires_every_node_and_rejects_collisions():
         adapter.verbose_observations("a.py::test_a PASSED\n", ["a.py::test_a", "a.py::test_b"])
     with pytest.raises(ValueError, match="duplicate canonical"):
         adapter.verbose_observations("a.py::TestA::()::test_a PASSED\na.py::TestA::test_a PASSED\n", ["a.py::TestA::test_a"])
+
+
+@pytest.mark.parametrize("node,expected", [
+    ("a.py::test_x[ø]", r"a.py::test_x[\xf8]"),
+    ("a.py::test_x[Ж]", r"a.py::test_x[\u0416]"),
+    ("a.py::test_x[😀]", r"a.py::test_x[\U0001f600]"),
+    (r"a.py::test_x[literal\xf8]", r"a.py::test_x[literal\xf8]")])
+def test_only_nonascii_codepoints_gain_derived_terminal_aliases(node, expected):
+    assert adapter.terminal_escape_nonascii(node) == expected
+    mapping = adapter.sealed_terminal_mapping([node])
+    assert mapping[node] == mapping[expected] == node
+
+
+def test_exact_captured_unicode_verbose_line_maps_to_sealed_raw_node():
+    raw = "tests/test_requests.py::TestRequests::()::test_unicode_get[ø-params4]"
+    canonical = adapter.canonical_node_id(raw)
+    printed = r"tests/test_requests.py::TestRequests::test_unicode_get[\xf8-params4]"
+    assert adapter.verbose_observations(printed + " PASSED\n", [canonical]) == {canonical: "PASSED"}
+
+
+@pytest.mark.parametrize("nodes", [
+    ["a.py::test_x[ø]", r"a.py::test_x[\xf8]"],
+    [r"a.py::test_x[\xf8]", "a.py::test_x[ø]"],
+    ["a.py::test_x[Ж]", r"a.py::test_x[\u0416]"],
+    ["a.py::test_x[😀]", r"a.py::test_x[\U0001f600]"]])
+def test_literal_escape_and_unicode_spelling_collisions_are_refused(nodes):
+    with pytest.raises(ValueError, match="terminal spelling collision"):
+        adapter.sealed_terminal_mapping(nodes)
+
+
+def test_unsealed_escape_is_not_decoded_into_a_different_node():
+    with pytest.raises(ValueError, match="outside collection"):
+        adapter.verbose_observations(r"a.py::test_x[\u00f8] PASSED" + "\n", ["a.py::test_x[ø]"])
+
+
+def test_independent_parser_uses_the_same_sealed_terminal_alias_map(monkeypatch):
+    task, _ = task_control()
+    result, statuses = receipt(task)
+    raw = "tests/test_requests.py::TestRequests::()::test_unicode_get[ø-params4]"
+    canonical = adapter.canonical_node_id(raw)
+    printed = r"tests/test_requests.py::TestRequests::test_unicode_get[\xf8-params4]"
+    assert canonical not in result["collection"]
+    result["collection"].append(raw)
+    result["reports"].extend({"id": raw, "when": phase, "outcome": "passed", "has_wasxfail": False}
+                             for phase in ("setup", "call", "teardown"))
+    parser_results = {**statuses, printed: "PASSED"}
+    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (parser_results, {}))
+    text = transcript(result, 0).replace(raw + " PASSED", printed + " PASSED", 1)
+    row = adapter.classify_target(task, text, 0, None, None)
+    assert row["tests"][canonical] == "PASSED"
+    assert row["printed_to_canonical_node_ids"][printed] == canonical
+    assert row["raw_to_canonical_node_ids"][raw] == canonical
+    assert row["runner_receipt"]["collection"][-1] == raw

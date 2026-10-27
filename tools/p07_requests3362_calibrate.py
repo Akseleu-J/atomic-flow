@@ -153,12 +153,41 @@ def canonicalize_runner(raw):
     return observed, mapping
 
 
-def verbose_observations(body, collection):
+def terminal_escape_nonascii(node):
+    """Derive legacy ASCII-terminal spellings without decoding literal escapes."""
+    output = []
+    for character in node:
+        point = ord(character)
+        if point < 128:
+            output.append(character)
+        elif point <= 0xff:
+            output.append("\\x" + format(point, "02x"))
+        elif point <= 0xffff:
+            output.append("\\u" + format(point, "04x"))
+        else:
+            output.append("\\U" + format(point, "08x"))
+    return "".join(output)
+
+
+def sealed_terminal_mapping(collection):
+    mapping = {}
+    for node in collection:
+        if canonical_node_id(node) != node:
+            raise ValueError("canonical sealed collection required for terminal mapping")
+        for printed in {node, terminal_escape_nonascii(node)}:
+            if printed in mapping and mapping[printed] != node:
+                raise ValueError("sealed collection terminal spelling collision")
+            mapping[printed] = node
+    return mapping
+
+
+def verbose_observations(body, collection, printed_mapping=None):
     results = {}
+    printed_mapping = sealed_terminal_mapping(collection) if printed_mapping is None else printed_mapping
     pattern = r"^(\S+::.*?)\s+(PASSED|FAILED|ERROR|SKIPPED|xfail|XPASS)(?:\s+\[\s*\d+%\])?\s*$"
     statuses = {"xfail": "XFAILED", "XPASS": "XPASSED"}
     for match in re.finditer(pattern, oracle.ANSI.sub("", body), re.MULTILINE):
-        node = canonical_node_id(match[1])
+        node = printed_mapping.get(canonical_node_id(match[1]))
         if node not in collection or node in results:
             raise ValueError("verbose result outside collection or duplicate canonical node")
         results[node] = statuses.get(match[2], match[2])
@@ -195,10 +224,13 @@ def classify_target(task, text, exit_code, parser, spec):
         if not phases or not {"setup", "teardown"} <= {item.get("when") for item in phases}:
             raise ValueError("ordinary collection lacks complete setup and teardown")
     parsed, diagnostics = oracle.parse_observations(task, body, parser, spec)
-    tests = verbose_observations(body, observed["collection"])
+    printed_mapping = sealed_terminal_mapping(observed["collection"])
+    tests = verbose_observations(body, observed["collection"], printed_mapping)
     parsed_canonical = {}
     for raw_id, status in parsed.items():
-        node = canonical_node_id(raw_id)
+        node = printed_mapping.get(canonical_node_id(raw_id))
+        if node is None:
+            raise ValueError("independent parser result outside sealed terminal identities")
         if node in parsed_canonical:
             raise ValueError("native summary node canonicalization collision")
         parsed_canonical[node] = status
@@ -235,7 +267,7 @@ def classify_target(task, text, exit_code, parser, spec):
     return {**oracle.classify(task, tests, completed=True, exit_code=exit_code), "tests": tests,
             "parser_diagnostics": diagnostics, "runner_receipt": raw_observed,
             "canonical_runner_receipt": observed, "raw_to_canonical_node_ids": node_mapping,
-            "expected_failure_outcomes": expected_outcomes}
+            "expected_failure_outcomes": expected_outcomes, "printed_to_canonical_node_ids": printed_mapping}
 
 
 def execute(args, timeout=60, *, input_bytes=None):

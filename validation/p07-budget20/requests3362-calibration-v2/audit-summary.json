@@ -1,0 +1,41 @@
+{
+  "run": 40454290733,
+  "runtime": "82b42f085fd7a3edc443cf1db8ea995bf2d580b6",
+  "artifact": 12712042751,
+  "archive_sha256": "016ea7b8c740488b9ab95c4712e2d482401cebf161ced2f5ef1642dc4ee3b10d",
+  "accepted": false,
+  "model_calls": 0,
+  "reason": "one historical terminal Unicode escape not mapped; fresh parser qualification required",
+  "rows": [
+    {
+      "label": "base",
+      "native_exit": 1,
+      "collection": 349,
+      "cleanup_confirmed": true,
+      "protected": "failed",
+      "summary": "==== 1 failed, 345 passed, 1 skipped, 1 xfailed, 1 xpassed in 45.26 seconds ====",
+      "stdout_sha256": "2f78ed6d1f3b0f75f0123b2f4d492c1517c86f8a826412f70a25e2806e590665",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "gold",
+      "native_exit": 0,
+      "collection": 349,
+      "cleanup_confirmed": true,
+      "protected": "passed",
+      "summary": "========= 346 passed, 1 skipped, 1 xfailed, 1 xpassed in 45.26 seconds =========",
+      "stdout_sha256": "7b4a903cd59abbfc08654e540405c0cd183c74517202aa79aba905990a1ec08f",
+      "stderr_sha256": "5893e2c5479dcf89b1eb3dec736b6b747f56b7a64f327d1125175b6e91f44735"
+    },
+    {
+      "label": "wrong",
+      "native_exit": 1,
+      "collection": 349,
+      "cleanup_confirmed": true,
+      "protected": "failed",
+      "summary": "==== 1 failed, 345 passed, 1 skipped, 1 xfailed, 1 xpassed in 45.25 seconds ====",
+      "stdout_sha256": "e6cadadbd149c4b587aa684b7fbad45d8f1f7e989a86474da471bd2c6f7ab9ab",
+      "stderr_sha256": "a5cc260e34f65a20092a3c34f90fc52bebf555c3c5bd4a0b70e5d23c3b27f92d"
+    }
+  ]
+}
