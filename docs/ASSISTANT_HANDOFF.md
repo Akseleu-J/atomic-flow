@@ -1,5 +1,7 @@
 # Atomic-flow: справочник основного исполнителя
 
+27 октября:30/30isolatedкалибровок приняты; coupled2-file publicTaskRunner CI40546120074 принят. NativeSymPyCheckSpec boundary CI40549454212 наe026fe9 принят под1GiB/128PID:FAIL→editedPASS→requiredSKIPrefused; archive/rawhash/cleanup проверены. Это syntheticordinarychecker, неfullhistoricalTaskRunner/modelquality. P07OPEN, новыхprovidercallsнет.
+
 27 октября: **30/30 сред калиброваны**. ПоследнийRequests863 CI40541137888 на3101b3c:106ordinarytests/65requirements, base/wrongFAIL толькоhook-тест, gold106PASS; source/hash/namespace/regressions/cleanup проверены. Архив12751400315 SHA256013e9f71a49576dc5f3e5a6e9fc361a5bfba888e344c0de787f8628ffddd1d41. P07OPEN: полныйhistoricalin-looprunner, matchedpairs/holdout/ablations/finalreview ещётребуются. Новыхprovidercalls/spendнет.
 
 27 октября: **29/30 калибровок приняты**. Requests2674 CI40497176497 на73751bf: nativePython2.7.18,162 ordinary tests/155 requirements, base/wrong FAIL и gold PASS, regression/source/cleanup/hash проверены. ОсталсяRequests863; реальныйSSLv3 donor2.7.13Wheezy квалифицирован отдельно. Public scripted TaskRunner journey принят; paid matched pairs/holdout/ablations ещё не выполнены, **P07 OPEN**.

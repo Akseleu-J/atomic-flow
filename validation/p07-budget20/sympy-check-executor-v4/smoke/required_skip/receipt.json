@@ -1,0 +1,16 @@
+{
+  "check_passed": false,
+  "result": {
+    "returncode": 5,
+    "stderr": "",
+    "stderr_truncated": false,
+    "stdout": "ATOMIC_SYMPY_BEGIN:7b44989ec3754517b6c61a7846eda1f0\n============================= test process starts ==============================\nexecutable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]\narchitecture:       64-bit\ncache:              no\nground types:       python \nnumpy:              None\nrandom seed:        15659980\nhash randomization: on (PYTHONHASHSEED=4286365253)\n\nsympy/core/tests/test_p07_native_check.py[2] \ntest_native_identity ok\ntest_native_probe synthetic required ordinary obligation s                  [OK]\n\n\n============= tests finished: 1 passed, 1 skipped, in 0.00 seconds =============\nATOMIC_SYMPY_END:7b44989ec3754517b6c61a7846eda1f0\nATOMIC_CHECK_SPEC_RECEIPT:{\"collected\": 2, \"collection\": [\"sympy/core/tests/test_p07_native_check.py::test_native_identity\", \"sympy/core/tests/test_p07_native_check.py::test_native_probe\"], \"counts\": {\"exceptions\": 0, \"failed\": 0, \"passed\": 1, \"skipped\": 1, \"xfailed\": 0, \"xpassed\": 0}, \"exit_code\": 0, \"files\": [\"sympy/core/tests/test_p07_native_check.py\"], \"finished\": true, \"interpreter\": \"/opt/miniconda3/envs/testbed/bin/python\", \"interpreter_resolved\": \"/opt/miniconda3/envs/testbed/bin/python3.9\", \"native_argv\": [\"/testbed/bin/test\", \"-C\", \"--verbose\", \"sympy/core/tests/test_p07_native_check.py\"], \"native_source_sha256\": {\"bin/get_sympy.py\": \"3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869\", \"bin/test\": \"da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5\", \"sympy/utilities/runtests.py\": \"e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27\"}, \"native_stdout_sha256\": \"f17b861525b1e294bbf0da7f83aa1181311ffc0a6aec1a27e8511d3dbef3bbee\", \"nonce\": \"7b44989ec3754517b6c61a7846eda1f0\", \"python_version\": [3, 9, 20], \"root\": \"/testbed\", \"runner\": \"sympy-native\", \"sympy_module\": \"/testbed/sympy/__init__.py\", \"sympy_version\": \"1.7.dev\", \"test_statuses\": {\"sympy/core/tests/test_p07_native_check.py::test_native_identity\": \"passed\", \"sympy/core/tests/test_p07_native_check.py::test_native_probe\": \"skipped\"}}\n",
+    "stdout_truncated": false,
+    "timed_out": false
+  },
+  "runner_receipt": null,
+  "source_after": "62b22f3cf5be3cc75cb73318a615eb3f146033ded96a81f98d4552cc3c3fc7a4",
+  "source_before": "62b22f3cf5be3cc75cb73318a615eb3f146033ded96a81f98d4552cc3c3fc7a4",
+  "spec_digest": "a3d27164df653828094d97d81cdd560aefadf4408a4a40af1fcdd48255f4e6b3",
+  "verified_success": false
+}

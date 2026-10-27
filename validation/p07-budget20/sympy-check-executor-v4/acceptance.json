@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "native_sympy_checkspec_synthetic_boundary_acceptance",
+  "runtime_commit": "e026fe985c97b4fb78aa21d7b4a1a260978f42a9",
+  "workflow_run": 40549454212,
+  "artifact_id": 12753703781,
+  "archive_sha256": "0a73c3e26de0e121cdce272aea2dd48ddd68c0c2d1b6d6d4f29b4089a6b6e5de",
+  "model_calls": 0,
+  "provider_calls": 0,
+  "independent_requirement_success": false,
+  "full_p07": "OPEN",
+  "qualified": {
+    "interpreter": [
+      3,
+      9,
+      20
+    ],
+    "sympy_version": "1.7.dev",
+    "source_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626",
+    "resources": {
+      "memory_bytes": 1073741824,
+      "cpus": 2,
+      "pids": 128
+    },
+    "native_assertion_failure": {
+      "passed": 1,
+      "failed": 1,
+      "exit": 1,
+      "check_passed": false
+    },
+    "edited_pass": {
+      "passed": 2,
+      "exit": 0,
+      "check_passed": true
+    },
+    "required_skip": {
+      "passed": 1,
+      "skipped": 1,
+      "exit": 5,
+      "check_passed": false
+    },
+    "source_preserved": true,
+    "cleanup_confirmed": true
+  },
+  "limitations": [
+    "Synthetic ordinary tests only, not all historical SymPy suites",
+    "Not a live-model or hidden-oracle evaluation",
+    "Private Python3.6 and Python2 runtimes still unsupported by this profile"
+  ]
+}
