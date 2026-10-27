@@ -41,8 +41,32 @@ enum Command {
         #[command(subcommand)]
         command: BackendCommand,
     },
+    /// Bounded agent journey on the kernel (observe → plan → apply → verify).
+    Agent {
+        #[command(subcommand)]
+        command: AgentCommand,
+    },
     /// In-process vertical journey: build → delta → parity on a scratch root.
     SelfTest,
+}
+
+#[derive(Subcommand)]
+enum AgentCommand {
+    /// Run one bounded journey: full read proof, exact reviewed replacement,
+    /// sandbox apply, syntax/content verification, journaled evidence.
+    Journey {
+        #[arg(long)]
+        root_id: String,
+        #[arg(long)]
+        file: String,
+        /// Exact reviewed replacement text (the reviewed plan; never model output).
+        #[arg(long)]
+        replacement: String,
+        #[arg(long, default_value = "bounded kernel journey")]
+        goal: String,
+        #[arg(long, default_value = "journey")]
+        session_id: String,
+    },
 }
 
 #[derive(Subcommand)]
@@ -194,6 +218,11 @@ fn main() {
 fn run(command: Command) -> Result<String, String> {
     match command {
         Command::SelfTest => self_test(),
+        Command::Agent { command } => match command {
+            AgentCommand::Journey { root_id, file, replacement, goal, session_id } => {
+                agent_journey(root_id, file, replacement, goal, session_id)
+            }
+        },
         Command::Graph { command } => match command {
             GraphCommand::Build { root, store } => graph_build(root, store),
             GraphCommand::Show { store } => graph_show(store),
@@ -334,6 +363,34 @@ fn sha_hex(bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(bytes);
     format!("{:x}", hasher.finalize())
+}
+
+fn agent_journey(root_id: String, file: String, replacement: String, goal: String, session_id: String) -> Result<String, String> {
+    // A session bound to the operator's cwd provides the journey evidence.
+    let project = std::env::current_dir().map_err(|e| e.to_string())?;
+    let mut journal = af_journal::SessionJournal::create(&project, Some(&session_id), None)
+        .or_else(|_| af_journal::SessionJournal::open(&session_id))
+        .map_err(|e| e.0)?;
+    let registry = af_sandbox::SandboxRegistry::new("default").map_err(|e| e.0)?;
+    let mut journey = af_agent::Journey::new(&registry, &mut journal, af_agent::JourneyLimits::default());
+    let plan = af_agent::JourneyPlan {
+        root_id,
+        file,
+        replacement: Some(replacement),
+        goal,
+    };
+    let report = journey.run(&plan).map_err(|e| e.0)?;
+    let value = json!({
+        "ok": report.ok, "verified": report.verified,
+        "goal": report.goal, "steps": report.steps,
+        "refusal": report.refusal,
+        "session_id": journal.session_id,
+    });
+    if report.ok {
+        Ok(serde_json::to_string(&value).map_err(|e| e.to_string())?)
+    } else {
+        Err(serde_json::to_string(&value).map_err(|e| e.to_string())?)
+    }
 }
 
 fn sandbox_grant(root_id: String, path: PathBuf, write: Vec<String>, host_approved: bool) -> Result<String, String> {

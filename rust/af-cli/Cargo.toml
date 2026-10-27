@@ -16,6 +16,7 @@ af-journal.workspace = true
 af-agents.workspace = true
 af-exec.workspace = true
 af-llm.workspace = true
+af-agent.workspace = true
 af-entropy.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
