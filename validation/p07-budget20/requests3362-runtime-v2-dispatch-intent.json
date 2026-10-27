@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-10-27T04:23:44.645Z",
+  "head": "fe6c3a44d8a4a5ba42e3e34108fb736079335353",
+  "workflow": "p07-requests3362-runtime.yml",
+  "ref": "experimental",
+  "model_calls": 0,
+  "fix": "host-owned stdin inventory, unchanged read-only isolation"
+}

@@ -141,3 +141,22 @@ Do not import these oracle-side requirement details into model-visible workspace
 The profile identifies a complete small package candidate and concrete blockers.
 It does not bypass source-distribution review, freeze missing interpreter
 provenance, shorten tests or declare any Requests task accepted.
+
+## Requests dependency runtime accepted, 27 October 2026
+
+Run `40449494148` on `fe6c3a44d8a4a5ba42e3e34108fb736079335353`
+completed successfully. Artifact `12709189504` SHA256
+`09c81fbb99c88745e83826b91ed87b23f07bdac2be74ffc78e7490e91515bbe3`
+was checked independently, as were the stdlib and installed-inventory stdout
+digests. Private Python 3.6.15, all 13 wheels and 235 installed file hashes were
+confirmed. Target source was unchanged and cleanup confirmed. Fixed host
+inventory was streamed via stdin; worker root remained read-only. No target
+imports, setup, plugins or tests ran. Status: `runtime_dependencies_qualified`,
+`calibrated=false`. The earlier failed copy attempt is retained separately.
+All CI workflows for this runtime completed successfully.
+
+Inventory remains 24/30. Next: execute the certificate/plugin/HTTPBin health
+contract in `P07_REQUESTS3362_HEALTH_CONTRACT.md`, then integrate the qualified
+timeout topology and run all six complete Requests base/gold/wrong triples.
+Model quality and the remaining full P07 gates are still OPEN; no paid calls
+were added by these environment qualifications.
