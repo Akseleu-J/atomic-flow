@@ -35,12 +35,41 @@ impl Default for Cancel {
 pub struct ChatMessage {
     pub role: String,
     pub content: String,
+    /// Assistant tool_calls (OpenAI shape) when the model requested tools.
+    pub tool_calls: Option<Value>,
+    /// tool role: the id of the call this result answers.
+    pub tool_call_id: Option<String>,
 }
 
 impl ChatMessage {
     pub fn new(role: &str, content: &str) -> ChatMessage {
-        ChatMessage { role: role.to_string(), content: content.to_string() }
+        ChatMessage { role: role.to_string(), content: content.to_string(), tool_calls: None, tool_call_id: None }
     }
+
+    pub fn assistant_with_tool_calls(content: &str, tool_calls: Value) -> ChatMessage {
+        ChatMessage { role: "assistant".into(), content: content.to_string(), tool_calls: Some(tool_calls), tool_call_id: None }
+    }
+
+    pub fn tool_result(call_id: &str, content: &str) -> ChatMessage {
+        ChatMessage { role: "tool".into(), content: content.to_string(), tool_calls: None, tool_call_id: Some(call_id.to_string()) }
+    }
+}
+
+/// A model-callable tool contract (JSON Schema parameters).
+#[derive(Debug, Clone, PartialEq)]
+pub struct ToolSpec {
+    pub name: String,
+    pub description: String,
+    pub parameters: Value,
+}
+
+/// One tool invocation requested by the model.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ToolCall {
+    pub id: String,
+    pub name: String,
+    /// Raw JSON-string arguments, exactly as the provider returned them.
+    pub arguments: String,
 }
 
 #[derive(Debug, Clone)]
@@ -48,6 +77,13 @@ pub struct ChatRequest {
     pub model: String,
     pub messages: Vec<ChatMessage>,
     pub max_output_tokens: Option<u64>,
+    pub tools: Option<Vec<ToolSpec>>,
+}
+
+impl ChatRequest {
+    pub fn new(model: &str, messages: Vec<ChatMessage>) -> ChatRequest {
+        ChatRequest { model: model.to_string(), messages, max_output_tokens: None, tools: None }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -69,6 +105,8 @@ pub struct ChatResult {
     pub content: String,
     pub usage: Usage,
     pub truncated: bool,
+    /// Tool invocations the model requested (empty for plain answers).
+    pub tool_calls: Vec<ToolCall>,
 }
 
 /// Outcome of one physical call. `sent` decides failover per the contract:
@@ -105,9 +143,51 @@ impl ScriptedBackend {
                 content: "scripted-echo".to_string(),
                 usage: Usage { tokens_in: Some(1), tokens_out: Some(1), cost_usd: Some(0.0), latency_ms: Some(0) },
                 truncated: false,
+                tool_calls: Vec::new(),
             })],
         )
     }
+
+    /// Script one assistant turn that requests tool calls.
+    pub fn tool_calls(name: &str, calls: &[( &str, &str, &str )]) -> ScriptedBackend {
+        let mapped: Vec<Value> = calls
+            .iter()
+            .map(|(id, tool, arguments)| {
+                json!({"id": id, "type": "function", "function": {"name": tool, "arguments": arguments}})
+            })
+            .collect();
+        ScriptedBackend::new(
+            name,
+            vec![BackendOutcome::Completed(ChatResult {
+                content: String::new(),
+                usage: Usage { tokens_in: Some(1), tokens_out: Some(1), cost_usd: Some(0.0), latency_ms: Some(0) },
+                truncated: false,
+                tool_calls: parsed_tool_calls(&json!(mapped)),
+            })],
+        )
+    }
+}
+
+/// Parse provider tool_calls JSON into typed ToolCall records.
+pub fn parsed_tool_calls(value: &Value) -> Vec<ToolCall> {
+    value
+        .as_array()
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(|item| {
+                    let id = item.get("id")?.as_str()?.to_string();
+                    let name = item.pointer("/function/name")?.as_str()?.to_string();
+                    let arguments = item
+                        .pointer("/function/arguments")
+                        .and_then(Value::as_str)
+                        .unwrap_or("{}")
+                        .to_string();
+                    Some(ToolCall { id, name, arguments })
+                })
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 impl ChatBackend for ScriptedBackend {
@@ -125,6 +205,7 @@ impl ChatBackend for ScriptedBackend {
                 content: String::new(),
                 usage: Usage { tokens_in: Some(0), tokens_out: Some(0), cost_usd: Some(0.0), latency_ms: Some(0) },
                 truncated: false,
+                tool_calls: Vec::new(),
             });
         }
         script.remove(0)
@@ -150,13 +231,29 @@ impl OpenAiBackend {
     }
 
     fn payload(&self, request: &ChatRequest) -> Value {
-        json!({
+        let mut payload = json!({
             "model": request.model,
             "messages": request.messages.iter()
-                .map(|message| json!({"role": message.role, "content": message.content}))
+                .map(|message| {
+                    let mut entry = json!({"role": message.role, "content": message.content});
+                    if let Some(tool_calls) = &message.tool_calls {
+                        entry["tool_calls"] = tool_calls.clone();
+                    }
+                    if let Some(call_id) = &message.tool_call_id {
+                        entry["tool_call_id"] = json!(call_id);
+                    }
+                    entry
+                })
                 .collect::<Vec<_>>(),
             "max_tokens": request.max_output_tokens,
-        })
+        });
+        if let Some(tools) = &request.tools {
+            payload["tools"] = json!(tools.iter().map(|tool| json!({
+                "type": "function",
+                "function": {"name": tool.name, "description": tool.description, "parameters": tool.parameters},
+            })).collect::<Vec<_>>());
+        }
+        payload
     }
 }
 
@@ -205,6 +302,11 @@ impl ChatBackend for OpenAiBackend {
                                 .and_then(Value::as_str)
                                 .unwrap_or("unknown")
                                 .to_string();
+                            let tool_calls = document
+                                .pointer("/choices/0/message/tool_calls")
+                                .cloned()
+                                .map(|calls| parsed_tool_calls(&calls))
+                                .unwrap_or_default();
                             let usage = Usage {
                                 tokens_in: document.pointer("/usage/prompt_tokens").and_then(Value::as_u64),
                                 tokens_out: document.pointer("/usage/completion_tokens").and_then(Value::as_u64),
@@ -215,6 +317,7 @@ impl ChatBackend for OpenAiBackend {
                                 content,
                                 usage,
                                 truncated: finish == "length",
+                                tool_calls,
                             })
                         }
                         Err(error) => BackendOutcome::Unknown {
@@ -317,6 +420,7 @@ mod tests {
             model: "test-model".into(),
             messages: vec![ChatMessage::new("user", "hello")],
             max_output_tokens: Some(16),
+            tools: None,
         }
     }
 
@@ -346,6 +450,7 @@ mod tests {
                     content: "ok".into(),
                     usage: Usage { tokens_in: Some(2), tokens_out: Some(1), cost_usd: Some(0.01), latency_ms: Some(5) },
                     truncated: false,
+                    tool_calls: Vec::new(),
                 })],
             )),
         ]);

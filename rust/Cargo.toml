@@ -9,6 +9,7 @@ members = [
     "af-exec",
     "af-llm",
     "af-agent",
+    "af-loop",
     "af-program",
     "af-cli",
 ]
@@ -33,6 +34,7 @@ af-agents = { path = "af-agents" }
 af-exec = { path = "af-exec" }
 af-llm = { path = "af-llm" }
 af-agent = { path = "af-agent" }
+af-loop = { path = "af-loop" }
 af-program = { path = "af-program" }
 
 [profile.release]

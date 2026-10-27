@@ -62,6 +62,7 @@ pub fn conformance_suite(backend: &dyn ChatBackend) -> Value {
         model: "conformance".into(),
         messages: vec![af_llm::ChatMessage::new("user", "ping")],
         max_output_tokens: Some(8),
+        tools: None,
     };
     let cancel = af_llm::Cancel::new();
     let outcome = backend.chat(&request, &cancel);
@@ -106,6 +107,7 @@ pub fn router_hold_conformance() -> Value {
         model: "conformance".into(),
         messages: vec![af_llm::ChatMessage::new("user", "ping")],
         max_output_tokens: Some(8),
+        tools: None,
     };
     match router.route(&request, &af_llm::Cancel::new()) {
         RouteOutcome::Hold { backend, .. } => json!({

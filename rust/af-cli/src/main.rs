@@ -487,11 +487,8 @@ fn job_reconcile(store: PathBuf, job_id: String, actor: String, reason: String) 
 
 fn backend_ping() -> Result<String, String> {
     let router = af_llm::Router::new(vec![Box::new(af_llm::ScriptedBackend::echo())]);
-    let request = af_llm::ChatRequest {
-        model: "scripted".into(),
-        messages: vec![af_llm::ChatMessage::new("user", "ping")],
-        max_output_tokens: Some(8),
-    };
+    let mut request = af_llm::ChatRequest::new("scripted", vec![af_llm::ChatMessage::new("user", "ping")]);
+    request.max_output_tokens = Some(8);
     match router.route(&request, &af_llm::Cancel::new()) {
         af_llm::RouteOutcome::Completed { backend, result } => Ok(json!({
             "ok": true, "backend": backend, "content": result.content,
@@ -508,11 +505,8 @@ fn backend_ping() -> Result<String, String> {
 
 fn backend_call(base_url: String, api_key_env: String, model: String, prompt: String) -> Result<String, String> {
     let router = af_llm::Router::new(vec![Box::new(af_llm::OpenAiBackend::new("openai", &base_url, &api_key_env))]);
-    let request = af_llm::ChatRequest {
-        model,
-        messages: vec![af_llm::ChatMessage::new("user", &prompt)],
-        max_output_tokens: Some(256),
-    };
+    let mut request = af_llm::ChatRequest::new(&model, vec![af_llm::ChatMessage::new("user", &prompt)]);
+    request.max_output_tokens = Some(256);
     match router.route(&request, &af_llm::Cancel::new()) {
         af_llm::RouteOutcome::Completed { backend, result } => Ok(json!({
             "ok": true, "backend": backend,

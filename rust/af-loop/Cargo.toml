@@ -1,0 +1,13 @@
+[package]
+name = "af-loop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Model-driven tool loop on the kernel: tool registry, bounded turns, journal evidence, hold semantics (the Aider/Claude-Code-style harness)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true
+af-entropy.workspace = true
+af-llm.workspace = true
+af-journal.workspace = true
