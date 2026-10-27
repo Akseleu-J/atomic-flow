@@ -142,7 +142,10 @@ def validate_certificates(files, now=None):
 def admit_parent(directory):
     raw = (directory / "requests-runtime.json").read_bytes()
     report = json.loads(raw)
-    raw_profile, profile = legacy.frozen_profile(legacy.PROFILE)
+    try:
+        raw_profile, profile = legacy.receipt_profile(report)
+    except ValueError as exc:
+        raise ValueError("Requests parent runtime was not fully qualified") from exc
     wheels = report.get("wheels", [])
     expected = {(item["name"], item["version"], item["filename"], item["sha256"]) for item in profile["wheels"]}
     actual = {(item.get("name"), item.get("version"), item.get("filename"), item.get("sha256")) for item in wheels}
@@ -151,6 +154,7 @@ def admit_parent(directory):
         if files.keys() & item.get("installed_files", {}).keys():
             raise ValueError("parent wheel inventory overlaps")
         files.update(item.get("installed_files", {}))
+    legacy.validate_installed_inventory(profile, files)
     if (report.get("status") != "runtime_dependencies_qualified" or report.get("task") != legacy.TASK
             or report.get("base_image") != legacy.BASE or report.get("donor_image") != legacy.DONOR
             or report.get("base_commit") != legacy.COMMIT or report.get("profile_sha256") != sha(raw_profile)
@@ -162,7 +166,7 @@ def admit_parent(directory):
             or report.get("dockerfile_sha256") != sha(legacy.dockerfile().encode())
             or report.get("requirements_sha256") != sha(legacy.requirements(profile).encode())
             or report.get("inventory_exit") != 0 or report.get("before") != report.get("after")
-            or report.get("installed_files") != files or len(files) != 235 or actual != expected or len(wheels) != 13
+            or report.get("installed_files") != files or actual != expected or len(wheels) != len(profile["wheels"])
             or report.get("inventory", {}).get("files") != files
             or report.get("model_calls") != 0 or report.get("target_or_plugins_imported") is not False
             or report.get("target_setup_or_tests_executed") is not False
@@ -205,6 +209,7 @@ def prepare(runtime_receipt, output):
     overlay = {"pytest_httpbin/certs/" + name: sha(files[name]) for name in CERT_NAMES}
     result = {"status": "prepared_not_built", "task": legacy.TASK, "parent_image_id": parent["image_id"],
         "parent_runtime_report_sha256": sha(raw_parent), "profile_sha256": parent["profile_sha256"],
+        "profile_path": parent.get("profile_path", legacy.PROFILE_V1_NAME),
         "original_certificate_files": {path: parent["installed_files"][path] for path in CERT_PATHS},
         "overlay_files": overlay, "certificate_metadata": metadata,
         "dockerfile_sha256": sha(dockerfile(parent["image_id"]).encode()), "model_calls": 0,

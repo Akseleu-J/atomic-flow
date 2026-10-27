@@ -80,6 +80,20 @@ def test_missing_or_duplicate_finished_receipt_is_refused():
         health.validate_health(receipt(complete_result()) * 2)
 
 
+def test_v2_health_version_is_explicit_and_bound_to_receipt():
+    files = {f"package/file{index}.py": "a" * 64 for index in range(238)}
+    source = health.bootstrap_source(files, "-----BEGIN CERTIFICATE-----", httpbin_version="0.5.0")
+    compile(source, "<v2-health>", "exec")
+    assert "pkg_resources.get_distribution('httpbin').version!=data['httpbin_version']" in source
+    result = complete_result()
+    result["httpbin_version"] = "0.5.0"
+    assert health.validate_health(receipt(result), httpbin_version="0.5.0") == result
+    with pytest.raises(ValueError):
+        health.validate_health(receipt(result))
+    with pytest.raises(ValueError):
+        health.bootstrap_source(files, "-----BEGIN CERTIFICATE-----", httpbin_version="0.10.2")
+
+
 def test_fixed_bootstrap_confines_imports_checks_all_bytes_and_uses_verified_tls():
     files = {f"package/file{index}.py": "a" * 64 for index in range(235)}
     source = health.bootstrap_source(files, "-----BEGIN CERTIFICATE-----\npublic test fixture\n")

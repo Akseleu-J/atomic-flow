@@ -74,6 +74,17 @@ def test_committed_parent_has_complete_inventory(tmp_path):
     assert len(parent["wheels"]) == 13
 
 
+def test_v2_parent_profile_is_bound_before_any_qualification(tmp_path):
+    parent = original_parent()
+    parent["profile_path"] = cert.legacy.PROFILE_V2_NAME
+    raw, _ = cert.legacy.frozen_profile(cert.legacy.PROFILE_V2)
+    parent["profile_sha256"] = cert.sha(raw)
+    directory = tmp_path / "parent"
+    write_parent(directory, parent)
+    with pytest.raises(ValueError):
+        cert.admit_parent(directory)
+
+
 @pytest.mark.parametrize("field,value", [
     ("status", "prepared_not_built"), ("cleanup_confirmed", False), ("cleanup", []),
     ("probe_compatible", False), ("base_commit", "0" * 40), ("profile_sha256", "0" * 64),

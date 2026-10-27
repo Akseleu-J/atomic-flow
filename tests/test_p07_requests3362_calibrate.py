@@ -47,15 +47,24 @@ def receipt(task, failed=False):
     result = {"version_info": [3, 6, 15], "prefix": adapter.transplant.PREFIX,
         "executable": adapter.transplant.PREFIX + "/bin/python3.6", "pytest_version": "2.8.7",
         "pytest_module": adapter.health.PREFIX + "pytest.py", "requests_module": "/testbed/requests/__init__.py",
-        "argv": [*adapter.health.PLUGIN_ARGS, "-rA"], "finished": True, "exit": int(failed),
+        "argv": [*adapter.health.PLUGIN_ARGS, "-rA", "-v"], "finished": True, "exit": int(failed),
         "collection": ids, "plugins": [["fixture", "pytest_httpbin.plugin"], ["mock", "pytest_mock"]],
-        "reports": [{"id": test, "when": when, "outcome": statuses[test].lower() if when == "call" else "passed"}
+        "reports": [{"id": test, "when": when, "outcome": statuses[test].lower() if when == "call" else "passed",
+                     "has_wasxfail": False, "wasxfail": None, "native_category": statuses[test].lower() if when == "call" else ""}
                     for test in ids for when in ("setup", "call", "teardown")]}
     return result, statuses
 
 
 def transcript(result, exit_code):
-    return adapter.START + "\n" + adapter.RESULT + json.dumps(result) + "\nP07_TEST_EXIT=" + str(exit_code) + "\n" + adapter.END
+    lines = []
+    for test in result["collection"]:
+        phases = [report for report in result["reports"] if report["id"] == test]
+        call = next((report for report in phases if report["when"] == "call"), None)
+        status = "SKIPPED" if call is None else call["outcome"].upper()
+        if call and call.get("has_wasxfail"):
+            status = "xfail" if call["native_category"] == "xfailed" else "XPASS"
+        lines.append(test + " " + status)
+    return adapter.START + "\n" + "\n".join(lines) + "\n" + adapter.RESULT + json.dumps(result) + "\nP07_TEST_EXIT=" + str(exit_code) + "\n" + adapter.END
 
 
 def test_complete_native_gold_and_real_requirement_negative(monkeypatch):
@@ -105,7 +114,7 @@ def test_bootstrap_is_syntax_valid_and_preserves_native_assertions_and_source_im
     ast.parse(source)
     assert source.index("import pytest") < source.index("sys.path.insert(0,'/testbed')") < source.index("import requests")
     assert "--assert=plain" not in source and "--noconftest" not in source
-    assert "['-rA']" in source and "entries=list(pkg_resources.iter_entry_points('pytest11'))" in source
+    assert "['-rA','-v']" in source and "entries=list(pkg_resources.iter_entry_points('pytest11'))" in source
     assert "PYTEST_DISABLE_PLUGIN_AUTOLOAD" in source and "os.environ.pop(key,None)" in source
     assert "pytest.main(argv,plugins=[recorder])" in source
 
@@ -141,8 +150,9 @@ def health_fixture(tmp_path, monkeypatch):
         "bootstrap_sha256": adapter.oracle.sha(b"host health bootstrap"), "observed": observed,
         "before": admitted["after"], "after": admitted["after"], "target_setup_or_tests_executed": False, "model_calls": 0}
     monkeypatch.setattr(adapter.certificate, "admit_certificate_receipt", lambda directory: (b"certificate receipt", admitted))
-    monkeypatch.setattr(adapter.health, "bootstrap_source", lambda *args: "host health bootstrap")
-    monkeypatch.setattr(adapter.health, "validate_health", lambda text: observed)
+    monkeypatch.setattr(adapter.health, "runtime_httpbin_version", lambda admitted: "0.5.0")
+    monkeypatch.setattr(adapter.health, "bootstrap_source", lambda *args, httpbin_version: "host health bootstrap" if httpbin_version == "0.5.0" else "wrong bootstrap")
+    monkeypatch.setattr(adapter.health, "validate_health", lambda text, httpbin_version: observed if httpbin_version == "0.5.0" else {})
     (health_dir / "health.stdout").write_bytes(stdout)
     (health_dir / "health.stderr").write_bytes(stderr)
     return cert_dir, health_dir, report
@@ -179,3 +189,69 @@ def test_same_cardinality_substituted_regression_ids_refused():
     task["PASS_TO_PASS"] = [*task["PASS_TO_PASS"][:-1], "different::test"]
     with pytest.raises(ValueError):
         adapter.admit_task(task, control)
+
+
+@pytest.mark.parametrize("raw,expected", [
+    ("tests/a.py::TestA::()::test_b", "tests/a.py::TestA::test_b"),
+    ("tests/a.py::test_b[param::()::value]", "tests/a.py::test_b[param::()::value]"),
+    ("tests/a.py::TestA::()::test_b[x]", "tests/a.py::TestA::test_b[x]")])
+def test_exact_collector_normalization_preserves_parameter_bytes(raw, expected):
+    assert adapter.canonical_node_id(raw) == expected
+
+
+@pytest.mark.parametrize("ids", [
+    ["a.py::TestA::()::test_b", "a.py::TestA::test_b"],
+    ["a.py::TestA::()::test_b"] * 2,
+    ["a.py::()::test_b"], ["a.py::::test_b"]])
+def test_ambiguous_or_malformed_node_mapping_refused(ids):
+    with pytest.raises(ValueError):
+        adapter.canonicalize_runner({"collection": ids, "reports": []})
+
+
+def test_complete_historical_raw_collection_and_reports_are_retained(monkeypatch):
+    task, _ = task_control()
+    result, statuses = receipt(task)
+    mapping = {test: test.replace("::TestRequests::", "::TestRequests::()::") for test in result["collection"]}
+    result["collection"] = [mapping[test] for test in result["collection"]]
+    result["reports"] = [{**report, "id": mapping[report["id"]]} for report in result["reports"]]
+    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (statuses, {}))
+    row = adapter.classify_target(task, transcript(result, 0), 0, None, None)
+    assert row["runner_receipt"] == result
+    assert len(row["raw_to_canonical_node_ids"]) == 76
+    assert row["canonical_runner_receipt"]["collection"] == list(mapping)
+
+
+@pytest.mark.parametrize("category,outcome,expected", [("xfailed", "skipped", "XFAILED"),
+                                                       ("xpassed", "failed", "XPASSED")])
+def test_old_pytest_expected_outcomes_remain_distinct_outside_requirements(monkeypatch, category, outcome, expected):
+    task, _ = task_control()
+    result, statuses = receipt(task)
+    extra = "tests/extra.py::test_expected"
+    result["collection"].append(extra)
+    result["reports"].extend([
+        {"id": extra, "when": "setup", "outcome": "passed", "has_wasxfail": False},
+        {"id": extra, "when": "call", "outcome": outcome, "has_wasxfail": True,
+         "wasxfail": "original native mark", "native_category": category},
+        {"id": extra, "when": "teardown", "outcome": "passed", "has_wasxfail": False}])
+    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (statuses, {}))
+    row = adapter.classify_target(task, transcript(result, 0), 0, None, None)
+    assert row["verified_success"] is True
+    assert row["tests"][extra] == expected
+    assert row["expected_failure_outcomes"] == {extra: expected}
+
+
+def test_required_xpass_does_not_satisfy_a_required_pass(monkeypatch):
+    task, _ = task_control()
+    result, statuses = receipt(task)
+    call = result["reports"][1]
+    call.update(outcome="failed", has_wasxfail=True, wasxfail="native mark", native_category="xpassed")
+    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (statuses, {}))
+    with pytest.raises(ValueError):
+        adapter.classify_target(task, transcript(result, 0), 0, None, None)
+
+
+def test_verbose_output_requires_every_node_and_rejects_collisions():
+    with pytest.raises(ValueError, match="full native verbose"):
+        adapter.verbose_observations("a.py::test_a PASSED\n", ["a.py::test_a", "a.py::test_b"])
+    with pytest.raises(ValueError, match="duplicate canonical"):
+        adapter.verbose_observations("a.py::TestA::()::test_a PASSED\na.py::TestA::test_a PASSED\n", ["a.py::TestA::test_a"])

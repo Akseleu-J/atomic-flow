@@ -105,12 +105,16 @@ def test_inventory_program_uses_only_stdlib_and_preserves_byte_obligations():
 def context(tmp_path, monkeypatch):
     profile = json.loads(image.PROFILE.read_bytes())
     payloads = {}
+    files = {}
     for index, selected in enumerate(profile["wheels"]):
         changed, raw = wheel(selected)
         profile["wheels"][index] = changed
+        files.update(image.verified_wheel(changed, raw)["installed_files"])
         payloads[changed["url"]] = raw
         payloads[changed["primary_metadata_url"]] = json.dumps({"urls": [{"filename": changed["filename"],
             "url": changed["url"], "digests": {"sha256": changed["sha256"]}}]}).encode()
+    profile["installed_inventory"] = {"count": len(files),
+        "sha256": image.sha(json.dumps(files, sort_keys=True, separators=(",", ":")).encode())}
     path = tmp_path / "profile.json"
     path.write_text(json.dumps(profile))
     monkeypatch.setattr(image, "PROFILE", path)
@@ -171,3 +175,28 @@ def test_fixed_worker_command_failure_retains_bounded_daemon_reason():
     assert receipt["stderr_truncated"] and len(receipt["stderr"]) == 2000
     assert receipt["stderr_sha256"] == image.sha(stderr)
     assert receipt["command"] == ["docker", "cp"]
+
+
+def test_profile_v2_is_explicit_and_keeps_v1_default(tmp_path):
+    assert image.PROFILE.name == "p07-requests-legacy-profile.json"
+    raw, profile = image.frozen_profile(image.PROFILE_V2)
+    assert image.sha(raw) == "810e98b8f663ed03c3f4b529f692fdcdcffe46364ee678ac18fcda547ad1076f"
+    assert len(profile["pins"]) == len(profile["wheels"]) == 14
+    assert profile["pins"]["httpbin"] == "0.5.0"
+    verified = [{"name": item["name"], "version": item["version"], "requires_dist": item["requires_dist"]}
+                for item in profile["wheels"]]
+    assert len(image.closure(profile, verified)) == 16
+    with pytest.raises(ValueError, match="whitelist"):
+        image.frozen_profile(tmp_path / "profile-copy.json")
+    with pytest.raises(ValueError, match="profile bytes"):
+        image.receipt_profile({"profile_path": image.PROFILE_V2_NAME, "profile_sha256": "0" * 64})
+
+
+def test_original_full_installed_inventory_digest_is_preserved():
+    report = json.loads((image.ROOT / "validation/p07-budget20/requests3362-runtime-v2/requests-runtime.json").read_bytes())
+    _, profile = image.receipt_profile(report)
+    image.validate_installed_inventory(profile, report["installed_files"])
+    files = dict(report["installed_files"])
+    files.pop(next(iter(files)))
+    with pytest.raises(ValueError, match="complete publisher"):
+        image.validate_installed_inventory(profile, files)

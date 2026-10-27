@@ -22,7 +22,7 @@ jobs:
         run: |
           mkdir -p p07-requests3362-runtime-worker
           git rev-parse HEAD > p07-requests3362-runtime-worker/tested-commit.txt
-          python tools/p07_requests3362_legacy_image.py prepare --output /tmp/p07-requests3362-runtime
+          python tools/p07_requests3362_legacy_image.py prepare --profile benchmarks/stage4/p07-requests-legacy-profile-v2.json --output /tmp/p07-requests3362-runtime
           python tools/p07_requests3362_legacy_image.py build --context /tmp/p07-requests3362-runtime --output p07-requests3362-runtime-worker/runtime
       - name: Build disclosed CN-only fixture certificate overlay
         run: |

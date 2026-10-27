@@ -37,13 +37,15 @@ def admit_health(cert_dir, health_dir):
     report = json.loads(raw)
     stdout = (health_dir / "health.stdout").read_bytes()
     stderr = (health_dir / "health.stderr").read_bytes()
-    bootstrap = health.bootstrap_source(admitted["installed_files"], (cert_dir / "wrongca.pem").read_text())
+    httpbin_version = health.runtime_httpbin_version(admitted)
+    bootstrap = health.bootstrap_source(admitted["installed_files"], (cert_dir / "wrongca.pem").read_text(),
+                                        httpbin_version=httpbin_version)
     if (report.get("status") != "synthetic_legacy_health_qualified" or report.get("cleanup_confirmed") is not True
             or report.get("cleanup_exit") != 0 or report.get("certificate_receipt_sha256") != oracle.sha(raw_cert)
             or report.get("image_id") != admitted["image_id"] or report.get("process_exit") != 0
             or report.get("stdout_sha256") != oracle.sha(stdout) or report.get("stderr_sha256") != oracle.sha(stderr)
             or report.get("bootstrap_sha256") != oracle.sha(bootstrap.encode())
-            or report.get("observed") != health.validate_health(stdout.decode())
+            or report.get("observed") != health.validate_health(stdout.decode(), httpbin_version=httpbin_version)
             or report.get("before") != admitted["after"] or report.get("before") != report.get("after")
             or report.get("target_setup_or_tests_executed") is not False or report.get("model_calls") != 0):
         raise ValueError("fresh qualified same-image health receipt required")
@@ -97,15 +99,18 @@ class Recorder:
     def __init__(self):
         self.collected=[]; self.reports=[]; self.finished=False; self.exit=None; self.plugins=[]
     def pytest_configure(self,config):
+        self.config=config
         self.plugins=[[name,getattr(plugin,'__name__',plugin.__class__.__module__)] for name,plugin in config.pluginmanager.list_name_plugin() if plugin is not None]
     def pytest_collection_finish(self,session):
         self.collected=[item.nodeid for item in session.items]
     def pytest_runtest_logreport(self,report):
-        self.reports.append({'id':report.nodeid,'when':report.when,'outcome':report.outcome})
+        self.reports.append({'id':report.nodeid,'when':report.when,'outcome':report.outcome,
+            'has_wasxfail':hasattr(report,'wasxfail'),'wasxfail':getattr(report,'wasxfail',None),
+            'native_category':self.config.hook.pytest_report_teststatus(report=report)[0]})
     def pytest_sessionfinish(self,session,exitstatus):
         self.finished=True; self.exit=exitstatus
 recorder=Recorder()
-argv=payload['plugins']+['-rA']
+argv=payload['plugins']+['-rA','-v']
 print('>>>>> Start Test Output',flush=True)
 exit_code=pytest.main(argv,plugins=[recorder])
 print('P07_TARGET_RESULT='+json.dumps({'version_info':list(sys.version_info[:3]),'prefix':sys.prefix,'executable':sys.executable,
@@ -117,6 +122,51 @@ raise SystemExit(exit_code)
 '''.replace("DATA", repr(json.dumps(data, sort_keys=True)))
 
 
+def canonical_node_id(raw):
+    if not isinstance(raw, str) or not raw or "\n" in raw or "\r" in raw:
+        raise ValueError("bounded plain raw node identity required")
+    base, separator, parameters = raw.partition("[")
+    parts = base.split("::")
+    if any(not part for part in parts):
+        raise ValueError("empty node identity segment")
+    if "()" in parts:
+        if len(parts) != 4 or parts[2] != "()" or parts.count("()") != 1:
+            raise ValueError("unreviewed historical instance collector shape")
+        parts.pop(2)
+    return "::".join(parts) + separator + parameters
+
+
+def canonicalize_runner(raw):
+    observed = {**raw}
+    collection = raw.get("collection")
+    if not isinstance(collection, list) or not collection or len(set(collection)) != len(collection):
+        raise ValueError("unique complete raw collection required")
+    mapping = {node: canonical_node_id(node) for node in collection}
+    if len(set(mapping.values())) != len(mapping):
+        raise ValueError("raw collection canonicalization collision")
+    observed["collection"] = list(mapping.values())
+    observed["reports"] = []
+    for report in raw.get("reports", []):
+        if report.get("id") not in mapping:
+            raise ValueError("report outside sealed raw collection")
+        observed["reports"].append({**report, "id": mapping[report["id"]]})
+    return observed, mapping
+
+
+def verbose_observations(body, collection):
+    results = {}
+    pattern = r"^(\S+::.*?)\s+(PASSED|FAILED|ERROR|SKIPPED|xfail|XPASS)(?:\s+\[\s*\d+%\])?\s*$"
+    statuses = {"xfail": "XFAILED", "XPASS": "XPASSED"}
+    for match in re.finditer(pattern, oracle.ANSI.sub("", body), re.MULTILINE):
+        node = canonical_node_id(match[1])
+        if node not in collection or node in results:
+            raise ValueError("verbose result outside collection or duplicate canonical node")
+        results[node] = statuses.get(match[2], match[2])
+    if set(results) != set(collection):
+        raise ValueError("full native verbose observation inventory required")
+    return results
+
+
 def classify_target(task, text, exit_code, parser, spec):
     if text.count(START) != 1 or text.count(END) != 1 or text.index(START) >= text.index(END):
         raise ValueError("complete unique target test markers required")
@@ -124,14 +174,15 @@ def classify_target(task, text, exit_code, parser, spec):
     receipts = re.findall(r"^" + RESULT + r"(.*)$", body, re.MULTILINE)
     if len(receipts) != 1 or re.findall(r"^P07_TEST_EXIT=(\d+)$", body, re.MULTILINE) != [str(exit_code)] or exit_code not in {0, 1}:
         raise ValueError("one complete native target receipt required")
-    observed = json.loads(receipts[0])
+    raw_observed = json.loads(receipts[0])
+    observed, node_mapping = canonicalize_runner(raw_observed)
     required = task["FAIL_TO_PASS"] + task["PASS_TO_PASS"]
     if (observed.get("version_info") != [3, 6, 15] or observed.get("prefix") != transplant.PREFIX
             or observed.get("executable") != transplant.PREFIX + "/bin/python3.6"
             or observed.get("pytest_version") != "2.8.7"
             or not observed.get("pytest_module", "").startswith(health.PREFIX)
             or observed.get("requests_module") != "/testbed/requests/__init__.py"
-            or observed.get("argv") != [*health.PLUGIN_ARGS, "-rA"]
+            or observed.get("argv") != [*health.PLUGIN_ARGS, "-rA", "-v"]
             or observed.get("finished") is not True or observed.get("exit") != exit_code
             or not observed.get("collection") or len(set(observed["collection"])) != len(observed["collection"])
             or not set(required) <= set(observed["collection"])):
@@ -143,18 +194,48 @@ def classify_target(task, text, exit_code, parser, spec):
         phases = [item for item in observed.get("reports", []) if item.get("id") == test]
         if not phases or not {"setup", "teardown"} <= {item.get("when") for item in phases}:
             raise ValueError("ordinary collection lacks complete setup and teardown")
-    tests, diagnostics = oracle.parse_observations(task, body, parser, spec)
+    parsed, diagnostics = oracle.parse_observations(task, body, parser, spec)
+    tests = verbose_observations(body, observed["collection"])
+    parsed_canonical = {}
+    for raw_id, status in parsed.items():
+        node = canonical_node_id(raw_id)
+        if node in parsed_canonical:
+            raise ValueError("native summary node canonicalization collision")
+        parsed_canonical[node] = status
+        if status in {"PASSED", "FAILED", "ERROR", "SKIPPED"} and tests.get(node) != status:
+            raise ValueError("independent parser disagrees with exact native verbose observation")
+    expected_outcomes = {}
+    for test in observed["collection"]:
+        phases = [item for item in observed["reports"] if item["id"] == test]
+        calls = [item for item in phases if item["when"] == "call"]
+        for item in phases:
+            if item.get("has_wasxfail"):
+                category = item.get("native_category")
+                if (not isinstance(item.get("wasxfail"), str) or category not in {"xfailed", "xpassed"}
+                        or item.get("outcome") != {"xfailed": "skipped", "xpassed": "failed"}[category]):
+                    raise ValueError("historical expected-failure semantics mismatch")
+                expected_outcomes[test] = "XFAILED" if category == "xfailed" else "XPASSED"
+        if test in expected_outcomes:
+            if tests.get(test) not in {expected_outcomes[test], "XFAIL" if expected_outcomes[test] == "XFAILED" else "XPASS"}:
+                raise ValueError("native verbose expected-failure observation disagrees")
+            tests[test] = expected_outcomes[test]
+        elif len(calls) == 1 and calls[0].get("outcome") in {"passed", "failed"}:
+            if tests.get(test) != calls[0]["outcome"].upper():
+                raise ValueError("ordinary native verbose output disagrees with direct report")
     for test in required:
         phases = [item for item in observed.get("reports", []) if item.get("id") == test]
         if (len(phases) != 3 or {item.get("when") for item in phases} != {"setup", "call", "teardown"}
+                or any(item.get("has_wasxfail") for item in phases)
                 or any(item.get("outcome") != "passed" for item in phases if item["when"] != "call")
                 or sum(item.get("when") == "call" and item.get("outcome") in {"passed", "failed"} for item in phases) != 1):
             raise ValueError("required target setup/call/teardown incomplete or skipped")
         call = next(item["outcome"] for item in phases if item["when"] == "call").upper()
-        if tests.get(test) != {"PASSED": "PASSED", "FAILED": "FAILED"}[call]:
+        if tests.get(test) != {"PASSED": "PASSED", "FAILED": "FAILED"}[call] or parsed_canonical.get(test) != call:
             raise ValueError("native summary disagrees with direct phase observation")
     return {**oracle.classify(task, tests, completed=True, exit_code=exit_code), "tests": tests,
-            "parser_diagnostics": diagnostics, "runner_receipt": observed}
+            "parser_diagnostics": diagnostics, "runner_receipt": raw_observed,
+            "canonical_runner_receipt": observed, "raw_to_canonical_node_ids": node_mapping,
+            "expected_failure_outcomes": expected_outcomes}
 
 
 def execute(args, timeout=60, *, input_bytes=None):
@@ -318,7 +399,7 @@ def main():
         report.update(**receipts, image_id=admitted["image_id"], base_commit=runtime.COMMIT,
                       manifest_sha256=oracle.sha(manifest.read_bytes()), controls_sha256=oracle.sha(controls.read_bytes()),
                       required_tests=len(task["FAIL_TO_PASS"]) + len(task["PASS_TO_PASS"]),
-                      native_command="pytest -rA", argv=[*health.PLUGIN_ARGS, "-rA"])
+                      native_command="pytest -rA", reporting_only_flags=["-v"], argv=[*health.PLUGIN_ARGS, "-rA", "-v"])
         (args.output / "bootstrap.py").write_bytes(bootstrap_source(admitted["installed_files"]).encode())
         rows = [grade(task, spec, MAP_REPO_TO_PARSER[task["repo"]], admitted, patch, label, args.output)
                 for label, patch in (("base", ""), ("gold", task["patch"]), ("wrong", wrong))]

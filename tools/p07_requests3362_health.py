@@ -70,14 +70,21 @@ def sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
-def bootstrap_source(installed_files, wrong_ca):
-    if (not isinstance(installed_files, dict) or len(installed_files) != 235
+def runtime_httpbin_version(admitted):
+    parent = admitted["parent_runtime_report"]
+    _, profile = runtime.receipt_profile(parent)
+    return next(item["version"] for item in profile["wheels"] if item["name"].lower() == "httpbin")
+
+
+def bootstrap_source(installed_files, wrong_ca, *, httpbin_version="0.4.1"):
+    if (not isinstance(installed_files, dict) or not 1 <= len(installed_files) <= 5000
             or any(not isinstance(k, str) or k.startswith("/") or ".." in k.split("/")
                    or not re.fullmatch(r"[0-9a-f]{64}", v) for k, v in installed_files.items())
-            or not isinstance(wrong_ca, str) or "BEGIN CERTIFICATE" not in wrong_ca):
+            or not isinstance(wrong_ca, str) or "BEGIN CERTIFICATE" not in wrong_ca
+            or httpbin_version not in {"0.4.1", "0.5.0"}):
         raise ValueError("complete fixed installed inventory and unrelated public CA required")
     data = {"files": installed_files, "wrong_ca": wrong_ca, "test_source": TEST_SOURCE,
-            "plugin_args": list(PLUGIN_ARGS), "entrypoints": ENTRYPOINTS}
+            "plugin_args": list(PLUGIN_ARGS), "entrypoints": ENTRYPOINTS, "httpbin_version": httpbin_version}
     return r'''import hashlib,json,os,pathlib,sys
 data=json.loads(DATA)
 prefix='/opt/p07-python36/lib/python3.6/site-packages/'
@@ -101,7 +108,7 @@ for ep in entries:
         raise RuntimeError('entrypoint outside admitted private prefix')
 import pytest,httpbin,pytest_httpbin.plugin,pytest_mock
 imports={name:sys.modules[name].__file__ for name in ('pytest','httpbin','pytest_httpbin.plugin','pytest_mock')}
-if pytest.__version__!='2.8.7' or any(not str(pathlib.Path(path).resolve()).startswith(prefix) for path in imports.values()):
+if pytest.__version__!='2.8.7' or pkg_resources.get_distribution('httpbin').version!=data['httpbin_version'] or any(not str(pathlib.Path(path).resolve()).startswith(prefix) for path in imports.values()):
     raise RuntimeError('private package import identity mismatch')
 directory=pathlib.Path('/tmp/p07-health')
 directory.mkdir()
@@ -154,14 +161,17 @@ result={'exit_code':exit_code,'session_exit':recorder.exit,'finished':recorder.f
     'entrypoints':entrypoints,'imports':imports,'servers_stopped':stopped,
     'target_imports':target_modules,'requests_imported':'requests' in sys.modules,
     'version_info':list(sys.version_info[:3]),'prefix':sys.prefix,'executable':sys.executable,
-    'assertion_mode':'plain_synthetic_only','fixture_tests_sha256':hashlib.sha256(data['test_source'].encode()).hexdigest()}
+    'assertion_mode':'plain_synthetic_only','fixture_tests_sha256':hashlib.sha256(data['test_source'].encode()).hexdigest(),
+    'httpbin_version':data['httpbin_version']}
 print('P07_HEALTH_RESULT='+json.dumps(result,sort_keys=True))
 if exit_code or not stopped or target_modules or 'requests' in sys.modules:
     raise RuntimeError('synthetic health did not complete safely')
 '''.replace("DATA", repr(json.dumps(data, sort_keys=True)))
 
 
-def validate_health(text):
+def validate_health(text, *, httpbin_version="0.4.1"):
+    if httpbin_version not in {"0.4.1", "0.5.0"}:
+        raise ValueError("unreviewed HTTPBin health version")
     lines = [line[len(RESULT_PREFIX):] for line in text.splitlines() if line.startswith(RESULT_PREFIX)]
     if len(lines) != 1:
         raise ValueError("one complete health receipt required")
@@ -172,7 +182,8 @@ def validate_health(text):
             or result.get("version_info") != [3, 6, 15] or result.get("prefix") != transplant.PREFIX
             or result.get("executable") != transplant.PREFIX + "/bin/python3.6"
             or result.get("assertion_mode") != "plain_synthetic_only"
-            or result.get("fixture_tests_sha256") != sha(TEST_SOURCE.encode())):
+            or result.get("fixture_tests_sha256") != sha(TEST_SOURCE.encode())
+            or result.get("httpbin_version", "0.4.1") != httpbin_version):
         raise ValueError("health completion, identity or isolation mismatch")
     collection = result.get("collection", [])
     if len(collection) != 3 or {name.split("::")[-1] for name in collection} != set(TEST_IDS):
@@ -263,7 +274,9 @@ def qualify(certificate_receipt, output):
         report["before"] = source()
         if report["before"] != admitted["after"]:
             raise ValueError("health target source differs from admitted source")
-        code = bootstrap_source(admitted["installed_files"], (certificate_receipt / "wrongca.pem").read_text())
+        httpbin_version = runtime_httpbin_version(admitted)
+        code = bootstrap_source(admitted["installed_files"], (certificate_receipt / "wrongca.pem").read_text(),
+                                httpbin_version=httpbin_version)
         (output / "health.py").write_bytes(code.encode())
         process = execute(["docker", "exec", "-i", name, transplant.LAUNCHER, "-c", runtime.STDIN_BOOTSTRAP],
                           120, input_bytes=code.encode())
@@ -273,7 +286,8 @@ def qualify(certificate_receipt, output):
                       bootstrap_sha256=sha(code.encode()), synthetic_assertion_mode="plain")
         if process.returncode or len(process.stdout) + len(process.stderr) > LIMIT:
             raise ValueError("health process failed or exceeded audit output bound")
-        report["observed"] = validate_health(process.stdout.decode(errors="replace"))
+        report["observed"] = validate_health(process.stdout.decode(errors="replace"), httpbin_version=httpbin_version)
+        report["httpbin_version"] = httpbin_version
         report["after"] = source()
         if report["before"] != report["after"]:
             raise ValueError("synthetic health changed target source")

@@ -26,6 +26,9 @@ from packaging.utils import canonicalize_name, parse_wheel_filename
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = ROOT / "benchmarks/stage4/p07-requests-legacy-profile.json"
+PROFILE_V2 = ROOT / "benchmarks/stage4/p07-requests-legacy-profile-v2.json"
+PROFILE_V1_NAME = "benchmarks/stage4/p07-requests-legacy-profile.json"
+PROFILE_V2_NAME = "benchmarks/stage4/p07-requests-legacy-profile-v2.json"
 TASK = "psf__requests-3362"
 BASE = "swebench/sweb.eval.x86_64.psf_1776_requests-3362@sha256:c5dc4ba64a2d97d6cff6b82fe9c0561589df13f23df6883d05e99b630942bbd1"
 COMMIT = "36453b95b13079296776d11b09cab2567ea3e703"
@@ -48,14 +51,40 @@ def save(path, value):
 
 
 def frozen_profile(path):
+    selected = profile_name(path)
     raw = path.read_bytes().replace(b"\r\n", b"\n")
-    if raw != PROFILE.read_bytes().replace(b"\r\n", b"\n"):
-        raise ValueError("profile differs from reviewed checkout")
     profile = json.loads(raw)
     target = next(item for item in profile["tasks"] if item["instance_id"] == TASK)
-    if target["base_image_digest"] != BASE or target["base_commit"] != COMMIT or len(profile["wheels"]) != 13:
+    expected_count = 13 if selected == PROFILE_V1_NAME else 14
+    if target["base_image_digest"] != BASE or target["base_commit"] != COMMIT or len(profile["wheels"]) != expected_count:
         raise ValueError("fixed target or dependency cardinality differs")
     return raw, profile
+
+
+def profile_name(path):
+    for name, known in ((PROFILE_V1_NAME, PROFILE), (PROFILE_V2_NAME, PROFILE_V2)):
+        if Path(path).resolve() == known.resolve():
+            return name
+    raise ValueError("profile differs from reviewed checkout whitelist")
+
+
+def receipt_profile(report):
+    selected = report.get("profile_path", PROFILE_V1_NAME)
+    known = {PROFILE_V1_NAME: PROFILE, PROFILE_V2_NAME: PROFILE_V2}
+    if selected not in known:
+        raise ValueError("receipt profile is outside reviewed whitelist")
+    raw, config = frozen_profile(known[selected])
+    if report.get("profile_sha256") != sha(raw):
+        raise ValueError("receipt profile bytes differ from reviewed checkout")
+    return raw, config
+
+
+def validate_installed_inventory(config, files):
+    expected = config.get("installed_inventory", {"count": 235,
+        "sha256": "f9bbfa24f016c51269b1cdb9ce7faaee00f409f62f35cdfd946e3278f059425e"})
+    if (not isinstance(files, dict) or len(files) != expected["count"]
+            or sha(json.dumps(files, sort_keys=True, separators=(",", ":")).encode()) != expected["sha256"]):
+        raise ValueError("complete publisher installed inventory differs from frozen profile")
 
 
 def verified_wheel(record, raw):
@@ -99,7 +128,8 @@ def verified_wheel(record, raw):
 
 def closure(profile, verified):
     pins = {canonicalize_name(name): value for name, value in profile["pins"].items()}
-    if len(pins) != 13 or len(verified) != 13 or {canonicalize_name(item["name"]): item["version"] for item in verified} != pins:
+    if (len(pins) not in {13, 14} or len(verified) != len(pins) or len(profile["wheels"]) != len(pins)
+            or {canonicalize_name(item["name"]): item["version"] for item in verified} != pins):
         raise ValueError("wheel closure identity/cardinality mismatch")
     edges = []
     for item in verified:
@@ -170,6 +200,7 @@ def prepare(profile, output, *, downloader=fetch):
         if files.keys() & wheel["installed_files"].keys():
             raise ValueError("overlapping wheel installation paths")
         files.update(wheel["installed_files"])
+    validate_installed_inventory(config, files)
     output.mkdir(parents=True)
     (output / "wheels").mkdir()
     for filename, raw in downloads:
@@ -178,7 +209,8 @@ def prepare(profile, output, *, downloader=fetch):
     (output / "Dockerfile").write_bytes(dockerfile().encode())
     (output / "python36").write_bytes(transplant.LAUNCHER_SOURCE.encode())
     report = {"status": "prepared_not_built", "task": TASK, "base_image": BASE, "donor_image": DONOR,
-              "base_commit": COMMIT, "profile_sha256": sha(raw_profile), "wheels": wheels, "installed_files": files,
+              "base_commit": COMMIT, "profile_path": profile_name(profile), "profile_sha256": sha(raw_profile),
+              "wheels": wheels, "installed_files": files,
               "active_edges": edges, "dockerfile_sha256": sha(dockerfile().encode()),
               "launcher_sha256": sha(transplant.LAUNCHER_SOURCE.encode()), "probe_sha256": sha(transplant.PROBE.encode()),
               "requirements_sha256": sha(requirements(config).encode()), "model_calls": 0,
@@ -190,8 +222,8 @@ def prepare(profile, output, *, downloader=fetch):
 
 
 def validate_context(context):
-    raw_profile, config = frozen_profile(PROFILE)
     prepared = json.loads((context / "preparation.json").read_bytes())
+    raw_profile, config = receipt_profile(prepared)
     wheels = [verified_wheel(record, (context / "wheels" / record["filename"]).read_bytes()) for record in config["wheels"]]
     edges = closure(config, wheels)
     files = {}
@@ -199,6 +231,7 @@ def validate_context(context):
         if files.keys() & wheel["installed_files"].keys():
             raise ValueError("overlapping wheel paths")
         files.update(wheel["installed_files"])
+    validate_installed_inventory(config, files)
     if (prepared.get("status") != "prepared_not_built"
             or prepared.get("dockerfile_sha256") != sha(dockerfile().encode())
             or prepared.get("launcher_sha256") != sha(transplant.LAUNCHER_SOURCE.encode())
