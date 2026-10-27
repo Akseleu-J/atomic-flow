@@ -3,6 +3,14 @@
 //! host-created envelope and fails closed for legacy approvals, tool widening
 //! or weaker verification. The runner must still enforce the approved
 //! source/scope, current runtime binding, accounting and effect holds.
+//!
+//! Ported from the codex-session P06/P07 hardening: the durable repair
+//! ceiling (`repair`), provably-equivalent replan lineage binding
+//! (`constraints`) and the immutable host target-test contract (`check_spec`).
+
+pub mod check_spec;
+pub mod constraints;
+pub mod repair;
 
 use std::collections::BTreeSet;
 use serde_json::{json, Value};

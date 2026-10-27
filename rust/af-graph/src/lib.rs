@@ -7,6 +7,7 @@ pub mod adapter_ast;
 pub mod adapter_resource;
 pub mod canonical;
 pub mod delta;
+pub mod identity;
 pub mod project;
 pub mod resolve;
 pub mod schema;

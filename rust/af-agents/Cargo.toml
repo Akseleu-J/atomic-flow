@@ -8,3 +8,5 @@ description = "Fail-closed agent authority contracts: internal replan envelope, 
 [dependencies]
 serde_json.workspace = true
 thiserror.workspace = true
+sha2.workspace = true
+af-entropy.workspace = true
