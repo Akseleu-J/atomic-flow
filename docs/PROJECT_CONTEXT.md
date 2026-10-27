@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+27 октября: public scripted TaskRunner journey CI40495395039 SUCCESS (failure→replan→repair→fresh final check→publish); provider_calls=0. Отдельный nativePython2.7 runtime Requests2674 CI40495398692 SUCCESS,244 файла и cleanup проверены. Полная2674 калибровка ещё ожидается; общий счёт28/30, P07 OPEN.
+
 27 октября: **28/30 калибровок приняты**. Свежая матрица CI40491720928
 на ecaaea6 приняла Requests1963/2148/2317: gold PASS, base/wrong FAIL,
 все регрессии, исходники, хеши и cleanup подтверждены. Остались863/2674.

@@ -1,0 +1,20 @@
+{
+  "id": 12730537894,
+  "node_id": "MDg6QXJ0aWZhY3QxMjczMDUzNzg5NA==",
+  "name": "p07-requests2674-runtime-72e0ab941e65bb90d5e428505ac2d8e0b1ccb750",
+  "size_in_bytes": 63523,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12730537894",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12730537894/zip",
+  "expired": false,
+  "digest": "sha256:c29a6ed8d0b152fc1eb2ca42e0ccd79834e750dcd94d1dfd7988d4aadc903614",
+  "created_at": "2026-10-27T11:22:03Z",
+  "updated_at": "2026-10-27T11:22:03Z",
+  "expires_at": "2026-11-10T11:22:02Z",
+  "workflow_run": {
+    "id": 40495398692,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "72e0ab941e65bb90d5e428505ac2d8e0b1ccb750"
+  }
+}

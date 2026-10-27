@@ -1,0 +1,143 @@
+{
+  "status": "scripted_public_obligation_journey_qualified",
+  "provider_calls": 0,
+  "model_transport": "scripted",
+  "independent_requirement_success": false,
+  "hidden_oracle": "not_run",
+  "task_status": "done",
+  "task_error": "",
+  "replan_count": 1,
+  "completion": {
+    "schema_version": 1,
+    "ready_to_publish": true,
+    "checked_at": 1793100086.6626155,
+    "checks": [
+      {
+        "name": "completed_steps",
+        "status": "passed",
+        "superseded_by_replanning": [
+          0
+        ]
+      },
+      {
+        "name": "approved_diff_and_freshness",
+        "status": "passed"
+      },
+      {
+        "name": "final_python_syntax",
+        "status": "passed",
+        "scope": "Changed surviving Python files only"
+      }
+    ],
+    "diagnostics": [],
+    "tests": "passed",
+    "model_calls": 0,
+    "step_observations": [
+      {
+        "index": 1,
+        "receipt": "2c3d8da4cd4611bc659dad80096f988f17f67765a2e0853be15de529d96c5971",
+        "current": true,
+        "legacy_missing": false
+      }
+    ],
+    "changed_paths": [
+      {
+        "path": "sample.py",
+        "before_hash": "039837f8d68e7878acf853010d78db304528bfd6",
+        "after_hash": "618b60bdab29be835f2f6e3be929c0211f2cbba0"
+      }
+    ],
+    "workspace_manifest_sha256": "a9a0ce757be3529078f4b078a1ca05752ffddf50ab8d47343913dd1d43120515",
+    "impact_check_plan": {
+      "schema_version": 1,
+      "changed_paths": [
+        "sample.py"
+      ],
+      "affected_paths": [
+        "sample.py",
+        "tests/test_sample.py"
+      ],
+      "targeted_tests": [
+        "tests/test_sample.py"
+      ],
+      "impact_status": "static_inferred",
+      "unresolved": [],
+      "runtime_coverage": "not_assessed",
+      "omitted_unsupported": [],
+      "loop_check": "targeted_pytest",
+      "required_final_check": "full_pytest",
+      "checks_executed": false,
+      "source_digests": {
+        "sample.py": "b4fd4f9256bb1cafe38825606c8b5a287d32d48d7259fe079ca75404062f7a56",
+        "tests/test_sample.py": "3d1f191a5890142d8e5eabdb54b908cf5c7c99decd443bfe17208e16b7525286"
+      },
+      "final_gate_applicable": true
+    },
+    "check_obligation_digest": "259be5694b0a81e73332ccf7d0f7075208b097ee57ac61f2b2cbd6d35aabc23a",
+    "check_spec_digest": "441e7ef5b9514fb79a1ea7cd2fc71a53597ffd63f351c778d4ec0db0d1e27352",
+    "check_spec": {
+      "schema_version": 1,
+      "kind": "host_target_test_spec",
+      "task_id": "public-scripted-journey",
+      "task_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "base_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source_revision": "e98e63d4df4006a6afe575709b0dd0609d8ba58bf18286867a1871baf9354f47",
+      "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7080@sha256:3389f0d1319ca611d04a209fc30990c131e0bae9acfeb2163938c75ad23479fe",
+      "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+      "runner": "pytest",
+      "test_paths": [
+        "tests/test_sample.py"
+      ],
+      "target_root": "/workspace",
+      "timeout_seconds": 180,
+      "resources": {
+        "memory_bytes": 1073741824,
+        "cpus": 2,
+        "pids": 128,
+        "tmpfs_bytes": 134217728,
+        "output_bytes_per_stream": 16384
+      },
+      "argv": [
+        "/opt/miniconda3/envs/testbed/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--no-header",
+        "-x",
+        "tests/test_sample.py"
+      ],
+      "controls": {
+        "network": "none",
+        "root_read_only": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "no_new_privileges": true,
+        "non_root": true,
+        "automatic_pull": false,
+        "provider_environment": false
+      }
+    },
+    "check_passed": true,
+    "checked_source_revision": "e98e63d4df4006a6afe575709b0dd0609d8ba58bf18286867a1871baf9354f47",
+    "test_exit_code": 0,
+    "test_timed_out": false,
+    "test_output_tail": ".                                                                        [100%]\n1 passed in 0.00s\n\nATOMIC_CHECK_SPEC_RECEIPT:{\"collected\": 1, \"exit_code\": 0, \"failed\": 0, \"files\": [\"tests/test_sample.py\"], \"finished\": true, \"interpreter\": \"/opt/miniconda3/envs/testbed/bin/python\", \"interpreter_resolved\": \"/opt/miniconda3/envs/testbed/bin/python3.9\", \"nonce\": \"e305832ec3a2434f8394afa31192bb9f\", \"pytest_module\": \"/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/pytest/__init__.py\", \"pytest_version\": \"7.4.4\", \"root\": \"/workspace\", \"skipped\": 0}\n",
+    "limits": "Host gates confirm declared checks and approved bytes, not semantic fulfillment of every user requirement."
+  },
+  "backend_roles": [
+    "parser",
+    "answerer",
+    "answerer",
+    "critic",
+    "host_planner",
+    "parser",
+    "answerer",
+    "answerer",
+    "answerer",
+    "answerer",
+    "critic"
+  ],
+  "final_source": "def sample():\n    return 42\n",
+  "obligation_digest": "259be5694b0a81e73332ccf7d0f7075208b097ee57ac61f2b2cbd6d35aabc23a"
+}

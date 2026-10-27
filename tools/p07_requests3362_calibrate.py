@@ -212,7 +212,13 @@ def opaque_parser_transport(body, collection, printed_mapping):
     return "\n".join(lines) + "\n", opaque_to_node
 
 
-def classify_target(task, text, exit_code, parser, spec):
+def classify_target(task, text, exit_code, parser, spec, *, runtime_profile="python36"):
+    if runtime_profile == "python27" and task.get("instance_id") == "psf__requests-2674":
+        version, prefix, executable = [2, 7, 18], "/opt/p07-python27", "/opt/p07-python27/bin/python2.7"
+    elif runtime_profile == "python36":
+        version, prefix, executable = [3, 6, 15], transplant.PREFIX, transplant.PREFIX + "/bin/python3.6"
+    else:
+        raise ValueError("unreviewed task/runtime classification profile")
     if text.count(START) != 1 or text.count(END) != 1 or text.index(START) >= text.index(END):
         raise ValueError("complete unique target test markers required")
     body = text.split(START, 1)[1].split(END, 1)[0]
@@ -222,10 +228,10 @@ def classify_target(task, text, exit_code, parser, spec):
     raw_observed = json.loads(receipts[0])
     observed, node_mapping = canonicalize_runner(raw_observed)
     required = task["FAIL_TO_PASS"] + task["PASS_TO_PASS"]
-    if (observed.get("version_info") != [3, 6, 15] or observed.get("prefix") != transplant.PREFIX
-            or observed.get("executable") != transplant.PREFIX + "/bin/python3.6"
+    if (observed.get("version_info") != version or observed.get("prefix") != prefix
+            or observed.get("executable") != executable
             or observed.get("pytest_version") != "2.8.7"
-            or not observed.get("pytest_module", "").startswith(health.PREFIX)
+            or not observed.get("pytest_module", "").startswith(prefix + ("/lib/python2.7/site-packages/" if runtime_profile == "python27" else "/lib/python3.6/site-packages/"))
             or observed.get("requests_module") != "/testbed/requests/__init__.py"
             or observed.get("argv") != [*health.PLUGIN_ARGS, "-rA", "-v"]
             or observed.get("finished") is not True or observed.get("exit") != exit_code
