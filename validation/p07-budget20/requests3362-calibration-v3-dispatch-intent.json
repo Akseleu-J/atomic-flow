@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-10-27T05:23:51.995Z",
+  "head": "9ef6d0503609e3154e9442ee3dbc03a50a015ca3",
+  "workflow": "p07-requests3362-calibration.yml",
+  "ref": "experimental",
+  "profile": "p07-requests-legacy-profile-v2.json",
+  "change": "sealed collection Unicode terminal aliases only",
+  "model_calls": 0
+}

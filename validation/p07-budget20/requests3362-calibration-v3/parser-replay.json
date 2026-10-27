@@ -1,0 +1,41 @@
+{
+  "kind": "offline_parser_replay_only",
+  "accepted_calibration": false,
+  "source": {
+    "wheel": "swebench-3.0.15-py3-none-any.whl",
+    "wheel_sha256": "dd694356f9c155a55d3d2e113fe58446f7385eea0574230af5e2504426f8b85b",
+    "parser_sha256": "42f564edfee3c21751739bbf09d60cf3a3ecdc58ac5cf45717dc6b47a85d7459",
+    "constants_sha256": "ba8277bda09fbc0fa13cfb2ff7582f410f560f3d0d2699decee9a00e33fb3547"
+  },
+  "rows": [
+    {
+      "label": "base",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "regressions_passed": true,
+      "tests": 349,
+      "assertion_failures": [
+        "tests/test_requests.py::TestRequests::test_response_decode_unicode"
+      ]
+    },
+    {
+      "label": "gold",
+      "status": "verified_success",
+      "verified_success": true,
+      "regressions_passed": true,
+      "tests": 349,
+      "assertion_failures": []
+    },
+    {
+      "label": "wrong",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "regressions_passed": true,
+      "tests": 349,
+      "assertion_failures": [
+        "tests/test_requests.py::TestRequests::test_response_decode_unicode"
+      ]
+    }
+  ],
+  "classification_triple": true
+}

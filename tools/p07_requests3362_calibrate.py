@@ -196,6 +196,22 @@ def verbose_observations(body, collection, printed_mapping=None):
     return results
 
 
+def opaque_parser_transport(body, collection, printed_mapping):
+    """Transport full exact native identities through the pinned whitespace parser."""
+    tests = verbose_observations(body, collection, printed_mapping)
+    node_to_opaque = {node: "tests/p07_identity.py::case_" + format(index, "06d")
+                      for index, node in enumerate(sorted(collection))}
+    opaque_to_node = {opaque: node for node, opaque in node_to_opaque.items()}
+    lines = []
+    pattern = r"^(\S+::.*?)\s+(PASSED|FAILED|ERROR|SKIPPED|xfail|XPASS)(?:\s+\[\s*\d+%\])?\s*$"
+    for match in re.finditer(pattern, oracle.ANSI.sub("", body), re.MULTILINE):
+        node = printed_mapping[canonical_node_id(match[1])]
+        lines.append(node_to_opaque[node] + " " + match[2])
+    if len(lines) != len(collection) or len(tests) != len(collection):
+        raise ValueError("opaque transport omitted or duplicated a native observation")
+    return "\n".join(lines) + "\n", opaque_to_node
+
+
 def classify_target(task, text, exit_code, parser, spec):
     if text.count(START) != 1 or text.count(END) != 1 or text.index(START) >= text.index(END):
         raise ValueError("complete unique target test markers required")
@@ -223,14 +239,19 @@ def classify_target(task, text, exit_code, parser, spec):
         phases = [item for item in observed.get("reports", []) if item.get("id") == test]
         if not phases or not {"setup", "teardown"} <= {item.get("when") for item in phases}:
             raise ValueError("ordinary collection lacks complete setup and teardown")
-    parsed, diagnostics = oracle.parse_observations(task, body, parser, spec)
     printed_mapping = sealed_terminal_mapping(observed["collection"])
     tests = verbose_observations(body, observed["collection"], printed_mapping)
+    transported_body, opaque_mapping = opaque_parser_transport(body, observed["collection"], printed_mapping)
+    parsed, diagnostics = oracle.parse_observations(task, transported_body, parser, spec)
+    diagnostics["identity_transport"] = "bijective sealed full verbose node identities; statuses unchanged"
+    diagnostics["original_body_sha256"] = oracle.sha(body.encode())
+    diagnostics["transported_body_sha256"] = oracle.sha(transported_body.encode())
+    diagnostics["opaque_to_canonical_node_ids"] = opaque_mapping
     parsed_canonical = {}
     for raw_id, status in parsed.items():
-        node = printed_mapping.get(canonical_node_id(raw_id))
+        node = opaque_mapping.get(raw_id)
         if node is None:
-            raise ValueError("independent parser result outside sealed terminal identities")
+            raise ValueError("independent parser result outside sealed opaque identities")
         if node in parsed_canonical:
             raise ValueError("native summary node canonicalization collision")
         parsed_canonical[node] = status

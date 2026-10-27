@@ -67,11 +67,20 @@ def transcript(result, exit_code):
     return adapter.START + "\n" + "\n".join(lines) + "\n" + adapter.RESULT + json.dumps(result) + "\nP07_TEST_EXIT=" + str(exit_code) + "\n" + adapter.END
 
 
+def stub_external(statuses, collection):
+    canonical = [adapter.canonical_node_id(node) for node in collection]
+    aliases = adapter.sealed_terminal_mapping(canonical)
+    tokens = {node: "tests/p07_identity.py::case_" + format(index, "06d") for index, node in enumerate(sorted(canonical))}
+    values = {tokens[aliases.get(adapter.canonical_node_id(node), node)]: status
+              for node, status in statuses.items() if aliases.get(adapter.canonical_node_id(node), node) in tokens}
+    return lambda *args: (values, {})
+
+
 def test_complete_native_gold_and_real_requirement_negative(monkeypatch):
     task, _ = task_control()
     for failed in (False, True):
         result, statuses = receipt(task, failed)
-        monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args, statuses=statuses: (statuses, {}))
+        monkeypatch.setattr(adapter.oracle, "parse_observations", stub_external(statuses, result["collection"]))
         row = adapter.classify_target(task, transcript(result, int(failed)), int(failed), None, None)
         assert row["verified_success"] is not failed
         assert row["regressions_passed"] is True
@@ -96,7 +105,7 @@ def test_missing_skipped_setup_error_or_disagreeing_native_receipt_refused(monke
         result["plugins"].append(["duplicate", "pytest_httpbin.plugin"])
     else:
         statuses[result["collection"][0]] = "FAILED"
-    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (statuses, {}))
+    monkeypatch.setattr(adapter.oracle, "parse_observations", stub_external(statuses, result["collection"]))
     with pytest.raises(ValueError):
         adapter.classify_target(task, transcript(result, 0), 0, None, None)
 
@@ -214,7 +223,7 @@ def test_complete_historical_raw_collection_and_reports_are_retained(monkeypatch
     mapping = {test: test.replace("::TestRequests::", "::TestRequests::()::") for test in result["collection"]}
     result["collection"] = [mapping[test] for test in result["collection"]]
     result["reports"] = [{**report, "id": mapping[report["id"]]} for report in result["reports"]]
-    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (statuses, {}))
+    monkeypatch.setattr(adapter.oracle, "parse_observations", stub_external(statuses, result["collection"]))
     row = adapter.classify_target(task, transcript(result, 0), 0, None, None)
     assert row["runner_receipt"] == result
     assert len(row["raw_to_canonical_node_ids"]) == 76
@@ -233,7 +242,7 @@ def test_old_pytest_expected_outcomes_remain_distinct_outside_requirements(monke
         {"id": extra, "when": "call", "outcome": outcome, "has_wasxfail": True,
          "wasxfail": "original native mark", "native_category": category},
         {"id": extra, "when": "teardown", "outcome": "passed", "has_wasxfail": False}])
-    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (statuses, {}))
+    monkeypatch.setattr(adapter.oracle, "parse_observations", stub_external(statuses, result["collection"]))
     row = adapter.classify_target(task, transcript(result, 0), 0, None, None)
     assert row["verified_success"] is True
     assert row["tests"][extra] == expected
@@ -245,7 +254,7 @@ def test_required_xpass_does_not_satisfy_a_required_pass(monkeypatch):
     result, statuses = receipt(task)
     call = result["reports"][1]
     call.update(outcome="failed", has_wasxfail=True, wasxfail="native mark", native_category="xpassed")
-    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (statuses, {}))
+    monkeypatch.setattr(adapter.oracle, "parse_observations", stub_external(statuses, result["collection"]))
     with pytest.raises(ValueError):
         adapter.classify_target(task, transcript(result, 0), 0, None, None)
 
@@ -301,10 +310,70 @@ def test_independent_parser_uses_the_same_sealed_terminal_alias_map(monkeypatch)
     result["reports"].extend({"id": raw, "when": phase, "outcome": "passed", "has_wasxfail": False}
                              for phase in ("setup", "call", "teardown"))
     parser_results = {**statuses, printed: "PASSED"}
-    monkeypatch.setattr(adapter.oracle, "parse_observations", lambda *args: (parser_results, {}))
+    monkeypatch.setattr(adapter.oracle, "parse_observations", stub_external(parser_results, result["collection"]))
     text = transcript(result, 0).replace(raw + " PASSED", printed + " PASSED", 1)
     row = adapter.classify_target(task, text, 0, None, None)
     assert row["tests"][canonical] == "PASSED"
     assert row["printed_to_canonical_node_ids"][printed] == canonical
     assert row["raw_to_canonical_node_ids"][raw] == canonical
     assert row["runner_receipt"]["collection"][-1] == raw
+
+
+
+def test_whitespace_parameter_ids_with_identical_prefix_keep_distinct_outcomes():
+    first = "tests/test_requests.py::TestTimeout::test_invalid_timeout[timeout0-(connect, read)]"
+    second = "tests/test_requests.py::TestTimeout::test_invalid_timeout[timeout0-(connect, write)]"
+    collection = [first, second]
+    body = first + " PASSED\n" + second + " FAILED\n"
+    transformed, inverse = adapter.opaque_parser_transport(body, collection, adapter.sealed_terminal_mapping(collection))
+    assert len(inverse) == 2 and len(set(inverse.values())) == 2
+    # The independent parser's whitespace-based token extraction sees the whole
+    # fixed opaque identity, preserving both statuses instead of truncating them.
+    observed = {}
+    for line in transformed.splitlines():
+        identity, status = line.split()
+        assert identity.startswith("tests/p07_identity.py::case_")
+        observed[inverse[identity]] = status
+    assert observed == {first: "PASSED", second: "FAILED"}
+    assert adapter.oracle.sha(body.encode()) != adapter.oracle.sha(transformed.encode())
+
+
+def test_opaque_transport_retains_exact_expected_failure_status_tokens():
+    collection = ["a.py::test_x", "a.py::test_y"]
+    transformed, inverse = adapter.opaque_parser_transport("a.py::test_x xfail\na.py::test_y XPASS\n",
+                                                         collection, adapter.sealed_terminal_mapping(collection))
+    assert [line.split()[1] for line in transformed.splitlines()] == ["xfail", "XPASS"]
+    assert set(inverse.values()) == set(collection)
+
+
+@pytest.mark.parametrize("body", [
+    "a.py::test_a PASSED\na.py::unknown FAILED\n",
+    "a.py::test_a PASSED\na.py::test_a FAILED\n",
+    "a.py::test_a UNKNOWN\n",
+    "a.py::test_a PASSED\na.py::test_a PASSED\n"])
+def test_opaque_transport_refuses_unknown_duplicate_or_missing_native_rows(body):
+    with pytest.raises(ValueError):
+        adapter.opaque_parser_transport(body, ["a.py::test_a"], {"a.py::test_a": "a.py::test_a"})
+
+
+def test_external_parser_unknown_opaque_identity_is_not_decoded_or_accepted(monkeypatch):
+    task, _ = task_control()
+    result, _ = receipt(task)
+    monkeypatch.setattr(adapter.oracle, "parse_observations",
+                        lambda *args: ({"tests/p07_identity.py::case_999999": "PASSED"}, {}))
+    with pytest.raises(ValueError, match="outside sealed opaque"):
+        adapter.classify_target(task, transcript(result, 0), 0, None, None)
+
+
+def test_opaque_transport_diagnostics_preserve_full_inverse_map_and_original_body(monkeypatch):
+    task, _ = task_control()
+    result, statuses = receipt(task)
+    monkeypatch.setattr(adapter.oracle, "parse_observations", stub_external(statuses, result["collection"]))
+    text = transcript(result, 0)
+    row = adapter.classify_target(task, text, 0, None, None)
+    diagnostics = row["parser_diagnostics"]
+    body = text.split(adapter.START, 1)[1].split(adapter.END, 1)[0]
+    assert diagnostics["original_body_sha256"] == adapter.oracle.sha(body.encode())
+    assert len(diagnostics["opaque_to_canonical_node_ids"]) == 76
+    assert set(diagnostics["opaque_to_canonical_node_ids"].values()) == set(result["collection"])
+    assert "statuses unchanged" in diagnostics["identity_transport"]
