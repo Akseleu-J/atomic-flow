@@ -17,6 +17,7 @@ _IMAGE = re.compile(r"[a-z0-9]+(?:[._-][a-z0-9]+)*(?::[0-9]+)?(?:/[a-z0-9]+(?:[.
 _TASK = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}")
 _PATH = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_./-]{0,511}")
 _INTERPRETERS = frozenset({"/opt/miniconda3/envs/testbed/bin/python", "/usr/local/bin/python", "/usr/bin/python3"})
+SYMPY_RUNNER_PATHS = ("bin/get_sympy.py", "bin/test", "sympy/utilities/runtests.py")
 
 
 def _integer(name: str, value: int, maximum: int) -> None:
@@ -57,6 +58,34 @@ class CheckResources:
 
 
 @dataclass(frozen=True, slots=True)
+class SymPyRunnerIdentity:
+    """Host-admitted native runner bytes and exact runtime, not an attestation."""
+
+    python_version: tuple[int, int, int]
+    sympy_version: str
+    source_sha256: tuple[tuple[str, str], ...]
+
+    def __post_init__(self) -> None:
+        version = self.python_version
+        if (type(version) is not tuple or len(version) != 3 or any(type(part) is not int or part < 0 for part in version)
+                or version[0] != 3 or version[1] < 8 or version[1] > 99 or version[2] > 999):
+            raise ValueError("native SymPy requires an exact Python3.8+ version")
+        if (type(self.sympy_version) is not str or not 1 <= len(self.sympy_version) <= 128
+                or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.+-]*", self.sympy_version) is None):
+            raise ValueError("native SymPy requires an exact bounded package version")
+        if (type(self.source_sha256) is not tuple or len(self.source_sha256) != len(SYMPY_RUNNER_PATHS)
+                or any(type(item) is not tuple or len(item) != 2 for item in self.source_sha256)
+                or tuple(path for path, _ in self.source_sha256) != SYMPY_RUNNER_PATHS):
+            raise ValueError("native SymPy requires the complete sorted runner byte inventory")
+        for _, digest in self.source_sha256:
+            _digest("native runner source", digest, 64)
+
+    def as_dict(self) -> dict:
+        return {"python_version": list(self.python_version), "sympy_version": self.sympy_version,
+                "source_sha256": dict(self.source_sha256)}
+
+
+@dataclass(frozen=True, slots=True)
 class CheckSpec:
     """A host-admitted exact runner/image/source obligation, never a model command.
 
@@ -77,6 +106,7 @@ class CheckSpec:
     target_root: Literal["/workspace", "/testbed"] = "/workspace"
     timeout_seconds: int = 180
     resources: CheckResources = field(default_factory=CheckResources)
+    sympy_identity: SymPyRunnerIdentity | None = None
 
     def __post_init__(self) -> None:
         if type(self.task_id) is not str or _TASK.fullmatch(self.task_id) is None:
@@ -100,19 +130,21 @@ class CheckSpec:
             raise ValueError("duplicate test obligations are not admitted")
         if self.runner == "sympy-native" and any(not path.startswith("sympy/") for path in self.test_paths):
             raise ValueError("native SymPy obligations must be under sympy/")
+        if self.sympy_identity is not None and (self.runner != "sympy-native" or type(self.sympy_identity) is not SymPyRunnerIdentity):
+            raise ValueError("native SymPy identity belongs only to a native runner specification")
         _integer("timeout_seconds", self.timeout_seconds, 180)
         if type(self.resources) is not CheckResources:
             raise ValueError("resource bounds must use the immutable host contract")
 
     @property
     def argv(self) -> tuple[str, ...]:
-        """Exact non-shell argv; native SymPy remains a declaration until execution admission."""
+        """Exact non-shell argv; native execution additionally requires host runner identity."""
         if self.runner == "pytest":
             return (self.interpreter, "-m", "pytest", "-q", "--no-header", "-x", *self.test_paths)
-        return (self.interpreter, "bin/test", "-v", *self.test_paths)
+        return (self.interpreter, "bin/test", "-C", "--verbose", *self.test_paths)
 
     def as_dict(self) -> dict:
-        return {"schema_version": 1, "kind": "host_target_test_spec", "task_id": self.task_id,
+        value = {"schema_version": 1, "kind": "host_target_test_spec", "task_id": self.task_id,
                 "task_commit": self.task_commit, "base_commit": self.base_commit,
                 "source_revision": self.source_revision, "image": self.image,
                 "interpreter": self.interpreter, "runner": self.runner, "test_paths": list(self.test_paths),
@@ -121,6 +153,9 @@ class CheckSpec:
                 "controls": {"network": "none", "root_read_only": True, "cap_drop": ["ALL"],
                              "no_new_privileges": True, "non_root": True, "automatic_pull": False,
                              "provider_environment": False}}
+        if self.sympy_identity is not None:
+            value["sympy_identity"] = self.sympy_identity.as_dict()
+        return value
 
     def canonical_bytes(self) -> bytes:
         return json.dumps(self.as_dict(), sort_keys=True, separators=(",", ":"), ensure_ascii=True,

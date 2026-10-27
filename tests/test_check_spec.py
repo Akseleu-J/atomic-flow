@@ -32,7 +32,7 @@ def test_exact_argv_canonical_hash_and_fixed_security_controls():
 
 def test_native_sympy_is_explicit_and_never_disguised_as_pytest():
     check = spec(runner="sympy-native", test_paths=("sympy/core/tests/test_kind.py",), target_root="/testbed")
-    assert check.argv == (check.interpreter, "bin/test", "-v", "sympy/core/tests/test_kind.py")
+    assert check.argv == (check.interpreter, "bin/test", "-C", "--verbose", "sympy/core/tests/test_kind.py")
     assert check.as_dict()["runner"] == "sympy-native"
     with pytest.raises(ValueError, match="under sympy"):
         spec(runner="sympy-native")
