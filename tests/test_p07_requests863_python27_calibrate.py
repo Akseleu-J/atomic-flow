@@ -55,6 +55,20 @@ def test_fixture_refuses_unadmitted_certificate_paths():
         service.server_source({'/tmp/cert.pem': 'a' * 64})
 
 
+def test_fixture_worker_requires_inspected_init_without_relaxing_other_isolation():
+    image = 'sha256:' + 'a' * 64
+    config = {'Image': image, 'Mounts': [], 'HostConfig': {
+        'Init': True, 'NetworkMode': 'none', 'CapDrop': ['ALL'], 'SecurityOpt': ['no-new-privileges'],
+        'Memory': 6 * 1024**3, 'NanoCpus': 2_000_000_000, 'PidsLimit': 256,
+        'Sysctls': {'net.ipv4.ip_unprivileged_port_start': '0'},
+        'ExtraHosts': [host + ':' + address for host, address in health.TASK_HOSTS['psf__requests-863'].items()],
+    }}
+    worker.inspect_policy(config, image, 'psf__requests-863')
+    config['HostConfig']['Init'] = False
+    with pytest.raises(ValueError, match='transport policy'):
+        worker.inspect_policy(config, image, 'psf__requests-863')
+
+
 @pytest.mark.parametrize('transfer', ['', 'chunked'])
 def test_wsgi_compatibility_passes_the_original_body_stream_through(transfer):
     function = next(node for node in ast.parse(service.CHILD).body if isinstance(node, ast.FunctionDef) and node.name == 'historical_application')

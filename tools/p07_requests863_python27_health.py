@@ -101,6 +101,7 @@ def fetch(url,context=None,authorization=None,redirect=True):
         request.add_header('Authorization',authorization)
     return closing(urllib2.build_opener(*handlers).open(request,timeout=3))
 checks={}
+health_completed=False
 try:
     try:
         closed_probe=socket.create_connection(('127.0.0.1',1),timeout=1)
@@ -216,10 +217,11 @@ START_SERVERS
         if not isinstance(error.reason,ssl.CertificateError):raise
         checks['wrong_hostname']='certificate_verification_failed'
     else:raise RuntimeError('mismatched certificate hostname accepted')
+    health_completed=True
 
 
 finally:
-    print('P07_SERVICE_HEALTH_PROGRESS='+json.dumps({'checks':checks,'active_error':getattr(sys.exc_info()[0],'__name__',None)},sort_keys=True))
+    print('P07_SERVICE_HEALTH_PROGRESS='+json.dumps({'checks':checks,'completed_checks':health_completed},sort_keys=True))
     sys.stdout.flush()
 STOP_SERVERS
 stopped=len(function_processes)==2 and all(process.poll() is not None for process in function_processes)

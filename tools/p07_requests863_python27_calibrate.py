@@ -25,7 +25,7 @@ from evaluation_stage4 import load_manifest, patch_paths, protected_test_path
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 16 * 1024**2
-PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v6.json"
+PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v7.json"
 MANIFEST = ROOT / "benchmarks/stage4/corpus-p07-v3.json"
 CONTROLS = ROOT / "benchmarks/stage4/p07-controls-v7.json"
 MANIFEST_SHA256 = "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920"
@@ -86,7 +86,8 @@ def transport_arguments(task_id):
 def inspect_policy(config, image_id, task_id):
     common.inspect_policy(config, image_id)
     host = config["HostConfig"]
-    if (host.get("Sysctls") != {"net.ipv4.ip_unprivileged_port_start": "0"}
+    if (host.get("Init") is not True
+            or host.get("Sysctls") != {"net.ipv4.ip_unprivileged_port_start": "0"}
             or set(host.get("ExtraHosts", [])) != {name + ":" + address for name, address in service.TASK_HOSTS[task_id].items()}):
         raise ValueError("fixed function transport policy differs")
 
@@ -212,7 +213,7 @@ def grade(task, spec, parser, admitted, patch, label, output):
     try:
         if patch and (patch_paths(patch) & patch_paths(task["test_patch"]) or any(protected_test_path(p) for p in patch_paths(patch))):
             raise ValueError("production patch crosses protected boundary")
-        checked(["docker", "create", "--name", name, "--network", "none", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
+        checked(["docker", "create", "--init", "--name", name, "--network", "none", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
                  "--memory", "6g", "--cpus", "2", "--pids-limit", "256", *transport_arguments(task["instance_id"]), "--entrypoint", "/bin/sleep", admitted["image_id"], "infinity"])
         checked(["docker", "start", name])
         config = json.loads(checked(["docker", "inspect", name]))[0]

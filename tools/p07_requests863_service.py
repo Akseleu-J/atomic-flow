@@ -72,7 +72,15 @@ def stop_function_servers(require_complete=True):
                 if error.errno!=3:failures.append('group_state_unknown')
                 break
             if time.time()>=group_deadline:
-                failures.append('group_still_present')
+                members=[]
+                for entry in os.listdir('/proc'):
+                    if not entry.isdigit():continue
+                    try:
+                        fields=open('/proc/'+entry+'/stat').read().rsplit(')',1)[1].split()
+                        if int(fields[2])==process.pid:
+                            members.append({'pid':int(entry),'state':fields[0],'ppid':int(fields[1])})
+                    except (IOError,ValueError,IndexError):pass
+                failures.append({'group_still_present':members})
                 break
             time.sleep(0.05)
     if failures or (require_complete and len(function_processes)!=2):raise RuntimeError('WSGI process cleanup unconfirmed: '+repr(failures))
