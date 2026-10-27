@@ -12,6 +12,8 @@ CHILD = r'''from __future__ import print_function
 import os,ssl,sys
 import gunicorn,httpbin,pkg_resources
 from gunicorn.app.base import BaseApplication
+from gunicorn.workers.gthread import ThreadWorker
+from gunicorn import http
 config=CONFIG
 prefix='/opt/p07-python27/lib/python2.7/site-packages/'
 for module in (gunicorn,httpbin):
@@ -20,9 +22,23 @@ if gunicorn.__version__!='19.9.0' or pkg_resources.get_distribution('httpbin').v
     raise RuntimeError('WSGI versions differ')
 if any(str(path).startswith('/testbed') for path in sys.path):raise RuntimeError('target path exposed to fixture')
 WIRE_CONTRACTS
+class FixtureThreadWorker(ThreadWorker):
+    def enqueue_req(self,connection):
+        if connection.parser is None and self.cfg.is_ssl:
+            connection.sock.setblocking(True)
+            context=ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            context.options &= ~ssl.OP_NO_SSLv3
+            context.load_cert_chain(self.cfg.certfile,self.cfg.keyfile)
+            context.set_ciphers(self.cfg.ciphers)
+            connection.sock=context.wrap_socket(connection.sock,server_side=True,
+                do_handshake_on_connect=self.cfg.do_handshake_on_connect,
+                suppress_ragged_eofs=self.cfg.suppress_ragged_eofs)
+            connection.parser=http.RequestParser(self.cfg,connection.sock)
+        return ThreadWorker.enqueue_req(self,connection)
 class FixedApplication(BaseApplication):
     def load_config(self):
         for key,value in config.items():self.cfg.set(key,value)
+        self.cfg.set('worker_class',FixtureThreadWorker)
     def load(self):return historical_application
 FixedApplication().run()
 '''.replace('WIRE_CONTRACTS', WIRE_CONTRACTS)

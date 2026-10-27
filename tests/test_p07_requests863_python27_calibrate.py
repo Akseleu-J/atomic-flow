@@ -27,6 +27,9 @@ def test_real_transport_is_separate_from_target_and_checked_before_exposing_sour
     assert 'try:\n    exit_code=pytest.main(argv,plugins=[recorder])\nfinally:' in code
     assert "'worker_class':'gthread'" in code
     assert 'ssl.PROTOCOL_SSLv23' in code
+    assert 'context.options &= ~ssl.OP_NO_SSLv3' in code
+    assert "self.cfg.set('worker_class',FixtureThreadWorker)" in service.CHILD
+    assert 'ssl.wrap_socket=' not in code and 'ssl.SSLContext=' not in code
     assert 'os.killpg(process.pid,signal.SIGTERM)' in code
     assert 'group_still_present' in code
     assert 'requests.' not in service.CHILD and 'import requests' not in service.CHILD
@@ -71,3 +74,43 @@ def test_wsgi_compatibility_passes_the_original_body_stream_through(transfer):
     assert observed == [b'actual-wire-body'] and response == [b'original-application-response']
     assert ('wsgi.input_terminated' in environ) == (transfer == 'chunked')
     assert headers == [('Content-Type', 'text/plain')]
+
+
+def test_legacy_tls_changes_only_a_fresh_fixture_context_and_preserves_parser_reuse():
+    calls = []
+
+    class Parent:
+        def enqueue_req(self, connection):
+            calls.append(('enqueue', connection.parser))
+            return 'submitted'
+
+    class Context:
+        options = 7
+
+        def __init__(self, protocol):
+            calls.append(('context', protocol))
+
+        def load_cert_chain(self, cert, key):
+            calls.append(('chain', cert, key))
+
+        def set_ciphers(self, ciphers):
+            calls.append(('ciphers', ciphers))
+
+        def wrap_socket(self, sock, **kwargs):
+            assert self.options == 5 and kwargs['server_side'] is True
+            return sock
+
+    tree = ast.parse(service.CHILD.replace('CONFIG', '{}'))
+    worker = next(node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == 'FixtureThreadWorker')
+    namespace = {'ThreadWorker': Parent, 'ssl': SimpleNamespace(SSLContext=Context, PROTOCOL_SSLv23=23, OP_NO_SSLv3=2),
+                 'http': SimpleNamespace(RequestParser=lambda cfg, sock: 'original-gunicorn-parser')}
+    exec(compile(ast.Module(body=[worker], type_ignores=[]), '<host-owned-tls-worker>', 'exec'), namespace)
+    instance = namespace['FixtureThreadWorker']()
+    instance.cfg = SimpleNamespace(is_ssl=True, certfile='fixture.cert', keyfile='fixture.key', ciphers='AES128-SHA',
+                                   do_handshake_on_connect=False, suppress_ragged_eofs=True)
+    connection = SimpleNamespace(parser=None, sock=SimpleNamespace(setblocking=lambda flag: None))
+    assert instance.enqueue_req(connection) == 'submitted'
+    assert instance.enqueue_req(connection) == 'submitted'
+    assert calls.count(('context', 23)) == 1
+    assert calls.count(('enqueue', 'original-gunicorn-parser')) == 2
+    assert Context.options == 7

@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+  File "<p07-host>", line 1, in <module>
+  File "<p07-fixed-host-bootstrap>", line 167, in <module>
+  File "<p07-fixed-host-bootstrap>", line 45, in fetch
+  File "/opt/p07-python27/lib/python2.7/urllib2.py", line 429, in open
+    response = self._open(req, data)
+  File "/opt/p07-python27/lib/python2.7/urllib2.py", line 447, in _open
+    '_open', req)
+  File "/opt/p07-python27/lib/python2.7/urllib2.py", line 407, in _call_chain
+    result = func(*args)
+  File "/opt/p07-python27/lib/python2.7/urllib2.py", line 1241, in https_open
+    context=self._context)
+  File "/opt/p07-python27/lib/python2.7/urllib2.py", line 1198, in do_open
+    raise URLError(err)
+urllib2.URLError: <urlopen error [SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:661)>
