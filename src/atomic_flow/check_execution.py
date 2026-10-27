@@ -87,6 +87,8 @@ def _parse_sympy_output(text, paths, exit_code):
     footer = re.search(r"(?:^|\n)\s*=*\s*tests finished:\s*(.*?)\bin ([0-9]+(?:\.[0-9]+)?) seconds\s*=*\s*(?:\n|$)", clean, re.S)
     if footer is None or len(footer.group(1)) > 2048:
         raise ValueError("native terminal summary shape differs")
+    if clean[footer.end():].strip():
+        raise ValueError("unexpected output after native terminal summary")
     counts = {name: 0 for name in ("passed", "failed", "skipped", "xfailed", "xpassed", "exceptions")}
     names = {"passed": "passed", "failed": "failed", "skipped": "skipped", "expected to fail": "xfailed",
              "expected to fail but passed": "xpassed", "exceptions": "exceptions"}
@@ -121,6 +123,9 @@ def _parse_sympy_output(text, paths, exit_code):
             if status[3] is not None:
                 if len(files[active]) != declared:
                     raise ValueError("native testcase count differs from file collection")
+                file_failed = any(tests[active + "::" + name] in {"failed", "exceptions", "xpassed"} for name in files[active])
+                if status[3] != ("FAIL" if file_failed else "OK"):
+                    raise ValueError("native file verdict contradicts testcase observations")
                 active = None
             continue
         if active is not None and line.strip():
@@ -240,8 +245,11 @@ def admit_check_spec(spec: CheckSpec, workspace: Path, config: ExecutionConfig,
             path = root / relative
             if (any(part.is_symlink() or getattr(part, "is_junction", lambda: False)()
                     for part in (path, *path.parents) if part != root.parent and part.is_relative_to(root))
-                    or not path.is_file() or path.stat().st_size > 4 * 1024**2
-                    or hashlib.sha256(path.read_bytes()).hexdigest() != expected):
+                    or not path.is_file() or path.stat().st_size > 4 * 1024**2):
+                raise ExecutionUnavailable("Native SymPy runner source differs from admitted bytes")
+            with path.open('rb') as source:
+                raw = source.read(4 * 1024**2 + 1)
+            if len(raw) > 4 * 1024**2 or hashlib.sha256(raw).hexdigest() != expected:
                 raise ExecutionUnavailable("Native SymPy runner source differs from admitted bytes")
     from atomic_flow.agents.verify import check_source_revision
     revision = check_source_revision(root, check)

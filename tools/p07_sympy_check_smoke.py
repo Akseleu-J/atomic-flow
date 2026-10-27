@@ -46,7 +46,7 @@ def read_version(workspace):
     literal = re.search(r"^__version__\s*=\s*(['\"])([A-Za-z0-9_.+-]+)\1\s*$", source, re.MULTILINE)
     if literal:
         return literal[2], "sympy/__init__.py"
-    if re.search(r"^from \.release import __version__\s*$", source, re.MULTILINE):
+    if re.search(r"^from (?:\.release|sympy\.release) import __version__\s*$", source, re.MULTILINE):
         source = (workspace / "sympy/release.py").read_text(encoding="utf-8")
         literal = re.search(r"^__version__\s*=\s*(['\"])([A-Za-z0-9_.+-]+)\1\s*$", source, re.MULTILINE)
         if literal:

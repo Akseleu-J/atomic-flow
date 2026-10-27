@@ -141,6 +141,13 @@ def test_native_receipt_rejects_boolean_exit_code_even_when_numeric_comparison_m
     assert checks._runner_receipt(observed, spec, NONCE) is None
 
 
+@pytest.mark.parametrize('body', [BODY + 'test_extra F [FAIL]\n', BODY + 'Traceback: incomplete child failure\n',
+                                BODY.replace('[OK]', '[FAIL]')])
+def test_native_log_cannot_append_unaccounted_observations_or_contradict_its_file_verdict(body):
+    with pytest.raises(ValueError):
+        checks._parse_sympy_output(body, (PATH,), 0)
+
+
 @pytest.mark.parametrize('field', ['timed_out', 'stdout_truncated', 'stderr_truncated'])
 def test_native_timeout_or_output_truncation_never_passes(admitted, field):
     spec, _ = admitted
