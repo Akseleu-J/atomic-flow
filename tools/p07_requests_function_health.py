@@ -21,7 +21,7 @@ TASK_HOSTS = {
 }
 URLS = {"http": "http://httpbin.org/", "https": "https://httpbin.org/"}
 RESULT_PREFIX = "P07_FUNCTION_HEALTH="
-PROFILE_SHA256 = "0269eddd007c3112c4dc4861662dbf3ea00958f822df8d8b7a299e4a0dfbee7e"
+PROFILE_SHA256 = "cbeb060fc4e7272034112de1e94f6153a6f41fe92b4c1ab04ff5a2cd44dd86d1"
 
 
 def sha(raw):
@@ -84,7 +84,7 @@ for host,address in data['host_mappings'].items():
     actual_hosts[host]=actual
 os.environ['HTTPBIN_URL']='http://httpbin.org/'
 import pkg_resources,httpbin
-if pkg_resources.get_distribution('httpbin').version!='0.4.1' or not str(pathlib.Path(httpbin.__file__).resolve()).startswith(prefix):
+if pkg_resources.get_distribution('httpbin').version!='0.5.0' or not str(pathlib.Path(httpbin.__file__).resolve()).startswith(prefix):
     raise RuntimeError('HTTPBin private import/version mismatch')
 from wsgiref.simple_server import make_server
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -181,7 +181,7 @@ if target_imports or 'requests' in sys.modules:
     raise RuntimeError('health imported target Requests')
 result={'task_id':data['task_id'],'profile_sha256':data['profile_sha256'],'input_sha256':data['input_sha256'],'version_info':list(sys.version_info[:3]),
     'prefix':sys.prefix,'executable':sys.executable,'isolated':sys.flags.isolated,
-    'httpbin_version':'0.4.1','httpbin_module':httpbin.__file__,'host_mappings':actual_hosts,
+    'httpbin_version':'0.5.0','httpbin_module':httpbin.__file__,'host_mappings':actual_hosts,
     'urls':data['urls'],'ports':[80,443],'server_host':'127.0.0.1','checks':checks,
     'servers_stopped':stopped,'target_imports':target_imports,'requests_imported':False,
     'target_setup_or_tests_executed':False,'calibrated':False,'verified_success':False}
@@ -205,7 +205,7 @@ def validate_health(text, task_id, installed_files, certificate_files):
             or result.get("input_sha256") != canonical_sha(bound)
             or result.get("version_info") != [3, 6, 15] or result.get("prefix") != "/opt/p07-python36"
             or result.get("executable") != "/opt/p07-python36/bin/python3.6" or result.get("isolated") != 1
-            or result.get("httpbin_version") != "0.4.1" or not result.get("httpbin_module", "").startswith(PREFIX)
+            or result.get("httpbin_version") != "0.5.0" or not result.get("httpbin_module", "").startswith(PREFIX)
             or result.get("host_mappings") != {host: [address] for host, address in TASK_HOSTS[task_id].items()}
             or result.get("urls") != URLS or result.get("ports") != [80, 443] or result.get("server_host") != "127.0.0.1"
             or result.get("checks") != checks or result.get("servers_stopped") is not True

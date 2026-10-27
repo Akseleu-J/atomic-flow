@@ -25,7 +25,7 @@ def complete(task):
     return {"task_id": task, "profile_sha256": health.PROFILE_SHA256,
             "input_sha256": health.canonical_sha(health.bound_inputs(task, FILES, CERTS)),
             "version_info": [3, 6, 15], "prefix": "/opt/p07-python36", "executable": "/opt/p07-python36/bin/python3.6",
-            "isolated": 1, "httpbin_version": "0.4.1", "httpbin_module": health.PREFIX + "httpbin/__init__.py",
+            "isolated": 1, "httpbin_version": "0.5.0", "httpbin_module": health.PREFIX + "httpbin/__init__.py",
             "host_mappings": {host: [address] for host, address in health.TASK_HOSTS[task].items()},
             "urls": health.URLS, "ports": [80, 443], "server_host": "127.0.0.1", "checks": checks,
             "servers_stopped": True, "target_imports": [], "requests_imported": False,
@@ -124,7 +124,7 @@ def test_missing_fixed_certificate_or_unreviewed_task_refused():
 
 
 def test_profile_hash_and_service_mappings_match_exact_frozen_profile():
-    profile_path = Path(__file__).resolve().parents[1] / "benchmarks/stage4/p07-requests-function-service-profile.json"
+    profile_path = Path(__file__).resolve().parents[1] / "benchmarks/stage4/p07-requests-function-service-profile-v2.json"
     raw = profile_path.read_bytes().replace(b"\r\n", b"\n")
     assert health.sha(raw) == health.PROFILE_SHA256
     profile = json.loads(raw)
