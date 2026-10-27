@@ -215,6 +215,8 @@ def opaque_parser_transport(body, collection, printed_mapping):
 def classify_target(task, text, exit_code, parser, spec, *, runtime_profile="python36"):
     if runtime_profile == "python27" and task.get("instance_id") == "psf__requests-2674":
         version, prefix, executable = [2, 7, 18], "/opt/p07-python27", "/opt/p07-python27/bin/python2.7"
+    elif runtime_profile == "python2713" and task.get("instance_id") == "psf__requests-863":
+        version, prefix, executable = [2, 7, 13], "/opt/p07-python27", "/opt/p07-python27/bin/python2.7"
     elif runtime_profile == "python36":
         version, prefix, executable = [3, 6, 15], transplant.PREFIX, transplant.PREFIX + "/bin/python3.6"
     else:
@@ -231,7 +233,7 @@ def classify_target(task, text, exit_code, parser, spec, *, runtime_profile="pyt
     if (observed.get("version_info") != version or observed.get("prefix") != prefix
             or observed.get("executable") != executable
             or observed.get("pytest_version") != "2.8.7"
-            or not observed.get("pytest_module", "").startswith(prefix + ("/lib/python2.7/site-packages/" if runtime_profile == "python27" else "/lib/python3.6/site-packages/"))
+            or not observed.get("pytest_module", "").startswith(prefix + ("/lib/python2.7/site-packages/" if runtime_profile in {"python27", "python2713"} else "/lib/python3.6/site-packages/"))
             or observed.get("requests_module") != "/testbed/requests/__init__.py"
             or observed.get("argv") != [*health.PLUGIN_ARGS, "-rA", "-v"]
             or observed.get("finished") is not True or observed.get("exit") != exit_code

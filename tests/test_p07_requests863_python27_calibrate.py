@@ -1,0 +1,44 @@
+import ast
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
+import p07_requests863_python27_calibrate as worker  # noqa:E402
+import p07_requests863_python27_health as health  # noqa:E402
+import p07_requests863_service as service  # noqa:E402
+import p07_requests3362_calibrate as common  # noqa:E402
+
+
+def test_real_transport_is_separate_from_target_and_checked_before_exposing_source():
+    files = {'module.py': 'a' * 64}
+    certs = {p: 'b' * 64 for p in health.CERTIFICATE_PATHS}
+    code = worker.bootstrap_source('psf__requests-863', files, certs)
+    probe = health.bootstrap_source('psf__requests-863', files, certs, '-----BEGIN CERTIFICATE-----\nfixture')
+    for source in (code, probe, service.CHILD.replace('CONFIG', '{}')):
+        ast.parse(source)
+        assert 'pathlib' not in source and ',flush=True)' not in source
+    assert code.index('subprocess.Popen') < code.index("sys.path.insert(0,'/testbed')")
+    assert 'try:\n    exit_code=pytest.main(argv,plugins=[recorder])\nfinally:' in code
+    assert "'worker_class':'gthread'" in code
+    assert 'ssl.PROTOCOL_SSLv23' in code
+    assert 'os.killpg(process.pid,signal.SIGTERM)' in code
+    assert 'group_still_present' in code
+    assert 'requests.' not in service.CHILD and 'import requests' not in service.CHILD
+    assert 'httpbin.app(environ,fixture_response)' in service.CHILD
+    assert 'HTTP connection was silently reopened' in probe
+    assert 'Transfer-Encoding' in probe and 'chunked' in probe
+    assert "context.check_hostname" in probe and 'CERT_REQUIRED' in probe
+    assert "sslv3" not in probe.lower()  # modern client health still verifies CA/TLS; target uses its original SSL API
+
+
+@pytest.mark.parametrize('task', ['psf__requests-2674', 'other'])
+def test_other_tasks_cannot_use_historical863_classifier(task):
+    with pytest.raises(ValueError, match='unreviewed task/runtime'):
+        common.classify_target({'instance_id': task}, '', 0, None, None, runtime_profile='python2713')
+
+
+def test_fixture_refuses_unadmitted_certificate_paths():
+    with pytest.raises(ValueError):
+        service.server_source({'/tmp/cert.pem': 'a' * 64})
