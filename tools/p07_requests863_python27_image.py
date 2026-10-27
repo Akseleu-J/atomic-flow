@@ -19,8 +19,8 @@ import p07_requests863_python27_support as transplant
 from p07_sympy13971_image import fetch
 
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v3.json"
-PROFILE_SHA = "d740daf157446332a3c0e76402b9c675cc5f533109a8ab7867604a984bb8faf2"
+PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v4.json"
+PROFILE_SHA = "f1e8a383ad133e5f4ee753ac45c530f197ccc26b8e227ddb5b76ae8577f6657e"
 TASK_IDS = ("psf__requests-863",)
 CERT_ROOT = "/opt/p07-function-fixture"
 CERT_NAMES = ("cacert.pem", "cert.pem", "key.pem")
@@ -155,6 +155,10 @@ def frozen_task(task):
         raise ValueError("reviewed function service profile bytes differ")
     profile = json.loads(raw)
     target = next(item for item in profile["tasks"] if item["instance_id"] == task)
+    wire = target["service"]["historical_wire_contracts"]
+    if (wire["source_path"] != "tools/p07_requests863_wire_contracts.py"
+            or wire["source_sha256"] != sha((ROOT / wire["source_path"]).read_bytes().replace(b"\r\n", b"\n"))):
+        raise ValueError("historical wire fixture differs from frozen profile")
     dep_raw, dependency = legacy.frozen_profile(legacy.PROFILE_V2)
     binding = profile["source_bindings"]["legacy_wheel_profile"]
     if (binding["path"] != legacy.PROFILE_V2_NAME or binding["git_lf_sha256"] != sha(dep_raw)

@@ -12,11 +12,12 @@ import re
 
 import p07_requests863_python27_image as runtime
 import p07_requests863_service as wsgi
+from p07_requests863_wire_contracts import HOSTS
 
 PREFIX = "/opt/p07-python27/lib/python2.7/site-packages/"
 FIXTURE_ROOT = "/opt/p07-function-fixture/"
 CERTIFICATE_PATHS = tuple(FIXTURE_ROOT + name for name in ("cacert.pem", "cert.pem", "key.pem"))
-TASK_HOSTS = {'psf__requests-863': {'httpbin.org': '127.0.0.1', 'github.com': '127.0.0.1'}}
+TASK_HOSTS = {'psf__requests-863': {host: '127.0.0.1' for host in HOSTS}}
 URLS = {"http": "http://httpbin.org/", "https": "https://httpbin.org/"}
 RESULT_PREFIX = "P07_FUNCTION_HEALTH="
 PROFILE_SHA256 = runtime.PROFILE_SHA
@@ -167,6 +168,34 @@ START_SERVERS
     connection.close()
     if response.status!=200 or payload.get('data')!='abc':raise RuntimeError('real chunked WSGI input differs: '+repr((response.status,payload)))
     checks['chunked_request']='abc'
+    legacy=ssl.SSLContext(ssl.PROTOCOL_SSLv3)
+    legacy.verify_mode=ssl.CERT_REQUIRED
+    legacy.load_verify_locations(fixture+'cacert.pem')
+    legacy.check_hostname=True
+    with fetch('https://httpbin.org/get?health=p07',legacy) as response:
+        if response.code!=200 or json.loads(response.read()).get('args')!={'health':'p07'}:raise RuntimeError('real CA-verified SSLv3 service failed')
+    checks['legacy_sslv3']='verified_chain_and_hostname'
+    for password,expected in (('pass',200),('wrong',401)):
+        passwords=urllib2.HTTPPasswordMgrWithDefaultRealm()
+        passwords.add_password(None,'http://httpbin.org/digest-auth/auth/user/pass','user',password)
+        opener=urllib2.build_opener(urllib2.ProxyHandler({}),urllib2.HTTPDigestAuthHandler(passwords))
+        try:
+            response=opener.open('http://httpbin.org/digest-auth/auth/user/pass',timeout=3)
+        except urllib2.HTTPError as error:
+            if expected!=401 or error.code!=401:raise
+            error.close()
+        else:
+            payload=json.loads(response.read())
+            response.close()
+            if expected!=200 or payload!={'authenticated':True,'user':'user'}:raise RuntimeError('Digest response validation differs')
+    checks['digest']='real_response_hash_validated_wrong_password_rejected'
+    try:
+        with fetch('https://kennethreitz.com/',context) as response:response.read(1)
+    except urllib2.URLError as error:
+        if not isinstance(error.reason,(ssl.SSLError,ssl.CertificateError)):raise
+        checks['wrong_hostname']='certificate_verification_failed'
+    else:raise RuntimeError('mismatched certificate hostname accepted')
+
 
 finally:
 STOP_SERVERS
@@ -196,7 +225,9 @@ def validate_health(text, task_id, installed_files, certificate_files):
     checks.update(basic_auth={"status": 200, "authenticated": True, "user": "p07"}, wrong_ca="certificate_verification_failed",
                   port1="connection_refused")
     checks.update(github_cookie={"status": 200, "cookie": "p07_fixture=public; Path=/; HttpOnly"},
-                  http11_keepalive_close="real_persistent_connection", chunked_request="abc")
+                  http11_keepalive_close="real_persistent_connection", chunked_request="abc",
+                  legacy_sslv3="verified_chain_and_hostname", wrong_hostname="certificate_verification_failed",
+                  digest="real_response_hash_validated_wrong_password_rejected")
     if (result.get("task_id") != task_id or result.get("profile_sha256") != PROFILE_SHA256
             or result.get("input_sha256") != canonical_sha(bound)
             or result.get("version_info") != [2, 7, 13] or result.get("prefix") != "/opt/p07-python27"

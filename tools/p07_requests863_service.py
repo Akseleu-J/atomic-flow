@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import json
 
+from p07_requests863_wire_contracts import SOURCE as WIRE_CONTRACTS
+
 CHILD = r'''from __future__ import print_function
 import os,ssl,sys
 import gunicorn,httpbin,pkg_resources
@@ -17,20 +19,13 @@ for module in (gunicorn,httpbin):
 if gunicorn.__version__!='19.9.0' or pkg_resources.get_distribution('httpbin').version!='0.5.0':
     raise RuntimeError('WSGI versions differ')
 if any(str(path).startswith('/testbed') for path in sys.path):raise RuntimeError('target path exposed to fixture')
-def application(environ,start_response):
-    if environ.get('HTTP_TRANSFER_ENCODING','').lower()=='chunked':
-        environ['wsgi.input_terminated']=True
-    def fixture_response(status,headers,exc_info=None):
-        if environ.get('HTTP_HOST','').split(':',1)[0]=='github.com' and environ.get('PATH_INFO')=='/':
-            headers=list(headers)+[('Set-Cookie','p07_fixture=public; Path=/; HttpOnly')]
-        return start_response(status,headers,exc_info)
-    return httpbin.app(environ,fixture_response)
+WIRE_CONTRACTS
 class FixedApplication(BaseApplication):
     def load_config(self):
         for key,value in config.items():self.cfg.set(key,value)
-    def load(self):return application
+    def load(self):return historical_application
 FixedApplication().run()
-'''
+'''.replace('WIRE_CONTRACTS', WIRE_CONTRACTS)
 
 START = r'''import os,signal,socket,subprocess,time
 function_processes=[]
@@ -59,7 +54,7 @@ try:
                 'worker_tmp_dir':'/tmp','chdir':'/tmp'}
         if port==443:
             config.update(certfile='/opt/p07-function-fixture/cert.pem',keyfile='/opt/p07-function-fixture/key.pem',
-                          ssl_version=ssl.PROTOCOL_SSLv23)
+                          ssl_version=ssl.PROTOCOL_SSLv23,ciphers='AES128-SHA:AES256-SHA:ECDHE-RSA-AES128-GCM-SHA256')
         child=CHILD_TEMPLATE.replace('CONFIG',repr(config))
         process=subprocess.Popen(['/opt/p07-runtime/python27','-c',child],cwd='/tmp',preexec_fn=os.setsid,close_fds=True)
         function_processes.append(process)

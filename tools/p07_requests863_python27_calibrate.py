@@ -25,7 +25,7 @@ from evaluation_stage4 import load_manifest, patch_paths, protected_test_path
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 16 * 1024**2
-PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v3.json"
+PROFILE = ROOT / "benchmarks/stage4/p07-requests863-python27-service-profile-v4.json"
 MANIFEST = ROOT / "benchmarks/stage4/corpus-p07-v3.json"
 CONTROLS = ROOT / "benchmarks/stage4/p07-controls-v7.json"
 MANIFEST_SHA256 = "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920"

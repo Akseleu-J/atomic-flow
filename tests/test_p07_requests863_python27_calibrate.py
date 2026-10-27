@@ -36,7 +36,8 @@ def test_real_transport_is_separate_from_target_and_checked_before_exposing_sour
     assert 'HTTP connection was silently reopened' in probe
     assert 'Transfer-Encoding' in probe and 'chunked' in probe
     assert "context.check_hostname" in probe and 'CERT_REQUIRED' in probe
-    assert "sslv3" not in probe.lower()  # modern client health still verifies CA/TLS; target uses its original SSL API
+    assert "legacy.verify_mode=ssl.CERT_REQUIRED" in probe
+    assert "legacy.check_hostname=True" in probe
 
 
 @pytest.mark.parametrize('task', ['psf__requests-2674', 'other'])
@@ -52,7 +53,7 @@ def test_fixture_refuses_unadmitted_certificate_paths():
 
 @pytest.mark.parametrize('transfer', ['', 'chunked'])
 def test_wsgi_compatibility_passes_the_original_body_stream_through(transfer):
-    function = next(node for node in ast.parse(service.CHILD).body if isinstance(node, ast.FunctionDef) and node.name == 'application')
+    function = next(node for node in ast.parse(service.CHILD).body if isinstance(node, ast.FunctionDef) and node.name == 'historical_application')
     stream = io.BytesIO(b'actual-wire-body')
     environ = {'wsgi.input': stream, 'HTTP_TRANSFER_ENCODING': transfer, 'HTTP_HOST': 'httpbin.org', 'PATH_INFO': '/post'}
     observed = []
@@ -66,7 +67,7 @@ def test_wsgi_compatibility_passes_the_original_body_stream_through(transfer):
     namespace = {'httpbin': SimpleNamespace(app=app)}
     exec(compile(ast.Module(body=[function], type_ignores=[]), '<host-owned-fixture-function>', 'exec'), namespace)
     headers = []
-    response = namespace['application'](environ, lambda status, fields, exc=None: headers.extend(fields))
+    response = namespace['historical_application'](environ, lambda status, fields, exc=None: headers.extend(fields))
     assert observed == [b'actual-wire-body'] and response == [b'original-application-response']
     assert ('wsgi.input_terminated' in environ) == (transfer == 'chunked')
     assert headers == [('Content-Type', 'text/plain')]

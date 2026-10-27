@@ -38,6 +38,129 @@
               "verified_success": false
             }
           ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v1/oracle/calibration.json",
+          "report_sha256": "d388c92455fb08df040d8c73bf76d0e23e01ac6297b9b3fde2b9900af629c0b0",
+          "calibrated": false,
+          "workflow_run": 40499615004,
+          "artifact_id": 12732475720,
+          "archive_sha256": "6747afad25230efa1a4f460adc31f0192411212cd84bd0e76fa3c4e0fda61789",
+          "runtime_commit": "ef48cf546eb1ad167fc3bc081b0a0b9a8c2e81d5",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "error": "same-worker function service health failed"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v2/oracle/calibration.json",
+          "report_sha256": "31e7139d362f6a5ed13837c4171a60d7dae22bef4200dcc9f566b56de088ed7e",
+          "calibrated": false,
+          "workflow_run": 40500204776,
+          "artifact_id": 12732905461,
+          "archive_sha256": "18f666356c28b8113c2a1716e765358db2416224718cf7674a58b4f2990b5272",
+          "runtime_commit": "4437da426f92d87f3339eb0b56a28f2a91abe15c",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "rows": [
+            {
+              "label": "base",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "error": "complete unique target test markers required",
+              "stdout_sha256": "e116bca6f487c2c25f992968983babdf7c62f038ead5feedf893a8718c140190",
+              "stderr_sha256": "a377fa0e655a04f09c5274f90b2bd82daa3431cb0d0c19f0788958b0f6905758"
+            },
+            {
+              "label": "gold",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "error": "complete unique target test markers required",
+              "stdout_sha256": "e116bca6f487c2c25f992968983babdf7c62f038ead5feedf893a8718c140190",
+              "stderr_sha256": "a377fa0e655a04f09c5274f90b2bd82daa3431cb0d0c19f0788958b0f6905758"
+            },
+            {
+              "label": "wrong",
+              "status": "infrastructure_error",
+              "verified_success": false,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "error": "complete unique target test markers required",
+              "stdout_sha256": "e116bca6f487c2c25f992968983babdf7c62f038ead5feedf893a8718c140190",
+              "stderr_sha256": "a377fa0e655a04f09c5274f90b2bd82daa3431cb0d0c19f0788958b0f6905758"
+            }
+          ]
+        },
+        {
+          "report": "validation/p07-budget20/requests863-calibration-v3/oracle/calibration.json",
+          "report_sha256": "f6f8402e507f7429cf2cd818cbfaded0b50b70743e42687f18fc767d1f9dc52f",
+          "calibrated": false,
+          "workflow_run": 40501037688,
+          "artifact_id": 12732966444,
+          "archive_sha256": "6bd0e261cf6ea7358b85d81179e77f9177903eded6f6249e8716b4c04eae3cd1",
+          "runtime_commit": "ad37e969f3068ab43caef370fc8f3d565203e359",
+          "manifest_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+          "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+          "rows": [
+            {
+              "label": "base",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": false,
+              "source_preserved": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "3161d4c6a4a5362e92b2a4aa8c17524e9b9c27a1ca3ed763ab2d4fa8ef6ab166",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "gold",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": false,
+              "source_preserved": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "815c5dccb0baa829cdb5ece6d94a6bd4f3f32973fe00504dbfc8fc6764580c5e",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "label": "wrong",
+              "status": "requirement_failed",
+              "verified_success": false,
+              "regressions_passed": false,
+              "source_preserved": true,
+              "cleanup_confirmed": true,
+              "process_exit": 1,
+              "stdout_sha256": "6ce186d4a82bb6357c0d9fa643d77506097c1ecab04a1126cb76c2834e419ad8",
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
         }
       ]
     },

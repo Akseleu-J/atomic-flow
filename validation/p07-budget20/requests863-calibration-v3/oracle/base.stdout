@@ -1,0 +1,2936 @@
+>>>>> Start Test Output
+============================= test session starts ==============================
+platform linux2 -- Python 2.7.13, pytest-2.8.7, py-1.4.31, pluggy-0.3.1 -- /opt/p07-python27/bin/python2.7
+cachedir: .cache
+rootdir: /testbed, inifile: 
+collecting ... collected 106 items
+
+tests/test_cookies.py::CookieTests::test_convert_jar_to_dict PASSED
+tests/test_cookies.py::CookieTests::test_cookies_from_response PASSED
+tests/test_cookies.py::CookieTests::test_crossdomain_cookies PASSED
+tests/test_cookies.py::CookieTests::test_disabled_cookie_persistence PASSED
+tests/test_cookies.py::CookieTests::test_jar_utility_functions PASSED
+tests/test_cookies.py::CookieTests::test_none_cookie PASSED
+tests/test_cookies.py::CookieTests::test_overwrite PASSED
+tests/test_cookies.py::CookieTests::test_redirects PASSED
+tests/test_cookies.py::CookieTests::test_secure_cookies FAILED
+tests/test_cookies.py::LWPCookieJarTest::test_cookiejar_persistence PASSED
+tests/test_cookies.py::LWPCookieJarTest::test_crossdomain PASSED
+tests/test_cookies.py::LWPCookieJarTest::test_persistent_cookies FAILED
+tests/test_cookies.py::MozCookieJarTest::test_cookiejar_persistence PASSED
+tests/test_cookies.py::MozCookieJarTest::test_crossdomain PASSED
+tests/test_cookies.py::MozCookieJarTest::test_persistent_cookies FAILED
+tests/test_proxies.py::HTTPSProxyTest::test_empty_http_proxy FAILED
+tests/test_proxies.py::HTTPSProxyTest::test_empty_https_proxy FAILED
+tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_HTTP_200_OK_GET PASSED
+tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_TUPLE_HTTP_200_OK_GET PASSED
+tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_HTTP_200_OK_GET FAILED
+tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_WRONG_HTTP_401_GET PASSED
+tests/test_requests.py::RequestsTestSuite::test_GET_no_redirect PASSED
+tests/test_requests.py::RequestsTestSuite::test_HEAD_no_redirect PASSED
+tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET PASSED
+tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS PASSED
+tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_PARAMS PASSED
+tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_HEAD PASSED
+tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_PUT PASSED
+tests/test_requests.py::RequestsTestSuite::test_HTTP_302_ALLOW_REDIRECT_GET PASSED
+tests/test_requests.py::RequestsTestSuite::test_HTTP_302_GET PASSED
+tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES PASSED
+tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_STRINGS PASSED
+tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_HEADERS PASSED
+tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_PARAMS PASSED
+tests/test_requests.py::RequestsTestSuite::test_accept_objects_with_string_representations_as_urls PASSED
+tests/test_requests.py::RequestsTestSuite::test_allow_list_of_hooks_to_register_hook FAILED
+tests/test_requests.py::RequestsTestSuite::test_bytes_files PASSED
+tests/test_requests.py::RequestsTestSuite::test_cached_response PASSED
+tests/test_requests.py::RequestsTestSuite::test_can_have_none_in_header_values PASSED
+tests/test_requests.py::RequestsTestSuite::test_connection_error PASSED
+tests/test_requests.py::RequestsTestSuite::test_connection_error_with_safe_mode PASSED
+tests/test_requests.py::RequestsTestSuite::test_connection_keepalive_and_close PASSED
+tests/test_requests.py::RequestsTestSuite::test_danger_mode_redirects PASSED
+tests/test_requests.py::RequestsTestSuite::test_decompress_gzip PASSED
+tests/test_requests.py::RequestsTestSuite::test_default_status_raising PASSED
+tests/test_requests.py::RequestsTestSuite::test_empty_response PASSED
+tests/test_requests.py::RequestsTestSuite::test_entry_points PASSED
+tests/test_requests.py::RequestsTestSuite::test_file_post_data PASSED
+tests/test_requests.py::RequestsTestSuite::test_head_content PASSED
+tests/test_requests.py::RequestsTestSuite::test_httpauth_recursion PASSED
+tests/test_requests.py::RequestsTestSuite::test_invalid_url PASSED
+tests/test_requests.py::RequestsTestSuite::test_invalid_urls_throw_requests_exception PASSED
+tests/test_requests.py::RequestsTestSuite::test_iter_lines PASSED
+tests/test_requests.py::RequestsTestSuite::test_max_redirects PASSED
+tests/test_requests.py::RequestsTestSuite::test_multiple_hooks PASSED
+tests/test_requests.py::RequestsTestSuite::test_none_vals_in_data_are_deleted PASSED
+tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_post_data PASSED
+tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_postdata PASSED
+tests/test_requests.py::RequestsTestSuite::test_nonzero_evaluation PASSED
+tests/test_requests.py::RequestsTestSuite::test_params_accepts_kv_list PASSED
+tests/test_requests.py::RequestsTestSuite::test_params_are_added_before_fragment PASSED
+tests/test_requests.py::RequestsTestSuite::test_path_is_not_double_encoded PASSED
+tests/test_requests.py::RequestsTestSuite::test_permissive_iter_content PASSED
+tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files PASSED
+tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files_as_tuples PASSED
+tests/test_requests.py::RequestsTestSuite::test_prefetch_redirect_bug PASSED
+tests/test_requests.py::RequestsTestSuite::test_prefetch_return_response_interaction PASSED
+tests/test_requests.py::RequestsTestSuite::test_redirect_history PASSED
+tests/test_requests.py::RequestsTestSuite::test_relative_redirect_history PASSED
+tests/test_requests.py::RequestsTestSuite::test_request_ok_set PASSED
+tests/test_requests.py::RequestsTestSuite::test_response_has_unicode_url PASSED
+tests/test_requests.py::RequestsTestSuite::test_response_sent PASSED
+tests/test_requests.py::RequestsTestSuite::test_session_HTTP_200_OK_GET PASSED
+tests/test_requests.py::RequestsTestSuite::test_session_cookies_with_return_response_false PASSED
+tests/test_requests.py::RequestsTestSuite::test_session_persistent_cookies PASSED
+tests/test_requests.py::RequestsTestSuite::test_session_persistent_headers PASSED
+tests/test_requests.py::RequestsTestSuite::test_session_persistent_params PASSED
+tests/test_requests.py::RequestsTestSuite::test_session_pickling PASSED
+tests/test_requests.py::RequestsTestSuite::test_single_hook PASSED
+tests/test_requests.py::RequestsTestSuite::test_status_raising PASSED
+tests/test_requests.py::RequestsTestSuite::test_str_data_content_type FAILED
+tests/test_requests.py::RequestsTestSuite::test_unicode_get PASSED
+tests/test_requests.py::RequestsTestSuite::test_unpickled_session_requests PASSED
+tests/test_requests.py::RequestsTestSuite::test_upload_binary_data PASSED
+tests/test_requests.py::RequestsTestSuite::test_urlencoded_get_query_multivalued_param PASSED
+tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_data PASSED
+tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_and_data PASSED
+tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_multivalued_and_data PASSED
+tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring PASSED
+tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring_multivalued PASSED
+tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_port PASSED
+tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_scheme PASSED
+tests/test_requests.py::RequestsTestSuite::test_user_agent_transfers PASSED
+tests/test_requests_ext.py::RequestsTestSuite::test_addition PASSED
+tests/test_requests_ext.py::RequestsTestSuite::test_binary_post FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_chunked_head_redirect FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_cookies_on_redirects FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_redirect_encoding FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_not_ok FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_ok FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_session_not_ok FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_unicode_error FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_unicode_redirect FAILED
+tests/test_requests_ext.py::RequestsTestSuite::test_unicode_url_outright FAILED
+tests/test_requests_https.py::HTTPSTest::test_smoke FAILED
+tests/test_requests_https.py::HTTPSTest::test_smoke_verified FAILED
+
+=================================== FAILURES ===================================
+_______________________ CookieTests.test_secure_cookies ________________________
+
+self = <test_cookies.CookieTests testMethod=test_secure_cookies>
+
+    def test_secure_cookies(self):
+        """Test that secure cookies can only be sent via https."""
+        header = "Set-Cookie: ThisIsA=SecureCookie; Path=/; Secure; HttpOnly"
+        url = 'https://httpbin.org/response-headers?%s' % (requests.utils.quote(header),)
+>       cookies = requests.get(url, verify=False).cookies
+
+tests/test_cookies.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno 104] Connection reset by peer
+
+requests/models.py:629: ConnectionError
+___________________ LWPCookieJarTest.test_persistent_cookies ___________________
+
+self = <test_cookies.LWPCookieJarTest testMethod=test_persistent_cookies>
+
+    def test_persistent_cookies(self):
+        """Test that we correctly interpret persistent cookies."""
+        # httpbin's normal cookie methods don't send persistent cookies,
+        # so cook up the appropriate header and force it to send
+        header = "Set-Cookie: Persistent=CookiesAreScary; expires=Sun, 04-May-2032 04:56:50 GMT; path=/"
+        url = httpbin('response-headers?%s' % (requests.utils.quote(header),))
+        cookiejar = self.COOKIEJAR_CLASS(self.cookiejar_filename)
+    
+        requests.get(url, cookies=cookiejar)
+>       self.assertEqual(len(cookiejar), 1)
+E       AssertionError: 0 != 1
+
+tests/test_cookies.py:243: AssertionError
+___________________ MozCookieJarTest.test_persistent_cookies ___________________
+
+self = <test_cookies.MozCookieJarTest testMethod=test_persistent_cookies>
+
+    def test_persistent_cookies(self):
+        """Test that we correctly interpret persistent cookies."""
+        # httpbin's normal cookie methods don't send persistent cookies,
+        # so cook up the appropriate header and force it to send
+        header = "Set-Cookie: Persistent=CookiesAreScary; expires=Sun, 04-May-2032 04:56:50 GMT; path=/"
+        url = httpbin('response-headers?%s' % (requests.utils.quote(header),))
+        cookiejar = self.COOKIEJAR_CLASS(self.cookiejar_filename)
+    
+        requests.get(url, cookies=cookiejar)
+>       self.assertEqual(len(cookiejar), 1)
+E       AssertionError: 0 != 1
+
+tests/test_cookies.py:243: AssertionError
+_____________________ HTTPSProxyTest.test_empty_http_proxy _____________________
+
+self = <test_proxies.HTTPSProxyTest testMethod=test_empty_http_proxy>
+
+    def test_empty_http_proxy(self):
+        proxy = {"http" : "" }
+>       result = requests.get(self.smoke_url, proxies = proxy)
+
+tests/test_proxies.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+                raise ConnectionError(sockerr)
+    
+            except MaxRetryError as e:
+                raise ConnectionError(e)
+    
+            except (_SSLError, _HTTPError) as e:
+                if isinstance(e, _SSLError):
+>                   raise SSLError(e)
+E                   SSLError: EOF occurred in violation of protocol (_ssl.c:661)
+
+requests/models.py:636: SSLError
+____________________ HTTPSProxyTest.test_empty_https_proxy _____________________
+
+self = <test_proxies.HTTPSProxyTest testMethod=test_empty_https_proxy>
+
+    def test_empty_https_proxy(self):
+        proxy = {"https" : "" }
+>       result = requests.get(self.smoke_url, verify=False, proxies = proxy)
+
+tests/test_proxies.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+                raise ConnectionError(sockerr)
+    
+            except MaxRetryError as e:
+                raise ConnectionError(e)
+    
+            except (_SSLError, _HTTPError) as e:
+                if isinstance(e, _SSLError):
+>                   raise SSLError(e)
+E                   SSLError: EOF occurred in violation of protocol (_ssl.c:661)
+
+requests/models.py:636: SSLError
+______________ RequestsTestSuite.test_DIGESTAUTH_HTTP_200_OK_GET _______________
+
+self = <test_requests.RequestsTestSuite testMethod=test_DIGESTAUTH_HTTP_200_OK_GET>
+
+    def test_DIGESTAUTH_HTTP_200_OK_GET(self):
+    
+        for service in SERVICES:
+    
+            auth = HTTPDigestAuth('user', 'pass')
+            url = service('digest-auth', 'auth', 'user', 'pass')
+    
+            r = get(url, auth=auth)
+            self.assertEqual(r.status_code, 200)
+            self.assertEqual(len(r.history), 1)
+    
+            r = get(url, auth=auth)
+            self.assertEqual(r.status_code, 200)
+>           self.assertEqual(len(r.history), 0)
+E           AssertionError: 1 != 0
+
+tests/test_requests.py:286: AssertionError
+_________ RequestsTestSuite.test_allow_list_of_hooks_to_register_hook __________
+
+self = <test_requests.RequestsTestSuite testMethod=test_allow_list_of_hooks_to_register_hook>
+
+    def test_allow_list_of_hooks_to_register_hook(self):
+        """Issue 785: https://github.com/kennethreitz/requests/issues/785"""
+        def add_foo_header(args):
+            if not args.get('headers'):
+                args['headers'] = {}
+    
+            args['headers'].update({
+                'X-Foo': 'foo'
+            })
+    
+            return args
+    
+        def add_bar_header(args):
+            if not args.get('headers'):
+                args['headers'] = {}
+    
+            args['headers'].update({
+                'X-Bar': 'bar'
+            })
+    
+            return args
+    
+        def assert_hooks_are_callable(hooks):
+            for h in hooks['args']:
+                assert callable(h) is True
+    
+        hooks = [add_foo_header, add_bar_header]
+        r = requests.models.Request()
+        r.register_hook('args', hooks)
+>       assert_hooks_are_callable(r.hooks)
+
+tests/test_requests.py:776: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hooks = {'args': [[<function add_foo_header at 0x7f5968b14050>, <function add_bar_header at 0x7f5968b140c8>]], 'post_request': [], 'pre_request': [], 'pre_send': [], ...}
+
+    def assert_hooks_are_callable(hooks):
+        for h in hooks['args']:
+>           assert callable(h) is True
+E           AssertionError: assert callable([<function add_foo_header at 0x7f5968b14050>, <function add_bar_header at 0x7f5968b140c8>]) is True
+
+tests/test_requests.py:771: AssertionError
+_________________ RequestsTestSuite.test_str_data_content_type _________________
+
+self = <test_requests.RequestsTestSuite testMethod=test_str_data_content_type>
+
+    def test_str_data_content_type(self):
+        data = 'test string data'
+        r = post(httpbin('post'), data=data)
+        t = json.loads(r.text)
+>       self.assertEqual(t.get('headers').get('Content-Type'), '')
+E       AssertionError: None != ''
+
+tests/test_requests.py:1090: AssertionError
+______________________ RequestsTestSuite.test_binary_post ______________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_binary_post>
+
+    def test_binary_post(self):
+        '''We need to be careful how we build the utf-8 string since
+            unicode literals are a syntax error in python3
+            '''
+    
+        if is_py2:
+            # Blasphemy!
+            utf8_string = eval("u'Smörgås'.encode('utf-8')")
+        elif is_py3:
+            utf8_string = 'Smörgås'.encode('utf-8')
+        else:
+            raise EnvironmentError('Flesh out this test for your environment.')
+>       requests.post('http://www.google.com/', data=utf8_string)
+
+tests/test_requests_ext.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:98: in post
+    return request('post', url, data=data, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [POST]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+_________________ RequestsTestSuite.test_chunked_head_redirect _________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_chunked_head_redirect>
+
+    def test_chunked_head_redirect(self):
+        url = "http://t.co/NFrx0zLG"
+>       r = requests.head(url, allow_redirects=True)
+
+tests/test_requests_ext.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:87: in head
+    return request('head', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [HEAD]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+_________________ RequestsTestSuite.test_cookies_on_redirects __________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_cookies_on_redirects>
+
+    def test_cookies_on_redirects(self):
+        """Test interaction between cookie handling and redirection."""
+        # get a cookie for tinyurl.com ONLY
+        s = requests.session()
+>       s.get(url='http://tinyurl.com/preview.php?disable=1')
+
+tests/test_requests_ext.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/sessions.py:254: in get
+    return self.request('get', url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+___________________ RequestsTestSuite.test_redirect_encoding ___________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_redirect_encoding>
+
+    def test_redirect_encoding(self):
+        '''This url redirects to
+            http://www.dealipedia.com/deal_view_investment.php?r=20012'''
+    
+        r = requests.get('http://feedproxy.google.com/~r/Dealipedia' +
+                         'News/~3/BQtUJRJeZlo/deal_view_investment.' +
+>                        'php')
+
+tests/test_requests_ext.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+__________________ RequestsTestSuite.test_ssl_hostname_not_ok __________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_ssl_hostname_not_ok>
+
+    def test_ssl_hostname_not_ok(self):
+>       requests.get('https://kennethreitz.com', verify=False)
+
+tests/test_requests_ext.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+____________________ RequestsTestSuite.test_ssl_hostname_ok ____________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_ssl_hostname_ok>
+
+    def test_ssl_hostname_ok(self):
+>       requests.get('https://github.com', verify=True)
+
+tests/test_requests_ext.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+                raise ConnectionError(sockerr)
+    
+            except MaxRetryError as e:
+                raise ConnectionError(e)
+    
+            except (_SSLError, _HTTPError) as e:
+                if isinstance(e, _SSLError):
+>                   raise SSLError(e)
+E                   SSLError: EOF occurred in violation of protocol (_ssl.c:661)
+
+requests/models.py:636: SSLError
+______________ RequestsTestSuite.test_ssl_hostname_session_not_ok ______________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_ssl_hostname_session_not_ok>
+
+    def test_ssl_hostname_session_not_ok(self):
+    
+        s = requests.session()
+    
+>       self.assertRaises(requests.exceptions.SSLError, s.get, 'https://kennethreitz.com')
+
+tests/test_requests_ext.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/sessions.py:254: in get
+    return self.request('get', url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+_____________________ RequestsTestSuite.test_unicode_error _____________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_unicode_error>
+
+    def test_unicode_error(self):
+        url = 'http://blip.fm/~1abvfu'
+>       requests.get(url)
+
+tests/test_requests_ext.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+___________________ RequestsTestSuite.test_unicode_redirect ____________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_unicode_redirect>
+
+    def test_unicode_redirect(self):
+        '''This url redirects to a location that has a nonstandard
+            character in it, that breaks requests in python2.7
+    
+            After some research, the cause was identified as an unintended
+            sideeffect of overriding of str with unicode.
+    
+            In the case that the redirected url is actually a malformed
+            "bytes" object, i.e. a string with character c where
+                ord(c) > 127,
+            then unicode(url) breaks.
+            '''
+        r = requests.get('http://www.marketwire.com/mw/release.' +
+>                        'do?id=1628202&sourceType=3')
+
+tests/test_requests_ext.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+_________________ RequestsTestSuite.test_unicode_url_outright __________________
+
+self = <test_requests_ext.RequestsTestSuite testMethod=test_unicode_url_outright>
+
+    def test_unicode_url_outright(self):
+        '''This url visits in my browser'''
+        r = requests.get('http://www.marketwire.com/press-release/' +
+                         'jp-morgan-behauptet-sich-der-spitze-euro' +
+                         'p%C3%A4ischer-anleihe-analysten-laut-umf' +
+>                        'rageergebnissen-1628202.htm')
+
+tests/test_requests_ext.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+>               raise ConnectionError(sockerr)
+E               ConnectionError: [Errno -2] Name or service not known
+
+requests/models.py:629: ConnectionError
+_____________________________ HTTPSTest.test_smoke _____________________________
+
+self = <test_requests_https.HTTPSTest testMethod=test_smoke>
+
+    def test_smoke(self):
+        """Smoke test without verification."""
+>       self.perform_smoke_test(verify=False)
+
+tests/test_requests_https.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_requests_https.py:19: in perform_smoke_test
+    result = requests.get(self.smoke_url, verify=verify)
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+                raise ConnectionError(sockerr)
+    
+            except MaxRetryError as e:
+                raise ConnectionError(e)
+    
+            except (_SSLError, _HTTPError) as e:
+                if isinstance(e, _SSLError):
+>                   raise SSLError(e)
+E                   SSLError: EOF occurred in violation of protocol (_ssl.c:661)
+
+requests/models.py:636: SSLError
+________________________ HTTPSTest.test_smoke_verified _________________________
+
+self = <test_requests_https.HTTPSTest testMethod=test_smoke_verified>
+
+    def test_smoke_verified(self):
+        """Smoke test with SSL verification."""
+>       self.perform_smoke_test(verify=True)
+
+tests/test_requests_https.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_requests_https.py:19: in perform_smoke_test
+    result = requests.get(self.smoke_url, verify=verify)
+requests/api.py:65: in get
+    return request('get', url, **kwargs)
+requests/safe_mode.py:39: in wrapped
+    return function(method, url, **kwargs)
+requests/api.py:51: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:241: in request
+    r.send(prefetch=prefetch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Request [GET]>, anyway = False, prefetch = True
+
+    def send(self, anyway=False, prefetch=None):
+        """Sends the request. Returns True if successful, False if not.
+            If there was an HTTPError during transmission,
+            self.response.status_code will contain the HTTPError code.
+    
+            Once a request is successfully sent, `sent` will equal True.
+    
+            :param anyway: If True, request will be sent, even if it has
+            already been sent.
+    
+            :param prefetch: If not None, will override the request's own setting
+            for prefetch.
+            """
+    
+        # Build the URL
+        url = self.full_url
+    
+        # Pre-request hook.
+        r = dispatch_hook('pre_request', self.hooks, self)
+        self.__dict__.update(r.__dict__)
+    
+        # Logging
+        if self.config.get('verbose'):
+            self.config.get('verbose').write('%s   %s   %s\n' % (
+                datetime.now().isoformat(), self.method, url
+            ))
+    
+        # Use .netrc auth if none was provided.
+        if not self.auth and self.config.get('trust_env'):
+            self.auth = get_netrc_auth(url)
+    
+        if self.auth:
+            if isinstance(self.auth, tuple) and len(self.auth) == 2:
+                # special-case basic HTTP auth
+                self.auth = HTTPBasicAuth(*self.auth)
+    
+            # Allow auth to make its changes.
+            r = self.auth(self)
+    
+            # Update self to reflect the auth changes.
+            self.__dict__.update(r.__dict__)
+    
+        # Nottin' on you.
+        body = None
+        content_type = None
+    
+        # Multi-part file uploads.
+        if self.files:
+            (body, content_type) = self._encode_files(self.files)
+        else:
+            if self.data:
+    
+                body = self._encode_params(self.data)
+                if isinstance(self.data, str) or isinstance(self.data, builtin_str) or hasattr(self.data, 'read'):
+                    content_type = None
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+    
+        # Add content-type if it wasn't explicitly provided.
+        if (content_type) and (not 'content-type' in self.headers):
+            self.headers['Content-Type'] = content_type
+    
+        _p = urlparse(url)
+        no_proxy = filter(lambda x: x.strip(), self.proxies.get('no', '').split(','))
+        proxy = self.proxies.get(_p.scheme)
+    
+        if proxy and not any(map(_p.hostname.endswith, no_proxy)):
+            conn = poolmanager.proxy_from_url(proxy)
+            _proxy = urlparse(proxy)
+            if '@' in _proxy.netloc:
+                auth, url = _proxy.netloc.split('@', 1)
+                self.proxy_auth = HTTPProxyAuth(*auth.split(':', 1))
+                r = self.proxy_auth(self)
+                self.__dict__.update(r.__dict__)
+        else:
+            # Check to see if keep_alive is allowed.
+            try:
+                if self.config.get('keep_alive'):
+                    conn = self._poolmanager.connection_from_url(url)
+                else:
+                    conn = connectionpool.connection_from_url(url)
+                    self.headers['Connection'] = 'close'
+            except LocationParseError as e:
+                raise InvalidURL(e)
+    
+        if url.startswith('https') and self.verify:
+    
+            cert_loc = None
+    
+            # Allow self-specified cert location.
+            if self.verify is not True:
+                cert_loc = self.verify
+    
+            # Look for configuration.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('REQUESTS_CA_BUNDLE')
+    
+            # Curl compatibility.
+            if not cert_loc and self.config.get('trust_env'):
+                cert_loc = os.environ.get('CURL_CA_BUNDLE')
+    
+            if not cert_loc:
+                cert_loc = DEFAULT_CA_BUNDLE_PATH
+    
+            if not cert_loc:
+                raise Exception("Could not find a suitable SSL CA certificate bundle.")
+    
+            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.ca_certs = cert_loc
+        else:
+            conn.cert_reqs = 'CERT_NONE'
+            conn.ca_certs = None
+    
+        if self.cert:
+            if len(self.cert) == 2:
+                conn.cert_file = self.cert[0]
+                conn.key_file = self.cert[1]
+            else:
+                conn.cert_file = self.cert
+    
+        if not self.sent or anyway:
+    
+            # Skip if 'cookie' header is explicitly set.
+            if 'cookie' not in self.headers:
+                cookie_header = get_cookie_header(self.cookies, self)
+                if cookie_header is not None:
+                    self.headers['Cookie'] = cookie_header
+    
+            # Pre-send hook.
+            r = dispatch_hook('pre_send', self.hooks, self)
+            self.__dict__.update(r.__dict__)
+    
+            # catch urllib3 exceptions and throw Requests exceptions
+            try:
+                # Send the request.
+                r = conn.urlopen(
+                    method=self.method,
+                    url=self.path_url,
+                    body=body,
+                    headers=self.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.config.get('max_retries', 0),
+                    timeout=self.timeout,
+                )
+                self.sent = True
+    
+            except socket.error as sockerr:
+                raise ConnectionError(sockerr)
+    
+            except MaxRetryError as e:
+                raise ConnectionError(e)
+    
+            except (_SSLError, _HTTPError) as e:
+                if isinstance(e, _SSLError):
+>                   raise SSLError(e)
+E                   SSLError: EOF occurred in violation of protocol (_ssl.c:661)
+
+requests/models.py:636: SSLError
+===================== 20 failed, 86 passed in 0.68 seconds =====================
+P07_FUNCTION_SERVERS_STOPPED=1
+P07_TARGET_RESULT={"argv": ["-p", "no:httpbin", "-p", "pytest_httpbin.plugin", "-p", "pytest_mock", "-rA", "-v"], "collection": ["tests/test_cookies.py::CookieTests::test_convert_jar_to_dict", "tests/test_cookies.py::CookieTests::test_cookies_from_response", "tests/test_cookies.py::CookieTests::test_crossdomain_cookies", "tests/test_cookies.py::CookieTests::test_disabled_cookie_persistence", "tests/test_cookies.py::CookieTests::test_jar_utility_functions", "tests/test_cookies.py::CookieTests::test_none_cookie", "tests/test_cookies.py::CookieTests::test_overwrite", "tests/test_cookies.py::CookieTests::test_redirects", "tests/test_cookies.py::CookieTests::test_secure_cookies", "tests/test_cookies.py::LWPCookieJarTest::test_cookiejar_persistence", "tests/test_cookies.py::LWPCookieJarTest::test_crossdomain", "tests/test_cookies.py::LWPCookieJarTest::test_persistent_cookies", "tests/test_cookies.py::MozCookieJarTest::test_cookiejar_persistence", "tests/test_cookies.py::MozCookieJarTest::test_crossdomain", "tests/test_cookies.py::MozCookieJarTest::test_persistent_cookies", "tests/test_proxies.py::HTTPSProxyTest::test_empty_http_proxy", "tests/test_proxies.py::HTTPSProxyTest::test_empty_https_proxy", "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_HTTP_200_OK_GET", "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_TUPLE_HTTP_200_OK_GET", "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_HTTP_200_OK_GET", "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_WRONG_HTTP_401_GET", "tests/test_requests.py::RequestsTestSuite::test_GET_no_redirect", "tests/test_requests.py::RequestsTestSuite::test_HEAD_no_redirect", "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET", "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS", "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_PARAMS", "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_HEAD", "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_PUT", "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_ALLOW_REDIRECT_GET", "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_GET", "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES", "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_STRINGS", "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_HEADERS", "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_PARAMS", "tests/test_requests.py::RequestsTestSuite::test_accept_objects_with_string_representations_as_urls", "tests/test_requests.py::RequestsTestSuite::test_allow_list_of_hooks_to_register_hook", "tests/test_requests.py::RequestsTestSuite::test_bytes_files", "tests/test_requests.py::RequestsTestSuite::test_cached_response", "tests/test_requests.py::RequestsTestSuite::test_can_have_none_in_header_values", "tests/test_requests.py::RequestsTestSuite::test_connection_error", "tests/test_requests.py::RequestsTestSuite::test_connection_error_with_safe_mode", "tests/test_requests.py::RequestsTestSuite::test_connection_keepalive_and_close", "tests/test_requests.py::RequestsTestSuite::test_danger_mode_redirects", "tests/test_requests.py::RequestsTestSuite::test_decompress_gzip", "tests/test_requests.py::RequestsTestSuite::test_default_status_raising", "tests/test_requests.py::RequestsTestSuite::test_empty_response", "tests/test_requests.py::RequestsTestSuite::test_entry_points", "tests/test_requests.py::RequestsTestSuite::test_file_post_data", "tests/test_requests.py::RequestsTestSuite::test_head_content", "tests/test_requests.py::RequestsTestSuite::test_httpauth_recursion", "tests/test_requests.py::RequestsTestSuite::test_invalid_url", "tests/test_requests.py::RequestsTestSuite::test_invalid_urls_throw_requests_exception", "tests/test_requests.py::RequestsTestSuite::test_iter_lines", "tests/test_requests.py::RequestsTestSuite::test_max_redirects", "tests/test_requests.py::RequestsTestSuite::test_multiple_hooks", "tests/test_requests.py::RequestsTestSuite::test_none_vals_in_data_are_deleted", "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_post_data", "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_postdata", "tests/test_requests.py::RequestsTestSuite::test_nonzero_evaluation", "tests/test_requests.py::RequestsTestSuite::test_params_accepts_kv_list", "tests/test_requests.py::RequestsTestSuite::test_params_are_added_before_fragment", "tests/test_requests.py::RequestsTestSuite::test_path_is_not_double_encoded", "tests/test_requests.py::RequestsTestSuite::test_permissive_iter_content", "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files", "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files_as_tuples", "tests/test_requests.py::RequestsTestSuite::test_prefetch_redirect_bug", "tests/test_requests.py::RequestsTestSuite::test_prefetch_return_response_interaction", "tests/test_requests.py::RequestsTestSuite::test_redirect_history", "tests/test_requests.py::RequestsTestSuite::test_relative_redirect_history", "tests/test_requests.py::RequestsTestSuite::test_request_ok_set", "tests/test_requests.py::RequestsTestSuite::test_response_has_unicode_url", "tests/test_requests.py::RequestsTestSuite::test_response_sent", "tests/test_requests.py::RequestsTestSuite::test_session_HTTP_200_OK_GET", "tests/test_requests.py::RequestsTestSuite::test_session_cookies_with_return_response_false", "tests/test_requests.py::RequestsTestSuite::test_session_persistent_cookies", "tests/test_requests.py::RequestsTestSuite::test_session_persistent_headers", "tests/test_requests.py::RequestsTestSuite::test_session_persistent_params", "tests/test_requests.py::RequestsTestSuite::test_session_pickling", "tests/test_requests.py::RequestsTestSuite::test_single_hook", "tests/test_requests.py::RequestsTestSuite::test_status_raising", "tests/test_requests.py::RequestsTestSuite::test_str_data_content_type", "tests/test_requests.py::RequestsTestSuite::test_unicode_get", "tests/test_requests.py::RequestsTestSuite::test_unpickled_session_requests", "tests/test_requests.py::RequestsTestSuite::test_upload_binary_data", "tests/test_requests.py::RequestsTestSuite::test_urlencoded_get_query_multivalued_param", "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_data", "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_and_data", "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_multivalued_and_data", "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring", "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring_multivalued", "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_port", "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_scheme", "tests/test_requests.py::RequestsTestSuite::test_user_agent_transfers", "tests/test_requests_ext.py::RequestsTestSuite::test_addition", "tests/test_requests_ext.py::RequestsTestSuite::test_binary_post", "tests/test_requests_ext.py::RequestsTestSuite::test_chunked_head_redirect", "tests/test_requests_ext.py::RequestsTestSuite::test_cookies_on_redirects", "tests/test_requests_ext.py::RequestsTestSuite::test_redirect_encoding", "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_not_ok", "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_ok", "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_session_not_ok", "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_error", "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_redirect", "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_url_outright", "tests/test_requests_https.py::HTTPSTest::test_smoke", "tests/test_requests_https.py::HTTPSTest::test_smoke_verified"], "executable": "/opt/p07-python27/bin/python2.7", "exit": 1, "finished": true, "plugins": [["cacheprovider", "_pytest.cacheprovider"], ["helpconfig", "_pytest.helpconfig"], ["pytestconfig", "_pytest.config"], ["runner", "_pytest.runner"], ["unittest", "_pytest.unittest"], ["pastebin", "_pytest.pastebin"], ["skipping", "_pytest.skipping"], ["genscript", "_pytest.genscript"], ["session", "_pytest.main"], ["lfplugin", "_pytest.cacheprovider"], ["tmpdir", "_pytest.tmpdir"], ["140022054614160", "_pytest.config"], ["pytest_httpbin.plugin", "pytest_httpbin.plugin"], ["assertion", "_pytest.assertion"], ["mark", "_pytest.mark"], ["terminal", "_pytest.terminal"], ["pytest_mock", "pytest_mock"], ["main", "_pytest.main"], ["nose", "_pytest.nose"], ["capture", "_pytest.capture"], ["python", "_pytest.python"], ["recwarn", "_pytest.recwarn"], ["140022009681320", "__main__"], ["monkeypatch", "_pytest.monkeypatch"], ["resultlog", "_pytest.resultlog"], ["capturemanager", "_pytest.capture"], ["junitxml", "_pytest.junitxml"], ["doctest", "_pytest.doctest"], ["pdb", "_pytest.pdb"]], "prefix": "/opt/p07-python27", "pytest_module": "/opt/p07-python27/lib/python2.7/site-packages/pytest.py", "pytest_version": "2.8.7", "reports": [{"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_convert_jar_to_dict", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_convert_jar_to_dict", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_convert_jar_to_dict", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_cookies_from_response", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_cookies_from_response", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_cookies_from_response", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_crossdomain_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_crossdomain_cookies", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_crossdomain_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_disabled_cookie_persistence", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_disabled_cookie_persistence", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_disabled_cookie_persistence", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_jar_utility_functions", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_jar_utility_functions", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_jar_utility_functions", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_none_cookie", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_none_cookie", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_none_cookie", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_overwrite", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_overwrite", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_overwrite", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_redirects", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_secure_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_secure_cookies", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::CookieTests::test_secure_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_cookiejar_persistence", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_cookiejar_persistence", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_cookiejar_persistence", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_crossdomain", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_crossdomain", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_crossdomain", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_persistent_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_persistent_cookies", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::LWPCookieJarTest::test_persistent_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_cookiejar_persistence", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_cookiejar_persistence", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_cookiejar_persistence", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_crossdomain", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_crossdomain", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_crossdomain", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_persistent_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_persistent_cookies", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_cookies.py::MozCookieJarTest::test_persistent_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_proxies.py::HTTPSProxyTest::test_empty_http_proxy", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_proxies.py::HTTPSProxyTest::test_empty_http_proxy", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_proxies.py::HTTPSProxyTest::test_empty_http_proxy", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_proxies.py::HTTPSProxyTest::test_empty_https_proxy", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_proxies.py::HTTPSProxyTest::test_empty_https_proxy", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_proxies.py::HTTPSProxyTest::test_empty_https_proxy", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_HTTP_200_OK_GET", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_TUPLE_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_TUPLE_HTTP_200_OK_GET", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_TUPLE_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_HTTP_200_OK_GET", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_WRONG_HTTP_401_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_WRONG_HTTP_401_GET", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_DIGESTAUTH_WRONG_HTTP_401_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_GET_no_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_GET_no_redirect", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_GET_no_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HEAD_no_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HEAD_no_redirect", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HEAD_no_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_PARAMS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_PARAMS", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_PARAMS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_HEAD", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_HEAD", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_HEAD", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_PUT", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_PUT", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_PUT", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_ALLOW_REDIRECT_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_ALLOW_REDIRECT_GET", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_ALLOW_REDIRECT_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_GET", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_STRINGS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_STRINGS", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_STRINGS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_HEADERS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_HEADERS", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_HEADERS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_PARAMS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_PARAMS", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_PARAMS", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_accept_objects_with_string_representations_as_urls", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_accept_objects_with_string_representations_as_urls", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_accept_objects_with_string_representations_as_urls", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_allow_list_of_hooks_to_register_hook", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_allow_list_of_hooks_to_register_hook", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_allow_list_of_hooks_to_register_hook", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_bytes_files", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_bytes_files", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_bytes_files", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_cached_response", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_cached_response", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_cached_response", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_can_have_none_in_header_values", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_can_have_none_in_header_values", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_can_have_none_in_header_values", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_error", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_error", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_error", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_error_with_safe_mode", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_error_with_safe_mode", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_error_with_safe_mode", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_keepalive_and_close", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_keepalive_and_close", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_connection_keepalive_and_close", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_danger_mode_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_danger_mode_redirects", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_danger_mode_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_decompress_gzip", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_decompress_gzip", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_decompress_gzip", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_default_status_raising", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_default_status_raising", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_default_status_raising", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_empty_response", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_empty_response", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_empty_response", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_entry_points", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_entry_points", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_entry_points", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_file_post_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_file_post_data", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_file_post_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_head_content", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_head_content", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_head_content", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_httpauth_recursion", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_httpauth_recursion", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_httpauth_recursion", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_invalid_url", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_invalid_url", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_invalid_url", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_invalid_urls_throw_requests_exception", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_invalid_urls_throw_requests_exception", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_invalid_urls_throw_requests_exception", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_iter_lines", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_iter_lines", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_iter_lines", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_max_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_max_redirects", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_max_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_multiple_hooks", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_multiple_hooks", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_multiple_hooks", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_none_vals_in_data_are_deleted", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_none_vals_in_data_are_deleted", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_none_vals_in_data_are_deleted", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_post_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_post_data", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_post_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_postdata", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_postdata", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_postdata", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonzero_evaluation", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonzero_evaluation", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_nonzero_evaluation", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_params_accepts_kv_list", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_params_accepts_kv_list", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_params_accepts_kv_list", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_params_are_added_before_fragment", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_params_are_added_before_fragment", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_params_are_added_before_fragment", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_path_is_not_double_encoded", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_path_is_not_double_encoded", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_path_is_not_double_encoded", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_permissive_iter_content", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_permissive_iter_content", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_permissive_iter_content", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files_as_tuples", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files_as_tuples", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files_as_tuples", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_prefetch_redirect_bug", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_prefetch_redirect_bug", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_prefetch_redirect_bug", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_prefetch_return_response_interaction", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_prefetch_return_response_interaction", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_prefetch_return_response_interaction", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_redirect_history", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_redirect_history", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_redirect_history", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_relative_redirect_history", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_relative_redirect_history", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_relative_redirect_history", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_request_ok_set", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_request_ok_set", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_request_ok_set", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_response_has_unicode_url", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_response_has_unicode_url", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_response_has_unicode_url", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_response_sent", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_response_sent", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_response_sent", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_HTTP_200_OK_GET", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_HTTP_200_OK_GET", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_cookies_with_return_response_false", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_cookies_with_return_response_false", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_cookies_with_return_response_false", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_cookies", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_cookies", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_headers", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_headers", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_headers", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_params", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_params", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_persistent_params", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_pickling", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_pickling", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_session_pickling", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_single_hook", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_single_hook", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_single_hook", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_status_raising", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_status_raising", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_status_raising", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_str_data_content_type", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_str_data_content_type", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_str_data_content_type", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_unicode_get", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_unicode_get", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_unicode_get", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_unpickled_session_requests", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_unpickled_session_requests", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_unpickled_session_requests", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_upload_binary_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_upload_binary_data", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_upload_binary_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_get_query_multivalued_param", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_get_query_multivalued_param", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_get_query_multivalued_param", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_data", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_and_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_and_data", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_and_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_multivalued_and_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_multivalued_and_data", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_multivalued_and_data", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring_multivalued", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring_multivalued", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring_multivalued", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_port", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_port", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_port", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_scheme", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_scheme", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_scheme", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_user_agent_transfers", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_user_agent_transfers", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests.py::RequestsTestSuite::test_user_agent_transfers", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_addition", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_addition", "native_category": "passed", "outcome": "passed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_addition", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_binary_post", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_binary_post", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_binary_post", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_chunked_head_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_chunked_head_redirect", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_chunked_head_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_cookies_on_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_cookies_on_redirects", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_cookies_on_redirects", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_redirect_encoding", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_redirect_encoding", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_redirect_encoding", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_not_ok", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_not_ok", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_not_ok", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_ok", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_ok", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_ok", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_session_not_ok", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_session_not_ok", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_ssl_hostname_session_not_ok", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_error", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_error", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_error", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_redirect", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_redirect", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_url_outright", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_url_outright", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_ext.py::RequestsTestSuite::test_unicode_url_outright", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_https.py::HTTPSTest::test_smoke", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_https.py::HTTPSTest::test_smoke", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_https.py::HTTPSTest::test_smoke", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}, {"has_wasxfail": false, "id": "tests/test_requests_https.py::HTTPSTest::test_smoke_verified", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "setup"}, {"has_wasxfail": false, "id": "tests/test_requests_https.py::HTTPSTest::test_smoke_verified", "native_category": "failed", "outcome": "failed", "wasxfail": null, "when": "call"}, {"has_wasxfail": false, "id": "tests/test_requests_https.py::HTTPSTest::test_smoke_verified", "native_category": "", "outcome": "passed", "wasxfail": null, "when": "teardown"}], "requests_module": "/testbed/requests/__init__.py", "version_info": [2, 7, 13]}
+P07_TEST_EXIT=1
+>>>>> End Test Output
