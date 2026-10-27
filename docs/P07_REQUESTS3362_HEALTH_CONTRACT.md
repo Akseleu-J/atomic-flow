@@ -130,3 +130,15 @@ separate receipt until integrated into the same fresh worker. Only after this
 health admission should full protected base/gold/wrong target tests run. The
 Requests3362 wrong control also still needs review; health success cannot replace
 that independent negative-control gate.
+
+## Actual qualification, 27 October 2026
+
+Run `40452536663` on `1caffa5324bd09593fc477f12cf26de287d4d073`
+completed successfully. Downloaded artifact `12710089869` SHA256
+`de3932da0701a92e55ffb6fd1ddc77c932bc97f010f2d1501b3d8c7aa3f7fe3b`
+and health stdout/stderr/certificate-receipt hashes were independently checked.
+Both admitted plugins registered once; all three synthetic tests and nine phases
+passed. Real HTTP, CA/hostname-verified HTTPS and unrelated-CA rejection passed.
+Servers stopped; source was unchanged; cleanup confirmed. No Requests or target
+modules were imported. This accepts synthetic legacy health, not a target
+calibration. Full target pytest assertion rewriting is a separate pending check.
