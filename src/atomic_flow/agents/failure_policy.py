@@ -42,11 +42,19 @@ _ACTIONS = {
 _REPAIR_BUDGET_FRACTION = 0.25  # bounded repair may use a quarter of remaining budget
 
 
+_V1_FIELDS = frozenset({"version", "check", "exit_code", "step_index", "started_at", "source_revision",
+                        "checked_source_revision", "outcome"})
+_V2_FIELDS = _V1_FIELDS | {"runner", "check_completed", "check_failed_completed",
+                           "check_obligation_digest", "check_spec_digest", "check_receipt_digest"}
+
+
 def validate_failure_evidence(evidence):
-    if (not isinstance(evidence, dict)
-            or set(evidence) != {"version", "check", "exit_code", "step_index", "started_at", "source_revision", "checked_source_revision", "outcome"}
-            or type(evidence["version"]) is not int or evidence["version"] != 1
-            or not isinstance(evidence["check"], str) or evidence["check"] not in {"syntax", "pytest", "ruff", "mypy"}
+    if not isinstance(evidence, dict) or type(evidence.get("version")) is not int:
+        raise ValueError("missing or invalid host failing-check evidence")
+    version = evidence["version"]
+    if (version not in {1, 2} or set(evidence) != (_V1_FIELDS if version == 1 else _V2_FIELDS)
+            or not isinstance(evidence["check"], str)
+            or evidence["check"] not in ({"syntax", "pytest", "ruff", "mypy"} if version == 1 else {"ordinary_test"})
             or type(evidence["exit_code"]) is not int or evidence["exit_code"] != 1
             or type(evidence["step_index"]) is not int or evidence["step_index"] < 0
             or type(evidence["started_at"]) not in (int, float) or not math.isfinite(evidence["started_at"])
@@ -56,6 +64,13 @@ def validate_failure_evidence(evidence):
             or not isinstance(evidence["checked_source_revision"], str)
             or not re.fullmatch(r"[a-f0-9]{64}", evidence["checked_source_revision"])):
         raise ValueError("missing or invalid host failing-check evidence")
+    if version == 2:
+        if (type(evidence["runner"]) is not str or evidence["runner"] not in {"pytest", "sympy-native"}
+                or evidence["check_completed"] is not True or evidence["check_failed_completed"] is not True
+                or evidence["source_revision"] != evidence["checked_source_revision"]
+                or any(type(evidence[key]) is not str or re.fullmatch(r"[a-f0-9]{64}", evidence[key]) is None
+                       for key in ("check_obligation_digest", "check_spec_digest", "check_receipt_digest"))):
+            raise ValueError("missing or invalid completed ordinary-check evidence")
 
 
 def classify(failure: dict[str, Any]) -> dict[str, Any]:
@@ -70,7 +85,7 @@ def classify(failure: dict[str, Any]) -> dict[str, Any]:
             validate_failure_evidence(failure.get("evidence"))
         except ValueError as exc:
             return {"action": STOP, "kind": kind, "reason": str(exc)}
-        if (kind == "deterministic_test_failure") != (failure["evidence"]["check"] == "pytest"):
+        if (kind == "deterministic_test_failure") != (failure["evidence"]["check"] in {"pytest", "ordinary_test"}):
             return {"action": STOP, "kind": kind, "reason": "failure kind/check mismatch"}
         remaining = failure.get("remaining_budget_usd")
         if type(remaining) not in (int, float) or not math.isfinite(remaining) or remaining <= 0:

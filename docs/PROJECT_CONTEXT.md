@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+28 октября: native SymPy full-source scripted TaskRunner execution/publication принят на030d22f, CI40637655114. Проверены1805files, nativeFAIL→replan1→read/patch→freshnativePASS→finalgate→publicationonlyprobe; archive12794860192 SHA5c75ec59... проверен. Graphsync AFTER PUBLICATION failed и остаётся OPEN отдельно. Provider calls0; это syntheticordinaryjourney, неhistoricalissue/paidquality/whole30. P07OPEN. Failure-evidencev2 с actualrunner и replayguard подготовлена, CI ещё требуется.
+
 28 октября: completed-check repair guard принят в public Docker journey CI40633693098 на4285540; raw artifact SHA проверен, один replan и точные опубликованные байты подтверждены. Main/interoperability CI зелёные. Command=check с host-only runner принят в матрице двух команд CI40634036115 на0de098a, ZIP/raw SHA проверены. Review отметил асимметрию deny/ask; симметричная защита обеих команд проверяется отдельным follow-up. P07 OPEN; provider calls=0. Подробности: P07_COMPLETED_CHECK_GUARD_2026-10-28.md.
 
 27 октября:30/30isolatedкалибровок приняты; coupled2-file publicTaskRunner CI40546120074 принят. NativeSymPyCheckSpec boundary CI40549454212 наe026fe9 принят под1GiB/128PID:FAIL→editedPASS→requiredSKIPrefused; archive/rawhash/cleanup проверены. Это syntheticordinarychecker, неfullhistoricalTaskRunner/modelquality. P07OPEN, новыхprovidercallsнет.

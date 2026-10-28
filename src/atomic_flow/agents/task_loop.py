@@ -699,6 +699,15 @@ class TaskRunner:
         from atomic_flow.agents.step_evidence import manifest_digest
         remaining = self.config.task.max_budget_usd - task.budget_spent if self.config.task.max_budget_usd > 0 else None
         decision = classify({**step.failure, "remaining_budget_usd": remaining})
+        evidence = step.failure.get("evidence", {})
+        if evidence.get("version") == 2 and (
+                self.check_obligation is None
+                or evidence.get("check_obligation_digest") != self.check_obligation.digest
+                or evidence.get("runner") != self.check_obligation.template.runner
+                or evidence.get("source_revision") != manifest_digest(self.changeset.validate_workspace())):
+            task.status, task.error = "paused", "ordinary-check contract changed; fresh host failing check required"
+            save(task)
+            return task
         if (decision["action"] != "continue_bounded_repair"
                 or step.failure.get("rollback_revision") != manifest_digest(self.changeset.validate_workspace())):
             task.status, task.error = "paused", "repair requires fresh host failing-check evidence and unchanged rollback source"
@@ -1049,6 +1058,11 @@ class TaskRunner:
                     "started_at": step.started_at, "outcome": "failed",
                     "source_revision": current}
         evidence["checked_source_revision"] = checked_revision or evidence["source_revision"]
+        if self.check_obligation is not None and check == "pytest":
+            evidence.update(version=2, check="ordinary_test", runner=check_observation["check_runner"],
+                            check_completed=True, check_failed_completed=True,
+                            **{key: check_observation[key] for key in
+                               ("check_obligation_digest", "check_spec_digest", "check_receipt_digest")})
         return StepFailure(step.index, message,
                            "deterministic_test_failure" if check == "pytest" else "deterministic_check_failure", evidence)
 

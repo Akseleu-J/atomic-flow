@@ -1,0 +1,17 @@
+{
+  "status": "accepted_synthetic_native_execution_and_publication",
+  "tested_commit": "030d22fa9ba5875ce5c6e4209fe86a4065999638",
+  "run_id": 40637655114,
+  "artifact_id": 12794860192,
+  "zip_sha256": "5c75ec59b577a218876d2ae17eb4a4213c53a1f0f95b4aa34c0c1cfe9a05abea",
+  "admitted_source_files": 1805,
+  "changed_paths": [
+    "sympy/p07_probe.py"
+  ],
+  "provider_calls": 0,
+  "hidden_oracle": "not_run",
+  "whole30_qualified": false,
+  "graph_sync": "failed_after_publication",
+  "graph_sync_acceptance": false,
+  "raw_in_loop_receipts_retained": false
+}
