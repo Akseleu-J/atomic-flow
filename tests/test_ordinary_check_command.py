@@ -63,16 +63,17 @@ def test_command_routes_only_to_complete_host_obligation(tmp_path, monkeypatch, 
 
 @pytest.mark.parametrize("action", ["ask", "forbid"])
 @pytest.mark.parametrize("layer", ["host", "user", "project", "session"])
-def test_check_cannot_bypass_legacy_pytest_restrictions(action, layer):
-    rules = [Rule("run_command", "auto", command_matches=r"^check$"),
-             Rule("run_command", action, command_matches=r"^pytest$")]
+@pytest.mark.parametrize("command,restricted", [("check", "pytest"), ("pytest", "check")])
+def test_equivalent_spellings_cannot_bypass_restrictions(action, layer, command, restricted):
+    rules = [Rule("run_command", "auto", command_matches="^" + command + "$"),
+             Rule("run_command", action, command_matches="^" + restricted + "$")]
     engine = PolicyEngine(**{layer + "_rules": rules})
-    decision = engine.decide("run_command", {"command": "check"}, project_trusted=True)
-    explanation = engine.explain("run_command", {"command": "check"}, project_trusted=True)
+    decision = engine.decide("run_command", {"command": command}, project_trusted=True)
+    explanation = engine.explain("run_command", {"command": command}, project_trusted=True)
     assert decision.action == action and decision.source == layer
     assert explanation["action"] == action and explanation["source"] == layer
     selected = [match for match in explanation["matches"] if match["selected"]]
-    assert len(selected) == 1 and selected[0]["command"] == "pytest"
+    assert len(selected) == 1 and selected[0]["command"] == restricted
 
 
 def test_default_check_is_auto_but_unrelated_commands_keep_approval():
@@ -86,3 +87,10 @@ def test_explicit_check_restriction_survives_pytest_allow():
     engine = PolicyEngine(user_rules=[Rule("run_command", "forbid", command_matches=r"^check$"),
                                       Rule("run_command", "auto", command_matches=r"^pytest$")])
     assert engine.decide("run_command", {"command": "check"}, project_trusted=True).action == "forbid"
+
+
+@pytest.mark.parametrize("command", [[], {}, ["check"], {"command": "check"}])
+def test_offline_policy_handles_malformed_command_without_type_error(command):
+    engine = PolicyEngine()
+    assert engine.decide("run_command", {"command": command}, project_trusted=True).action == "ask"
+    assert engine.explain("run_command", {"command": command}, project_trusted=True)["action"] == "ask"

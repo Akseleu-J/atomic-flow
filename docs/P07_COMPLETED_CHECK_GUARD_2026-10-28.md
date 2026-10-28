@@ -36,8 +36,11 @@ runner output. The separate hidden oracle remains required for benchmark quality
   source commit, task failure/current revision, one replan, exact final bytes and
   publication gate were audited from the downloaded artifact. Provider calls=0.
   Main checks40633692030/40633697185 and interoperability40633692152/40633697282 succeeded.
-- Independent review: requested; the previous reviewer stopped on an account
-  usage limit. Root review is not an independent review.
+- Independent read-only review completed for command routing, policy, guard and
+  journey scope. It found no blockers in the original declared scope and noted
+  asymmetric alias restrictions, now corrected prospectively. The follow-up independent
+  review confirmed symmetric restrictions; its offline malformed-argument
+  robustness note was fixed with list/dict regression tests. This is not the final independent P07 review.
 
 All 30 isolated historical environment calibrations remain accepted. Full
 historical in-loop runner admission, matched paid pairs, fresh holdout, ablations
@@ -49,13 +52,24 @@ P07_BUDGET20_PROPOSAL_2026-10-27.md is unfrozen and has not changed active budge
 The next package adds command=check, requiring an existing host CheckObligation.
 No target narrowing, model-selected runner/image/environment or host fallback is
 allowed. Native obligations reject the misleading command=pytest spelling;
-installed-pytest obligations preserve it for compatibility. Policy also evaluates
-legacy pytest restrictions so check cannot bypass explicit deny or ask rules.
+installed-pytest obligations preserve it for compatibility. Policy evaluates restrictions for both equivalent spellings so neither check
+nor pytest can bypass explicit deny or ask rules. Because policy has no host
+obligation context, this conservatively also applies check restrictions to
+legacy unbound pytest calls.
 The actual runner remains in the host observation. TaskRunner applies the same
 completed-failure guard to the alias. Failure evidence uses one current workspace
 snapshot for both the guard and recorded revision.
 
 Focused command/policy/envelope/obligation neighbors: 86 passed; Ruff passed.
-The public Docker journey matrix now exercises both spellings. Its fresh CI is
-pending. Internal plan verification labels still use legacy pytest; generic
+The public Docker journey matrix exercises both spellings. CI40634036115
+on 0de098aaeff5a6f6294353ef78730818b68aafe0 accepted both failure/repair/publication
+journeys. ZIP12792462483 check SHA256198729db914a65c3dd89ee19345f13e4b161f834f083cf7c5b79137cc1cd857f;
+ZIP12792169663 pytest SHA25691f652e907a9b074c49175470174e6d2dc182b24d580a7cbb7a6e2489a082cba.
+Both archives, tested SHA, initial deterministic failure, one replan, exact final
+source and publication gate were audited. This matrix uses installed pytest,
+not native SymPy. Symmetric alias-policy hardening was added after independent
+read-only review identified the original one-directional compatibility; fresh CI
+for that follow-up remains pending. Focused symmetric policy and command suite:
+54 passed, Ruff passed. Static inventory refreshed: 472 Python files, no missing
+absolute internal imports. Internal plan verification labels still use legacy pytest; generic
 ordinary_test labels and historical runtime profiles are separate unfinished work.
