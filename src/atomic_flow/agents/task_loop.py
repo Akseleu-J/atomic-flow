@@ -84,6 +84,8 @@ class TaskRunner:
                     or self.config.execution.image != check_obligation.template.image):
                 raise ValueError("ordinary-test obligation requires its exact reviewed Docker checks image")
         self.check_obligation = check_obligation
+        if self.config.task.final_check == "ordinary_test" and check_obligation is None:
+            raise ValueError("ordinary_test requires a host CheckObligation")
         self.backend = backend
         self.approval_callback = approval_callback
         self.question_callback = question_callback
@@ -116,6 +118,7 @@ class TaskRunner:
                 for g in plan.goals]
 
     def _review(self, task, allowed_paths, allow_internal_replan):
+        self._require_ordinary_tests(task.steps)
         if type(allow_internal_replan) is not bool:
             raise ValueError("allow_internal_replan must be an explicit boolean")
         if allow_internal_replan and self.capability_factory is not None:
@@ -238,6 +241,7 @@ class TaskRunner:
                 planning_context = json.dumps({
                     "phase": "initial_plan", "workspace_revision": revision,
                     "graph_revision": graph_revision, "graph_status": "advisory_not_read_proof",
+                    "host_ordinary_test": self.check_obligation is not None,
                     "remaining_model_calls": self.config.task.max_model_calls,
                     "remaining_budget_usd": (self.config.task.max_budget_usd - task.budget_spent
                                              if self.config.task.max_budget_usd > 0 else None),
@@ -246,6 +250,7 @@ class TaskRunner:
                 plan = plan_task(query, project_root=self.project, backend=backend,
                                  candidates=candidates, n_files=n_files, planning_context=planning_context)
                 task.steps = self._steps(plan)
+                self._require_ordinary_tests(task.steps)
                 task.goals = self._goals(plan)
                 task.rationale = plan.rationale
                 task.plan_ready = True
@@ -259,6 +264,11 @@ class TaskRunner:
                 task.status, task.error = "failed", f"planning failed: {type(exc).__name__}"
             save(task)
         return task
+
+    def _require_ordinary_tests(self, steps):
+        if self.check_obligation is None and (self.config.task.final_check == "ordinary_test"
+                or any(step.verify_with == "ordinary_test" and step.status != "superseded" for step in steps)):
+            raise ChangeSetConflict("ordinary_test requires a host CheckObligation; no fallback is permitted")
 
     def run_plan(self, query: str, plan: Plan, *, allowed_paths: list[str] | None = None,
                  allow_internal_replan: bool = False) -> Task:
@@ -296,6 +306,9 @@ class TaskRunner:
                                "fallback": bool(report.get("fallback")),
                                "failed": bool(report.get("failed")),
                                "relocation": report.get("relocation", {})}
+            for key in ("coverage_complete", "coverage_omissions"):
+                if key in report:
+                    task.graph_sync[key] = report[key]
         except Exception as exc:  # publication already succeeded; record only
             task.graph_sync = {"failed": True, "error_type": type(exc).__name__}
 
@@ -676,6 +689,7 @@ class TaskRunner:
         return task
 
     def _require_replan_runtime(self, task):
+        self._require_ordinary_tests(task.steps)
         from atomic_flow.check_obligation import require_obligation_binding
         try:
             require_obligation_binding(task.plan_approval, self.check_obligation)
@@ -810,6 +824,12 @@ class TaskRunner:
 
         base_index = max(s.index for s in task.steps) + 1
         new_steps = self._steps(new_plan, base_index)
+        try:
+            self._require_ordinary_tests(new_steps)
+        except ChangeSetConflict as exc:
+            task.status, task.error = "paused", str(exc)
+            save(task)
+            return task
         if len(task.steps) + len(new_steps) > 128:
             task.status, task.error = "paused", "task history exceeds 128 steps; start a reviewed continuation"
             save(task)
@@ -835,16 +855,19 @@ class TaskRunner:
             # replacement plan only when the pure predicate proves nothing is
             # lost; anything else still needs fresh review.
             envelope = previous_approval.get("internal_replan") or {}
+            from atomic_flow.agents.replan_lineage import verification_lineage_kind
+            def check_kind(method):
+                return verification_lineage_kind(method, host_ordinary_test=self.check_obligation is not None)
             obligations = {
                 "criteria": sorted({criterion for holder in [*task.goals, *new_goals, *task.steps, *new_steps]
                                     for criterion in getattr(holder, "acceptance_criteria", ())}),
                 "scope_paths": previous_approval.get("allowed_paths"),
                 "max_budget_usd": envelope.get("max_budget_usd"),
-                "required_checks": {envelope["required_verify"]} if envelope.get("required_verify") else set(),
+                "required_checks": {check_kind(envelope["required_verify"])} if envelope.get("required_verify") else set(),
             }
             lineage_ok, lineage_reasons = lineage_preserved(obligations, [
                 {"criteria": list(s.acceptance_criteria), "scope_paths": s.scope_paths or None,
-                 "checks": [s.verify_with], "budget_usd": None} for s in new_steps])
+                 "checks": [check_kind(s.verify_with)], "budget_usd": None} for s in new_steps])
             if not lineage_ok:
                 accepted = False
                 reasons.extend(lineage_reasons)
@@ -1042,7 +1065,7 @@ class TaskRunner:
         from atomic_flow.agents.step_evidence import manifest_digest
         # The command alias does not choose a runner. Its host observation must
         # pass the same immutable obligation and completed-failure gate below.
-        if check == "check" and self.check_obligation is not None:
+        if check in {"check", "ordinary_test"} and self.check_obligation is not None:
             check = "pytest"
         if type(exit_code) is not int or exit_code != 1 or check not in {"syntax", "pytest", "ruff", "mypy"}:
             return StepFailure(step.index, message, "check_unavailable")
@@ -1068,8 +1091,10 @@ class TaskRunner:
 
     def _verify_step(self, step: Step, result) -> None:
         calls = result.tool_calls or []
-        if step.verify_with not in {"none", "py_compile", "pytest"}:
+        if step.verify_with not in {"none", "py_compile", "pytest", "ordinary_test"}:
             raise StepFailure(step.index, f"unknown verification method: {step.verify_with}", "verification_contract_failure")
+        if step.verify_with == "ordinary_test" and self.check_obligation is None:
+            raise StepFailure(step.index, "ordinary_test requires a host CheckObligation", "check_unavailable")
         edits = []
         last_edit = -1
         last_mutation = max((i for i, call in enumerate(calls) if call.get("tool") in MUTATING_TOOLS), default=-1)
@@ -1082,7 +1107,7 @@ class TaskRunner:
             if summary.get("check_timed_out") or summary.get("timed_out"):
                 raise StepFailure(step.index, "host check timed out", "check_timeout")
             if summary.get("status") == "rolled_back":
-                failed = [check for check in ("syntax", "pytest") if summary.get("verification", {}).get(check) == "failed"]
+                failed = [check for check in ("syntax", "pytest", "ordinary_test") if summary.get("verification", {}).get(check) == "failed"]
                 if failed and i >= last_mutation:
                     code = 1 if failed[-1] == "syntax" else summary.get("check_exit_code")
                     if code == 1 and not summary.get("checked_source_revision"):
@@ -1136,11 +1161,11 @@ class TaskRunner:
         if step.verify_with == "py_compile":
             syntax = "passed" if all("syntax" in edit.get("checks", []) for edit in edits) else "not run for all files"
             step.result_summary = f"ok (file verification passed; syntax {syntax}; tests " + (
-                "passed)" if all("pytest" in edit.get("checks", []) for edit in edits) else "not run for all edits)"
+                "passed)" if all(set(edit.get("checks", [])) & {"pytest", "ordinary_test"} for edit in edits) else "not run for all edits)"
             )
             return
 
-        if step.verify_with == "pytest" and self.check_obligation is not None:
+        if step.verify_with in {"pytest", "ordinary_test"} and self.check_obligation is not None:
             from atomic_flow.check_obligation import check_observation, run_obligation_check
             workspace = self.changeset.workspace if self.changeset else self.project
             spec, receipt = run_obligation_check(self.check_obligation, workspace, cancel_check=self.cancel_check)

@@ -14,6 +14,7 @@ from typing import Any
 from atomic_flow.activation.text import raw_terms
 from atomic_flow.graph import read_plan
 from atomic_flow.graph.project import affected_by_name
+from atomic_flow.graph.projection import PROJECTION_POLICY, coverage_from_file_nodes
 from atomic_flow.graph.resolve import module_map
 
 ContextPackIndex = read_plan.ContextPackIndex
@@ -99,12 +100,15 @@ def context_pack_from_index(index: ContextPackIndex, goals: list[str], *, byte_c
         total += entry["bytes"]
         capped.append(entry)
     omissions = [{"path": entry["file"], "reason": "context_byte_cap"} for entry in capped if entry.get("truncated")]
+    coverage = coverage_from_file_nodes(node for record in index.files.values() for node in record["nodes"])
+    omissions.extend(coverage["coverage_omissions"])
     return {"extractor": PACK_EXTRACTOR, "goals": sorted(goals), "entries": capped,
             "included_bytes": total, "byte_cap": byte_cap,
             "estimated_token_cap": byte_cap, "omissions": omissions, "coverage_complete": not omissions,
             "read_proof": False, "runtime_coverage": "not_assessed",
+            "projection_policy": PROJECTION_POLICY, "coverage_omissions": coverage["coverage_omissions"],
             "revision": index.revision, "stats": dict(index.stats),
-            "parse_failures": sorted(p for p, record in index.files.items() if not record["nodes"][0]["facts"]["parse_ok"]),
+            "parse_failures": sorted(p for p, record in index.files.items() if record["nodes"][0]["facts"]["parse_ok"] is False),
             "method": "name-level advisory; not a resolution claim"}
 
 
@@ -145,15 +149,12 @@ def verification_plan(files: dict[str, bytes], changed_paths: list[str]) -> dict
     from atomic_flow.graph.adapter_resource import resource_kind
     from atomic_flow.graph.project import clean_build
     from atomic_flow.graph.semantic import file_dependencies
-    # Graph adapters admit at most 1MB per file; the source workspace has a
-    # larger independent ceiling. An oversized advisory input is an explicit
-    # coverage omission, never permission to omit the full final test gate.
-    oversized = sorted(p for p, raw in files.items()
-                       if (p.endswith((".py", ".pyi")) or resource_kind(p)) and len(raw) > 1_000_000)
     supported = {p: raw for p, raw in files.items()
-                 if (p.endswith((".py", ".pyi")) or resource_kind(p)) and len(raw) <= 1_000_000}
+                 if p.endswith((".py", ".pyi")) or resource_kind(p)}
     omitted = sorted(set(files) - set(supported))
     build = clean_build(supported)
+    coverage = coverage_from_file_nodes(build["nodes"])
+    oversized = [row["path"] for row in coverage["coverage_omissions"]]
     deps = file_dependencies(build)
     affected = set(changed_paths)
     while True:
@@ -166,12 +167,16 @@ def verification_plan(files: dict[str, bytes], changed_paths: list[str]) -> dict
     for path in changed_paths:
         stem = path.rsplit("/", 1)[-1].removesuffix(".py")
         targets.extend(p for p in files if p.endswith(".py") and p.rsplit("/", 1)[-1] == "test_" + stem + ".py")
-    unknown = bool(omitted or build["unresolved"] or any(p not in files or not p.endswith((".py", ".pyi")) for p in changed_paths))
+    unknown = bool(omitted or not coverage["coverage_complete"] or build["unresolved"]
+                   or any(p not in files or not p.endswith((".py", ".pyi")) for p in changed_paths))
     return {"schema_version": 1, "changed_paths": sorted(set(changed_paths)), "affected_paths": sorted(affected),
             "targeted_tests": sorted(set(targets)), "impact_status": "unknown" if unknown else "static_inferred",
             "unresolved": build["unresolved"], "runtime_coverage": "not_assessed",
-            "omitted_unsupported": omitted,
+            # Legacy field includes files omitted from structural extraction;
+            # oversized files now retain identity nodes in the project graph.
+            "omitted_unsupported": sorted(set(omitted) | set(oversized)),
             "omitted_oversized": oversized,
+            **coverage, "projection_policy": PROJECTION_POLICY,
             "loop_check": "full_pytest" if unknown or not targets else "targeted_pytest",
             "required_final_check": "full_pytest", "checks_executed": False,
             "source_digests": {p: __import__("hashlib").sha256(raw).hexdigest() for p, raw in sorted(files.items())}}

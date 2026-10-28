@@ -89,6 +89,8 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
     edit_id, state = file_transaction.begin(storage, ctx.project_root, before, after)
     checks = ["filesystem"]
     verification = {"filesystem": "not_run", "syntax": "not_run", "pytest": "not_run"}
+    if ctx.check_obligation is not None:
+        verification["ordinary_test"] = "not_run"
     diagnostics = []
     verdict = None
     bound_observation = {}
@@ -124,8 +126,8 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
                 spec, receipt = run_obligation_check(ctx.check_obligation, check_root, cancel_check=ctx.cancel_check)
             bound_observation = check_observation(ctx.check_obligation, spec, receipt)
             bound_result = receipt.result
-            checks.append("pytest")
-            verification["pytest"] = "passed" if receipt.check_passed else "failed"
+            checks.append("ordinary_test")
+            verification["ordinary_test"] = "passed" if receipt.check_passed else "failed"
             if not receipt.check_passed:
                 raise SourceConflict("complete host ordinary-test obligation failed after file removal/move")
         elif removed_tests:

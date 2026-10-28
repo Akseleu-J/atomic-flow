@@ -17,6 +17,7 @@ from atomic_flow.graph.adapter_ast import EXTRACTOR
 from atomic_flow.graph.adapter_resource import RESOURCE_EXTRACTOR, resource_kind
 from atomic_flow.graph.delta import apply_changes, fallback_rebuild
 from atomic_flow.graph.project import clean_build, project_files, project_paths
+from atomic_flow.graph.projection import coverage_from_file_nodes, valid_file_extractor
 from atomic_flow.graph.resolve import RESOLVER
 from atomic_flow.graph.schema import GraphContractError
 from atomic_flow.graph.store import GraphStore
@@ -57,7 +58,7 @@ def sync_project_graph(project: Path, changed: dict[str, Any], *, cancel_check=l
             result = {"created": True, "parsed_files": clean["parsed_files"], "deltas": 0}
         else:
             store = GraphStore(target)
-            if any(node["facts"].get("extractor") != (
+            if any(not valid_file_extractor(node,
                     EXTRACTOR if node["path"].endswith((".py", ".pyi")) else RESOURCE_EXTRACTOR)
                    for node in store.nodes() if node["kind"] == "file"):
                 raise GraphContractError("parser/extractor version changed")
@@ -69,6 +70,7 @@ def sync_project_graph(project: Path, changed: dict[str, Any], *, cancel_check=l
                     raise GraphContractError("published source drifted during graph synchronization")
             result = {"created": False, **apply_changes(store, changed, cancel_check=cancel_check,
                                                         source_check=validate_source, moves=moves)}
+        result.update(coverage_from_file_nodes(store.nodes()))
         result["seconds"] = round(time.monotonic() - started, 4)
         _append(log, {**result, "changed": sorted(changed), "status": "ok"})
         return result
@@ -81,10 +83,11 @@ def sync_project_graph(project: Path, changed: dict[str, Any], *, cancel_check=l
             store = GraphStore(target)
             rebuild = fallback_rebuild(store, files, reason,
                                        source_check=lambda: validate_snapshot(files), cancel_check=cancel_check)
-            _append(log, {"status": "fallback", "reason": reason,
+            coverage = coverage_from_file_nodes(store.nodes())
+            _append(log, {"status": "fallback", "reason": reason, **coverage,
                           "parsed_files": rebuild["parsed_files"],
                           "seconds": round(time.monotonic() - started, 4)})
-            return {"created": False, "deltas": 0, "fallback": True, "reason": reason}
+            return {"created": False, "deltas": 0, "fallback": True, "reason": reason, **coverage}
         except BaseException as inner:  # never break publication
             _append(log, {"status": "failed", "reason": reason,
                           "fallback_error_type": type(inner).__name__})

@@ -8,6 +8,10 @@ permissions:
 
 jobs:
   qualify:
+    strategy:
+      fail-fast: false
+      matrix:
+        verify_method: [ordinary_test, pytest]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -22,11 +26,11 @@ jobs:
         run: |
           mkdir -p p07-sympy-task-worker
           git rev-parse HEAD > p07-sympy-task-worker/tested-commit.txt
-          python tools/p07_sympy_task_journey.py --output p07-sympy-task-worker/smoke
+          python tools/p07_sympy_task_journey.py --verify-method ${{ matrix.verify_method }} --output p07-sympy-task-worker/smoke
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: p07-sympy-task-journey-${{ github.sha }}
+          name: p07-sympy-task-journey-${{ matrix.verify_method }}-${{ github.sha }}
           path: p07-sympy-task-worker/
           retention-days: 14
           if-no-files-found: error

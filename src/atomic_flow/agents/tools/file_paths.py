@@ -7,11 +7,17 @@ from pathlib import PurePosixPath
 from atomic_flow.agents.source import SourceConflict, confined_path
 from atomic_flow.config import user_dir
 from atomic_flow.execution_inputs import private_credential_path
+from atomic_flow.project_resources import ProjectLimits
 from atomic_flow.tree.builder import _Ignore
 from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES, SOURCE_SUFFIXES
 
 
-def admitted_path(ctx, rel: str, *, existing: bool = False, notebook: bool = False):
+def admitted_path(ctx, rel: str, *, existing: bool = False, notebook: bool = False,
+                  source_byte_limit: int = MAX_FILE_BYTES):
+    # Host snapshot callers may select the existing ProjectLimits admission
+    # ceiling. Model read/mutation schemas never expose this parameter.
+    if type(source_byte_limit) is not int or not 1 <= source_byte_limit <= ProjectLimits().max_file_bytes:
+        raise SourceConflict("invalid host source byte limit")
     # Reject OS aliases, alternate data streams, hidden/private files and paths
     # which the project's index intentionally excludes.
     if not rel or "\\" in rel or ":" in rel or rel != PurePosixPath(rel).as_posix():
@@ -35,7 +41,7 @@ def admitted_path(ctx, rel: str, *, existing: bool = False, notebook: bool = Fal
         info = path.stat()
         if not stat.S_ISREG(info.st_mode):
             raise SourceConflict("source path is not a regular file")
-        if info.st_size > MAX_FILE_BYTES:
+        if info.st_size > source_byte_limit:
             raise SourceConflict("source file exceeds the size limit")
     elif existing:
         raise SourceConflict("source file does not exist")

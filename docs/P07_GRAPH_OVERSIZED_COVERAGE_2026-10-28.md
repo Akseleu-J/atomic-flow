@@ -50,3 +50,16 @@ source/generation CAS, cancellation/crash, read-plan invalidation and final-test
 authority. Then repeat the full native journey requiring both scoped publication
 and successful durable graph sync with explicit incomplete extraction coverage.
 This design was independently reviewed read-only; no implementation is claimed.
+
+## Implementation checkpoint
+
+Shared projection, durable clean/delta/fallback/sync coverage, read-plan policy
+identity, semantic partial-coverage reports and host graph admission are now
+implemented. Model read/edit keep their original1MB cap; host graph snapshots
+use a separately validated bound up to16MiB without changing path/link/private
+source rules. Peer review found unknown-star and opaque alias call-resolution
+gaps; conservative unresolved handling and clean/delta regressions were added.
+Root graph neighbors passed82 tests with1 platform-dependent symlink skip;
+updated resolver/projection neighbors passed43 tests. Ruff passed.
+Fresh Linux graph/native full-source matrix has not yet run, so graph runtime
+acceptance is still pending. No paid inference was made.

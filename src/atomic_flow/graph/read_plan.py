@@ -9,8 +9,13 @@ from __future__ import annotations
 import hashlib
 import json
 
-from atomic_flow.graph.adapter_ast import EXTRACTOR, adapt_file
+from atomic_flow.graph.adapter_ast import EXTRACTOR
+from atomic_flow.graph.projection import PROJECTION_POLICY, coverage_from_file_nodes, project_file_projection
 from atomic_flow.graph.schema import GraphContractError
+
+# Preserve the existing instrumentation patch point, with the shared project
+# projection applying its unchanged strict parser or explicit file placeholder.
+adapt_file = project_file_projection
 
 
 class ContextPackIndex:
@@ -21,6 +26,8 @@ class ContextPackIndex:
         self.revision = ""
         self.node_count = 0
         self.stats: dict[str, int] = {}
+        self.projection_policy = ""
+        self.coverage = {"coverage_complete": True, "coverage_omissions": []}
 
     def update(self, files: dict[str, bytes], *, cancel_check=lambda: None, max_nodes=100_000, adapter=None):
         if type(max_nodes) is not int or max_nodes < 1:
@@ -30,9 +37,11 @@ class ContextPackIndex:
         for path in sorted(files):
             cancel_check()
             data = files[path]
+            if not isinstance(data, bytes):
+                raise GraphContractError("read-plan source must be bytes")
             digest = hashlib.sha256(data).hexdigest()
             old = self.files.get(path)
-            if old is not None and old["digest"] == digest:
+            if old is not None and old["digest"] == digest and self.projection_policy == PROJECTION_POLICY:
                 continue
             pending[path] = (data, digest)
         node_count = self.node_count - sum(len(self.files[p]["nodes"]) for p in deleted | pending.keys() if p in self.files)
@@ -76,11 +85,13 @@ class ContextPackIndex:
             if path in changed:
                 records[path] = changed[path]
                 update_record(path, changed[path], True)
-        revision = hashlib.sha256(json.dumps({"extractor": EXTRACTOR,
+        coverage = coverage_from_file_nodes(node for record in records.values() for node in record["nodes"])
+        revision = hashlib.sha256(json.dumps({"extractor": EXTRACTOR, "projection_policy": PROJECTION_POLICY,
             "files": {p: records[p]["digest"] for p in sorted(records)}}, sort_keys=True).encode()).hexdigest()
         cancel_check()
         self.files, self.reverse, self.exports = records, reverse, exports
         self.revision, self.node_count = revision, node_count
+        self.projection_policy, self.coverage = PROJECTION_POLICY, coverage
         self.stats = {"parsed_files": len(changed), "reused_files": len(files) - len(changed),
                       "deleted_files": len(deleted), "scanned_files": len(files)}
         return dict(self.stats)

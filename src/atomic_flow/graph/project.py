@@ -11,7 +11,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
-from atomic_flow.graph.adapter_resource import adapt_source
+from atomic_flow.graph.projection import coverage_from_file_nodes, project_file_projection
 from atomic_flow.graph.resolve import exports_by_file, infer_file_edges, module_map
 
 
@@ -20,7 +20,7 @@ def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
     edges: list[dict] = []
     reverse: dict[str, dict[str, list[str]]] = {"imports": {}, "calls": {}}
     for path in sorted(files):
-        payload = adapt_source(path, files[path])
+        payload = project_file_projection(path, files[path])
         nodes.extend(payload["nodes"])
         edges.extend(payload["edges"])
         file_node = payload["nodes"][0]
@@ -43,7 +43,7 @@ def clean_build(files: dict[str, bytes]) -> dict[str, Any]:
         edges.extend(inferred["edges"])
         unresolved.extend(f"{node['path']}: {item}" for item in inferred["unresolved"])
     return {"nodes": nodes, "edges": edges, "reverse": reverse, "exports": exports,
-            "parsed_files": len(files), "unresolved": sorted(unresolved)}
+            "parsed_files": len(files), "unresolved": sorted(unresolved), **coverage_from_file_nodes(nodes)}
 
 
 def project_files(root: Path, *, suffix: str | None = ".py", tree_ignore=None, respect_gitignore=True,
@@ -97,7 +97,7 @@ def project_files(root: Path, *, suffix: str | None = ".py", tree_ignore=None, r
             continue
         if len(files) >= limits.max_files:
             raise ResourceLimitError("read-plan source file limit exceeded")
-        path = admitted_path(ctx, rel, existing=True)
+        path = admitted_path(ctx, rel, existing=True, source_byte_limit=limits.max_file_bytes)
         sink = BytesIO()
         _, size = stream_source(path, limits, cancel_check, sink=sink,
                                 remaining_bytes=limits.max_total_bytes - total)
@@ -141,7 +141,7 @@ def project_paths(root: Path, paths, *, tree_ignore=None, respect_gitignore=True
         if not target.exists():
             result[path] = None
             continue
-        target = admitted_path(ctx, path, existing=True)
+        target = admitted_path(ctx, path, existing=True, source_byte_limit=limits.max_file_bytes)
         with target.open("rb") as handle:
             data = handle.read(limits.max_file_bytes + 1)
         total += len(data)

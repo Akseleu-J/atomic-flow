@@ -1,7 +1,7 @@
 """Synthetic full-source native SymPy TaskRunner journey, with zero provider calls.
 
-Uses public built-in tools and the existing scalar verify_with='pytest' as the
-internal ordinary-check floor. Actual observations must name sympy-native.
+Uses public built-in tools with ordinary_test or legacy pytest verification.
+Actual observations must name sympy-native; graph coverage omissions are explicit.
 This is neither a paid campaign nor hidden-oracle or whole-30 quality evidence.
 """
 from __future__ import annotations
@@ -58,13 +58,13 @@ def _observations(state, task, output):
     return observations
 
 
-def _journey(workspace, identity, calibration, report, output):
+def _journey(workspace, identity, calibration, report, output, *, verify_method="ordinary_test"):
     report.update(scope="synthetic full admitted SymPy source public TaskRunner journey only",
                   taskrunner_wired=True, model_transport="scripted", historical_target_tests=False,
                   hidden_oracle="not_run", benchmark_quality_claim=False, whole30_qualified=False,
                   raw_in_loop_receipts_retained=False,
                   receipt_evidence="bounded host tool summaries; raw native executor proof is separate smoke evidence",
-                  internal_verify_label="pytest compatibility floor; actual runner is sympy-native")
+                  internal_verify_label=verify_method)
     previous = os.environ.get("ATOMIC_FLOW_HOME")
     state = workspace.parent / "journey-private-state"
     try:
@@ -87,7 +87,7 @@ def _journey(workspace, identity, calibration, report, output):
                                           deadline_at=time.time() + 900)
         save(output / "obligation.json", obligation.as_dict())
         step = {"description": "Repair the native ordinary requirement by changing only the probe module",
-                "tools_needed": ["read_file", "patch_file", "run_command"], "verify_with": "pytest",
+                "tools_needed": ["read_file", "patch_file", "run_command"], "verify_with": "pytest" if verify_method == "ordinary_test" else "ordinary_test",
                 "scope_paths": [MODULE_PATH]}
 
         class Backend(ScriptedBackend):
@@ -119,7 +119,7 @@ def _journey(workspace, identity, calibration, report, output):
         runner = TaskRunner(config, workspace, backend, approval_callback=lambda *args: True, check_obligation=obligation)
         task = runner.run_plan("Change only the probe module so the existing native ordinary test passes",
                                Plan(steps=[PlanStep(description="Check existing native requirement and repair if needed",
-                                     tools_needed=["read_file", "patch_file", "run_command"], verify_with="pytest",
+                                     tools_needed=["read_file", "patch_file", "run_command"], verify_with=verify_method,
                                      scope_paths=[MODULE_PATH])]), allowed_paths=[MODULE_PATH], allow_internal_replan=True)
         save(output / "task.json", asdict(task))
         after = check_source_snapshot(workspace)
@@ -136,7 +136,7 @@ def _journey(workspace, identity, calibration, report, output):
                     and row.get("check_obligation_digest") == obligation.digest]
         runner_unchanged = all(sha((workspace / path).read_bytes()) == digest for path, digest in identity.source_sha256)
         report.update(task_status=task.status, task_error=task.error, replan_count=task.replan_count,
-                      completion=task.completion_report, obligation_digest=obligation.digest,
+                      completion=task.completion_report, obligation_digest=obligation.digest, graph_sync=task.graph_sync,
                       backend_roles=backend.roles(), changed_source_paths=changed,
                       admitted_source_files=len(before), source_manifest_scope="core admitted source filter; generated/hidden files excluded",
                       ordinary_test_sha256=sha((workspace / TEST_PATH).read_bytes()), runner_source_unchanged=runner_unchanged,
@@ -149,6 +149,10 @@ def _journey(workspace, identity, calibration, report, output):
                 or not negative or not positive or not failures
                 or negative[0].get("checked_source_revision") != spec.source_revision
                 or positive[-1].get("checked_source_revision") != check_source_revision(workspace)
+                or task.graph_sync.get("failed") is not False
+                or task.graph_sync.get("coverage_complete") is not False
+                or not any(row.get("path") == "sympy/integrals/rubi/rubi_tests/tests/test_trinomials.py"
+                           for row in task.graph_sync.get("coverage_omissions", []))
                 or not task.completion_report.get("ready_to_publish")
                 or task.completion_report.get("check_runner") != "sympy-native"
                 or task.completion_report.get("check_passed") is not True
@@ -165,13 +169,17 @@ def _journey(workspace, identity, calibration, report, output):
             os.environ["ATOMIC_FLOW_HOME"] = previous
 
 
-def journey(output):
-    return smoke(output, host_callback=_journey)
+def journey(output, verify_method="ordinary_test"):
+    if verify_method not in {"ordinary_test", "pytest"}:
+        raise ValueError("fixed host verification method required")
+    return smoke(output, host_callback=lambda *args: _journey(*args, verify_method=verify_method))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    result = journey(parser.parse_args().output)
+    parser.add_argument("--verify-method", choices=("ordinary_test", "pytest"), default="ordinary_test")
+    arguments = parser.parse_args()
+    result = journey(arguments.output, arguments.verify_method)
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result["status"] == QUALIFIED else 1)

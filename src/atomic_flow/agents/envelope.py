@@ -17,7 +17,7 @@ MUTATING_TOOLS = frozenset({"edit_node", "patch_file", "patch_files", "notebook_
 SOURCE_TOOLS = frozenset({"read_node", "find_callers", "search_tree", "search_text", "read_result",
                           "read_file", "find_files", "notebook_read"})
 SUPPORTED_TOOLS = SOURCE_TOOLS | MUTATING_TOOLS | {"run_command", "ask_user"}
-VERIFY_KINDS = {"none": 0, "py_compile": 1, "pytest": 2}
+VERIFY_KINDS = {"none": 0, "py_compile": 1, "pytest": 2, "ordinary_test": 2}
 LEGACY_ENVELOPE_FIELDS = {"version", "allowed_tools", "required_verify", "max_budget_usd", "max_model_calls",
                           "max_replans", "runtime_digest", "replan_failures"}
 ENVELOPE_FIELDS = LEGACY_ENVELOPE_FIELDS | {"deadline_at"}
@@ -185,7 +185,7 @@ def envelope_preserved(approval: dict[str, Any], new_steps: list, *, failure: st
     if MUTATING_TOOLS & allowed and not MUTATING_TOOLS & proposed_tools:
         reasons.append("replan would drop the approved verified edit obligation")
     if "run_command" in allowed and "run_command" not in proposed_tools and not any(
-            step.verify_with == "pytest" for step in new_steps):
+            step.verify_with in {"pytest", "ordinary_test"} for step in new_steps):
         reasons.append("replan would drop the approved execution/check obligation")
     for step in new_steps:
         unknown = set(step.tools_needed or []) - allowed
@@ -195,7 +195,7 @@ def envelope_preserved(approval: dict[str, Any], new_steps: list, *, failure: st
             reasons.append(f"step {step.index}: introduces a mutating tool the plan never had")
         if VERIFY_KINDS.get(step.verify_with, -1) < VERIFY_KINDS[envelope["required_verify"]]:
             reasons.append(f"step {step.index}: verify_with would weaken the approved verification obligation")
-        if step.verify_with == "pytest" and envelope["required_verify"] != "pytest" and "run_command" not in allowed:
+        if step.verify_with in {"pytest", "ordinary_test"} and envelope["required_verify"] not in {"pytest", "ordinary_test"} and "run_command" not in allowed:
             reasons.append(f"step {step.index}: pytest execution was not approved")
     if no_progress(approval, failure):
         reasons.append("no-progress guard: recurring failure requires review")

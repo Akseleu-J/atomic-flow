@@ -13,8 +13,9 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from atomic_flow.graph.adapter_resource import adapt_source as adapt_file
 from atomic_flow.graph.project import clean_build
+from atomic_flow.graph.projection import coverage_from_file_nodes
+from atomic_flow.graph.projection import project_file_projection as adapt_file
 from atomic_flow.graph.schema import GraphContractError, file_id
 from atomic_flow.graph.store import GraphGenerationConflict, GraphStore
 
@@ -74,7 +75,8 @@ def _relink(store: GraphStore, delta: dict[str, Any], drop_ids: set[str]):
     changed_exports = {candidate for candidate in pre_exports.keys() | exports.keys()
                        if (pre_exports.get(candidate) != exports.get(candidate)
                            or pre_exports.star_names.get(candidate) != exports.star_names.get(candidate)
-                           or (candidate in pre_exports.dynamic) != (candidate in exports.dynamic))}
+                           or (candidate in pre_exports.dynamic) != (candidate in exports.dynamic)
+                           or (candidate in pre_exports.unknown) != (candidate in exports.unknown))}
     from atomic_flow.graph.resolve import dependencies
     for candidate_path, node in file_nodes.items():
         names, targets = dependencies(node, modules)
@@ -146,7 +148,8 @@ def apply_delta(store: GraphStore, delta: dict[str, Any]) -> dict[str, Any]:
             "scanned_files": 1, "read_files": 1 if not delta["deleted"] else 0,
             "relinked_files": relinked, "reused_files": max(0, sum(n["kind"] == "file" for n in store.nodes()) - relinked),
             "invalidated_paths": affected,
-            "global_algorithms_invalidated": ["pagerank"], "unresolved": unresolved}
+            "global_algorithms_invalidated": ["pagerank"], "unresolved": unresolved,
+            **coverage_from_file_nodes(store.nodes())}
 
 
 def fallback_rebuild(store: GraphStore, files: dict[str, bytes], reason: str, *,
@@ -162,7 +165,7 @@ def fallback_rebuild(store: GraphStore, files: dict[str, bytes], reason: str, *,
     generation = store.commit(base_generation=store.generation, put_nodes=clean["nodes"],
                               put_edges=clean["edges"], drop_node_ids=old_ids)
     return {"generation": generation, "reason": reason, "parsed_files": clean["parsed_files"],
-            "scanned_files": len(files)}
+            "scanned_files": len(files), **coverage_from_file_nodes(store.nodes())}
 
 
 def apply_changes(store: GraphStore, changed: dict[str, bytes | None], *, cancel_check=lambda: None,
@@ -199,4 +202,5 @@ def apply_changes(store: GraphStore, changed: dict[str, bytes | None], *, cancel
             "scanned_files": len(changed), "read_files": sum(v is not None for v in changed.values()),
             "relinked_files": sum(r["relinked_files"] for r in reports),
             "invalidated_paths": sorted({path for report in reports for path in report["invalidated_paths"]}),
-            "global_algorithms_invalidated": ["pagerank"] if changed else []}
+            "global_algorithms_invalidated": ["pagerank"] if changed else [],
+            **coverage_from_file_nodes(store.nodes())}

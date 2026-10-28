@@ -16,7 +16,7 @@ from pathlib import PurePosixPath
 MAX_RECEIPT_BYTES = 32_768
 MAX_LINKS = 64
 OUTCOMES = frozenset({"observed", "passed", "failed", "not_run", "unavailable"})
-VERIFY_METHODS = frozenset({"none", "py_compile", "pytest"})
+VERIFY_METHODS = frozenset({"none", "py_compile", "pytest", "ordinary_test"})
 FIELDS = frozenset({"version", "task_id", "step_index", "request_id", "contract_sha256",
                     "before_manifest_sha256", "after_manifest_sha256", "approved_scope_sha256",
                     "graph_revision", "context_revision", "linked_code_nodes", "linked_test_nodes",

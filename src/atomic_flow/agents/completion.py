@@ -18,6 +18,11 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None, *, che
         report["declared_criteria"] = {"status": "not_assessed",
                                        "scope": "declared checks only; no independent semantic requirement evaluator"}
     cancel_check()
+    if check_obligation is None and (config.task.final_check == "ordinary_test"
+            or any(s.verify_with == "ordinary_test" and s.status != "superseded" for s in task.steps)):
+        report["tests"] = "unavailable"
+        report["checks"].append({"name": "ordinary_test_obligation", "status": "unavailable"})
+        return report
     if not task.steps or task.current_index != len(task.steps) or not any(s.status == "done" for s in task.steps):
         report["checks"].append({"name": "completed_steps", "status": "failed"})
         return report

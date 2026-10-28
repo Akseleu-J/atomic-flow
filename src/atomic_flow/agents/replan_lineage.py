@@ -11,6 +11,13 @@ from __future__ import annotations
 from typing import Any
 
 
+def verification_lineage_kind(method: str, *, host_ordinary_test: bool = False) -> str:
+    """Transient comparison only; persisted contracts keep their exact labels."""
+    if type(host_ordinary_test) is not bool:
+        raise ValueError("host ordinary-test binding must be explicit")
+    return "ordinary_test" if host_ordinary_test and method in {"pytest", "ordinary_test"} else method
+
+
 def lineage_preserved(obligations: dict[str, Any], new_steps: list[dict[str, Any]]) -> tuple[bool, list[str]]:
     """Check obligations against a normalized replacement plan.
 

@@ -84,7 +84,7 @@ def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
         with checked_workspace(project_root, private_workspace=private_workspace, cancel_check=cancel_check) as check_root:
             spec, receipt = run_obligation_check(check_obligation, check_root, cancel_check=cancel_check)
         result = receipt.result
-        return VerificationResult(ok=receipt.check_passed, checks=["syntax", "pytest"],
+        return VerificationResult(ok=receipt.check_passed, checks=["syntax", "ordinary_test"],
                                   message="complete host ordinary-test obligation " + ("passed" if receipt.check_passed else "failed or incomplete"),
                                   test_output=(result.stdout + result.stderr)[-3000:], source_hash=source_hash,
                                   timed_out=result.timed_out, exit_code=result.returncode,

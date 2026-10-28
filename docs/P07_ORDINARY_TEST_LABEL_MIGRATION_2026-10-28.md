@@ -42,3 +42,16 @@ stale refusal; edit and rollback verification propagation; complete final gate.
 Then run the real native SymPy journey with the new label while retaining the
 legacy compatibility journey. No paid comparison or P07 closure follows from
 label migration alone.
+
+## Implementation checkpoint
+
+The mapped generic label migration is implemented. Unbound labels/config refuse
+before model/check execution; bound post-edit observations use ordinary_test.
+Legacy persisted labels and defaults remain unchanged. Scoped mixed-label replan
+uses a transient lineage comparison only when the actual host obligation is
+present. The native Docker matrix now starts under both labels and switches
+labels during one builtin replan, requiring actual native final checks and
+successful durable graph synchronization with an explicit oversized omission.
+Root initial152 neighbor tests,60 label neighbors and updated148 related cases
+passed; Ruff passed. These sets overlap and must not be summed. Fresh real
+Docker matrix and final integration CI are pending.

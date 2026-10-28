@@ -14,6 +14,7 @@ import json
 from typing import Any
 
 from atomic_flow.graph.project import clean_build
+from atomic_flow.graph.projection import PROJECTION_POLICY, coverage_from_file_nodes
 
 SEMANTIC_EXTRACTOR = "structural-semantic/1"
 
@@ -52,7 +53,11 @@ def semantic_hashes(source: bytes) -> dict[str, str]:
 
 
 def file_dependencies(build: dict) -> dict[str, list[str]]:
-    """Conservative resolved file dependency closure; unresolved stays explicit."""
+    """Resolved edges only; build unresolved/coverage omissions bound completeness.
+
+    An empty dependency list for a placeholder is not known independence.
+    Consumers needing safe invalidation must consult the build coverage report.
+    """
     paths = {n["id"]: n["path"] for n in build["nodes"]}
     direct = {n["path"]: set() for n in build["nodes"] if n["kind"] == "file"}
     for edge in build["edges"]:
@@ -104,7 +109,8 @@ def assemble(files, build, artifacts) -> dict:
                     "semantic_correctness": "not_assessed"}
     return {"layers": layers(files), "entry_points": entry,
             "tour": {**structural_tour, "steps": steps, "note": "Evidence-bound inferred narrative; semantic truth not assessed"},
-            "flows": flows, "architecture": architecture, "unresolved": build["unresolved"]}
+            "flows": flows, "architecture": architecture, "unresolved": build["unresolved"],
+            **_coverage(build)}
 
 
 def layers(files: dict[str, bytes]) -> dict[str, Any]:
@@ -117,7 +123,7 @@ def layers(files: dict[str, bytes]) -> dict[str, Any]:
         parts = node["path"].split("/")
         groups.setdefault(parts[0] if len(parts) > 1 else ".", []).append(node["path"])
     return {"extractor": SEMANTIC_EXTRACTOR, "source_digests": _digests(build),
-            "groups": {name: sorted(paths) for name, paths in sorted(groups.items())}}
+            "groups": {name: sorted(paths) for name, paths in sorted(groups.items())}, **_coverage(build)}
 
 
 def entry_points(files: dict[str, bytes]) -> dict[str, Any]:
@@ -138,7 +144,7 @@ def entry_points(files: dict[str, bytes]) -> dict[str, Any]:
                 break
     entries = sorted(path for path in files if path not in mentioned)
     return {"extractor": SEMANTIC_EXTRACTOR, "source_digests": _digests(build),
-            "entry_files": entries, "method": "name-level; not a resolution claim"}
+            "entry_files": entries, "method": "name-level; not a resolution claim", **_coverage(build)}
 
 
 def tour(files: dict[str, bytes]) -> dict[str, Any]:
@@ -150,7 +156,13 @@ def tour(files: dict[str, bytes]) -> dict[str, Any]:
             "steps": [{"position": index + 1, "file": path,
                        "rationale": "entry candidate" if path in entries else "project file"}
                       for index, path in enumerate(order)],
-            "note": "structural order only; narrative tours require the LLM stage"}
+            "note": "structural order only; narrative tours require the LLM stage", **_coverage(build)}
+
+
+def _coverage(build: dict) -> dict:
+    coverage = coverage_from_file_nodes(build["nodes"])
+    return {**coverage, "projection_policy": PROJECTION_POLICY,
+            "dependency_coverage": "partial" if build["unresolved"] or not coverage["coverage_complete"] else "static_inferred"}
 
 
 def _digests(build: dict[str, Any]) -> dict[str, str]:

@@ -97,7 +97,7 @@ class EditNodeTool(Tool):
             if isinstance(exc, TaskCancelled):
                 raise
             verification = {check: ("passed" if verdict and check in verdict.checks else "not_run")
-                            for check in ("syntax", "pytest")}
+                            for check in (("syntax", "ordinary_test") if ctx.check_obligation is not None else ("syntax", "pytest"))}
             if verdict and not verdict.ok and verdict.checks:
                 verification[verdict.checks[-1]] = "failed"
             return {"status": "rolled_back" if restored else "rollback_failed", "reason": str(exc),

@@ -29,7 +29,7 @@ def _chat(backend, messages):
     return backend.chat(messages, json_mode=True)
 
 
-VerifyMethod = Literal["py_compile", "pytest", "none"]
+VerifyMethod = Literal["py_compile", "pytest", "ordinary_test", "none"]
 
 
 class PlanGoal(StrictModel):
@@ -57,7 +57,7 @@ class PlanStep(StrictModel):
                                   description="What should be true after this step succeeds.")
     verify_with: VerifyMethod = Field(
         default="py_compile",
-        description="How to verify this step: py_compile (syntax), pytest (matching tests), none."
+        description="How to verify: py_compile (syntax), ordinary_test (complete host obligation only), pytest (legacy matching tests), none."
     )
 
 
@@ -95,6 +95,8 @@ RULES
   Each hierarchical step names its parent_goal and may add acceptance_criteria.
   Criteria describe requirements; they do not authorize tools or assert tests passed.
 - Choose `verify_with` carefully:
+    * `ordinary_test` — only when planning_context explicitly says host_ordinary_test=true.
+      This runs the full immutable host test obligation; never invent or narrow its runner.
     * `py_compile` — for edits that do NOT change behavior: docstrings, renames,
       type hints, comments, formatting, imports.
     * `pytest` — ONLY when the step changes logic AND the project has matching tests.

@@ -38,7 +38,7 @@ class ToolResult:
         verification = {}
         if status in {"applied", "rolled_back", "rollback_failed"}:
             verification = {check: ("passed" if check in checks else "not_run")
-                            for check in ("syntax", "pytest")}
+                            for check in (("syntax", "ordinary_test") if "ordinary_test" in checks else ("syntax", "pytest"))}
             if resolved != "success" and checks:
                 verification[checks[-1]] = "failed"
         if "command" in payload:

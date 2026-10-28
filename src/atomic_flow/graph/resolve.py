@@ -17,11 +17,20 @@ class ExportIndex(dict):
 
     def __init__(self, values, files):
         super().__init__(values)
+        self.unknown = {path for path, node in files.items() if node["facts"].get("exports_status") == "unknown"}
+        modules = module_map(list(files))
+        for _ in range(len(files)):
+            added = {path for path, node in files.items()
+                     if any((binding.get("name") or binding.get("star"))
+                            and modules.get(import_module(path, binding)) in self.unknown for binding in _bindings(node))}
+            if added <= self.unknown:
+                break
+            self.unknown.update(added)
         self.star_names = {path: (set(node["facts"].get("module_exports") or [])
                                  if node["facts"].get("module_exports") is not None
                                  else {name for name in self[path] if not name.startswith("_")})
                            for path, node in files.items()}
-        self.dynamic = {path for path, node in files.items() if node["facts"].get("dynamic_exports")}
+        self.dynamic = {path for path, node in files.items() if node["facts"].get("dynamic_exports")} | self.unknown
 
 
 def module_map(paths: list[str]) -> dict[str, str]:
@@ -88,7 +97,8 @@ def exports_by_file(nodes: list[dict[str, Any]]) -> dict[str, dict[str, list[str
                 if not b.get("star") and b["local"] in _ambiguous_bindings(node):
                     continue
                 target = modules.get(import_module(path, b))
-                if not target or target == path or files[target]["facts"].get("dynamic_exports"):
+                if (not target or target == path or files[target]["facts"].get("dynamic_exports")
+                        or files[target]["facts"].get("exports_status") == "unknown"):
                     continue
                 candidates = exports[target]
                 if b.get("star"):
@@ -132,6 +142,8 @@ def infer_file_edges(file_node: dict[str, Any], *, modules: dict[str, str],
                      exports: dict[str, dict[str, list[str]]]) -> dict[str, Any]:
     path, facts = file_node["path"], file_node["facts"]
     edges, unresolved = {}, []
+    if facts.get("extraction_status") == "omitted_oversized":
+        return {"edges": [], "unresolved": ["coverage omitted_oversized: imports/calls/exports unknown"]}
 
     def edge(kind, target):
         if target != file_node["id"]:
@@ -142,6 +154,7 @@ def infer_file_edges(file_node: dict[str, Any], *, modules: dict[str, str],
             edges[item["id"]] = item
 
     local, module_locals, stars = {}, {}, []
+    unknown_star = False
     for b in _bindings(file_node):
         module = import_module(path, b)
         target = modules.get(module)
@@ -155,6 +168,15 @@ def infer_file_edges(file_node: dict[str, Any], *, modules: dict[str, str],
             unresolved.append(f"import {module or b.get('module', '')} (unresolved)")
             continue
         edge("imports", "file:" + target)
+        if target in getattr(exports, "unknown", set()):
+            unresolved.append(f"import {module}: export coverage unknown")
+            if b.get("star"):
+                # Its unexamined bindings may shadow even an extracted local
+                # function or module alias. Without statement-order proof no
+                # call binding in this file can be treated as resolved.
+                unknown_star = True
+            if b.get("name") or b.get("star"):
+                continue
         if b.get("star"):
             stars.append(target)
         elif b.get("name"):
@@ -165,13 +187,15 @@ def infer_file_edges(file_node: dict[str, Any], *, modules: dict[str, str],
     for call in facts.get("call_targets", facts.get("raw_calls", [])):
         head, _, tail = call.partition(".")
         ids = []
-        if head not in shadowed:
+        if head not in shadowed and not unknown_star:
             if tail and head in module_locals:
                 target = module_locals[head]
-                ids = exports.get(target, {}).get(tail, [])
-                if not ids:
-                    target = modules.get(call.rpartition(".")[0])
-                    ids = exports.get(target, {}).get(call.rsplit(".", 1)[-1], [])
+                if target not in getattr(exports, "unknown", set()):
+                    ids = exports.get(target, {}).get(tail, [])
+                    if not ids:
+                        target = modules.get(call.rpartition(".")[0])
+                        ids = ([] if target in getattr(exports, "unknown", set())
+                               else exports.get(target, {}).get(call.rsplit(".", 1)[-1], []))
             elif not tail:
                 ids = local.get(call, []) or exports.get(path, {}).get(call, [])
                 if not ids:
