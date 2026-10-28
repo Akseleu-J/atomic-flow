@@ -31,7 +31,11 @@ runner output. The separate hidden oracle remains required for benchmark quality
   obligation contracts/integration, internal replan and failure policy).
 - Additional native negative cases and edit/result neighbors: 98 passed.
 - Ruff: passed. Real Docker public failure -> replan -> coupled repair -> fresh check
-  -> publication: pending on the package source commit.
+  -> publication: accepted on 4285540d087b87be49e23ccd7fb03ba0a87e4203, CI40633693098.
+  Artifact12792532996 ZIP SHA256 caef323495192db6a302b4d704140f359f7e50a2787e19da2313383e496d921b;
+  source commit, task failure/current revision, one replan, exact final bytes and
+  publication gate were audited from the downloaded artifact. Provider calls=0.
+  Main checks40633692030/40633697185 and interoperability40633692152/40633697282 succeeded.
 - Independent review: requested; the previous reviewer stopped on an account
   usage limit. Root review is not an independent review.
 
@@ -39,3 +43,19 @@ All 30 isolated historical environment calibrations remain accepted. Full
 historical in-loop runner admission, matched paid pairs, fresh holdout, ablations
 and final independent review remain open. The allocation proposal in
 P07_BUDGET20_PROPOSAL_2026-10-27.md is unfrozen and has not changed active budgets.
+
+## Host-selected check command
+
+The next package adds command=check, requiring an existing host CheckObligation.
+No target narrowing, model-selected runner/image/environment or host fallback is
+allowed. Native obligations reject the misleading command=pytest spelling;
+installed-pytest obligations preserve it for compatibility. Policy also evaluates
+legacy pytest restrictions so check cannot bypass explicit deny or ask rules.
+The actual runner remains in the host observation. TaskRunner applies the same
+completed-failure guard to the alias. Failure evidence uses one current workspace
+snapshot for both the guard and recorded revision.
+
+Focused command/policy/envelope/obligation neighbors: 86 passed; Ruff passed.
+The public Docker journey matrix now exercises both spellings. Its fresh CI is
+pending. Internal plan verification labels still use legacy pytest; generic
+ordinary_test labels and historical runtime profiles are separate unfinished work.

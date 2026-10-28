@@ -26,12 +26,14 @@ from atomic_flow.tree.builder import build_tree, save_tree
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def journey(output):
+def journey(output, command="pytest"):
+    if command not in {"pytest", "check"}:
+        raise ValueError("fixed host-check command required")
     if platform.system() != "Linux" or output.exists():
         raise ValueError("fresh output on accepted Linux Docker host required")
     output.mkdir(parents=True)
     report = {"status": "not_qualified", "provider_calls": 0, "model_transport": "scripted",
-              "independent_requirement_success": False, "hidden_oracle": "not_run"}
+              "independent_requirement_success": False, "hidden_oracle": "not_run", "check_command": command}
     previous = os.environ.get("ATOMIC_FLOW_HOME")
     try:
         subprocess.run(["docker", "pull", IMAGE], check=True, timeout=600)
@@ -67,7 +69,7 @@ def journey(output):
                     return super().chat(messages, **kwargs)
             backend = Backend({"parser": {"task_type": "modify", "focus_terms": ["original", "renamed", "call"]},
                 "answerer": [
-                    {"tool": "run_command", "args": {"command": "pytest"}},
+                    {"tool": "run_command", "args": {"command": command}},
                     {"text": "The source check failed; repair is required.", "confidence": "low"},
                     {"tool": "read_file", "args": {"path": "a.py"}},
                     {"tool": "read_file", "args": {"path": "b.py"}},
@@ -75,7 +77,7 @@ def journey(output):
                         {"path": path, "expected_hash": hashlib.sha1(source.encode()).hexdigest(),
                          "old_text": source, "new_text": source.replace('original', 'renamed')}
                         for path, source in originals.items()]}},
-                    {"tool": "run_command", "args": {"command": "pytest"}},
+                    {"tool": "run_command", "args": {"command": command}},
                     {"text": "Coupled rename completed and ordinary checks passed.", "confidence": "low"}],
                 "critic": {"verdict": "ok", "citation_coverage": 1}})
             config = AtomicConfig()
@@ -111,6 +113,8 @@ def journey(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    result = journey(parser.parse_args().output)
+    parser.add_argument("--command", choices=("pytest", "check"), default="pytest")
+    arguments = parser.parse_args()
+    result = journey(arguments.output, arguments.command)
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result["status"] == "scripted_public_coupled_obligation_journey_qualified" else 1)

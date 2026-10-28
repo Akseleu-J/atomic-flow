@@ -97,19 +97,25 @@ def test_stream_is_revalidated_and_truncation_never_authorizes_repair(bound):
     assert not completed_check_receipt(spec, receipt, negative=True)
 
 
-def test_task_failure_requires_host_proof_and_current_revision(bound):
+@pytest.mark.parametrize("command", ["pytest", "check"])
+def test_task_failure_requires_host_proof_and_current_revision(bound, command):
     obligation, spec = bound
     manifest = {"a.py": "f" * 64}
     current = manifest_digest(manifest)
     spec = replace(spec, source_revision=current)
     observation = check_observation(obligation, spec, failed_receipt(spec))
+    snapshots = []
+    def validate():
+        snapshots.append(manifest)
+        return manifest
     host = SimpleNamespace(check_obligation=obligation,
-                           changeset=SimpleNamespace(validate_workspace=lambda: manifest))
+                           changeset=SimpleNamespace(validate_workspace=validate))
     step = SimpleNamespace(index=0, started_at="2026-10-28T00:00:00Z")
-    failure = TaskRunner._check_failure(host, step, "failed", "pytest", 1,
+    failure = TaskRunner._check_failure(host, step, "failed", command, 1,
                                       checked_revision=current, check_observation=observation)
     assert failure.kind == "deterministic_test_failure"
+    assert len(snapshots) == 1
     for proof, revision in ((None, current), (observation, "0" * 64)):
-        failure = TaskRunner._check_failure(host, step, "failed", "pytest", 1,
+        failure = TaskRunner._check_failure(host, step, "failed", command, 1,
                                           checked_revision=revision, check_observation=proof)
         assert failure.kind == "check_unavailable"

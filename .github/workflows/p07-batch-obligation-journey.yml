@@ -8,6 +8,10 @@ permissions:
 
 jobs:
   qualify:
+    strategy:
+      fail-fast: false
+      matrix:
+        command: [pytest, check]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -22,11 +26,11 @@ jobs:
         run: |
           mkdir -p p07-obligation-worker
           git rev-parse HEAD > p07-obligation-worker/tested-commit.txt
-          python tools/p07_batch_obligation_journey.py --output p07-obligation-worker/smoke
+          python tools/p07_batch_obligation_journey.py --command ${{ matrix.command }} --output p07-obligation-worker/smoke
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: p07-batch-obligation-journey-${{ github.sha }}
+          name: p07-batch-obligation-journey-${{ matrix.command }}-${{ github.sha }}
           path: p07-obligation-worker/
           retention-days: 14
           if-no-files-found: error

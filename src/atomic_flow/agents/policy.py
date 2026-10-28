@@ -62,7 +62,7 @@ class PolicyEngine:
             Rule(tool="ask_user", action="auto"),
             Rule(tool="edit_node", when="trusted", lines_lt=20, action="auto"),
             Rule(tool="edit_node", action="ask"),
-            Rule(tool="run_command", command_matches=r"^(pytest|ruff|mypy|py_compile)(\s|$)", action="auto"),
+            Rule(tool="run_command", command_matches=r"^(check|pytest|ruff|mypy|py_compile)(\s|$)", action="auto"),
         ]
 
     @staticmethod
@@ -112,6 +112,11 @@ class PolicyEngine:
 
     def decide(self, tool_name: str, args: dict[str, Any], *, project_trusted: bool) -> Decision:
         decision = self._decide(tool_name, args, project_trusted=project_trusted)
+        if tool_name == "run_command" and args.get("command") == "check":
+            # New ordinary-test spelling cannot weaken an existing pytest restriction.
+            legacy = self._decide(tool_name, {**args, "command": "pytest"}, project_trusted=project_trusted)
+            return next((item for item in (decision, legacy) if item.action == "forbid"),
+                        next((item for item in (decision, legacy) if item.action == "ask"), decision))
         if tool_name == "patch_files" and isinstance(args.get("patches"), list) and 1 <= len(args["patches"]) <= 16:
             # A batch cannot bypass existing explicit single-file deny/ask.
             # An explicit batch allow may supersede only the single-file default.
@@ -145,16 +150,26 @@ class PolicyEngine:
         decision = self.decide(tool_name, args, project_trusted=project_trusted)
         matches = []
         selected = False
-        for source, rules in [*self.layers.items(), ("default", self._default_rules())]:
-            for index, rule in enumerate(rules):
-                if self._tool_matches(rule.tool, tool_name) and self._context_matches(rule, args, project_trusted):
-                    choose = not selected and source == decision.source and rule == decision.rule
-                    matches.append({"source": source, "index": index, "tool": rule.tool, "action": rule.action,
-                                    "selected": choose})
-                    selected |= choose
+        variants = [args]
+        ordinary_alias = tool_name == "run_command" and args.get("command") == "check"
+        if ordinary_alias:
+            variants.append({**args, "command": "pytest"})
+        for variant in variants:
+            for source, rules in [*self.layers.items(), ("default", self._default_rules())]:
+                for index, rule in enumerate(rules):
+                    if self._tool_matches(rule.tool, tool_name) and self._context_matches(rule, variant, project_trusted):
+                        choose = not selected and source == decision.source and rule == decision.rule
+                        match = {"source": source, "index": index, "tool": rule.tool, "action": rule.action,
+                                 "selected": choose}
+                        if ordinary_alias:
+                            match["command"] = variant["command"]
+                        matches.append(match)
+                        selected |= choose
         result = {"tool": tool_name, "project_trusted": project_trusted, "action": decision.action,
                   "source": decision.source, "reason": decision.reason, "matches": matches,
                   "semantics": "All matching forbids win; otherwise first per layer, ask wins across layers. No tool was run."}
+        if ordinary_alias:
+            result["semantics"] += " The check alias also preserves pytest deny/ask rules."
         if tool_name == "patch_files" and isinstance(args.get("patches"), list) and 1 <= len(args["patches"]) <= 16:
             result["batch_items"] = [{"path": patch.get("path"), **self.explain("patch_file", patch, project_trusted=project_trusted)}
                                      for patch in args["patches"] if isinstance(patch, dict)]

@@ -1031,19 +1031,23 @@ class TaskRunner:
                        check_observation=None) -> StepFailure:
         """Trusted host check result for this attempt; never inferred from text."""
         from atomic_flow.agents.step_evidence import manifest_digest
+        # The command alias does not choose a runner. Its host observation must
+        # pass the same immutable obligation and completed-failure gate below.
+        if check == "check" and self.check_obligation is not None:
+            check = "pytest"
         if type(exit_code) is not int or exit_code != 1 or check not in {"syntax", "pytest", "ruff", "mypy"}:
             return StepFailure(step.index, message, "check_unavailable")
         if self.changeset is None or step.started_at is None:
             return StepFailure(step.index, message, "verification_contract_failure")
+        current = manifest_digest(self.changeset.validate_workspace())
         if self.check_obligation is not None and check == "pytest":
             from atomic_flow.check_obligation import failed_observation_matches
-            current = manifest_digest(self.changeset.validate_workspace())
             if (checked_revision != current
                     or not failed_observation_matches(self.check_obligation, check_observation, current)):
                 return StepFailure(step.index, "host obligation failure is incomplete, unavailable or stale", "check_unavailable")
         evidence = {"version": 1, "check": check, "exit_code": exit_code, "step_index": step.index,
                     "started_at": step.started_at, "outcome": "failed",
-                    "source_revision": manifest_digest(self.changeset.validate_workspace())}
+                    "source_revision": current}
         evidence["checked_source_revision"] = checked_revision or evidence["source_revision"]
         return StepFailure(step.index, message,
                            "deterministic_test_failure" if check == "pytest" else "deterministic_check_failure", evidence)

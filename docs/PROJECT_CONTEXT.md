@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+28 октября: completed-check repair guard принят в public Docker journey CI40633693098 на4285540; raw artifact SHA проверен, один replan и точные опубликованные байты подтверждены. Main/interoperability CI зелёные. Command=check с host-only runner и сохранением pytest deny/ask подготовлен; новая матрица двух команд ещё ожидается. P07 OPEN; provider calls=0. Подробности: P07_COMPLETED_CHECK_GUARD_2026-10-28.md.
+
 27 октября:30/30isolatedкалибровок приняты; coupled2-file publicTaskRunner CI40546120074 принят. NativeSymPyCheckSpec boundary CI40549454212 наe026fe9 принят под1GiB/128PID:FAIL→editedPASS→requiredSKIPrefused; archive/rawhash/cleanup проверены. Это syntheticordinarychecker, неfullhistoricalTaskRunner/modelquality. P07OPEN, новыхprovidercallsнет.
 
 27 октября: **30/30 сред калиброваны**. ПоследнийRequests863 CI40541137888 на3101b3c:106ordinarytests/65requirements, base/wrongFAIL толькоhook-тест, gold106PASS; source/hash/namespace/regressions/cleanup проверены. Архив12751400315 SHA256013e9f71a49576dc5f3e5a6e9fc361a5bfba888e344c0de787f8628ffddd1d41. P07OPEN: полныйhistoricalin-looprunner, matchedpairs/holdout/ablations/finalreview ещётребуются. Новыхprovidercalls/spendнет.

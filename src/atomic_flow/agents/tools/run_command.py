@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from atomic_flow.agents.base import Tool
 from atomic_flow.agents.context import ToolContext
@@ -20,29 +20,35 @@ ALLOWED = {
 
 
 class RunCommandArgs(BaseModel):
-    command: Literal["pytest", "ruff", "mypy"]
+    model_config = ConfigDict(extra="forbid")
+
+    command: Literal["check", "pytest", "ruff", "mypy"]
     target: str = Field(default="", description="Optional path/pattern inside the project.")
 
 
 class RunCommandTool(Tool):
     name = "run_command"
     description = (
-        "Run one of the project's quality tools: pytest, ruff, or mypy. "
+        "Run the full host ordinary-test obligation with check, or quality tools pytest, ruff, or mypy. "
         "Commands come from a fixed list; arbitrary shell is unavailable."
     )
     args_schema = RunCommandArgs
 
     def run(self, args: RunCommandArgs, ctx: ToolContext) -> dict[str, Any]:
-        if ctx.check_obligation is not None and args.command == "pytest":
+        if args.command == "check" and ctx.check_obligation is None:
+            return {"command": args.command, "error": "check requires a host ordinary-test obligation"}
+        if ctx.check_obligation is not None and args.command in {"check", "pytest"}:
             from atomic_flow.check_obligation import check_observation, run_obligation_check
             if args.target:
-                return {"command": "pytest", "error": "host ordinary-test obligation cannot be narrowed"}
+                return {"command": args.command, "error": "host ordinary-test obligation cannot be narrowed"}
+            if args.command == "pytest" and ctx.check_obligation.template.runner != "pytest":
+                return {"command": args.command, "error": "native host obligation requires command check"}
             ctx.cancel_check()
             with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
                 spec, receipt = run_obligation_check(ctx.check_obligation, check_root, cancel_check=ctx.cancel_check)
             result = receipt.result
             observation = check_observation(ctx.check_obligation, spec, receipt)
-            return sanitize_output({"command": "pytest", "exit_code": result.returncode,
+            return sanitize_output({"command": args.command, "exit_code": result.returncode,
                                     **observation, "timed_out": result.timed_out,
                                     "error": "" if receipt.check_passed else "complete host test obligation failed or incomplete",
                                     "stdout": result.stdout[-4000:], "stderr": result.stderr[-2000:], "index_revision": ctx.revision})

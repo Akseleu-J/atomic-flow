@@ -1,0 +1,10 @@
+{
+  "status": "accepted_synthetic_public_journey",
+  "run_id": 40633693098,
+  "tested_commit": "4285540d087b87be49e23ccd7fb03ba0a87e4203",
+  "artifact_id": 12792532996,
+  "zip_sha256": "caef323495192db6a302b4d704140f359f7e50a2787e19da2313383e496d921b",
+  "provider_calls": 0,
+  "hidden_oracle": "not_run",
+  "failure_kind": "deterministic_test_failure"
+}
