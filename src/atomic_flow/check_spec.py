@@ -13,6 +13,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Literal
 
+from atomic_flow.check_fixture import FixtureIdentity, PrivatePytestIdentity
 from atomic_flow.check_pytest_self import PytestSelfIdentity
 from atomic_flow.check_runtime import RuntimeIdentity
 
@@ -112,6 +113,8 @@ class CheckSpec:
     sympy_identity: SymPyRunnerIdentity | None = None
     pytest_self_identity: PytestSelfIdentity | None = None
     runtime_identity: RuntimeIdentity | None = None
+    private_pytest_identity: PrivatePytestIdentity | None = None
+    fixture_identity: FixtureIdentity | None = None
 
     def __post_init__(self) -> None:
         if type(self.task_id) is not str or _TASK.fullmatch(self.task_id) is None:
@@ -156,6 +159,21 @@ class CheckSpec:
         if (self.pytest_self_identity is not None and self.runtime_identity is not None
                 and self.pytest_self_identity.python_version != self.runtime_identity.python_version):
             raise ValueError("pytest self Python version differs from the private runtime identity")
+        if self.private_pytest_identity is not None:
+            identity = self.private_pytest_identity
+            runtime = self.runtime_identity
+            if (type(identity) is not PrivatePytestIdentity or self.runner != "pytest"
+                    or runtime is None or identity.task_id != self.task_id
+                    or identity.runtime_digest != runtime.digest or identity.python_version != runtime.python_version):
+                raise ValueError("private pytest identity differs from its exact task/runtime/runner")
+        if self.fixture_identity is not None:
+            fixture = self.fixture_identity
+            identity = self.private_pytest_identity
+            runtime = self.runtime_identity
+            if (type(fixture) is not FixtureIdentity or identity is None or runtime is None
+                    or fixture.task_id != self.task_id or fixture.variant != identity.variant
+                    or fixture.runtime_digest != runtime.digest or fixture.image_id != runtime.image_id):
+                raise ValueError("fixture identity differs from its exact private task/runtime")
         _integer("timeout_seconds", self.timeout_seconds, 180)
         if type(self.resources) is not CheckResources:
             raise ValueError("resource bounds must use the immutable host contract")
@@ -164,6 +182,8 @@ class CheckSpec:
     def argv(self) -> tuple[str, ...]:
         """Exact non-shell argv; native execution additionally requires host runner identity."""
         if self.runner == "pytest":
+            if self.private_pytest_identity is not None:
+                return (self.interpreter, "-m", "pytest", *self.private_pytest_identity.plugin_args, *self.test_paths)
             return (self.interpreter, "-m", "pytest", "-q", "--no-header", "-x", *self.test_paths)
         if self.runner == "pytest-self":
             profile = ("--tb=short",) if self.pytest_self_identity is not None and self.pytest_self_identity.traceback == "short" else ()
@@ -186,6 +206,10 @@ class CheckSpec:
             value["pytest_self_identity"] = self.pytest_self_identity.as_dict()
         if self.runtime_identity is not None:
             value["runtime_identity"] = self.runtime_identity.as_dict()
+        if self.private_pytest_identity is not None:
+            value["private_pytest_identity"] = self.private_pytest_identity.as_dict()
+        if self.fixture_identity is not None:
+            value["fixture_identity"] = self.fixture_identity.as_dict()
         return value
 
     def canonical_bytes(self) -> bytes:

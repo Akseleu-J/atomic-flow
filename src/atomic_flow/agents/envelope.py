@@ -61,6 +61,9 @@ def runtime_digest(config, project: Path, backend=None, *, check_obligation=None
     from atomic_flow.config import is_trusted, user_dir
 
     settings = config.model_dump(mode="json")
+    # Optional strategy identity must not change historical Atomic digest bytes.
+    if settings.get("task", {}).get("execution_strategy") is None:
+        settings.get("task", {}).pop("execution_strategy", None)
     for entry in settings.get("backends", {}).values():
         entry.pop("api_key", None)
     selected = None

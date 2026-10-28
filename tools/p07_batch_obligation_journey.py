@@ -26,7 +26,7 @@ from atomic_flow.tree.builder import build_tree, save_tree
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def journey(output, command="pytest", *, backend_factory=None):
+def journey(output, command="pytest", *, backend_factory=None, runner_factory=None):
     if command not in {"pytest", "check"}:
         raise ValueError("fixed host-check command required")
     if platform.system() != "Linux" or output.exists():
@@ -87,7 +87,8 @@ def journey(output, command="pytest", *, backend_factory=None):
             config.task.max_replans = 1
             config.task.max_model_calls = 40
             config.task.max_budget_usd = 1
-            runner = TaskRunner(config, project, backend, approval_callback=lambda *args: True, check_obligation=obligation)
+            runner_type = TaskRunner if runner_factory is None else runner_factory
+            runner = runner_type(config, project, backend, approval_callback=lambda *args: True, check_obligation=obligation)
             task = runner.run_plan("Rename original to renamed consistently across a.py and b.py and pass the existing ordinary test",
                                    Plan(steps=[PlanStep(description="Check sample requirement and repair if needed",
                                          tools_needed=["read_file", "patch_files", "run_command"], verify_with="pytest", scope_paths=["a.py", "b.py"])]),
@@ -100,7 +101,7 @@ def journey(output, command="pytest", *, backend_factory=None):
                     or not task.completion_report.get("ready_to_publish")
                     or task.completion_report.get("check_obligation_digest") != obligation.digest):
                 raise ValueError("public source-bound failure/repair/publication journey did not qualify")
-            if backend_factory is not None:
+            if backend_factory is not None or runner_factory is not None:
                 report["graph_sync"] = task.graph_sync
                 report["budget_events"] = task.budget_events
                 report["budget_spent_usd"] = task.budget_spent

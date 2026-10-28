@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "p07_model_response",
+  "call_id": "mq_d6b49f5aafd94efdaabe2e9baa053fb2",
+  "request_sha256": "7db23cbe2347e8a42ead051477547b4680fe7181e1c3d50f1f2801f3ce15e690",
+  "identity_sha256": "0fe5311f5fb3af6e5e152621b969645c8a3894c32b0ce292be4a30a6cac04d7e",
+  "state": "completed",
+  "result": {
+    "content": "{\"status\":\"ok\"}",
+    "tokens_in": 25,
+    "tokens_out": 11,
+    "cost_usd": "0.00016",
+    "latency_ms": 1094,
+    "truncated": false,
+    "cost_source": "provider",
+    "resolved_backend": "kaggle_model_proxy",
+    "resolved_model": "anthropic/claude-sonnet-5@default",
+    "attempt_id": "mq_d6b49f5aafd94efdaabe2e9baa053fb2"
+  },
+  "error_code": "none",
+  "response_sha256": "c3888e6039bfa20bb0eab6959e915c783a642286352239fbc3920627e78782f5"
+}

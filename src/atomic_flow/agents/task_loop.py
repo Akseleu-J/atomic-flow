@@ -70,11 +70,15 @@ class StepFailure(Exception):
 
 
 class TaskRunner:
+    execution_strategy = None
+
     def __init__(self, config: AtomicConfig | None, project: Path, backend, approval_callback=None, question_callback=None,
                  capability_factory=None, resource_limits: ProjectLimits | None = None, *, check_obligation=None):
         if resource_limits is not None and not isinstance(resource_limits, ProjectLimits):
             raise TypeError("resource_limits must be host-owned ProjectLimits")
         self.config = config if config is not None else AtomicConfig()
+        if self.config.task.execution_strategy != self.execution_strategy:
+            raise ValueError("task execution strategy differs from the host runner")
         self.project = project
         from atomic_flow.check_obligation import CheckObligation
         if check_obligation is not None:
@@ -790,20 +794,7 @@ class TaskRunner:
                 "task_budget_cap_usd": self.config.task.max_budget_usd,
                 "observations": [{"index": s.index, "status": s.status, "receipt": s.evidence.get("digest", "")}
                                  for s in task.steps][-16:]}, ensure_ascii=False)
-            new_plan = replan_task(
-                task.query,
-                completed=[f"{s.index + 1}. {s.description}" for s in task.steps if s.status == "done"],
-                failed_description=step.description,
-                verify_with=step.verify_with,
-                error=step.result_summary,
-                remaining=[f"{s.index + 1}. {s.description}" for s in task.steps
-                               if s.index != step.index and s.status not in {"done", "superseded"}],
-                project_root=self.changeset.workspace,
-                backend=self.task_backend,
-                settings_project=self.project,
-                requirements_context=requirements_context,
-                planning_context=planning_context,
-            )
+            new_plan = self._choose_replacement_plan(task, step, requirements_context, planning_context)
         except BudgetExceeded as exc:
             task.status, task.error = "paused", str(exc)
             save(task)
@@ -904,6 +895,23 @@ class TaskRunner:
         save(task)
         return task
 
+
+    def _choose_replacement_plan(self, task: Task, step: Step, requirements_context: str, planning_context: str) -> Plan:
+        """Default model planner; host variants retain the surrounding repair gates."""
+        return replan_task(
+            task.query,
+            completed=[f"{s.index + 1}. {s.description}" for s in task.steps if s.status == "done"],
+            failed_description=step.description,
+            verify_with=step.verify_with,
+            error=step.result_summary,
+            remaining=[f"{s.index + 1}. {s.description}" for s in task.steps
+                           if s.index != step.index and s.status not in {"done", "superseded"}],
+            project_root=self.changeset.workspace,
+            backend=self.task_backend,
+            settings_project=self.project,
+            requirements_context=requirements_context,
+            planning_context=planning_context,
+        )
 
     def _read_plan(self, task: Task, workspace, step: Step | None = None) -> str:
         """Host-computed advisory read order for the approved paths (P04).
@@ -1041,6 +1049,10 @@ class TaskRunner:
                             tool_registry=capabilities.tool_registry, role_tools=capabilities.role_tools,
                             check_obligation=self.check_obligation)
         result = orch.answer(subquery, mode="medium", approve_edits=True, retrieval_query=base_query)
+        self._accept_step_result(task, step, result, effective_scope)
+
+    def _accept_step_result(self, task: Task, step: Step, result, effective_scope) -> None:
+        """Common applied-byte tracking and unchanged verification for host executors."""
         self._step_tool_calls[step.index] = result.tool_calls or []
         step.request_id = result.ledger_id
         if self.changeset:

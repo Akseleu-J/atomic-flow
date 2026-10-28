@@ -141,6 +141,7 @@ def _binding(spec: CheckSpec, identity: PrivatePytestIdentity, nonce: str) -> di
     runtime.require_execution_eligible()
     if (spec.runner != "pytest" or runtime.runner != "pytest" or spec.task_id != identity.task_id
             or runtime.digest != identity.runtime_digest or runtime.python_version != identity.python_version
+            or (spec.private_pytest_identity is not None and spec.private_pytest_identity != identity)
             or spec.image != runtime.image_id or spec.interpreter != runtime.interpreter):
         raise ValueError("private pytest task/runtime/version binding differs")
     files = dict(identity.installed_files)
