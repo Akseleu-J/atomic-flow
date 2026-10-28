@@ -1,0 +1,84 @@
+{
+  "cases": [
+    {
+      "case": "base_fail",
+      "check_passed": false,
+      "process_exit": 1,
+      "source_after": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+      "source_before": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+      "status": "expected_private_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d5d2b99e477901eaba480acef81f8071086fcc4cfc8b32b83756f1bbebf4e024",
+      "verified_success": false
+    },
+    {
+      "case": "edited_pass",
+      "check_passed": true,
+      "process_exit": 0,
+      "source_after": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae",
+      "source_before": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae",
+      "status": "expected_private_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "5d8f6aa9ac07f3d982b68c316494e137a6173a8c5e52fc85bf53bc01d408dc20",
+      "verified_success": false
+    }
+  ],
+  "cleanup": [
+    {
+      "confirmed": true,
+      "container": "p07-private-source-3708a594c07641a9b21bc74a",
+      "remove_exit": 0
+    },
+    {
+      "confirmed": true,
+      "container": "p07-private-inventory-e7f49f8e525d4b70a49b24bf",
+      "remove_exit": 0
+    }
+  ],
+  "cleanup_confirmed": true,
+  "current_case": "required_skip",
+  "error": "One complete private native receipt required",
+  "error_type": "ValueError",
+  "full_source_file_count": 1733,
+  "full_source_revision": "5919863b4a5d047e5d632dc6c4eb72166874c9df0e655c57de8cd6216a717ed2",
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "provider_calls": 0,
+  "runtime_digest": "d2b93caacdebda1b387d59f57f4b8cabec24b40671311723604935a8ec343f55",
+  "scope": "private Python3.6 synthetic syntax and native CheckSpec boundary",
+  "status": "not_qualified",
+  "sympy_identity": {
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "source_sha256": {
+      "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+      "bin/test": "973e3cf784388b8e7821e4962da8eeb4b615447cd652af920452b322bd63588c",
+      "sympy/utilities/runtests.py": "f3ebc3f4677d84d64b7e52ea5129522b2b5233fd2937fe5857fbe8244dfcf95c"
+    },
+    "sympy_version": "1.1.2.dev"
+  },
+  "syntax": [
+    {
+      "case": "valid36",
+      "outcome": "passed",
+      "source_after": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae",
+      "source_before": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae"
+    },
+    {
+      "case": "walrus_rejected",
+      "outcome": "failed",
+      "source_after": "80cb0cf37a4510aa491526af4cd8a0792ff01ed7934e243166a82dcbe22427f6",
+      "source_before": "80cb0cf37a4510aa491526af4cd8a0792ff01ed7934e243166a82dcbe22427f6"
+    }
+  ],
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "9dc0cfad9e2ae41335c76c88de9da0da1bb5f596",
+  "verified_success": false,
+  "version_source": "sympy/release.py"
+}

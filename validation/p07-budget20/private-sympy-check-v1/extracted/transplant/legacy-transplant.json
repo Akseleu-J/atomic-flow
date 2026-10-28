@@ -1,0 +1,329 @@
+{
+  "after": {
+    "diff": "",
+    "head": "767245d8655ff89a6ada9fccfb31faf84c333cd6",
+    "status": ""
+  },
+  "base_commit": "84c125972ad535b2dfb245f8d311d347b45e5b8a",
+  "base_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+  "base_image_inspect": {
+    "Architecture": "amd64",
+    "Author": "",
+    "Comment": "buildkit.dockerfile.v0",
+    "Config": {
+      "AttachStderr": false,
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "Cmd": [
+        "/bin/bash"
+      ],
+      "Domainname": "",
+      "Entrypoint": null,
+      "Env": [
+        "PATH=/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "TZ=Etc/UTC"
+      ],
+      "Hostname": "",
+      "Image": "",
+      "Labels": {
+        "org.opencontainers.image.version": "22.04"
+      },
+      "OnBuild": null,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Tty": false,
+      "User": "",
+      "Volumes": null,
+      "WorkingDir": "/testbed/"
+    },
+    "Created": "2026-08-15T08:08:29.386597505Z",
+    "DockerVersion": "",
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/35c4cc4628a5793d9b0b1bb268c197fdffcb3baa166a2efe9ed044228621d327/diff:/var/lib/docker/overlay2/31a4f529cd32c645e09f640e26f485aaba9d23f3cec3dd8bcba412bc13f6b6a8/diff:/var/lib/docker/overlay2/b7d10e6c89333cc0fba6498bf6930d6bb4bb158152100000876515efd63f66bb/diff:/var/lib/docker/overlay2/1f85a5c5d1ac32ad9d57e27a8ccfbf985169b07e1efa2c5bf4d74f650921e991/diff:/var/lib/docker/overlay2/0f2f20e9640e2a81f4e24d941c2be1035ba4ac6546c91288f2f87ce5ec2999de/diff:/var/lib/docker/overlay2/303fcac974b27a350daeb9b96bf5ae41bfd0fd8bbdb681497532490a1446f6de/diff:/var/lib/docker/overlay2/4851680e2c290ebdd3bba853d41406af969c3491b1a789b9e3ac21f90ecc4146/diff:/var/lib/docker/overlay2/8bc9ed0a76557641f0892c54c9bb32ed70edc6c61ba01685b666d99c24333e21/diff:/var/lib/docker/overlay2/5c6537ebbca2ef71f2dc59c4bab71e6f6f8136efec46bbf3cac02509dd851176/diff",
+        "MergedDir": "/var/lib/docker/overlay2/85a2cbe74ec808d62c86c45ecea8935dd10d25141663229a698b52d97a8deb37/merged",
+        "UpperDir": "/var/lib/docker/overlay2/85a2cbe74ec808d62c86c45ecea8935dd10d25141663229a698b52d97a8deb37/diff",
+        "WorkDir": "/var/lib/docker/overlay2/85a2cbe74ec808d62c86c45ecea8935dd10d25141663229a698b52d97a8deb37/work"
+      },
+      "Name": "overlay2"
+    },
+    "Id": "sha256:59ccf914ab15876ca87accbbb2139e1c4a111840d44d2671ae3bf27a7f54d6b1",
+    "Metadata": {
+      "LastTagTime": "0001-01-01T00:00:00Z"
+    },
+    "Os": "linux",
+    "Parent": "",
+    "RepoDigests": [
+      "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a"
+    ],
+    "RepoTags": [],
+    "RootFS": {
+      "Layers": [
+        "sha256:beb59027b96ddbf30ac9c80b527668fe7011f4f553fe83f5e59199e9a84fb5ca",
+        "sha256:8b070dae4fd6562cc7272d3392d3e5d0eb54aebbabe7992ea47407c02a7e4ab5",
+        "sha256:e41dda3ddff433b42bc5c7db367e9a89b90e42702b2204ac3748eff0661fed5d",
+        "sha256:77dfb20914dd629938c812a6dbd69d5523e3eca3798e570ceee0b09b0e9f8eeb",
+        "sha256:73f1203e53826763f5480b23ca857212005fd21f7fbfb1df5f40641c278d0802",
+        "sha256:9f91f535caf3186b2a7f093b2f8bc4e3a6605e119e563b7e49fb81415185125d",
+        "sha256:e3120eb1e4cf8aec908f688cf2d297732712cf4f7ab9ee0d516e8b8d4798e0c3",
+        "sha256:530d89bd2b9740fb615e0e50a53225c1c8338e75d1ca5f0e94459955da525cc9",
+        "sha256:e6bbeb6b9c95785aa8aa4b0ffe3ca9738d84919bc81be5fd6889fd92dd5415b5",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ],
+      "Type": "layers"
+    },
+    "Size": 2748063282
+  },
+  "before": {
+    "diff": "",
+    "head": "767245d8655ff89a6ada9fccfb31faf84c333cd6",
+    "status": ""
+  },
+  "calibrated": false,
+  "cleanup": [
+    {
+      "confirmed": true,
+      "container": "p07-transplant-6ef3d6f37f1044ed88d40773",
+      "exit": 0
+    },
+    {
+      "confirmed": true,
+      "container": "p07-transplant-a1ca979e0dd84173a5e94421",
+      "exit": 0
+    }
+  ],
+  "cleanup_confirmed": true,
+  "dockerfile_sha256": "1a36c4844f73fa3eacc5dc5c2dd4f0bc3438702c5fb55fe598ca38e5b8a8a23c",
+  "donor_image": "library/python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2",
+  "donor_image_inspect": {
+    "Architecture": "amd64",
+    "Author": "",
+    "Comment": "",
+    "Config": {
+      "AttachStderr": false,
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "Cmd": [
+        "python3"
+      ],
+      "Domainname": "",
+      "Entrypoint": null,
+      "Env": [
+        "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=C.UTF-8",
+        "GPG_KEY=0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D",
+        "PYTHON_VERSION=3.6.15",
+        "PYTHON_PIP_VERSION=21.2.4",
+        "PYTHON_SETUPTOOLS_VERSION=57.5.0",
+        "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/3cb8888cc2869620f57d5d2da64da38f516078c7/public/get-pip.py",
+        "PYTHON_GET_PIP_SHA256=c518250e91a70d7b20cceb15272209a4ded2a0c263ae5776f129e0d9b5674309"
+      ],
+      "Hostname": "",
+      "Image": "sha256:9da4cb957bd5a34666322bdd7ac329c52cc6f546bc1ae946b19e1091711a2244",
+      "Labels": null,
+      "OnBuild": null,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Tty": false,
+      "User": "",
+      "Volumes": null,
+      "WorkingDir": ""
+    },
+    "Created": "2021-12-21T12:29:38.036669692Z",
+    "DockerVersion": "20.10.7",
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/b21d49e34acd7e3684c8f2abb4d7804a04e94ae6929bad996f758c9a660c55a4/diff:/var/lib/docker/overlay2/3fff6ab42e18ea47628d6c7048db802191f5c26dabbc9d3ce3b9582b4396fed3/diff:/var/lib/docker/overlay2/0680195587f6c078ca2531cf56e2c4b24831b584fdff65c71cb05a1c172aaa44/diff:/var/lib/docker/overlay2/5a5a7307fce2852398148edd145bc1698a6ae2a635263f984fa327628a732faa/diff",
+        "MergedDir": "/var/lib/docker/overlay2/79c28e4152a46bac7ea193b3ddefabd1825445d562bcdb87e953ce79fec0e8b9/merged",
+        "UpperDir": "/var/lib/docker/overlay2/79c28e4152a46bac7ea193b3ddefabd1825445d562bcdb87e953ce79fec0e8b9/diff",
+        "WorkDir": "/var/lib/docker/overlay2/79c28e4152a46bac7ea193b3ddefabd1825445d562bcdb87e953ce79fec0e8b9/work"
+      },
+      "Name": "overlay2"
+    },
+    "Id": "sha256:dc468cf655a42fccd7f2bb1549e9d43d69c1e0a7dbff5457fb45de19e124ed6d",
+    "Metadata": {
+      "LastTagTime": "0001-01-01T00:00:00Z"
+    },
+    "Os": "linux",
+    "Parent": "",
+    "RepoDigests": [
+      "python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2"
+    ],
+    "RepoTags": [],
+    "RootFS": {
+      "Layers": [
+        "sha256:ad6b69b549193f81b039a1d478bc896f6e460c77c1849a4374ab95f9a3d2cea2",
+        "sha256:c42229255bc94b196a4d5aeb50642c842815cc0352baa851d1c65cbe365b384b",
+        "sha256:82baccdbb0707481406c96e8f95bbbf50c5c8b6705182a59b9b0228fbecbb96a",
+        "sha256:64978906fbf179110fdca2b0cfa439da3260951e3b3528ddd89ce36a48e690d6",
+        "sha256:e30df7d241f6e0435d003652dab5d7804dcbd5822a7deafbc337e85227bd0fcc"
+      ],
+      "Type": "layers"
+    },
+    "Size": 111818893
+  },
+  "image_id": "sha256:b0ae16163746903ad198775bb85f26d153a10f7503abfced70b29b2fe9746c34",
+  "image_inspect": {
+    "Architecture": "amd64",
+    "Author": "",
+    "Comment": "buildkit.dockerfile.v0",
+    "Config": {
+      "AttachStderr": false,
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "Cmd": [
+        "/bin/bash"
+      ],
+      "Domainname": "",
+      "Entrypoint": null,
+      "Env": [
+        "PATH=/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "TZ=Etc/UTC"
+      ],
+      "Hostname": "",
+      "Image": "",
+      "Labels": {
+        "atomic.p07.legacy.base": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+        "atomic.p07.legacy.donor": "library/python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2",
+        "atomic.p07.legacy.launcher": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+        "org.opencontainers.image.version": "22.04"
+      },
+      "OnBuild": null,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Tty": false,
+      "User": "root",
+      "Volumes": null,
+      "WorkingDir": "/testbed/"
+    },
+    "Created": "2026-10-28T11:09:32.631940368Z",
+    "DockerVersion": "",
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/u2dkp35dtjqmjdltt7md3xy5f/diff:/var/lib/docker/overlay2/2l2mcgi8x1gmpgli17lpui61d/diff:/var/lib/docker/overlay2/b03qqoh30yhm5p98m80mgtqco/diff:/var/lib/docker/overlay2/uah4x5hdw52hlvp0kfylkfum9/diff:/var/lib/docker/overlay2/85a2cbe74ec808d62c86c45ecea8935dd10d25141663229a698b52d97a8deb37/diff:/var/lib/docker/overlay2/35c4cc4628a5793d9b0b1bb268c197fdffcb3baa166a2efe9ed044228621d327/diff:/var/lib/docker/overlay2/31a4f529cd32c645e09f640e26f485aaba9d23f3cec3dd8bcba412bc13f6b6a8/diff:/var/lib/docker/overlay2/b7d10e6c89333cc0fba6498bf6930d6bb4bb158152100000876515efd63f66bb/diff:/var/lib/docker/overlay2/1f85a5c5d1ac32ad9d57e27a8ccfbf985169b07e1efa2c5bf4d74f650921e991/diff:/var/lib/docker/overlay2/0f2f20e9640e2a81f4e24d941c2be1035ba4ac6546c91288f2f87ce5ec2999de/diff:/var/lib/docker/overlay2/303fcac974b27a350daeb9b96bf5ae41bfd0fd8bbdb681497532490a1446f6de/diff:/var/lib/docker/overlay2/4851680e2c290ebdd3bba853d41406af969c3491b1a789b9e3ac21f90ecc4146/diff:/var/lib/docker/overlay2/8bc9ed0a76557641f0892c54c9bb32ed70edc6c61ba01685b666d99c24333e21/diff:/var/lib/docker/overlay2/5c6537ebbca2ef71f2dc59c4bab71e6f6f8136efec46bbf3cac02509dd851176/diff",
+        "MergedDir": "/var/lib/docker/overlay2/3b4eli1wmpdhuk7ftqa6r64pq/merged",
+        "UpperDir": "/var/lib/docker/overlay2/3b4eli1wmpdhuk7ftqa6r64pq/diff",
+        "WorkDir": "/var/lib/docker/overlay2/3b4eli1wmpdhuk7ftqa6r64pq/work"
+      },
+      "Name": "overlay2"
+    },
+    "Id": "sha256:b0ae16163746903ad198775bb85f26d153a10f7503abfced70b29b2fe9746c34",
+    "Metadata": {
+      "LastTagTime": "2026-10-28T11:09:35.901286863Z"
+    },
+    "Os": "linux",
+    "Parent": "",
+    "RepoDigests": [],
+    "RepoTags": [
+      "p07-legacy-transplant:1ab04647cf1f48608f3dee8b76d96c1f"
+    ],
+    "RootFS": {
+      "Layers": [
+        "sha256:beb59027b96ddbf30ac9c80b527668fe7011f4f553fe83f5e59199e9a84fb5ca",
+        "sha256:8b070dae4fd6562cc7272d3392d3e5d0eb54aebbabe7992ea47407c02a7e4ab5",
+        "sha256:e41dda3ddff433b42bc5c7db367e9a89b90e42702b2204ac3748eff0661fed5d",
+        "sha256:77dfb20914dd629938c812a6dbd69d5523e3eca3798e570ceee0b09b0e9f8eeb",
+        "sha256:73f1203e53826763f5480b23ca857212005fd21f7fbfb1df5f40641c278d0802",
+        "sha256:9f91f535caf3186b2a7f093b2f8bc4e3a6605e119e563b7e49fb81415185125d",
+        "sha256:e3120eb1e4cf8aec908f688cf2d297732712cf4f7ab9ee0d516e8b8d4798e0c3",
+        "sha256:530d89bd2b9740fb615e0e50a53225c1c8338e75d1ca5f0e94459955da525cc9",
+        "sha256:e6bbeb6b9c95785aa8aa4b0ffe3ca9738d84919bc81be5fd6889fd92dd5415b5",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+        "sha256:cb82ceb702afe422e3656ada57de962ab3daab72ff282edb769daa6db82a2f37",
+        "sha256:c7b2937411222f61bb3add15b403804ee1699d68be617e588b2c8b1fc0699938",
+        "sha256:e4a812af3658737a348ee110fce4f00542ad61125abc709fd2cb7497af1f44a5",
+        "sha256:bc42cff2a8747d35c8ac6ac2cf2718a89340e335cb2fa1b0fe73344e226f8b0b",
+        "sha256:3cdf9f6d7ad8cce91c7b78d800abf7e077dbb266a26e361c17bd4c2383147826"
+      ],
+      "Type": "layers"
+    },
+    "Size": 2819524057
+  },
+  "launcher": "/opt/p07-runtime/python36",
+  "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+  "model_calls": 0,
+  "observed": {
+    "base_prefix": "/opt/p07-python36",
+    "executable": "/opt/p07-python36/bin/python3.6",
+    "imports": {
+      "bz2": {
+        "path": "/opt/p07-python36/lib/python3.6/bz2.py",
+        "status": "imported"
+      },
+      "ctypes": {
+        "path": "/opt/p07-python36/lib/python3.6/ctypes/__init__.py",
+        "status": "imported"
+      },
+      "encodings": {
+        "path": "/opt/p07-python36/lib/python3.6/encodings/__init__.py",
+        "status": "imported"
+      },
+      "lzma": {
+        "path": "/opt/p07-python36/lib/python3.6/lzma.py",
+        "status": "imported"
+      },
+      "sqlite3": {
+        "path": "/opt/p07-python36/lib/python3.6/sqlite3/__init__.py",
+        "status": "imported"
+      },
+      "ssl": {
+        "path": "/opt/p07-python36/lib/python3.6/ssl.py",
+        "status": "imported"
+      }
+    },
+    "mapped_libraries": [
+      "/opt/p07-donor/lib/x86_64-linux-gnu/ld-2.28.so",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/libbz2.so.1.0.4",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/libc-2.28.so",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/libdl-2.28.so",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/liblzma.so.5.2.4",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/libm-2.28.so",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/libpthread-2.28.so",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/libutil-2.28.so",
+      "/opt/p07-donor/lib/x86_64-linux-gnu/libz.so.1.2.11",
+      "/opt/p07-donor/usr/lib/x86_64-linux-gnu/libcrypto.so.1.1",
+      "/opt/p07-donor/usr/lib/x86_64-linux-gnu/libffi.so.6.0.4",
+      "/opt/p07-donor/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+      "/opt/p07-donor/usr/lib/x86_64-linux-gnu/libssl.so.1.1",
+      "/opt/p07-python36/bin/python3.6",
+      "/opt/p07-python36/lib/libpython3.6m.so.1.0",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_bz2.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_ctypes.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_datetime.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_heapq.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_json.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_lzma.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_socket.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_sqlite3.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_ssl.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/_struct.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/binascii.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/math.cpython-36m-x86_64-linux-gnu.so",
+      "/opt/p07-python36/lib/python3.6/lib-dynload/select.cpython-36m-x86_64-linux-gnu.so"
+    ],
+    "prefix": "/opt/p07-python36",
+    "soabi": "cpython-36m-x86_64-linux-gnu",
+    "stdlib": "/opt/p07-python36/lib/python3.6",
+    "sys_path": [
+      "/opt/p07-python36/lib/python36.zip",
+      "/opt/p07-python36/lib/python3.6",
+      "/opt/p07-python36/lib/python3.6/lib-dynload",
+      "/opt/p07-python36/lib/python3.6/site-packages"
+    ],
+    "version": "3.6.15 (default, Dec 21 2021, 12:28:02) \n[GCC 8.3.0]",
+    "version_info": [
+      3,
+      6,
+      15
+    ]
+  },
+  "prefix": "/opt/p07-python36",
+  "probe_compatible": true,
+  "probe_sha256": "536d6ab485ad79b020d173389961be00b1b8691b8cf15621ee36beb189359e2c",
+  "process_exit": 0,
+  "provider_credentials": "none",
+  "status": "transplant_stdlib_qualified",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "e56aa756eecf0ce823644307e22dec2493f8e8a13789d53f03714b59fc502f5b",
+  "target_setup_or_tests_executed": false
+}

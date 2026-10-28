@@ -1,0 +1,21 @@
+{
+  "base_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+  "base_image_id": "sha256:59ccf914ab15876ca87accbbb2139e1c4a111840d44d2671ae3bf27a7f54d6b1",
+  "helper_sha256": "c30ae45db4c732d5cce5935389df8121c13bfaa76d6c67e0d80a53068877439d",
+  "image_id": "sha256:2e7bd5cd5f2ed4a621920a7423c745345b922a16e05ea3f5bc52e91d034fd5c0",
+  "interpreter": "/opt/p07-python36/bin/python3.6",
+  "inventory_sha256": "ca2164da16c614f2c78b17152e71dd15f67a536381de99996220fb135cc5a168",
+  "kind": "host_runtime_identity",
+  "launcher": "/opt/p07-runtime/python36",
+  "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+  "private_prefix": "/opt/p07-python36",
+  "profile_sha256": "821e48d06e7db5efd03bb59f3efc199826d1e83c23dc00d9e0ba98cc47eaee69",
+  "provisioning_receipt_sha256": "3fbd83150b7efd69f7aa5142a41cf958ef8ad76cd6dc642fd920791be55118b3",
+  "python_version": [
+    3,
+    6,
+    15
+  ],
+  "runner": "sympy-native",
+  "schema_version": 1
+}

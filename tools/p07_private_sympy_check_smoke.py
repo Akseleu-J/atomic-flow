@@ -21,7 +21,7 @@ from pathlib import Path
 import p07_legacy_transplant as transplant
 import p07_sympy13971_image as provision
 from p07_sympy13971_calibrate import RUNNER_SOURCES, runtime_admission
-from p07_sympy_check_smoke import MODULE_PATH, ORDINARY_TEST, SKIP_TEST, TEST_PATH, read_version
+from p07_sympy_check_smoke import MODULE_PATH, ORDINARY_TEST, TEST_PATH, read_version
 
 from atomic_flow.agents.execution import clean_environment, run_python
 from atomic_flow.agents.verify import check_source_revision
@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MARKER = "ATOMIC_CHECK_SPEC_RECEIPT:"
 WALRUS_SOURCE = "if (value := 42):\n    pass\n"
 VALID_SOURCE = "value = 42\n"
+SKIP_TEST = "from sympy.utilities.pytest import skip\n\ndef test_native_identity():\n    assert 1 + 1 == 2\n\ndef test_native_probe():\n    skip('synthetic required ordinary obligation')\n"
 
 
 def sha(raw):

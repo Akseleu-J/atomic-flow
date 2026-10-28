@@ -1,0 +1,9 @@
+{
+  "after_file_count": 1733,
+  "after_inventory_sha256": "a1e8eecdd1dd72e910ca1197578252fdfbd02553b92941e7aa676aebec141206",
+  "before_file_count": 1733,
+  "before_inventory_sha256": "a1e8eecdd1dd72e910ca1197578252fdfbd02553b92941e7aa676aebec141206",
+  "removed": [],
+  "retained_bytes_unchanged": true,
+  "scope": "copied disposable /testbed only; installed private runtime untouched"
+}

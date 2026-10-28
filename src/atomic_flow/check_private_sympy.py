@@ -112,6 +112,10 @@ body=stdout.value()
 errors=stderr.value()
 if not body.endswith('\n'):
     body+='\n'
+sys.stderr.write(errors)
+print('ATOMIC_SYMPY_BEGIN:'+nonce,flush=True)
+sys.stdout.write(body)
+print('ATOMIC_SYMPY_END:'+nonce,flush=True)
 summary=_parse_sympy_output(body,paths,code)
 receipt={'nonce':nonce,'root':root,'interpreter':sys.executable,
          'interpreter_resolved':os.path.realpath(sys.executable),'runner':'sympy-native',
@@ -126,10 +130,6 @@ receipt={'nonce':nonce,'root':root,'interpreter':sys.executable,
          'dependency_inventory_verification':'required_separately_by_host_admission',
          'warning_policy':['ignore::UserWarning','ignore::SyntaxWarning']}
 receipt.update(summary)
-sys.stderr.write(errors)
-print('ATOMIC_SYMPY_BEGIN:'+nonce,flush=True)
-sys.stdout.write(body)
-print('ATOMIC_SYMPY_END:'+nonce,flush=True)
 print('ATOMIC_CHECK_SPEC_RECEIPT:'+json.dumps(receipt,sort_keys=True),flush=True)
 complete=code==0 and not any(summary['counts'][name] for name in ('failed','exceptions','skipped','xpassed'))
 raise SystemExit(code if code else 0 if complete else 5)

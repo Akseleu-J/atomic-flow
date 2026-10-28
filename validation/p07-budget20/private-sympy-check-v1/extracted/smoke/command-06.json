@@ -1,0 +1,8 @@
+{
+  "command": [
+    "docker",
+    "create",
+    "--name"
+  ],
+  "exit_code": 0
+}

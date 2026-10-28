@@ -1,0 +1,11 @@
+{
+  "case": "edited_pass",
+  "check_passed": true,
+  "process_exit": 0,
+  "source_after": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae",
+  "source_before": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae",
+  "status": "expected_private_boundary_behavior",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "5d8f6aa9ac07f3d982b68c316494e137a6173a8c5e52fc85bf53bc01d408dc20",
+  "verified_success": false
+}
