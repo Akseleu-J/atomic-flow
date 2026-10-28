@@ -145,7 +145,13 @@ def verification_plan(files: dict[str, bytes], changed_paths: list[str]) -> dict
     from atomic_flow.graph.adapter_resource import resource_kind
     from atomic_flow.graph.project import clean_build
     from atomic_flow.graph.semantic import file_dependencies
-    supported = {p: raw for p, raw in files.items() if p.endswith((".py", ".pyi")) or resource_kind(p)}
+    # Graph adapters admit at most 1MB per file; the source workspace has a
+    # larger independent ceiling. An oversized advisory input is an explicit
+    # coverage omission, never permission to omit the full final test gate.
+    oversized = sorted(p for p, raw in files.items()
+                       if (p.endswith((".py", ".pyi")) or resource_kind(p)) and len(raw) > 1_000_000)
+    supported = {p: raw for p, raw in files.items()
+                 if (p.endswith((".py", ".pyi")) or resource_kind(p)) and len(raw) <= 1_000_000}
     omitted = sorted(set(files) - set(supported))
     build = clean_build(supported)
     deps = file_dependencies(build)
@@ -165,6 +171,7 @@ def verification_plan(files: dict[str, bytes], changed_paths: list[str]) -> dict
             "targeted_tests": sorted(set(targets)), "impact_status": "unknown" if unknown else "static_inferred",
             "unresolved": build["unresolved"], "runtime_coverage": "not_assessed",
             "omitted_unsupported": omitted,
+            "omitted_oversized": oversized,
             "loop_check": "full_pytest" if unknown or not targets else "targeted_pytest",
             "required_final_check": "full_pytest", "checks_executed": False,
             "source_digests": {p: __import__("hashlib").sha256(raw).hexdigest() for p, raw in sorted(files.items())}}
