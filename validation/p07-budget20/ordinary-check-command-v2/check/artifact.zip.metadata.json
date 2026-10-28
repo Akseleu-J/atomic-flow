@@ -1,0 +1,20 @@
+{
+  "id": 12792797656,
+  "node_id": "MDg6QXJ0aWZhY3QxMjc5Mjc5NzY1Ng==",
+  "name": "p07-batch-obligation-journey-check-4facbdb54cfbbeb52ba4be9d70c5d2d1f536f8b8",
+  "size_in_bytes": 7325,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12792797656",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12792797656/zip",
+  "expired": false,
+  "digest": "sha256:65e1cc83ec4ae53c4f6b777415225530a049db708f26cd4d44188864a99893a9",
+  "created_at": "2026-10-28T04:52:20Z",
+  "updated_at": "2026-10-28T04:52:20Z",
+  "expires_at": "2026-11-11T04:52:19Z",
+  "workflow_run": {
+    "id": 40634655989,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "4facbdb54cfbbeb52ba4be9d70c5d2d1f536f8b8"
+  }
+}

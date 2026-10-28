@@ -54,7 +54,14 @@ def read_version(workspace):
     raise ValueError("No admitted literal native SymPy version found; never import target on host")
 
 
-def smoke(output):
+def smoke(output, *, host_callback=None):
+    """Provision fixed byte source; optional callback is trusted host tooling only.
+
+    The CLI never accepts a callback, target code, or model-supplied hook.
+    Default triple execution and its output schema remain unchanged.
+    """
+    if host_callback is not None and not callable(host_callback):
+        raise TypeError("trusted host callback must be callable")
     if platform.system() != "Linux" or output.exists():
         raise ValueError("Fresh output on an approved Linux Docker worker required")
     calibration_raw = CALIBRATION.read_bytes()
@@ -138,54 +145,57 @@ def smoke(output):
                           version_source_sha256=sha((workspace / version_source).read_bytes()))
             if (workspace / MODULE_PATH).exists() or (workspace / TEST_PATH).exists():
                 raise ValueError("Synthetic source paths must be absent in the pinned image")
-            for label, value, test in (("base_fail", 1, ORDINARY_TEST), ("edited_pass", 42, ORDINARY_TEST),
-                                       ("required_skip", 42, SKIP_TEST)):
-                case = output / label
-                case.mkdir()
-                (workspace / MODULE_PATH).write_bytes(("value = " + str(value) + "\n").encode())
-                (workspace / TEST_PATH).write_bytes(test.encode())
-                revision = check_source_revision(workspace)
-                spec = CheckSpec(task_id="p07_native_synthetic_" + label, task_commit=report["tested_commit"],
-                                 base_commit=calibration["base_commit"], source_revision=revision,
-                                 image=IMAGE, interpreter=INTERPRETER, runner="sympy-native", test_paths=(TEST_PATH,),
-                                 target_root="/testbed", sympy_identity=identity)
-                save(case / "spec.json", spec.as_dict())
-                receipt = run_check_spec(spec, workspace)
-                save(case / "receipt.json", receipt.as_dict())
-                (case / "stdout.txt").write_bytes(receipt.result.stdout.encode())
-                (case / "stderr.txt").write_bytes(receipt.result.stderr.encode())
-                observations = [json.loads(line[len(MARKER):]) for line in receipt.result.stdout.splitlines() if line.startswith(MARKER)]
-                if len(observations) != 1:
-                    raise ValueError("Exactly one completed counted native observation required")
-                observed = observations[0]
-                expected_counts = {key: int(key == {"base_fail": "failed", "edited_pass": "passed", "required_skip": "skipped"}[label])
-                                   for key in ("passed", "failed", "skipped", "xfailed", "xpassed", "exceptions")}
-                expected_counts['passed'] += 1
-                expected_exit = {"base_fail": 1, "edited_pass": 0, "required_skip": 5}[label]
-                row = {"case": label, "check_passed": receipt.check_passed, "process_exit": receipt.result.returncode,
-                       "verified_success": receipt.verified_success, "source_before": receipt.source_before,
-                       "source_after": receipt.source_after, "spec_digest": spec.digest,
-                       "stdout_sha256": sha(receipt.result.stdout.encode()), "stderr_sha256": sha(receipt.result.stderr.encode()),
-                       "runner_receipt": observed, "cleanup": "confirmed_by_existing_executor_return"}
-                qualified = (receipt.source_before == receipt.source_after == revision == check_source_revision(workspace)
-                             and receipt.check_passed == (label == "edited_pass") and receipt.verified_success is False
-                             and receipt.result.returncode == expected_exit and not receipt.result.timed_out
-                             and not receipt.result.stdout_truncated and not receipt.result.stderr_truncated
-                             and observed.get("runner") == "sympy-native" and observed.get("finished") is True
-                             and observed.get("python_version") == [3, 9, 20] and observed.get("sympy_version") == version
-                             and observed.get("sympy_module") == "/testbed/sympy/__init__.py"
-                             and observed.get("files") == [TEST_PATH] and observed.get("collected") == 2
-                             and observed.get("counts") == expected_counts
-                             and observed.get("native_source_sha256") == dict(runner_hashes)
-                             and receipt.result.stdout.count("ATOMIC_SYMPY_BEGIN:") == 1
-                             and receipt.result.stdout.count("ATOMIC_SYMPY_END:") == 1)
-                row["status"] = "expected_native_boundary_behavior" if qualified else "boundary_mismatch"
-                report["cases"].append(row)
-                save(case / "result.json", row)
-            if len(report["cases"]) == 3 and all(row["status"] == "expected_native_boundary_behavior" for row in report["cases"]):
-                report["status"] = "native_sympy_check_boundary_qualified"
+            if host_callback is not None:
+                host_callback(workspace, identity, calibration, report, output)
+            else:
+                for label, value, test in (("base_fail", 1, ORDINARY_TEST), ("edited_pass", 42, ORDINARY_TEST),
+                                           ("required_skip", 42, SKIP_TEST)):
+                    case = output / label
+                    case.mkdir()
+                    (workspace / MODULE_PATH).write_bytes(("value = " + str(value) + "\n").encode())
+                    (workspace / TEST_PATH).write_bytes(test.encode())
+                    revision = check_source_revision(workspace)
+                    spec = CheckSpec(task_id="p07_native_synthetic_" + label, task_commit=report["tested_commit"],
+                                     base_commit=calibration["base_commit"], source_revision=revision,
+                                     image=IMAGE, interpreter=INTERPRETER, runner="sympy-native", test_paths=(TEST_PATH,),
+                                     target_root="/testbed", sympy_identity=identity)
+                    save(case / "spec.json", spec.as_dict())
+                    receipt = run_check_spec(spec, workspace)
+                    save(case / "receipt.json", receipt.as_dict())
+                    (case / "stdout.txt").write_bytes(receipt.result.stdout.encode())
+                    (case / "stderr.txt").write_bytes(receipt.result.stderr.encode())
+                    observations = [json.loads(line[len(MARKER):]) for line in receipt.result.stdout.splitlines() if line.startswith(MARKER)]
+                    if len(observations) != 1:
+                        raise ValueError("Exactly one completed counted native observation required")
+                    observed = observations[0]
+                    expected_counts = {key: int(key == {"base_fail": "failed", "edited_pass": "passed", "required_skip": "skipped"}[label])
+                                       for key in ("passed", "failed", "skipped", "xfailed", "xpassed", "exceptions")}
+                    expected_counts['passed'] += 1
+                    expected_exit = {"base_fail": 1, "edited_pass": 0, "required_skip": 5}[label]
+                    row = {"case": label, "check_passed": receipt.check_passed, "process_exit": receipt.result.returncode,
+                           "verified_success": receipt.verified_success, "source_before": receipt.source_before,
+                           "source_after": receipt.source_after, "spec_digest": spec.digest,
+                           "stdout_sha256": sha(receipt.result.stdout.encode()), "stderr_sha256": sha(receipt.result.stderr.encode()),
+                           "runner_receipt": observed, "cleanup": "confirmed_by_existing_executor_return"}
+                    qualified = (receipt.source_before == receipt.source_after == revision == check_source_revision(workspace)
+                                 and receipt.check_passed == (label == "edited_pass") and receipt.verified_success is False
+                                 and receipt.result.returncode == expected_exit and not receipt.result.timed_out
+                                 and not receipt.result.stdout_truncated and not receipt.result.stderr_truncated
+                                 and observed.get("runner") == "sympy-native" and observed.get("finished") is True
+                                 and observed.get("python_version") == [3, 9, 20] and observed.get("sympy_version") == version
+                                 and observed.get("sympy_module") == "/testbed/sympy/__init__.py"
+                                 and observed.get("files") == [TEST_PATH] and observed.get("collected") == 2
+                                 and observed.get("counts") == expected_counts
+                                 and observed.get("native_source_sha256") == dict(runner_hashes)
+                                 and receipt.result.stdout.count("ATOMIC_SYMPY_BEGIN:") == 1
+                                 and receipt.result.stdout.count("ATOMIC_SYMPY_END:") == 1)
+                    row["status"] = "expected_native_boundary_behavior" if qualified else "boundary_mismatch"
+                    report["cases"].append(row)
+                    save(case / "result.json", row)
+                if len(report["cases"]) == 3 and all(row["status"] == "expected_native_boundary_behavior" for row in report["cases"]):
+                    report["status"] = "native_sympy_check_boundary_qualified"
     except Exception as error:
-        report.update(error_type=type(error).__name__, error=str(error)[:500])
+        report.update(status="not_qualified", error_type=type(error).__name__, error=str(error)[:500])
     finally:
         if create_attempted:
             try:

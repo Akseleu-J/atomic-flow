@@ -1,5 +1,42 @@
 # P07: concrete full TaskRunner path on a Linux Docker host
 
+## 28 October 2026 update
+
+The sections below are the retained 26 October review snapshot. Their line
+numbers and "not implemented" claims describe that old source, not current
+runtime. Consult PROJECT_CONTEXT.md and P07_COMPLETED_CHECK_GUARD_2026-10-28.md
+for exact-source acceptance.
+
+Implemented since that review: immutable CheckSpec selects exact image,
+interpreter, mount root, complete test inventory and bounded resources;
+CheckObligation binds it to all four check consumers, protected runner/tests,
+current source and a non-renewing deadline. Installed-pytest public TaskRunner
+failure/replan/coupled-edit/check/publication passed real Docker. Native SymPy
+with exact Python3.8+ and runner hashes passed the standalone failure/pass/skip
+boundary. The host-selected command=check rejects model runtime choice and test
+narrowing; check/pytest restrictions are now symmetric. Missing/incomplete/stale
+negative receipts cannot authorize automatic repair. Native full TaskRunner
+journey is being prepared separately and is not yet accepted.
+
+Remaining admission work: accurate generic ordinary_test plan/failure labels;
+private legacy Python2/Python3.6 runtime profiles, pytest self-runner identity,
+and the fixed Requests service lifecycle in the core executor; full per-task
+workspace/ordinary-test parity under core bounds; accepted live transport on the
+Linux worker; capable iterative baseline and matched full-Atomic harness.
+
+The existing source-only campaign is still diagnostic. In particular, its
+production-only snapshot and gold-derived single-file write scope must not be
+reused as an unbiased full matched experiment. Define equal write permissions
+from admitted base source and public task constraints before seeing solution
+paths; keep hidden gold/test patches and oracle logs out of generator context.
+All roles, indexing, failed attempts and unknown reservations count against the
+same physical call/cost limits. Full pairs, fresh holdout, ablations and final
+independent P07 review remain open. No new paid inference is authorized by this
+document and no spend was incurred by the scripted Docker journeys.
+
+## Retained historical review
+
+
 Read-only source review, 26 October 2026. This is an implementation path, not
 an implemented adapter, live-model result, or production acceptance. The current
 source-only campaign still cannot satisfy full P07.

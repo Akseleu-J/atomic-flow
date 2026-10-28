@@ -73,3 +73,12 @@ for that follow-up remains pending. Focused symmetric policy and command suite:
 54 passed, Ruff passed. Static inventory refreshed: 472 Python files, no missing
 absolute internal imports. Internal plan verification labels still use legacy pytest; generic
 ordinary_test labels and historical runtime profiles are separate unfinished work.
+
+Final symmetric-policy Docker matrix accepted: CI40634655989 on
+4facbdb54cfbbeb52ba4be9d70c5d2d1f536f8b8, both commands done after one replan
+and exact two-file publication. Artifact12792797656 check ZIP SHA256
+65e1cc83ec4ae53c4f6b777415225530a049db708f26cd4d44188864a99893a9;
+artifact12792682909 pytest ZIP SHA256
+384f780adea8c040469ea3e02db5447c65b42a7347ec6c0274e149ff639e5fa2.
+Main checks40634653549/40634659132 and interoperability40634653482/40634659120
+succeeded. Both archives were downloaded and audited. P07 remains OPEN.
