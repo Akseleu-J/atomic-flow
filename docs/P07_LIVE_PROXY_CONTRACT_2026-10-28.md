@@ -1,0 +1,11 @@
+# Single live Model Proxy contract diagnostic
+
+P07 remains OPEN; this is not a generated code task, matched comparison or oracle success. One separate diagnostic profile was frozen under the authorized20USD aggregate budget: ownerakseley, modelanthropic/claude-sonnet-5@default, input512/output64, no retry, one physical call,0.01USD reservation. Prior booked spend0.035611375USD was included. Existing study/old attempt profiles were not overwritten.
+
+The one request returned HTTP200 with the exact requested model. The host observer retained provider usage25prompt/11completion tokens, input50000/output110000 nanodollars:0.00016USD. Original response text was not retained. The desktop Node runtime supplied a valid Uint8Array from another VM realm; the adapter used instanceof and rejected it before response decoding. An offline replay reproduced the mismatch (ArrayBuffer.isView=true, instanceof=false), without another provider call. The fix accepts actual one-byte ArrayBuffer views; a cross-realm regression passes and a replay in the same desktop runtime decodes the retained numeric usage. Synthetic replay text is explicitly not the original model response.
+
+Provider usage was reconciled against the original request/call and remote-checkpoint-bound ledger. Known aggregate spend is now0.035771375USD. The original UNKNOWN response packet is preserved; response content remains unverified and no transport/model-response success is claimed. The financial reservation is settled at0.00016, while the broker record remains unknown/unusable and paid follow-ups are held. No retry, route fallback, account switch or model fallback occurred.
+
+Evidence: validation/p07-budget20/live-proxy-contract-v1 contains the pre-send intent/profile, original response/outcome, selected provider usage, separate billing reconciliation and ledger snapshots. Credentials, token and endpoint are process-only and excluded. This proves a real billed request reached Sonnet5; it does not prove model-quality performance or close P07.
+
+The manufacturer pricing reference was checked at https://www.anthropic.com/news/claude-sonnet-5 (2USD/MTok input and10USD/MTok output); the Kaggle invoice remains the provider usage above. The conservative diagnostic reservation used5/25 rates. Current quota/catalog checks are read-only evidence and do not replace campaign reconciliation.

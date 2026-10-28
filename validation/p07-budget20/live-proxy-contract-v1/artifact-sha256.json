@@ -1,0 +1,12 @@
+{
+  "billing-checkpoint.json": "d5b5709477a094652b8001e7a5a2b39a468bdcecf80ab0ded5e228357f83a478",
+  "billing-remote-identity.json": "820018e5a791687fd73bd8bf2313660225a3b84b2bbe98c868a137091f7600a6",
+  "campaign-reconciled.json": "42c02786bb95e4d0796220dfd4bf61737515d8babed9defb3c6454fe5d097f5b",
+  "campaign.json": "aba542c83cead40d960ded804ef02431818dced61943f16909dbe4d22a2540e8",
+  "intent.json": "915926f920b380517d29cd645f4f4a9fbe2945cb4a4df4192e4912f6b5cecf2a",
+  "observed-usage.json": "008541410c6e4f67e79d4c30a717961cfe597236b943f451b36e88b12ea06654",
+  "offline-replay.json": "e5c951d40056f0448592049a1a5b7e6ddad407a8f20ad2dd297fbba63d2fdebc",
+  "reconciliation.json": "23b63ab1bcc92ab76145c0c504a66b12ced14b239ca87492d1002a053f897cc0",
+  "response.json": "8bf04bc0c185c71e07524f75ad0842b93cde194d9d8eaaeff6f1c709dee1ac00",
+  "result.json": "f4eae44b05ade8f5da5c1ab32acb10a19f7d88b65815a52442e767fee7ecde2b"
+}

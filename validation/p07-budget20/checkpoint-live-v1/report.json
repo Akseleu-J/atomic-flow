@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "status": "synthetic_real_github_checkpoint_ledger_hold_qualified",
+  "campaign_id": "p07_checkpoint_store_synthetic_smoke",
+  "tested_framework_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+  "tested_workflow_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+  "branch": "codex/p07-model-queue-paid-20261028-01",
+  "profile_sha256": "1afc6a5aef018e1ecd74943d986a9c379e74ab0860aa93332159c5392286b87a",
+  "provider_calls": 0,
+  "model_generation": false,
+  "scripted_callback_entries": 1,
+  "zero_charged": true,
+  "actual_provider_charge_usd": "0",
+  "route_qualification": "not_run",
+  "model_response_generated": false,
+  "scope": "Real GitHub checkpoint CAS and durable ledger hold integration with a synthetic pre-inference callback failure",
+  "reservation_scope": "Synthetic framework reservation only; no provider was contacted and no charge was incurred",
+  "first_attempt": {
+    "call_id": "mq_4e94ad359e28462f94a41d6ee3e1ba30",
+    "state": "unknown",
+    "sent": true
+  },
+  "second_attempt": {
+    "call_id": "mq_a468c8558132454bb4a9c44842db1d59",
+    "state": "unknown",
+    "sent": false
+  },
+  "first_call_identity": {
+    "campaign_id": "p07_checkpoint_store_synthetic_smoke",
+    "owner": "akseley",
+    "arm": "synthetic_atomic",
+    "task_id": "synthetic_owner2",
+    "framework_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+    "workflow_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+    "profile_sha256": "1afc6a5aef018e1ecd74943d986a9c379e74ab0860aa93332159c5392286b87a"
+  },
+  "second_call_identity": {
+    "campaign_id": "p07_checkpoint_store_synthetic_smoke",
+    "owner": "umirbayulgaisha",
+    "arm": "synthetic_baseline",
+    "task_id": "synthetic_participant3",
+    "framework_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+    "workflow_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+    "profile_sha256": "1afc6a5aef018e1ecd74943d986a9c379e74ab0860aa93332159c5392286b87a"
+  },
+  "framework_accounting": {
+    "known_actual_usd": "0",
+    "known_total_including_prior_usd": "0",
+    "unresolved_reserved_usd": "0.01",
+    "reserved_call_count": 1
+  },
+  "ledger_holds": [],
+  "unresolved_call_ids": [
+    "mq_4e94ad359e28462f94a41d6ee3e1ba30",
+    "mq_a468c8558132454bb4a9c44842db1d59"
+  ],
+  "admission_hold_active": true,
+  "profile_fingerprint": "04d23dc6c1be7020302ff5e278a23f75c2b5a5cedd5f3260961a5f040dc6dd06",
+  "checkpoint": {
+    "schema_version": 1,
+    "sequence": 7,
+    "state_sha256": "f6d01ff1382994d9396bd394be6e31b4aa68ea06dd4678e7e727a0ab6ab67997",
+    "profile_fingerprint": "04d23dc6c1be7020302ff5e278a23f75c2b5a5cedd5f3260961a5f040dc6dd06"
+  },
+  "reopened_checkpoint": {
+    "schema_version": 1,
+    "sequence": 7,
+    "state_sha256": "f6d01ff1382994d9396bd394be6e31b4aa68ea06dd4678e7e727a0ab6ab67997",
+    "profile_fingerprint": "04d23dc6c1be7020302ff5e278a23f75c2b5a5cedd5f3260961a5f040dc6dd06"
+  },
+  "local_state_sha256": "f6d01ff1382994d9396bd394be6e31b4aa68ea06dd4678e7e727a0ab6ab67997",
+  "response_sha256": {
+    "mq_4e94ad359e28462f94a41d6ee3e1ba30": "b228ef85f6430e2b5abfd0d034a788d5cf32e4557fd02c4037bb455fe9a3a3de",
+    "mq_a468c8558132454bb4a9c44842db1d59": "712e294681845cf58ce779ce604e7297b00a974cd0ba7d09eb0f9f1fb0d92e58"
+  },
+  "reopen_matches": true
+}

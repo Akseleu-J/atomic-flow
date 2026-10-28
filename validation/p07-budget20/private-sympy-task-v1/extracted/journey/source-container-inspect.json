@@ -1,0 +1,214 @@
+{
+  "AppArmorProfile": "",
+  "Args": [
+    "infinity"
+  ],
+  "Config": {
+    "AttachStderr": true,
+    "AttachStdin": false,
+    "AttachStdout": true,
+    "Cmd": [
+      "infinity"
+    ],
+    "Domainname": "",
+    "Entrypoint": [
+      "/bin/sleep"
+    ],
+    "Env": [
+      "PATH=/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "TZ=Etc/UTC"
+    ],
+    "Hostname": "cb6b9b0b0580",
+    "Image": "sha256:edf8c41d32ec116382faa5c31a0383024ed9b05ff8d359555ca5958612e594de",
+    "Labels": {
+      "atomic.p07.legacy.base": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+      "atomic.p07.legacy.donor": "library/python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2",
+      "atomic.p07.legacy.launcher": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+      "atomic.p07.sympy.base": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+      "atomic.p07.sympy.parent": "sha256:c83e64bc8ea111b88b32384a715030e5317b186d76b76ec1e160e35393f40b13",
+      "atomic.p07.sympy.profile": "821e48d06e7db5efd03bb59f3efc199826d1e83c23dc00d9e0ba98cc47eaee69",
+      "org.opencontainers.image.version": "22.04"
+    },
+    "OnBuild": null,
+    "OpenStdin": false,
+    "StdinOnce": false,
+    "Tty": false,
+    "User": "65534:65534",
+    "Volumes": null,
+    "WorkingDir": "/testbed/"
+  },
+  "Created": "2026-10-28T11:31:55.052534994Z",
+  "Driver": "overlay2",
+  "ExecIDs": null,
+  "GraphDriver": {
+    "Data": {
+      "ID": "cb6b9b0b05805f0ef8075c83d326805f4bde22edc43f0cd89d1fc8d125bcd597",
+      "LowerDir": "/var/lib/docker/overlay2/6f035f110930cd8adf57c9d8bff05470ed8f4436da23018541443168e4419528-init/diff:/var/lib/docker/overlay2/dw57b2h9076jvwbjnrkc86qa7/diff:/var/lib/docker/overlay2/qudx42tn0io0cr6iz0cw1umdw/diff:/var/lib/docker/overlay2/kl73bmw71zh6cneyqw8mzyuiv/diff:/var/lib/docker/overlay2/2jjslvzx8msaenyqjg05g3stv/diff:/var/lib/docker/overlay2/l06u6i6jtwx2m5vmii0y9x427/diff:/var/lib/docker/overlay2/wo42xa2u5h427p9rpqnbsg00t/diff:/var/lib/docker/overlay2/yykc42ikfv0yj7i48pzltd6mj/diff:/var/lib/docker/overlay2/5b2a8d1ac652f625eaa2c836619edac40946e3938ae7a45be4b8e1df47928661/diff:/var/lib/docker/overlay2/c2ef28ca2e69090e1b89bfc3f46a876d4c6ed00ce9f2abe4ef55c6ce6105a8f3/diff:/var/lib/docker/overlay2/e0a9e16084a4d31d8d2e8dbd8a9c8a69f9fddfba867a0cf99d6d975dad176d4b/diff:/var/lib/docker/overlay2/68c66afd2cc93f7b2dbf60cb2dfc5076369f1eb35a6c2a460d111f887842ef5c/diff:/var/lib/docker/overlay2/a5328728fee9ee1029e608a6a61169c5217d7ee52c8568dc94cb9fc511eb3bd8/diff:/var/lib/docker/overlay2/8f574e64f0e70b59bb69e20325132bcf8ebb5ae21cdc2feebdf3022092d743c4/diff:/var/lib/docker/overlay2/cadc62b9b2c51189240c25ddb2ab6637f96a41774c430362935f06cc0b5f09af/diff:/var/lib/docker/overlay2/06078ea1c83efa295f5faa5ba3986f554fa2c69b440866ddecfe3c11d56bd7d7/diff:/var/lib/docker/overlay2/89ddd2f91a0dee476743a3ee31e1fae10c7798a67e59fc31c2cf47596b36bed3/diff:/var/lib/docker/overlay2/ee5847ba00e0b0ec58b96fb45f272c0512678c43dc86376fcc576b90bbb7eff8/diff",
+      "MergedDir": "/var/lib/docker/overlay2/6f035f110930cd8adf57c9d8bff05470ed8f4436da23018541443168e4419528/merged",
+      "UpperDir": "/var/lib/docker/overlay2/6f035f110930cd8adf57c9d8bff05470ed8f4436da23018541443168e4419528/diff",
+      "WorkDir": "/var/lib/docker/overlay2/6f035f110930cd8adf57c9d8bff05470ed8f4436da23018541443168e4419528/work"
+    },
+    "Name": "overlay2"
+  },
+  "HostConfig": {
+    "AutoRemove": false,
+    "Binds": null,
+    "BlkioDeviceReadBps": [],
+    "BlkioDeviceReadIOps": [],
+    "BlkioDeviceWriteBps": [],
+    "BlkioDeviceWriteIOps": [],
+    "BlkioWeight": 0,
+    "BlkioWeightDevice": [],
+    "CapAdd": null,
+    "CapDrop": [
+      "ALL"
+    ],
+    "Cgroup": "",
+    "CgroupParent": "",
+    "CgroupnsMode": "private",
+    "ConsoleSize": [
+      0,
+      0
+    ],
+    "ContainerIDFile": "",
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "CpuShares": 0,
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "DeviceCgroupRules": null,
+    "DeviceRequests": null,
+    "Devices": [],
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": null,
+    "GroupAdd": null,
+    "IOMaximumBandwidth": 0,
+    "IOMaximumIOps": 0,
+    "IpcMode": "private",
+    "Isolation": "",
+    "Links": null,
+    "LogConfig": {
+      "Config": {},
+      "Type": "json-file"
+    },
+    "MaskedPaths": [
+      "/proc/asound",
+      "/proc/acpi",
+      "/proc/interrupts",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/sys/firmware",
+      "/sys/devices/virtual/powercap"
+    ],
+    "Memory": 1073741824,
+    "MemoryReservation": 0,
+    "MemorySwap": 2147483648,
+    "MemorySwappiness": null,
+    "NanoCpus": 2000000000,
+    "NetworkMode": "none",
+    "OomKillDisable": false,
+    "OomScoreAdj": 0,
+    "PidMode": "",
+    "PidsLimit": 128,
+    "PortBindings": {},
+    "Privileged": false,
+    "PublishAllPorts": false,
+    "ReadonlyPaths": [
+      "/proc/bus",
+      "/proc/fs",
+      "/proc/irq",
+      "/proc/sys",
+      "/proc/sysrq-trigger"
+    ],
+    "ReadonlyRootfs": true,
+    "RestartPolicy": {
+      "MaximumRetryCount": 0,
+      "Name": "no"
+    },
+    "Runtime": "runc",
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "ShmSize": 67108864,
+    "UTSMode": "",
+    "Ulimits": [],
+    "UsernsMode": "",
+    "VolumeDriver": "",
+    "VolumesFrom": null
+  },
+  "HostnamePath": "",
+  "HostsPath": "",
+  "Id": "cb6b9b0b05805f0ef8075c83d326805f4bde22edc43f0cd89d1fc8d125bcd597",
+  "Image": "sha256:edf8c41d32ec116382faa5c31a0383024ed9b05ff8d359555ca5958612e594de",
+  "LogPath": "",
+  "MountLabel": "",
+  "Mounts": [],
+  "Name": "/p07-private-source-9f5ac5ad2bc04c69be0e01b0",
+  "NetworkSettings": {
+    "Bridge": "",
+    "EndpointID": "",
+    "Gateway": "",
+    "GlobalIPv6Address": "",
+    "GlobalIPv6PrefixLen": 0,
+    "HairpinMode": false,
+    "IPAddress": "",
+    "IPPrefixLen": 0,
+    "IPv6Gateway": "",
+    "LinkLocalIPv6Address": "",
+    "LinkLocalIPv6PrefixLen": 0,
+    "MacAddress": "",
+    "Networks": {
+      "none": {
+        "Aliases": null,
+        "DNSNames": null,
+        "DriverOpts": null,
+        "EndpointID": "",
+        "Gateway": "",
+        "GlobalIPv6Address": "",
+        "GlobalIPv6PrefixLen": 0,
+        "GwPriority": 0,
+        "IPAMConfig": null,
+        "IPAddress": "",
+        "IPPrefixLen": 0,
+        "IPv6Gateway": "",
+        "Links": null,
+        "MacAddress": "",
+        "NetworkID": ""
+      }
+    },
+    "Ports": {},
+    "SandboxID": "",
+    "SandboxKey": "",
+    "SecondaryIPAddresses": null,
+    "SecondaryIPv6Addresses": null
+  },
+  "Path": "/bin/sleep",
+  "Platform": "linux",
+  "ProcessLabel": "",
+  "ResolvConfPath": "",
+  "RestartCount": 0,
+  "State": {
+    "Dead": false,
+    "Error": "",
+    "ExitCode": 0,
+    "FinishedAt": "0001-01-01T00:00:00Z",
+    "OOMKilled": false,
+    "Paused": false,
+    "Pid": 0,
+    "Restarting": false,
+    "Running": false,
+    "StartedAt": "0001-01-01T00:00:00Z",
+    "Status": "created"
+  }
+}

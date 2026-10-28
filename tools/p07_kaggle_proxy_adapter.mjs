@@ -136,7 +136,11 @@ async function boundedBody(response) {
     while (true) {
       const item = await reader.read();
       if (item.done) break;
-      if (!(item.value instanceof Uint8Array)) throw Error('response');
+      // Fetch readers may originate in another VM realm (desktop Node REPL).
+      // instanceof rejects valid byte views there; retain an actual byte-view
+      // check rather than admitting arbitrary array-like values.
+      if (!ArrayBuffer.isView(item.value) || item.value.BYTES_PER_ELEMENT !== 1
+          || typeof item.value.length !== 'number' || item.value.byteLength !== item.value.length) throw Error('response');
       size += item.value.byteLength;
       if (size > MAX_RESPONSE_BYTES) { await reader.cancel(); throw Error('response'); }
       chunks.push(item.value);

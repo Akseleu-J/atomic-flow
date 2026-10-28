@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "provider_usage_settled_response_unavailable",
+  "original_call_id": "mq_4f294c730ed549ef90b5dd144f1e2e20",
+  "original_response_preserved": true,
+  "request_sha256": "72fa2615db3eb27352e5f11ac97e5f33f5d0c54863339959ded29be5923c2e2f",
+  "observed_usage_sha256": "a4b4e146344921c5544e404ee4881baf96e0c2d8e3422f56525b29333a1c71e2",
+  "cause": "Valid cross-realm Uint8Array fetch body rejected by instanceof check in desktop Node runtime; confirmed by offline replay. No new provider request.",
+  "provider_calls": 1,
+  "automatic_retries": 0,
+  "known_actual_usd": "0.00016",
+  "known_total_including_prior_usd": "0.035771375",
+  "unresolved_reserved_usd": "0",
+  "model_response_content_verified": false,
+  "original_broker_state": "unknown",
+  "paid_followups": "held; no automatic retry or success upgrade",
+  "P07": "OPEN"
+}

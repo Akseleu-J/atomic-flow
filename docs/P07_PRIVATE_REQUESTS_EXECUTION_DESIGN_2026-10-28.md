@@ -246,3 +246,6 @@ and manifest proof; one owns FixtureIdentity/cohort selection; one owns
 PrivatePytestIdentity/raw-to-canonical collection validation. Root integrates
 shared contracts and Docker lifecycle serially after those interfaces agree.
 These are proposed assignments, not authorization to start extra agents.
+
+
+Pure implementation checkpoint: check_fixture.py binds all six exact cohorts, reviewed helper/profile/dependency/public certificate inventories and explicit candidate/execution CA-overlay revisions. check_private_pytest.py builds fixed Python2/3.6-compatible installed-pytest/plugin execution and strict complete raw receipts, but has no fixture lifecycle admission and is deliberately disconnected from ordinary execution dispatch. Combined fixture/bootstrap tests66PASS. Flat attempt executor is prepared separately; it is not yet a matched baseline driver. No historical Requests in-loop acceptance follows from these pure contracts.

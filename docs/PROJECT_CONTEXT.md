@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+28 октября: full private Python3.6 TaskRunner принят на4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876, CI40680449793 SUCCESS,1505 admittedfiles, FAIL→replan1→repair→freshPASS/final→onlyprobe publication→graph sync с explicit oversized omission. Artifact12812244003 SHA f8343167.../50rawhashes verified. Один отдельный живой API preflight Sonnet5: HTTP200, providerusage25/11,cost0.00016USD; response body не подтверждён из-за crossrealm Uint8Array bug, fixed/offline verified, безповтора. Billing reconciled,knownaggregate0.035771375USD; originalUNKNOWN preserved. P07 OPEN; matchedpairs/holdout/ablations ещё не выполнены.
+
 28 октября: private Python3.6 executor принят на1c912cb2549ffd89de4fc26457fb61a2c612368f, CI40678851144 SUCCESS. Архив12812121013 SHA07e06978... и77 raw hashes сверены; target syntax PASS/newer-walrus refusal, nativeFAIL/PASS/required-SKIP refusal, cleanup. Это synthetic executor; full private TaskRunner ещё проверяется. P07 OPEN, provider calls0. Подготовлены обязательный remote checkpoint журнала бюджета и process-only proxy adapter, живой inference ещё не запускался.
 
 28 октября: full queued public TaskRunner принят на3b9228dc98a295e605dd3ca525e1aff8a610b574, CI40674589781 SUCCESS. Все12 запросов/ответов сверены с Windows durable journal; FAIL→replan1→2-file repair→fresh PASS→publication→graph sync, usage0/scripted. Provider calls0. Evidence queued-task-scripted-v1. Private-runtime syntax/native integration подготовлена, свежий Docker CI ещё требуется; P07 OPEN.

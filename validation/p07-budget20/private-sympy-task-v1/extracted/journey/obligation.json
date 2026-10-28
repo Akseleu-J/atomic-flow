@@ -1,0 +1,320 @@
+{
+  "absent_paths": [
+    "pyproject.toml",
+    "pytest.ini",
+    "setup.cfg",
+    "sympy/core/conftest.py",
+    "sympy/core/pyproject.toml",
+    "sympy/core/pytest.ini",
+    "sympy/core/setup.cfg",
+    "sympy/core/setup.py",
+    "sympy/core/tests/conftest.py",
+    "sympy/core/tests/pyproject.toml",
+    "sympy/core/tests/pytest.ini",
+    "sympy/core/tests/setup.cfg",
+    "sympy/core/tests/setup.py",
+    "sympy/core/tests/tox.ini",
+    "sympy/core/tox.ini",
+    "sympy/pyproject.toml",
+    "sympy/pytest.ini",
+    "sympy/setup.cfg",
+    "sympy/setup.py",
+    "sympy/tox.ini",
+    "tox.ini"
+  ],
+  "deadline_at": 1793188359.759655,
+  "directory_inventory": [
+    "sympy/core/tests/__init__.py",
+    "sympy/core/tests/test_args.py",
+    "sympy/core/tests/test_arit.py",
+    "sympy/core/tests/test_assumptions.py",
+    "sympy/core/tests/test_basic.py",
+    "sympy/core/tests/test_cache.py",
+    "sympy/core/tests/test_compatibility.py",
+    "sympy/core/tests/test_complex.py",
+    "sympy/core/tests/test_constructor_postprocessor.py",
+    "sympy/core/tests/test_containers.py",
+    "sympy/core/tests/test_count_ops.py",
+    "sympy/core/tests/test_diff.py",
+    "sympy/core/tests/test_equal.py",
+    "sympy/core/tests/test_eval.py",
+    "sympy/core/tests/test_eval_power.py",
+    "sympy/core/tests/test_evalf.py",
+    "sympy/core/tests/test_evaluate.py",
+    "sympy/core/tests/test_expand.py",
+    "sympy/core/tests/test_expr.py",
+    "sympy/core/tests/test_exprtools.py",
+    "sympy/core/tests/test_facts.py",
+    "sympy/core/tests/test_function.py",
+    "sympy/core/tests/test_logic.py",
+    "sympy/core/tests/test_match.py",
+    "sympy/core/tests/test_noncommutative.py",
+    "sympy/core/tests/test_numbers.py",
+    "sympy/core/tests/test_operations.py",
+    "sympy/core/tests/test_p07_native_check.py",
+    "sympy/core/tests/test_priority.py",
+    "sympy/core/tests/test_relational.py",
+    "sympy/core/tests/test_rules.py",
+    "sympy/core/tests/test_subs.py",
+    "sympy/core/tests/test_symbol.py",
+    "sympy/core/tests/test_sympify.py",
+    "sympy/core/tests/test_trace.py",
+    "sympy/core/tests/test_truediv.py",
+    "sympy/core/tests/test_var.py"
+  ],
+  "environment_digest": "efdccfb15db676d7a0bb598b060194d2218e0ed7c4d8f8c416fc51c06b2fe7e6",
+  "kind": "host_ordinary_test_obligation",
+  "protected_files": [
+    [
+      "bin/get_sympy.py",
+      "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869"
+    ],
+    [
+      "bin/test",
+      "973e3cf784388b8e7821e4962da8eeb4b615447cd652af920452b322bd63588c"
+    ],
+    [
+      "conftest.py",
+      "30b974d8bc09ea85f5f64a67830d960a7c853124837d05ea225cd228fa61ce75"
+    ],
+    [
+      "setup.py",
+      "061482f8755b921d4a4e6c638d06cee7103d5085aa916b1bd3122697d351ca8a"
+    ],
+    [
+      "sympy/conftest.py",
+      "7ea1b8d2ee97892f0af3e18e3c3b70ff803697e0a9bf68e820a6c93f6ea7be53"
+    ],
+    [
+      "sympy/core/tests/__init__.py",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+      "sympy/core/tests/test_args.py",
+      "fbd271aaeb5f91ccc921b77e3da871e48901fc185da05e01e9e2afa4e89b02d3"
+    ],
+    [
+      "sympy/core/tests/test_arit.py",
+      "34240ab881c6a894420c317ffcd62fe4ce253dbd40a5027dd46ef24fbe843a18"
+    ],
+    [
+      "sympy/core/tests/test_assumptions.py",
+      "1d42e664afa6bd9b121a2d4f75a3a523f9e6851e1733e85387464eb63c482a1b"
+    ],
+    [
+      "sympy/core/tests/test_basic.py",
+      "8ecf5456457fbb1002dcb5c381adecd1bcd44f1e0c2362cd36f55f5bd1dd8107"
+    ],
+    [
+      "sympy/core/tests/test_cache.py",
+      "4f20851ce344c7bc259a98d1bd8e9a9d4cf3bb4a10830cbfc656b8458a85802a"
+    ],
+    [
+      "sympy/core/tests/test_compatibility.py",
+      "f2903092a11ca75650422783d581aee15b71770c557d5e20360ed0dfeed466dd"
+    ],
+    [
+      "sympy/core/tests/test_complex.py",
+      "5db3cfeb99988df3a3e294f0b723cf906a0ad923c2f553357ed860fec4231150"
+    ],
+    [
+      "sympy/core/tests/test_constructor_postprocessor.py",
+      "62265df5f84d703833c32274a7823f4c7c8918606be15c55453439aa71cdf4a0"
+    ],
+    [
+      "sympy/core/tests/test_containers.py",
+      "dab8a94d8c1cca3ef2a02df46d475a8cc26e30224ad4c76bf9445e3fa19a7f0d"
+    ],
+    [
+      "sympy/core/tests/test_count_ops.py",
+      "ee5578a0af0b5cc8acfc36771b2edbadf17fe2a7fcaed753755f08d1d73d55c7"
+    ],
+    [
+      "sympy/core/tests/test_diff.py",
+      "b88c1eb370c4b9b3466cdb723f738e652ae6a90efa2b2ae59d718e0936cf0e28"
+    ],
+    [
+      "sympy/core/tests/test_equal.py",
+      "11a8b5295e66cb629a76ecbec8d250dde20a35f85c8a8496d73dce844f0fe640"
+    ],
+    [
+      "sympy/core/tests/test_eval.py",
+      "78c412b827c889456de7b3d121d663ff3ffd76c4e348936606a707c83e63caac"
+    ],
+    [
+      "sympy/core/tests/test_eval_power.py",
+      "0afb6fc98b27e78853d7d5bc9560e5bf9ab607077e6366682801e91715b226ae"
+    ],
+    [
+      "sympy/core/tests/test_evalf.py",
+      "061d598ce074409437c6c8a04344f9b6e8e3cfba718117653b918145229648a7"
+    ],
+    [
+      "sympy/core/tests/test_evaluate.py",
+      "d29be2a82a2cab184c59ceea368ac0185c52a5cde1b249abf92e7bea7784b333"
+    ],
+    [
+      "sympy/core/tests/test_expand.py",
+      "6c056c3019f24f28b8e48abae2fd54c43f478429ac2d6a4070579a15e76c6d94"
+    ],
+    [
+      "sympy/core/tests/test_expr.py",
+      "b58848655bb2f87f7436dd66a3c0d7618aa41be3f264d4550b6b38572ec7510f"
+    ],
+    [
+      "sympy/core/tests/test_exprtools.py",
+      "a0e74eb77ac51731fe6e0e04df62c02ff30d0c05972fd26296e5f6992c48fdca"
+    ],
+    [
+      "sympy/core/tests/test_facts.py",
+      "af81d568a6eea1ae6e640af40dd5e0d7c59235e0db1255b13927dbfa4c5483f6"
+    ],
+    [
+      "sympy/core/tests/test_function.py",
+      "a15d0114388ad9e6d5485f3a5c52a2e09fb53279445418bd21c0ab614fee6fc6"
+    ],
+    [
+      "sympy/core/tests/test_logic.py",
+      "042ce487684c87463d9aecf9dccd409fca1c653a6ab3db14c59dfc3c43ed2273"
+    ],
+    [
+      "sympy/core/tests/test_match.py",
+      "ac99bc561efccab5f585d2fc05cd134d8953c7e4509b19bdc21082c7f12ab0dd"
+    ],
+    [
+      "sympy/core/tests/test_noncommutative.py",
+      "da27b16a73480ea18eb9eb69dda4a1238f7b0fddda56a5603d59c0f54426a87e"
+    ],
+    [
+      "sympy/core/tests/test_numbers.py",
+      "9f7f7c761bdda76e79d0fdad941d2fa973b4434d5a3773d75f50fc7765141076"
+    ],
+    [
+      "sympy/core/tests/test_operations.py",
+      "56258833563b6b89f2a874fe776257f417f18f4495bb012b3272ef5121ec3eba"
+    ],
+    [
+      "sympy/core/tests/test_p07_native_check.py",
+      "934b9364f49aeaaef4ce0e75873d55a5dc925809b0f872fad8603eb151778a01"
+    ],
+    [
+      "sympy/core/tests/test_priority.py",
+      "25496813c07bcc1c876247dfa61ce2b8935e0fd817a2e0af5ccc0c8721abbd12"
+    ],
+    [
+      "sympy/core/tests/test_relational.py",
+      "6bfa55126c714cda6bbd5cf3be74335cda7fc3f45b296ff2b175ec6d405e2687"
+    ],
+    [
+      "sympy/core/tests/test_rules.py",
+      "2ccee2e95957f15bda09b71f5d3bd382e193d722c24a87c9a7f9909b20ca779f"
+    ],
+    [
+      "sympy/core/tests/test_subs.py",
+      "9026d4d1415917f69bb8afda64714ba2f4d4d9d4764d422660854d5574d90ba1"
+    ],
+    [
+      "sympy/core/tests/test_symbol.py",
+      "380395202d28d2cd9926dfa9ad57b3a6eb5a90f18fe2d9a5446927ccba1cfb04"
+    ],
+    [
+      "sympy/core/tests/test_sympify.py",
+      "8548ef2609b8bf4c3f500bb4c66ab4f355b8cd88ff77d553aadafcb62c03442e"
+    ],
+    [
+      "sympy/core/tests/test_trace.py",
+      "151c7501118ade754647071f6f0f18fc670439d402700cd0c19dfa757b3cb2d6"
+    ],
+    [
+      "sympy/core/tests/test_truediv.py",
+      "73ef71a4b90fc5742cb012539cf10219e972198611a289c5273792e86c17ddec"
+    ],
+    [
+      "sympy/core/tests/test_var.py",
+      "0fc33d16d304e4b9ea7f35c81a443d625b665094befeb31ec2a9f4a51e83658e"
+    ],
+    [
+      "sympy/utilities/runtests.py",
+      "f3ebc3f4677d84d64b7e52ea5129522b2b5233fd2937fe5857fbe8244dfcf95c"
+    ]
+  ],
+  "schema_version": 1,
+  "template": {
+    "argv": [
+      "/opt/p07-python36/bin/python3.6",
+      "bin/test",
+      "-C",
+      "--verbose",
+      "sympy/core/tests/test_p07_native_check.py"
+    ],
+    "base_commit": "84c125972ad535b2dfb245f8d311d347b45e5b8a",
+    "controls": {
+      "automatic_pull": false,
+      "cap_drop": [
+        "ALL"
+      ],
+      "network": "none",
+      "no_new_privileges": true,
+      "non_root": true,
+      "provider_environment": false,
+      "root_read_only": true
+    },
+    "image": "sha256:edf8c41d32ec116382faa5c31a0383024ed9b05ff8d359555ca5958612e594de",
+    "interpreter": "/opt/p07-python36/bin/python3.6",
+    "kind": "host_target_test_spec",
+    "resources": {
+      "cpus": 2,
+      "memory_bytes": 1073741824,
+      "output_bytes_per_stream": 16384,
+      "pids": 128,
+      "tmpfs_bytes": 134217728
+    },
+    "runner": "sympy-native",
+    "runtime_identity": {
+      "base_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+      "base_image_id": "sha256:59ccf914ab15876ca87accbbb2139e1c4a111840d44d2671ae3bf27a7f54d6b1",
+      "helper_sha256": "6f5eb101ea3a0f6b93353a5237889e09f5d22130417e3ac7ed0101a4a75b52f1",
+      "image_id": "sha256:edf8c41d32ec116382faa5c31a0383024ed9b05ff8d359555ca5958612e594de",
+      "interpreter": "/opt/p07-python36/bin/python3.6",
+      "inventory_sha256": "ca2164da16c614f2c78b17152e71dd15f67a536381de99996220fb135cc5a168",
+      "kind": "host_runtime_identity",
+      "launcher": "/opt/p07-runtime/python36",
+      "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+      "private_prefix": "/opt/p07-python36",
+      "profile_sha256": "821e48d06e7db5efd03bb59f3efc199826d1e83c23dc00d9e0ba98cc47eaee69",
+      "provisioning_receipt_sha256": "91c3cd5fb2102c1a869425eada04eaebc4f85d1ac6367f43470d19e75042bd2a",
+      "python_version": [
+        3,
+        6,
+        15
+      ],
+      "runner": "sympy-native",
+      "schema_version": 1
+    },
+    "schema_version": 1,
+    "source_revision": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+    "sympy_identity": {
+      "python_version": [
+        3,
+        6,
+        15
+      ],
+      "source_sha256": {
+        "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+        "bin/test": "973e3cf784388b8e7821e4962da8eeb4b615447cd652af920452b322bd63588c",
+        "sympy/utilities/runtests.py": "f3ebc3f4677d84d64b7e52ea5129522b2b5233fd2937fe5857fbe8244dfcf95c"
+      },
+      "sympy_version": "1.1.2.dev"
+    },
+    "target_root": "/testbed",
+    "task_commit": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+    "task_id": "p07_private_native_full_source_scripted_journey",
+    "test_paths": [
+      "sympy/core/tests/test_p07_native_check.py"
+    ],
+    "timeout_seconds": 180
+  },
+  "test_directories": [
+    "sympy/core/tests"
+  ]
+}

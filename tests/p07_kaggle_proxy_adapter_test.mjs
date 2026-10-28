@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {runInNewContext} from 'node:vm';
 import {MODEL, MAX_WIRE_BYTES, digest, processOne} from '../tools/p07_model_broker.mjs';
 import {createKaggleProxy, MAX_RESPONSE_BYTES} from '../tools/p07_kaggle_proxy_adapter.mjs';
 
@@ -7,6 +8,23 @@ const NOW = 1700000000000;
 const BASE = 'https://reviewed-proxy.example/session';
 const TEST_AUTH = 'synthetic-fixture-only';
 let count = 0;
+test('fetch byte views from another VM realm decode without another request', async () => {
+  const raw = JSON.stringify(payload());
+  const bytes = runInNewContext('Uint8Array.from(' + JSON.stringify([...Buffer.from(raw)]) + ')');
+  assert.equal(bytes instanceof Uint8Array, false);
+  let reads = 0, calls = 0;
+  const proxy = fixture(async () => {
+    calls++;
+    return {status: 200, redirected: false, headers: new Headers(), body: {getReader: () => ({
+      read: async () => reads++ ? {done: true} : {done: false, value: bytes},
+      releaseLock() {}, cancel: async () => {},
+    })}};
+  });
+  const result = await proxy.complete(request());
+  assert.equal(result.content, '{"answer":"ok"}');
+  assert.equal(result.cost_usd, '0.012');
+  assert.equal(calls, 1);
+});
 function request(changes = {}) {
   const req = {schema_version: 1, kind: 'p07_model_request', call_id: 'mq_' + (++count).toString(16).padStart(32, '0'),
     identity: {campaign_id: 'p07_paid', owner: 'akseley', arm: 'atomic', task_id: 'sympy_1',
