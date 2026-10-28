@@ -1,0 +1,16 @@
+{
+  "status": "not_qualified",
+  "run_id": 40750378642,
+  "source_sha": "7bd3ac29e3caaf0e4f1a0fc12497a7f8cbd00a21",
+  "raw_hashes_verified": 762,
+  "cause": "pytest2.8 cacheprovider writes cache/lastfailed to read-only /testbed/.cache after expected completed production test failure",
+  "health_tests_observed_passed": 3,
+  "required_production_failure_observed": true,
+  "complete_receipt": false,
+  "source_extractor_cleanup": {
+    "confirmed": true,
+    "container_id": "8e3feb9b138db010a813d31bef8de695ccb9c23b0545e28f08794cb1e7b1ee61",
+    "remove_exit": 0
+  },
+  "provider_calls": 0
+}

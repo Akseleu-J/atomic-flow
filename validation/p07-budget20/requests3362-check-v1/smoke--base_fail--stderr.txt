@@ -1,0 +1,60 @@
+Traceback (most recent call last):
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_error.py", line 64, in checked_call
+    return func(*args, **kwargs)
+OSError: [Errno 30] Read-only file system: '/testbed/.cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 152, in <module>
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/config.py", line 48, in main
+    return config.hook.pytest_cmdline_main(config=config)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 724, in __call__
+    return self._hookexec(self, self._nonwrappers + self._wrappers, kwargs)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 338, in _hookexec
+    return self._inner_hookexec(hook, methods, kwargs)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 333, in <lambda>
+    _MultiCall(methods, kwargs, hook.spec_opts).execute()
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 596, in execute
+    res = hook_impl.function(*args)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/main.py", line 115, in pytest_cmdline_main
+    return wrap_session(config, _main)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/main.py", line 110, in wrap_session
+    exitstatus=session.exitstatus)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 724, in __call__
+    return self._hookexec(self, self._nonwrappers + self._wrappers, kwargs)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 338, in _hookexec
+    return self._inner_hookexec(hook, methods, kwargs)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 333, in <lambda>
+    _MultiCall(methods, kwargs, hook.spec_opts).execute()
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 595, in execute
+    return _wrapped_call(hook_impl.function(*args), self.execute)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 249, in _wrapped_call
+    wrap_controller.send(call_outcome)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/terminal.py", line 361, in pytest_sessionfinish
+    outcome.get_result()
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 278, in get_result
+    raise ex[1].with_traceback(ex[2])
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 264, in __init__
+    self.result = func()
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/vendored_packages/pluggy.py", line 596, in execute
+    res = hook_impl.function(*args)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/cacheprovider.py", line 152, in pytest_sessionfinish
+    config.cache.set("cache/lastfailed", self.lastfailed)
+  File "/opt/p07-python36/lib/python3.6/site-packages/_pytest/cacheprovider.py", line 73, in set
+    path.dirpath().ensure_dir()
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_path/common.py", line 233, in ensure_dir
+    return self.ensure(*args, **{"dir": True})
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_path/local.py", line 512, in ensure
+    return p._ensuredirs()
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_path/local.py", line 494, in _ensuredirs
+    parent._ensuredirs()
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_path/local.py", line 494, in _ensuredirs
+    parent._ensuredirs()
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_path/local.py", line 497, in _ensuredirs
+    self.mkdir()
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_path/local.py", line 447, in mkdir
+    py.error.checked_call(os.mkdir, getattr(p, "strpath", p))
+  File "/opt/p07-python36/lib/python3.6/site-packages/py/_error.py", line 84, in checked_call
+    raise cls("%s%r" % (func.__name__, args))
+py.error.EROFS: [Read-only file system]: mkdir('/testbed/.cache',)

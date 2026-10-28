@@ -13,7 +13,9 @@ from dataclasses import dataclass
 
 from atomic_flow.agents.step_evidence import manifest_digest
 
-_PLUGIN_ARGS = ("-p", "no:httpbin", "-p", "pytest_httpbin.plugin", "-p", "pytest_mock", "-rA", "-v")
+# pytest2.8 writes cache/lastfailed during a completed failing session. Source
+# stays read-only; disable this optional plugin in the sealed ordinary profile.
+_PLUGIN_ARGS = ("-p", "no:cacheprovider", "-p", "no:httpbin", "-p", "pytest_httpbin.plugin", "-p", "pytest_mock", "-rA", "-v")
 _ENTRYPOINTS = (("httpbin", "pytest_httpbin.plugin"), ("pytest_mock", "pytest_mock"))
 _HELPERS = {
     "tools/p07_requests3362_calibrate.py": "862ed1fc8caed51fbcf71c0760bfdf0aa9ed3b765ddd1f29b6de44586e44a9ca",

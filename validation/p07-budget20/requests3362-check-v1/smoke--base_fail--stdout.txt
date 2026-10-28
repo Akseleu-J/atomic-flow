@@ -1,0 +1,10 @@
+============================= test session starts ==============================
+platform linux -- Python 3.6.15, pytest-2.8.7, py-1.4.31, pluggy-0.3.1 -- /opt/p07-python36/bin/python3.6
+cachedir: .cache
+rootdir: /testbed, inifile: 
+collecting ... collected 4 items
+
+test_p07_private_fixture.py::test_legacy_apis PASSED
+test_p07_private_fixture.py::test_real_http PASSED
+test_p07_private_fixture.py::test_ca_verified_https PASSED
+test_p07_private_fixture.py::test_required_production_value FAILED

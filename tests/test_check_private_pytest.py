@@ -73,7 +73,7 @@ def test_fixed_python27_compatible_payload_and_exact_explicit_plugins(version):
     assert value["identity"] == identity.as_dict()
     assert value["runtime"] == spec.runtime_identity.as_dict()
     assert value["check_spec_digest"] == spec.digest and value["source_revision"] == spec.source_revision
-    assert value["identity"]["plugin_args"] == ["-p", "no:httpbin", "-p", "pytest_httpbin.plugin", "-p", "pytest_mock", "-rA", "-v"]
+    assert value["identity"]["plugin_args"] == ["-p", "no:cacheprovider", "-p", "no:httpbin", "-p", "pytest_httpbin.plugin", "-p", "pytest_mock", "-rA", "-v"]
     assert not any(isinstance(node, (ast.AnnAssign, ast.JoinedStr, ast.AsyncFunctionDef)) for node in ast.walk(tree))
     assert "PAYLOAD_JSON" not in source and "sys.argv" not in source
     assert "pytest.main(arguments,plugins=[evidence])" in source

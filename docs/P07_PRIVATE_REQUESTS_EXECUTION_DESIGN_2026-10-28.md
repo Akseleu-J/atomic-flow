@@ -273,3 +273,13 @@ namespace bindings and immutable-container cleanup evidence. Static syntax,
 host-only import and Ruff checks passed; independent read-only review found no
 remaining concrete API mismatch. Real execution is pending; this workflow does
 not establish historical issue-solving quality or enable generic dispatch.
+
+First real controller attempt, CI40750378642 on7bd3ac2, is NOT QUALIFIED.
+The three ordinary HTTP/TLS health tests passed and the production probe failed
+as intended. During session finish pytest2.8 cacheprovider then tried to write
+`/testbed/.cache/cache/lastfailed` on the read-only source mount, aborting before
+the completion receipt. All762 smoke artifact hashes were verified; the failed
+attempt is preserved in `validation/p07-budget20/requests3362-check-v1`.
+The fixed sealed plugin argv now explicitly disables cacheprovider; source
+remains read-only. Focused profile/controller tests124PASS locally. A fresh run
+is required, with no upgrade of the first result.
