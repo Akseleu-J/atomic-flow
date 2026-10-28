@@ -395,7 +395,7 @@ class GitHubContentsQueueTransport:
                 raise QueueOutcomeUnknown("immutable model queue request conflict")
             return
         self._api("PUT", f"{self.prefix}/requests/{call_id}.json", {
-            "message": "p07 bounded model request " + call_id, "branch": self.branch,
+            "message": "[skip ci] p07 bounded model request " + call_id, "branch": self.branch,
             "content": base64.b64encode(canonical(value)).decode("ascii")})
 
     def get_response(self, call_id):

@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+28 октября: private Python3.6 executor принят на1c912cb2549ffd89de4fc26457fb61a2c612368f, CI40678851144 SUCCESS. Архив12812121013 SHA07e06978... и77 raw hashes сверены; target syntax PASS/newer-walrus refusal, nativeFAIL/PASS/required-SKIP refusal, cleanup. Это synthetic executor; full private TaskRunner ещё проверяется. P07 OPEN, provider calls0. Подготовлены обязательный remote checkpoint журнала бюджета и process-only proxy adapter, живой inference ещё не запускался.
+
 28 октября: full queued public TaskRunner принят на3b9228dc98a295e605dd3ca525e1aff8a610b574, CI40674589781 SUCCESS. Все12 запросов/ответов сверены с Windows durable journal; FAIL→replan1→2-file repair→fresh PASS→publication→graph sync, usage0/scripted. Provider calls0. Evidence queued-task-scripted-v1. Private-runtime syntax/native integration подготовлена, свежий Docker CI ещё требуется; P07 OPEN.
 
 28 октября, runtime9538c147: native full-source mixed-label matrix CI40668974718 SUCCESS в обоих вариантах (ordinary_test/pytest). FAIL→replan1→repair→fresh native PASS→publication→durable graph sync принят; oversized coverage явно неполная. Pytest-self executor CI40668978237 SUCCESS (FAIL/PASS/required-SKIP refusal); standalone real GitHub queue CI40668983526 SUCCESS, broker scripted, provider_calls0. Архивы/хеши проверены. P07 OPEN: historical runtime integration, real model matched pairs/holdout/ablations/final review. Следующий пакет — full TaskRunner через очередь без provider calls.

@@ -1,0 +1,8 @@
+{
+  "command": [
+    "docker",
+    "cp",
+    "p07-private-source-733fe3f6a03144b79c2ef827:/opt/p07-runtime/python36"
+  ],
+  "exit_code": 0
+}

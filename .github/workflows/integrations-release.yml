@@ -50,7 +50,7 @@ jobs:
         with:
           node-version: '24'
       - name: P07 broker, scripted proxy and fixed-budget ledger contracts
-        run: node --test tests/p07_model_broker_test.mjs tests/p07_scripted_task_proxy_test.mjs tests/p07_paid_campaign_ledger_test.mjs
+        run: node --test tests/p07_model_broker_test.mjs tests/p07_scripted_task_proxy_test.mjs tests/p07_paid_campaign_ledger_test.mjs tests/p07_kaggle_proxy_adapter_test.mjs tests/p07_github_checkpoint_store_test.mjs tests/p07_checkpoint_store_smoke_test.mjs
       # Install the selected runtime explicitly; npx implicit downloads stay off.
       - name: Install explicitly pinned public acceptance tools
         shell: bash

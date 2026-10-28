@@ -1,0 +1,81 @@
+{
+  "Architecture": "amd64",
+  "Author": "",
+  "Comment": "buildkit.dockerfile.v0",
+  "Config": {
+    "AttachStderr": false,
+    "AttachStdin": false,
+    "AttachStdout": false,
+    "Cmd": [
+      "/bin/bash"
+    ],
+    "Domainname": "",
+    "Entrypoint": null,
+    "Env": [
+      "PATH=/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "TZ=Etc/UTC"
+    ],
+    "Hostname": "",
+    "Image": "",
+    "Labels": {
+      "atomic.p07.legacy.base": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+      "atomic.p07.legacy.donor": "library/python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2",
+      "atomic.p07.legacy.launcher": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+      "atomic.p07.sympy.base": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+      "atomic.p07.sympy.parent": "sha256:f72c9827c09c77d48aa2296e710dbf5434eb36d6c02717a061854a98d3fb59ef",
+      "atomic.p07.sympy.profile": "821e48d06e7db5efd03bb59f3efc199826d1e83c23dc00d9e0ba98cc47eaee69",
+      "org.opencontainers.image.version": "22.04"
+    },
+    "OnBuild": null,
+    "OpenStdin": false,
+    "StdinOnce": false,
+    "Tty": false,
+    "User": "root",
+    "Volumes": null,
+    "WorkingDir": "/testbed/"
+  },
+  "Created": "2026-10-28T11:19:07.3028927Z",
+  "DockerVersion": "",
+  "GraphDriver": {
+    "Data": {
+      "LowerDir": "/var/lib/docker/overlay2/zbrzfo6a4w3oyp8got931mkx7/diff:/var/lib/docker/overlay2/zmvu9gyepfgyfo8pus9x6vsny/diff:/var/lib/docker/overlay2/rgw1e3yk7n1x7nq0kq8rq15sg/diff:/var/lib/docker/overlay2/woutkeb2pmnrrwe4t40siuay8/diff:/var/lib/docker/overlay2/l93mn3e0oqryq0bxytimprc13/diff:/var/lib/docker/overlay2/jfpik5kvie6ethdll9dundo76/diff:/var/lib/docker/overlay2/ca860905a4ca70e6c2618f662eeeaf7f257528626474cf7c79874cc5ddba22c4/diff:/var/lib/docker/overlay2/96d418bf10ec0edabb9257a1ed96304ba34db675b802cca5de979983edc204de/diff:/var/lib/docker/overlay2/58dae1cee6ad582fbc1eb71c598e4a38579b88c688073d84672ebc1bdd66d8ba/diff:/var/lib/docker/overlay2/4ab306870bbc61ae25098875f1bd3570f89f23c6def199ea99c3ac123c5558a6/diff:/var/lib/docker/overlay2/82350c9f437967871f2a886be129775de4a35ccd2f40d0b97709d63855ea06e1/diff:/var/lib/docker/overlay2/1e9e96f1f3c33f2e9e2f8be6dd5a406863cc586a6f32033d28995222a94b8ed1/diff:/var/lib/docker/overlay2/ab15bd360cbe73ef2c018fceb297209088648b60b684d0d68a3f56fa65e86be2/diff:/var/lib/docker/overlay2/ae92228efb231e275086c6b44963068f6fe7fb41bbf03863b4b85bcc981f7b03/diff:/var/lib/docker/overlay2/03e517f22f2787d8863a156deaff55491199541ab800dc0802533830fe4845c7/diff:/var/lib/docker/overlay2/e4d0a8305148a1211016115b842bd9ddad634d7d573aceb7f98eefb3f9afab94/diff",
+      "MergedDir": "/var/lib/docker/overlay2/249c20et8zltc60d9gumt6pca/merged",
+      "UpperDir": "/var/lib/docker/overlay2/249c20et8zltc60d9gumt6pca/diff",
+      "WorkDir": "/var/lib/docker/overlay2/249c20et8zltc60d9gumt6pca/work"
+    },
+    "Name": "overlay2"
+  },
+  "Id": "sha256:df4e0d6d697f6d49d5d8493247c7d42db904a230b7801f4392e268652a564898",
+  "Metadata": {
+    "LastTagTime": "2026-10-28T11:19:09.594557228Z"
+  },
+  "Os": "linux",
+  "Parent": "",
+  "RepoDigests": [],
+  "RepoTags": [
+    "p07-sympy13971:faab6e9b93de469f8a837a37f779154e"
+  ],
+  "RootFS": {
+    "Layers": [
+      "sha256:beb59027b96ddbf30ac9c80b527668fe7011f4f553fe83f5e59199e9a84fb5ca",
+      "sha256:8b070dae4fd6562cc7272d3392d3e5d0eb54aebbabe7992ea47407c02a7e4ab5",
+      "sha256:e41dda3ddff433b42bc5c7db367e9a89b90e42702b2204ac3748eff0661fed5d",
+      "sha256:77dfb20914dd629938c812a6dbd69d5523e3eca3798e570ceee0b09b0e9f8eeb",
+      "sha256:73f1203e53826763f5480b23ca857212005fd21f7fbfb1df5f40641c278d0802",
+      "sha256:9f91f535caf3186b2a7f093b2f8bc4e3a6605e119e563b7e49fb81415185125d",
+      "sha256:e3120eb1e4cf8aec908f688cf2d297732712cf4f7ab9ee0d516e8b8d4798e0c3",
+      "sha256:530d89bd2b9740fb615e0e50a53225c1c8338e75d1ca5f0e94459955da525cc9",
+      "sha256:e6bbeb6b9c95785aa8aa4b0ffe3ca9738d84919bc81be5fd6889fd92dd5415b5",
+      "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+      "sha256:a7937ab831a2e336b0bb3c389c03b01b46d3e1caf56b0455643b3a8cbda54f34",
+      "sha256:c50103d786da22193ed8fb81d47ac0911cea45c3a26017044716bbdb9cfef14a",
+      "sha256:a47c503acf032d3f78894786b9befa35723c2d250ba206c778ae2727cb69645d",
+      "sha256:a5b8bfb22790cc9da9cb438edd632a4edeff557217eb23b18fcc5256960ac9d7",
+      "sha256:a9fa3a91fa8906440b5f93949f3473ce54624c2f9c711ec3ffa648c59b608ba3",
+      "sha256:5e37d9dac998e4c67837749c189e0fda84e12438e98afe46de5f427d0f50c2ce",
+      "sha256:694da61d631d541f611002d8550c6c7084ffd270eca9951dd0ac47e8935b6a13"
+    ],
+    "Type": "layers"
+  },
+  "Size": 2821992283
+}

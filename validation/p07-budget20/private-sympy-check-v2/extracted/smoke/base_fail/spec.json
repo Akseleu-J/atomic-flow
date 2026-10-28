@@ -1,0 +1,75 @@
+{
+  "argv": [
+    "/opt/p07-python36/bin/python3.6",
+    "bin/test",
+    "-C",
+    "--verbose",
+    "sympy/core/tests/test_p07_native_check.py"
+  ],
+  "base_commit": "84c125972ad535b2dfb245f8d311d347b45e5b8a",
+  "controls": {
+    "automatic_pull": false,
+    "cap_drop": [
+      "ALL"
+    ],
+    "network": "none",
+    "no_new_privileges": true,
+    "non_root": true,
+    "provider_environment": false,
+    "root_read_only": true
+  },
+  "image": "sha256:df4e0d6d697f6d49d5d8493247c7d42db904a230b7801f4392e268652a564898",
+  "interpreter": "/opt/p07-python36/bin/python3.6",
+  "kind": "host_target_test_spec",
+  "resources": {
+    "cpus": 2,
+    "memory_bytes": 1073741824,
+    "output_bytes_per_stream": 16384,
+    "pids": 128,
+    "tmpfs_bytes": 134217728
+  },
+  "runner": "sympy-native",
+  "runtime_identity": {
+    "base_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-13971@sha256:cc0369f168735cf7b9add74f5d3a50cf3c51a03549b798fa853181633ed2921a",
+    "base_image_id": "sha256:59ccf914ab15876ca87accbbb2139e1c4a111840d44d2671ae3bf27a7f54d6b1",
+    "helper_sha256": "6f5eb101ea3a0f6b93353a5237889e09f5d22130417e3ac7ed0101a4a75b52f1",
+    "image_id": "sha256:df4e0d6d697f6d49d5d8493247c7d42db904a230b7801f4392e268652a564898",
+    "interpreter": "/opt/p07-python36/bin/python3.6",
+    "inventory_sha256": "ca2164da16c614f2c78b17152e71dd15f67a536381de99996220fb135cc5a168",
+    "kind": "host_runtime_identity",
+    "launcher": "/opt/p07-runtime/python36",
+    "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+    "private_prefix": "/opt/p07-python36",
+    "profile_sha256": "821e48d06e7db5efd03bb59f3efc199826d1e83c23dc00d9e0ba98cc47eaee69",
+    "provisioning_receipt_sha256": "5843e51b90eea28790a56195f08ea68ed4d65abad0a5464b97e8907abd3f4f41",
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "runner": "sympy-native",
+    "schema_version": 1
+  },
+  "schema_version": 1,
+  "source_revision": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+  "sympy_identity": {
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "source_sha256": {
+      "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+      "bin/test": "973e3cf784388b8e7821e4962da8eeb4b615447cd652af920452b322bd63588c",
+      "sympy/utilities/runtests.py": "f3ebc3f4677d84d64b7e52ea5129522b2b5233fd2937fe5857fbe8244dfcf95c"
+    },
+    "sympy_version": "1.1.2.dev"
+  },
+  "target_root": "/testbed",
+  "task_commit": "1c912cb2549ffd89de4fc26457fb61a2c612368f",
+  "task_id": "p07_private_native_base_fail",
+  "test_paths": [
+    "sympy/core/tests/test_p07_native_check.py"
+  ],
+  "timeout_seconds": 180
+}

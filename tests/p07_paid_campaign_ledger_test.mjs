@@ -18,6 +18,19 @@ function profile(changes = {}) {
     task_owners: {sympy_1: 'akseley', requests_2: 'umirbayulgaisha'}, ...changes};
 }
 const prior = () => ({total: '0.035611375', owners: {akseley: '0.035611375', umirbayulgaisha: '0'}});
+function checkpointStore() {
+  let current = null;
+  return {
+    writes: [],
+    async read() { return structuredClone(current); },
+    async compareAndSwap(expected, next) {
+      assert.equal(canonical(expected), canonical(current), 'checkpoint CAS expected original state');
+      current = structuredClone(next);
+      this.writes.push(structuredClone(next));
+      return structuredClone(next);
+    },
+  };
+}
 function request(p, changes = {}) {
   const req = {schema_version: 1, kind: 'p07_model_request',
     call_id: 'mq_' + (++sequence).toString(16).padStart(32, '0'),
@@ -38,8 +51,9 @@ function physical(req, cost = '0.05') {
 async function fixture(t, p = profile(), booked = prior()) {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'p07-paid-ledger-test-'));
   t.after(() => fs.rm(directory, {recursive: true, force: true}));
-  const adapter = await createPaidCampaignLedger({directory, profile: p, priorSpendUsd: booked, now: () => NOW});
-  const h = {directory, adapter, profile: p, sends: 0, packets: new Map()};
+  const checkpoints = checkpointStore();
+  const adapter = await createPaidCampaignLedger({directory, profile: p, priorSpendUsd: booked, checkpointStore: checkpoints, now: () => NOW});
+  const h = {directory, adapter, checkpoints, profile: p, sends: 0, packets: new Map()};
   h.queue = {async put_response(id, packet) {
     if (h.packets.has(id)) assert.equal(canonical(h.packets.get(id)), canonical(packet));
     h.packets.set(id, structuredClone(packet));
@@ -49,6 +63,9 @@ async function fixture(t, p = profile(), booked = prior()) {
     const saved = JSON.parse(await fs.readFile(path.join(directory, 'campaign.json'), 'utf8'));
     assert.equal(saved.calls[req.call_id].broker.state, 'claimed');
     assert.equal(saved.calls[req.call_id].reservation.reserved_usd, p.reserve_per_call_usd);
+    const checkpoint = await checkpoints.read();
+    assert.equal(checkpoint.state_sha256, digest(saved));
+    assert.equal(checkpoint.sequence, saved.checkpoint_sequence);
     return physical(req);
   }};
   h.run = req => processOne({request: req, queue: h.queue, proxy: h.proxy, ...h.adapter});
@@ -175,7 +192,7 @@ test('completion response publication can reconcile after reopen without inferen
   h.queue.put_response = async () => { throw Error('publication failed'); };
   await assert.rejects(h.run(req));
   h.queue.put_response = put;
-  const reopened = await createPaidCampaignLedger({directory: h.directory, profile: h.profile, priorSpendUsd: prior(), now: () => NOW});
+  const reopened = await createPaidCampaignLedger({directory: h.directory, profile: h.profile, priorSpendUsd: prior(), checkpointStore: h.checkpoints, now: () => NOW});
   await processOne({request: req, queue: h.queue, proxy: {complete: async () => assert.fail('replayed provider')}, ...reopened});
   assert.equal(h.sends, 1);
   assert.equal(h.packets.get(req.call_id).state, 'completed');
@@ -184,7 +201,7 @@ test('completion response publication can reconcile after reopen without inferen
 
 test('campaign lock is exclusive, stale locks are not stolen, callbacks require lock ownership', async t => {
   const h = await fixture(t), second = await createPaidCampaignLedger({directory: h.directory,
-    profile: h.profile, priorSpendUsd: prior(), now: () => NOW});
+    profile: h.profile, priorSpendUsd: prior(), checkpointStore: h.checkpoints, now: () => NOW});
   await assert.rejects(h.adapter.admit(request(h.profile)), /exclusive lock/);
   await assert.rejects(h.adapter.journal.get(request(h.profile).call_id), /exclusive lock/);
   await h.adapter.journal.withLock(async () => {
@@ -200,10 +217,10 @@ test('profile and historic-spend reopening cannot increase authority', async t =
   const h = await fixture(t);
   for (const changed of [profile({arm_budget_usd: '0.6'}), profile({allowed_arms: ['atomic', 'baseline', 'critic_off']}),
     profile({task_owners: {...h.profile.task_owners, sympy_3: 'akseley'}})]) {
-    await assert.rejects(createPaidCampaignLedger({directory: h.directory, profile: changed, priorSpendUsd: prior(), now: () => NOW}));
+    await assert.rejects(createPaidCampaignLedger({directory: h.directory, profile: changed, priorSpendUsd: prior(), checkpointStore: h.checkpoints, now: () => NOW}));
   }
   await assert.rejects(createPaidCampaignLedger({directory: h.directory, profile: h.profile,
-    priorSpendUsd: {total: '0', owners: {akseley: '0', umirbayulgaisha: '0'}}, now: () => NOW}));
+    priorSpendUsd: {total: '0', owners: {akseley: '0', umirbayulgaisha: '0'}}, checkpointStore: h.checkpoints, now: () => NOW}));
 });
 
 test('profile caps, precise decimals and all named owner prior entries are mandatory', async t => {
@@ -212,10 +229,10 @@ test('profile caps, precise decimals and all named owner prior entries are manda
   for (const changed of [profile({total_budget_usd: '20.000000001'}), profile({reserve_per_call_usd: '0'}),
     profile({owner_caps: {other: '1'}}), profile({allowed_arms: ['atomic', 'atomic']}),
     profile({task_owners: {sympy_1: 'other'}}), profile({model: 'other'}), profile({reserve_per_call_usd: '0.0000000001'})]) {
-    await assert.rejects(createPaidCampaignLedger({directory, profile: changed, priorSpendUsd: prior(), now: () => NOW}));
+    await assert.rejects(createPaidCampaignLedger({directory, profile: changed, priorSpendUsd: prior(), checkpointStore: checkpointStore(), now: () => NOW}));
   }
   await assert.rejects(createPaidCampaignLedger({directory, profile: profile(),
-    priorSpendUsd: {total: '0.035611375', owners: {akseley: '0.035611375'}}, now: () => NOW}));
+    priorSpendUsd: {total: '0.035611375', owners: {akseley: '0.035611375'}}, checkpointStore: checkpointStore(), now: () => NOW}));
 });
 
 test('mutation of caller profile after construction cannot change approved authority', async t => {
@@ -234,4 +251,116 @@ test('settlement and original request conflicts fail closed', async t => {
     await assert.rejects(h.adapter.settle({reservation_id: 'paid_' + req.call_id}, physical(req, '0.04'), req), /invalid|conflict/);
   });
   assert.equal((await h.adapter.snapshot()).known_actual_usd, '0.05');
+});
+
+test('durable checkpoint store is mandatory before initializing any paid ledger', async t => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'p07-no-checkpoint-test-'));
+  t.after(() => fs.rm(directory, {recursive: true, force: true}));
+  for (const store of [undefined, {}, {read: async () => null}]) {
+    await assert.rejects(createPaidCampaignLedger({directory, profile: profile(), priorSpendUsd: prior(),
+      checkpointStore: store, now: () => NOW}), /checkpoint read\/CAS store required/);
+  }
+  assert.deepEqual(await fs.readdir(directory), []);
+});
+
+test('every checkpoint is hash-only, strictly sequenced and acknowledged before physical send', async t => {
+  const h = await fixture(t), req = request(h.profile);
+  let released = false;
+  const original = h.checkpoints.compareAndSwap.bind(h.checkpoints);
+  h.checkpoints.compareAndSwap = async (expected, next) => {
+    const saved = JSON.parse(await fs.readFile(path.join(h.directory, 'campaign.json'), 'utf8'));
+    assert.equal(next.state_sha256, digest(saved));
+    assert.deepEqual(Object.keys(next).sort(), ['profile_fingerprint', 'schema_version', 'sequence', 'state_sha256']);
+    assert.equal(next.sequence, (expected?.sequence ?? 0) + 1);
+    const ack = await original(expected, next);
+    if (saved.calls[req.call_id]?.broker.state === 'claimed') released = true;
+    return ack;
+  };
+  const proxy = h.proxy.complete;
+  h.proxy.complete = async req => { assert.equal(released, true); return proxy(req); };
+  await h.run(req);
+  assert.equal(h.sends, 1);
+  const sequences = h.checkpoints.writes.map(value => value.sequence);
+  assert.deepEqual(sequences, Array.from({length: sequences.length}, (_, index) => index + 1));
+});
+
+test('lost, stale, truncated or modified local accounting cannot reopen against authoritative checkpoint', async t => {
+  for (const damage of ['missing', 'stale', 'truncated', 'modified']) {
+    const h = await fixture(t), target = path.join(h.directory, 'campaign.json');
+    const earlier = await fs.readFile(target);
+    await h.run(request(h.profile));
+    if (damage === 'missing') await fs.unlink(target);
+    else if (damage === 'stale') await fs.writeFile(target, earlier);
+    else if (damage === 'truncated') await fs.writeFile(target, '{');
+    else {
+      const saved = JSON.parse(await fs.readFile(target, 'utf8'));
+      saved.calls = {};
+      await fs.writeFile(target, canonical(saved));
+    }
+    await assert.rejects(createPaidCampaignLedger({directory: h.directory, profile: h.profile,
+      priorSpendUsd: prior(), checkpointStore: h.checkpoints, now: () => NOW}));
+    assert.equal(h.sends, 1);
+  }
+});
+
+test('existing local ledger cannot initialize an absent authoritative checkpoint', async t => {
+  const h = await fixture(t);
+  const fresh = checkpointStore();
+  await assert.rejects(createPaidCampaignLedger({directory: h.directory, profile: h.profile,
+    priorSpendUsd: prior(), checkpointStore: fresh, now: () => NOW}), /authoritative checkpoint differ/);
+  assert.equal(fresh.writes.length, 0);
+});
+
+test('CAS conflict, unknown outcome and null or malformed acknowledgement latch before inference without retry', async t => {
+  for (const fault of ['conflict', 'unknown', 'null', 'malformed']) {
+    const h = await fixture(t), req = request(h.profile);
+    const compare = h.checkpoints.compareAndSwap.bind(h.checkpoints);
+    let attempts = 0;
+    h.checkpoints.compareAndSwap = async (expected, next) => {
+      attempts++;
+      if (fault === 'conflict') throw Error('CAS original changed');
+      const actual = await compare(expected, next);
+      if (fault === 'unknown') throw Error('remote committed but response lost');
+      if (fault === 'null') return null;
+      return {...actual, sequence: actual.sequence + 1};
+    };
+    await assert.rejects(h.run(req), /checkpoint outcome unknown/);
+    await assert.rejects(h.run(req), /checkpoint outcome unknown/);
+    await assert.rejects(h.adapter.snapshot(), /checkpoint outcome unknown/);
+    assert.equal(attempts, 1);
+    assert.equal(h.sends, 0);
+  }
+});
+
+test('checkpoint failure after reservation but before claimed acknowledgement prevents physical send', async t => {
+  const h = await fixture(t), req = request(h.profile);
+  const compare = h.checkpoints.compareAndSwap.bind(h.checkpoints);
+  h.checkpoints.compareAndSwap = async (expected, next) => {
+    const saved = JSON.parse(await fs.readFile(path.join(h.directory, 'campaign.json'), 'utf8'));
+    if (saved.calls[req.call_id]?.broker.state === 'claimed') throw Error('durable claim not acknowledged');
+    return compare(expected, next);
+  };
+  await assert.rejects(h.run(req), /checkpoint outcome unknown/);
+  assert.equal(h.sends, 0);
+  await assert.rejects(createPaidCampaignLedger({directory: h.directory, profile: h.profile,
+    priorSpendUsd: prior(), checkpointStore: h.checkpoints, now: () => NOW}), /authoritative checkpoint differ/);
+});
+
+test('snapshot rereads authoritative checkpoint rather than trusting an in-memory copy', async t => {
+  const h = await fixture(t), read = h.checkpoints.read.bind(h.checkpoints);
+  let reads = 0;
+  h.checkpoints.read = async () => { reads++; const current = await read(); return {...current, state_sha256: '0'.repeat(64)}; };
+  await assert.rejects(h.adapter.snapshot(), /authoritative checkpoint differ/);
+  assert.equal(reads, 1);
+  assert.equal(h.sends, 0);
+});
+
+test('unknown checkpoint reads latch admission and are not retried automatically', async t => {
+  const h = await fixture(t);
+  let reads = 0;
+  h.checkpoints.read = async () => { reads++; throw Error('replica unreachable'); };
+  await assert.rejects(h.run(request(h.profile)), /checkpoint read unknown/);
+  await assert.rejects(h.run(request(h.profile)), /checkpoint outcome unknown/);
+  assert.equal(reads, 1);
+  assert.equal(h.sends, 0);
 });

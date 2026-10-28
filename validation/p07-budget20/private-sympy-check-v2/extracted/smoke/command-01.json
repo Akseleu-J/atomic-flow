@@ -1,0 +1,8 @@
+{
+  "command": [
+    "git",
+    "rev-parse",
+    "HEAD"
+  ],
+  "exit_code": 0
+}

@@ -1,6 +1,6 @@
 /** Durable fixed-profile host accounting for processOne. No provider/network/env/credential I/O.
  *
- * createPaidCampaignLedger({directory, profile, priorSpendUsd, now?}) returns
+ * createPaidCampaignLedger({directory, profile, priorSpendUsd, checkpointStore, now?}) returns
  * {journal, admit, settle, snapshot}. Pass its journal/admit/settle to processOne.
  * journal.withLock owns one exclusive campaign fs lock through the whole broker
  * callback, including physical send. Locks are never stolen or recovered by PID.
@@ -22,6 +22,11 @@
  * An unresolved call, expired deadline, cost over reservation, or budget overrun
  * blocks all new paid admissions, across both named owners. A completed packet
  * may still be republished by processOne without a second inference.
+ * checkpointStore is a trusted durable replica of hashes only. Its read() must
+ * return the current checkpoint or null; compareAndSwap(expected,next) must
+ * atomically preserve next durably and acknowledge exactly next. Every local
+ * transition requires that acknowledgement before physical execution proceeds.
+ * This is consistency with a trusted replica, not remote attestation.
  */
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -100,15 +105,26 @@ function checkProfile(profile, prior) {
   validateRequest(probe);
 }
 
-export async function createPaidCampaignLedger({directory, profile, priorSpendUsd, now = () => Date.now()}) {
+export async function createPaidCampaignLedger({directory, profile, priorSpendUsd, checkpointStore, now = () => Date.now()}) {
   checkProfile(profile, priorSpendUsd);
   if (typeof directory !== 'string' || !directory || typeof now !== 'function') throw Error('private ledger directory and clock required');
+  if (!checkpointStore || typeof checkpointStore.read !== 'function' || typeof checkpointStore.compareAndSwap !== 'function') {
+    throw Error('trusted durable checkpoint read/CAS store required');
+  }
   const frozen = clone(profile), historic = clone(priorSpendUsd);
   const fingerprint = digest({profile: frozen, prior_spend_usd: historic});
   const root = path.resolve(directory), target = path.join(root, 'campaign.json'), lock = path.join(root, 'campaign.lock');
   const context = new AsyncLocalStorage();
   const token = randomUUID();
   let state;
+  let checkpoint = null, checkpointUncertain = false;
+  function checkCheckpoint(value) {
+    if (value !== null && (!exact(value, ['schema_version', 'sequence', 'state_sha256', 'profile_fingerprint'])
+        || value.schema_version !== 1 || !Number.isSafeInteger(value.sequence) || value.sequence < 1
+        || typeof value.state_sha256 !== 'string' || !SHA.test(value.state_sha256)
+        || value.profile_fingerprint !== fingerprint)) throw Error('invalid authoritative paid checkpoint');
+    return value === null ? null : clone(value);
+  }
   async function safeRoot() {
     let current = root;
     while (true) {
@@ -121,6 +137,7 @@ export async function createPaidCampaignLedger({directory, profile, priorSpendUs
   }
   function ownLock() {
     if (context.getStore() !== token) throw Error('campaign exclusive lock required for accounting');
+    if (checkpointUncertain) throw Error('paid checkpoint outcome unknown; explicit reconciliation required');
   }
   function clock() {
     const value = now();
@@ -135,6 +152,7 @@ export async function createPaidCampaignLedger({directory, profile, priorSpendUs
       if (raw.length > MAX_BYTES) throw Error('paid ledger exceeded bound');
       const saved = JSON.parse(raw.toString('utf8'));
       if (!plain(saved) || saved.schema_version !== 1 || saved.profile_fingerprint !== fingerprint
+          || !Number.isSafeInteger(saved.checkpoint_sequence) || saved.checkpoint_sequence < 1
           || canonical(saved.profile) !== canonical(frozen) || canonical(saved.prior_spend_usd) !== canonical(historic)
           || !plain(saved.calls) || Object.keys(saved.calls).length > frozen.max_physical_calls + 100
           || !Array.isArray(saved.holds) || saved.holds.some(hold => typeof hold !== 'string')) {
@@ -166,6 +184,9 @@ export async function createPaidCampaignLedger({directory, profile, priorSpendUs
   }
   async function persist() {
     ownLock(); await safeRoot();
+    const sequence = checkpoint === null ? 1 : checkpoint.sequence + 1;
+    if (!Number.isSafeInteger(sequence)) throw Error('paid checkpoint sequence exhausted');
+    state.checkpoint_sequence = sequence;
     const raw = canonical(state);
     if (Buffer.byteLength(raw) > MAX_BYTES) throw Error('paid ledger capacity exceeded');
     const temporary = target + '.' + randomUUID() + '.tmp';
@@ -173,8 +194,19 @@ export async function createPaidCampaignLedger({directory, profile, priorSpendUs
     try { await handle.writeFile(raw, 'utf8'); await handle.sync(); }
     finally { await handle.close(); }
     await fs.rename(temporary, target);
+    const next = {schema_version: 1, sequence, state_sha256: digest(state), profile_fingerprint: fingerprint};
+    try {
+      const acknowledged = checkCheckpoint(await checkpointStore.compareAndSwap(
+        checkpoint === null ? null : clone(checkpoint), clone(next)));
+      if (acknowledged === null || canonical(acknowledged) !== canonical(next)) throw Error('paid checkpoint acknowledgement differs');
+      checkpoint = clone(next);
+    } catch {
+      checkpointUncertain = true;
+      throw Error('paid checkpoint outcome unknown; no automatic retry');
+    }
   }
   async function withLock(callback) {
+    if (checkpointUncertain) throw Error('paid checkpoint outcome unknown; explicit reconciliation required');
     if (context.getStore() === token) throw Error('nested paid campaign lock is not permitted');
     await safeRoot();
     let handle;
@@ -183,11 +215,20 @@ export async function createPaidCampaignLedger({directory, profile, priorSpendUs
     try {
       await handle.writeFile(token + '\n'); await handle.sync();
       return await context.run(token, async () => {
+        try { checkpoint = checkCheckpoint(await checkpointStore.read()); }
+        catch {
+          checkpointUncertain = true;
+          throw Error('paid checkpoint read unknown; no automatic retry');
+        }
         state = await read();
         if (state === null) {
+          if (checkpoint !== null) throw Error('local paid ledger missing despite authoritative checkpoint');
           state = {schema_version: 1, profile_fingerprint: fingerprint, profile: frozen,
             prior_spend_usd: historic, calls: {}, holds: []};
           await persist();
+        } else if (checkpoint === null || state.checkpoint_sequence !== checkpoint.sequence
+            || digest(state) !== checkpoint.state_sha256) {
+          throw Error('local paid ledger and authoritative checkpoint differ; reconciliation required');
         }
         return callback();
       });

@@ -120,7 +120,14 @@ def validate_native_case(label, spec, receipt, observed, revision, mpmath_sha):
                  if label != "required_skip" else not completed_check_receipt(spec, receipt)))
 
 
-def smoke(runtime_receipt, runtime_context, output):
+def smoke(runtime_receipt, runtime_context, output, *, host_callback=None):
+    """Execute the fixed smoke, or a trusted host-only admitted-source callback.
+
+    No CLI callback or model hook is accepted. A callback owns its explicit
+    evidence scope; the default syntax/triple behavior stays unchanged.
+    """
+    if host_callback is not None and not callable(host_callback):
+        raise TypeError("trusted host callback must be callable")
     if platform.system() != "Linux" or output.exists():
         raise ValueError("Fresh output on an approved Linux Docker worker required")
     output.mkdir(parents=True)
@@ -253,6 +260,9 @@ def smoke(runtime_receipt, runtime_context, output):
                           version_source=version_source, sympy_identity=identity.as_dict())
             if any((workspace / path).exists() for path in (MODULE_PATH, TEST_PATH)):
                 raise ValueError("Synthetic test/source paths must be absent")
+            if host_callback is not None:
+                host_callback(workspace, identity, runtime, admitted, report, output)
+                return report
 
             def make_spec(label):
                 return CheckSpec(task_id="p07_private_native_" + label, task_commit=report["tested_commit"],

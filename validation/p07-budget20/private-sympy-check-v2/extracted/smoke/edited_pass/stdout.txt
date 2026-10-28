@@ -1,0 +1,18 @@
+ATOMIC_SYMPY_BEGIN:34e210f1f2774573b80c0ab42c35a264
+============================= test process starts ==============================
+executable:         /opt/p07-python36/bin/python3.6  (3.6.15-final-0) [CPython]
+architecture:       64-bit
+cache:              yes
+ground types:       python 
+numpy:              None
+random seed:        27537725
+hash randomization: off
+
+sympy/core/tests/test_p07_native_check.py[2] 
+test_native_identity ok
+test_native_probe ok                                                        [OK]
+
+
+================== tests finished: 2 passed, in 0.00 seconds ===================
+ATOMIC_SYMPY_END:34e210f1f2774573b80c0ab42c35a264
+ATOMIC_CHECK_SPEC_RECEIPT:{"check_spec_digest": "4a23c934c1be18544ec53f44312981a670fd61e0246dbf9641042efb55207259", "collected": 2, "collection": ["sympy/core/tests/test_p07_native_check.py::test_native_identity", "sympy/core/tests/test_p07_native_check.py::test_native_probe"], "counts": {"exceptions": 0, "failed": 0, "passed": 2, "skipped": 0, "xfailed": 0, "xpassed": 0}, "dependency_inventory_sha256": "ca2164da16c614f2c78b17152e71dd15f67a536381de99996220fb135cc5a168", "dependency_inventory_verification": "required_separately_by_host_admission", "exit_code": 0, "files": ["sympy/core/tests/test_p07_native_check.py"], "finished": true, "interpreter": "/opt/p07-python36/bin/python3.6", "interpreter_resolved": "/opt/p07-python36/bin/python3.6", "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81", "mpmath_module": "/opt/p07-python36/lib/python3.6/site-packages/mpmath/__init__.py", "mpmath_module_sha256": "46cd24a875e8dd00fb47c6a5cf28fd06878d4dfe7562446b8d23ca69ca65b413", "mpmath_version": "1.2.1", "native_argv": ["/testbed/bin/test", "-C", "--verbose", "sympy/core/tests/test_p07_native_check.py"], "native_source_sha256": {"bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869", "bin/test": "973e3cf784388b8e7821e4962da8eeb4b615447cd652af920452b322bd63588c", "sympy/utilities/runtests.py": "f3ebc3f4677d84d64b7e52ea5129522b2b5233fd2937fe5857fbe8244dfcf95c"}, "native_stdout_sha256": "60a8be3572f8df75505be753679da56d75be7b0f60b4c416b688209e9e1290e1", "nonce": "34e210f1f2774573b80c0ab42c35a264", "python_version": [3, 6, 15], "root": "/testbed", "runner": "sympy-native", "runtime_digest": "92dd4b2e91de10005ef0ac334fae79f668c9de428762c3aa990216add42207fc", "source_revision": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae", "sympy_module": "/testbed/sympy/__init__.py", "sympy_version": "1.1.2.dev", "test_statuses": {"sympy/core/tests/test_p07_native_check.py::test_native_identity": "passed", "sympy/core/tests/test_p07_native_check.py::test_native_probe": "passed"}, "warning_policy": ["ignore::UserWarning", "ignore::SyntaxWarning"]}

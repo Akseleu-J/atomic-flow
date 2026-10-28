@@ -1,0 +1,20 @@
+{
+  "id": 12812121013,
+  "node_id": "MDg6QXJ0aWZhY3QxMjgxMjEyMTAxMw==",
+  "name": "p07-private-sympy-check-1c912cb2549ffd89de4fc26457fb61a2c612368f",
+  "size_in_bytes": 244174,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12812121013",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12812121013/zip",
+  "expired": false,
+  "digest": "sha256:07e06978c62c72761cb677bbde56bf04b483b61a58efeefd71247db02d637dc7",
+  "created_at": "2026-10-28T11:19:23Z",
+  "updated_at": "2026-10-28T11:19:23Z",
+  "expires_at": "2026-11-11T11:19:22Z",
+  "workflow_run": {
+    "id": 40678851144,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "1c912cb2549ffd89de4fc26457fb61a2c612368f"
+  }
+}
