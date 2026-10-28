@@ -41,6 +41,22 @@ def config(spec):
                            output_bytes=spec.resources.output_bytes_per_stream)
 
 
+@pytest.mark.parametrize('status,footer,eligible', [
+    ('F', '1 failed', True), ('E', '1 exceptions', False),
+    ('s', '1 skipped', False), ('X', '1 expected to fail but passed', False),
+])
+def test_native_only_assertion_failure_can_authorize_bounded_repair(admitted, status, footer, eligible):
+    spec, _ = admitted
+    body = ('================ test process starts ================\n'
+            + PATH + '[1] \n' + 'test_probe ' + status + (' [OK]\n' if status == 's' else ' [FAIL]\n')
+            + '====== tests finished: 0 passed, ' + footer + ', in 0.01 seconds ======\n')
+    raw = result(spec, body=body, exit_code=1)
+    runner_receipt = checks._runner_receipt(raw, spec, NONCE)
+    receipt = checks.CheckReceipt(spec.digest, spec.source_revision, spec.source_revision, False,
+                                   runner_receipt, raw)
+    assert checks.completed_check_receipt(spec, receipt, negative=True) is eligible
+
+
 def result(spec, *, body=BODY, exit_code=0, **changes):
     summary = checks._parse_sympy_output(body, spec.test_paths, exit_code)
     receipt = {'nonce': NONCE, 'root': spec.target_root, 'interpreter': spec.interpreter,

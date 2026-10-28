@@ -293,9 +293,47 @@ def run_obligation_check(obligation: CheckObligation, workspace: Path, *, cancel
 
 def check_observation(obligation: CheckObligation, spec: CheckSpec, receipt) -> dict:
     """Host result fields whose source and immutable contract can be checked later."""
+    from atomic_flow.check_execution import completed_check_receipt
+
+    completed = completed_check_receipt(spec, receipt)
+    negative = completed_check_receipt(spec, receipt, negative=True) if completed else False
+    runner_digest = (hashlib.sha256(json.dumps(receipt.runner_receipt, sort_keys=True, separators=(",", ":"),
+                                               allow_nan=False).encode()).hexdigest() if completed else None)
     return {"check_obligation_digest": obligation.digest, "check_spec_digest": spec.digest,
             "check_spec": spec.as_dict(), "check_passed": receipt.check_passed,
-            "checked_source_revision": spec.source_revision}
+            "checked_source_revision": spec.source_revision, "check_completed": completed,
+            "check_failed_completed": negative, "check_runner": spec.runner,
+            "check_timeout_seconds": spec.timeout_seconds, "check_resources": spec.resources.as_dict(),
+            "check_result_exit_code": receipt.result.returncode, "check_receipt_digest": runner_digest}
+
+
+def failed_observation_matches(obligation: CheckObligation, observation: dict, revision: str) -> bool:
+    """Check a trusted completed-negative summary against current host authority.
+
+    Only host tool/automatic-check observations may call this integrity helper.
+    A model's dict or a digest is not an attestation or execution permission.
+    Rollback to an earlier revision deliberately requires a fresh current check.
+    """
+    if (type(obligation) is not CheckObligation or not isinstance(observation, dict)
+            or observation.get("check_obligation_digest") != obligation.digest
+            or observation.get("checked_source_revision") != revision
+            or observation.get("check_passed") is not False or observation.get("check_completed") is not True
+            or observation.get("check_failed_completed") is not True
+            or observation.get("check_runner") != obligation.template.runner
+            or type(observation.get("check_result_exit_code")) is not int or observation["check_result_exit_code"] != 1
+            or type(observation.get("check_receipt_digest")) is not str
+            or re.fullmatch(r"[0-9a-f]{64}", observation["check_receipt_digest"]) is None):
+        return False
+    try:
+        selected = CheckResources(**observation["check_resources"])
+        if any(getattr(selected, name) > getattr(obligation.template.resources, name) for name in selected.__dataclass_fields__):
+            return False
+        candidate = replace(obligation.template, source_revision=revision,
+                            timeout_seconds=observation["check_timeout_seconds"], resources=selected)
+        return (candidate.timeout_seconds <= obligation.template.timeout_seconds
+                and candidate.digest == observation.get("check_spec_digest"))
+    except (KeyError, TypeError, ValueError):
+        return False
 
 
 def observation_matches(obligation: CheckObligation, observation: dict, revision: str) -> bool:

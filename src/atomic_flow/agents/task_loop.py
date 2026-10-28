@@ -1027,13 +1027,20 @@ class TaskRunner:
                 self.changeset.track(path, expected_hash)
         self._verify_step(step, result)
 
-    def _check_failure(self, step: Step, message: str, check: str, exit_code: int, *, checked_revision=None) -> StepFailure:
+    def _check_failure(self, step: Step, message: str, check: str, exit_code: int, *, checked_revision=None,
+                       check_observation=None) -> StepFailure:
         """Trusted host check result for this attempt; never inferred from text."""
         from atomic_flow.agents.step_evidence import manifest_digest
         if type(exit_code) is not int or exit_code != 1 or check not in {"syntax", "pytest", "ruff", "mypy"}:
             return StepFailure(step.index, message, "check_unavailable")
         if self.changeset is None or step.started_at is None:
             return StepFailure(step.index, message, "verification_contract_failure")
+        if self.check_obligation is not None and check == "pytest":
+            from atomic_flow.check_obligation import failed_observation_matches
+            current = manifest_digest(self.changeset.validate_workspace())
+            if (checked_revision != current
+                    or not failed_observation_matches(self.check_obligation, check_observation, current)):
+                return StepFailure(step.index, "host obligation failure is incomplete, unavailable or stale", "check_unavailable")
         evidence = {"version": 1, "check": check, "exit_code": exit_code, "step_index": step.index,
                     "started_at": step.started_at, "outcome": "failed",
                     "source_revision": manifest_digest(self.changeset.validate_workspace())}
@@ -1063,7 +1070,7 @@ class TaskRunner:
                     if code == 1 and not summary.get("checked_source_revision"):
                         raise StepFailure(step.index, "host check lacks source revision", "verification_contract_failure")
                     raise self._check_failure(step, "host check failed; edit rolled back", failed[-1], code,
-                                              checked_revision=summary.get("checked_source_revision"))
+                                              checked_revision=summary.get("checked_source_revision"), check_observation=summary)
                 raise StepFailure(step.index, f"edit rolled back: {summary.get('reason', 'verification failed')}")
             if (call.get("tool") == "run_command" and type(summary.get("exit_code")) is int
                     and summary["exit_code"] != 0 and summary.get("outcome") != "denied"):
@@ -1073,7 +1080,7 @@ class TaskRunner:
                             manifest_digest(self.changeset.validate_workspace())):
                         raise StepFailure(step.index, "host check source revision is missing or stale", "source_conflict")
                     raise self._check_failure(step, "host command check failed", call.get("args", {}).get("command"), summary["exit_code"],
-                                              checked_revision=summary["checked_source_revision"])
+                                              checked_revision=summary["checked_source_revision"], check_observation=summary)
                 raise StepFailure(step.index, "failing command predates a later mutation", "verification_contract_failure")
             if summary.get("outcome") in {"error", "denied"} or summary.get("error"):
                 kind = "scope_violation_detected" if summary.get("outcome") == "denied" else "tool_precondition_failure"
@@ -1095,7 +1102,8 @@ class TaskRunner:
                 type(summary.get("exit_code")) is not int or summary["exit_code"] != 0
             ):
                 if i >= last_mutation:
-                    raise self._check_failure(step, "host command check failed", call.get("args", {}).get("command"), summary.get("exit_code"))
+                    raise self._check_failure(step, "host command check failed", call.get("args", {}).get("command"), summary.get("exit_code"),
+                                              checked_revision=summary.get("checked_source_revision"), check_observation=summary)
                 raise StepFailure(step.index, "failing command predates a later mutation", "verification_contract_failure")
 
         if getattr(result, "verdict", "unverified") in {"wrong_answer", "needs_retry", "needs_more_context"}:
@@ -1115,14 +1123,15 @@ class TaskRunner:
             return
 
         if step.verify_with == "pytest" and self.check_obligation is not None:
-            from atomic_flow.check_obligation import run_obligation_check
+            from atomic_flow.check_obligation import check_observation, run_obligation_check
             workspace = self.changeset.workspace if self.changeset else self.project
             spec, receipt = run_obligation_check(self.check_obligation, workspace, cancel_check=self.cancel_check)
             if receipt.result.timed_out:
                 raise StepFailure(step.index, "host obligation timed out", "check_timeout")
             if not receipt.check_passed:
                 raise self._check_failure(step, "complete host ordinary-test obligation failed", "pytest",
-                                          receipt.result.returncode, checked_revision=spec.source_revision)
+                                          receipt.result.returncode, checked_revision=spec.source_revision,
+                                          check_observation=check_observation(self.check_obligation, spec, receipt))
             step.result_summary = "ok (complete source-bound ordinary-test obligation passed)"
             return
 

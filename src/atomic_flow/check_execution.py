@@ -44,6 +44,9 @@ class Evidence:
     files = set()
     skipped = 0
     failed = 0
+    call_failed = 0
+    setup_failed = 0
+    teardown_failed = 0
     finished = False
     def pytest_collection_finish(self,session):
         self.collected = len(session.items)
@@ -56,6 +59,9 @@ class Evidence:
             self.skipped += 1
         if report.failed:
             self.failed += 1
+            if report.when == 'call':self.call_failed += 1
+            elif report.when == 'setup':self.setup_failed += 1
+            elif report.when == 'teardown':self.teardown_failed += 1
     def pytest_sessionfinish(self,session,exitstatus):
         self.finished = True
 evidence = Evidence()
@@ -65,6 +71,7 @@ receipt = {'nonce':nonce,'root':root,'interpreter':sys.executable,
            'pytest_module':runner_path,'pytest_version':getattr(pytest,'__version__','unknown'),
            'collected':evidence.collected,'files':sorted(evidence.files),
            'skipped':evidence.skipped,'failed':evidence.failed,'finished':evidence.finished,
+           'call_failed':evidence.call_failed,'setup_failed':evidence.setup_failed,'teardown_failed':evidence.teardown_failed,
            'exit_code':code}
 print('\nATOMIC_CHECK_SPEC_RECEIPT:' + json.dumps(receipt,sort_keys=True),flush=True)
 complete = (evidence.finished and evidence.collected > 0 and evidence.files == set(paths)
@@ -293,7 +300,7 @@ class CheckReceipt:
 
 
 def _runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str) -> dict | None:
-    if result.timed_out or result.stdout_truncated or result.stderr_truncated:
+    if type(result.returncode) is not int or result.timed_out or result.stdout_truncated or result.stderr_truncated:
         return None
     lines = [line[len(_MARKER):] for line in result.stdout.splitlines() if line.startswith(_MARKER)]
     if len(lines) != 1:
@@ -308,12 +315,29 @@ def _runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str) -> dict 
             or receipt.get("interpreter") != spec.interpreter or receipt.get("finished") is not True
             or type(receipt.get("collected")) is not int or receipt["collected"] <= 0
             or receipt.get("files") != sorted(spec.test_paths) or receipt.get("skipped") != 0
-            or receipt.get("failed") != 0 or receipt.get("exit_code") != result.returncode
+            or type(receipt.get("failed")) is not int or receipt["failed"] < 0
+            or receipt.get("exit_code") != result.returncode
             or any(type(receipt.get(key)) is not int for key in ("skipped", "failed", "exit_code"))
             or not isinstance(receipt.get("pytest_module"), str)
             or not receipt["pytest_module"].startswith("/")
             or receipt["pytest_module"].startswith(spec.target_root + "/")
             or not isinstance(receipt.get("pytest_version"), str)):
+        return None
+    phases = ("call_failed", "setup_failed", "teardown_failed")
+    if any(key in receipt for key in phases):
+        if (any(type(receipt.get(key)) is not int or receipt[key] < 0 for key in phases)
+                or sum(receipt[key] for key in phases) != receipt["failed"]):
+            return None
+    if result.returncode == 0:
+        if receipt["failed"] != 0:
+            return None
+    elif result.returncode == 1:
+        if (any(type(receipt.get(key)) is not int or receipt[key] < 0 for key in ("call_failed", "setup_failed", "teardown_failed"))
+                or receipt["call_failed"] <= 0 or receipt["call_failed"] > receipt["collected"]
+                or receipt["setup_failed"] != 0 or receipt["teardown_failed"] != 0
+                or receipt["failed"] != receipt["call_failed"]):
+            return None
+    else:
         return None
     return receipt
 
@@ -350,6 +374,33 @@ def _sympy_runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str, re
             or result.returncode == 0 and any(summary["counts"][name] for name in ("failed", "exceptions", "skipped", "xpassed"))):
         return None
     return receipt
+
+
+def completed_check_receipt(spec: CheckSpec, receipt: CheckReceipt, *, negative: bool = False) -> bool:
+    """Revalidate a host receipt; arbitrary output flags never attest completion.
+
+    The target interpreter's report is not an independent oracle or signature.
+    This checks the actual stored stream and the immutable host/source binding.
+    """
+    if (type(spec) is not CheckSpec or type(receipt) is not CheckReceipt
+            or receipt.spec_digest != spec.digest or receipt.source_before != spec.source_revision
+            or receipt.source_after != spec.source_revision or not isinstance(receipt.runner_receipt, dict)):
+        return False
+    nonce = receipt.runner_receipt.get("nonce")
+    if type(nonce) is not str or re.fullmatch(r"[0-9a-f]{32}", nonce) is None:
+        return False
+    validated = _runner_receipt(receipt.result, spec, nonce)
+    if validated is None or validated != receipt.runner_receipt:
+        return False
+    if not negative:
+        return True
+    if receipt.check_passed is not False or receipt.result.returncode != 1:
+        return False
+    if spec.runner == "pytest":
+        return validated.get("call_failed", 0) > 0
+    counts = validated.get("counts", {})
+    return (type(counts.get("failed")) is int and counts["failed"] > 0
+            and all(counts.get(name) == 0 for name in ("exceptions", "skipped", "xpassed")))
 
 
 def run_check_spec(spec: CheckSpec, workspace: Path, *, cancel_check=None) -> CheckReceipt:

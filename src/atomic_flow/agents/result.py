@@ -1,6 +1,7 @@
 """Host-owned tool outcomes, independent of model wording and provider protocol."""
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -64,6 +65,25 @@ class ToolResult:
             "effect_not_started",
             "workspace_id", "root_id", "root_generation", "hash_algorithm", "version", "available", "data_only",
         ) if key in self.payload}
+        for name in ("check_obligation_digest", "check_spec_digest", "check_receipt_digest"):
+            value = self.payload.get(name)
+            if type(value) is str and re.fullmatch(r"[a-f0-9]{64}", value):
+                out[name] = value
+        for name in ("check_passed", "check_completed", "check_failed_completed"):
+            if type(self.payload.get(name)) is bool:
+                out[name] = self.payload[name]
+        if type(self.payload.get("check_runner")) is str and self.payload["check_runner"] in {"pytest", "sympy-native"}:
+            out["check_runner"] = self.payload["check_runner"]
+        for name, minimum, maximum in (("check_timeout_seconds", 1, 180), ("check_result_exit_code", -(2**32), 2**32 - 1)):
+            value = self.payload.get(name)
+            if type(value) is int and minimum <= value <= maximum:
+                out[name] = value
+        bounds = {"memory_bytes": 1024**3, "cpus": 2, "pids": 128, "tmpfs_bytes": 128 * 1024**2,
+                  "output_bytes_per_stream": 1_000_000}
+        resources = self.payload.get("check_resources")
+        if (type(resources) is dict and resources.keys() == bounds.keys()
+                and all(type(resources[name]) is int and 1 <= resources[name] <= maximum for name, maximum in bounds.items())):
+            out["check_resources"] = dict(resources)
         if isinstance(self.payload.get("counts"), dict):
             out["counts"] = self.payload["counts"]
         if isinstance(self.payload.get("results"), list):

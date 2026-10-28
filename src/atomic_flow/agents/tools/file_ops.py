@@ -91,6 +91,8 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
     verification = {"filesystem": "not_run", "syntax": "not_run", "pytest": "not_run"}
     diagnostics = []
     verdict = None
+    bound_observation = {}
+    bound_result = None
     try:
         file_transaction.apply(storage, ctx.project_root, edit_id, state, after, ctx.cancel_check, after_modes)
         verification["filesystem"] = "passed"
@@ -103,6 +105,7 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
             verdict = verify_edit(ctx.project_root, path, execution=ctx.execution, cancel_check=ctx.cancel_check,
                                   private_workspace=ctx.private_workspace, check_obligation=ctx.check_obligation)
             diagnostics.extend(verdict.diagnostics)
+            bound_observation = verdict.check_observation
             for check in verdict.checks:
                 if check != "skip":
                     if check not in checks:
@@ -116,9 +119,11 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
         removed_tests = sorted({test for path, data in after.items() if data is None
                                 for test in _matching_tests(ctx.project_root, path)} - tested)
         if ctx.check_obligation is not None and any(data is None for data in after.values()):
-            from atomic_flow.check_obligation import run_obligation_check
+            from atomic_flow.check_obligation import check_observation, run_obligation_check
             with checked_workspace(ctx.project_root, private_workspace=ctx.private_workspace, cancel_check=ctx.cancel_check) as check_root:
-                _, receipt = run_obligation_check(ctx.check_obligation, check_root, cancel_check=ctx.cancel_check)
+                spec, receipt = run_obligation_check(ctx.check_obligation, check_root, cancel_check=ctx.cancel_check)
+            bound_observation = check_observation(ctx.check_obligation, spec, receipt)
+            bound_result = receipt.result
             checks.append("pytest")
             verification["pytest"] = "passed" if receipt.check_passed else "failed"
             if not receipt.check_passed:
@@ -156,18 +161,18 @@ def _mutate(ctx, before: dict[str, bytes | None], after: dict[str, bytes | None]
             raise
         return {"status": "rolled_back" if restored else "rollback_failed", "reason": str(exc),
                 "edit_id": edit_id, "checks": checks, "verification": verification,
-                "check_timed_out": bool(verdict and verdict.timed_out),
-                "check_exit_code": verdict.exit_code if verdict else None,
+                "check_timed_out": bound_result.timed_out if bound_result is not None else bool(verdict and verdict.timed_out),
+                "check_exit_code": bound_result.returncode if bound_result is not None else verdict.exit_code if verdict else None,
                 "check_source_changed": bool(verdict and verdict.source_changed),
                 "checked_source_revision": verdict.checked_source_revision if verdict else "",
-                    **(verdict.check_observation if verdict else {}),
+                    **bound_observation,
                 "index_refresh_error": refresh_error, "diagnostics": diagnostics}
     changes = [{"path": path, "before_hash": hashes["before"], "after_hash": hashes["after"]}
                for path, hashes in state["changes"].items()]
     return {"status": "applied", "edit_id": edit_id, "path": next(iter(after)), "paths": list(after),
             "changes": changes, "content_hash": changes[0]["after_hash"], "checks": checks,
             "verification": verification, "index_revision": ctx.revision, "diagnostics": diagnostics,
-            **(verdict.check_observation if verdict else {}),
+            **bound_observation,
             "undo_hint": f"atomic undo {edit_id}"}
 
 
