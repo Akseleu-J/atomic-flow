@@ -147,6 +147,9 @@ class CheckObligation:
         identity = self.template.sympy_identity
         if identity is not None and not set(identity.source_sha256) <= set(self.protected_files):
             raise CheckObligationError("all native SymPy runner bytes must be protected")
+        identity = self.template.pytest_self_identity
+        if identity is not None and not set(identity.source_sha256) <= set(self.protected_files):
+            raise CheckObligationError("all pytest self entrypoint bytes must be protected")
         if self.test_directories != _test_directories(self.template.test_paths):
             raise CheckObligationError("test-directory scope differs from complete test obligation")
         if not _config_paths(self.template.test_paths) <= set(paths) | set(self.absent_paths):
@@ -188,6 +191,8 @@ class CheckObligation:
             inventory = _directory_inventory(before, directories)
             configs = _config_paths(spec.test_paths)
             native_files = dict(spec.sympy_identity.source_sha256) if spec.sympy_identity is not None else {}
+            if spec.pytest_self_identity is not None:
+                native_files.update(spec.pytest_self_identity.source_sha256)
             requested = set(spec.test_paths) | set(protected_paths) | set(inventory) | native_files.keys()
             missing = requested - before.keys()
             if missing:
@@ -202,7 +207,7 @@ class CheckObligation:
                     raise CheckObligationError("checker configuration was not admitted in source inventory")
             protected = tuple((path, _sha256(root, path, check)) for path in sorted(present))
             if any(dict(protected)[path] != expected for path, expected in native_files.items()):
-                raise CheckObligationError("native SymPy runner source differs from admitted bytes")
+                raise CheckObligationError("protected check runner source differs from admitted bytes")
             if check_source_snapshot(root, check) != before:
                 raise CheckObligationError("source changed while sealing ordinary tests")
             check()

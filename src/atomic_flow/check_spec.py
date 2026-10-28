@@ -13,6 +13,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Literal
 
+from atomic_flow.check_pytest_self import PytestSelfIdentity
+
 _IMAGE = re.compile(r"[a-z0-9]+(?:[._-][a-z0-9]+)*(?::[0-9]+)?(?:/[a-z0-9]+(?:[._-][a-z0-9]+)*)*@sha256:[0-9a-f]{64}")
 _TASK = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}")
 _PATH = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_./-]{0,511}")
@@ -101,12 +103,13 @@ class CheckSpec:
     source_revision: str
     image: str
     interpreter: str
-    runner: Literal["pytest", "sympy-native"]
+    runner: Literal["pytest", "sympy-native", "pytest-self"]
     test_paths: tuple[str, ...]
     target_root: Literal["/workspace", "/testbed"] = "/workspace"
     timeout_seconds: int = 180
     resources: CheckResources = field(default_factory=CheckResources)
     sympy_identity: SymPyRunnerIdentity | None = None
+    pytest_self_identity: PytestSelfIdentity | None = None
 
     def __post_init__(self) -> None:
         if type(self.task_id) is not str or _TASK.fullmatch(self.task_id) is None:
@@ -118,7 +121,7 @@ class CheckSpec:
             raise ValueError("image must be an exact image reference at sha256 digest")
         if type(self.interpreter) is not str or self.interpreter not in _INTERPRETERS:
             raise ValueError("interpreter must be an admitted absolute image path")
-        if type(self.runner) is not str or self.runner not in {"pytest", "sympy-native"}:
+        if type(self.runner) is not str or self.runner not in {"pytest", "sympy-native", "pytest-self"}:
             raise ValueError("unreviewed test runner")
         if type(self.target_root) is not str or self.target_root not in {"/workspace", "/testbed"}:
             raise ValueError("unreviewed target root")
@@ -132,6 +135,8 @@ class CheckSpec:
             raise ValueError("native SymPy obligations must be under sympy/")
         if self.sympy_identity is not None and (self.runner != "sympy-native" or type(self.sympy_identity) is not SymPyRunnerIdentity):
             raise ValueError("native SymPy identity belongs only to a native runner specification")
+        if self.pytest_self_identity is not None and (self.runner != "pytest-self" or type(self.pytest_self_identity) is not PytestSelfIdentity):
+            raise ValueError("pytest self identity belongs only to a pytest self runner specification")
         _integer("timeout_seconds", self.timeout_seconds, 180)
         if type(self.resources) is not CheckResources:
             raise ValueError("resource bounds must use the immutable host contract")
@@ -141,6 +146,9 @@ class CheckSpec:
         """Exact non-shell argv; native execution additionally requires host runner identity."""
         if self.runner == "pytest":
             return (self.interpreter, "-m", "pytest", "-q", "--no-header", "-x", *self.test_paths)
+        if self.runner == "pytest-self":
+            profile = ("--tb=short",) if self.pytest_self_identity is not None and self.pytest_self_identity.traceback == "short" else ()
+            return (self.interpreter, "-m", "pytest", "-rA", *profile, *self.test_paths)
         return (self.interpreter, "bin/test", "-C", "--verbose", *self.test_paths)
 
     def as_dict(self) -> dict:
@@ -155,6 +163,8 @@ class CheckSpec:
                              "provider_environment": False}}
         if self.sympy_identity is not None:
             value["sympy_identity"] = self.sympy_identity.as_dict()
+        if self.pytest_self_identity is not None:
+            value["pytest_self_identity"] = self.pytest_self_identity.as_dict()
         return value
 
     def canonical_bytes(self) -> bytes:

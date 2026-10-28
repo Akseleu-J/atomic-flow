@@ -72,7 +72,7 @@ class ToolResult:
         for name in ("check_passed", "check_completed", "check_failed_completed"):
             if type(self.payload.get(name)) is bool:
                 out[name] = self.payload[name]
-        if type(self.payload.get("check_runner")) is str and self.payload["check_runner"] in {"pytest", "sympy-native"}:
+        if type(self.payload.get("check_runner")) is str and self.payload["check_runner"] in {"pytest", "sympy-native", "pytest-self"}:
             out["check_runner"] = self.payload["check_runner"]
         for name, minimum, maximum in (("check_timeout_seconds", 1, 180), ("check_result_exit_code", -(2**32), 2**32 - 1)):
             value = self.payload.get(name)

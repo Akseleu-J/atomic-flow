@@ -9,7 +9,7 @@ from typing import Any
 
 from atomic_flow.graph.schema import edge_id
 
-RESOLVER = "name-resolver/2"
+RESOLVER = "name-resolver/3"
 
 
 class ExportIndex(dict):
@@ -165,9 +165,13 @@ def infer_file_edges(file_node: dict[str, Any], *, modules: dict[str, str],
                 module_locals[b["local"]] = subtarget
                 edge("imports", "file:" + subtarget)
         if not target:
+            if b.get("star"):
+                unknown_star = True
             unresolved.append(f"import {module or b.get('module', '')} (unresolved)")
             continue
         edge("imports", "file:" + target)
+        if b.get("star") and target in getattr(exports, "dynamic", set()):
+            unknown_star = True
         if target in getattr(exports, "unknown", set()):
             unresolved.append(f"import {module}: export coverage unknown")
             if b.get("star"):

@@ -1,11 +1,11 @@
-"""Execute admitted installed-pytest or native-SymPy checks with Docker lifecycle.
+"""Execute admitted installed-pytest, pytest-self or native-SymPy Docker checks.
 
 TaskRunner's host CheckObligation uses this boundary for tool, edit, step and
 final checks. A target process can lie about its own pytest hooks/output; its
 receipt is not an independent oracle grade or remote attestation. Native SymPy
 requires a separately admitted exact runner identity and complete counted output.
-Historical pytest repository self-tests are also unsupported: this launcher
-deliberately imports an installed checker before permitting target imports.
+Pytest repository self-tests use a separate pinned entrypoint identity and
+import the actual edited source root inside the same bounded Docker lifecycle.
 """
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from atomic_flow.agents.execution import CommandResult, ExecutionUnavailable
+from atomic_flow.check_pytest_self import pytest_self_args, pytest_self_receipt
 from atomic_flow.check_spec import CheckSpec
 from atomic_flow.config import ExecutionConfig
 
@@ -230,7 +231,9 @@ def admit_check_spec(spec: CheckSpec, workspace: Path, config: ExecutionConfig,
     check()
     if spec.runner == "sympy-native" and spec.sympy_identity is None:
         raise ExecutionUnavailable("Native SymPy execution without an admitted runner identity is not implemented")
-    if spec.task_id.startswith("pytest-dev__pytest-"):
+    if spec.runner == "pytest-self" and spec.pytest_self_identity is None:
+        raise ExecutionUnavailable("Pytest repository self-checks require an admitted runner identity")
+    if spec.task_id.startswith("pytest-dev__pytest-") and (spec.runner != "pytest-self" or spec.pytest_self_identity is None):
         raise ExecutionUnavailable("Historical pytest repository self-checks require a separate runner identity contract")
     if (config.mode != "docker" or config.profile != "checks" or config.image != spec.image
             or config.output_bytes > spec.resources.output_bytes_per_stream
@@ -253,18 +256,19 @@ def admit_check_spec(spec: CheckSpec, workspace: Path, config: ExecutionConfig,
                 raise ExecutionUnavailable("CheckSpec test obligation contains a link")
         if not path.is_file() or not path.resolve().is_relative_to(root.resolve()):
             raise ExecutionUnavailable("CheckSpec test obligation is missing or escapes the workspace")
-    if spec.runner == "sympy-native":
-        for relative, expected in spec.sympy_identity.source_sha256:
+    identity = spec.sympy_identity if spec.runner == "sympy-native" else spec.pytest_self_identity if spec.runner == "pytest-self" else None
+    if identity is not None:
+        for relative, expected in identity.source_sha256:
             check()
             path = root / relative
             if (any(part.is_symlink() or getattr(part, "is_junction", lambda: False)()
                     for part in (path, *path.parents) if part != root.parent and part.is_relative_to(root))
                     or not path.is_file() or path.stat().st_size > 4 * 1024**2):
-                raise ExecutionUnavailable("Native SymPy runner source differs from admitted bytes")
+                raise ExecutionUnavailable("Protected check runner source differs from admitted bytes")
             with path.open('rb') as source:
                 raw = source.read(4 * 1024**2 + 1)
             if len(raw) > 4 * 1024**2 or hashlib.sha256(raw).hexdigest() != expected:
-                raise ExecutionUnavailable("Native SymPy runner source differs from admitted bytes")
+                raise ExecutionUnavailable("Protected check runner source differs from admitted bytes")
     from atomic_flow.agents.verify import check_source_revision
     revision = check_source_revision(root, check)
     if revision != spec.source_revision:
@@ -282,6 +286,10 @@ def checker_args(spec: CheckSpec, nonce: str) -> list[str]:
         bootstrap = _SYMPY_BOOTSTRAP.replace("PARSE_SOURCE", inspect.getsource(_parse_sympy_output))
         return ["-I", "-c", bootstrap, nonce, spec.target_root,
                 json.dumps(spec.sympy_identity.as_dict(), sort_keys=True), str(spec.resources.output_bytes_per_stream), *spec.test_paths]
+    if spec.runner == "pytest-self":
+        if spec.pytest_self_identity is None:
+            raise ExecutionUnavailable("Pytest repository self-checks need an admitted runner identity")
+        return pytest_self_args(spec.pytest_self_identity, nonce, spec.target_root, spec.interpreter, spec.test_paths)
     return ["-I", "-c", _BOOTSTRAP, nonce, spec.target_root, *spec.test_paths]
 
 
@@ -302,6 +310,10 @@ class CheckReceipt:
 def _runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str) -> dict | None:
     if type(result.returncode) is not int or result.timed_out or result.stdout_truncated or result.stderr_truncated:
         return None
+    if spec.runner == "pytest-self":
+        if spec.pytest_self_identity is None:
+            return None
+        return pytest_self_receipt(result, spec.pytest_self_identity, nonce, spec.target_root, spec.interpreter, spec.test_paths)
     lines = [line[len(_MARKER):] for line in result.stdout.splitlines() if line.startswith(_MARKER)]
     if len(lines) != 1:
         return None
@@ -396,7 +408,7 @@ def completed_check_receipt(spec: CheckSpec, receipt: CheckReceipt, *, negative:
         return True
     if receipt.check_passed is not False or receipt.result.returncode != 1:
         return False
-    if spec.runner == "pytest":
+    if spec.runner in {"pytest", "pytest-self"}:
         return validated.get("call_failed", 0) > 0
     counts = validated.get("counts", {})
     return (type(counts.get("failed")) is int and counts["failed"] > 0

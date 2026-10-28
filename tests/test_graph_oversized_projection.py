@@ -261,3 +261,25 @@ def test_host_graph_large_file_admission_keeps_hidden_ignore_and_link_guards(tmp
         project_paths(tmp_path, ["alias.py"])
     with pytest.raises(SourceConflict):
         admitted_path(ctx, "alias.py", existing=True, source_byte_limit=ADMITTED_BYTE_LIMIT)
+
+
+@pytest.mark.parametrize("provider", [None, b"__all__ = discover()\n"])
+def test_unresolved_or_dynamic_star_does_not_prove_local_call_binding(provider):
+    files = {"consumer.py": b"def local(): return 1\nfrom provider import *\nlocal()\n"}
+    if provider is not None:
+        files["provider.py"] = provider
+    build = clean_build(files)
+    assert not any(edge["kind"] == "calls" and edge["src"] == "file:consumer.py" for edge in build["edges"])
+    assert any("call local" in item for item in build["unresolved"])
+
+
+def test_graph_scan_on_mixed_checkout_keeps_supported_sources_and_syncs(tmp_path):
+    from atomic_flow.graph.project import project_files
+    (tmp_path / "code.py").write_bytes(SMALL)
+    (tmp_path / "data.json").write_bytes(b"{}")
+    (tmp_path / "binary.png").write_bytes(b"\x89PNG\x00")
+    (tmp_path / "launcher").write_bytes(b"#!/usr/bin/python\n")
+    (tmp_path / "README.rst").write_bytes(b"Unsupported source-index suffix\n")
+    assert set(project_files(tmp_path, suffix=None)) == {"code.py", "data.json"}
+    report = sync_project_graph(tmp_path, {})
+    assert report["created"] is True and not report.get("failed")

@@ -62,7 +62,7 @@ def project_files(root: Path, *, suffix: str | None = ".py", tree_ignore=None, r
     from atomic_flow.execution_inputs import private_credential_path
     from atomic_flow.project_resources import ProjectLimits, ResourceLimitError, source_files, stream_source
     from atomic_flow.tree.builder import _Ignore
-    from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES
+    from atomic_flow.tree.defaults import DEFAULT_IGNORE, MAX_FILE_BYTES, SOURCE_SUFFIXES
 
     root = Path(root).absolute()
     if any(p.is_symlink() or getattr(p, "is_junction", lambda: False)() for p in (root, *root.parents)):
@@ -94,6 +94,11 @@ def project_files(root: Path, *, suffix: str | None = ".py", tree_ignore=None, r
     files, total = {}, 0
     for rel, _ in source_files(root, skip, limits, cancel_check, private_root=user_dir().resolve()):
         if suffix is not None and not rel.endswith(suffix):
+            continue
+        if suffix is None and Path(rel).suffix.lower() not in SOURCE_SUFFIXES:
+            # A mixed checkout also contains binaries, extensionless launchers
+            # and unsupported docs. They are outside the source-index adapter
+            # contract; never send them through a model source-read admission.
             continue
         if len(files) >= limits.max_files:
             raise ResourceLimitError("read-plan source file limit exceeded")

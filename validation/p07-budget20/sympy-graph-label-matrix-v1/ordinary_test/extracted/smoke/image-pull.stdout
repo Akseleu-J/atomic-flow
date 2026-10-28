@@ -1,0 +1,50 @@
+docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626: Pulling from swebench/sweb.eval.x86_64.sympy_1776_sympy-20212
+39a945af8df2: Pulling fs layer
+a4d326e88417: Pulling fs layer
+fd7a87c0b95b: Pulling fs layer
+d07e7f5cb3eb: Pulling fs layer
+3d473160e8e5: Pulling fs layer
+6a99d82d9a89: Pulling fs layer
+dc407fa36252: Pulling fs layer
+c271b27e967a: Pulling fs layer
+dadb20e53690: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+d07e7f5cb3eb: Waiting
+3d473160e8e5: Waiting
+6a99d82d9a89: Waiting
+dadb20e53690: Waiting
+4f4fb700ef54: Waiting
+dc407fa36252: Waiting
+c271b27e967a: Waiting
+39a945af8df2: Verifying Checksum
+39a945af8df2: Download complete
+d07e7f5cb3eb: Verifying Checksum
+d07e7f5cb3eb: Download complete
+3d473160e8e5: Verifying Checksum
+3d473160e8e5: Download complete
+a4d326e88417: Download complete
+6a99d82d9a89: Verifying Checksum
+6a99d82d9a89: Download complete
+c271b27e967a: Verifying Checksum
+c271b27e967a: Download complete
+fd7a87c0b95b: Verifying Checksum
+fd7a87c0b95b: Download complete
+dadb20e53690: Verifying Checksum
+dadb20e53690: Download complete
+39a945af8df2: Pull complete
+4f4fb700ef54: Verifying Checksum
+4f4fb700ef54: Download complete
+dc407fa36252: Verifying Checksum
+dc407fa36252: Download complete
+a4d326e88417: Pull complete
+fd7a87c0b95b: Pull complete
+d07e7f5cb3eb: Pull complete
+3d473160e8e5: Pull complete
+6a99d82d9a89: Pull complete
+dc407fa36252: Pull complete
+c271b27e967a: Pull complete
+dadb20e53690: Pull complete
+4f4fb700ef54: Pull complete
+Digest: sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626
+Status: Downloaded newer image for swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626
+docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626

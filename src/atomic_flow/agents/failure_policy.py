@@ -65,7 +65,7 @@ def validate_failure_evidence(evidence):
             or not re.fullmatch(r"[a-f0-9]{64}", evidence["checked_source_revision"])):
         raise ValueError("missing or invalid host failing-check evidence")
     if version == 2:
-        if (type(evidence["runner"]) is not str or evidence["runner"] not in {"pytest", "sympy-native"}
+        if (type(evidence["runner"]) is not str or evidence["runner"] not in {"pytest", "sympy-native", "pytest-self"}
                 or evidence["check_completed"] is not True or evidence["check_failed_completed"] is not True
                 or evidence["source_revision"] != evidence["checked_source_revision"]
                 or any(type(evidence[key]) is not str or re.fullmatch(r"[a-f0-9]{64}", evidence[key]) is None
