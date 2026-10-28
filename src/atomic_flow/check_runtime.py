@@ -47,6 +47,7 @@ class RuntimeIdentity:
     provisioning_receipt_sha256: str
     private_prefix: str = ""
     launcher: str = ""
+    launcher_sha256: str | None = None
 
     def __post_init__(self) -> None:
         if type(self.base_image) is not str or len(self.base_image) > 512 or _IMAGE.fullmatch(self.base_image) is None:
@@ -66,9 +67,30 @@ class RuntimeIdentity:
             raise ValueError("unreviewed runner family")
         if self.runner == "sympy-native" and version[:2] == (2, 7):
             raise ValueError("Python2 native SymPy has no reviewed runner")
+        if self.launcher_sha256 is not None:
+            _sha("launcher_sha256", self.launcher_sha256)
+            if not self.launcher:
+                raise ValueError("launcher hash requires a reviewed private launcher")
+
+    @property
+    def execution_eligible(self) -> bool:
+        """Private execution prerequisites, not evidence verification or authority.
+
+        Legacy identities remain usable for metadata consistency checks. A host
+        must separately validate admission bytes and live image metadata before
+        executing even an eligible identity.
+        """
+        return bool(self.private_prefix and self.launcher and self.launcher_sha256
+                    and self.image_id != self.base_image_id)
+
+    def require_execution_eligible(self) -> None:
+        if not self.execution_eligible:
+            raise ValueError("private execution requires a derived image and exact reviewed launcher hash")
 
     def as_dict(self) -> dict:
         value = {name: getattr(self, name) for name in self.__dataclass_fields__}
+        if self.launcher_sha256 is None:
+            value.pop("launcher_sha256")
         value["python_version"] = list(self.python_version)
         return {"schema_version": 1, "kind": "host_runtime_identity", **value}
 
@@ -122,6 +144,7 @@ def validate_runtime_admission(
     identity: RuntimeIdentity, *, base_inspect: dict, image_inspect: dict,
     profile_bytes: bytes, helper_bytes: bytes, inventory_bytes: bytes,
     provisioning_receipt_bytes: bytes,
+    launcher_bytes: bytes | None = None,
 ) -> str:
     """Check host-collected bytes and image metadata; return the binding digest.
 
@@ -132,6 +155,12 @@ def validate_runtime_admission(
     """
     if type(identity) is not RuntimeIdentity:
         raise ValueError("runtime identity must be the immutable host contract")
+    if identity.launcher_sha256 is None:
+        if launcher_bytes is not None:
+            raise ValueError("launcher bytes have no admitted identity hash")
+    elif (type(launcher_bytes) is not bytes or not 1 <= len(launcher_bytes) <= 64 * 1024
+          or hashlib.sha256(launcher_bytes).hexdigest() != identity.launcher_sha256):
+        raise ValueError("exact bounded launcher bytes must match their independently bound hash")
     for name, raw in (("profile", profile_bytes), ("helper", helper_bytes),
                       ("inventory", inventory_bytes), ("provisioning_receipt", provisioning_receipt_bytes)):
         if type(raw) is not bytes or not 1 <= len(raw) <= 16 * 1024**2:

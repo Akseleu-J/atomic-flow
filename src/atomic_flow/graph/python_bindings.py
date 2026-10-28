@@ -43,15 +43,24 @@ def extract_bindings(tree: ast.Module) -> dict:
                 except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
                     dynamic_all = True
     calls = sorted({_dotted(node.func) for node in ast.walk(tree) if isinstance(node, ast.Call)} - {""})
-    # Function-local rebinding is not resolved by a module-level name index.
-    # Mark those names ambiguous rather than inventing a definite call target.
+    # Scope-local rebinding is not resolved by a module-level name index.
+    # Imports and nested definitions bind names without ast.Name(Store) nodes.
+    # Facts aggregate calls across scopes, so conservatively mark those names
+    # ambiguous throughout this file rather than inventing a definite target.
     shadowed = set()
     for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
-            shadowed.update(arg.arg for arg in ast.walk(node.args) if isinstance(arg, ast.arg))
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.ClassDef)):
+            if not isinstance(node, ast.ClassDef):
+                shadowed.update(arg.arg for arg in ast.walk(node.args) if isinstance(arg, ast.arg))
             for part in ast.walk(node):
                 if isinstance(part, ast.Name) and isinstance(part.ctx, (ast.Store, ast.Del)):
                     shadowed.add(part.id)
+                elif isinstance(part, ast.Import):
+                    shadowed.update(alias.asname or alias.name.split(".")[0] for alias in part.names)
+                elif isinstance(part, ast.ImportFrom):
+                    shadowed.update(alias.asname or alias.name for alias in part.names if alias.name != "*")
+                elif part is not node and isinstance(part, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    shadowed.add(part.name)
     return {"import_bindings": imports, "call_targets": calls, "top_level_names": sorted(set(definitions)),
             "assigned_names": sorted(assigned), "shadowed_call_names": sorted(shadowed),
             "module_exports": explicit_all, "dynamic_exports": dynamic_all}

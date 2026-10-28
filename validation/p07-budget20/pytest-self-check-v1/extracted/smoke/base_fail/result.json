@@ -1,0 +1,61 @@
+{
+  "case": "base_fail",
+  "check_passed": false,
+  "cleanup": "confirmed_by_existing_executor_return",
+  "process_exit": 1,
+  "runner_receipt": {
+    "_pytest_module": "/testbed/src/_pytest/__init__.py",
+    "argv": [
+      "-rA",
+      "testing/test_p07_self_check.py"
+    ],
+    "call_failed": 1,
+    "collected": 2,
+    "collection_complete": true,
+    "collection_errors": 0,
+    "completed": 2,
+    "exit_code": 1,
+    "failed": 1,
+    "files": [
+      "testing/test_p07_self_check.py"
+    ],
+    "finished": true,
+    "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+    "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+    "nonce": "0cd95319bf0e45e0be3161100a86378d",
+    "pytest_module": "/testbed/src/pytest.py",
+    "pytest_self_identity": {
+      "pytest_entrypoint": "src/pytest.py",
+      "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+      "python_version": [
+        3,
+        9,
+        20
+      ],
+      "source_root": "src",
+      "source_sha256": {
+        "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+        "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+      },
+      "traceback": "auto"
+    },
+    "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "root": "/testbed",
+    "runner": "pytest-self",
+    "setup_failed": 0,
+    "skipped": 0,
+    "teardown_failed": 0
+  },
+  "source_after": "0c8b11b5ebd454b7c96a445e505b3a45b30bcd9fbbf27865718a80efd6a752cf",
+  "source_before": "0c8b11b5ebd454b7c96a445e505b3a45b30bcd9fbbf27865718a80efd6a752cf",
+  "spec_digest": "0f6d12bcd5f7640bfbe5be72003fad583257d87a51c608bdc4bf3854451028f1",
+  "status": "expected_pytest_self_boundary_behavior",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "c72f500e0660779d67a88d1140178998e937d884701eec2862e2574aed1af7ae",
+  "verified_success": false
+}

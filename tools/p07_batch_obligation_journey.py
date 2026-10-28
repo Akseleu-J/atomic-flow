@@ -26,7 +26,7 @@ from atomic_flow.tree.builder import build_tree, save_tree
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def journey(output, command="pytest"):
+def journey(output, command="pytest", *, backend_factory=None):
     if command not in {"pytest", "check"}:
         raise ValueError("fixed host-check command required")
     if platform.system() != "Linux" or output.exists():
@@ -80,6 +80,8 @@ def journey(output, command="pytest"):
                     {"tool": "run_command", "args": {"command": command}},
                     {"text": "Coupled rename completed and ordinary checks passed.", "confidence": "low"}],
                 "critic": {"verdict": "ok", "citation_coverage": 1}})
+            if backend_factory is not None:
+                backend = backend_factory(originals=dict(originals), step=dict(step), output=output)
             config = AtomicConfig()
             config.execution.mode, config.execution.profile, config.execution.image = "docker", "checks", IMAGE
             config.task.max_replans = 1
@@ -98,6 +100,10 @@ def journey(output, command="pytest"):
                     or not task.completion_report.get("ready_to_publish")
                     or task.completion_report.get("check_obligation_digest") != obligation.digest):
                 raise ValueError("public source-bound failure/repair/publication journey did not qualify")
+            if backend_factory is not None:
+                report["graph_sync"] = task.graph_sync
+                report["budget_events"] = task.budget_events
+                report["budget_spent_usd"] = task.budget_spent
             report["status"] = "scripted_public_coupled_obligation_journey_qualified"
     except Exception as exc:
         report.update(error_type=type(exc).__name__, error=str(exc)[:500])

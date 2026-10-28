@@ -46,3 +46,5 @@ selection, registry confinement, evidence substitution, missing inspect data,
 image/digest mismatches, architecture, and layer-prefix ancestry. They use
 synthetic metadata only. This agent did not run tests, Git commands, Docker,
 target code, provider APIs or paid calls; the parent integration owns validation.
+
+Private launcher binding checkpoint: optional launcher_sha256 is omitted when absent, retaining legacy identity canonical bytes. Private execution eligibility requires reviewed exact private layout, a distinct derived image ID and a launcher SHA256. validate_runtime_admission accepts separate exact launcher bytes only when hash-bound, and rejects missing/substituted/unbound launcher evidence. This is pure contract eligibility, not executable core integration; CheckSpec and Docker dispatch still refuse private runtimes.

@@ -1,0 +1,8 @@
+{
+  "command": [
+    "docker",
+    "pull",
+    "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9"
+  ],
+  "exit_code": 0
+}

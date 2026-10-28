@@ -62,3 +62,5 @@ used as a route success claim. Official CLI/local docs consulted:
 https://github.com/Kaggle/kaggle-cli/blob/main/docs/benchmarks.md and
 https://github.com/Kaggle/kaggle-benchmark-harbor-starter-template . No .env was
 written and no provider credential was transferred to GitHub.
+
+Actual zero-provider GitHub transport smoke accepted: CI40668983526 on9538c147271c6816dee736d5a9bec64c3a7ea48c, archive12807267815 SHA2561dc6b5defa46ca3441218c47ee949cbd164fb45c0a13ce65deaa2dbcd00b87dc. Request/response canonical digests and exact identity match durable completed journal. This is one scripted callback, not live Model Proxy inference or full TaskRunner. Evidence: validation/p07-budget20/model-queue-scripted-v1/acceptance.json. New full TaskRunner queued workflow and strict scripted proxy prepared; fresh remote qualification pending.

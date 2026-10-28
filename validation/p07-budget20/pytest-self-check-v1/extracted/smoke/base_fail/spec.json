@@ -1,0 +1,56 @@
+{
+  "argv": [
+    "/opt/miniconda3/envs/testbed/bin/python",
+    "-m",
+    "pytest",
+    "-rA",
+    "testing/test_p07_self_check.py"
+  ],
+  "base_commit": "e670ff76cbad80108bde9bab616b66771b8653cf",
+  "controls": {
+    "automatic_pull": false,
+    "cap_drop": [
+      "ALL"
+    ],
+    "network": "none",
+    "no_new_privileges": true,
+    "non_root": true,
+    "provider_environment": false,
+    "root_read_only": true
+  },
+  "image": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9",
+  "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+  "kind": "host_target_test_spec",
+  "pytest_self_identity": {
+    "pytest_entrypoint": "src/pytest.py",
+    "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "source_root": "src",
+    "source_sha256": {
+      "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+      "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+    },
+    "traceback": "auto"
+  },
+  "resources": {
+    "cpus": 2,
+    "memory_bytes": 1073741824,
+    "output_bytes_per_stream": 16384,
+    "pids": 128,
+    "tmpfs_bytes": 134217728
+  },
+  "runner": "pytest-self",
+  "schema_version": 1,
+  "source_revision": "0c8b11b5ebd454b7c96a445e505b3a45b30bcd9fbbf27865718a80efd6a752cf",
+  "target_root": "/testbed",
+  "task_commit": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+  "task_id": "p07_pytest_self_synthetic_base_fail",
+  "test_paths": [
+    "testing/test_p07_self_check.py"
+  ],
+  "timeout_seconds": 180
+}

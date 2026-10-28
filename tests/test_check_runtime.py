@@ -146,3 +146,52 @@ def test_same_image_requires_identical_rootfs_metadata():
         validate_runtime_admission(identity, **evidence)
     evidence["image_inspect"]["RootFS"] = evidence["base_inspect"]["RootFS"]
     assert validate_runtime_admission(identity, **evidence) == identity.digest
+
+
+def test_optional_launcher_hash_preserves_legacy_serialization_and_denies_execution():
+    identity = _identity()
+    expected = {"schema_version": 1, "kind": "host_runtime_identity",
+                "base_image": identity.base_image, "base_image_id": identity.base_image_id,
+                "image_id": identity.image_id, "interpreter": identity.interpreter,
+                "python_version": [3, 6, 15], "runner": identity.runner,
+                "profile_sha256": identity.profile_sha256, "helper_sha256": identity.helper_sha256,
+                "inventory_sha256": identity.inventory_sha256,
+                "provisioning_receipt_sha256": identity.provisioning_receipt_sha256,
+                "private_prefix": identity.private_prefix, "launcher": identity.launcher}
+    assert identity.as_dict() == expected
+    assert identity.canonical_bytes() == json.dumps(expected, sort_keys=True, separators=(",", ":")).encode("ascii")
+    assert not identity.execution_eligible
+    with pytest.raises(ValueError, match="private execution"):
+        identity.require_execution_eligible()
+    assert validate_runtime_admission(identity, **_evidence(identity)) == identity.digest
+
+
+def test_private_execution_requires_separate_exact_launcher_hash_and_derived_id():
+    raw = b"reviewed launcher bytes\n"
+    identity = replace(_identity(), launcher_sha256=_sha(raw))
+    assert identity.execution_eligible
+    assert identity.require_execution_eligible() is None
+    assert identity.as_dict()["launcher_sha256"] == _sha(raw)
+    assert identity.digest != _identity().digest
+    assert validate_runtime_admission(identity, launcher_bytes=raw, **_evidence(identity)) == identity.digest
+    same_image = replace(identity, image_id=identity.base_image_id)
+    assert not same_image.execution_eligible
+    with pytest.raises(ValueError):
+        same_image.require_execution_eligible()
+
+
+@pytest.mark.parametrize("raw", [None, b"", b"changed", "reviewed launcher bytes\n", bytearray(b"launcher"), b"x" * 65537],
+                         ids=["missing", "empty", "changed", "text", "mutable", "oversized"])
+def test_admission_refuses_missing_changed_mutable_or_unbounded_launcher_bytes(raw):
+    identity = replace(_identity(), launcher_sha256=_sha(b"reviewed launcher bytes\n"))
+    with pytest.raises(ValueError, match="launcher"):
+        validate_runtime_admission(identity, launcher_bytes=raw, **_evidence(identity))
+
+
+def test_unbound_launcher_bytes_and_hash_without_launcher_are_rejected():
+    identity = _identity()
+    with pytest.raises(ValueError, match="no admitted identity hash"):
+        validate_runtime_admission(identity, launcher_bytes=b"launcher", **_evidence(identity))
+    with pytest.raises(ValueError, match="private launcher"):
+        replace(identity, python_version=(3, 9, 20), interpreter="/opt/miniconda3/envs/testbed/bin/python",
+                private_prefix="", launcher="", launcher_sha256="a" * 64)

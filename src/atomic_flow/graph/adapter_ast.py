@@ -14,7 +14,7 @@ from typing import Any
 
 from atomic_flow.graph.schema import GraphContractError, _posix, edge_id, file_id, symbol_id
 
-EXTRACTOR = "python-ast/2"
+EXTRACTOR = "python-ast/3"
 
 
 def _qualified(parent: str, name: str) -> str:

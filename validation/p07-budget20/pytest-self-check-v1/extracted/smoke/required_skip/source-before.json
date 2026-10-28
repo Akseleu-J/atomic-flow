@@ -1,0 +1,7 @@
+{
+  "protected_source_sha256": {
+    "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+    "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+  },
+  "revision": "5e654934806d8008be655978176deeff4d4cf0312011089da1a3e98e5f3bb233"
+}

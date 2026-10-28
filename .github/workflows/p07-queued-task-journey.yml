@@ -1,0 +1,41 @@
+name: P07 public TaskRunner Docker journey over scripted Windows model queue
+
+on:
+  workflow_dispatch:
+    inputs:
+      queue_branch:
+        description: Reviewed data-only scratch branch served by the zero-provider Windows broker
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p07-scripted-queued-task-${{ inputs.queue_branch }}
+  cancel-in-progress: false
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install '.[dev]'
+      - name: Public source-bound failure, builtin replan, repair, final check, publication and graph sync
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          QUEUE_BRANCH: ${{ inputs.queue_branch }}
+        run: python tools/p07_queued_task_journey.py --queue-branch "$QUEUE_BRANCH" --output p07-queued-task-worker
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-scripted-queued-task-${{ github.sha }}
+          path: p07-queued-task-worker/
+          retention-days: 14
+          if-no-files-found: error

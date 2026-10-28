@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "status": "accepted_scoped_scripted_native_graph_journey",
+  "tested_commit": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+  "run_id": 40668974718,
+  "arms": [
+    {
+      "label": "ordinary_test",
+      "artifact": 12808221014,
+      "changed": [
+        "sympy/p07_probe.py"
+      ],
+      "admitted_source_files": 1805,
+      "graph_sync": {
+        "coverage_complete": false,
+        "coverage_omissions": [
+          {
+            "digest": "2a57012ff499d0bbc4fc08ab620d35f5d7824fa69d5816971eb96ab79641ecf8",
+            "extractor": "graph-placeholder/1",
+            "path": "sympy/integrals/rubi/rubi_tests/tests/test_trinomials.py",
+            "policy": "project-file-projection/1",
+            "reason": "source_exceeds_extraction_byte_limit",
+            "size_bytes": 1508403
+          }
+        ],
+        "created": true,
+        "deltas": 0,
+        "failed": false,
+        "fallback": false,
+        "relocation": {}
+      },
+      "completed_failure": 1,
+      "completed_pass": 1
+    },
+    {
+      "label": "pytest",
+      "artifact": 12807099261,
+      "changed": [
+        "sympy/p07_probe.py"
+      ],
+      "admitted_source_files": 1805,
+      "graph_sync": {
+        "coverage_complete": false,
+        "coverage_omissions": [
+          {
+            "digest": "2a57012ff499d0bbc4fc08ab620d35f5d7824fa69d5816971eb96ab79641ecf8",
+            "extractor": "graph-placeholder/1",
+            "path": "sympy/integrals/rubi/rubi_tests/tests/test_trinomials.py",
+            "policy": "project-file-projection/1",
+            "reason": "source_exceeds_extraction_byte_limit",
+            "size_bytes": 1508403
+          }
+        ],
+        "created": true,
+        "deltas": 0,
+        "failed": false,
+        "fallback": false,
+        "relocation": {}
+      },
+      "completed_failure": 1,
+      "completed_pass": 1
+    }
+  ],
+  "provider_calls": 0,
+  "model_generation": false,
+  "historical_issue_quality": false,
+  "whole30_qualified": false,
+  "raw_in_loop_receipts_retained": false,
+  "P07": "OPEN"
+}

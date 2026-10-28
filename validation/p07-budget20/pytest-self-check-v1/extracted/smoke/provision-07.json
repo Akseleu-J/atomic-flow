@@ -1,0 +1,8 @@
+{
+  "command": [
+    "docker",
+    "run",
+    "--rm"
+  ],
+  "exit_code": 0
+}

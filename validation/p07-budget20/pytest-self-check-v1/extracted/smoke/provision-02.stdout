@@ -1,0 +1,49 @@
+docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9: Pulling from swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116
+39a945af8df2: Pulling fs layer
+a4d326e88417: Pulling fs layer
+fd7a87c0b95b: Pulling fs layer
+d07e7f5cb3eb: Pulling fs layer
+3d473160e8e5: Pulling fs layer
+6a99d82d9a89: Pulling fs layer
+36b963109585: Pulling fs layer
+ea36a8ec45f6: Pulling fs layer
+4360758a7919: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+d07e7f5cb3eb: Waiting
+3d473160e8e5: Waiting
+6a99d82d9a89: Waiting
+36b963109585: Waiting
+ea36a8ec45f6: Waiting
+4360758a7919: Waiting
+4f4fb700ef54: Waiting
+39a945af8df2: Download complete
+d07e7f5cb3eb: Verifying Checksum
+d07e7f5cb3eb: Download complete
+3d473160e8e5: Verifying Checksum
+3d473160e8e5: Download complete
+a4d326e88417: Verifying Checksum
+a4d326e88417: Download complete
+6a99d82d9a89: Verifying Checksum
+6a99d82d9a89: Download complete
+ea36a8ec45f6: Download complete
+4360758a7919: Verifying Checksum
+4360758a7919: Download complete
+fd7a87c0b95b: Verifying Checksum
+fd7a87c0b95b: Download complete
+4f4fb700ef54: Verifying Checksum
+4f4fb700ef54: Download complete
+39a945af8df2: Pull complete
+36b963109585: Verifying Checksum
+36b963109585: Download complete
+a4d326e88417: Pull complete
+fd7a87c0b95b: Pull complete
+d07e7f5cb3eb: Pull complete
+3d473160e8e5: Pull complete
+6a99d82d9a89: Pull complete
+36b963109585: Pull complete
+ea36a8ec45f6: Pull complete
+4360758a7919: Pull complete
+4f4fb700ef54: Pull complete
+Digest: sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9
+Status: Downloaded newer image for swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9
+docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9
