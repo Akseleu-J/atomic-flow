@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "status": "failed_ci_not_accepted",
+  "run_id": 40742950013,
+  "source_head_sha": "24368249867437b6629235b6cc326c599e4a1c81",
+  "artifact_id": 12840850590,
+  "artifact_digest": "sha256:f9fea994dfd2aeec3a6baf15910ae08d77472746934664a22cc2824867f09b37",
+  "failures": 41,
+  "cause": "Topology unit-test fixture monkeypatched process-wide os.open/fstat/close; Linux pytest FD capture received fake stat without st_size. Windows did not exercise FD capture.",
+  "prospective_fix": "Use module-local os/platform/subprocess facades; preserve real process FD APIs and add regression.",
+  "synthetic_docker_safety_matrix": "accepted separately at CI40742941290",
+  "P07": "OPEN"
+}

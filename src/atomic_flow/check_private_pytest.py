@@ -70,6 +70,15 @@ if (pytest_module!=site+'pytest.py' or internal_module!=site+'_pytest/__init__.p
 entrypoints=sorted((entry.name,entry.module_name) for entry in pkg_resources.iter_entry_points('pytest11'))
 if entrypoints!=sorted(identity['entrypoints'].items()):
     raise SystemExit(125)
+for name in ('PYTEST_ADDOPTS','PYTEST_PLUGINS','PYTEST_DISABLE_PLUGIN_AUTOLOAD'):
+    os.environ.pop(name,None)
+# Import the two reviewed plugin modules before exposing edited target source.
+# Their dependency entry points and source bytes were checked above.
+for name in sorted(identity['entrypoints'].values()):
+    plugin=__import__(name,fromlist=['*'])
+    path=os.path.realpath(plugin.__file__)
+    if not path.startswith(site) or os.path.relpath(path,site).replace(os.sep,'/') not in identity['installed_files']:
+        raise SystemExit(125)
 sys.path.insert(0,root)
 import requests
 requests_module=os.path.realpath(requests.__file__)

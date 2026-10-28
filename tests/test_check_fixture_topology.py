@@ -1,5 +1,7 @@
 """Mocked host topology commands only; never enter namespaces or run probes."""
 import json
+import os
+import tempfile
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
 
@@ -16,6 +18,13 @@ NONCE = "d" * 32
 
 @pytest.fixture
 def worker(monkeypatch):
+    # Patch module-local facades, never the process-wide os/subprocess modules:
+    # pytest's Linux FD capture also uses os.fstat/open/close during setup.
+    for name in ("os", "platform", "subprocess"):
+        original = getattr(topology, name)
+        monkeypatch.setattr(topology, name, SimpleNamespace(**{
+            key: getattr(original, key) for key in dir(original)
+        }))
     config = {"Id": CID, "Image": IMAGE, "Config": {"User": "65534:65534"},
               "State": {"Running": True, "Paused": False, "Restarting": False, "Pid": 123},
               "HostConfig": {"Privileged": False, "ReadonlyRootfs": True, "NetworkMode": "none",
@@ -58,6 +67,14 @@ def worker(monkeypatch):
 def apply(**changes):
     return topology.apply_owned_timeout_topology(**({"engine": "docker", "container_id": CID,
         "image_id": IMAGE, "fixture_digest": FIXTURE, "nonce": NONCE} | changes))
+
+
+def test_worker_mocks_leave_process_file_descriptors_untouched(worker):
+    with tempfile.TemporaryFile() as stream:
+        stream.write(b"capture still works")
+        stream.flush()
+        assert os.fstat(stream.fileno()).st_size == len(b"capture still works")
+    assert worker.opens == worker.closes == []
 
 
 def test_fixed_owned_namespace_route_and_drop_proof_without_target_execution(worker):

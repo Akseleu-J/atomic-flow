@@ -73,6 +73,16 @@ def test_pytest_dependency_bytes_and_helper_bytes_are_both_complete_and_immutabl
         identity.validate_bytes(installed_files_bytes=files, helper_bytes=changed_helpers)
 
 
+def test_empty_installed_package_initializer_preserves_exact_inventory_hash():
+    identity, files = pytest_identity()
+    files["_pytest/empty_package/__init__.py"] = b""
+    identity = replace(identity, installed_files=tuple(sorted((path, sha(raw)) for path, raw in files.items())))
+    assert identity.validate_bytes(installed_files_bytes=files, helper_bytes=helpers(identity.variant)) == identity.digest
+    with pytest.raises(ValueError):
+        identity.validate_bytes(installed_files_bytes=files | {"_pytest/empty_package/__init__.py": b"changed"},
+                                helper_bytes=helpers(identity.variant))
+
+
 @pytest.mark.parametrize("variant,task_id,version", [
     ("3362-cn", "psf__requests-3362", (3, 6, 15)), ("function36-v3", "psf__requests-1963", (3, 6, 15)),
     ("function36-v3", "psf__requests-2148", (3, 6, 15)), ("function36-v3", "psf__requests-2317", (3, 6, 15)),

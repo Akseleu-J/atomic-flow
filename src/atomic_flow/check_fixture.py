@@ -98,7 +98,7 @@ def _validate_bytes(inventory, supplied, *, maximum=4 * 1024**2):
     total = 0
     for path, expected in inventory:
         raw = supplied[path]
-        if type(raw) is not bytes or not 1 <= len(raw) <= maximum or _sha(raw) != expected:
+        if type(raw) is not bytes or len(raw) > maximum or _sha(raw) != expected:
             raise ValueError("retained bytes differ from admitted inventory")
         total += len(raw)
         if total > 128 * 1024**2:
