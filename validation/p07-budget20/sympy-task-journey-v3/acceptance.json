@@ -1,0 +1,25 @@
+{
+  "status": "accepted_synthetic_native_v2_execution_and_publication",
+  "tested_commit": "2903ccd42855f23ecaf5dcb224a16863a710e457",
+  "run_id": 40638502706,
+  "artifact_id": 12794188079,
+  "zip_sha256": "f9f957b12d3bca1610b4750ee0690167e15f4447306ab36e1ef2a8ca81f2b89a",
+  "failure_version": 2,
+  "actual_runner": "sympy-native",
+  "admitted_source_files": 1805,
+  "changed_paths": [
+    "sympy/p07_probe.py"
+  ],
+  "provider_calls": 0,
+  "hidden_oracle": "not_run",
+  "graph_sync": {
+    "created": false,
+    "deltas": 0,
+    "failed": true,
+    "fallback": false,
+    "relocation": {}
+  },
+  "graph_sync_acceptance": false,
+  "whole30_qualified": false,
+  "raw_in_loop_receipts_retained": false
+}

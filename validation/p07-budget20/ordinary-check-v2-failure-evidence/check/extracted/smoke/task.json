@@ -1,0 +1,650 @@
+{
+  "id": "task_c8d727f8947d",
+  "query": "Rename original to renamed consistently across a.py and b.py and pass the existing ordinary test",
+  "project": "/tmp/p07-public-obligation-doz84cdu/project",
+  "steps": [
+    {
+      "index": 0,
+      "description": "Check sample requirement and repair if needed",
+      "tools_needed": [
+        "read_file",
+        "patch_files",
+        "run_command"
+      ],
+      "expected_outcome": "",
+      "verify_with": "pytest",
+      "status": "superseded",
+      "result_summary": "StepFailure: host command check failed",
+      "started_at": 1793165554.0002599,
+      "finished_at": 1793165554.522346,
+      "request_id": "req_115d252e3908",
+      "depends_on": [],
+      "blocked_reason": "",
+      "invalidated_reason": "",
+      "parent_goal": "",
+      "acceptance_criteria": [],
+      "scope_paths": [
+        "a.py",
+        "b.py"
+      ],
+      "linked_code_nodes": [],
+      "linked_test_nodes": [],
+      "evidence": {},
+      "failure": {
+        "kind": "deterministic_test_failure",
+        "evidence": {
+          "version": 2,
+          "check": "ordinary_test",
+          "exit_code": 1,
+          "step_index": 0,
+          "started_at": 1793165554.0002599,
+          "outcome": "failed",
+          "source_revision": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20",
+          "checked_source_revision": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20",
+          "runner": "pytest",
+          "check_completed": true,
+          "check_failed_completed": true,
+          "check_obligation_digest": "8755bf0e429c9850ba5cf59a2876eb5c65666c2af30973b16db24382bed46b6a",
+          "check_spec_digest": "d2f931ffce012b832ca1cfe72d531e5b56b592c0077ecbc53c2a3c0036cc0185",
+          "check_receipt_digest": "2aa918ca9d2a541bdb658cbda1a5b156aa6f1b359614c9462cfa15830b9f1d96"
+        },
+        "rollback_revision": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20"
+      }
+    },
+    {
+      "index": 1,
+      "description": "Perform coupled original-to-renamed source edit and verify ordinary requirement",
+      "tools_needed": [
+        "read_file",
+        "patch_files",
+        "run_command"
+      ],
+      "expected_outcome": "",
+      "verify_with": "pytest",
+      "status": "done",
+      "result_summary": "ok (complete source-bound ordinary-test obligation passed)",
+      "started_at": 1793165554.5642705,
+      "finished_at": 1793165555.9030666,
+      "request_id": "req_e3d0e3aedc08",
+      "depends_on": [],
+      "blocked_reason": "",
+      "invalidated_reason": "",
+      "parent_goal": "",
+      "acceptance_criteria": [],
+      "scope_paths": [
+        "a.py",
+        "b.py"
+      ],
+      "linked_code_nodes": [],
+      "linked_test_nodes": [],
+      "evidence": {
+        "version": 1,
+        "task_id": "task_c8d727f8947d",
+        "step_index": 1,
+        "request_id": "req_e3d0e3aedc08",
+        "contract_sha256": "b6154d6cc3f0f23dc38165e34bacfa4afe0b9d23846ce3233f8dfc7fdb88ac17",
+        "before_manifest_sha256": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20",
+        "after_manifest_sha256": "f1206d09344fff9eb60043569840dcf81e82f4984cf66df405cc8f3ca0c0d71e",
+        "approved_scope_sha256": "4d589daaf4c3ff587355f149210bb689f33e48fb4aba2ee67cf0c7cfd4226147",
+        "graph_revision": "aea043f4eb9d4657f62be06db42f17ae3931ec1e",
+        "context_revision": "3581d1cd212a8516b517c576b73ced6ea3dd3d6daea349fdf7ebb2aadd0a1bf3",
+        "linked_code_nodes": [],
+        "linked_test_nodes": [],
+        "verification": {
+          "method": "pytest",
+          "outcome": "passed"
+        },
+        "observed_hashes": null,
+        "tool_transcript_sha256": "5e944579319e15c3e4a94be0e7552e179d1c4d57630dd8b2c692fde9b2adbeb0",
+        "digest": "b283f7690fe98143fb5359ab37084a04a9292f8a410a14eea933e7313f0daee9"
+      },
+      "failure": {}
+    }
+  ],
+  "current_index": 2,
+  "status": "done",
+  "created_at": 1793165553.9692538,
+  "finished_at": 1793165556.220421,
+  "tree_fingerprint": "aea043f4eb9d4657f62be06db42f17ae3931ec1e",
+  "budget_spent": 0.012000000000000004,
+  "error": "",
+  "rationale": "Repair failed ordinary requirement under original scope",
+  "replan_count": 1,
+  "changeset_id": "change_082bf33cd709",
+  "plan_ready": true,
+  "budget_events": [
+    {
+      "id": "call_0318dbd03b53403bbb2d8a4904c666f1",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.008263,
+      "created_at": 1793165554.081451,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 4167,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.0835478,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_434f44b82a4b4ac8afd163b2843e49bd",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.013285,
+      "created_at": 1793165554.105999,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 9189,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.108371,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_916b5660d84b4c35b385f2436209849e",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.018096,
+      "created_at": 1793165554.5030465,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 14000,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.5055926,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_5dc6ac4ae3af4cfd93038f09fca3e01d",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.011618,
+      "created_at": 1793165554.5132127,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 7522,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.515547,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_037937ddf9e942e8a5e5e9740b7ad98e",
+      "phase": "replan",
+      "status": "completed",
+      "reserved_usd": 0.008707,
+      "created_at": 1793165554.543037,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 4611,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.5452385,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_99dac048d1774d6e8914c18ec3f7d6a3",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.008493,
+      "created_at": 1793165554.580293,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 4397,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.5834568,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_a9ffd49bfa854647b62d730163a6cbe4",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.013501,
+      "created_at": 1793165554.5931497,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 9405,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.5958548,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_936728b8faa94472ac3bd46c5dad9f81",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.015309,
+      "created_at": 1793165554.6031964,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 11213,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.6061795,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_ef7b7028f6394cb98d4b04f41e465786",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.017085,
+      "created_at": 1793165554.6145303,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 12989,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165554.6174314,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_4ababd660db748ff950add11dae27bae",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.021485,
+      "created_at": 1793165555.3033156,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 17389,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165555.306599,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_506f99b44eab470ab652da4f116348fa",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.025642,
+      "created_at": 1793165555.5883296,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 21546,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165555.6029959,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    },
+    {
+      "id": "call_d28e4576bcba4456b98fb5f153f41ae0",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.011839,
+      "created_at": 1793165555.612865,
+      "backend": "fake",
+      "model": "fake-model",
+      "input_allowance": 7743,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 1.0,
+      "price_out_per_mtok": 1.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_a44c67b3685445e0ba736177effb2e44",
+      "cost_usd": 0.001,
+      "tokens_in": 100,
+      "tokens_out": 50,
+      "finished_at": 1793165555.6159623,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "unspecified"
+    }
+  ],
+  "schema_version": 2,
+  "completion_report": {
+    "schema_version": 1,
+    "ready_to_publish": true,
+    "checked_at": 1793165555.9201472,
+    "checks": [
+      {
+        "name": "completed_steps",
+        "status": "passed",
+        "superseded_by_replanning": [
+          0
+        ]
+      },
+      {
+        "name": "approved_diff_and_freshness",
+        "status": "passed"
+      },
+      {
+        "name": "final_python_syntax",
+        "status": "passed",
+        "scope": "Changed surviving Python files only"
+      }
+    ],
+    "diagnostics": [],
+    "tests": "passed",
+    "model_calls": 0,
+    "step_observations": [
+      {
+        "index": 1,
+        "receipt": "b283f7690fe98143fb5359ab37084a04a9292f8a410a14eea933e7313f0daee9",
+        "current": true,
+        "legacy_missing": false
+      }
+    ],
+    "changed_paths": [
+      {
+        "path": "a.py",
+        "before_hash": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+        "after_hash": "25a0807bf944cba473b3a90a0dbdb78d18f4d63c"
+      },
+      {
+        "path": "b.py",
+        "before_hash": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7",
+        "after_hash": "2625b0953cfbae9e02c11a18adcc56438a123773"
+      }
+    ],
+    "workspace_manifest_sha256": "c4f7536ae739b1d361c2e156cbed7d26c38254c139b01cba27ccb18dbe207cf5",
+    "impact_check_plan": {
+      "schema_version": 1,
+      "changed_paths": [
+        "a.py",
+        "b.py"
+      ],
+      "affected_paths": [
+        "a.py",
+        "b.py",
+        "tests/test_sample.py"
+      ],
+      "targeted_tests": [
+        "tests/test_sample.py"
+      ],
+      "impact_status": "unknown",
+      "unresolved": [
+        "tests/test_sample.py: call hasattr (no imported exporter or shadowed/dynamic binding)"
+      ],
+      "runtime_coverage": "not_assessed",
+      "omitted_unsupported": [],
+      "omitted_oversized": [],
+      "loop_check": "full_pytest",
+      "required_final_check": "full_pytest",
+      "checks_executed": false,
+      "source_digests": {
+        "a.py": "6eafb4ba0d5cc4bb908f1393227bb34ec62aa5c9f7876683166e2608c3a8e0be",
+        "b.py": "53756f9541c8df37fc03afe8dd649b99ff72ec03a7372b075727123800c462e2",
+        "tests/test_sample.py": "1d8c38446bf23d40630fedbf010ef7aa8b5b1dc93e796f8249e757a842195c89"
+      },
+      "final_gate_applicable": true
+    },
+    "check_obligation_digest": "8755bf0e429c9850ba5cf59a2876eb5c65666c2af30973b16db24382bed46b6a",
+    "check_spec_digest": "162723b5157f674898740afca2d16f37de924e13bc7a8dae738fd4fde4cb3870",
+    "check_spec": {
+      "schema_version": 1,
+      "kind": "host_target_test_spec",
+      "task_id": "public-coupled-scripted-journey",
+      "task_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "base_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source_revision": "f1206d09344fff9eb60043569840dcf81e82f4984cf66df405cc8f3ca0c0d71e",
+      "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7080@sha256:3389f0d1319ca611d04a209fc30990c131e0bae9acfeb2163938c75ad23479fe",
+      "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+      "runner": "pytest",
+      "test_paths": [
+        "tests/test_sample.py"
+      ],
+      "target_root": "/workspace",
+      "timeout_seconds": 180,
+      "resources": {
+        "memory_bytes": 1073741824,
+        "cpus": 2,
+        "pids": 128,
+        "tmpfs_bytes": 134217728,
+        "output_bytes_per_stream": 16384
+      },
+      "argv": [
+        "/opt/miniconda3/envs/testbed/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--no-header",
+        "-x",
+        "tests/test_sample.py"
+      ],
+      "controls": {
+        "network": "none",
+        "root_read_only": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "no_new_privileges": true,
+        "non_root": true,
+        "automatic_pull": false,
+        "provider_environment": false
+      }
+    },
+    "check_passed": true,
+    "checked_source_revision": "f1206d09344fff9eb60043569840dcf81e82f4984cf66df405cc8f3ca0c0d71e",
+    "check_completed": true,
+    "check_failed_completed": false,
+    "check_runner": "pytest",
+    "check_timeout_seconds": 180,
+    "check_resources": {
+      "memory_bytes": 1073741824,
+      "cpus": 2,
+      "pids": 128,
+      "tmpfs_bytes": 134217728,
+      "output_bytes_per_stream": 16384
+    },
+    "check_result_exit_code": 0,
+    "check_receipt_digest": "04e723b47f20709ffbef83828afea66dbbd96a88ecb5b5ee21896bf3a67e7db2",
+    "test_exit_code": 0,
+    "test_timed_out": false,
+    "test_output_tail": ".                                                                        [100%]\n1 passed in 0.00s\n\nATOMIC_CHECK_SPEC_RECEIPT:{\"call_failed\": 0, \"collected\": 1, \"exit_code\": 0, \"failed\": 0, \"files\": [\"tests/test_sample.py\"], \"finished\": true, \"interpreter\": \"/opt/miniconda3/envs/testbed/bin/python\", \"interpreter_resolved\": \"/opt/miniconda3/envs/testbed/bin/python3.9\", \"nonce\": \"e379d27b6a914f119a95639a7e109388\", \"pytest_module\": \"/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/pytest/__init__.py\", \"pytest_version\": \"7.4.4\", \"root\": \"/workspace\", \"setup_failed\": 0, \"skipped\": 0, \"teardown_failed\": 0}\n",
+    "limits": "Host gates confirm declared checks and approved bytes, not semantic fulfillment of every user requirement."
+  },
+  "plan_approval": {
+    "schema_version": 2,
+    "task_id": "task_c8d727f8947d",
+    "project": "/tmp/p07-public-obligation-doz84cdu/project",
+    "plan": {
+      "query": "Rename original to renamed consistently across a.py and b.py and pass the existing ordinary test",
+      "rationale": "Repair failed ordinary requirement under original scope",
+      "steps": [
+        {
+          "index": 0,
+          "description": "Check sample requirement and repair if needed",
+          "tools_needed": [
+            "read_file",
+            "patch_files",
+            "run_command"
+          ],
+          "expected_outcome": "",
+          "verify_with": "pytest",
+          "depends_on": [],
+          "superseded": true,
+          "scope_paths": [
+            "a.py",
+            "b.py"
+          ]
+        },
+        {
+          "index": 1,
+          "description": "Perform coupled original-to-renamed source edit and verify ordinary requirement",
+          "tools_needed": [
+            "read_file",
+            "patch_files",
+            "run_command"
+          ],
+          "expected_outcome": "",
+          "verify_with": "pytest",
+          "depends_on": [],
+          "superseded": false,
+          "scope_paths": [
+            "a.py",
+            "b.py"
+          ]
+        }
+      ]
+    },
+    "source_manifest": {
+      "a.py": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+      "b.py": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7",
+      "tests/test_sample.py": "469cef575929bd50cc325acf85040a427cd748d5"
+    },
+    "allowed_paths": [
+      "a.py",
+      "b.py"
+    ],
+    "scope_hashes": {
+      "a.py": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+      "b.py": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7"
+    },
+    "workspace_manifest": {
+      "a.py": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+      "b.py": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7",
+      "tests/test_sample.py": "469cef575929bd50cc325acf85040a427cd748d5"
+    },
+    "check_obligation": {
+      "digest": "8755bf0e429c9850ba5cf59a2876eb5c65666c2af30973b16db24382bed46b6a",
+      "environment_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "deadline_at": 1793166153.9668682
+    },
+    "internal_replan": {
+      "version": 2,
+      "deadline_at": 1793169153.9692538,
+      "allowed_tools": [
+        "find_callers",
+        "find_files",
+        "notebook_read",
+        "patch_files",
+        "read_file",
+        "read_node",
+        "read_result",
+        "run_command",
+        "search_text",
+        "search_tree"
+      ],
+      "required_verify": "pytest",
+      "max_budget_usd": 1,
+      "max_model_calls": 40,
+      "max_replans": 1,
+      "runtime_digest": "c6918f427f7d83165647d4fba450be5d18eb0ef336a2ec56de92140c4e9fef6d",
+      "replan_failures": [
+        "StepFailure: host command check failed"
+      ]
+    },
+    "digest": "b20675c43f9decbfd80aaa0003fa58a09b4197ff4ca6bbf0a064e563c4ecf715"
+  },
+  "graph_sync": {
+    "deltas": 0,
+    "created": true,
+    "fallback": false,
+    "failed": false,
+    "relocation": {}
+  },
+  "last_failure_decision": {
+    "action": "continue_bounded_repair",
+    "kind": "deterministic_test_failure",
+    "repair_budget_usd": 0.249,
+    "requires": "envelope_preserved AND lineage_preserved AND fresh failing-check evidence",
+    "effective_repair_cap_usd": 0.249,
+    "repair_id": "repair_a44c67b3685445e0ba736177effb2e44"
+  },
+  "repair_budget": {
+    "version": 1,
+    "id": "repair_a44c67b3685445e0ba736177effb2e44",
+    "cap_usd": 0.249,
+    "start_spent_usd": 0.004,
+    "start_event": 4,
+    "failure_step": 0
+  },
+  "goals": [],
+  "expansion_count": 0
+}

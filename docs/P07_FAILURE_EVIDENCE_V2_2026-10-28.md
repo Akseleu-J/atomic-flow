@@ -35,3 +35,22 @@ revision to match version2 evidence before any model call. Missing/changed
 contract or source pauses for a fresh host failure check. Four regressions cover
 missing obligation, replaced digest, changed runner and changed source. Updated
 focused suite:114 passed; Ruff passed. Follow-up review requested.
+
+Follow-up independent read-only review confirmed the replay guard. Real public
+Docker matrix CI40638505847 on2903ccd42855f23ecaf5dcb224a16863a710e457 accepted
+both command spellings with strict version2 ordinary_test evidence, actual pytest
+runner, one replan and publication. Downloaded archives audited:
+pytest artifact12794442507 SHA2563900f223cbd2634f16730fadf0f8a5ff4407d0cc8968713ea701cbb52e98d7bd;
+check artifact12794248569 SHA256ae7a7d76f73e35b541f73ceddadb2bf8a14eac535bea06f9e2ef4b642d120694.
+Current strict calibration-admission inventory:40 tests passed, all30 accepted
+rows preserved. Exact-source native journey and remaining main CI are pending.
+
+ACCEPTED on2903ccd42855f23ecaf5dcb224a16863a710e457: native full-source journey
+CI40638502706 SUCCESS; archive12794188079 SHA256
+f9f957b12d3bca1610b4750ee0690167e15f4447306ab36e1ef2a8ca81f2b89a
+downloaded/audited. Actual v2 ordinary_test/sympy-native failure, one replan,
+completed native PASS/final gate and only probe publication across1805 files.
+Graph sync remains explicitly failed after publication and unaccepted. No hidden
+oracle/model-quality claim. Main checks40638502015/40638508885 and installed
+interoperability40638502011/40638509027 succeeded. Both public alias journeys
+and native execution/publication are accepted; full P07 remains OPEN.

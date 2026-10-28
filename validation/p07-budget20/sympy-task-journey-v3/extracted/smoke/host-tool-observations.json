@@ -1,0 +1,102 @@
+[
+  {
+    "request_id": "req_4ba2c733ebaf",
+    "step_index": 0,
+    "summary": {
+      "check_completed": true,
+      "check_failed_completed": true,
+      "check_obligation_digest": "77f17210446c8dd44690f7c64b1b4482d9273407d2e7e95117e06afda884627f",
+      "check_passed": false,
+      "check_receipt_digest": "a1380182e01575ae02a1f3fff78a332e8c9bebac34544c3f42f106691215b6a3",
+      "check_resources": {
+        "cpus": 2,
+        "memory_bytes": 1073741824,
+        "output_bytes_per_stream": 16384,
+        "pids": 128,
+        "tmpfs_bytes": 134217728
+      },
+      "check_result_exit_code": 1,
+      "check_runner": "sympy-native",
+      "check_spec_digest": "919c42bce010d86fb28f57b9ec9153b009bf478419818d882eae4cb6fc67b69f",
+      "check_timeout_seconds": 180,
+      "checked_source_revision": "dcba5fd20badf204904fde627a718f9ae7504c34b1e4b1ea041bea3eb9b3de5e",
+      "command": "check",
+      "exit_code": 1,
+      "outcome": "error",
+      "verification": {
+        "check": "failed"
+      }
+    },
+    "tool": "run_command"
+  },
+  {
+    "request_id": "req_be436e41e978",
+    "step_index": 1,
+    "summary": {
+      "outcome": "success",
+      "verification": {}
+    },
+    "tool": "read_file"
+  },
+  {
+    "request_id": "req_be436e41e978",
+    "step_index": 1,
+    "summary": {
+      "check_completed": true,
+      "check_failed_completed": false,
+      "check_obligation_digest": "77f17210446c8dd44690f7c64b1b4482d9273407d2e7e95117e06afda884627f",
+      "check_passed": true,
+      "check_receipt_digest": "97127085293d67fe0148c236b22de876a31f6f01e9c680846530549a26f6ebdd",
+      "check_resources": {
+        "cpus": 2,
+        "memory_bytes": 1073741824,
+        "output_bytes_per_stream": 16384,
+        "pids": 128,
+        "tmpfs_bytes": 134217728
+      },
+      "check_result_exit_code": 0,
+      "check_runner": "sympy-native",
+      "check_spec_digest": "6bc13db60682be5d00ba68808280ee63d46ae7637dfd6c43509a4ab331bdbf46",
+      "check_timeout_seconds": 180,
+      "checked_source_revision": "4a228b188a061a826fcfbc1292b9efb45baddc5830d99ae8756b83e6e7917731",
+      "outcome": "success",
+      "status": "applied",
+      "verification": {
+        "filesystem": "passed",
+        "pytest": "passed",
+        "syntax": "passed"
+      }
+    },
+    "tool": "patch_file"
+  },
+  {
+    "request_id": "req_be436e41e978",
+    "step_index": 1,
+    "summary": {
+      "check_completed": true,
+      "check_failed_completed": false,
+      "check_obligation_digest": "77f17210446c8dd44690f7c64b1b4482d9273407d2e7e95117e06afda884627f",
+      "check_passed": true,
+      "check_receipt_digest": "5e492fc10acc9fb4a8d4ed6019e0afbdcaaa63d737bb495ffdb1d5c5ec765e06",
+      "check_resources": {
+        "cpus": 2,
+        "memory_bytes": 1073741824,
+        "output_bytes_per_stream": 16384,
+        "pids": 128,
+        "tmpfs_bytes": 134217728
+      },
+      "check_result_exit_code": 0,
+      "check_runner": "sympy-native",
+      "check_spec_digest": "6bc13db60682be5d00ba68808280ee63d46ae7637dfd6c43509a4ab331bdbf46",
+      "check_timeout_seconds": 180,
+      "checked_source_revision": "4a228b188a061a826fcfbc1292b9efb45baddc5830d99ae8756b83e6e7917731",
+      "command": "check",
+      "exit_code": 0,
+      "outcome": "success",
+      "verification": {
+        "check": "passed"
+      }
+    },
+    "tool": "run_command"
+  }
+]

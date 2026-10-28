@@ -26,7 +26,9 @@ persisted legacy strings, approvals or their digests.
 - agents/completion.py: ordinary_test without obligation refuses before any
   unbound fallback. A bound final check remains the complete host obligation.
 
-Version2 typed failure evidence is a separate narrow package: actual runner,
+Version2 typed failure evidence was implemented separately on2903ccd; see
+P07_FAILURE_EVIDENCE_V2_2026-10-28.md for exact-source evidence and remaining CI.
+Its contract includes actual runner,
 completed-negative flags and obligation/spec/receipt digests, with strict exact
 schema and current source binding. Version1 legacy schema must not be expanded.
 Advisory full_pytest/targeted_pytest names and campaign profiles are later changes.
