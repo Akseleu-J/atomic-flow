@@ -75,13 +75,24 @@ def verify_edit(project_root: Path, rel_path: str, *, run_tests: bool = True,
         return VerificationResult(ok=False, checks=["exists"], message=f"file missing, unsafe or oversized: {rel_path}")
     if check_obligation is not None:
         from atomic_flow.check_obligation import check_observation, run_obligation_check
-        if rel_path.endswith((".py", ".pyi")):
+        private_runtime = check_obligation.template.runtime_identity is not None
+        if rel_path.endswith((".py", ".pyi")) and not private_runtime:
             try:
                 compile(data, rel_path, "exec", dont_inherit=True)
             except SyntaxError as exc:
                 return VerificationResult(ok=False, checks=["syntax"], message=str(exc)[:500],
                                           diagnostics=[syntax_diagnostic(rel_path, data, exc)], source_hash=source_hash)
         with checked_workspace(project_root, private_workspace=private_workspace, cancel_check=cancel_check) as check_root:
+            if private_runtime and rel_path.endswith((".py", ".pyi")):
+                from atomic_flow.check_execution import run_private_syntax
+                syntax_spec = check_obligation.derive(check_root, cancel_check=cancel_check)
+                syntax = run_private_syntax(syntax_spec, check_root, rel_path, cancel_check=cancel_check)
+                if syntax["outcome"] != "passed":
+                    return VerificationResult(ok=False, checks=["syntax"],
+                                              message="Target interpreter rejected Python syntax",
+                                              diagnostics=[{"path": rel_path, **syntax["diagnostic"]}],
+                                              source_hash=source_hash, exit_code=1,
+                                              checked_source_revision=syntax_spec.source_revision)
             spec, receipt = run_obligation_check(check_obligation, check_root, cancel_check=cancel_check)
         result = receipt.result
         return VerificationResult(ok=receipt.check_passed, checks=["syntax", "ordinary_test"],

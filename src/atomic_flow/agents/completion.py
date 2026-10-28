@@ -34,6 +34,9 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None, *, che
     report["checks"].append({"name": "completed_steps", "status": "passed",
                              "superseded_by_replanning": [s.index for s in task.steps if s.status == "superseded"]})
     try:
+        if check_obligation is not None:
+            from atomic_flow.check_obligation import require_obligation_binding
+            require_obligation_binding(task.plan_approval, check_obligation)
         changeset.check_original()
         manifest = changeset.validate_workspace()
         from atomic_flow.agents.step_evidence import receipt_matches
@@ -67,6 +70,14 @@ def assess_completion(task, changeset, config, cancel_check=lambda: None, *, che
             data = confined_path(changeset.workspace, path).read_bytes()
             if digest(data) != manifest[path]:
                 raise ValueError("Workspace changed during final verification")
+            if check_obligation is not None and check_obligation.template.runtime_identity is not None:
+                from atomic_flow.check_execution import run_private_syntax
+                syntax_spec = check_obligation.derive(changeset.workspace, cancel_check=cancel_check)
+                syntax = run_private_syntax(syntax_spec, changeset.workspace, path, cancel_check=cancel_check)
+                report.setdefault("target_syntax_observations", []).append(syntax)
+                if syntax["outcome"] != "passed":
+                    report["diagnostics"].append({"path": path, **syntax["diagnostic"]})
+                continue
             try:
                 compile(data, path, "exec", dont_inherit=True)
             except SyntaxError as exc:

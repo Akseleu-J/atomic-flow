@@ -177,15 +177,45 @@ def container_identity() -> str:
     return f"{uid}:{gid if gid != 0 else 65534}"
 
 
+def validate_host_syntax_request(host_spec, host_spec_nonce, host_syntax_request) -> None:
+    """Bind a typed syntax observation to its current private host CheckSpec.
+
+    This verifies immutable data consistency, not provisioning provenance or
+    live image attestation. Source/image admission still belongs to the caller.
+    """
+    from atomic_flow.check_private_runtime import PrivateSyntaxRequest
+    from atomic_flow.check_runtime import RuntimeIdentity
+    from atomic_flow.check_spec import CheckSpec
+
+    if type(host_spec) is not CheckSpec or type(host_syntax_request) is not PrivateSyntaxRequest:
+        raise ExecutionUnavailable("Private syntax requires an immutable host specification and request")
+    runtime = host_spec.runtime_identity
+    if type(runtime) is not RuntimeIdentity:
+        raise ExecutionUnavailable("Private syntax requires an eligible bound runtime identity")
+    try:
+        runtime.require_execution_eligible()
+    except ValueError:
+        raise ExecutionUnavailable("Private syntax requires an eligible bound runtime identity") from None
+    if (host_syntax_request.check_spec_digest != host_spec.digest
+            or host_syntax_request.source_revision != host_spec.source_revision
+            or host_syntax_request.runtime != runtime or host_syntax_request.target_root != host_spec.target_root
+            or type(host_spec_nonce) is not str or host_spec_nonce != host_syntax_request.nonce
+            or host_spec.image != runtime.image_id or host_spec.interpreter != runtime.interpreter
+            or host_spec.runner != runtime.runner):
+        raise ExecutionUnavailable("Private syntax request differs from its host CheckSpec/runtime/nonce")
+
+
 def docker_command(engine: str, image: str, workspace: Path, name: str, args: list[str], *,
                    profile: str = "checks", container_id_file: Path | None = None,
-                   host_spec=None, host_spec_nonce: str | None = None) -> list[str]:
+                   host_spec=None, host_spec_nonce: str | None = None,
+                   host_syntax_request=None) -> list[str]:
     bounds = execution_profile(profile)
     root = str(workspace.resolve())
     if any(character in root for character in (",", "\n", "\r", "\0")):
         raise ExecutionUnavailable("Workspace path cannot be represented safely as a Docker bind mount")
     target_root = "/workspace"
     interpreter = "python"
+    entrypoint_args = []
     checker = _trusted_checker_args(args)
     resource_args = [f"--pids-limit={bounds.pids}", f"--memory={bounds.memory}", f"--cpus={bounds.cpus}"]
     tmpfs_size = bounds.tmpfs_size
@@ -196,11 +226,22 @@ def docker_command(engine: str, image: str, workspace: Path, name: str, args: li
                 or args != list(host_spec.argv[1:])):
             raise ExecutionUnavailable("Docker command differs from the host CheckSpec")
         target_root, interpreter = host_spec.target_root, host_spec.interpreter
-        checker = checker_args(host_spec, host_spec_nonce)
+        if host_syntax_request is not None:
+            from atomic_flow.check_private_runtime import private_syntax_args
+            validate_host_syntax_request(host_spec, host_spec_nonce, host_syntax_request)
+            checker = list(private_syntax_args(host_syntax_request))
+        else:
+            checker = checker_args(host_spec, host_spec_nonce)
+        if host_spec.runtime_identity is not None:
+            host_spec.runtime_identity.require_execution_eligible()
+            interpreter = host_spec.runtime_identity.launcher
+            # An inherited image ENTRYPOINT must never intercept this exact
+            # host-admitted launcher. Legacy image command semantics stay fixed.
+            entrypoint_args = ["--entrypoint=" + interpreter]
         resources = host_spec.resources
         resource_args = [f"--pids-limit={resources.pids}", f"--memory={resources.memory_bytes}", f"--cpus={resources.cpus}"]
         tmpfs_size = str(resources.tmpfs_bytes)
-    elif host_spec_nonce is not None:
+    elif host_spec_nonce is not None or host_syntax_request is not None:
         raise ExecutionUnavailable("CheckSpec nonce requires a host specification")
     mount = f"type=bind,src={root},dst={target_root}" + (",readonly" if bounds.workspace_read_only else "")
     cid_args = ["--cidfile", str(container_id_file.absolute())] if container_id_file is not None else []
@@ -211,7 +252,8 @@ def docker_command(engine: str, image: str, workspace: Path, name: str, args: li
             f"--tmpfs=/tmp:rw,noexec,nosuid,size={tmpfs_size},mode=1777", f"--workdir={target_root}",
             "--mount", mount,
             "--env=HOME=/tmp", "--env=PYTHONDONTWRITEBYTECODE=1",
-            "--env=PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", "--", image, interpreter, *checker]
+            "--env=PYTEST_DISABLE_PLUGIN_AUTOLOAD=1", *entrypoint_args, "--", image,
+            *([] if entrypoint_args else [interpreter]), *checker]
 
 
 def _kill_tree(proc: subprocess.Popen):
@@ -273,7 +315,8 @@ def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None
                output_callback: Callable[[str, bytes], None] | None = None,
                container_name: str | None = None, container_id_file: Path | None = None,
                requirements: ExecutionRequirements | None = None,
-               host_spec=None, host_spec_nonce: str | None = None) -> CommandResult:
+               host_spec=None, host_spec_nonce: str | None = None,
+               host_syntax_request=None) -> CommandResult:
     """Execute Python arguments; docker mode fails closed without an engine/image.
 
     Cancel checks raise TaskCancelled. Output retains only a bounded tail per stream.
@@ -282,9 +325,12 @@ def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None
     config = config or ExecutionConfig()
     if host_spec is not None:
         from atomic_flow.check_execution import admit_check_spec, checker_args
+        if host_syntax_request is not None:
+            validate_host_syntax_request(host_spec, host_spec_nonce, host_syntax_request)
         admit_check_spec(host_spec, project, config, timeout, args, cancel_check=cancel_check)
-        checker_args(host_spec, host_spec_nonce)
-    elif host_spec_nonce is not None:
+        if host_syntax_request is None:
+            checker_args(host_spec, host_spec_nonce)
+    elif host_spec_nonce is not None or host_syntax_request is not None:
         raise ExecutionUnavailable("CheckSpec nonce requires a host specification")
     execution_manifest(config, requirements, probe=True)
     check = cancel_check or (lambda: None)
@@ -306,6 +352,8 @@ def run_python(args: list[str], project: Path, *, config: ExecutionConfig | None
         if engine is None:
             raise ExecutionUnavailable("Docker unavailable; no local fallback. See docs/EXECUTION.md.")
         options = {} if host_spec is None else {"host_spec": host_spec, "host_spec_nonce": host_spec_nonce}
+        if host_syntax_request is not None:
+            options["host_syntax_request"] = host_syntax_request
         cmd = docker_command(engine, config.image, project, name, args, profile=config.profile,
                              container_id_file=container_id_file, **options)
     else:

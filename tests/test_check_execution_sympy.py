@@ -223,10 +223,12 @@ def test_identity_is_immutable_and_cannot_select_private_or_older_runtime(admitt
     identity = spec.sympy_identity
     with pytest.raises(FrozenInstanceError):
         identity.sympy_version = 'changed'
-    for fields in ({'python_version': (3, 6, 15)}, {'python_version': [3, 9, 20]}, {'python_version': (True, 9, 20)},
+    for fields in ({'python_version': (3, 6, 14)}, {'python_version': [3, 9, 20]}, {'python_version': (True, 9, 20)},
                    {'source_sha256': identity.source_sha256[:-1]}, {'source_sha256': tuple(reversed(identity.source_sha256))},
                    {'sympy_version': 'version; shell'}, {'source_sha256': tuple((path, 'x' * 64) for path in SYMPY_RUNNER_PATHS)}):
         with pytest.raises(ValueError):
             replace(identity, **fields)
+    with pytest.raises(ValueError, match='private runtime'):
+        replace(spec, sympy_identity=replace(identity, python_version=(3, 6, 15)))
     with pytest.raises(ValueError, match='only to a native'):
         replace(spec, runner='pytest')

@@ -49,6 +49,8 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
+      - name: P07 broker, scripted proxy and fixed-budget ledger contracts
+        run: node --test tests/p07_model_broker_test.mjs tests/p07_scripted_task_proxy_test.mjs tests/p07_paid_campaign_ledger_test.mjs
       # Install the selected runtime explicitly; npx implicit downloads stay off.
       - name: Install explicitly pinned public acceptance tools
         shell: bash

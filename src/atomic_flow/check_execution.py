@@ -280,6 +280,11 @@ def checker_args(spec: CheckSpec, nonce: str) -> list[str]:
     if (type(spec) is not CheckSpec or type(nonce) is not str
             or re.fullmatch(r"[0-9a-f]{32}", nonce) is None):
         raise ExecutionUnavailable("Unsupported CheckSpec launcher")
+    if spec.runtime_identity is not None:
+        if spec.runner != "sympy-native" or spec.runtime_identity.python_version != (3, 6, 15):
+            raise ExecutionUnavailable("Private ordinary runner is not implemented for this runtime")
+        from atomic_flow.check_private_sympy import private_sympy_args
+        return private_sympy_args(spec, nonce)
     if spec.runner == "sympy-native":
         if spec.sympy_identity is None:
             raise ExecutionUnavailable("Native SymPy execution needs an admitted runner identity")
@@ -367,6 +372,19 @@ def _sympy_runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str, re
             or receipt.get("native_source_sha256") != dict(identity.source_sha256)
             or receipt.get("native_argv") != [spec.target_root + "/bin/test", "-C", "--verbose", *spec.test_paths]):
         return None
+    runtime = spec.runtime_identity
+    if runtime is not None and (
+            receipt.get("runtime_digest") != runtime.digest
+            or receipt.get("check_spec_digest") != spec.digest
+            or receipt.get("source_revision") != spec.source_revision
+            or receipt.get("launcher_sha256") != runtime.launcher_sha256
+            or receipt.get("dependency_inventory_sha256") != runtime.inventory_sha256
+            or receipt.get("mpmath_version") != "1.2.1"
+            or not isinstance(receipt.get("mpmath_module"), str)
+            or not receipt["mpmath_module"].startswith(runtime.private_prefix + "/lib/python3.6/site-packages/mpmath/")
+            or type(receipt.get("mpmath_module_sha256")) is not str
+            or re.fullmatch(r"[0-9a-f]{64}", receipt["mpmath_module_sha256"]) is None):
+        return None
     if (type(receipt.get("collected")) is not int or not isinstance(receipt.get("counts"), dict)
             or any(type(value) is not int for value in receipt["counts"].values())):
         return None
@@ -436,3 +454,39 @@ def run_check_spec(spec: CheckSpec, workspace: Path, *, cancel_check=None) -> Ch
     receipt = _runner_receipt(result, spec, nonce)
     passed = before == after and receipt is not None and result.returncode == 0
     return CheckReceipt(spec.digest, before, after, passed, receipt, result)
+
+
+def run_private_syntax(spec: CheckSpec, workspace: Path, path: str, *, cancel_check=None) -> dict:
+    """Compile one confined file with its admitted target grammar, never execute it.
+
+    Whole-source freshness, exact runtime/spec binding and container cleanup are
+    mandatory. This observation never satisfies the ordinary-test obligation.
+    """
+    from atomic_flow.agents.execution import run_python
+    from atomic_flow.agents.source import confined_path
+    from atomic_flow.agents.verify import check_source_revision
+    from atomic_flow.check_private_runtime import MAX_SOURCE_BYTES, PrivateSyntaxRequest, private_syntax_receipt
+
+    if type(spec) is not CheckSpec or spec.runtime_identity is None:
+        raise ExecutionUnavailable("Private syntax requires a host runtime-bound specification")
+    config = ExecutionConfig(mode="docker", profile="checks", image=spec.image,
+                             output_bytes=spec.resources.output_bytes_per_stream)
+    args = list(spec.argv[1:])
+    before = admit_check_spec(spec, workspace, config, spec.timeout_seconds, args, cancel_check=cancel_check)
+    source = confined_path(workspace, path)
+    if not source.is_file() or source.stat().st_size > MAX_SOURCE_BYTES:
+        raise ExecutionUnavailable("Private syntax source is missing or oversized")
+    with source.open("rb") as stream:
+        data = stream.read(MAX_SOURCE_BYTES + 1)
+    if len(data) > MAX_SOURCE_BYTES:
+        raise ExecutionUnavailable("Private syntax source exceeds its admitted byte limit")
+    request = PrivateSyntaxRequest(spec.runtime_identity, spec.digest, before, path,
+                                   hashlib.sha256(data).hexdigest(), uuid.uuid4().hex, spec.target_root)
+    result = run_python(args, workspace, config=config, timeout=spec.timeout_seconds,
+                        cancel_check=cancel_check, host_spec=spec, host_spec_nonce=request.nonce,
+                        host_syntax_request=request)
+    after = check_source_revision(workspace, cancel_check)
+    receipt = private_syntax_receipt(result, request)
+    if before != after or receipt is None:
+        raise ExecutionUnavailable("Private syntax execution was incomplete or source identity changed")
+    return receipt

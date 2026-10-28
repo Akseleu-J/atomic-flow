@@ -1,0 +1,11 @@
+# Private target-runtime execution checkpoint
+
+P07 OPEN; private runtime execution is implemented prospectively and awaits real Docker qualification. The accepted calibration is not reused as core-executor proof.
+
+CheckSpec optionally binds RuntimeIdentity, exact derived image ID, interpreter, runner, original base digest and admission evidence hashes. Omitting this field retains legacy canonical serialization. Native Python3.6.15 data cannot select execution without an eligible private identity. Docker uses the exact reviewed private launcher; ordinary Python2 runners remain refused until their own implementation.
+
+Private syntax requests bind spec/runtime/source/path/file SHA256 and nonce. A fixed Python2/3.6-compatible bootstrap compiles bytes without importing or executing target code; distinct syntax receipts never satisfy an ordinary test. Source equality and core Docker isolation/cleanup stay mandatory. Edit and final gates use target grammar for private obligations. Final approval binding is checked before any target syntax process starts.
+
+Private native SymPy runs exact bin/test -C --verbose through runpy in the same admitted Python3.6 interpreter, preserving its loader and stdlib. Launcher and native runner bytes are verified before/after; output is bounded, complete native output is parsed and runtime/spec/source identities are revalidated. The source tree rejects links or stale bytecode before target imports; modern runner defaults stay unchanged. Complete dependency evidence remains host admission, not self-attestation.
+
+The new manual CI workflow provisions the fixed private runtime and mpmath wheel in one job, independently hashes installed dependency files, copies full source and records any disposable bytecode removal with complete retained-file equality. It will run valid Python3.6 syntax and reject newer walrus syntax, then native FAIL/PASS/required-SKIP refusal under core1GiB/2CPU/128PID limits. Raw stdout/stderr, typed requests/receipts, source revisions, hashes and cleanup artifacts are retained. No historical issue quality, full TaskRunner, provider inference or whole30 acceptance follows from this synthetic boundary alone.

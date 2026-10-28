@@ -1,6 +1,8 @@
+import hashlib
 import json
 import os
 import time
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -10,6 +12,128 @@ from atomic_flow.agents.execution import ExecutionUnavailable, TaskCancelled, co
 from atomic_flow.agents.task import Task, save
 from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.config import AtomicConfig, ExecutionConfig, load_config
+
+
+def private_syntax_fixture(root):
+    from atomic_flow.agents.verify import check_source_revision
+    from atomic_flow.check_private_runtime import PrivateSyntaxRequest
+    from atomic_flow.check_runtime import RuntimeIdentity
+    from atomic_flow.check_spec import SYMPY_RUNNER_PATHS, CheckSpec, SymPyRunnerIdentity
+
+    runtime = RuntimeIdentity(base_image="swebench/task@sha256:" + "a" * 64,
+        base_image_id="sha256:" + "b" * 64, image_id="sha256:" + "c" * 64,
+        interpreter="/opt/p07-python36/bin/python3.6", python_version=(3, 6, 15), runner="sympy-native",
+        profile_sha256="d" * 64, helper_sha256="e" * 64, inventory_sha256="f" * 64,
+        provisioning_receipt_sha256="1" * 64, private_prefix="/opt/p07-python36",
+        launcher="/opt/p07-runtime/python36", launcher_sha256="2" * 64)
+    for path in (*SYMPY_RUNNER_PATHS, "sympy/core/tests/test_value.py", "sympy/value.py"):
+        target = root / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"VALUE = 1\n")
+    native = SymPyRunnerIdentity((3, 6, 15), "1.4", tuple((path, hashlib.sha256((root / path).read_bytes()).hexdigest())
+                                                    for path in SYMPY_RUNNER_PATHS))
+    spec = CheckSpec("sympy__sympy-example", "a" * 40, "b" * 40, check_source_revision(root),
+                     runtime.image_id, runtime.interpreter, "sympy-native", ("sympy/core/tests/test_value.py",),
+                     sympy_identity=native, runtime_identity=runtime)
+    request = PrivateSyntaxRequest(runtime, spec.digest, spec.source_revision, "sympy/value.py",
+                                   hashlib.sha256((root / "sympy/value.py").read_bytes()).hexdigest(), "3" * 32)
+    return spec, request
+
+
+def test_private_syntax_docker_command_uses_only_bound_launcher_and_fixed_bootstrap(tmp_path, monkeypatch):
+    from atomic_flow.check_private_runtime import private_syntax_args
+    spec, request = private_syntax_fixture(tmp_path)
+    def ordinary_forbidden(*args):
+        pytest.fail("syntax must not invoke ordinary test bootstrap")
+    monkeypatch.setattr("atomic_flow.check_execution.checker_args", ordinary_forbidden)
+    command = docker_command("docker", spec.image, tmp_path, "test", list(spec.argv[1:]),
+                             host_spec=spec, host_spec_nonce=request.nonce, host_syntax_request=request)
+    index = command.index("--")
+    assert command[index + 1:] == [spec.image, *private_syntax_args(request)]
+    assert "--entrypoint=" + spec.runtime_identity.launcher in command[:index]
+    for option in ("--network=none", "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges",
+                   "--pids-limit=128", "--memory=1073741824", "--cpus=2", "--pull=never"):
+        assert option in command
+    assert command.count("--mount") == 1
+    assert "--workdir=/workspace" in command
+
+
+def test_private_ordinary_check_uses_same_exact_launcher(tmp_path, monkeypatch):
+    spec, request = private_syntax_fixture(tmp_path)
+    calls = []
+    def checker(value, nonce):
+        calls.append((value, nonce))
+        return ["-c", "reviewed-native-bootstrap"]
+    monkeypatch.setattr("atomic_flow.check_execution.checker_args", checker)
+    command = docker_command("docker", spec.image, tmp_path, "test", list(spec.argv[1:]),
+                             host_spec=spec, host_spec_nonce=request.nonce)
+    index = command.index("--")
+    assert command[index + 1:] == [spec.image, "-c", "reviewed-native-bootstrap"]
+    assert "--entrypoint=" + spec.runtime_identity.launcher in command[:index]
+    assert calls == [(spec, request.nonce)]
+
+
+@pytest.mark.parametrize("changes", [{"check_spec_digest": "0" * 64}, {"source_revision": "0" * 64},
+                                    {"target_root": "/testbed"}, {"nonce": "0" * 32}])
+def test_private_syntax_request_binding_mismatch_refuses_before_process(tmp_path, monkeypatch, changes):
+    spec, request = private_syntax_fixture(tmp_path)
+    changed = replace(request, **changes)
+    monkeypatch.setattr("atomic_flow.agents.execution.subprocess.Popen", lambda *args, **kwargs: pytest.fail("must refuse before spawn"))
+    with pytest.raises(ExecutionUnavailable, match="differs"):
+        run_python(list(spec.argv[1:]), tmp_path, config=ExecutionConfig(mode="docker", image=spec.image),
+                   host_spec=spec, host_spec_nonce=request.nonce, host_syntax_request=changed)
+    with pytest.raises(ExecutionUnavailable, match="differs"):
+        docker_command("docker", spec.image, tmp_path, "test", list(spec.argv[1:]),
+                       host_spec=spec, host_spec_nonce=request.nonce, host_syntax_request=changed)
+
+
+def test_private_syntax_runtime_substitution_refuses(tmp_path):
+    from atomic_flow.agents.execution import validate_host_syntax_request
+    spec, request = private_syntax_fixture(tmp_path)
+    changed = replace(request, runtime=replace(request.runtime, profile_sha256="9" * 64))
+    with pytest.raises(ExecutionUnavailable, match="differs"):
+        validate_host_syntax_request(spec, request.nonce, changed)
+
+
+def test_private_syntax_successful_admission_skips_ordinary_checker_before_engine_probe(tmp_path, monkeypatch):
+    spec, request = private_syntax_fixture(tmp_path)
+    monkeypatch.setattr("atomic_flow.check_execution.checker_args", lambda *args: pytest.fail("ordinary checker is not syntax"))
+    def probe(config, requirements, *, probe):
+        assert probe is True
+        raise ExecutionUnavailable("test stopped at engine probe")
+    monkeypatch.setattr("atomic_flow.agents.execution.execution_manifest", probe)
+    with pytest.raises(ExecutionUnavailable, match="test stopped at engine probe"):
+        run_python(list(spec.argv[1:]), tmp_path, config=ExecutionConfig(mode="docker", image=spec.image),
+                   host_spec=spec, host_spec_nonce=request.nonce, host_syntax_request=request)
+
+
+@pytest.mark.parametrize("with_spec", [True, False])
+def test_private_syntax_requires_typed_request_and_host_spec(tmp_path, monkeypatch, with_spec):
+    spec, request = private_syntax_fixture(tmp_path)
+    monkeypatch.setattr("atomic_flow.agents.execution.subprocess.Popen", lambda *args, **kwargs: pytest.fail("must refuse before spawn"))
+    arguments = {"host_spec": spec, "host_spec_nonce": request.nonce} if with_spec else {}
+    with pytest.raises(ExecutionUnavailable):
+        run_python(list(spec.argv[1:]), tmp_path, config=ExecutionConfig(mode="docker", image=spec.image),
+                   host_syntax_request=request.as_dict() if with_spec else request, **arguments)
+    with pytest.raises(ExecutionUnavailable):
+        docker_command("docker", spec.image, tmp_path, "test", list(spec.argv[1:]),
+                       host_syntax_request=request.as_dict() if with_spec else request, **arguments)
+
+
+def test_private_syntax_still_requires_admitted_source_config_and_exact_descriptive_args(tmp_path, monkeypatch):
+    spec, request = private_syntax_fixture(tmp_path)
+    monkeypatch.setattr("atomic_flow.agents.execution.subprocess.Popen", lambda *args, **kwargs: pytest.fail("must refuse before spawn"))
+    monkeypatch.setattr("atomic_flow.check_execution.checker_args", lambda *args: pytest.fail("ordinary checker is not syntax"))
+    for config, args in ((ExecutionConfig(mode="local", image=spec.image), list(spec.argv[1:])),
+                         (ExecutionConfig(mode="docker", image=spec.image), ["-c", "arbitrary"]),
+                         (ExecutionConfig(mode="docker", image="wrong:latest"), list(spec.argv[1:]))):
+        with pytest.raises(ExecutionUnavailable):
+            run_python(args, tmp_path, config=config, host_spec=spec, host_spec_nonce=request.nonce,
+                       host_syntax_request=request)
+    (tmp_path / "sympy/value.py").write_bytes(b"VALUE = 2\n")
+    with pytest.raises(ExecutionUnavailable, match="stale"):
+        run_python(list(spec.argv[1:]), tmp_path, config=ExecutionConfig(mode="docker", image=spec.image),
+                   host_spec=spec, host_spec_nonce=request.nonce, host_syntax_request=request)
 
 
 def test_environment_and_output_are_bounded(tmp_path, monkeypatch):

@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from atomic_flow.check_pytest_self import PytestSelfIdentity
+from atomic_flow.check_runtime import RuntimeIdentity
 
 _IMAGE = re.compile(r"[a-z0-9]+(?:[._-][a-z0-9]+)*(?::[0-9]+)?(?:/[a-z0-9]+(?:[._-][a-z0-9]+)*)*@sha256:[0-9a-f]{64}")
 _TASK = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}")
@@ -70,8 +71,8 @@ class SymPyRunnerIdentity:
     def __post_init__(self) -> None:
         version = self.python_version
         if (type(version) is not tuple or len(version) != 3 or any(type(part) is not int or part < 0 for part in version)
-                or version[0] != 3 or version[1] < 8 or version[1] > 99 or version[2] > 999):
-            raise ValueError("native SymPy requires an exact Python3.8+ version")
+                or (version != (3, 6, 15) and (version[0] != 3 or version[1] < 8 or version[1] > 99 or version[2] > 999))):
+            raise ValueError("native SymPy requires an exact Python3.8+ or privately bound Python3.6.15 version")
         if (type(self.sympy_version) is not str or not 1 <= len(self.sympy_version) <= 128
                 or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.+-]*", self.sympy_version) is None):
             raise ValueError("native SymPy requires an exact bounded package version")
@@ -110,6 +111,7 @@ class CheckSpec:
     resources: CheckResources = field(default_factory=CheckResources)
     sympy_identity: SymPyRunnerIdentity | None = None
     pytest_self_identity: PytestSelfIdentity | None = None
+    runtime_identity: RuntimeIdentity | None = None
 
     def __post_init__(self) -> None:
         if type(self.task_id) is not str or _TASK.fullmatch(self.task_id) is None:
@@ -117,10 +119,19 @@ class CheckSpec:
         _digest("task_commit", self.task_commit, 40)
         _digest("base_commit", self.base_commit, 40)
         _digest("source_revision", self.source_revision, 64)
-        if type(self.image) is not str or len(self.image) > 512 or _IMAGE.fullmatch(self.image) is None:
-            raise ValueError("image must be an exact image reference at sha256 digest")
-        if type(self.interpreter) is not str or self.interpreter not in _INTERPRETERS:
-            raise ValueError("interpreter must be an admitted absolute image path")
+        if self.runtime_identity is not None:
+            if type(self.runtime_identity) is not RuntimeIdentity:
+                raise ValueError("runtime identity must be the immutable host contract")
+            self.runtime_identity.require_execution_eligible()
+            if (type(self.image) is not str or type(self.interpreter) is not str
+                    or self.image != self.runtime_identity.image_id or self.interpreter != self.runtime_identity.interpreter
+                    or self.runner != self.runtime_identity.runner):
+                raise ValueError("image, interpreter and runner must match the exact private runtime identity")
+        else:
+            if type(self.image) is not str or len(self.image) > 512 or _IMAGE.fullmatch(self.image) is None:
+                raise ValueError("image must be an exact image reference at sha256 digest")
+            if type(self.interpreter) is not str or self.interpreter not in _INTERPRETERS:
+                raise ValueError("interpreter must be an admitted absolute image path")
         if type(self.runner) is not str or self.runner not in {"pytest", "sympy-native", "pytest-self"}:
             raise ValueError("unreviewed test runner")
         if type(self.target_root) is not str or self.target_root not in {"/workspace", "/testbed"}:
@@ -137,6 +148,14 @@ class CheckSpec:
             raise ValueError("native SymPy identity belongs only to a native runner specification")
         if self.pytest_self_identity is not None and (self.runner != "pytest-self" or type(self.pytest_self_identity) is not PytestSelfIdentity):
             raise ValueError("pytest self identity belongs only to a pytest self runner specification")
+        if self.sympy_identity is not None:
+            if self.sympy_identity.python_version == (3, 6, 15) and self.runtime_identity is None:
+                raise ValueError("Python3.6.15 native SymPy requires an eligible private runtime identity")
+            if self.runtime_identity is not None and self.sympy_identity.python_version != self.runtime_identity.python_version:
+                raise ValueError("native SymPy Python version differs from the private runtime identity")
+        if (self.pytest_self_identity is not None and self.runtime_identity is not None
+                and self.pytest_self_identity.python_version != self.runtime_identity.python_version):
+            raise ValueError("pytest self Python version differs from the private runtime identity")
         _integer("timeout_seconds", self.timeout_seconds, 180)
         if type(self.resources) is not CheckResources:
             raise ValueError("resource bounds must use the immutable host contract")
@@ -165,6 +184,8 @@ class CheckSpec:
             value["sympy_identity"] = self.sympy_identity.as_dict()
         if self.pytest_self_identity is not None:
             value["pytest_self_identity"] = self.pytest_self_identity.as_dict()
+        if self.runtime_identity is not None:
+            value["runtime_identity"] = self.runtime_identity.as_dict()
         return value
 
     def canonical_bytes(self) -> bytes:
