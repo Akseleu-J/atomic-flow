@@ -54,5 +54,7 @@ def test_oversized_advisory_graph_file_never_removes_full_regression_gate(tmp_pa
     plan = report["impact_check_plan"]
     assert plan["impact_status"] == "unknown" and plan["loop_check"] == "full_pytest"
     assert plan["omitted_oversized"] == ["tests/test_large.py"]
+    assert "tests/test_large.py" in plan["omitted_unsupported"]
+    assert plan["final_gate_applicable"] is True
     assert "tests/test_large.py" in plan["source_digests"]
     assert calls == [["-m", "pytest", "-q", "--no-header", "-x"]]

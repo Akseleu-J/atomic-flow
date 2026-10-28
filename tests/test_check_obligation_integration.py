@@ -103,6 +103,27 @@ def test_final_gate_always_checks_full_bound_obligation(workspace, monkeypatch, 
     assert report["tests"] == ("passed" if passed else "failed")
 
 
+@pytest.mark.parametrize("passed", [True, False])
+def test_oversized_graph_omission_preserves_complete_host_obligation(workspace, monkeypatch, passed):
+    root, bound = workspace
+    (root / "large.py").write_bytes(b"#" + b"x" * 1_000_000 + b"\n")
+    calls = fake_executor(monkeypatch, passed=passed)
+    changeset = ChangeSet.create(root)
+    edited = changeset.workspace / "value.py"
+    edited.write_bytes(b"VALUE = 2\n")
+    from atomic_flow.agents.source import digest
+    changeset.track("value.py", digest(edited.read_bytes()))
+    task = Task.new("Inspect", root, [Step(0, "Inspect", verify_with="none", status="done")])
+    task.current_index = 1
+    task.plan_approval["check_obligation"] = obligation_binding(bound)
+    report = assess_completion(task, changeset, config(bound), check_obligation=bound)
+    assert len(calls) == 1 and report["ready_to_publish"] is passed
+    assert calls[0][0].test_paths == bound.template.test_paths
+    assert report["impact_check_plan"]["omitted_oversized"] == ["large.py"]
+    assert report["impact_check_plan"]["impact_status"] == "unknown"
+    assert report["check_obligation_digest"] == bound.digest
+
+
 def test_resume_cannot_drop_or_replace_bound_obligation(workspace):
     _, bound = workspace
     approval = {"check_obligation": obligation_binding(bound)}
