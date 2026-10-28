@@ -1,5 +1,7 @@
 # atomic-flow — рабочая карта проекта
 
+28 октября: исправление Linux topology-test принято на `0fb21baf855c38f1eabc73edb93c54dc5f5a5d34`, общий CI40748973134 SUCCESS. Python3.11/3.12: по3107PASS/14SKIP, JUnit и389 source hashes сверены; Windows/wheel/real Docker jobs SUCCESS. Requests3362 controller и private fixture composition пока проверены только локально/моками; отдельный реальный smoke готовится. Пять пакетов P07 остаются OPEN, paid main pairs ещё не запускались.
+
 28 октября: Atomic/flat Docker safety matrix CI40742941290 на24368249867437b6629235b6cc326c599e4a1c81 принята по ZIP/session hashes. Обе системыFAIL→repair1→2-file publish→freshPASS→graph sync; flat6scriptedcallbacks безparser/critic/planner. MainLinuxCI выявил globalosmock→pytestFDcapture bug в topologytest, фикслокальный43PASS; нуженсвежийCI. DirectSonnet5 APIv2 принят,response/usage25/11,cost0.00016,knownaggregate0.035931375USD; P07 OPEN.
 
 28 октября: full private Python3.6 TaskRunner принят на4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876, CI40680449793 SUCCESS,1505 admittedfiles, FAIL→replan1→repair→freshPASS/final→onlyprobe publication→graph sync с explicit oversized omission. Artifact12812244003 SHA f8343167.../50rawhashes verified. Один отдельный живой API preflight Sonnet5: HTTP200, providerusage25/11,cost0.00016USD; response body не подтверждён из-за crossrealm Uint8Array bug, fixed/offline verified, безповтора. Billing reconciled,knownaggregate0.035771375USD; originalUNKNOWN preserved. P07 OPEN; matchedpairs/holdout/ablations ещё не выполнены.

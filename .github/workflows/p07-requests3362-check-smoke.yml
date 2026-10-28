@@ -1,0 +1,40 @@
+name: P07 private Requests3362 CheckSpec fixture boundary
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install . swebench==3.0.15 packaging==25.0 cryptography==46.0.3
+      - name: Provision actual reviewed private runtime and public fixture certificates
+        run: |
+          mkdir -p p07-requests3362-check-worker
+          git rev-parse HEAD > p07-requests3362-check-worker/tested-commit.txt
+          python tools/p07_requests3362_legacy_image.py prepare --profile benchmarks/stage4/p07-requests-legacy-profile-v2.json --output /tmp/p07-requests3362-check-runtime
+          python tools/p07_requests3362_legacy_image.py build --context /tmp/p07-requests3362-check-runtime --output p07-requests3362-check-worker/runtime
+          python tools/p07_requests3362_cert_image.py prepare --runtime-receipt p07-requests3362-check-worker/runtime --output /tmp/p07-requests3362-check-cert
+          python tools/p07_requests3362_cert_image.py build --context /tmp/p07-requests3362-check-cert --output p07-requests3362-check-worker/certificate
+      - name: Independently qualify actual same-image HTTP TLS and plugin health
+        run: python tools/p07_requests3362_health.py --certificate-receipt p07-requests3362-check-worker/certificate --output p07-requests3362-check-worker/health
+      - name: Root operator installs only fixed owned-container timeout topology
+        run: |
+          sudo -- "$(command -v python)" tools/p07_requests3362_check_smoke.py --certificate-receipt p07-requests3362-check-worker/certificate --health-receipt p07-requests3362-check-worker/health --output p07-requests3362-check-worker/smoke
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-requests3362-check-${{ github.sha }}
+          path: p07-requests3362-check-worker/
+          retention-days: 14
+          if-no-files-found: error

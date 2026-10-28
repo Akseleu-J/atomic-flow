@@ -261,3 +261,15 @@ General CI on2436824 failed onLinux because topology unit fixtures monkeypatched
 
 
 The separate Requests3362 controller is implemented prospectively: rootLinux-only, fixed ownedCID container with read-only source/root and core bounds; PIDbirth/netns binding before/after fixed topology; only then private pytest fixture execution; bounded streams/cancellation, source equality, fixture shutdown and immutableCID absenceproof before returning. Generic check dispatch remains disabled until real Docker/runtime/health acceptance. Eleven mocked controller testsPASS withoutpytestcache; an initial Windows cache read ended withMemoryError, so that earlier run is not accepted as a completed suite. The fixed privatepytest builder clears reviewed pytest environment overrides and preloads pinned plugins before target sys.path. No new provider calls beyond the two recorded diagnostics.
+
+The new `p07-requests3362-check-smoke.yml` workflow prepares the exact v2
+private runtime and certificate image, independently qualifies the same-image
+health, and then runs `p07_requests3362_check_smoke.py` as the explicit root
+Linux operator. Target tests remain inside the non-root, network-none container.
+The synthetic inventory checks real HTTP/TLS, hostname/CA verification and
+unrelated-CA refusal alongside a production probe: FAIL, edited PASS, then
+required-SKIP refusal. It retains source/runtime/fixture identities, raw output,
+namespace bindings and immutable-container cleanup evidence. Static syntax,
+host-only import and Ruff checks passed; independent read-only review found no
+remaining concrete API mismatch. Real execution is pending; this workflow does
+not establish historical issue-solving quality or enable generic dispatch.

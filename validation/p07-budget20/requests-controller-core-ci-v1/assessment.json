@@ -1,0 +1,33 @@
+{
+  "status": "exact_source_core_ci_accepted",
+  "tested_commit": "0fb21baf855c38f1eabc73edb93c54dc5f5a5d34",
+  "run_id": 40748973134,
+  "host_checks": [
+    {
+      "python": "3.11",
+      "testcases": 3121,
+      "skipped": 14,
+      "source_files": 389,
+      "current_runtime_mismatches": []
+    },
+    {
+      "python": "3.12",
+      "testcases": 3121,
+      "skipped": 14,
+      "source_files": 389,
+      "current_runtime_mismatches": []
+    }
+  ],
+  "docker": {
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+    "gpu_requested": false,
+    "model_calls": 0,
+    "container": "PASS",
+    "tests_exit": 0,
+    "extra_tests_exit": 0,
+    "compile_exit": 0,
+    "image_id": "sha256:4a57d6918dacc40f3a4e9efa5c8349018d44ba695235819e7b6fd075b2906142"
+  },
+  "scope": "General CI only; Requests3362 new controller real Docker qualification remains pending."
+}
