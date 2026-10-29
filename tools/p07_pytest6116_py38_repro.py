@@ -28,6 +28,7 @@ from atomic_flow.check_requests_execution import _bounded
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = ROOT / 'benchmarks/stage4/p07-pytest6116-py38-repro-v1.json'
 FULL_PROFILE = ROOT / 'benchmarks/stage4/p07-pytest6116-py38-full-v1.json'
+PEXPECT_PROFILE = ROOT / 'benchmarks/stage4/p07-pytest6116-py38-pexpect-v1.json'
 PYTHON = '/usr/local/bin/python'
 TARGET = r'''
 import json,os,sys
@@ -116,9 +117,11 @@ def audit_installed_wheels(command, cid, wheelhouse, profile, destination):
     return expected, actual, extras
 
 
-def run(output, *, full_public=False, source_for_subprocesses=False):
+def run(output, *, full_public=False, source_for_subprocesses=False, with_pexpect=False):
     if os.name != 'posix' or output.exists():
         raise ValueError('fresh output on Linux required')
+    if with_pexpect and not full_public:
+        raise ValueError('pexpect candidate requires the full public suite')
     output.mkdir(parents=True)
     report = {'status': 'not_qualified', 'scope': 'full public test diagnostic' if full_public else 'three-test public compatibility diagnostic',
               'ordinary_acceptance': False, 'provider_calls': 0, 'hidden_oracle': 'not_run'}
@@ -130,10 +133,10 @@ def run(output, *, full_public=False, source_for_subprocesses=False):
         cidfile = tmp / 'cid'
         cid = None
         try:
-            profile_raw = (FULL_PROFILE if full_public else PROFILE).read_bytes()
+            profile_raw = (PEXPECT_PROFILE if with_pexpect else FULL_PROFILE if full_public else PROFILE).read_bytes()
             profile = json.loads(profile_raw)
             report['profile_sha256'] = hashlib.sha256(profile_raw).hexdigest()
-            if (len(profile['wheels']) != (11 if full_public else 8) or profile['source_image'] != recon.IMAGE
+            if (len(profile['wheels']) != (13 if with_pexpect else 11 if full_public else 8) or profile['source_image'] != recon.IMAGE
                     or profile['python_image'] != 'python@sha256:1d52838af602b4b5a831beb13a0e4d073280665ea7be7f69ce2382f29c5a613f'):
                 raise ValueError('fixed images and wheels required')
             rows = prepare_wheels(profile, tmp)
@@ -260,7 +263,9 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--full-public', action='store_true')
     parser.add_argument('--source-for-subprocesses', action='store_true')
+    parser.add_argument('--with-pexpect', action='store_true')
     options = parser.parse_args()
-    result = run(options.output, full_public=options.full_public, source_for_subprocesses=options.source_for_subprocesses)
+    result = run(options.output, full_public=options.full_public, source_for_subprocesses=options.source_for_subprocesses,
+                 with_pexpect=options.with_pexpect)
     expected = 'full_diagnostic_completed' if options.full_public else 'focused_diagnostic_completed'
     raise SystemExit(0 if result['status'] == expected and result['exit_code'] == 0 else 1)
