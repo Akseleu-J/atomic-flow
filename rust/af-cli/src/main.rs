@@ -214,6 +214,18 @@ enum BackendCommand {
         #[arg(long)]
         prompt: String,
     },
+    /// Streaming call: content deltas print to stdout as they arrive; the
+    /// final settled JSON (usage, finish) prints last. Same hold semantics.
+    CallStream {
+        #[arg(long)]
+        base_url: String,
+        #[arg(long, default_value = "ATOMIC_FLOW_API_KEY")]
+        api_key_env: String,
+        #[arg(long, default_value = "gpt-4o-mini")]
+        model: String,
+        #[arg(long)]
+        prompt: String,
+    },
 }
 
 fn main() {
@@ -332,6 +344,12 @@ fn run(command: Command) -> Result<String, String> {
                 model,
                 prompt,
             } => backend_call(base_url, api_key_env, model, prompt),
+            BackendCommand::CallStream {
+                base_url,
+                api_key_env,
+                model,
+                prompt,
+            } => backend_call_stream(base_url, api_key_env, model, prompt),
         },
     }
 }
@@ -754,6 +772,43 @@ fn backend_call(
             "HOLD {backend}: {detail} (unknown outcomes are never retried)"
         )),
         af_llm::RouteOutcome::Exhausted { refusals } => Err(format!("exhausted: {refusals:?}")),
+    }
+}
+
+fn backend_call_stream(
+    base_url: String,
+    api_key_env: String,
+    model: String,
+    prompt: String,
+) -> Result<String, String> {
+    let backend =
+        af_llm::OpenAiBackend::new("openai", &base_url, &api_key_env);
+    let mut request =
+        af_llm::ChatRequest::new(&model, vec![af_llm::ChatMessage::new("user", &prompt)]);
+    request.max_output_tokens = Some(256);
+    let mut deltas = 0usize;
+    // Deltas stream to stdout live; the settled summary prints last so a
+    // consumer splitting on the final line gets clean JSON.
+    let outcome = backend.chat_stream(&request, &af_llm::Cancel::new(), &mut |delta| {
+        print!("{delta}");
+        deltas += 1;
+        let _ = std::io::Write::flush(&mut std::io::stdout());
+    });
+    println!();
+    match outcome {
+        af_llm::BackendOutcome::Completed(result) => Ok(json!({
+            "ok": true, "deltas": deltas,
+            "content_chars": result.content.chars().count(),
+            "tokens_in": result.usage.tokens_in, "tokens_out": result.usage.tokens_out,
+            "truncated": result.truncated,
+        })
+        .to_string()),
+        af_llm::BackendOutcome::Refused { sent, reason } => Err(format!(
+            "REFUSED (sent={sent}): {reason}"
+        )),
+        af_llm::BackendOutcome::Unknown { sent, detail } => Err(format!(
+            "HOLD (sent={sent}): {detail} (unknown outcomes are never retried)"
+        )),
     }
 }
 

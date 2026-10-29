@@ -1,0 +1,76 @@
+name: Surfaces acceptance
+
+on:
+  push:
+    branches: [main, experimental]
+  pull_request:
+
+concurrency:
+  group: surfaces-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ts-client:
+    name: TypeScript client (typecheck + vitest)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@6044e13b5db4789a24ef6e0b3ec1826e84042607 # v4
+        with:
+          node-version: 22
+      - name: Record tested source
+        run: |
+          mkdir -p validation/ts
+          git rev-parse HEAD > validation/ts/commit.txt
+      - name: Install dependencies
+        working-directory: ts/af-client
+        run: npm install --no-fund --no-audit
+      - name: Typecheck (strict)
+        working-directory: ts/af-client
+        run: npm run typecheck
+      - name: Unit tests
+        working-directory: ts/af-client
+        run: npm test 2>&1 | tee ../../validation/ts/vitest.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: ts-client-${{ github.sha }}
+          path: validation/ts/
+
+  docker-driver:
+    name: Real Docker acceptance (SandboxDriver)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          profile: minimal
+      - name: Record tested source
+        run: |
+          mkdir -p validation/docker
+          git rev-parse HEAD > validation/docker/commit.txt
+      - name: Build af kernel tests
+        working-directory: rust
+        env:
+          CARGO_BUILD_JOBS: "2"
+          CARGO_INCREMENTAL: "0"
+          CARGO_PROFILE_DEV_DEBUG: "0"
+        run: cargo build --release -p af-exec --tests
+      - name: Real Docker acceptance through run_with_driver (alpine, network none, read-only)
+        working-directory: rust
+        run: cargo test -p af-exec --release real_docker_acceptance -- --ignored --nocapture 2>&1 | tee ../validation/docker/acceptance.log
+      - name: Verify the evidence names the docker boundary
+        run: rg -q '"driver":\s*"docker"' validation/docker/acceptance.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: docker-driver-${{ github.sha }}
+          path: validation/docker/
+      - name: Firecracker status (documented block)
+        run: |
+          cat > validation/docker/firecracker-status.md <<'MD'
+          Firecracker real acceptance stays blocked on GitHub-hosted runners:
+          no /dev/kvm (nested virtualization is not exposed). The driver code
+          and honest availability refusal are covered by unit tests; real
+          microVM acceptance needs a self-hosted Linux runner with KVM.
+          MD

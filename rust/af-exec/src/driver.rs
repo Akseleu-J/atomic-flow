@@ -336,4 +336,38 @@ mod tests {
             assert!(!driver.available(), "honest refusal off Linux");
         }
     }
+
+    /// REAL Docker acceptance (CI-only; `cargo test -- --ignored` on a Linux
+    /// host with docker preinstalled). Pulls alpine, runs a job through the
+    /// DockerDriver via run_with_driver, and asserts the isolation evidence
+    /// names the docker boundary with the sandbox posture. Firecracker
+    /// itself stays blocked on hosted runners: no /dev/kvm.
+    #[test]
+    #[ignore = "requires a Linux host with docker; run in CI via --ignored"]
+    fn real_docker_acceptance_through_run_with_driver() {
+        use super::DockerDriver;
+        use crate::{JobRunner, JobSpec};
+        let store = std::env::temp_dir().join(format!("af-docker-acc-{}", af_entropy::token()));
+        let runner = JobRunner::open(&store).unwrap();
+        let spec = JobSpec {
+            argv: vec!["/bin/echo".into(), "sandbox-live".into()],
+            cwd: std::env::temp_dir(),
+            timeout_secs: 120,
+            image: Some("alpine:3.19".into()),
+            sandbox_workdir: Some("/workspace".into()),
+            job_id: af_entropy::token(),
+        };
+        let status = runner.run_with_driver(&spec, &DockerDriver).unwrap();
+        assert_eq!(status["status"], json!("succeeded"), "{status}");
+        assert_eq!(status["sandbox"]["driver"], json!("docker"));
+        assert_eq!(status["sandbox"]["network_none"], json!(true));
+        assert_eq!(status["sandbox"]["root_read_only"], json!(true));
+        assert!(status["sandbox"]["isolation"]
+            .as_str()
+            .unwrap()
+            .contains("shared kernel"));
+        let jobs = runner.jobs().unwrap();
+        assert_eq!(jobs[&spec.job_id]["status"], json!("succeeded"));
+        let _ = std::fs::remove_dir_all(&store);
+    }
 }
