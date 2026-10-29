@@ -1,0 +1,15 @@
+﻿{
+    "run_id":  "rust-live-20261026-01",
+    "af_exe":  "C:\\Users\\omirb\\.zcode\\workspace\\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\\atomic-flow-dev\\rust\\target\\release\\af.exe",
+    "prompt":  "Reply with exactly one line: RUST-LIVE-OK",
+    "caps":  {
+                 "max_physical_calls":  1,
+                 "max_output_tokens":  256,
+                 "timeout_seconds":  600,
+                 "max_retries":  0,
+                 "min_quota_reserve":  1,
+                 "prompt_transfer":  "no repository content; synthetic one-line prompt only"
+             },
+    "model_override":  "google/gemini-3.1-flash-lite-preview",
+    "model_choice_note":  "account 3 has no LLM_DEFAULT/LLMS_AVAILABLE; using the model the owner approved for all previous live pilots (see .local-tools/live-request.json p05-diagnostic)"
+}
