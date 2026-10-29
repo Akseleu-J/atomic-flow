@@ -78,17 +78,25 @@ def run(receipt_dir: Path, output: Path):
             spec = CheckSpec(admitted["task"], commit, target["base_commit"], check_source_revision(root), image_id,
                              runtime.interpreter, "pytest", ("test_requests.py",), runtime_identity=runtime,
                              private_pytest_identity=identity, resources=CheckResources(output_bytes_per_stream=1000000))
+            bootstrap = private_pytest_args(spec, identity, NONCE)
+            # Diagnostic instrumentation only: identify a failing fixed guard
+            # without weakening it or changing any pytest/test behavior.
+            lines = bootstrap[1].splitlines(keepends=True)
+            bootstrap[1] = "".join(line.replace("raise SystemExit(125)",
+                "raise RuntimeError('private bootstrap guard line " + str(index) + "')")
+                for index, line in enumerate(lines, 1))
             cidfile = parent / (case + ".cid")
             args = [ENGINE, "run", "--cidfile", str(cidfile), "--pull=never", "--network=none", "--read-only",
                     "--user=65534:65534", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--memory=1g",
                     "--cpus=2", "--pids-limit=128", "--tmpfs", "/tmp:rw,noexec,nosuid,size=128m",
                     "--mount", "type=bind,src=" + str(root) + ",dst=/testbed,readonly", "--workdir=/testbed",
-                    "--entrypoint", legacy.LAUNCHER, image_id, *private_pytest_args(spec, identity, NONCE)]
+                    "--entrypoint", legacy.LAUNCHER, image_id, *bootstrap]
             try:
                 process = subprocess.run(args, cwd=ROOT, capture_output=True, timeout=120, check=False)
                 stdout, stderr = process.stdout.decode("utf-8"), process.stderr.decode("utf-8")
                 (output / (case + ".stdout")).write_bytes(process.stdout)
                 (output / (case + ".stderr")).write_bytes(process.stderr)
+                (output / (case + ".exit.json")).write_text(json.dumps({"exit": process.returncode}) + "\n")
                 result = CommandResult(returncode=process.returncode, stdout=stdout, stderr=stderr)
                 observed = private_pytest_receipt(result, spec, identity, NONCE)
                 if (observed is not None) != (case != "skip") or bool(observed and not observed["call_failed"]) != expected:
