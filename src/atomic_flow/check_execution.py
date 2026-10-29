@@ -321,6 +321,9 @@ def _runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str) -> dict 
         if spec.fixture_identity.variant == "function36-v3" and spec.requests_ca_identity is not None:
             from atomic_flow.check_requests_function import function_receipt
             return function_receipt(result, spec, nonce)
+        if spec.fixture_identity.variant == "2674-v2" and spec.requests_ca_identity is not None:
+            from atomic_flow.check_requests2674 import function_receipt
+            return function_receipt(result, spec, nonce)
         if spec.fixture_identity.variant != "3362-cn":
             return None
         from atomic_flow.check_requests3362 import requests3362_receipt
@@ -458,6 +461,11 @@ def run_check_spec(spec: CheckSpec, workspace: Path, *, cancel_check=None) -> Ch
                 and spec.requests_ca_identity is not None):
             from atomic_flow.check_requests_function_execution import run_function36_check
             receipt, _, _ = run_function36_check(spec, workspace, cancel_check=cancel_check)
+            return receipt
+        if (spec.fixture_identity is not None and spec.fixture_identity.variant == "2674-v2"
+                and spec.requests_ca_identity is not None):
+            from atomic_flow.check_requests_function_execution import run_requests2674_check
+            receipt, _, _ = run_requests2674_check(spec, workspace, cancel_check=cancel_check)
             return receipt
         if spec.fixture_identity is None or spec.fixture_identity.variant != "3362-cn":
             raise ExecutionUnavailable("Private Requests fixture lifecycle is not implemented for this cohort")

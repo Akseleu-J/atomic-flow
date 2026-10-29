@@ -1,0 +1,15 @@
+{
+  "run": 40834413145,
+  "tested_commit": "00e48150a9ecb2172adb163226ec988f89948f4a",
+  "artifact": 12880405739,
+  "sha256": "86ae3296c109cefb4ac5077423dfaff1f0a153758251faff57a7179f5f61b5c3",
+  "manifest_members_verified": 795,
+  "synthetic_cases": [
+    "base_fail",
+    "edited_pass",
+    "required_skip"
+  ],
+  "resource_receipts_verified": 3,
+  "provider_calls": 0,
+  "scope": "synthetic full-source resource boundary, no historical tests"
+}
