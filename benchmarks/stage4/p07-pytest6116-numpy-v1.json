@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "scope": "prospective Python 3.8 Linux NumPy wheel; no runtime admission",
+  "task_id": "pytest-dev__pytest-6116",
+  "python_version": "3.8.20",
+  "base_optional_profile_sha256": "82a142fdd6e1ac6c5aee6b59cef0e415fa171f66be3b6f6edc8afaf935f2072d",
+  "wheel": {
+    "name": "numpy",
+    "version": "1.21.6",
+    "filename": "numpy-1.21.6-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+    "sha256": "4aa48afdce4660b0076a00d80afa54e8a97cd49f457d68a4342d188a09451c1a",
+    "size": 15749422,
+    "url": "https://files.pythonhosted.org/packages/d5/43/e88bb1fb7d040ae8e0e06e749341b13f57701aab11fe9d71c99af6202c5c/numpy-1.21.6-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
+  }
+}
