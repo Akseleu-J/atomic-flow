@@ -148,6 +148,19 @@ pub enum BackendOutcome {
 pub trait ChatBackend: Send + Sync {
     fn name(&self) -> &str;
     fn chat(&self, request: &ChatRequest, cancel: &Cancel) -> BackendOutcome;
+
+    /// Streaming variant with content deltas. Default: fall back to the
+    /// non-streaming call with no deltas (honest: nothing shown early).
+    /// Backends that stream must keep the spend contract: post-send
+    /// unknown/refusal = hold, settled usage in the final ChatResult.
+    fn chat_stream(
+        &self,
+        request: &ChatRequest,
+        cancel: &Cancel,
+        _on_delta: &mut dyn FnMut(&str),
+    ) -> BackendOutcome {
+        self.chat(request, cancel)
+    }
 }
 
 /// Deterministic scripted backend (the `fake backend` of the Python tests).
@@ -341,6 +354,76 @@ pub fn accumulate_chunk(content: &mut String, chunk: &Value) -> Option<String> {
         .map(str::to_string)
 }
 
+/// Streaming tool calls: fragments arrive per index across many chunks
+/// (`delta.tool_calls[{index, id?, function:{name?, arguments-fragment}}]`).
+/// Accumulate into partial slots; a slot is complete when the provider sends
+/// its finish (after the final `finish_reason` the map is drained by
+/// [`drain_tool_calls`]).
+#[derive(Default)]
+pub struct PartialToolCalls {
+    slots: BTreeMap<usize, (String, String, String)>, // index -> (id, name, arguments)
+}
+
+impl PartialToolCalls {
+    pub fn absorb(&mut self, chunk: &Value) {
+        let Some(fragments) = chunk
+            .pointer("/choices/0/delta/tool_calls")
+            .and_then(Value::as_array)
+        else {
+            return;
+        };
+        for fragment in fragments {
+            let index = fragment.get("index").and_then(Value::as_u64).unwrap_or(0) as usize;
+            let slot = self
+                .slots
+                .entry(index)
+                .or_insert_with(|| (String::new(), String::new(), String::new()));
+            if let Some(id) = fragment.get("id").and_then(Value::as_str) {
+                slot.0 = id.to_string();
+            }
+            if let Some(name) = fragment.pointer("/function/name").and_then(Value::as_str) {
+                slot.1.push_str(name);
+            }
+            if let Some(arguments) = fragment
+                .pointer("/function/arguments")
+                .and_then(Value::as_str)
+            {
+                slot.2.push_str(arguments);
+            }
+        }
+    }
+
+    /// Drain accumulated slots as typed ToolCall records, in index order.
+    pub fn drain(&mut self) -> Vec<ToolCall> {
+        let drained: Vec<ToolCall> = self
+            .slots
+            .iter()
+            .map(|(index, (id, name, arguments))| ToolCall {
+                id: if id.is_empty() {
+                    format!("stream-{index}")
+                } else {
+                    id.clone()
+                },
+                name: name.clone(),
+                arguments: arguments.clone(),
+            })
+            .collect();
+        self.slots.clear();
+        drained
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.slots.is_empty()
+    }
+}
+
+use std::collections::BTreeMap;
+
+/// Drain tool calls from the partial accumulator (see [`PartialToolCalls`]).
+pub fn drain_tool_calls(partial: &mut PartialToolCalls) -> Vec<ToolCall> {
+    partial.drain()
+}
+
 impl ChatBackend for OpenAiBackend {
     fn name(&self) -> &str {
         &self.name
@@ -528,6 +611,7 @@ impl OpenAiBackend {
         let mut content = String::new();
         let mut finish: Option<String> = None;
         let mut usage: Option<Usage> = None;
+        let mut partial_tool_calls = PartialToolCalls::default();
         let mut stream = std::io::BufReader::new(&mut reader);
         use std::io::BufRead as _;
         loop {
@@ -552,6 +636,7 @@ impl OpenAiBackend {
                 continue;
             };
             accumulate_chunk(&mut content, &chunk);
+            partial_tool_calls.absorb(&chunk);
             if let Some(reason) = chunk
                 .pointer("/choices/0/finish_reason")
                 .and_then(Value::as_str)
@@ -569,17 +654,24 @@ impl OpenAiBackend {
             }
         }
         match finish.as_deref() {
-            Some(reason) => BackendOutcome::Completed(ChatResult {
-                content,
-                usage: usage.unwrap_or(Usage {
-                    tokens_in: None,
-                    tokens_out: None,
-                    cost_usd: None,
-                    latency_ms,
-                }),
-                truncated: reason == "length",
-                tool_calls: Vec::new(),
-            }),
+            Some(reason) => {
+                let tool_calls = if reason == "tool_calls" {
+                    partial_tool_calls.drain()
+                } else {
+                    Vec::new()
+                };
+                BackendOutcome::Completed(ChatResult {
+                    content,
+                    usage: usage.unwrap_or(Usage {
+                        tokens_in: None,
+                        tokens_out: None,
+                        cost_usd: None,
+                        latency_ms,
+                    }),
+                    truncated: reason == "length",
+                    tool_calls,
+                })
+            }
             None => BackendOutcome::Unknown {
                 sent: true,
                 detail: "stream ended without finish_reason".into(),
@@ -615,6 +707,50 @@ impl Router {
         let mut refusals: Vec<String> = Vec::new();
         for backend in &self.backends {
             match backend.chat(request, cancel) {
+                BackendOutcome::Completed(result) => {
+                    return RouteOutcome::Completed {
+                        backend: backend.name().to_string(),
+                        result,
+                    };
+                }
+                BackendOutcome::Refused {
+                    sent: false,
+                    reason,
+                } => {
+                    refusals.push(format!("{}: {reason}", backend.name()));
+                }
+                BackendOutcome::Refused { sent: true, reason } => {
+                    return RouteOutcome::Hold {
+                        backend: backend.name().to_string(),
+                        detail: format!("refused after send: {reason}"),
+                    };
+                }
+                BackendOutcome::Unknown { sent, detail } => {
+                    if sent {
+                        return RouteOutcome::Hold {
+                            backend: backend.name().to_string(),
+                            detail,
+                        };
+                    }
+                    refusals.push(format!("{}: {detail}", backend.name()));
+                }
+            }
+        }
+        RouteOutcome::Exhausted { refusals }
+    }
+
+    /// Streaming route: same hold semantics, deltas via the callback. The
+    /// spend contract is identical to `route` — switching happens only on a
+    /// confirmed pre-send refusal; anything after send holds.
+    pub fn route_streaming(
+        &self,
+        request: &ChatRequest,
+        cancel: &Cancel,
+        on_delta: &mut dyn FnMut(&str),
+    ) -> RouteOutcome {
+        let mut refusals: Vec<String> = Vec::new();
+        for backend in &self.backends {
+            match backend.chat_stream(request, cancel, on_delta) {
                 BackendOutcome::Completed(result) => {
                     return RouteOutcome::Completed {
                         backend: backend.name().to_string(),
@@ -858,5 +994,52 @@ mod tests {
             }
             other => panic!("expected refusal, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn tool_call_fragments_accumulate_across_chunks() {
+        use super::{accumulate_chunk, drain_tool_calls, PartialToolCalls};
+        let mut partial = PartialToolCalls::default();
+        let mut content = String::new();
+        // Realistic three-chunk stream: name first, then argument fragments.
+        let lines = [
+            r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call_9","function":{"name":"edit_task","arguments":""}}]}}]}"#,
+            r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\"pa"}}]}}]}"#,
+            r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"th\":\"a.py\"}"}}]}}]}"#,
+            r#"data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}"#,
+        ];
+        for line in lines {
+            let chunk = parse_sse_line(line).expect("chunk parses");
+            accumulate_chunk(&mut content, &chunk);
+            partial.absorb(&chunk);
+        }
+        assert!(
+            content.is_empty(),
+            "tool-call streams carry no content deltas"
+        );
+        let calls = drain_tool_calls(&mut partial);
+        assert_eq!(calls.len(), 1);
+        assert_eq!(calls[0].id, "call_9");
+        assert_eq!(calls[0].name, "edit_task");
+        assert_eq!(calls[0].arguments, r#"{"path":"a.py"}"#);
+        assert!(partial.is_empty(), "drain clears the slots");
+    }
+
+    #[test]
+    fn two_parallel_tool_calls_keep_separate_slots() {
+        use super::{parse_sse_line, PartialToolCalls};
+        let mut partial = PartialToolCalls::default();
+        let lines = [
+            r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"a","function":{"name":"one","arguments":"{}"}}]}}]}"#,
+            r#"data: {"choices":[{"delta":{"tool_calls":[{"index":1,"id":"b","function":{"name":"two","arguments":"{\"x\":1}"}}]}}]}"#,
+            r#"data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}"#,
+        ];
+        for line in lines {
+            partial.absorb(&parse_sse_line(line).unwrap());
+        }
+        let calls = partial.drain();
+        assert_eq!(calls.len(), 2);
+        assert_eq!(calls[0].name, "one");
+        assert_eq!(calls[1].name, "two");
     }
 }

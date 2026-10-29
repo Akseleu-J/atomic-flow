@@ -120,6 +120,28 @@ impl<'a> TurnLoop<'a> {
         mut messages: Vec<ChatMessage>,
         cancel: &Cancel,
     ) -> LoopResult<LoopOutcome> {
+        self.run_inner(model, messages, cancel, None)
+    }
+
+    /// Streaming run: content deltas surface through `on_delta` as they
+    /// arrive; the spend/journal/hold semantics are identical to [`Self::run`].
+    pub fn run_streaming(
+        &mut self,
+        model: &str,
+        mut messages: Vec<ChatMessage>,
+        cancel: &Cancel,
+        on_delta: &mut dyn FnMut(&str),
+    ) -> LoopResult<LoopOutcome> {
+        self.run_inner(model, messages, cancel, Some(on_delta))
+    }
+
+    fn run_inner(
+        &mut self,
+        model: &str,
+        mut messages: Vec<ChatMessage>,
+        cancel: &Cancel,
+        mut on_delta: Option<&mut dyn FnMut(&str)>,
+    ) -> LoopResult<LoopOutcome> {
         let mut turns = 0usize;
         let mut tool_calls_used = 0usize;
         loop {
@@ -147,7 +169,11 @@ impl<'a> TurnLoop<'a> {
                 Some(&call_id),
                 None,
             );
-            match self.router.route(&request, cancel) {
+            let route = match on_delta.as_deref_mut() {
+                Some(on_delta) => self.router.route_streaming(&request, cancel, on_delta),
+                None => self.router.route(&request, cancel),
+            };
+            match route {
                 RouteOutcome::Completed { result, .. } => {
                     // A settled response must carry its cost: a model_response
                     // without a finite cost stays an unknown charge by design.
@@ -501,5 +527,97 @@ mod tests {
         assert_eq!(calls.len(), 1);
         assert_eq!(calls[0].name, "probe");
         assert_eq!(calls[0].arguments, "{\"a\":1}");
+    }
+
+    /// A streaming-scripted backend: overrides chat_stream to emit deltas
+    /// and return the scripted completed result.
+    struct StreamingScripted {
+        content: String,
+        deltas: Vec<String>,
+    }
+
+    impl af_llm::ChatBackend for StreamingScripted {
+        fn name(&self) -> &str {
+            "streaming-scripted"
+        }
+
+        fn chat(&self, _request: &ChatRequest, _cancel: &Cancel) -> BackendOutcome {
+            completed(&self.content, vec![])
+        }
+
+        fn chat_stream(
+            &self,
+            _request: &ChatRequest,
+            _cancel: &Cancel,
+            on_delta: &mut dyn FnMut(&str),
+        ) -> BackendOutcome {
+            for delta in &self.deltas {
+                on_delta(delta);
+            }
+            completed(&self.content, vec![])
+        }
+    }
+
+    #[test]
+    fn run_streaming_surfaces_deltas_and_final_answer() {
+        let backend = StreamingScripted {
+            content: "streamed answer".into(),
+            deltas: vec!["stream".into(), "ed ".into(), "answer".into()],
+        };
+        let router = Router::new(vec![Box::new(backend)]);
+        let tools: Vec<Box<dyn KernelTool + '_>> = vec![Box::new(CountingTool::new("probe"))];
+        let (_home, mut journal) = temp_journal();
+        let mut seen_deltas: Vec<String> = Vec::new();
+        let outcome = {
+            let mut loop_ =
+                TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
+            loop_
+                .run_streaming(
+                    "m",
+                    vec![ChatMessage::new("user", "go")],
+                    &Cancel::new(),
+                    &mut |delta| seen_deltas.push(delta.into()),
+                )
+                .unwrap()
+        };
+        match outcome {
+            LoopOutcome::Final { content, turns, .. } => {
+                assert_eq!(content, "streamed answer");
+                assert_eq!(turns, 1);
+            }
+            other => panic!("expected final, got {other:?}"),
+        }
+        assert_eq!(seen_deltas, vec!["stream", "ed ", "answer"]);
+        let snapshot = journal.read().unwrap();
+        assert!(snapshot.unresolved_call_ids().is_empty());
+    }
+
+    #[test]
+    fn streaming_hold_stops_the_loop_with_journaled_unknown() {
+        let backend = ScriptedBackend::new(
+            "scripted",
+            vec![BackendOutcome::Unknown {
+                sent: true,
+                detail: "mid-stream loss".into(),
+            }],
+        );
+        let router = Router::new(vec![Box::new(backend)]);
+        let tools: Vec<Box<dyn KernelTool + '_>> = vec![Box::new(CountingTool::new("probe"))];
+        let (_home, mut journal) = temp_journal();
+        let outcome = {
+            let mut loop_ =
+                TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
+            loop_
+                .run_streaming(
+                    "m",
+                    vec![ChatMessage::new("user", "go")],
+                    &Cancel::new(),
+                    &mut |_| {},
+                )
+                .unwrap()
+        };
+        assert!(matches!(outcome, LoopOutcome::Hold { .. }));
+        let snapshot = journal.read().unwrap();
+        assert_eq!(snapshot.unresolved_call_ids().len(), 1);
     }
 }
