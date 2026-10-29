@@ -15,6 +15,7 @@ import shlex
 import shutil
 import subprocess
 import tempfile
+import urllib.request
 import zipfile
 from pathlib import Path
 
@@ -23,6 +24,11 @@ import p07_pytest6116_prepare_dependencies as wheels
 
 ENGINE = "/usr/bin/docker"
 PREFIX = "/opt/p07-pytest6116-deps"
+COMPAT_SETUPTOOLS = {
+    "name": "setuptools", "version": "44.1.1", "filename": "setuptools-44.1.1-py2.py3-none-any.whl",
+    "sha256": "27a714c09253134e60a6fa68130f78c7037e5562c4f21f8f318f2ae900d152d5",
+    "url": "https://files.pythonhosted.org/packages/e1/b7/182161210a13158cd3ccc41ee19aadef54496b74f2817cc147006ec932b4/setuptools-44.1.1-py2.py3-none-any.whl",
+}
 
 
 def sha(raw):
@@ -73,7 +79,9 @@ def validate_installed(expected, actual):
     return sorted(extras)
 
 
-def run(output: Path, *, execute_public_tests: bool = False, neutralize_vendored_plugin: bool = False):
+def run(output: Path, *, execute_public_tests: bool = False, neutralize_vendored_plugin: bool = False, compat_setuptools: bool = False):
+    if neutralize_vendored_plugin and compat_setuptools:
+        raise ValueError("choose one prospective image policy")
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
     output.mkdir(parents=True)
@@ -113,11 +121,22 @@ def run(output: Path, *, execute_public_tests: bool = False, neutralize_vendored
             context.mkdir()
             for item in profile["wheels"]:
                 shutil.copyfile(wheelhouse / item["filename"], context / item["filename"])
+            if compat_setuptools:
+                with urllib.request.urlopen(COMPAT_SETUPTOOLS["url"], timeout=45) as response:
+                    compatible = response.read(wheels.MAX_WHEEL + 1)
+                compat_receipt = wheels.inspect_wheel(compatible, COMPAT_SETUPTOOLS)
+                (context / COMPAT_SETUPTOOLS["filename"]).write_bytes(compatible)
+                (output / "setuptools-wheel.json").write_text(json.dumps(compat_receipt, indent=2, sort_keys=True) + "\n")
             dockerfile = ("FROM " + recon.IMAGE + "\nWORKDIR /tmp\nCOPY *.whl /opt/p07-wheels/\n"
                 "RUN --network=none /opt/miniconda3/envs/testbed/bin/python -I -B -m pip --isolated install "
                 "--no-index --no-deps --no-compile --disable-pip-version-check --target " + PREFIX
-                + " /opt/p07-wheels/*.whl && chmod -R a+rX " + PREFIX + "\n"
+                + " " + " ".join("/opt/p07-wheels/" + item["filename"] for item in profile["wheels"]) + " && chmod -R a+rX " + PREFIX + "\n"
                 "LABEL atomic.p07.pytest6116.profile=" + sha(profile_raw) + "\n")
+            if compat_setuptools:
+                # Install into the interpreter environment so nested processes see the same version.
+                dockerfile += ("RUN --network=none " + recon.PYTHON + " -I -B -m pip --isolated install "
+                    "--no-index --no-deps --no-compile --disable-pip-version-check --force-reinstall "
+                    "/opt/p07-wheels/" + COMPAT_SETUPTOOLS["filename"] + "\n")
             if neutralize_vendored_plugin:
                 patch = ("import hashlib,pathlib; "
                     "p=pathlib.Path('/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/setuptools/_vendor/typeguard-4.3.0.dist-info/entry_points.txt'); "
@@ -181,6 +200,20 @@ def run(output: Path, *, execute_public_tests: bool = False, neutralize_vendored
             (output / "base-attrs.stderr").write_bytes(attrs.stderr)
             if attrs.returncode or attrs.stdout.strip() != b"23.1.0":
                 raise ValueError("actual base attrs differs from prospective closure")
+            if compat_setuptools:
+                package_dir = "/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/"
+                copied_root = temp / "compat-inventory"
+                copied_root.mkdir()
+                for name in ("easy_install.py", "pkg_resources", "setuptools", "setuptools-44.1.1.dist-info"):
+                    copied = command([ENGINE, "cp", cid + ":" + package_dir + name, str(copied_root / name)])
+                    if copied.returncode:
+                        raise ValueError("compatible setuptools inventory extraction failed: " + name)
+                compat_actual = installed_files(copied_root)
+                compat_expected = expected_wheel_files(context, {"wheels": [COMPAT_SETUPTOOLS]})
+                compat_extras = validate_installed(compat_expected, compat_actual)
+                (output / "setuptools-inventory.json").write_text(json.dumps(compat_actual, indent=2, sort_keys=True) + "\n")
+                report["setuptools_verified_files"] = len(compat_expected)
+                report["setuptools_metadata_extras"] = compat_extras
             removed = command([ENGINE, "rm", "-f", cid])
             absent = command([ENGINE, "container", "ls", "-a", "--no-trunc", "--filter", "id=" + cid, "--format", "{{.ID}}"])
             if removed.returncode or absent.returncode or absent.stdout.strip():
@@ -189,7 +222,7 @@ def run(output: Path, *, execute_public_tests: bool = False, neutralize_vendored
                           installed_files=len(actual), pip_metadata_files=extras, dependency_container_cleanup=True)
             cid = None
             observed = recon.run(output / "collection", admitted_image=image_id, dependency_prefix=PREFIX,
-                                 execute_public_tests=execute_public_tests, neutralize_vendored_plugin=neutralize_vendored_plugin)
+                                 execute_public_tests=execute_public_tests, neutralize_vendored_plugin=neutralize_vendored_plugin or compat_setuptools, compat_setuptools=compat_setuptools)
             dependencies = json.loads((output / "collection/dependencies.stdout").read_bytes())
             if [row for row in dependencies if row[0].lower() == "attrs"] != [["attrs", "23.1.0"]]:
                 raise ValueError("actual base attrs inventory differs from prospective closure")
@@ -218,8 +251,9 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--execute-public-tests", action="store_true")
     parser.add_argument("--neutralize-vendored-plugin", action="store_true")
+    parser.add_argument("--compat-setuptools", action="store_true")
     options = parser.parse_args()
     result = run(options.output, execute_public_tests=options.execute_public_tests,
-                 neutralize_vendored_plugin=options.neutralize_vendored_plugin)
+                 neutralize_vendored_plugin=options.neutralize_vendored_plugin, compat_setuptools=options.compat_setuptools)
     expected = "derived_execution_observed" if options.execute_public_tests else "derived_collection_observed"
     raise SystemExit(0 if result["status"] == expected else 1)

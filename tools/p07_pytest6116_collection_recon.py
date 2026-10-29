@@ -116,7 +116,7 @@ def collection_source(dependency_prefix: str | None, *, execute_public_tests: bo
 
 
 def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: str | None = None,
-        execute_public_tests: bool = False, neutralize_vendored_plugin: bool = False):
+        execute_public_tests: bool = False, neutralize_vendored_plugin: bool = False, compat_setuptools: bool = False):
     """Observe collection; callers must independently admit any derived image."""
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
@@ -216,11 +216,17 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
                 (output / "plugin-probe.stderr").write_bytes(probe.stderr)
                 if probe.returncode or json.loads(probe.stdout) != []:
                     raise ValueError("vendored plugin entry point remains visible")
+                if compat_setuptools:
+                    check_version = control([ENGINE, "exec", "--user=65534:65534", "-w", "/tmp", cid, PYTHON,
+                                             "-I", "-B", "-c", "import importlib.metadata as m; print(m.version('setuptools'))"])
+                    (output / "setuptools-version.stdout").write_bytes(check_version.stdout)
+                    if check_version.returncode or check_version.stdout.strip() != b"44.1.1":
+                        raise ValueError("actual setuptools version differs")
             code = collection_source(dependency_prefix, execute_public_tests=execute_public_tests,
                                      neutralize_vendored_plugin=neutralize_vendored_plugin)
             if dependency_prefix:
                 report["fixed_plugin_policy"] = {"disabled": ["typeguard"], "reason": "incompatible vendored host plugin",
-                                                 "inherited_via": "image_metadata" if neutralize_vendored_plugin else "PYTEST_ADDOPTS"}
+                                                 "inherited_via": "setuptools_replacement" if compat_setuptools else ("image_metadata" if neutralize_vendored_plugin else "PYTEST_ADDOPTS")}
                 report["hypothesis_storage"] = "/tmp/p07-hypothesis"
             result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", code],
                               home=home, timeout=180, limit=1_000_000, check=lambda: None)
