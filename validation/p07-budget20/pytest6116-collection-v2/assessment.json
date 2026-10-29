@@ -1,0 +1,26 @@
+{
+  "run": 40865187820,
+  "artifact": 12893317075,
+  "archive_sha256": "f5c07a5263fc7cee1e7bd83c66d0dc7249ec4c7dac86cd808ab0b4508a8ce88d",
+  "tested_commit": "7f2cc995ee201d698a2ebf16bfb79b96b3ed55ea",
+  "status": "incomplete_collection_environment_errors",
+  "wrapper_status": "not_qualified",
+  "wrapper_parse_error": "marker delimiter mismatch; raw output independently parsed",
+  "public_git_blobs_matched": 474,
+  "image_git_head": "c05cb32771ca491dcfda970e5e0982dd74dad19e",
+  "collected": 2414,
+  "collected_files": 59,
+  "collection_errors": [
+    "testing/python/metafunc.py",
+    "testing/test_junitxml.py"
+  ],
+  "causes": [
+    "missing xmlschema",
+    "missing hypothesis"
+  ],
+  "exit_code": 2,
+  "source_status": "public bytes matched, image git head differs",
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

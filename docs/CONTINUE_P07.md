@@ -4,7 +4,7 @@
 
 ## Реестр оставшихся ordinary-проходов
 
-`benchmarks/stage4/p07-ordinary-coverage-v1.json` связывает 30 калибровок и шесть принятых Requests ordinary journeys с конкретными evidence hashes. Для 24 остальных полная public ordinary приёмка в этом реестре не установлена; отдельные более узкие executor и synthetic journey evidence не обесценены. Ближайший профиль — pytest6116, где native `tox.ini` задаёт `testpaths=testing`, исключает example_scripts и использует дополнительные шаблоны файлов. Подготовлена отдельная bounded native collection reconnaissance. Подробный список условий закрытия: `docs/P07_REMAINING_AND_ORDINARY_COVERAGE_2026-10-29.md`.
+`benchmarks/stage4/p07-ordinary-coverage-v1.json` связывает 30 калибровок и шесть принятых Requests ordinary journeys с конкретными evidence hashes. Для 24 остальных полная public ordinary приёмка в этом реестре не установлена; отдельные более узкие executor и synthetic journey evidence не обесценены. Ближайший профиль — pytest6116, где native `tox.ini` задаёт `testpaths=testing`, исключает example_scripts и использует дополнительные шаблоны файлов. Bounded native collection CI 40865187820 сохранила совпадение 474 public Git blobs и 2414 collected nodes, но обнаружила два collection errors: отсутствуют xmlschema и hypothesis. Нужен отдельно закреплённый и проверенный dependency closure, затем повтор без исключения тестов. Подробный список условий закрытия: `docs/P07_REMAINING_AND_ORDINARY_COVERAGE_2026-10-29.md`.
 
 ## Requests863 public ordinary TaskRunner принят
 

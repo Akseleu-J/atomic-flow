@@ -70,6 +70,20 @@ def sha(value):
     return hashlib.sha256(value).hexdigest()
 
 
+def parse_collection(stdout: str, exit_code: int):
+    marker = "P07_PUBLIC_COLLECTION="
+    lines = [line.removeprefix(marker) for line in stdout.splitlines() if line.startswith(marker)]
+    if len(lines) != 1:
+        raise ValueError("one complete collection marker required")
+    observation = json.loads(lines[0])
+    if (type(observation) is not dict or observation.get("finished") is not True
+            or type(observation.get("exit_code")) is not int or observation["exit_code"] != exit_code
+            or type(observation.get("items")) is not list or type(observation.get("collection_errors")) is not list
+            or type(observation.get("collection_skips")) is not list):
+        raise ValueError("collection session did not finish")
+    return observation
+
+
 def run(output: Path):
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
@@ -141,6 +155,16 @@ def run(output: Path):
             report["source_verification"] = observation
             if observation.get("checked") != 474 or observation.get("differences"):
                 raise ValueError("image bytes do not match the public Git tree")
+            dependency_code = ("import importlib.metadata as m,json; "
+                               "print(json.dumps(sorted((d.metadata['Name'],d.version) "
+                               "for d in m.distributions() if d.metadata.get('Name'))))")
+            dependencies = control([ENGINE, "exec", "--user=65534:65534", "-w", "/tmp", cid, PYTHON,
+                                    "-I", "-B", "-c", dependency_code], timeout=45)
+            (output / "dependencies.stdout").write_bytes(dependencies.stdout)
+            (output / "dependencies.stderr").write_bytes(dependencies.stderr)
+            if dependencies.returncode:
+                raise ValueError("private dependency inventory unavailable")
+            report["dependency_inventory_sha256"] = sha(dependencies.stdout)
             (output / "container-inspect.json").write_bytes(inspected.stdout)
             result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", SOURCE],
                               home=home, timeout=180, limit=1_000_000, check=lambda: None)
@@ -149,17 +173,14 @@ def run(output: Path):
             report.update(exit_code=result.returncode, timed_out=result.timed_out,
                           stdout_truncated=result.stdout_truncated, stderr_truncated=result.stderr_truncated,
                           stdout_sha256=sha(result.stdout.encode()), stderr_sha256=sha(result.stderr.encode()))
-            lines = [line.removeprefix("P07_PUBLIC_COLLECTION:") for line in result.stdout.splitlines()
-                     if line.startswith("P07_PUBLIC_COLLECTION:")]
-            if len(lines) != 1 or result.timed_out or result.stdout_truncated or result.stderr_truncated:
+            if result.timed_out or result.stdout_truncated or result.stderr_truncated:
                 raise ValueError("collection output incomplete")
-            observation = json.loads(lines[0])
-            if not observation.get("finished") or observation.get("exit_code") != result.returncode:
-                raise ValueError("collection session did not finish")
+            observation = parse_collection(result.stdout, result.returncode)
             (output / "collection.json").write_text(json.dumps(observation, indent=2, sort_keys=True) + "\n")
             public_paths = {row["path"] for row in tree["blobs"]}
             collected_paths = {row["path"] for row in observation["items"]}
-            report.update(status="collection_observed", collected=len(observation["items"]),
+            status = "collection_observed" if result.returncode == 0 and not observation["collection_errors"] else "collection_observed_with_errors"
+            report.update(status=status, collected=len(observation["items"]),
                           collected_files=len(collected_paths), nonpublic_collected_files=sorted(collected_paths - public_paths),
                           collection_errors=observation["collection_errors"], collection_skips=observation["collection_skips"])
         except Exception as error:
