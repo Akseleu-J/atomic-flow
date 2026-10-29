@@ -25,18 +25,23 @@ from atomic_flow.check_requests_execution import _bounded
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = ROOT / 'benchmarks/stage4/p07-pytest6116-py38-repro-v1.json'
+FULL_PROFILE = ROOT / 'benchmarks/stage4/p07-pytest6116-py38-full-v1.json'
 PYTHON = '/usr/local/bin/python'
 TARGET = r'''
 import json,os,sys
 sys.dont_write_bytecode=True
+os.environ['HYPOTHESIS_STORAGE_DIRECTORY']='/tmp/p07-hypothesis'
 sys.path.insert(0,'/testbed/src')
 import pytest,_pytest
 if (sys.version_info[:3]!=(3,8,20) or os.path.realpath(pytest.__file__)!='/testbed/src/pytest.py'
     or os.path.realpath(_pytest.__file__)!='/testbed/src/_pytest/__init__.py'):
     raise SystemExit(125)
 class Recorder:
-    def __init__(self): self.items=[]; self.completed=[]; self.outcomes={}; self.finished=False
+    def __init__(self): self.items=[]; self.completed=[]; self.outcomes={}; self.finished=False; self.collection_errors=[]; self.collection_skips=[]
     def pytest_collection_finish(self,session): self.items=[i.nodeid for i in session.items]
+    def pytest_collectreport(self,report):
+        if report.failed:self.collection_errors.append(report.nodeid)
+        if report.skipped:self.collection_skips.append(report.nodeid)
     def pytest_runtest_logreport(self,report):
         k=report.when+':'+report.outcome; self.outcomes[k]=self.outcomes.get(k,0)+1
         if report.when=='teardown': self.completed.append(report.nodeid)
@@ -48,7 +53,8 @@ code=int(pytest.main(['-q','--tb=short','-o','cache_dir=/tmp/p07-pytest-cache',
  'testing/code/test_source.py::test_getfslineno'],plugins=[r]))
 print('\nP07_PY38_REPRO='+json.dumps({'finished':r.finished,'exit_code':code,'items':r.items,
  'completed':r.completed,'outcomes':r.outcomes,'python':list(sys.version_info[:3]),
- 'pytest_file':os.path.realpath(pytest.__file__)},sort_keys=True),flush=True)
+ 'pytest_file':os.path.realpath(pytest.__file__),'collection_errors':r.collection_errors,
+ 'collection_skips':r.collection_skips},sort_keys=True),flush=True)
 raise SystemExit(code)
 '''
 
@@ -79,11 +85,20 @@ def prepare_wheels(profile, directory):
     return rows
 
 
-def run(output):
+def target_source(full_public):
+    if not full_public:
+        return TARGET
+    focused = "'testing/code/test_source.py::test_isparseable',\n 'testing/code/test_source.py::TestAccesses::test_getrange',\n 'testing/code/test_source.py::test_getfslineno'"
+    if TARGET.count(focused) != 1:
+        raise ValueError('fixed full-suite source replacement failed')
+    return TARGET.replace("'-q','--tb=short'", "'-q','--tb=line'").replace(focused, "'testing'")
+
+
+def run(output, *, full_public=False):
     if os.name != 'posix' or output.exists():
         raise ValueError('fresh output on Linux required')
     output.mkdir(parents=True)
-    report = {'status': 'not_qualified', 'scope': 'three-test public compatibility diagnostic',
+    report = {'status': 'not_qualified', 'scope': 'full public test diagnostic' if full_public else 'three-test public compatibility diagnostic',
               'ordinary_acceptance': False, 'provider_calls': 0, 'hidden_oracle': 'not_run'}
     env = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'HOME': '/tmp', 'LANG': 'C', 'LC_ALL': 'C'}
     def command(args, timeout=120):
@@ -93,10 +108,10 @@ def run(output):
         cidfile = tmp / 'cid'
         cid = None
         try:
-            profile_raw = PROFILE.read_bytes()
+            profile_raw = (FULL_PROFILE if full_public else PROFILE).read_bytes()
             profile = json.loads(profile_raw)
             report['profile_sha256'] = hashlib.sha256(profile_raw).hexdigest()
-            if (len(profile['wheels']) != 8 or profile['source_image'] != recon.IMAGE
+            if (len(profile['wheels']) != (11 if full_public else 8) or profile['source_image'] != recon.IMAGE
                     or profile['python_image'] != 'python@sha256:1d52838af602b4b5a831beb13a0e4d073280665ea7be7f69ce2382f29c5a613f'):
                 raise ValueError('fixed images and wheels required')
             rows = prepare_wheels(profile, tmp)
@@ -152,8 +167,9 @@ def run(output):
             (output / 'source-verification.stdout').write_bytes(verify.stdout)
             if verify.returncode or json.loads(verify.stdout) != {'checked': 474, 'differences': []}:
                 raise ValueError('public source bytes differ')
+            source = target_source(full_public)
             result = _bounded([recon.ENGINE, 'exec', '--user=65534:65534', '-w', '/testbed', cid, PYTHON,
-                               '-I', '-B', '-c', TARGET], home=tmp, timeout=120, limit=1000000, check=lambda: None)
+                               '-I', '-B', '-c', source], home=tmp, timeout=240 if full_public else 120, limit=1000000, check=lambda: None)
             (output / 'stdout').write_bytes(result.stdout.encode())
             (output / 'stderr').write_bytes(result.stderr.encode())
             report.update(exit_code=result.returncode, timed_out=result.timed_out, stdout_truncated=result.stdout_truncated,
@@ -166,10 +182,18 @@ def run(output):
                 raise ValueError('diagnostic marker missing')
             marker = json.loads(markers[0])
             (output / 'observation.json').write_text(json.dumps(marker, indent=2, sort_keys=True) + '\n')
-            if (not marker['finished'] or marker['exit_code'] != result.returncode or len(marker['items']) != 3
-                    or len(set(marker['items'])) != 3 or set(marker['completed']) != set(marker['items'])):
-                raise ValueError('focused diagnostic inventory incomplete')
-            report.update(status='focused_diagnostic_completed', outcomes=marker['outcomes'])
+            if (not marker['finished'] or marker['exit_code'] != result.returncode or not marker['items']
+                    or (not full_public and len(marker['items']) != 3)
+                    or len(set(marker['items'])) != len(marker['items'])
+                    or set(marker['completed']) != set(marker['items'])):
+                raise ValueError('diagnostic inventory incomplete')
+            public_paths = {row['path'] for row in tree['blobs']}
+            nonpublic = sorted({node.split('::', 1)[0] for node in marker['items']} - public_paths)
+            if nonpublic:
+                raise ValueError('collected nonpublic paths: ' + repr(nonpublic))
+            report.update(status='full_diagnostic_completed' if full_public else 'focused_diagnostic_completed',
+                          outcomes=marker['outcomes'], collected=len(marker['items']),
+                          collection_errors=marker['collection_errors'], collection_skips=marker['collection_skips'])
         except Exception as exc:
             report.update(error_type=type(exc).__name__, error=str(exc)[:500])
         finally:
@@ -188,5 +212,8 @@ def run(output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
-    result = run(parser.parse_args().output)
-    raise SystemExit(0 if result['status'] == 'focused_diagnostic_completed' else 1)
+    parser.add_argument('--full-public', action='store_true')
+    options = parser.parse_args()
+    result = run(options.output, full_public=options.full_public)
+    expected = 'full_diagnostic_completed' if options.full_public else 'focused_diagnostic_completed'
+    raise SystemExit(0 if result['status'] == expected and result['exit_code'] == 0 else 1)

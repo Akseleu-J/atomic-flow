@@ -1,0 +1,14 @@
+"""The complete diagnostic must run the public suite, not only focused probes."""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
+from p07_pytest6116_py38_repro import TARGET, target_source  # noqa: E402
+
+
+def test_full_diagnostic_selects_public_test_root():
+    assert target_source(False) == TARGET
+    full = target_source(True)
+    assert "'-q','--tb=line','-o','cache_dir=/tmp/p07-pytest-cache',\n 'testing']" in full
+    assert 'testing/code/test_source.py::test_isparseable' not in full
+    assert 'PYTEST_ADDOPTS' not in full
