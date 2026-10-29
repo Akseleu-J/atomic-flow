@@ -2,9 +2,13 @@
 
 Работать в `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`, ветка `experimental`, draft PR №2. Начать с `docs/PROJECT_CONTEXT.md`; Git-команды выполнять только в этом клоне. Перед продолжением сверить HEAD, remote SHA и рабочий diff. P07 остаётся **OPEN**.
 
+## Requests863 public ordinary TaskRunner принят
+
+CI 40841965525 на `3feda8c33b058768f4f1c2348d8b233fdcaf8d37`: пять публичных pytest файлов и synthetic probe, 107 PASS после одного replanning; проверены 982 raw hashes и восемь resource receipts. 167 public Git blobs сверены; известные исключения source filter и неформальный скрипт без pytest tests записаны в `docs/P07_REQUESTS863_TASK_ACCEPTANCE_2026-10-29.md`. Общий CI 40841952407 SUCCESS. Это scripted ordinary execution, без модели и hidden oracle. Далее определить и закрыть оставшиеся ordinary profiles, затем frozen matched study gates.
+
 ## Requests863 ограниченный health
 
-[CI 40837223989](https://github.com/Akseleu-J/atomic-flow/actions/runs/40837223989) на `a841f55baaa50e3240b3b574fddff6f204cfe22b`: source-free реальный SSLv3/TLS/wire/Digest fixture принят под 1 ГиБ, 2 CPU, 128 PID, non-root и network=none. Контейнер удалён, raw stdout/stderr и archive SHA256 сверены. Отчёт: `docs/P07_REQUESTS863_BOUNDED_HEALTH_2026-10-29.md`. Это только health; полный 863 ordinary TaskRunner и generic dispatch ещё не приняты. Далее интегрировать CA overlay, same-container service lifecycle, receipt и проверить полный public ordinary путь.
+[CI 40837223989](https://github.com/Akseleu-J/atomic-flow/actions/runs/40837223989) на `a841f55baaa50e3240b3b574fddff6f204cfe22b`: source-free реальный SSLv3/TLS/wire/Digest fixture принят под 1 ГиБ, 2 CPU, 128 PID, non-root и network=none. Контейнер удалён, raw stdout/stderr и archive SHA256 сверены. Отчёт: `docs/P07_REQUESTS863_BOUNDED_HEALTH_2026-10-29.md`. На этом предыдущем checkpoint был принят только health; последующую приёмку полного ordinary TaskRunner и generic dispatch см. выше.
 
 ## Requests2674 завершён в ordinary scripted scope
 
@@ -18,7 +22,7 @@ CI 40835105105 на `520158504af00ab1f08899553458916943ad52b1`: 163 collected, 1
 
 Runtime `875fd01b1f3f4b4521b887688d27a82678f47df1`: три полных public ordinary journey Requests1963/2148/2317 приняты в scripted synthetic scope; CI 40824311185 SUCCESS, соответственно 122/134/144 PASS после probe repair, required SKIP отклонён. По 823 raw hashes и восемь resource receipts на задачу независимо сверены. Публичные базовые деревья сверены полностью: единственное ресурсное исключение — CA вне candidate; добавлены два synthetic файла. General CI 40824307411 SUCCESS, Python 3.11/3.12 по 3267 PASS / 14 SKIP, Windows 4 PASS. Отчёт: `docs/P07_FUNCTION36_TASK_JOURNEYS_2026-10-29.md`; локальные архивы и assessments: `validation/p07-budget20/function36-task-v1/`. Model calls 0, hidden oracle не запускался, P07 OPEN.
 
-Следующий приоритет: Requests863 SSLv3/wire; далее остальные ordinary profiles и study gates. Function36 generic dispatch теперь включён только для трёх указанных принятых контуров; прежний текст checkpoint ниже исторический.
+Следующий приоритет: оставшиеся ordinary profiles и study gates. Function36 generic dispatch теперь включён только для трёх указанных принятых контуров; прежний текст checkpoint ниже исторический.
 
 ## Предыдущий checkpoint
 
@@ -43,7 +47,7 @@ V1 выявил URL-callable wrappers над plugin-owned HTTPBin servers и н�
 
 ## Следующая работа
 
-Полный Requests3362 ordinary путь и function36 journeys Requests1963/2148/2317 приняты в указанном synthetic scope. Продолжить SSLv3/wire Requests863. Остальные private Requests cohorts отклоняются до evidence-gated приёмки; не включать их по metadata/unit tests.
+Полный Requests3362 ordinary путь и function36 journeys Requests1963/2148/2317 приняты в указанном synthetic scope. Продолжить остальные ordinary profiles и study gates. Остальные private Requests cohorts отклоняются до evidence-gated приёмки; не включать их по metadata/unit tests.
 
 Далее нужны все 30 ordinary profiles, полный исторический Atomic/flat driver с равными лимитами, замороженный study profile/cohort/order/owner caps, 30 пар с независимым oracle, свежий holdout, ablations и final review. 30/30 environment calibrations уже приняты, но это не 30 решённых моделью задач.
 
