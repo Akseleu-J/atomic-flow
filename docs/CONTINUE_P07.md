@@ -74,3 +74,5 @@ Python/Ruff: `.venv/Scripts/python.exe`, `.venv/Scripts/ruff.exe`. Node: `C:\Use
 ## pytest6116: актуальная граница
 
 Публичный сбор 2617 nodes в 61 файле подтверждён CI 40868874514, но два полных исполнения пока NOT QUALIFIED. Последний [CI 40870725655](https://github.com/Akseleu-J/atomic-flow/actions/runs/40870725655), artifact 12896565434 SHA256 `f1cb697e5237e7005c5f42711c01f00fbf42e92b2a8cbbe099a040e391d05e80`: вывод усечён; в хвосте 1439 failed, 1060 passed, 103 skipped, 9 xfailed, 6 errors и маркер 2617 завершённых nodes. Nested pytest по-прежнему загружает несовместимый vendored typeguard; `PYTEST_ADDOPTS` проблему не решил и меняет видимое тестам окружение. Источник (474 blobs) и cleanup подтверждены, provider calls = 0. Подробности и следующий gate: `docs/P07_REMAINING_AND_ORDINARY_COVERAGE_2026-10-29.md`. Не считать это ordinary acceptance.
+
+Причина подтверждена исходным `src/_pytest/pytester.py`: `Testdir.__init__` удаляет `PYTEST_ADDOPTS` перед вложенными запусками (строка 538); Git blob `6b45e077b487e9b9166604e02e4c7fd4a01f9f79` совпадает с публичным деревом.
