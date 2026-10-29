@@ -1,0 +1,31 @@
+{
+  "container_id": "332c673ee8c3aeb943fbd3ee3bb1c74c3aac906a2c395b18dc73fddb8b985ec7",
+  "dropped_bytes": 0,
+  "dropped_packets": 0,
+  "fixture_digest": "aef53008b4df92f9aa9b67d0246b4f1b52f4ad71e75504f1a340d4e0bba3dac1",
+  "host_netns_inode": 4026531833,
+  "image_id": "sha256:26dd451e512afdf598ee1fc2f029d75cfd8fbbe833165e2e715ab6d254d71cd2",
+  "netns_inode": 4026532273,
+  "nonce": "e000f98c8b1e45849898088e4c451c0a",
+  "pid": 7891,
+  "route": [
+    "10.255.255.1/32",
+    "dev",
+    "lo",
+    "src",
+    "127.0.0.1"
+  ],
+  "rule": [
+    "OUTPUT",
+    "-d",
+    "10.255.255.1/32",
+    "-p",
+    "tcp",
+    "--dport",
+    "80",
+    "-j",
+    "DROP"
+  ],
+  "start_ticks": "13064",
+  "status": "topology_applied_only"
+}

@@ -153,6 +153,8 @@ def _binding(spec: CheckSpec, identity: PrivatePytestIdentity, nonce: str) -> di
             or (spec.private_pytest_identity is not None and spec.private_pytest_identity != identity)
             or spec.image != runtime.image_id or spec.interpreter != runtime.interpreter):
         raise ValueError("private pytest task/runtime/version binding differs")
+    if not {node.split("::", 1)[0] for node, _ in identity.optional_test_outcomes} <= set(spec.test_paths):
+        raise ValueError("declared optional outcomes require their complete ordinary test files")
     files = dict(identity.installed_files)
     if (not {"pytest_httpbin/__init__.py", "pytest_httpbin/plugin.py"} <= set(files)
             or not ({"pytest_mock.py", "pytest_mock/__init__.py"} & set(files))):
@@ -167,7 +169,11 @@ def _binding(spec: CheckSpec, identity: PrivatePytestIdentity, nonce: str) -> di
 def private_pytest_args(spec: CheckSpec, identity: PrivatePytestIdentity, nonce: str) -> list[str]:
     """Pure candidate builder; HTTP fixture/CA lifecycle remains unqualified."""
     payload = _binding(spec, identity, nonce)
-    return ["-c", _BOOTSTRAP.replace("PAYLOAD_JSON", repr(json.dumps(payload, sort_keys=True, ensure_ascii=True)))]
+    source = _BOOTSTRAP
+    if identity.optional_test_outcomes:
+        from atomic_flow.check_private_outcomes import outcome_source
+        source = outcome_source(source)
+    return ["-c", source.replace("PAYLOAD_JSON", repr(json.dumps(payload, sort_keys=True, ensure_ascii=True)))]
 
 
 def private_pytest_receipt(result: CommandResult, spec: CheckSpec, identity: PrivatePytestIdentity, nonce: str) -> dict | None:
@@ -200,9 +206,14 @@ def private_pytest_receipt(result: CommandResult, spec: CheckSpec, identity: Pri
     counters = ("collected", "completed", "collection_errors", "passed", "failed", "skipped", "call_failed", "setup_failed", "teardown_failed", "xpassed", "exit_code")
     if any(type(value.get(key)) is not int or value[key] < 0 for key in counters):
         return None
+    optional = len(identity.optional_test_outcomes)
+    if optional:
+        from atomic_flow.check_private_outcomes import optional_receipt_valid
+        if not optional_receipt_valid(value, identity.optional_test_outcomes):
+            return None
     if (value["collected"] <= 0 or value["completed"] != value["collected"]
             or any(value[key] for key in ("collection_errors", "skipped", "setup_failed", "teardown_failed", "xpassed"))
-            or value["passed"] + value["call_failed"] != value["collected"]
+            or value["passed"] + value["call_failed"] + optional != value["collected"]
             or value["failed"] != value["call_failed"] or value["exit_code"] != result.returncode
             or bool(value["call_failed"]) != (result.returncode == 1)):
         return None

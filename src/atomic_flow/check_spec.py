@@ -166,6 +166,8 @@ class CheckSpec:
                     or runtime is None or identity.task_id != self.task_id
                     or identity.runtime_digest != runtime.digest or identity.python_version != runtime.python_version):
                 raise ValueError("private pytest identity differs from its exact task/runtime/runner")
+            if not {node.split("::", 1)[0] for node, _ in identity.optional_test_outcomes} <= set(self.test_paths):
+                raise ValueError("declared optional outcomes require their complete ordinary test files")
         if self.fixture_identity is not None:
             fixture = self.fixture_identity
             identity = self.private_pytest_identity

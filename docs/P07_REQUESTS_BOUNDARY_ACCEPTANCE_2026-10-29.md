@@ -123,3 +123,34 @@ the complete list in the same obligation and retains its raw execution. It
 uses no hidden calibration selectors or patches. Missing resources, required
 skips and unsupported runners must remain visible failures. This mode requires
 its own remote run and is not covered by the accepted four-test journey above.
+
+## First full public inventory attempt: not qualified
+
+CI40815490220 on16463c4 failed and is retained separately under
+`validation/p07-budget20/requests3362-full-public-v1`. Artifact12871404715
+SHA256 `3fbdad164ee0b358e9b07eddbafaec6f79262502b52865f5f87b42864e8efcff`
+and790raw hashes were verified. The task paused before repair/publication;
+cleanup completed. All six original public test files were independently
+fetched at base_commit36453b95b13079296776d11b09cab2567ea3e703 and compared
+against their retained source fingerprints. The tree/path rule includes them
+all, plus the declared synthetic probe.
+
+The native run collected353items. It exposed115teardown errors: historical
+`tests/conftest.py` wraps plugin servers in URL callables, while the lifecycle
+hook expected the server itself. It also exposed the public source's two
+`xfail` declarations and Python3-only missing-cStringIO conditional skip.
+The strict required-only bootstrap correctly refused these unsupported outcomes.
+
+The next implementation resolves wrapped servers through the actual cached
+plugin FixtureDef and validates the wrapper URL against that server. It also
+adds a distinct exact policy for the two marked nodes (XFAIL or XPASS, never
+ordinary PASS) and the single cStringIO setup skip. No arbitrary node, phase,
+new skip or exception is allowed. The immutable identity binds this policy;
+all original test bytes stay protected by the obligation. Empty policy preserves
+legacy identity bytes and required-SKIP refusal.
+
+The optional policy retains native exit status and each optional category
+separately, counts required tests only and normalizes the required-test exit
+only after complete inventories and clean setup/teardown. Native infrastructure
+errors never normalize into success. Focused contracts/dispatch/grammar tests:
+193PASS locally, Ruff PASS. A fresh full public run is required.

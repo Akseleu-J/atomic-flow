@@ -11,7 +11,7 @@ import json
 import os
 import sys
 import time
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 
 from p07_requests3362_check_smoke import MODULE_PATH, ORDINARY_SOURCE, ROOT, TEST_PATH, WRONG_CA, save, smoke
@@ -23,6 +23,7 @@ from atomic_flow.agents.planner import Plan, PlanStep
 from atomic_flow.agents.task_loop import TaskRunner
 from atomic_flow.agents.verify import check_source_revision, check_source_snapshot
 from atomic_flow.check_execution import completed_check_receipt, run_private_syntax
+from atomic_flow.check_fixture import REQUESTS3362_OPTIONAL_OUTCOMES
 from atomic_flow.check_obligation import CheckObligation
 from atomic_flow.check_spec import CheckResources, CheckSpec
 from atomic_flow.config import AtomicConfig, trust_project
@@ -104,6 +105,8 @@ def _journey(workspace, runtime, identity, fixture, report, output, *, ordinary_
         return receipt, topology
 
     try:
+        if ordinary_mode == "full-public":
+            identity = replace(identity, optional_test_outcomes=REQUESTS3362_OPTIONAL_OUTCOMES)
         os.environ["ATOMIC_FLOW_HOME"] = str(state)
         sys.path.insert(0, str(ROOT / "tests"))
         from conftest import ScriptedBackend

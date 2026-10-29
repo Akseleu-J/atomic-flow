@@ -17,6 +17,11 @@ from atomic_flow.agents.step_evidence import manifest_digest
 # stays read-only; disable this optional plugin in the sealed ordinary profile.
 _PLUGIN_ARGS = ("-p", "no:cacheprovider", "-p", "no:httpbin", "-p", "pytest_httpbin.plugin", "-p", "pytest_mock", "-rA", "-v")
 _ENTRYPOINTS = (("httpbin", "pytest_httpbin.plugin"), ("pytest_mock", "pytest_mock"))
+REQUESTS3362_OPTIONAL_OUTCOMES = (
+    ("tests/test_requests.py::TestRequests::test_auth_is_stripped_on_redirect_off_host", ("xfailed", "xpassed")),
+    ("tests/test_requests.py::TestRequests::test_response_iter_lines_reentrant", ("xfailed", "xpassed")),
+    ("tests/test_utils.py::TestSuperLen::test_io_streams[None-Test]", ("skipped",)),
+)
 _HELPERS = {
     "tools/p07_requests3362_calibrate.py": "862ed1fc8caed51fbcf71c0760bfdf0aa9ed3b765ddd1f29b6de44586e44a9ca",
     "tools/p07_requests3362_health.py": "a19f7354d9eb346509524b107c888addac6c74afebd227db5b8f3a2699acfe63",
@@ -129,9 +134,14 @@ class PrivatePytestIdentity(_Canonical):
     pytest_version: str = "2.8.7"
     entrypoints: tuple[tuple[str, str], ...] = _ENTRYPOINTS
     plugin_args: tuple[str, ...] = _PLUGIN_ARGS
+    optional_test_outcomes: tuple[tuple[str, tuple[str, ...]], ...] = ()
 
     def __post_init__(self):
         _variant(self.variant, self.task_id)
+        if (type(self.optional_test_outcomes) is not tuple
+                or self.optional_test_outcomes and (self.variant != "3362-cn"
+                or self.optional_test_outcomes != REQUESTS3362_OPTIONAL_OUTCOMES)):
+            raise ValueError("only exact public Requests3362 declared optional outcomes are admitted")
         _digest("runtime identity", self.runtime_digest)
         if (type(self.python_version) is not tuple or any(type(part) is not int for part in self.python_version)
                 or self.python_version != _VARIANTS[self.variant][0] or type(self.pytest_version) is not str
@@ -151,10 +161,14 @@ class PrivatePytestIdentity(_Canonical):
         return prefix + "/lib/" + version + "/site-packages/"
 
     def as_dict(self):
-        return {"schema_version": 1, "kind": "host_private_pytest_identity", "task_id": self.task_id, "variant": self.variant,
+        value = {"schema_version": 1, "kind": "host_private_pytest_identity", "task_id": self.task_id, "variant": self.variant,
                 "runtime_digest": self.runtime_digest, "python_version": list(self.python_version), "pytest_version": self.pytest_version,
                 "site_packages": self.site_packages, "installed_files": dict(self.installed_files), "helper_sha256": dict(self.helper_sha256),
                 "entrypoints": dict(self.entrypoints), "plugin_args": list(self.plugin_args)}
+        if self.optional_test_outcomes:
+            value.update(schema_version=2, optional_test_outcomes={p: list(kinds) for p, kinds in self.optional_test_outcomes},
+                         optional_outcome_policy="requests3362-public-declared-xfail-and-python3-cstringio/1")
+        return value
 
     def validate_bytes(self, *, installed_files_bytes: dict, helper_bytes: dict) -> str:
         _validate_bytes(self.installed_files, installed_files_bytes)

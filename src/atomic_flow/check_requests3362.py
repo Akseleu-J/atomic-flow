@@ -42,6 +42,20 @@ def fixture_capture(item):
         server=item.funcargs.get(name)
         if server is None:
             continue
+        if not isinstance(server,threading.Thread) and callable(server):
+            # Historical tests/conftest.py wraps the plugin-owned server in
+            # prepare_url. Resolve the actual cached plugin fixture, never
+            # treat the URL callable itself as a server/lifecycle receipt.
+            wrapper=server
+            definitions=item._request._fixturemanager.getfixturedefs(name,item.nodeid) or ()
+            actual=[definition.cached_result[0] for definition in definitions
+                    if getattr(definition,'cached_result',None) is not None
+                    and isinstance(definition.cached_result[0],threading.Thread)]
+            if len(actual)!=1:
+                raise RuntimeError('actual wrapped plugin server is unavailable')
+            server=actual[0]
+            if wrapper()!=server.url.rstrip('/')+'/':
+                raise RuntimeError('historical URL wrapper differs from plugin server')
         if (not isinstance(server,threading.Thread) or server.host!='127.0.0.1'
                 or server.protocol!=('http' if name=='httpbin' else 'https')
                 or type(server.port) is not int or not 1<=server.port<=65535

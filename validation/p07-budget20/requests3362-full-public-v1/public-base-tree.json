@@ -1,0 +1,1100 @@
+{
+  "sha": "36453b95b13079296776d11b09cab2567ea3e703",
+  "truncated": false,
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9fcc6c3dda9b17e60099efdb27ebd5388b7d3a55",
+      "size": 208
+    },
+    {
+      "path": "AUTHORS.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37b66698c891b4eb4699e3aeeb74f8b116915030",
+      "size": 5905
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57aef1e0c789e9c69160332b2d1acd9a70a418a0",
+      "size": 3010
+    },
+    {
+      "path": "HISTORY.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8913c8c0e4a88530034b118babc547f1e24319ca",
+      "size": 33545
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c1dd448d290702ae9b218d7ffe5e2a41d488859",
+      "size": 581
+    },
+    {
+      "path": "MANIFEST.in",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "439de496f0b8afee858e045b570d96a668632f4b",
+      "size": 100
+    },
+    {
+      "path": "Makefile",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a82897127e10b68f18f449196b054f12b706607c",
+      "size": 1117
+    },
+    {
+      "path": "NOTICE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f583e47ab293de98e4579cab28a42d2423620b89",
+      "size": 2292
+    },
+    {
+      "path": "README.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d072d1e806d0060af65932effb7ead5bd1c32444",
+      "size": 3199
+    },
+    {
+      "path": "docs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cca00382f46126f45d2e9efdecca772df64e42f4"
+    },
+    {
+      "path": "docs/Makefile",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08a2acf6dcaaf4fbdc0422fe7cca72a30a1e2a0a",
+      "size": 7664
+    },
+    {
+      "path": "docs/_static",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f4723fa8f40ab70cfc9d8b860197f8093d0e2767"
+    },
+    {
+      "path": "docs/_static/konami.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d72cf9df895d81759f0ffa06032a1ec10c22d830",
+      "size": 3672
+    },
+    {
+      "path": "docs/_static/requests-sidebar.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88a81477e065adabab604c20390caf4baa842557",
+      "size": 12001
+    },
+    {
+      "path": "docs/_templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a64712160c1f895de919b24a90b7106dc5a639ac"
+    },
+    {
+      "path": "docs/_templates/hacks.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9fc96cbd0c78576eaa6308cde94c24a1b32f14b",
+      "size": 1627
+    },
+    {
+      "path": "docs/_templates/sidebarintro.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7dbd74c8b9c87b8afb312153a3d97f00ce8e378a",
+      "size": 2992
+    },
+    {
+      "path": "docs/_templates/sidebarlogo.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e295f81782bb0db7a553eba772562ee3e60ab2c",
+      "size": 2525
+    },
+    {
+      "path": "docs/_themes",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2504b45699ab70d3d8ea4c0975f2dc036588f2cb"
+    },
+    {
+      "path": "docs/_themes/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "66b6e4c2f3b55b25afd9716f9d3c5afb47b15d4e",
+      "size": 22
+    },
+    {
+      "path": "docs/_themes/LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3d1e04a257aa9a7a51fbd87e3dc7cbef01f5b97b",
+      "size": 1861
+    },
+    {
+      "path": "docs/_themes/flask_theme_support.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33f47449c11d241e36c83d7f95d819bbe56e2c8f",
+      "size": 4875
+    },
+    {
+      "path": "docs/api.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "59b0523239fd7f8879a9b73611d08f456ef9c52a",
+      "size": 7064
+    },
+    {
+      "path": "docs/community",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "03c7535c6683a435a2c0e0ed0a695618bbde0880"
+    },
+    {
+      "path": "docs/community/faq.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f869ee9a43d9d7fa07254c6207ffcb15168ea660",
+      "size": 3336
+    },
+    {
+      "path": "docs/community/out-there.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "de41f1d4dc732b342a04148272f79858eefb2f1c",
+      "size": 1440
+    },
+    {
+      "path": "docs/community/recommended.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae2ae5eb4339e45fb173ddc4c3d87a863056bb55",
+      "size": 1818
+    },
+    {
+      "path": "docs/community/release-process.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "adb86d5c5d905f000bb8f6a85415d8160f27dbad",
+      "size": 2133
+    },
+    {
+      "path": "docs/community/support.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63069308402fe5fe37787ce13aa3b258139326c8",
+      "size": 1296
+    },
+    {
+      "path": "docs/community/updates.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b4897a83fada76bcefb7323151742d8152257006",
+      "size": 567
+    },
+    {
+      "path": "docs/community/vulnerabilities.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34444b2d42535367da7150eafe03496c1761a2c8",
+      "size": 4461
+    },
+    {
+      "path": "docs/conf.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb8a01e0b0bbc12e588d08864b48b376c2f36d14",
+      "size": 12070
+    },
+    {
+      "path": "docs/dev",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d5afb9447229868e1512961c5226620493892935"
+    },
+    {
+      "path": "docs/dev/authors.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2e96919c645725b90c5dcb4644e72f84812cd4c0",
+      "size": 49
+    },
+    {
+      "path": "docs/dev/contributing.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93181dad8a055daea7fcd21258144a46cf4bd1de",
+      "size": 7842
+    },
+    {
+      "path": "docs/dev/philosophy.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab9f37ae9330e244181e89850b7c03ac27e58532",
+      "size": 2563
+    },
+    {
+      "path": "docs/dev/todo.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f1700a9f829a8331b4cd0e81416c88bd14a3137",
+      "size": 1836
+    },
+    {
+      "path": "docs/index.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5eb643e12831eeda3b48df8dda3ee0982c796da8",
+      "size": 4208
+    },
+    {
+      "path": "docs/make.bat",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9eaf9b88930578b9da103662becd0d1a9a1c6c53",
+      "size": 7253
+    },
+    {
+      "path": "docs/user",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fc2b0a300b4340d3308e10a642f7bbfc05f480a0"
+    },
+    {
+      "path": "docs/user/advanced.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b53fa4368a75b1f5ec6d30f12ac765d8345bd3a9",
+      "size": 33675
+    },
+    {
+      "path": "docs/user/authentication.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2779e9c85a13e4b753c58659acdd6886b61f8b6d",
+      "size": 4307
+    },
+    {
+      "path": "docs/user/install.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c3f0084e2f68f0e7faac06bb5c94a6e4f9039e6f",
+      "size": 1207
+    },
+    {
+      "path": "docs/user/intro.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "816ad0a42abe0377ce33d8a6266ae733669ef182",
+      "size": 1191
+    },
+    {
+      "path": "docs/user/quickstart.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc6d32df7e027e4bb74ac47db7825a09095946e0",
+      "size": 16207
+    },
+    {
+      "path": "ext",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b39ffbd9dbb042d11b3ba88cc50b53f7efbe105f"
+    },
+    {
+      "path": "ext/requests-logo.ai",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c8bedb8d8c9fef25f044956f4b465e04636e65b1",
+      "size": 212865
+    },
+    {
+      "path": "ext/requests-logo.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bdcd21797b67f76ad31a366026226f02bd21b5c8",
+      "size": 49933
+    },
+    {
+      "path": "requests",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "de0628e62e257c48fed0aabf5558f52f2db29a66"
+    },
+    {
+      "path": "requests/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82c0f78074aceb90293a45e0d0b872aaf23163f9",
+      "size": 2215
+    },
+    {
+      "path": "requests/adapters.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75c7901e473f8597bbfb8b979d8bcb6bec90b801",
+      "size": 19519
+    },
+    {
+      "path": "requests/api.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2068d0eda91bc4006dd0068f3c513fa0ca8e48d",
+      "size": 5795
+    },
+    {
+      "path": "requests/auth.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "73f8e9da8da416469a2bf62757073534edbe2d8b",
+      "size": 8075
+    },
+    {
+      "path": "requests/cacert.pem",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a66daa99796dd0e23fb914dc8ff54f152fd0819",
+      "size": 344712
+    },
+    {
+      "path": "requests/certs.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "07e64750703903bd3971aa7536f6605ae65d6759",
+      "size": 613
+    },
+    {
+      "path": "requests/compat.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70edff784951c903d89c48697ac77e08759a3098",
+      "size": 1469
+    },
+    {
+      "path": "requests/cookies.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eee5168f2c5fe60899eb0227d52a20b54aea1a61",
+      "size": 17564
+    },
+    {
+      "path": "requests/exceptions.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba0b910e316cde8f256a29a9620a3942fe8b499d",
+      "size": 2776
+    },
+    {
+      "path": "requests/hooks.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9da94366d7e4d11b3f66743d604b7320cdc8cc6d",
+      "size": 767
+    },
+    {
+      "path": "requests/models.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbb3c7e606b5bc4fd2cc49203b84bd503f30126b",
+      "size": 29925
+    },
+    {
+      "path": "requests/packages",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cc8b251ece60a26bb65076cbb91be27636583a91"
+    },
+    {
+      "path": "requests/packages/README.rst",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83e0c6258dc6d80e35e46d6dfad0c27fc0e84829",
+      "size": 541
+    },
+    {
+      "path": "requests/packages/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "971c2ad024d24b8425bad8eef7bb08a8e935fe1c",
+      "size": 1384
+    },
+    {
+      "path": "requests/packages/chardet",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a5206435eea2b600eebbc0cd902c3edd5ef4f710"
+    },
+    {
+      "path": "requests/packages/chardet/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82c2a48d2905ce17924cafbf35c09b61e8ee4504",
+      "size": 1295
+    },
+    {
+      "path": "requests/packages/chardet/big5freq.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65bffc04b0d948522d4ebdf6be154aca27ccd9b0",
+      "size": 82594
+    },
+    {
+      "path": "requests/packages/chardet/big5prober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "becce81e5e8c2b6b672f9dfb69ce4177128cf590",
+      "size": 1684
+    },
+    {
+      "path": "requests/packages/chardet/chardetect.py",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "ffe892f25db3c7e2f8a57e29a7c981476a5eecf0",
+      "size": 2504
+    },
+    {
+      "path": "requests/packages/chardet/chardistribution.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e64a00befb85883ab60e23fe7c630c151149eb1",
+      "size": 9226
+    },
+    {
+      "path": "requests/packages/chardet/charsetgroupprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85e7a1c67db9343fcdce9f5a7dced9e067b99158",
+      "size": 3791
+    },
+    {
+      "path": "requests/packages/chardet/charsetprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97581712c1c2cfd31f89f396be24b27f657e1dd6",
+      "size": 1902
+    },
+    {
+      "path": "requests/packages/chardet/codingstatemachine.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dd8c917983f6e34718fe95888e1bf18b07392ef",
+      "size": 2318
+    },
+    {
+      "path": "requests/packages/chardet/compat.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d9e30addf9b5fd5f2677a4e799e17ce5fd788c9a",
+      "size": 1157
+    },
+    {
+      "path": "requests/packages/chardet/constants.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e4d148b3c5b995f810428ce6e44643147d406b15",
+      "size": 1335
+    },
+    {
+      "path": "requests/packages/chardet/cp949prober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff4272f82a0bad7585a6130f089618d09f34f02c",
+      "size": 1782
+    },
+    {
+      "path": "requests/packages/chardet/escprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80a844ff34c3af1fb6a247a4ec4034c64d0fc33d",
+      "size": 3187
+    },
+    {
+      "path": "requests/packages/chardet/escsm.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd302b4c61db77866944bcee33902d4b20125284",
+      "size": 7839
+    },
+    {
+      "path": "requests/packages/chardet/eucjpprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e64fdcc266349de08ded1163ad366a14de92848",
+      "size": 3678
+    },
+    {
+      "path": "requests/packages/chardet/euckrfreq.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a179e4c21c055614476dbc22160cd9394e18fe5a",
+      "size": 45978
+    },
+    {
+      "path": "requests/packages/chardet/euckrprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5982a46b606746ad6a613a9e78d44f1ca3fd7069",
+      "size": 1675
+    },
+    {
+      "path": "requests/packages/chardet/euctwfreq.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "576e7504dca6178504756182934f5bcad58c5cbe",
+      "size": 34872
+    },
+    {
+      "path": "requests/packages/chardet/euctwprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe652fe37a9707a8ecbf81be8ad3f1a6308ddc98",
+      "size": 1676
+    },
+    {
+      "path": "requests/packages/chardet/gb2312freq.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1238f510fc6afe2739f3f7a44359cfe471c154a3",
+      "size": 36011
+    },
+    {
+      "path": "requests/packages/chardet/gb2312prober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0325a2d8614a1a3c30e3da3716b4bef8e96b3216",
+      "size": 1681
+    },
+    {
+      "path": "requests/packages/chardet/hebrewprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba225c5ef43a8c32a1b9ae1b33914dee89c536a0",
+      "size": 13359
+    },
+    {
+      "path": "requests/packages/chardet/jisfreq.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "064345b0867d4d23ef17a4d7d11663dcf3cf4adf",
+      "size": 47315
+    },
+    {
+      "path": "requests/packages/chardet/jpcntx.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "59aeb6a87893b030a0ffceb93a460752eef75e92",
+      "size": 19348
+    },
+    {
+      "path": "requests/packages/chardet/langbulgarianmodel.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5788fc64a66e53a3dfe55b2a075d760e6904780",
+      "size": 12784
+    },
+    {
+      "path": "requests/packages/chardet/langcyrillicmodel.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a86f54bd5461039b1d9ecb24248f8b2c0fcfe5a1",
+      "size": 17725
+    },
+    {
+      "path": "requests/packages/chardet/langgreekmodel.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddb5837655d9c3adb3113cccf57e6c700b4c7a92",
+      "size": 12628
+    },
+    {
+      "path": "requests/packages/chardet/langhebrewmodel.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75f2bc7fe73f13242d5c351e00b6a15959afda5a",
+      "size": 11318
+    },
+    {
+      "path": "requests/packages/chardet/langhungarianmodel.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "49d2f0fe75169c5a73ae42b7a1d63114e647c639",
+      "size": 12536
+    },
+    {
+      "path": "requests/packages/chardet/langthaimodel.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0508b1b1abc3f727fe54fdc6653e5310e0105e71",
+      "size": 11275
+    },
+    {
+      "path": "requests/packages/chardet/latin1prober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eef3573543c8becb8976c8b1743d9fc6c04d1149",
+      "size": 5232
+    },
+    {
+      "path": "requests/packages/chardet/mbcharsetprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb42f2fb5e8189d442f3db4d4461ea6b230824b3",
+      "size": 3268
+    },
+    {
+      "path": "requests/packages/chardet/mbcsgroupprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03c9dcf3eb8337dd69e68574e58c33012ebb2408",
+      "size": 1967
+    },
+    {
+      "path": "requests/packages/chardet/mbcssm.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "efe678ca0394b2e0faf7051bbd86df86d54f2b51",
+      "size": 19590
+    },
+    {
+      "path": "requests/packages/chardet/sbcharsetprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37291bd27a9d88f1746b21c10d6d8ef055f74110",
+      "size": 4793
+    },
+    {
+      "path": "requests/packages/chardet/sbcsgroupprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b6196cd16cf6a6d6daf42c48d2ca0327a69b91f",
+      "size": 3291
+    },
+    {
+      "path": "requests/packages/chardet/sjisprober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd0e9e7078b38741e9e610d7b9a92a78369a3eb9",
+      "size": 3764
+    },
+    {
+      "path": "requests/packages/chardet/universaldetector.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "476522b999646b99ace47492210595cb457690c3",
+      "size": 6840
+    },
+    {
+      "path": "requests/packages/chardet/utf8prober.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c0bb5d8fdafd17f5c4b9c65b8a28fb5cfac544a",
+      "size": 2652
+    },
+    {
+      "path": "requests/packages/urllib3",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f7d56c6309d8778f764e16b46c3d8e2ecb2cf74c"
+    },
+    {
+      "path": "requests/packages/urllib3/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "73668991fd9388f4085b46264fa5b6d272f16eeb",
+      "size": 2854
+    },
+    {
+      "path": "requests/packages/urllib3/_collections.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77cee0170481f0b83f38b8029ad9b3eb73c45b6d",
+      "size": 10553
+    },
+    {
+      "path": "requests/packages/urllib3/connection.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ce0080480a6f82da6e3b459c8d831f8fcea8d99",
+      "size": 11617
+    },
+    {
+      "path": "requests/packages/urllib3/connectionpool.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3fcfb12012b4ac6cdf0811d0d06f5f5ba3dc12c9",
+      "size": 32713
+    },
+    {
+      "path": "requests/packages/urllib3/contrib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "875f87b0180e8b839552575ecb472db8864414c5"
+    },
+    {
+      "path": "requests/packages/urllib3/contrib/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0
+    },
+    {
+      "path": "requests/packages/urllib3/contrib/appengine.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f4289c0ff8d54dae052b8ca076fdfedd48c540f1",
+      "size": 7938
+    },
+    {
+      "path": "requests/packages/urllib3/contrib/ntlmpool.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "11d0b5c34d6c9f6471cd3cafc83dd23ac3ffac9b",
+      "size": 4531
+    },
+    {
+      "path": "requests/packages/urllib3/contrib/pyopenssl.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed3b9cc3423482af46468d856dae420a9dc023c3",
+      "size": 11778
+    },
+    {
+      "path": "requests/packages/urllib3/contrib/socks.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3748fee5333ffd1cec6309f48966ede019049538",
+      "size": 5669
+    },
+    {
+      "path": "requests/packages/urllib3/exceptions.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f2e65917b53f604f34e5a48a02d47c20c19861bd",
+      "size": 5599
+    },
+    {
+      "path": "requests/packages/urllib3/fields.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8fa2a127677961b67b27ed050d72500e04b7c548",
+      "size": 5931
+    },
+    {
+      "path": "requests/packages/urllib3/filepost.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97a2843ca4726c91645f383bd91a0e54ef3f5cd5",
+      "size": 2320
+    },
+    {
+      "path": "requests/packages/urllib3/packages",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1fe802b8626ce087529912a660ac517f2664e420"
+    },
+    {
+      "path": "requests/packages/urllib3/packages/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "170e974c15746c3aa6e960d3c7a53981459a528d",
+      "size": 109
+    },
+    {
+      "path": "requests/packages/urllib3/packages/backports",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "43ec42106336494de4d6cac93260f95f9efe7154"
+    },
+    {
+      "path": "requests/packages/urllib3/packages/backports/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0
+    },
+    {
+      "path": "requests/packages/urllib3/packages/backports/makefile.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75b80dcf8465cc6d2ce5692eaaa62b60555db60e",
+      "size": 1461
+    },
+    {
+      "path": "requests/packages/urllib3/packages/ordered_dict.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4479363cc45b5c7e0588072ccc19cab03fecce28",
+      "size": 8935
+    },
+    {
+      "path": "requests/packages/urllib3/packages/six.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "27d80112bf93d3d782bb1b5ced6f8ca7bd7285a3",
+      "size": 11628
+    },
+    {
+      "path": "requests/packages/urllib3/packages/ssl_match_hostname",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fe0f3f5f3c909bc3727e92190e318d295ff304c7"
+    },
+    {
+      "path": "requests/packages/urllib3/packages/ssl_match_hostname/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd59a75fd305dda8a588bc9a6c98471edafbf88c",
+      "size": 460
+    },
+    {
+      "path": "requests/packages/urllib3/packages/ssl_match_hostname/_implementation.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52f428733d27f50c20a7753f478d1320d8d75578",
+      "size": 3778
+    },
+    {
+      "path": "requests/packages/urllib3/poolmanager.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1023dcba38848fab2185abf32b7165a4f20a9e6c",
+      "size": 9614
+    },
+    {
+      "path": "requests/packages/urllib3/request.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5aa62d887f90675093eca880cb224129aa99cf3",
+      "size": 5988
+    },
+    {
+      "path": "requests/packages/urllib3/response.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac1b2f19e3dc373eba316f0dc4675b4a079f0b82",
+      "size": 18542
+    },
+    {
+      "path": "requests/packages/urllib3/util",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "df8bf3a51d2f6ebee665f323f6477b1dd2d95576"
+    },
+    {
+      "path": "requests/packages/urllib3/util/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4778cf9962b049cfcb164b4fa4a675aa28b33da7",
+      "size": 892
+    },
+    {
+      "path": "requests/packages/urllib3/util/connection.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "01a4812f21b7c1149b061f495d26692e49624722",
+      "size": 3380
+    },
+    {
+      "path": "requests/packages/urllib3/util/request.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "73779315f4b3222efc33438817b41722683e0ba2",
+      "size": 2128
+    },
+    {
+      "path": "requests/packages/urllib3/util/response.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0b5c75c13c8d2f0eaaea3889d72eadd7d493e826",
+      "size": 2165
+    },
+    {
+      "path": "requests/packages/urllib3/util/retry.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2d3aa20d0ae437c6c2a5263c8b9e61376efb111d",
+      "size": 10350
+    },
+    {
+      "path": "requests/packages/urllib3/util/ssl_.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8d9e7d292a4afc284e71609e985b9f267195bff",
+      "size": 11624
+    },
+    {
+      "path": "requests/packages/urllib3/util/timeout.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff62f4764dbf0998f10054bbe251e3e230a2b39d",
+      "size": 9596
+    },
+    {
+      "path": "requests/packages/urllib3/util/url.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e996204a07afe31e7c7972e8794c90c13d295248",
+      "size": 5879
+    },
+    {
+      "path": "requests/sessions.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f405ba9af1e2bcbda8e4a6dac4f47d3c1bd28b4",
+      "size": 25006
+    },
+    {
+      "path": "requests/status_codes.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0137c91d961d42ac313114fd5e0750471facfab8",
+      "size": 3315
+    },
+    {
+      "path": "requests/structures.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "991056e476e61a6a025f4069c93539b7d7ebf1f3",
+      "size": 3017
+    },
+    {
+      "path": "requests/utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d17b6b2fb390d0847fbc2bc690bade3b926cb12",
+      "size": 22639
+    },
+    {
+      "path": "requirements-to-freeze.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8b9e3547babf2b20b358b35c0b5fcaf773ab052",
+      "size": 39
+    },
+    {
+      "path": "requirements.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8426eecbc7f98ebd415fd94b75c6cbcb69fbe937",
+      "size": 388
+    },
+    {
+      "path": "setup.py",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "3a3905223c123025a6dc3b4bbfc48f1c110daf80",
+      "size": 2897
+    },
+    {
+      "path": "tests",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "026ce762108edb6f5a53dbb45aa2ed0bfb844a24"
+    },
+    {
+      "path": "tests/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e2220318cf4412869fd3489269c8f904b2cfcb6",
+      "size": 614
+    },
+    {
+      "path": "tests/compat.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a26bd9f4cc280ea352882396fb27795759c3a873",
+      "size": 324
+    },
+    {
+      "path": "tests/conftest.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af20e54df436b676ee9af086bc05f466da606687",
+      "size": 465
+    },
+    {
+      "path": "tests/test_hooks.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2b174d853ef0149236739605d80ab3a979c9cbe",
+      "size": 435
+    },
+    {
+      "path": "tests/test_lowlevel.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f3dd1b11f8e67507583a521ae76904806681a3b5",
+      "size": 1801
+    },
+    {
+      "path": "tests/test_requests.py",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "d2a2714aec89f229505b5f378a27d951181f55cd",
+      "size": 59033
+    },
+    {
+      "path": "tests/test_structures.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c332bb22561fec9d19d2aa8adf27d639e17a682",
+      "size": 2277
+    },
+    {
+      "path": "tests/test_testserver.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a35460e3c8db2ab9c189051389939e44b0e03e2",
+      "size": 5475
+    },
+    {
+      "path": "tests/test_utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17149d2615b323f7fc90c9a4eaa9ae084cc08dbb",
+      "size": 14368
+    },
+    {
+      "path": "tests/testserver",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0975354a6377eb31873bd9a025ad2d2be3729e61"
+    },
+    {
+      "path": "tests/testserver/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0
+    },
+    {
+      "path": "tests/testserver/server.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a92c87d36c632df6415b0e59dc5d18d0b472a8e",
+      "size": 3780
+    },
+    {
+      "path": "tests/utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cb75bfb6ad8a6c5519accd8a7e7c80d01809afa",
+      "size": 366
+    }
+  ]
+}
