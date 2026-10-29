@@ -1,0 +1,23 @@
+{
+  "tested_commit": "26821e998af04db4c9291d234fc3095f2d34156e",
+  "core_run": 40895865419,
+  "external_run": 40895865423,
+  "github_conclusions": "success",
+  "host_py311": {
+    "testcases": 3317,
+    "failures": 0,
+    "skipped": 14,
+    "source_files_verified": 411,
+    "artifact": 12907351486
+  },
+  "host_py312": {
+    "testcases": 3317,
+    "failures": 0,
+    "skipped": 14,
+    "source_files_verified": 411,
+    "artifact": 12905509160
+  },
+  "external_scripted_artifact": 12907770142,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

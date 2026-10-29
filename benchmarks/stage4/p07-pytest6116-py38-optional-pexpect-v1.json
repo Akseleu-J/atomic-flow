@@ -1,0 +1,109 @@
+{
+  "base_profile": "benchmarks/stage4/p07-pytest6116-py38-pexpect-v1.json",
+  "base_profile_sha256": "383cd9e40dcb1a33fe2146f353fd9d8f396cb66d3ae5c51d81e05abb4fb4a460",
+  "direct_requested": [
+    "nose",
+    "mock",
+    "decorator",
+    "jinja2",
+    "requests",
+    "argcomplete"
+  ],
+  "notes": [
+    "Candidate versions are selected for Python 3.8 and do not claim historical exactness.",
+    "MarkupSafe wheel contains a native CPython 3.8 x86_64 manylinux2010 extension; architecture and loader compatibility remain unverified.",
+    "The complete active closure is validated against this profile and the bound full-profile wheels; optional extras are not installed.",
+    "No target imports, target tests, platform capability checks, image admission or ordinary acceptance.",
+    "Combines the independently versioned pexpect profile with optional packages; installed bytes and plugin effects remain unverified."
+  ],
+  "python_version": "3.8.20",
+  "schema_version": 1,
+  "scope": "prospective combined pexpect and optional dependency candidate; no execution or admission",
+  "task_id": "pytest-dev__pytest-6116",
+  "wheels": [
+    {
+      "filename": "nose-1.3.7-py3-none-any.whl",
+      "name": "nose",
+      "sha256": "9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac",
+      "url": "https://files.pythonhosted.org/packages/15/d8/dd071918c040f50fa1cf80da16423af51ff8ce4a0f2399b7bf8de45ac3d9/nose-1.3.7-py3-none-any.whl",
+      "version": "1.3.7"
+    },
+    {
+      "filename": "mock-3.0.5-py2.py3-none-any.whl",
+      "name": "mock",
+      "sha256": "d157e52d4e5b938c550f39eb2fd15610db062441a9c2747d3dbfa9298211d0f8",
+      "url": "https://files.pythonhosted.org/packages/05/d2/f94e68be6b17f46d2c353564da56e6fb89ef09faeeff3313a046cb810ca9/mock-3.0.5-py2.py3-none-any.whl",
+      "version": "3.0.5"
+    },
+    {
+      "filename": "decorator-4.4.2-py2.py3-none-any.whl",
+      "name": "decorator",
+      "sha256": "41fa54c2a0cc4ba648be4fd43cff00aedf5b9465c9bf18d64325bc225f08f760",
+      "url": "https://files.pythonhosted.org/packages/ed/1b/72a1821152d07cf1d8b6fce298aeb06a7eb90f4d6d41acec9861e7cc6df0/decorator-4.4.2-py2.py3-none-any.whl",
+      "version": "4.4.2"
+    },
+    {
+      "filename": "Jinja2-2.11.3-py2.py3-none-any.whl",
+      "name": "Jinja2",
+      "sha256": "03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419",
+      "url": "https://files.pythonhosted.org/packages/7e/c2/1eece8c95ddbc9b1aeb64f5783a9e07a286de42191b7204d67b7496ddf35/Jinja2-2.11.3-py2.py3-none-any.whl",
+      "version": "2.11.3"
+    },
+    {
+      "filename": "MarkupSafe-2.0.1-cp38-cp38-manylinux2010_x86_64.whl",
+      "name": "MarkupSafe",
+      "sha256": "47ab1e7b91c098ab893b828deafa1203de86d0bc6ab587b160f78fe6c4011f75",
+      "url": "https://files.pythonhosted.org/packages/68/ba/7a5ca0f9b4239e6fd846dd54c0b5928187355fa62fbdbd13e1c5942afae7/MarkupSafe-2.0.1-cp38-cp38-manylinux2010_x86_64.whl",
+      "version": "2.0.1"
+    },
+    {
+      "filename": "requests-2.25.1-py2.py3-none-any.whl",
+      "name": "requests",
+      "sha256": "c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e",
+      "url": "https://files.pythonhosted.org/packages/29/c1/24814557f1d22c56d50280771a17307e6bf87b70727d975fd6b2ce6b014a/requests-2.25.1-py2.py3-none-any.whl",
+      "version": "2.25.1"
+    },
+    {
+      "filename": "urllib3-1.26.18-py2.py3-none-any.whl",
+      "name": "urllib3",
+      "sha256": "34b97092d7e0a3a8cf7cd10e386f401b3737364026c45e622aa02903dffe0f07",
+      "url": "https://files.pythonhosted.org/packages/b0/53/aa91e163dcfd1e5b82d8a890ecf13314e3e149c05270cc644581f77f17fd/urllib3-1.26.18-py2.py3-none-any.whl",
+      "version": "1.26.18"
+    },
+    {
+      "filename": "chardet-4.0.0-py2.py3-none-any.whl",
+      "name": "chardet",
+      "sha256": "f864054d66fd9118f2e67044ac8981a54775ec5b67aed0441892edb553d21da5",
+      "url": "https://files.pythonhosted.org/packages/19/c7/fa589626997dd07bd87d9269342ccb74b1720384a4d739a1872bd84fbe68/chardet-4.0.0-py2.py3-none-any.whl",
+      "version": "4.0.0"
+    },
+    {
+      "filename": "idna-2.10-py2.py3-none-any.whl",
+      "name": "idna",
+      "sha256": "b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0",
+      "url": "https://files.pythonhosted.org/packages/a2/38/928ddce2273eaa564f6f50de919327bf3a00f091b5baba8dfa9460f3a8a8/idna-2.10-py2.py3-none-any.whl",
+      "version": "2.10"
+    },
+    {
+      "filename": "certifi-2023.7.22-py3-none-any.whl",
+      "name": "certifi",
+      "sha256": "92d6037539857d8206b8f6ae472e8b77db8058fec5937a1ef3f54304089edbb9",
+      "url": "https://files.pythonhosted.org/packages/4c/dd/2234eab22353ffc7d94e8d13177aaa050113286e93e7b40eae01fbf7c3d9/certifi-2023.7.22-py3-none-any.whl",
+      "version": "2023.7.22"
+    },
+    {
+      "filename": "argcomplete-1.12.3-py2.py3-none-any.whl",
+      "name": "argcomplete",
+      "sha256": "291f0beca7fd49ce285d2f10e4c1c77e9460cf823eef2de54df0c0fec88b0d81",
+      "url": "https://files.pythonhosted.org/packages/b7/9e/9dc74d330c07866d72f62d553fe8bdbe32786ff247a14e68b5659963e6bd/argcomplete-1.12.3-py2.py3-none-any.whl",
+      "version": "1.12.3"
+    },
+    {
+      "filename": "six-1.16.0-py2.py3-none-any.whl",
+      "name": "six",
+      "sha256": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254",
+      "url": "https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl",
+      "version": "1.16.0"
+    }
+  ]
+}
