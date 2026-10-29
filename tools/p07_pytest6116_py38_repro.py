@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import subprocess
 import tempfile
 import urllib.request
@@ -94,7 +95,7 @@ def target_source(full_public):
     return TARGET.replace("'-q','--tb=short'", "'-q','--tb=line'").replace(focused, "'testing'")
 
 
-def run(output, *, full_public=False):
+def run(output, *, full_public=False, source_for_subprocesses=False):
     if os.name != 'posix' or output.exists():
         raise ValueError('fresh output on Linux required')
     output.mkdir(parents=True)
@@ -127,6 +128,13 @@ def run(output, *, full_public=False):
                           + '\nCOPY --from=target /testbed /testbed\nCOPY *.whl /opt/p07-wheels/\n'
                           + 'RUN --network=none /usr/local/bin/python -I -B -m pip --isolated install '
                             '--no-index --no-deps --no-compile /opt/p07-wheels/*.whl\n')
+            if source_for_subprocesses:
+                inject = ("from pathlib import Path; "
+                          "p=Path('/usr/local/lib/python3.8/site-packages/p07-public-source.pth'); "
+                          "assert not p.exists(); "
+                          "p.write_text(\"import sys; sys.path.insert(0, '/testbed/src')\\n\")")
+                dockerfile += 'RUN --network=none ' + PYTHON + ' -I -B -c ' + shlex.quote(inject) + '\n'
+                report['subprocess_source_policy'] = 'image site hook inserts audited public source into sys.path'
             (tmp / 'Dockerfile').write_text(dockerfile)
             (output / 'Dockerfile').write_text(dockerfile)
             build = command([recon.ENGINE, 'build', '--pull=false', '--network=none', '--iidfile', str(tmp / 'iid'), str(tmp)], timeout=300)
@@ -167,9 +175,16 @@ def run(output, *, full_public=False):
             (output / 'source-verification.stdout').write_bytes(verify.stdout)
             if verify.returncode or json.loads(verify.stdout) != {'checked': 474, 'differences': []}:
                 raise ValueError('public source bytes differ')
+            if source_for_subprocesses:
+                probe = command([recon.ENGINE, 'exec', '--user=65534:65534', '-w', '/tmp', cid, PYTHON, '-I', '-B', '-c',
+                                 "import os,pytest,_pytest; print(os.path.realpath(pytest.__file__)); print(os.path.realpath(_pytest.__file__))"])
+                (output / 'subprocess-source.stdout').write_bytes(probe.stdout)
+                (output / 'subprocess-source.stderr').write_bytes(probe.stderr)
+                if probe.returncode or probe.stdout.splitlines() != [b'/testbed/src/pytest.py', b'/testbed/src/_pytest/__init__.py']:
+                    raise ValueError('isolated subprocess does not import audited source')
             source = target_source(full_public)
             result = _bounded([recon.ENGINE, 'exec', '--user=65534:65534', '-w', '/testbed', cid, PYTHON,
-                               '-I', '-B', '-c', source], home=tmp, timeout=240 if full_public else 120, limit=1000000, check=lambda: None)
+                               '-I', '-B', '-c', source], home=tmp, timeout=360 if full_public else 120, limit=1000000, check=lambda: None)
             (output / 'stdout').write_bytes(result.stdout.encode())
             (output / 'stderr').write_bytes(result.stderr.encode())
             report.update(exit_code=result.returncode, timed_out=result.timed_out, stdout_truncated=result.stdout_truncated,
@@ -213,7 +228,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--full-public', action='store_true')
+    parser.add_argument('--source-for-subprocesses', action='store_true')
     options = parser.parse_args()
-    result = run(options.output, full_public=options.full_public)
+    result = run(options.output, full_public=options.full_public, source_for_subprocesses=options.source_for_subprocesses)
     expected = 'full_diagnostic_completed' if options.full_public else 'focused_diagnostic_completed'
     raise SystemExit(0 if result['status'] == expected and result['exit_code'] == 0 else 1)
