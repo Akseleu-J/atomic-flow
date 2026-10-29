@@ -1,0 +1,13 @@
+{
+  "run": 40933846341,
+  "artifact": 12924300891,
+  "archive_sha256": "d1f83290bcd0c15a7ff0b0651e3eae9f17be9de12682724d2db1d68a3341041e",
+  "status": "offline_double_build_byte_identical",
+  "wheel_sha256": "5fa22b9449f0afbcec12430a550ef9242a2307725b7409fba7e80b8de48db347",
+  "builder_publisher_files_verified": 196,
+  "container_cleanup_confirmed": 2,
+  "runtime_acceptance": false,
+  "ordinary_acceptance": false,
+  "provider_calls": 0,
+  "tested_commit": "04c3e69109b5ee4d3d5a2c830290fa7b96edee0a"
+}
