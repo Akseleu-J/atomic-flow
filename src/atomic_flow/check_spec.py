@@ -180,7 +180,7 @@ class CheckSpec:
                 raise ValueError("fixture identity differs from its exact private task/runtime")
         if self.requests_ca_identity is not None:
             ca, fixture = self.requests_ca_identity, self.fixture_identity
-            if (type(ca) is not RequestsCAIdentity or fixture is None or fixture.variant not in {"function36-v3", "2674-v2"}
+            if (type(ca) is not RequestsCAIdentity or fixture is None or fixture.variant not in {"function36-v3", "2674-v2", "863-v7"}
                     or ca.task_id != self.task_id or self.target_root != "/testbed"
                     or ca.fixture_ca_sha256 != dict(fixture.certificate_files)[fixture.certificate_root + "cacert.pem"]):
                 raise ValueError("public CA identity differs from exact function fixture/task/root")

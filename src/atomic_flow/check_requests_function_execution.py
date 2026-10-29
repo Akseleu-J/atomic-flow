@@ -132,7 +132,7 @@ def _run_function_check(spec: CheckSpec, candidate: Path, variant: str, *, cance
     """
     if (type(spec) is not CheckSpec or type(spec.requests_ca_identity) is not RequestsCAIdentity
             or spec.fixture_identity is None or spec.fixture_identity.variant != variant
-            or variant not in {"function36-v3", "2674-v2"}):
+            or variant not in {"function36-v3", "2674-v2", "863-v7"}):
         raise ExecutionUnavailable("immutable resource-bound function36 specification required")
     if platform.system() != "Linux" or not hasattr(os, "geteuid") or os.geteuid() != 0:
         raise ExecutionUnavailable("function36 requires an explicitly accepted root Linux worker")
@@ -171,3 +171,7 @@ def run_function36_check(spec: CheckSpec, candidate: Path, *, cancel_check=None)
 
 def run_requests2674_check(spec: CheckSpec, candidate: Path, *, cancel_check=None):
     return _run_function_check(spec, candidate, "2674-v2", cancel_check=cancel_check)
+
+
+def run_requests863_check(spec: CheckSpec, candidate: Path, *, cancel_check=None):
+    return _run_function_check(spec, candidate, "863-v7", cancel_check=cancel_check)
