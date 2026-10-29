@@ -14,6 +14,7 @@ pub mod corporate;
 pub mod eval;
 pub mod governance;
 pub mod mcp;
+pub mod mcp_stdio;
 pub mod perf;
 pub mod publication;
 pub mod rc;

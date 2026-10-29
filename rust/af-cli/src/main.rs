@@ -30,6 +30,8 @@ enum Command {
         #[arg(long)]
         token: Option<String>,
     },
+    /// MCP stdio server: line-delimited JSON-RPC over stdin/stdout.
+    Mcp,
     /// Structural graph operations (roadmap P01/P02 core).
     Graph {
         #[command(subcommand)]
@@ -233,6 +235,22 @@ fn main() {
             }
         }
     }
+    if let Command::Mcp = cli.command {
+        let stdin = std::io::stdin().lock();
+        let mut stdout = std::io::stdout().lock();
+        let tools = mcp_tools();
+        let mut reader = std::io::BufReader::new(stdin);
+        match af_program::mcp_stdio::run_stdio(&mut reader, &mut stdout, &tools) {
+            Ok(served) => {
+                eprintln!("af mcp: served {served} requests");
+                std::process::exit(0);
+            }
+            Err(error) => {
+                eprintln!("af mcp: {error}");
+                std::process::exit(1);
+            }
+        }
+    }
     let code = match run(cli.command) {
         Ok(output) => {
             println!("{output}");
@@ -249,6 +267,7 @@ fn main() {
 fn run(command: Command) -> Result<String, String> {
     match command {
         Command::Serve { .. } => unreachable!("serve is handled in main"),
+        Command::Mcp => unreachable!("mcp is handled in main"),
         Command::SelfTest => self_test(),
         Command::Agent { command } => match command {
             AgentCommand::Journey {
@@ -420,6 +439,78 @@ fn sha_hex(bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(bytes);
     format!("{:x}", hasher.finalize())
+}
+
+/// Read-only kernel tools exposed over MCP. Mutating tools stay out of the
+/// stdio surface on purpose: MCP clients are untrusted context until a host
+/// grants more (the envelope rules apply to them as to any model text).
+fn mcp_tools() -> Vec<af_program::mcp_stdio::McpTool<'static>> {
+    vec![
+        af_program::mcp_stdio::McpTool {
+            spec: af_llm::ToolSpec {
+                name: "kernel_version".into(),
+                description: "atomic-flow Rust kernel version".into(),
+                parameters: json!({"type": "object"}),
+            },
+            execute: &|_arguments| json!({"version": env!("CARGO_PKG_VERSION")}),
+        },
+        af_program::mcp_stdio::McpTool {
+            spec: af_llm::ToolSpec {
+                name: "backend_ping".into(),
+                description: "scripted backend smoke (settled usage, zero spend)".into(),
+                parameters: json!({"type": "object"}),
+            },
+            execute: &|_arguments| {
+                let router = af_llm::Router::new(vec![Box::new(af_llm::ScriptedBackend::echo())]);
+                let mut request = af_llm::ChatRequest::new(
+                    "scripted",
+                    vec![af_llm::ChatMessage::new("user", "ping")],
+                );
+                request.max_output_tokens = Some(8);
+                match router.route(&request, &af_llm::Cancel::new()) {
+                    af_llm::RouteOutcome::Completed { backend, result } => json!({
+                        "ok": true, "backend": backend, "content": result.content,
+                        "tokens_in": result.usage.tokens_in, "cost_usd": result.usage.cost_usd,
+                    }),
+                    af_llm::RouteOutcome::Hold { backend, detail } => {
+                        json!({"error": format!("HOLD {backend}: {detail}")})
+                    }
+                    af_llm::RouteOutcome::Exhausted { refusals } => {
+                        json!({"error": format!("exhausted: {refusals:?}")})
+                    }
+                }
+            },
+        },
+        af_program::mcp_stdio::McpTool {
+            spec: af_llm::ToolSpec {
+                name: "session_read".into(),
+                description: "read a session snapshot (events, pending and unresolved holds)"
+                    .into(),
+                parameters: json!({
+                    "type": "object",
+                    "properties": {"id": {"type": "string"}},
+                    "required": ["id"],
+                }),
+            },
+            execute: &|arguments| {
+                let Some(id) = arguments.get("id").and_then(Value::as_str) else {
+                    return json!({"error": "session_read requires id"});
+                };
+                let Ok(mut journal) = af_journal::SessionJournal::open(id) else {
+                    return json!({"error": format!("session {id} not found")});
+                };
+                match journal.read() {
+                    Ok(snapshot) => json!({
+                        "ok": true, "session_id": snapshot.session_id,
+                        "events": snapshot.events.len(),
+                        "pending_call_ids": snapshot.pending_call_ids(),
+                        "unresolved_call_ids": snapshot.unresolved_call_ids(),
+                    }),
+                    Err(error) => json!({"error": error.0}),
+                }
+            },
+        },
+    ]
 }
 
 fn agent_journey(
