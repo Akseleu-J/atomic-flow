@@ -76,15 +76,9 @@ def run(receipt_dir: Path, output: Path):
                             "    @pytest.mark.xfail\n    def test_response_iter_lines_reentrant(self):\n        assert True\n"
                             "    def test_required(self):\n        " + body + "\n", encoding="ascii")
             spec = CheckSpec(admitted["task"], commit, target["base_commit"], check_source_revision(root), image_id,
-                             runtime.interpreter, "pytest", ("test_requests.py",), runtime_identity=runtime,
+                             runtime.interpreter, "pytest", ("test_requests.py",), target_root="/testbed", runtime_identity=runtime,
                              private_pytest_identity=identity, resources=CheckResources(output_bytes_per_stream=1000000))
             bootstrap = private_pytest_args(spec, identity, NONCE)
-            # Diagnostic instrumentation only: identify a failing fixed guard
-            # without weakening it or changing any pytest/test behavior.
-            lines = bootstrap[1].splitlines(keepends=True)
-            bootstrap[1] = "".join(line.replace("raise SystemExit(125)",
-                "raise RuntimeError('private bootstrap guard line " + str(index) + "')")
-                for index, line in enumerate(lines, 1))
             cidfile = parent / (case + ".cid")
             args = [ENGINE, "run", "--cidfile", str(cidfile), "--pull=never", "--network=none", "--read-only",
                     "--user=65534:65534", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--memory=1g",

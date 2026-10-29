@@ -29,6 +29,8 @@ jobs:
         if: always()
         with:
           name: p07-2674-private-pytest-${{ github.sha }}
-          path: p07-python27-bootstrap-worker/
+          path: |
+            p07-python27-bootstrap-worker/
+            !p07-python27-bootstrap-worker/runtime/certificates/key.pem
           retention-days: 14
           if-no-files-found: error
