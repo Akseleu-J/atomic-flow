@@ -2,6 +2,10 @@
 
 Работать в `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`, ветка `experimental`, draft PR №2. Начать с `docs/PROJECT_CONTEXT.md`; Git-команды выполнять только в этом клоне. Перед продолжением сверить HEAD, remote SHA и рабочий diff. P07 остаётся **OPEN**.
 
+## Начало интеграции Requests2674
+
+Подготовлен bootstrap для Python2: JSON-имена модулей и argv преобразуются в ограниченные ASCII native str. Для 2674 добавлена отдельная точная политика публичного `test_requests.py::RequestsTestCase::test_response_iter_lines_reentrant` (source-declared xfail; calibration наблюдала XPASS с raw ID без `::()::`). Разрешены только xfailed/xpassed этого узла, новые SKIP/XPASS по-прежнему не проходят. Это только локальные контракты: 110 профильных тестов PASS; реальное выполнение нового bootstrap на Python2.7 и fixture/controller/TaskRunner integration ещё не приняты. Никакой generic dispatch 2674 не открыт. Продолжать с отдельного source-free CI smoke реального Python2 и затем owned fixture/CA controller; не считать калибровку модели или качеством.
+
 ## Новый checkpoint: function36 TaskRunner
 
 Runtime `875fd01b1f3f4b4521b887688d27a82678f47df1`: три полных public ordinary journey Requests1963/2148/2317 приняты в scripted synthetic scope; CI 40824311185 SUCCESS, соответственно 122/134/144 PASS после probe repair, required SKIP отклонён. По 823 raw hashes и восемь resource receipts на задачу независимо сверены. Публичные базовые деревья сверены полностью: единственное ресурсное исключение — CA вне candidate; добавлены два synthetic файла. General CI 40824307411 SUCCESS, Python 3.11/3.12 по 3267 PASS / 14 SKIP, Windows 4 PASS. Отчёт: `docs/P07_FUNCTION36_TASK_JOURNEYS_2026-10-29.md`; локальные архивы и assessments: `validation/p07-budget20/function36-task-v1/`. Model calls 0, hidden oracle не запускался, P07 OPEN.

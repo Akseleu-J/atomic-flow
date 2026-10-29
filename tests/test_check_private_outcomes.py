@@ -55,7 +55,7 @@ def test_actual_generated_report_handler_maps_only_exact_native_class_collector_
         def pytest_runtest_logreport(self, report):
             self.required.append(report.nodeid)
 
-    scope = {"identity": {"optional_test_outcomes": dict(REQUESTS3362_OPTIONAL_OUTCOMES)}, "Evidence": Evidence}
+    scope = {"identity": {"variant": "3362-cn", "optional_test_outcomes": dict(REQUESTS3362_OPTIONAL_OUTCOMES)}, "Evidence": Evidence}
     exec(compile(_EVIDENCE, "trusted-historical-evidence-test", "exec"), scope)
     generated = scope["evidence"]
     generated.pytest_configure(SimpleNamespace(hook=SimpleNamespace(
@@ -117,3 +117,59 @@ def test_optional_policy_cannot_expand_to_new_nodes_or_other_requests_cohorts():
         replace(identity, variant="function36-v3", task_id="psf__requests-1963")
     with pytest.raises(ValueError, match="complete ordinary test files"):
         replace(bound, test_paths=("tests/test_requests.py",))
+
+
+def test_2674_exact_public_xfail_receipt_and_unexpected_outcomes():
+    from test_check_private_pytest import NONCE as nonce
+    from test_check_private_pytest import bound, observation, result
+
+    from atomic_flow.check_fixture import REQUESTS2674_OPTIONAL_OUTCOMES
+    from atomic_flow.check_private_pytest import private_pytest_receipt
+
+    spec, identity = bound((2, 7, 18))
+    identity = replace(identity, optional_test_outcomes=REQUESTS2674_OPTIONAL_OUTCOMES)
+    spec = replace(spec, test_paths=("test_requests.py",), private_pytest_identity=identity)
+    node = REQUESTS2674_OPTIONAL_OUTCOMES[0][0]
+    value = observation(spec, identity, collected=3, completed=3, passed=2,
+                        native_exit_code=0, counter_scope="required_only",
+                        optional_outcome_policy="requests2674-public-declared-xfail/1",
+                        optional_outcomes={node: {"category": "xpassed", "when": "call", "raw_nodeid": node}})
+    assert private_pytest_receipt(result(value), spec, identity, nonce) == value
+    for mutate in (
+        lambda v: v["optional_outcomes"][node].update(raw_nodeid=node.replace("::test_", "::()::test_")),
+        lambda v: v["optional_outcomes"][node].update(category="skipped"),
+        lambda v: v.update(skipped=1),
+        lambda v: v.update(optional_outcome_policy=POLICY),
+        lambda v: v.update(native_exit_code=1),
+    ):
+        changed = copy.deepcopy(value)
+        mutate(changed)
+        assert private_pytest_receipt(result(changed), spec, identity, nonce) is None
+    with pytest.raises(ValueError, match="optional outcomes"):
+        replace(identity, optional_test_outcomes=((*REQUESTS2674_OPTIONAL_OUTCOMES,),))
+
+
+def test_2674_generated_handler_uses_observed_python27_raw_id():
+    from atomic_flow.check_fixture import REQUESTS2674_OPTIONAL_OUTCOMES
+    from atomic_flow.check_private_outcomes import _EVIDENCE
+
+    class Evidence:
+        def __init__(self):
+            self.completed, self.required = set(), []
+
+        def pytest_runtest_logreport(self, report):
+            self.required.append(report.nodeid)
+
+    identity = {"variant": "2674-v2", "optional_test_outcomes": dict(REQUESTS2674_OPTIONAL_OUTCOMES)}
+    scope = {"identity": identity, "Evidence": Evidence}
+    exec(compile(_EVIDENCE, "trusted-2674-evidence-test", "exec"), scope)
+    evidence = scope["evidence"]
+    evidence.pytest_configure(SimpleNamespace(hook=SimpleNamespace(
+        pytest_report_teststatus=lambda report: (report.category, "", ""))))
+    node = REQUESTS2674_OPTIONAL_OUTCOMES[0][0]
+    evidence.pytest_runtest_logreport(SimpleNamespace(nodeid=node, category="xpassed", when="call"))
+    assert evidence.optional_seen[node]["raw_nodeid"] == node
+    assert evidence.required == [] and not evidence.invalid_optional
+    impostor = node.replace("::test_", "::()::test_")
+    evidence.pytest_runtest_logreport(SimpleNamespace(nodeid=impostor, category="xpassed", when="call"))
+    assert evidence.required == [impostor]

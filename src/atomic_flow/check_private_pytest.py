@@ -75,7 +75,8 @@ for name in ('PYTEST_ADDOPTS','PYTEST_PLUGINS','PYTEST_DISABLE_PLUGIN_AUTOLOAD')
 # Import the two reviewed plugin modules before exposing edited target source.
 # Their dependency entry points and source bytes were checked above.
 for name in sorted(identity['entrypoints'].values()):
-    plugin=__import__(name,fromlist=['*'])
+    # Python 2's C import API rejects unicode names produced by json.loads.
+    plugin=__import__(str(name),fromlist=['*'])
     path=os.path.realpath(plugin.__file__)
     if not path.startswith(site) or os.path.relpath(path,site).replace(os.sep,'/') not in identity['installed_files']:
         raise SystemExit(125)
@@ -111,7 +112,9 @@ class Evidence:
             elif report.when=='teardown':self.teardown_failed+=1
     def pytest_sessionfinish(self,session,exitstatus):self.finished=True
 evidence=Evidence()
-arguments=identity['plugin_args']+paths
+# All admitted plugin arguments and test paths are ASCII host-owned strings.
+# pytest 2.8 on Python 2 requires native str instead of JSON unicode.
+arguments=[str(value) for value in identity['plugin_args']+paths]
 code=int(pytest.main(arguments,plugins=[evidence]))
 protected()
 receipt={'nonce':payload['nonce'],'root':root,'runner':'pytest-private','interpreter':sys.executable,
@@ -209,7 +212,7 @@ def private_pytest_receipt(result: CommandResult, spec: CheckSpec, identity: Pri
     optional = len(identity.optional_test_outcomes)
     if optional:
         from atomic_flow.check_private_outcomes import optional_receipt_valid
-        if not optional_receipt_valid(value, identity.optional_test_outcomes):
+        if not optional_receipt_valid(value, identity.optional_test_outcomes, variant=identity.variant):
             return None
     if (value["collected"] <= 0 or value["completed"] != value["collected"]
             or any(value[key] for key in ("collection_errors", "skipped", "setup_failed", "teardown_failed", "xpassed"))

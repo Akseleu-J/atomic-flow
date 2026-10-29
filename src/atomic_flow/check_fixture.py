@@ -22,6 +22,9 @@ REQUESTS3362_OPTIONAL_OUTCOMES = (
     ("tests/test_requests.py::TestRequests::test_response_iter_lines_reentrant", ("xfailed", "xpassed")),
     ("tests/test_utils.py::TestSuperLen::test_io_streams[None-Test]", ("skipped",)),
 )
+REQUESTS2674_OPTIONAL_OUTCOMES = (
+    ("test_requests.py::RequestsTestCase::test_response_iter_lines_reentrant", ("xfailed", "xpassed")),
+)
 _HELPERS = {
     "tools/p07_requests3362_calibrate.py": "862ed1fc8caed51fbcf71c0760bfdf0aa9ed3b765ddd1f29b6de44586e44a9ca",
     "tools/p07_requests3362_health.py": "a19f7354d9eb346509524b107c888addac6c74afebd227db5b8f3a2699acfe63",
@@ -139,9 +142,11 @@ class PrivatePytestIdentity(_Canonical):
     def __post_init__(self):
         _variant(self.variant, self.task_id)
         if (type(self.optional_test_outcomes) is not tuple
-                or self.optional_test_outcomes and (self.variant != "3362-cn"
-                or self.optional_test_outcomes != REQUESTS3362_OPTIONAL_OUTCOMES)):
-            raise ValueError("only exact public Requests3362 declared optional outcomes are admitted")
+                or self.optional_test_outcomes and self.optional_test_outcomes != {
+                    "3362-cn": REQUESTS3362_OPTIONAL_OUTCOMES,
+                    "2674-v2": REQUESTS2674_OPTIONAL_OUTCOMES,
+                }.get(self.variant)):
+            raise ValueError("only exact reviewed public declared optional outcomes are admitted")
         _digest("runtime identity", self.runtime_digest)
         if (type(self.python_version) is not tuple or any(type(part) is not int for part in self.python_version)
                 or self.python_version != _VARIANTS[self.variant][0] or type(self.pytest_version) is not str
@@ -167,7 +172,8 @@ class PrivatePytestIdentity(_Canonical):
                 "entrypoints": dict(self.entrypoints), "plugin_args": list(self.plugin_args)}
         if self.optional_test_outcomes:
             value.update(schema_version=2, optional_test_outcomes={p: list(kinds) for p, kinds in self.optional_test_outcomes},
-                         optional_outcome_policy="requests3362-public-declared-xfail-and-python3-cstringio/1")
+                         optional_outcome_policy=("requests3362-public-declared-xfail-and-python3-cstringio/1"
+                                                  if self.variant == "3362-cn" else "requests2674-public-declared-xfail/1"))
         return value
 
     def validate_bytes(self, *, installed_files_bytes: dict, helper_bytes: dict) -> str:
