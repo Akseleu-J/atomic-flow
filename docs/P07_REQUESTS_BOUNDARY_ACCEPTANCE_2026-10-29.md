@@ -154,3 +154,24 @@ separately, counts required tests only and normalizes the required-test exit
 only after complete inventories and clean setup/teardown. Native infrastructure
 errors never normalize into success. Focused contracts/dispatch/grammar tests:
 193PASS locally, Ruff PASS. A fresh full public run is required.
+
+Further retained attempts: v2 (CI40816702406) was sent to the previous SHA
+while a local commit was still completing; it was cancelled and is not evidence
+for the new source. V3 (CI40816770477 on8d68fa8) eliminated all115teardown
+errors but refused the historical raw `::()::` collector IDs. Its790raw hashes
+and archive12873255565/f2f7160a63426375d19457e812d21e62280a1c666f53620d81f50553502325a4
+were verified. V4 (CI40817446207 onfa43d65) accepted the full353-item negative
+receipt, replanned and observed350required PASS after repair. The host validator
+then incorrectly expected native exit1 for a non-strict XPASS, rejected the
+native exit0 and rolled the edit back. V4 remains NOT QUALIFIED;800raw hashes
+and archive12873177467/6391d16fc1b509411cf1e94c2267b71f5913e663bdbda2227ca053b1855138a3
+were verified. Cleanup completed in each executed attempt.
+
+The corrected outcome reader keeps native exit unchanged and requires it to
+match actual required call failures. Exact declared XPASS is retained separately;
+it cannot manufacture either a native failure or an ordinary PASS. The writer
+no longer transforms the native exit. Focused contracts119PASS/Ruff PASS locally.
+
+General CI40817445010 onfa43d65 is separately accepted:3229PASS/14SKIP on both
+Python versions, Windows4PASS, wheel/DockerPASS. All six archives, JUnit counts
+and395source hashes were audited. Evidence: requests-full-public-core-ci-v1.

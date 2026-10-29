@@ -18,7 +18,7 @@ def admitted(*, failed=False):
     bound = replace(original, private_pytest_identity=identity, test_paths=("tests/test_requests.py", "tests/test_utils.py"))
     value = receipt(bound, failed=failed)
     value.update(collected=value["collected"] + 3, completed=value["completed"] + 3,
-                 native_exit_code=1, counter_scope="required_only", optional_outcome_policy=POLICY,
+                 native_exit_code=int(failed), counter_scope="required_only", optional_outcome_policy=POLICY,
                  optional_outcomes={node: {"category": "skipped" if kinds == ("skipped",) else "xfailed" if index == 0 else "xpassed",
                                           "when": "setup" if kinds == ("skipped",) else "call",
                                           "raw_nodeid": node.rsplit("::", 1)[0] + "::()::" + node.rsplit("::", 1)[1]}
@@ -30,7 +30,7 @@ def admitted(*, failed=False):
 def test_native_expected_status_stays_distinct_from_required_pass_or_failure(failed):
     bound, value = admitted(failed=failed)
     assert requests3362_receipt(result(value), bound, NONCE) == value
-    assert value["native_exit_code"] == 1
+    assert value["native_exit_code"] == int(failed)
     assert value["exit_code"] == int(failed)
     assert value["skipped"] == value["xpassed"] == 0  # Required tests only.
     assert {x["category"] for x in value["optional_outcomes"].values()} == {"skipped", "xfailed", "xpassed"}
@@ -74,7 +74,7 @@ def test_actual_generated_report_handler_maps_only_exact_native_class_collector_
 
 
 @pytest.mark.parametrize("attack", ["required_skip", "required_xpass", "unknown_node", "missing_node",
-                                   "wrong_phase", "changed_category", "native_exit_hidden", "native_infra_exit",
+                                   "wrong_phase", "changed_category", "native_exit_substitution", "native_infra_exit",
                                    "claim_all_passed", "bool_native_exit", "teardown_error", "wrong_raw_alias"])
 def test_unreviewed_exceptions_or_infrastructure_cannot_satisfy_required_obligation(attack):
     bound, value = admitted()
@@ -92,8 +92,8 @@ def test_unreviewed_exceptions_or_infrastructure_cannot_satisfy_required_obligat
         optional[next(iter(optional))]["when"] = "teardown"
     elif attack == "changed_category":
         optional[next(iter(optional))]["category"] = "skipped"
-    elif attack == "native_exit_hidden":
-        value["native_exit_code"] = 0
+    elif attack == "native_exit_substitution":
+        value["native_exit_code"] = 1
     elif attack == "native_infra_exit":
         value["native_exit_code"] = 3
     elif attack == "claim_all_passed":

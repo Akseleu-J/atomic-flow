@@ -1,7 +1,8 @@
 """Full-source scripted Requests3362 TaskRunner with actual fixture checks.
 
-Synthetic ordinary tests only. No historical hidden test, gold patch or model
-call is used. Raw controller receipts and immutable namespace IDs are retained.
+The fixed probe is synthetic; full-public mode additionally runs the complete
+public historical test-file inventory. No hidden test, gold patch or model call
+is used. Raw controller receipts and immutable namespace IDs are retained.
 """
 from __future__ import annotations
 

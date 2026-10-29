@@ -1,5 +1,17 @@
 # Передача работы: atomic-flow / P07
 
+Рабочий checkpoint: `fa43d65d660d727d76adfa193f123864733551d5` опубликован.
+Полный public ordinary inventory (шесть исходных test files + synthetic probe)
+проверяется отдельной попыткой `requests3362-full-public-v4`. Перед продолжением
+сверить её run/head_sha и скачать outputs; dispatch ещё не означает приёмку.
+V1 обнаружил URL-callable fixtures и неподдержанные public xfail/skip. V2 был
+ошибочно отправлен на старый SHA и отменён. V3 подтвердил устранение всех 115
+teardown errors, но отказал из-за отсутствующего отображения raw `::()::` IDs.
+Fa43d65 добавляет точное отображение трёх объявленных optional nodes; их native
+categories и native exit сохраняются отдельно от required outcome. Требуется
+доказать FAIL → repair → fresh required PASS с полной исторической коллекцией.
+Required-SKIP вне этих трёх source-declared nodes по-прежнему запрещён.
+
 Последний принятый runtime: `500a0fdea0ab9258269cc0ace45338607c8ce917`.
 Requests3362 full synthetic TaskRunner: CI 40814165859 SUCCESS. Проверены
 810 hashes, пять raw checks, один replan, публикация только probe, свежий
