@@ -1,6 +1,8 @@
 """Requests863 fixed runtime, public CA and same-worker fixture contract."""
+import ast
 import hashlib
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 import test_check_requests_execution_overlay as core
@@ -12,7 +14,7 @@ from atomic_flow.check_requests_execution_overlay import prepare_requests_execut
 from atomic_flow.check_requests_resources import RequestsCAIdentity
 
 
-def test_863_resource_fixture_source_is_bound_and_isolated(tmp_path):
+def test_863_resource_fixture_source_is_bound_and_isolated(tmp_path, monkeypatch):
     candidate, execution, original = core.bound.__wrapped__(tmp_path)
     private_spec, identity = private_bound((2, 7, 13))
     runtime = private_spec.runtime_identity
@@ -32,6 +34,13 @@ def test_863_resource_fixture_source_is_bound_and_isolated(tmp_path):
     execution_spec, overlay = prepare_requests_execution_overlay(spec, candidate, execution, core.PUBLIC_CA,
                                                                  original_ca_sha256=sha(core.ORIGINAL_CA))
     source = function_args(execution_spec, "7" * 32, overlay)[1]
+    parsed = ast.parse(source, feature_version=(3, 6))
+    child = next(node.value.func.value.value for node in ast.walk(parsed)
+                 if isinstance(node, ast.Assign) and any(isinstance(x, ast.Name) and x.id == "child" for x in node.targets)
+                 and isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute))
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "tools"))
+    from p07_requests863_service import CHILD
+    assert child == CHILD
     assert "import base64,errno,socket,ssl,threading,urllib,urllib2" in source
     assert "ssl.PROTOCOL_SSLv3" in source and "urllib2.ProxyHandler({})" in source
     assert source.index("verified_chain_and_hostname") < source.index("sys.path.insert(0,root)")
