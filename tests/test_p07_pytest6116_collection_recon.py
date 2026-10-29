@@ -26,5 +26,9 @@ def test_derived_collection_only_adds_fixed_dependency_path_and_single_plugin_bl
     assert generated.count("no:typeguard") == 1
     assert "sys.path.insert(0,'/opt/p07-pytest6116-deps')" in generated
     assert "os.environ['HYPOTHESIS_STORAGE_DIRECTORY']='/tmp/p07-hypothesis'" in generated
+    execute = collection_source("/opt/p07-pytest6116-deps", execute_public_tests=True)
+    assert "['-p','no:typeguard','-q','testing']" in execute and "--collect-only" not in execute
+    with pytest.raises(ValueError, match="requires the admitted"):
+        collection_source(None, execute_public_tests=True)
     with pytest.raises(ValueError, match="fixed derived"):
         collection_source("/unreviewed")

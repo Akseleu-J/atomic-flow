@@ -48,19 +48,26 @@ if (os.path.realpath(os.getcwd())!='/testbed' or sys.executable!='/opt/miniconda
         or os.path.realpath(_pytest.__file__)!='/testbed/src/_pytest/__init__.py'):
     raise SystemExit(125)
 class Recorder:
-    def __init__(self):self.items=[];self.collection_errors=[];self.collection_skips=[];self.finished=False
+    def __init__(self):
+        self.items=[];self.collection_errors=[];self.collection_skips=[];self.finished=False
+        self.completed=set();self.outcomes={}
     def pytest_collection_finish(self,session):
         self.items=[{'nodeid':item.nodeid,'path':os.path.relpath(str(item.fspath),'/testbed').replace(os.sep,'/')} for item in session.items]
     def pytest_collectreport(self,report):
         if report.failed:self.collection_errors.append(report.nodeid)
         if report.skipped:self.collection_skips.append(report.nodeid)
+    def pytest_runtest_logreport(self,report):
+        key=report.when+':'+report.outcome
+        self.outcomes[key]=self.outcomes.get(key,0)+1
+        if report.when=='teardown':self.completed.add(report.nodeid)
     def pytest_sessionfinish(self,session,exitstatus):self.finished=True
 recorder=Recorder()
 code=int(pytest.main(['--collect-only','-q','testing'],plugins=[recorder]))
 result={'runner':'public_pytest_collection_recon','python_version':list(sys.version_info[:3]),
         'pytest_version':pytest.__version__,'pytest_module':os.path.realpath(pytest.__file__),
         'items':recorder.items,'collection_errors':recorder.collection_errors,
-        'collection_skips':recorder.collection_skips,'finished':recorder.finished,'exit_code':code}
+        'collection_skips':recorder.collection_skips,'completed':len(recorder.completed),
+        'outcomes':recorder.outcomes,'finished':recorder.finished,'exit_code':code}
 print('\nP07_PUBLIC_COLLECTION='+json.dumps(result,sort_keys=True),flush=True)
 raise SystemExit(code)
 '''
@@ -84,8 +91,12 @@ def parse_collection(stdout: str, exit_code: int):
     return observation
 
 
-def collection_source(dependency_prefix: str | None):
+def collection_source(dependency_prefix: str | None, *, execute_public_tests: bool = False):
+    if type(execute_public_tests) is not bool:
+        raise ValueError("fixed public execution flag required")
     if dependency_prefix is None:
+        if execute_public_tests:
+            raise ValueError("public execution requires the admitted derived dependency profile")
         return SOURCE
     if dependency_prefix != "/opt/p07-pytest6116-deps":
         raise ValueError("fixed derived dependency prefix required")
@@ -97,11 +108,12 @@ def collection_source(dependency_prefix: str | None):
                           "sys.path.insert(0,'/opt/p07-pytest6116-deps')\nsys.path.insert(0,'/testbed/src')")
     # Modern setuptools exposes its vendored typeguard pytest11 entrypoint,
     # which this old pytest cannot register. Block only this exact name.
-    return code.replace("pytest.main(['--collect-only','-q','testing']",
-                        "pytest.main(['-p','no:typeguard','--collect-only','-q','testing']")
+    args = "['-p','no:typeguard','-q','testing']" if execute_public_tests else "['-p','no:typeguard','--collect-only','-q','testing']"
+    return code.replace("['--collect-only','-q','testing']", args)
 
 
-def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: str | None = None):
+def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: str | None = None,
+        execute_public_tests: bool = False):
     """Observe collection; callers must independently admit any derived image."""
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
@@ -110,9 +122,12 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
         raise ValueError("fixed derived image identity and dependency prefix required")
     image = admitted_image or IMAGE
     output.mkdir(parents=True)
-    report = {"status": "not_qualified", "scope": "public native collection reconnaissance only",
+    if type(execute_public_tests) is not bool or (execute_public_tests and admitted_image is None):
+        raise ValueError("public execution requires the fixed derived image")
+    report = {"status": "not_qualified", "scope": "public native test execution observation" if execute_public_tests
+              else "public native collection reconnaissance only",
               "task_id": "pytest-dev__pytest-6116", "base_commit": BASE, "image": image,
-              "provider_calls": 0, "test_execution": False, "taskrunner_wired": False,
+              "provider_calls": 0, "test_execution": execute_public_tests, "taskrunner_wired": False,
               "ordinary_acceptance": False, "hidden_oracle": "not_run"}
     env = {"PATH": "/usr/sbin:/usr/bin:/sbin:/bin", "LANG": "C", "LC_ALL": "C", "HOME": "/tmp"}
     with tempfile.TemporaryDirectory(prefix="p07-pytest-collection-") as temporary:
@@ -189,7 +204,7 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
                 raise ValueError("private dependency inventory unavailable")
             report["dependency_inventory_sha256"] = sha(dependencies.stdout)
             (output / "container-inspect.json").write_bytes(inspected.stdout)
-            code = collection_source(dependency_prefix)
+            code = collection_source(dependency_prefix, execute_public_tests=execute_public_tests)
             if dependency_prefix:
                 report["fixed_plugin_policy"] = {"disabled": ["typeguard"], "reason": "incompatible vendored host plugin"}
                 report["hypothesis_storage"] = "/tmp/p07-hypothesis"
@@ -206,10 +221,14 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
             (output / "collection.json").write_text(json.dumps(observation, indent=2, sort_keys=True) + "\n")
             public_paths = {row["path"] for row in tree["blobs"]}
             collected_paths = {row["path"] for row in observation["items"]}
-            status = "collection_observed" if result.returncode == 0 and not observation["collection_errors"] else "collection_observed_with_errors"
+            if execute_public_tests:
+                status = "public_execution_observed" if result.returncode == 0 and not observation["collection_errors"] else "public_execution_failed"
+            else:
+                status = "collection_observed" if result.returncode == 0 and not observation["collection_errors"] else "collection_observed_with_errors"
             report.update(status=status, collected=len(observation["items"]),
                           collected_files=len(collected_paths), nonpublic_collected_files=sorted(collected_paths - public_paths),
-                          collection_errors=observation["collection_errors"], collection_skips=observation["collection_skips"])
+                          collection_errors=observation["collection_errors"], collection_skips=observation["collection_skips"],
+                          completed=observation.get("completed"), outcomes=observation.get("outcomes"))
         except Exception as error:
             report.update(error_type=type(error).__name__, error=str(error)[:500])
         finally:

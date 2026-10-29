@@ -72,13 +72,14 @@ def validate_installed(expected, actual):
     return sorted(extras)
 
 
-def run(output: Path):
+def run(output: Path, *, execute_public_tests: bool = False):
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
     output.mkdir(parents=True)
     profile_raw = wheels.PROFILE.read_bytes()
     profile = json.loads(profile_raw)
-    report = {"status": "not_qualified", "scope": "derived image and public collection only", "provider_calls": 0,
+    report = {"status": "not_qualified", "scope": "derived image and public execution observation" if execute_public_tests
+              else "derived image and public collection only", "provider_calls": 0,
               "ordinary_acceptance": False, "profile_sha256": sha(profile_raw)}
     env = {"PATH": "/usr/sbin:/usr/bin:/sbin:/bin", "LANG": "C", "LC_ALL": "C", "HOME": "/tmp"}
 
@@ -178,12 +179,16 @@ def run(output: Path):
             report.update(image_id=image_id, base_image_id=base["Id"], expected_files=len(expected),
                           installed_files=len(actual), pip_metadata_files=extras, dependency_container_cleanup=True)
             cid = None
-            observed = recon.run(output / "collection", admitted_image=image_id, dependency_prefix=PREFIX)
+            observed = recon.run(output / "collection", admitted_image=image_id, dependency_prefix=PREFIX,
+                                 execute_public_tests=execute_public_tests)
             dependencies = json.loads((output / "collection/dependencies.stdout").read_bytes())
             if [row for row in dependencies if row[0].lower() == "attrs"] != [["attrs", "23.1.0"]]:
                 raise ValueError("actual base attrs inventory differs from prospective closure")
             report["collection_status"] = observed["status"]
-            report["status"] = "derived_collection_observed" if observed["status"] == "collection_observed" else "derived_collection_incomplete"
+            if execute_public_tests:
+                report["status"] = "derived_execution_observed" if observed["status"] == "public_execution_observed" else "derived_execution_incomplete"
+            else:
+                report["status"] = "derived_collection_observed" if observed["status"] == "collection_observed" else "derived_collection_incomplete"
         except Exception as error:
             report.update(error_type=type(error).__name__, error=str(error)[:500])
         finally:
@@ -202,5 +207,8 @@ def run(output: Path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--execute-public-tests", action="store_true")
     options = parser.parse_args()
-    raise SystemExit(0 if run(options.output)["status"] == "derived_collection_observed" else 1)
+    result = run(options.output, execute_public_tests=options.execute_public_tests)
+    expected = "derived_execution_observed" if options.execute_public_tests else "derived_collection_observed"
+    raise SystemExit(0 if result["status"] == expected else 1)
