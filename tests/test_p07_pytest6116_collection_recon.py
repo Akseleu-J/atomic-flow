@@ -33,3 +33,11 @@ def test_derived_collection_only_adds_fixed_dependency_path_and_single_plugin_bl
         collection_source(None, execute_public_tests=True)
     with pytest.raises(ValueError, match="fixed derived"):
         collection_source("/unreviewed")
+
+
+def test_candidate_removes_env_override_and_only_shortens_traceback():
+    source = collection_source("/opt/p07-pytest6116-deps", execute_public_tests=True,
+                               neutralize_vendored_plugin=True)
+    assert "PYTEST_ADDOPTS" not in source
+    assert "['-p','no:typeguard','-q','--tb=line','testing']" in source
+    assert "--collect-only" not in source

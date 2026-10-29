@@ -91,7 +91,7 @@ def parse_collection(stdout: str, exit_code: int):
     return observation
 
 
-def collection_source(dependency_prefix: str | None, *, execute_public_tests: bool = False):
+def collection_source(dependency_prefix: str | None, *, execute_public_tests: bool = False, neutralize_vendored_plugin: bool = False):
     if type(execute_public_tests) is not bool:
         raise ValueError("fixed public execution flag required")
     if dependency_prefix is None:
@@ -107,14 +107,16 @@ def collection_source(dependency_prefix: str | None, *, execute_public_tests: bo
                           "os.environ['HYPOTHESIS_STORAGE_DIRECTORY']='/tmp/p07-hypothesis'\n"
                           "os.environ['PYTEST_ADDOPTS']='-p no:typeguard'\n"
                           "sys.path.insert(0,'/opt/p07-pytest6116-deps')\nsys.path.insert(0,'/testbed/src')")
+    if neutralize_vendored_plugin:
+        code = code.replace("os.environ['PYTEST_ADDOPTS']='-p no:typeguard'\n", "")
     # Modern setuptools exposes its vendored typeguard pytest11 entrypoint,
     # which this old pytest cannot register. Block only this exact name.
-    args = "['-p','no:typeguard','-q','testing']" if execute_public_tests else "['-p','no:typeguard','--collect-only','-q','testing']"
+    args = "['-p','no:typeguard','-q','--tb=line','testing']" if execute_public_tests and neutralize_vendored_plugin else ("['-p','no:typeguard','-q','testing']" if execute_public_tests else "['-p','no:typeguard','--collect-only','-q','testing']")
     return code.replace("['--collect-only','-q','testing']", args)
 
 
 def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: str | None = None,
-        execute_public_tests: bool = False):
+        execute_public_tests: bool = False, neutralize_vendored_plugin: bool = False):
     """Observe collection; callers must independently admit any derived image."""
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
@@ -205,10 +207,20 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
                 raise ValueError("private dependency inventory unavailable")
             report["dependency_inventory_sha256"] = sha(dependencies.stdout)
             (output / "container-inspect.json").write_bytes(inspected.stdout)
-            code = collection_source(dependency_prefix, execute_public_tests=execute_public_tests)
+            if neutralize_vendored_plugin:
+                probe_code = ("import pkg_resources,importlib.metadata as m,json; "
+                              "print(json.dumps([(d.metadata.get('Name'),e.name) for d in m.distributions() "
+                              "for e in d.entry_points if e.group=='pytest11' and e.name=='typeguard']))")
+                probe = control([ENGINE, "exec", "--user=65534:65534", "-w", "/tmp", cid, PYTHON, "-I", "-B", "-c", probe_code])
+                (output / "plugin-probe.stdout").write_bytes(probe.stdout)
+                (output / "plugin-probe.stderr").write_bytes(probe.stderr)
+                if probe.returncode or json.loads(probe.stdout) != []:
+                    raise ValueError("vendored plugin entry point remains visible")
+            code = collection_source(dependency_prefix, execute_public_tests=execute_public_tests,
+                                     neutralize_vendored_plugin=neutralize_vendored_plugin)
             if dependency_prefix:
                 report["fixed_plugin_policy"] = {"disabled": ["typeguard"], "reason": "incompatible vendored host plugin",
-                                                 "inherited_via": "PYTEST_ADDOPTS"}
+                                                 "inherited_via": "image_metadata" if neutralize_vendored_plugin else "PYTEST_ADDOPTS"}
                 report["hypothesis_storage"] = "/tmp/p07-hypothesis"
             result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", code],
                               home=home, timeout=180, limit=1_000_000, check=lambda: None)
@@ -221,6 +233,9 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
                 raise ValueError("collection output incomplete")
             observation = parse_collection(result.stdout, result.returncode)
             (output / "collection.json").write_text(json.dumps(observation, indent=2, sort_keys=True) + "\n")
+            nodes = [row["nodeid"] for row in observation["items"]]
+            if len(nodes) != len(set(nodes)) or (execute_public_tests and observation.get("completed") != len(nodes)):
+                raise ValueError("execution inventory is duplicate or incomplete")
             public_paths = {row["path"] for row in tree["blobs"]}
             collected_paths = {row["path"] for row in observation["items"]}
             if execute_public_tests:

@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -72,7 +73,7 @@ def validate_installed(expected, actual):
     return sorted(extras)
 
 
-def run(output: Path, *, execute_public_tests: bool = False):
+def run(output: Path, *, execute_public_tests: bool = False, neutralize_vendored_plugin: bool = False):
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
     output.mkdir(parents=True)
@@ -117,6 +118,14 @@ def run(output: Path, *, execute_public_tests: bool = False):
                 "--no-index --no-deps --no-compile --disable-pip-version-check --target " + PREFIX
                 + " /opt/p07-wheels/*.whl && chmod -R a+rX " + PREFIX + "\n"
                 "LABEL atomic.p07.pytest6116.profile=" + sha(profile_raw) + "\n")
+            if neutralize_vendored_plugin:
+                patch = ("import hashlib,pathlib; "
+                    "p=pathlib.Path('/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/setuptools/_vendor/typeguard-4.3.0.dist-info/entry_points.txt'); "
+                    "b=p.read_bytes(); "
+                    "assert hashlib.sha256(b).hexdigest()=='aa9ecd43568bb624a0310aa8ea05a57c6a72d08217ce830999e4132e9cea1594'; "
+                    "assert b==b'[pytest11]\\ntypeguard = typeguard._pytest_plugin\\n'; "
+                    "p.write_bytes(b'')")
+                dockerfile += "RUN --network=none " + recon.PYTHON + " -I -B -c " + shlex.quote(patch) + "\n"
             (context / "Dockerfile").write_text(dockerfile, encoding="ascii")
             (output / "Dockerfile").write_text(dockerfile, encoding="ascii")
             iid = temp / "image.id"
@@ -180,7 +189,7 @@ def run(output: Path, *, execute_public_tests: bool = False):
                           installed_files=len(actual), pip_metadata_files=extras, dependency_container_cleanup=True)
             cid = None
             observed = recon.run(output / "collection", admitted_image=image_id, dependency_prefix=PREFIX,
-                                 execute_public_tests=execute_public_tests)
+                                 execute_public_tests=execute_public_tests, neutralize_vendored_plugin=neutralize_vendored_plugin)
             dependencies = json.loads((output / "collection/dependencies.stdout").read_bytes())
             if [row for row in dependencies if row[0].lower() == "attrs"] != [["attrs", "23.1.0"]]:
                 raise ValueError("actual base attrs inventory differs from prospective closure")
@@ -208,7 +217,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--execute-public-tests", action="store_true")
+    parser.add_argument("--neutralize-vendored-plugin", action="store_true")
     options = parser.parse_args()
-    result = run(options.output, execute_public_tests=options.execute_public_tests)
+    result = run(options.output, execute_public_tests=options.execute_public_tests,
+                 neutralize_vendored_plugin=options.neutralize_vendored_plugin)
     expected = "derived_execution_observed" if options.execute_public_tests else "derived_collection_observed"
     raise SystemExit(0 if result["status"] == expected else 1)
