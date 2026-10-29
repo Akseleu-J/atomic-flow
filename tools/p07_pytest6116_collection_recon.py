@@ -214,13 +214,13 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
                 probe = control([ENGINE, "exec", "--user=65534:65534", "-w", "/tmp", cid, PYTHON, "-I", "-B", "-c", probe_code])
                 (output / "plugin-probe.stdout").write_bytes(probe.stdout)
                 (output / "plugin-probe.stderr").write_bytes(probe.stderr)
-                if probe.returncode or json.loads(probe.stdout) != []:
+                if probe.returncode or (compat_setuptools and probe.stderr) or json.loads(probe.stdout) != []:
                     raise ValueError("vendored plugin entry point remains visible")
                 if compat_setuptools:
                     check_version = control([ENGINE, "exec", "--user=65534:65534", "-w", "/tmp", cid, PYTHON,
                                              "-I", "-B", "-c", "import importlib.metadata as m; print(m.version('setuptools'))"])
                     (output / "setuptools-version.stdout").write_bytes(check_version.stdout)
-                    if check_version.returncode or check_version.stdout.strip() != b"44.1.1":
+                    if check_version.returncode or check_version.stderr or check_version.stdout.strip() != b"44.1.1":
                         raise ValueError("actual setuptools version differs")
             code = collection_source(dependency_prefix, execute_public_tests=execute_public_tests,
                                      neutralize_vendored_plugin=neutralize_vendored_plugin)

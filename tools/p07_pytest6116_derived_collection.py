@@ -137,6 +137,12 @@ def run(output: Path, *, execute_public_tests: bool = False, neutralize_vendored
                 dockerfile += ("RUN --network=none " + recon.PYTHON + " -I -B -m pip --isolated install "
                     "--no-index --no-deps --no-compile --disable-pip-version-check --force-reinstall "
                     "/opt/p07-wheels/" + COMPAT_SETUPTOOLS["filename"] + "\n")
+                orphan = ("import hashlib,pathlib; "
+                    "p=pathlib.Path('/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/distutils-precedence.pth'); "
+                    "b=p.read_bytes(); "
+                    "assert hashlib.sha256(b).hexdigest()=='2638ce9e2500e572a5e0de7faed6661eb569d1b696fcba07b0dd223da5f5d224'; "
+                    "p.unlink()")
+                dockerfile += "RUN --network=none " + recon.PYTHON + " -I -B -c " + shlex.quote(orphan) + "\n"
             if neutralize_vendored_plugin:
                 patch = ("import hashlib,pathlib; "
                     "p=pathlib.Path('/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/setuptools/_vendor/typeguard-4.3.0.dist-info/entry_points.txt'); "
