@@ -226,17 +226,32 @@ pub struct JournalledBlocks<'a> {
 
 impl<'a> JournalledBlocks<'a> {
     pub fn new(journal: &'a mut af_journal::SessionJournal) -> JournalledBlocks<'a> {
-        JournalledBlocks { blocks: BlockMemory::new(), journal }
+        JournalledBlocks {
+            blocks: BlockMemory::new(),
+            journal,
+        }
     }
 
     pub fn blocks(&self) -> &[MemoryBlock] {
         self.blocks.blocks()
     }
 
-    pub fn create(&mut self, title: &str, content: &str, author: &str, reason: &str) -> MemoryResult<Value> {
+    pub fn create(
+        &mut self,
+        title: &str,
+        content: &str,
+        author: &str,
+        reason: &str,
+    ) -> MemoryResult<Value> {
         let event = self.blocks.create(title, content, author, reason)?;
         self.journal
-            .append("tool_result", &json!({"memory_event": event}), None, Some("success"), None)
+            .append(
+                "tool_result",
+                &json!({"memory_event": event}),
+                None,
+                Some("success"),
+                None,
+            )
             .map_err(|error| MemoryError(error.0))?;
         Ok(event)
     }
@@ -249,9 +264,17 @@ impl<'a> JournalledBlocks<'a> {
         reason: &str,
         known_content_sha256: &str,
     ) -> MemoryResult<Value> {
-        let event = self.blocks.edit(id, new_content, author, reason, known_content_sha256)?;
+        let event = self
+            .blocks
+            .edit(id, new_content, author, reason, known_content_sha256)?;
         self.journal
-            .append("tool_result", &json!({"memory_event": event}), None, Some("success"), None)
+            .append(
+                "tool_result",
+                &json!({"memory_event": event}),
+                None,
+                Some("success"),
+                None,
+            )
             .map_err(|error| MemoryError(error.0))?;
         Ok(event)
     }
@@ -379,7 +402,9 @@ mod tests {
         let created = memory.create("profile", "v1", "agent", "intake").unwrap();
         let id = created["id"].as_str().unwrap().to_string();
         let digest = created["content_sha256"].as_str().unwrap().to_string();
-        memory.edit(&id, "v2", "agent", "correction", &digest).unwrap();
+        memory
+            .edit(&id, "v2", "agent", "correction", &digest)
+            .unwrap();
         match previous {
             Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
             None => std::env::remove_var("ATOMIC_FLOW_HOME"),

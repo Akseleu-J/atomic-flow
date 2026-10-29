@@ -80,7 +80,10 @@ async fn create_session(
     if auth_denied(&state, &headers).is_some() {
         return Err(StatusCode::UNAUTHORIZED);
     }
-    let body = body.map(|Json(body)| body).unwrap_or(CreateSessionBody { id: None, project: None });
+    let body = body.map(|Json(body)| body).unwrap_or(CreateSessionBody {
+        id: None,
+        project: None,
+    });
     let project = body.project.unwrap_or_else(|| ".".into());
     let journal = af_journal::SessionJournal::create(
         std::path::Path::new(&project),
@@ -113,7 +116,13 @@ async fn append_event(
     }
     let mut journal = af_journal::SessionJournal::open(&id).map_err(|_| StatusCode::NOT_FOUND)?;
     let event = journal
-        .append(&body.event_type, &body.payload, body.call_id.as_deref(), body.outcome.as_deref(), None)
+        .append(
+            &body.event_type,
+            &body.payload,
+            body.call_id.as_deref(),
+            body.outcome.as_deref(),
+            None,
+        )
         .map_err(|_| StatusCode::BAD_REQUEST)?;
     Ok(Json(event))
 }
@@ -166,16 +175,20 @@ async fn edit_journey(
     if !body.host_approved {
         return Err(StatusCode::FORBIDDEN);
     }
-    let backend = af_llm::OpenAiBackend::new("openai", &body.backend.base_url, &body.backend.api_key_env);
+    let backend =
+        af_llm::OpenAiBackend::new("openai", &body.backend.base_url, &body.backend.api_key_env);
     let router = af_llm::Router::new(vec![Box::new(backend)]);
-    let registry = af_sandbox::SandboxRegistry::new("default").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let registry = af_sandbox::SandboxRegistry::new("default")
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let project = std::env::current_dir().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let session_id = body.session_id.unwrap_or_else(|| format!("serve-{}", af_entropy::token()));
+    let session_id = body
+        .session_id
+        .unwrap_or_else(|| format!("serve-{}", af_entropy::token()));
     let mut journal = af_journal::SessionJournal::create(&project, Some(&session_id), None)
         .or_else(|_| af_journal::SessionJournal::open(&session_id))
         .map_err(|_| StatusCode::CONFLICT)?;
-    let toolset = crate::edit_toolset_for(&registry, &body.root_id)
-        .map_err(|_| StatusCode::BAD_REQUEST)?;
+    let toolset =
+        crate::edit_toolset_for(&registry, &body.root_id).map_err(|_| StatusCode::BAD_REQUEST)?;
     let outcome = af_loop::edit::run_edit_task(
         &router,
         &toolset,
@@ -188,14 +201,21 @@ async fn edit_journey(
     )
     .map_err(|error| StatusCode::BAD_REQUEST)?;
     let (ok, verified, refusal) = match &outcome {
-        af_loop::edit::EditOutcome::Completed { content, check, git, .. } => (
+        af_loop::edit::EditOutcome::Completed {
+            content,
+            check,
+            git,
+            ..
+        } => (
             true,
             check["status"] == json!("succeeded"),
             json!({"git": git, "content_chars": content.chars().count()}),
         ),
-        af_loop::edit::EditOutcome::CheckFailed { check, git, .. } => {
-            (false, false, json!({"git": git, "reason": "final gate failed"}))
-        }
+        af_loop::edit::EditOutcome::CheckFailed { check, git, .. } => (
+            false,
+            false,
+            json!({"git": git, "reason": "final gate failed"}),
+        ),
         af_loop::edit::EditOutcome::Interrupted { loop_outcome, .. } => {
             (false, false, json!({"reason": format!("{loop_outcome:?}")}))
         }
@@ -223,8 +243,12 @@ async fn job_status(
         return Err(StatusCode::UNAUTHORIZED);
     }
     let runner = af_exec::JobRunner::open(&query.store).map_err(|_| StatusCode::BAD_REQUEST)?;
-    let jobs = runner.jobs().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let unknown = runner.unresolved_unknown_ids().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let jobs = runner
+        .jobs()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let unknown = runner
+        .unresolved_unknown_ids()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(json!({
         "ok": true, "jobs": jobs.values().collect::<Vec<_>>(),
         "unresolved_unknown_ids": unknown,

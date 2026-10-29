@@ -240,9 +240,19 @@ pub fn run_edit_task(
                 json!({"committed": false, "reason": "checks did not pass; unverified changes are never committed"})
             };
             if verified {
-                Ok(EditOutcome::Completed { content, edits, check, git: git_record })
+                Ok(EditOutcome::Completed {
+                    content,
+                    edits,
+                    check,
+                    git: git_record,
+                })
             } else {
-                Ok(EditOutcome::CheckFailed { content, edits, check, git: git_record })
+                Ok(EditOutcome::CheckFailed {
+                    content,
+                    edits,
+                    check,
+                    git: git_record,
+                })
             }
         }
         other => Ok(EditOutcome::Interrupted {
@@ -423,7 +433,8 @@ mod tests {
             "m",
             "bump helper",
             true,
-            LoopLimits::default(), None,
+            LoopLimits::default(),
+            None,
         )
         .unwrap();
         match outcome {
@@ -436,7 +447,11 @@ mod tests {
                 assert_eq!(content, "helper now returns 2");
                 assert_eq!(edits, 1);
                 assert_eq!(check["status"], json!("succeeded"));
-                assert_eq!(git["skipped"], json!(true), "no workflow supplied: honest skip");
+                assert_eq!(
+                    git["skipped"],
+                    json!(true),
+                    "no workflow supplied: honest skip"
+                );
             }
             other => panic!("expected completed, got {other:?}"),
         }
@@ -479,7 +494,8 @@ mod tests {
             "m",
             "repair helper",
             true,
-            LoopLimits::default(), None,
+            LoopLimits::default(),
+            None,
         )
         .unwrap();
         assert!(matches!(outcome, EditOutcome::Completed { edits: 1, .. }));
@@ -522,7 +538,8 @@ mod tests {
             "m",
             "two edits",
             true,
-            LoopLimits::default(), None,
+            LoopLimits::default(),
+            None,
         )
         .unwrap();
         match outcome {
@@ -563,7 +580,8 @@ mod tests {
             "m",
             "optimistic",
             true,
-            LoopLimits::default(), None,
+            LoopLimits::default(),
+            None,
         )
         .unwrap();
         match outcome {
@@ -588,7 +606,8 @@ mod tests {
             "m",
             "t",
             false,
-            LoopLimits::default(), None,
+            LoopLimits::default(),
+            None,
         )
         .unwrap_err();
         assert!(error.contains("explicit host approval"));

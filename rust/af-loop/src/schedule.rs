@@ -232,7 +232,9 @@ impl ScheduleRegistry {
                 created_at_unix: self.records[&id].created_at_unix,
                 paused: false,
             })
-            .map_err(|error| ScheduleError(format!("schedule {id} ({title}) submit failed: {error}")))?;
+            .map_err(|error| {
+                ScheduleError(format!("schedule {id} ({title}) submit failed: {error}"))
+            })?;
             self.mark_run(&id, now_unix)?;
             dispatched.push(json!({"schedule_id": id, "title": title, "queue_seq": seq}));
         }
@@ -364,8 +366,12 @@ mod tests {
     #[test]
     fn tick_dispatches_due_schedules_once_and_marks_runs() {
         let mut registry = ScheduleRegistry::new();
-        let fast = registry.add_interval("fast", json!({"goal": "fast"}), 60).unwrap();
-        let slow = registry.add_interval("slow", json!({"goal": "slow"}), 7200).unwrap();
+        let fast = registry
+            .add_interval("fast", json!({"goal": "fast"}), 60)
+            .unwrap();
+        let slow = registry
+            .add_interval("slow", json!({"goal": "slow"}), 7200)
+            .unwrap();
         let t0 = 1_800_000_000.0;
         // Baseline runs: both fire once at t0 (never-run schedules are due).
         registry.tick(t0, |_| Ok(1)).unwrap();
@@ -377,7 +383,11 @@ mod tests {
                 Ok(42)
             })
             .unwrap();
-        assert_eq!(dispatched.len(), 1, "only the 60s interval is due at t0+3600");
+        assert_eq!(
+            dispatched.len(),
+            1,
+            "only the 60s interval is due at t0+3600"
+        );
         assert_eq!(dispatched[0]["queue_seq"], json!(42));
         assert_eq!(submissions, vec!["fast"]);
         let _ = (&fast, &slow);

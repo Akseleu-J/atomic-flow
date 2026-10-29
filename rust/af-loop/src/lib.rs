@@ -9,6 +9,7 @@
 use af_llm::{Cancel, ChatMessage, ChatRequest, RouteOutcome, Router, ToolCall, ToolSpec};
 use serde_json::{json, Value};
 
+pub mod compact;
 pub mod edit;
 pub mod schedule;
 pub mod steer;
@@ -31,6 +32,9 @@ pub trait KernelTool {
 pub struct LoopLimits {
     pub max_turns: usize,
     pub max_tool_calls: usize,
+    /// Serialized transcript byte ceiling; when Some, the loop compacts the
+    /// history before each model call (markers keep tool-call pairings).
+    pub max_history_bytes: Option<usize>,
 }
 
 impl Default for LoopLimits {
@@ -38,6 +42,7 @@ impl Default for LoopLimits {
         LoopLimits {
             max_turns: 12,
             max_tool_calls: 24,
+            max_history_bytes: None,
         }
     }
 }
@@ -132,6 +137,7 @@ impl<'a> TurnLoop<'a> {
                     tool_calls_used,
                 });
             }
+            messages = crate::compact::compact_if_needed(messages, self.limits.max_history_bytes);
             let mut request = ChatRequest::new(model, messages.clone());
             request.tools = Some(self.tool_specs());
             let call_id = af_entropy::token();
@@ -419,6 +425,7 @@ mod tests {
             LoopLimits {
                 max_turns: 12,
                 max_tool_calls: 3,
+                max_history_bytes: None,
             },
         );
         let outcome = loop_

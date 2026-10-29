@@ -281,11 +281,11 @@ impl OpenAiBackend {
         }
     }
 
-    fn payload(&self, request: &ChatRequest) -> Value {
+    pub fn payload(&self, request: &ChatRequest) -> Value {
         let mut payload = json!({
             "model": request.model,
             "messages": request.messages.iter()
-                .map(|message| {
+            .map(|message| {
                     let mut entry = json!({"role": message.role, "content": message.content});
                     if let Some(tool_calls) = &message.tool_calls {
                         entry["tool_calls"] = tool_calls.clone();
@@ -306,6 +306,39 @@ impl OpenAiBackend {
         }
         payload
     }
+
+    fn stream_payload(&self, request: &ChatRequest) -> Value {
+        let mut payload = self.payload(request);
+        payload["stream"] = json!(true);
+        payload["stream_options"] = json!({"include_usage": true});
+        payload
+    }
+}
+
+/// SSE parsing for `chat/completions` streams: one `data:` line in, the
+/// parsed chunk out. `[DONE]` and comments map to None.
+pub fn parse_sse_line(line: &str) -> Option<Value> {
+    let line = line.trim_end_matches(['\n', '\r']);
+    let payload = line.strip_prefix("data:")?.trim();
+    if payload == "[DONE]" || payload.is_empty() {
+        return None;
+    }
+    serde_json::from_str(payload).ok()
+}
+
+/// Accumulate one stream chunk into the running answer; returns the finish
+/// reason when the chunk carries one.
+pub fn accumulate_chunk(content: &mut String, chunk: &Value) -> Option<String> {
+    if let Some(delta) = chunk
+        .pointer("/choices/0/delta/content")
+        .and_then(Value::as_str)
+    {
+        content.push_str(delta);
+    }
+    chunk
+        .pointer("/choices/0/finish_reason")
+        .and_then(Value::as_str)
+        .map(str::to_string)
 }
 
 impl ChatBackend for OpenAiBackend {
@@ -423,6 +456,134 @@ impl ChatBackend for OpenAiBackend {
                     }
                 }
             }
+        }
+    }
+}
+
+impl OpenAiBackend {
+    /// Streaming variant: `stream: true` + `include_usage`, deltas pushed to
+    /// `on_delta` as they arrive, final `ChatResult` carries the accumulated
+    /// content and the settled usage from the trailing chunk. A drop
+    /// mid-stream after send is Unknown (sent) — the charge already happened.
+    /// No tool_calls in streaming v1: a stream that requests tools returns
+    /// them via the final `tool_calls` field if the provider includes one.
+    pub fn chat_stream(
+        &self,
+        request: &ChatRequest,
+        cancel: &Cancel,
+        on_delta: &mut dyn FnMut(&str),
+    ) -> BackendOutcome {
+        if cancel.is_cancelled() {
+            return BackendOutcome::Refused {
+                sent: false,
+                reason: "cancelled before send".into(),
+            };
+        }
+        let started = std::time::Instant::now();
+        let Ok(api_key) = std::env::var(&self.api_key_env) else {
+            return BackendOutcome::Refused {
+                sent: false,
+                reason: format!(
+                    "api key environment variable {} is not set",
+                    self.api_key_env
+                ),
+            };
+        };
+        let agent = ureq::AgentBuilder::new()
+            .timeout_connect(std::time::Duration::from_secs(15))
+            .build();
+        let response = agent
+            .post(&format!("{}/chat/completions", self.base_url))
+            .set("Authorization", &format!("Bearer {api_key}"))
+            .set("Content-Type", "application/json")
+            .timeout(std::time::Duration::from_secs(600))
+            .send_json(self.stream_payload(request));
+        let latency_ms = Some(started.elapsed().as_millis() as u64);
+        let mut reader = match response {
+            Ok(body) => body.into_reader(),
+            Err(ureq::Error::Status(code, _)) => {
+                return if (400..500).contains(&code) {
+                    BackendOutcome::Refused {
+                        sent: true,
+                        reason: format!("provider refused with status {code}"),
+                    }
+                } else {
+                    BackendOutcome::Unknown {
+                        sent: true,
+                        detail: format!("provider error status {code}"),
+                    }
+                };
+            }
+            Err(ureq::Error::Transport(transport)) => {
+                let sent = !matches!(
+                    transport.kind(),
+                    ureq::ErrorKind::Dns | ureq::ErrorKind::ConnectionFailed
+                );
+                return BackendOutcome::Unknown {
+                    sent,
+                    detail: format!("transport error: {transport}"),
+                };
+            }
+        };
+        let mut content = String::new();
+        let mut finish: Option<String> = None;
+        let mut usage: Option<Usage> = None;
+        let mut stream = std::io::BufReader::new(&mut reader);
+        use std::io::BufRead as _;
+        loop {
+            if cancel.is_cancelled() {
+                return BackendOutcome::Unknown {
+                    sent: true,
+                    detail: "cancelled mid-stream; charge unknown until reconciled".into(),
+                };
+            }
+            let mut line = Vec::new();
+            match stream.read_until(b'\n', &mut line) {
+                Ok(0) => break,
+                Ok(_) => {}
+                Err(error) => {
+                    return BackendOutcome::Unknown {
+                        sent: true,
+                        detail: format!("stream read failed mid-answer: {error}"),
+                    };
+                }
+            }
+            let Some(chunk) = parse_sse_line(&String::from_utf8_lossy(&line)) else {
+                continue;
+            };
+            accumulate_chunk(&mut content, &chunk);
+            if let Some(reason) = chunk
+                .pointer("/choices/0/finish_reason")
+                .and_then(Value::as_str)
+                .map(str::to_string)
+            {
+                finish = Some(reason);
+            }
+            if let Some(usage_value) = chunk.get("usage") {
+                usage = Some(Usage {
+                    tokens_in: usage_value.get("prompt_tokens").and_then(Value::as_u64),
+                    tokens_out: usage_value.get("completion_tokens").and_then(Value::as_u64),
+                    cost_usd: None,
+                    latency_ms,
+                });
+            }
+        }
+        match finish.as_deref() {
+            Some(reason) => BackendOutcome::Completed(ChatResult {
+                content,
+                usage: usage.unwrap_or(Usage {
+                    tokens_in: None,
+                    tokens_out: None,
+                    cost_usd: None,
+                    latency_ms,
+                }),
+                truncated: reason == "length",
+                tool_calls: Vec::new(),
+            }),
+            None => BackendOutcome::Unknown {
+                sent: true,
+                detail: "stream ended without finish_reason".into(),
+            },
         }
     }
 }
@@ -649,6 +810,51 @@ mod tests {
             BackendOutcome::Refused { sent, reason } => {
                 assert!(!sent);
                 assert!(reason.contains("AF_TEST_MISSING_KEY_XYZ"));
+            }
+            other => panic!("expected refusal, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn sse_parsing_and_accumulation() {
+        assert!(parse_sse_line("data: [DONE]").is_none());
+        assert!(parse_sse_line(": keep-alive comment").is_none());
+        let chunk = parse_sse_line(r#"data: {"choices":[{"delta":{"content":"Hel"}}]}"#)
+            .expect("content chunk parses");
+        let mut content = String::new();
+        assert!(accumulate_chunk(&mut content, &chunk).is_none());
+        assert_eq!(content, "Hel");
+        let final_chunk = parse_sse_line(
+            r#"data: {"choices":[{"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":3,"completion_tokens":2}}"#,
+        )
+        .expect("final chunk parses");
+        accumulate_chunk(&mut content, &final_chunk);
+        assert_eq!(
+            accumulate_chunk(&mut content, &final_chunk),
+            Some("stop".into())
+        );
+        assert_eq!(content, "Hel");
+    }
+
+    #[test]
+    fn stream_payload_carries_stream_flags() {
+        let backend = OpenAiBackend::new("api", "http://localhost:1", "K");
+        let payload = backend.stream_payload(&request());
+        assert_eq!(payload["stream"], json!(true));
+        assert_eq!(payload["stream_options"]["include_usage"], json!(true));
+        assert_eq!(payload["max_tokens"], json!(16));
+    }
+
+    #[test]
+    fn stream_missing_key_is_pre_send_refusal() {
+        let backend = OpenAiBackend::new("api", "http://localhost:1", "AF_TEST_MISSING_KEY_XYZ");
+        let mut deltas: Vec<String> = Vec::new();
+        match backend.chat_stream(&request(), &Cancel::new(), &mut |delta| {
+            deltas.push(delta.into())
+        }) {
+            BackendOutcome::Refused { sent, .. } => {
+                assert!(!sent);
+                assert!(deltas.is_empty(), "no deltas before send");
             }
             other => panic!("expected refusal, got {other:?}"),
         }

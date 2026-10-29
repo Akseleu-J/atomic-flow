@@ -119,9 +119,18 @@ mod tests {
     use super::*;
     use serde_json::json;
 
+    /// One process-wide lock for every steer test: the journal path resolves
+    /// through the environment at create time, so concurrent tests that
+    /// repoint it must be serialized end to end.
+    static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    fn lock_env() -> std::sync::MutexGuard<'static, ()> {
+        ENV_LOCK
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
     fn temp_journal(id: &str) -> (std::path::PathBuf, af_journal::SessionJournal) {
-        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         let home = std::env::temp_dir().join(format!("af-steer-{}", af_entropy::token()));
         std::fs::create_dir_all(&home).unwrap();
         let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
@@ -133,12 +142,12 @@ mod tests {
             Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
             None => std::env::remove_var("ATOMIC_FLOW_HOME"),
         }
-        drop(guard);
         (home, journal)
     }
 
     #[test]
     fn pause_resume_cycle_is_journaled() {
+        let _guard = lock_env();
         let (_home, mut journal) = temp_journal("cycle");
         Steering::pause(&mut journal, "ambiguous scope", "extend to tests/?").unwrap();
         // Resume before any pause would refuse; with the pause journaled it works.
@@ -154,6 +163,7 @@ mod tests {
 
     #[test]
     fn resume_requires_a_journaled_pause_and_clean_holds() {
+        let _guard = lock_env();
         let (_home, mut journal) = temp_journal("nopause");
         let error = Steering::resume(&mut journal, "owner", "go").unwrap_err();
         assert!(error.0.contains("requires a journaled pause"));
@@ -179,8 +189,7 @@ mod tests {
     fn fork_copies_by_reference_not_replay() {
         // The child session resolves its path at creation: keep the isolated
         // home active for the whole fork.
-        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        let guard = lock_env();
         let home = std::env::temp_dir().join(format!("af-steer-fork-{}", af_entropy::token()));
         std::fs::create_dir_all(&home).unwrap();
         let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
@@ -192,7 +201,11 @@ mod tests {
         parent
             .append("user_input", &json!({"text": "hi"}), None, None, None)
             .unwrap();
-        let child = Steering::fork(&mut parent, "child-fork", "owner");
+        let child = Steering::fork(
+            &mut parent,
+            &format!("child-fork-{}", af_entropy::token()),
+            "owner",
+        );
         match previous {
             Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
             None => std::env::remove_var("ATOMIC_FLOW_HOME"),

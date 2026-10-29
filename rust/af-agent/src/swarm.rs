@@ -5,9 +5,9 @@
 //! per-subtask: no shared mutable state, every row keeps its own outcome and
 //! cost; unknown outcomes hold the aggregation instead of becoming zeros.
 
-use std::collections::BTreeMap;
 use af_exec::queue::AdmissionQueue;
 use serde_json::{json, Value};
+use std::collections::BTreeMap;
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -126,7 +126,9 @@ pub fn execute_sweep(
     let mut pending: std::collections::VecDeque<u64> = items.iter().map(|item| item.seq).collect();
     while let Some(seq) = pending.pop_front() {
         let Some(ticket) = queue.claim().map_err(|error| SwarmError(error.0))? else {
-            return Err(SwarmError(format!("sweep item {seq} is not claimable; queue state diverged")));
+            return Err(SwarmError(format!(
+                "sweep item {seq} is not claimable; queue state diverged"
+            )));
         };
         if ticket.seq != seq {
             return Err(SwarmError(format!(
@@ -257,12 +259,20 @@ mod tests {
             &items,
             |item| {
                 executed.push(item.description.clone());
-                Ok(("succeeded".into(), Some(format!("answer for {}", item.description)), Some(0.01)))
+                Ok((
+                    "succeeded".into(),
+                    Some(format!("answer for {}", item.description)),
+                    Some(0.01),
+                ))
             },
             2,
         )
         .unwrap();
-        assert_eq!(executed, vec!["one", "two", "three"], "FIFO, each item exactly once");
+        assert_eq!(
+            executed,
+            vec!["one", "two", "three"],
+            "FIFO, each item exactly once"
+        );
         assert_eq!(rows.len(), 3);
         let report = aggregate(&queue, &items, &rows);
         assert_eq!(report["summary"]["complete"], json!(true));
@@ -293,17 +303,15 @@ mod tests {
         assert_eq!(rows.len(), 1);
         assert_eq!(rows[0].status, "succeeded");
         assert_eq!(rows[0].answer.as_deref(), Some("fresh run"));
-        assert_eq!(attempts, 2, "the item was re-run exactly once as a new claim");
+        assert_eq!(
+            attempts, 2,
+            "the item was re-run exactly once as a new claim"
+        );
         let snapshot = queue.snapshot();
         assert!(snapshot["epoch"].as_u64().unwrap() >= 2);
         // The reclaim bound eventually holds the sweep instead of looping.
         let fresh = plan_sweep(&mut queue, "g2", &["b".into()], 2).unwrap();
-        let bounded = execute_sweep(
-            &mut queue,
-            &fresh,
-            |_item| Err("always lost".into()),
-            1,
-        );
+        let bounded = execute_sweep(&mut queue, &fresh, |_item| Err("always lost".into()), 1);
         assert!(bounded.is_err());
     }
 }

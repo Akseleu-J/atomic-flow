@@ -479,11 +479,9 @@ pub fn edit_toolset_for<'a>(
         af_graph::canonical::canonical_bytes(&document),
     )
     .map_err(|e| e.to_string())?;
-    let document: Value =
-        serde_json::from_slice(&af_graph::canonical::canonical_bytes(&document))
-            .map_err(|e| e.to_string())?;
-    let runner =
-        af_exec::JobRunner::open(&af_sandbox::user_dir().join("jobs")).map_err(|e| e.0)?;
+    let document: Value = serde_json::from_slice(&af_graph::canonical::canonical_bytes(&document))
+        .map_err(|e| e.to_string())?;
+    let runner = af_exec::JobRunner::open(&af_sandbox::user_dir().join("jobs")).map_err(|e| e.0)?;
     #[cfg(windows)]
     let check_argv = vec!["cmd".to_string(), "/C".to_string(), "exit 0".to_string()];
     #[cfg(not(windows))]
