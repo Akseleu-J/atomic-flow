@@ -124,14 +124,15 @@ def _resource_packet(spec, candidate, destination, original, before, check):
         raise ExecutionUnavailable("function36 resource packet core differs from candidate")
 
 
-def run_function36_check(spec: CheckSpec, candidate: Path, *, cancel_check=None):
+def _run_function_check(spec: CheckSpec, candidate: Path, variant: str, *, cancel_check=None):
     """Return only after C/E/resource proofs, actual fixture stop and CID cleanup.
 
     Construction of a spec is not image admission. The caller must retain and
     independently verify its runtime, public CA and provisioning evidence.
     """
     if (type(spec) is not CheckSpec or type(spec.requests_ca_identity) is not RequestsCAIdentity
-            or spec.fixture_identity is None or spec.fixture_identity.variant != "function36-v3"):
+            or spec.fixture_identity is None or spec.fixture_identity.variant != variant
+            or variant not in {"function36-v3", "2674-v2"}):
         raise ExecutionUnavailable("immutable resource-bound function36 specification required")
     if platform.system() != "Linux" or not hasattr(os, "geteuid") or os.geteuid() != 0:
         raise ExecutionUnavailable("function36 requires an explicitly accepted root Linux worker")
@@ -162,3 +163,11 @@ def run_function36_check(spec: CheckSpec, candidate: Path, *, cancel_check=None)
                                    "candidate_ca_present": False, "candidate_core_revision": spec.source_revision,
                                    "execution_core_revision": execution_spec.source_revision,
                                    "candidate_and_execution_specs_equal": spec == execution_spec}
+
+
+def run_function36_check(spec: CheckSpec, candidate: Path, *, cancel_check=None):
+    return _run_function_check(spec, candidate, "function36-v3", cancel_check=cancel_check)
+
+
+def run_requests2674_check(spec: CheckSpec, candidate: Path, *, cancel_check=None):
+    return _run_function_check(spec, candidate, "2674-v2", cancel_check=cancel_check)

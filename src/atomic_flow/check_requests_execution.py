@@ -147,7 +147,7 @@ def _inspect(container_id, spec, workspace, user, environment, *, home, check, e
     except (TypeError, ValueError):
         raise ExecutionUnavailable("Requests worker environment differs") from None
     resources = spec.resources
-    function = spec.fixture_identity is not None and spec.fixture_identity.variant == "function36-v3"
+    function = spec.fixture_identity is not None and spec.fixture_identity.variant in {"function36-v3", "2674-v2"}
     expected_hosts = [host + ":" + address for host, address in spec.fixture_identity.host_mappings] if function else []
     expected_sysctls = {"net.ipv4.ip_unprivileged_port_start": "0"} if function else {}
     if (value.get("Id") != container_id or value.get("Image") != spec.image
@@ -201,7 +201,10 @@ def _run_requests_check(spec: CheckSpec, workspace: Path, *, cancel_check=None, 
         launcher_args = requests3362_args(spec, nonce)
         parse_receipt = requests3362_receipt
     else:
-        from atomic_flow.check_requests_function import function_args, function_receipt
+        if spec.fixture_identity.variant == "2674-v2":
+            from atomic_flow.check_requests2674 import function_args, function_receipt
+        else:
+            from atomic_flow.check_requests_function import function_args, function_receipt
         launcher_args = function_args(spec, nonce, _function_overlay)
         parse_receipt = function_receipt
     workspace = Path(workspace).absolute()

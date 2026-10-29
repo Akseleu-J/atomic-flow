@@ -180,10 +180,10 @@ class CheckSpec:
                 raise ValueError("fixture identity differs from its exact private task/runtime")
         if self.requests_ca_identity is not None:
             ca, fixture = self.requests_ca_identity, self.fixture_identity
-            if (type(ca) is not RequestsCAIdentity or fixture is None or fixture.variant != "function36-v3"
+            if (type(ca) is not RequestsCAIdentity or fixture is None or fixture.variant not in {"function36-v3", "2674-v2"}
                     or ca.task_id != self.task_id or self.target_root != "/testbed"
                     or ca.fixture_ca_sha256 != dict(fixture.certificate_files)[fixture.certificate_root + "cacert.pem"]):
-                raise ValueError("public CA identity differs from exact function36 fixture/task/root")
+                raise ValueError("public CA identity differs from exact function fixture/task/root")
         _integer("timeout_seconds", self.timeout_seconds, 180)
         if type(self.resources) is not CheckResources:
             raise ValueError("resource bounds must use the immutable host contract")

@@ -25,8 +25,8 @@ class RequestsCAIdentity(_Canonical):
     wrong_ca_pem: str
 
     def __post_init__(self):
-        if type(self.task_id) is not str or self.task_id not in FUNCTION36_TASKS:
-            raise ValueError("exact function36 task required for public CA resources")
+        if type(self.task_id) is not str or self.task_id not in FUNCTION36_TASKS | {"psf__requests-2674"}:
+            raise ValueError("exact function36 or Requests2674 task required for public CA resources")
         for name in ("original_ca_sha256", "fixture_ca_sha256", "result_ca_sha256"):
             _digest(name, getattr(self, name))
         if type(self.wrong_ca_pem) is not str:

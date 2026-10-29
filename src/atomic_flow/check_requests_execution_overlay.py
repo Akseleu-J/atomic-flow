@@ -28,7 +28,7 @@ from atomic_flow.project_resources import ProjectLimits, require_disk_space, sou
 from atomic_flow.source_lock import source_mutation_lease
 
 CA_PATH = "requests/cacert.pem"
-_TASKS = frozenset({"psf__requests-1963", "psf__requests-2148", "psf__requests-2317"})
+_TASKS = frozenset({"psf__requests-1963", "psf__requests-2148", "psf__requests-2317", "psf__requests-2674"})
 _MAX_CA_BYTES = 1_000_000
 _MAX_FIXTURE_CA_BYTES = 16_384
 
@@ -74,8 +74,11 @@ def _binding(spec: CheckSpec, fixture_ca: bytes, original_ca_sha256: str) -> Non
     runtime, identity, fixture = spec.runtime_identity, spec.private_pytest_identity, spec.fixture_identity
     if (spec.task_id not in _TASKS or spec.runner != "pytest"
             or type(runtime) is not RuntimeIdentity or type(identity) is not PrivatePytestIdentity
-            or type(fixture) is not FixtureIdentity or identity.variant != "function36-v3"
-            or fixture.variant != "function36-v3" or runtime.python_version != (3, 6, 15)
+            or type(fixture) is not FixtureIdentity
+            or (identity.variant, fixture.variant, runtime.python_version) not in {
+                ("function36-v3", "function36-v3", (3, 6, 15)),
+                ("2674-v2", "2674-v2", (2, 7, 18)),
+            }
             or identity.python_version != runtime.python_version or runtime.runner != spec.runner
             or identity.task_id != spec.task_id or fixture.task_id != spec.task_id
             or identity.runtime_digest != runtime.digest or fixture.runtime_digest != runtime.digest
