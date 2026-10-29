@@ -12,6 +12,10 @@ use af_llm::{
     RouteOutcome, ToolCall, ToolSpec,
 };
 
+pub mod edit;
+pub mod schedule;
+pub mod steer;
+
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 pub struct LoopError(pub String);
@@ -50,7 +54,7 @@ pub enum LoopOutcome {
 
 pub struct TurnLoop<'a> {
     router: &'a Router,
-    tools: &'a [Box<dyn KernelTool>],
+    tools: &'a [Box<dyn KernelTool + 'a>],
     journal: Option<&'a mut af_journal::SessionJournal>,
     limits: LoopLimits,
 }
@@ -58,7 +62,7 @@ pub struct TurnLoop<'a> {
 impl<'a> TurnLoop<'a> {
     pub fn new(
         router: &'a Router,
-        tools: &'a [Box<dyn KernelTool>],
+        tools: &'a [Box<dyn KernelTool + 'a>],
         journal: Option<&'a mut af_journal::SessionJournal>,
         limits: LoopLimits,
     ) -> TurnLoop<'a> {

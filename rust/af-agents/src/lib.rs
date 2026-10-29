@@ -10,6 +10,7 @@
 
 pub mod check_spec;
 pub mod constraints;
+pub mod failure_evidence;
 pub mod repair;
 
 use std::collections::BTreeSet;
