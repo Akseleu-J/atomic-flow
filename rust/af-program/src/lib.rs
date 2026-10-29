@@ -12,6 +12,8 @@
 
 pub mod corporate;
 pub mod eval;
+pub mod governance;
+pub mod mcp;
 pub mod perf;
 pub mod publication;
 pub mod rc;

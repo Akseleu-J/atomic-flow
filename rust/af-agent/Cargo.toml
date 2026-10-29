@@ -15,3 +15,4 @@ af-graph.workspace = true
 af-sandbox.workspace = true
 af-journal.workspace = true
 af-agents.workspace = true
+af-exec.workspace = true

@@ -15,6 +15,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use serde_json::{json, Value};
 
 pub mod driver;
+pub mod git;
 pub mod queue;
 
 pub const STATUS_SCHEMA_VERSION: i64 = 1;

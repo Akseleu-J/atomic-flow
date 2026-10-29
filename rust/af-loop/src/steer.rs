@@ -166,9 +166,28 @@ mod tests {
 
     #[test]
     fn fork_copies_by_reference_not_replay() {
-        let (home, mut parent) = temp_journal("parent");
-        parent.append("user_input", &json!({"text": "hi"}), None, None, None).unwrap();
-        let mut child = Steering::fork(&mut parent, "child-fork", "owner").unwrap();
+        // The child session resolves its path at creation: keep the isolated
+        // home active for the whole fork.
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        let home = std::env::temp_dir().join(format!("af-steer-fork-{}", af_entropy::token()));
+        std::fs::create_dir_all(&home).unwrap();
+        let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
+        std::env::set_var("ATOMIC_FLOW_HOME", &home);
+        let project = home.join("proj");
+        std::fs::create_dir_all(&project).unwrap();
+        let mut parent =
+            af_journal::SessionJournal::create(&project, Some("parent"), None).unwrap();
+        parent
+            .append("user_input", &json!({"text": "hi"}), None, None, None)
+            .unwrap();
+        let child = Steering::fork(&mut parent, "child-fork", "owner");
+        match previous {
+            Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
+            None => std::env::remove_var("ATOMIC_FLOW_HOME"),
+        }
+        drop(guard);
+        let mut child = child.unwrap();
         let snapshot = child.read().unwrap();
         assert_eq!(snapshot.events.len(), 2, "creation + fork event only");
         assert_eq!(snapshot.events[1]["event_type"], json!("fork_created"));

@@ -10,6 +10,8 @@ use serde_json::{json, Value};
 use rustpython_parser::Parse;
 use sha2::{Digest, Sha256};
 
+pub mod swarm;
+
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 pub struct AgentError(pub String);
