@@ -135,9 +135,12 @@ def run(output, *, full_public=False, source_for_subprocesses=False):
                 raise ValueError('fixed images and wheels required')
             rows = prepare_wheels(profile, tmp)
             (output / 'wheels.json').write_text(json.dumps(rows, indent=2, sort_keys=True) + '\n')
-            for image in (profile['python_image'], profile['source_image']):
-                if command([recon.ENGINE, 'pull', image], timeout=240).returncode:
-                    raise ValueError('pinned image pull failed')
+            for name, image in (('python', profile['python_image']), ('source', profile['source_image'])):
+                pull = command([recon.ENGINE, 'pull', image], timeout=240)
+                (output / (name + '-pull.stdout')).write_bytes(pull.stdout)
+                (output / (name + '-pull.stderr')).write_bytes(pull.stderr)
+                if pull.returncode:
+                    raise ValueError('pinned ' + name + ' image pull failed')
                 inspected = command([recon.ENGINE, 'image', 'inspect', image])
                 item = json.loads(inspected.stdout)[0]
                 if inspected.returncode or image not in item.get('RepoDigests', []) or item.get('Architecture') != 'amd64':

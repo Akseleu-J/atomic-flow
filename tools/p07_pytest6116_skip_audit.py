@@ -10,27 +10,35 @@ from pathlib import Path
 
 EXPECTED_SHA256 = "7f2878d554df55e7b34280c8fb8d7c5a75ddc99ed1640f4cd26992e20d56d2af"
 EXPECTED_COMMIT = "78fbf649fd58bbdc7b51230412c0ebe2ec5df7d8"
+PY38_SHA256 = "3530e6f2ebe99a119dbfd3e8b09cac20d939e1c2edae7014440a78aafe3a444e"
+PY38_COMMIT = "60fb3352f84feb69e754740c268d3951cb69d901"
 SKIP = re.compile(r"^SKIPPED \[(\d+)\] (.+?): (.+)$")
 SUMMARY = re.compile(r"^(\d+) failed, (\d+) passed, (\d+) skipped, (\d+) xfailed, .* in .+$")
+PY38_SUMMARY = re.compile(r"^(\d+) passed, (\d+) skipped, (\d+) xfailed in .+$")
 
 
-def summarize(raw: bytes, *, expected_sha256: str = EXPECTED_SHA256):
+def summarize(raw: bytes, *, expected_sha256: str = EXPECTED_SHA256, py38: bool = False):
     digest = hashlib.sha256(raw).hexdigest()
     if digest != expected_sha256:
         raise ValueError("retained stdout digest differs")
     lines = raw.decode("utf-8").splitlines()
-    summaries = [match for line in lines if (match := SUMMARY.fullmatch(line))]
-    markers = [line.removeprefix("P07_PUBLIC_COLLECTION=") for line in lines
-               if line.startswith("P07_PUBLIC_COLLECTION=")]
+    pattern = PY38_SUMMARY if py38 else SUMMARY
+    prefix = "P07_PY38_REPRO=" if py38 else "P07_PUBLIC_COLLECTION="
+    summaries = [match for line in lines if (match := pattern.fullmatch(line))]
+    markers = [line.removeprefix(prefix) for line in lines if line.startswith(prefix)]
     if len(summaries) != 1 or len(markers) != 1:
         raise ValueError("one native summary and structured marker required")
-    failed, passed, skipped, xfailed = map(int, summaries[0].groups())
+    numbers = tuple(map(int, summaries[0].groups()))
+    failed, passed, skipped, xfailed = (0, *numbers) if py38 else numbers
     marker = json.loads(markers[0])
     items = marker.get("items", [])
-    if (not marker.get("finished") or marker.get("exit_code") != 1
-            or len(items) != 2617 or marker.get("completed") != len(items)
-            or len({item["nodeid"] for item in items}) != len(items)
-            or (failed, passed, skipped, xfailed) != (3, 2489, 115, 10)):
+    nodes = items if py38 else [item["nodeid"] for item in items]
+    completed = len(marker.get("completed", [])) if py38 else marker.get("completed")
+    expected = (0, 2492, 115, 10) if py38 else (3, 2489, 115, 10)
+    if (not marker.get("finished") or marker.get("exit_code") != (0 if py38 else 1)
+            or len(items) != 2617 or completed != len(items) or len(set(nodes)) != len(items)
+            or (py38 and set(marker["completed"]) != set(nodes))
+            or (failed, passed, skipped, xfailed) != expected):
         raise ValueError("native result or execution inventory differs")
     rows = []
     categories = Counter()
@@ -63,9 +71,9 @@ def summarize(raw: bytes, *, expected_sha256: str = EXPECTED_SHA256):
         rows.append({"count": count, "location": location, "reason": reason, "category": category})
     if sum(row["count"] for row in rows) != skipped:
         raise ValueError("native skip lines do not account for all skips")
-    return {"scope": "diagnostic grouping only; no skip admitted", "tested_commit": EXPECTED_COMMIT,
+    return {"scope": "diagnostic grouping only; no skip admitted", "tested_commit": PY38_COMMIT if py38 else EXPECTED_COMMIT,
             "stdout_sha256": digest, "native_counts": {"failed": failed, "passed": passed,
-            "skipped": skipped, "xfailed": xfailed}, "completed": marker["completed"],
+            "skipped": skipped, "xfailed": xfailed}, "completed": completed,
             "categories": dict(sorted(categories.items())), "missing_python_dependencies": dict(sorted(dependencies.items())),
             "skip_groups": rows, "ordinary_acceptance": False, "provider_calls": 0}
 
@@ -74,8 +82,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stdout", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--py38", action="store_true")
     args = parser.parse_args()
-    result = summarize(args.stdout.read_bytes())
+    result = summarize(args.stdout.read_bytes(), expected_sha256=PY38_SHA256 if args.py38 else EXPECTED_SHA256, py38=args.py38)
     with args.output.open("x", encoding="utf8", newline="\n") as stream:
         json.dump(result, stream, indent=2, sort_keys=True)
         stream.write("\n")
