@@ -39,13 +39,16 @@ if (sys.version_info[:3]!=(3,8,20) or os.path.realpath(pytest.__file__)!='/testb
     or os.path.realpath(_pytest.__file__)!='/testbed/src/_pytest/__init__.py'):
     raise SystemExit(125)
 class Recorder:
-    def __init__(self): self.items=[]; self.completed=[]; self.outcomes={}; self.finished=False; self.collection_errors=[]; self.collection_skips=[]
+    def __init__(self): self.items=[]; self.completed=[]; self.outcomes={}; self.finished=False; self.collection_errors=[]; self.collection_skips=[]; self.nonpassing=[]
     def pytest_collection_finish(self,session): self.items=[i.nodeid for i in session.items]
     def pytest_collectreport(self,report):
         if report.failed:self.collection_errors.append(report.nodeid)
         if report.skipped:self.collection_skips.append(report.nodeid)
     def pytest_runtest_logreport(self,report):
         k=report.when+':'+report.outcome; self.outcomes[k]=self.outcomes.get(k,0)+1
+        if report.outcome!='passed':
+            self.nonpassing.append({'nodeid':report.nodeid,'phase':report.when,'outcome':report.outcome,
+                'wasxfail':getattr(report,'wasxfail',None),'reason':str(report.longrepr)[:500]})
         if report.when=='teardown': self.completed.append(report.nodeid)
     def pytest_sessionfinish(self,session,exitstatus): self.finished=True
 r=Recorder()
@@ -56,7 +59,7 @@ code=int(pytest.main(['-q','--tb=short','-o','cache_dir=/tmp/p07-pytest-cache',
 print('\nP07_PY38_REPRO='+json.dumps({'finished':r.finished,'exit_code':code,'items':r.items,
  'completed':r.completed,'outcomes':r.outcomes,'python':list(sys.version_info[:3]),
  'pytest_file':os.path.realpath(pytest.__file__),'collection_errors':r.collection_errors,
- 'collection_skips':r.collection_skips},sort_keys=True),flush=True)
+ 'collection_skips':r.collection_skips,'nonpassing':r.nonpassing},sort_keys=True),flush=True)
 raise SystemExit(code)
 '''
 
@@ -226,7 +229,9 @@ def run(output, *, full_public=False, source_for_subprocesses=False):
             if (not marker['finished'] or marker['exit_code'] != result.returncode or not marker['items']
                     or (not full_public and len(marker['items']) != 3)
                     or len(set(marker['items'])) != len(marker['items'])
-                    or set(marker['completed']) != set(marker['items'])):
+                    or set(marker['completed']) != set(marker['items'])
+                    or len(marker['nonpassing']) != sum(value for key, value in marker['outcomes'].items()
+                                                        if key.endswith(':failed') or key.endswith(':skipped'))):
                 raise ValueError('diagnostic inventory incomplete')
             public_paths = {row['path'] for row in tree['blobs']}
             nonpublic = sorted({node.split('::', 1)[0] for node in marker['items']} - public_paths)

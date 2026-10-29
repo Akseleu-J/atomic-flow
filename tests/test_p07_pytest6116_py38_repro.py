@@ -12,3 +12,5 @@ def test_full_diagnostic_selects_public_test_root():
     assert "'-q','--tb=line','-o','cache_dir=/tmp/p07-pytest-cache',\n 'testing']" in full
     assert 'testing/code/test_source.py::test_isparseable' not in full
     assert 'PYTEST_ADDOPTS' not in full
+    assert "'nonpassing':r.nonpassing" in full
+    compile(full, '<public-test-diagnostic>', 'exec')
