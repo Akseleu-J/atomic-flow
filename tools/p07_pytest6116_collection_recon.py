@@ -21,6 +21,23 @@ IMAGE = "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90
 BASE = "e670ff76cbad80108bde9bab616b66771b8653cf"
 PYTHON = "/opt/miniconda3/envs/testbed/bin/python"
 ENGINE = "/usr/bin/docker"
+PUBLIC_TREE = ROOT / "benchmarks/stage4/p07-pytest6116-public-tree-v1.json"
+VERIFY_SOURCE = r'''
+import hashlib,json,os,sys
+rows=json.loads(sys.argv[1])
+result=[]
+for row in rows:
+    relative=row['path']
+    path=os.path.join('/testbed',relative)
+    if os.path.realpath(path)!=path or not os.path.isfile(path):
+        result.append({'path':relative,'reason':'missing_or_linked'})
+        continue
+    with open(path,'rb') as stream:raw=stream.read(4*1024*1024+1)
+    actual=hashlib.sha1(('blob '+str(len(raw))+'\0').encode('ascii')+raw).hexdigest()
+    if len(raw)!=row['size'] or actual!=row['sha']:
+        result.append({'path':relative,'reason':'content_differs','actual':actual})
+print(json.dumps({'checked':len(rows),'differences':result},sort_keys=True))
+'''
 SOURCE = r'''
 import json,os,sys
 sys.dont_write_bytecode=True
@@ -105,17 +122,25 @@ def run(output: Path):
                 raise ValueError("actual immutable image differs")
             head = control([ENGINE, "exec", "--user=0:0", cid, "git", "-c", "safe.directory=/testbed",
                             "-C", "/testbed", "rev-parse", "HEAD"])
-            if head.returncode or head.stdout.decode().strip() != BASE:
-                raise ValueError("image source base differs")
-            diff = control([ENGINE, "exec", "--user=0:0", cid, "git", "-c", "safe.directory=/testbed",
-                            "-C", "/testbed", "diff", "--quiet", "HEAD", "--"])
-            if diff.returncode:
-                raise ValueError("tracked image source differs from base")
-            status = control([ENGINE, "exec", "--user=0:0", cid, "git", "-c", "safe.directory=/testbed",
-                              "-C", "/testbed", "status", "--porcelain", "--untracked-files=all"])
-            (output / "source-status.txt").write_bytes(status.stdout)
-            if status.returncode or status.stdout.strip():
-                raise ValueError("source checkout contains tracked or untracked changes")
+            (output / "git-head.stdout").write_bytes(head.stdout)
+            (output / "git-head.stderr").write_bytes(head.stderr)
+            report["git_head_exit"] = head.returncode
+            tree_raw = PUBLIC_TREE.read_bytes()
+            tree = json.loads(tree_raw)
+            if (tree.get("base_commit") != BASE or tree.get("repo") != "pytest-dev/pytest"
+                    or len(tree.get("blobs", [])) != 474):
+                raise ValueError("public tree inventory differs")
+            verify = control([ENGINE, "exec", "--user=65534:65534", cid, PYTHON, "-I", "-B", "-c", VERIFY_SOURCE,
+                              json.dumps(tree["blobs"], separators=(",", ":"))], timeout=90)
+            (output / "source-verification.stdout").write_bytes(verify.stdout)
+            (output / "source-verification.stderr").write_bytes(verify.stderr)
+            report["public_tree_sha256"] = sha(tree_raw)
+            if verify.returncode:
+                raise ValueError("public source byte audit failed to run")
+            observation = json.loads(verify.stdout)
+            report["source_verification"] = observation
+            if observation.get("checked") != 474 or observation.get("differences"):
+                raise ValueError("image bytes do not match the public Git tree")
             (output / "container-inspect.json").write_bytes(inspected.stdout)
             result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", SOURCE],
                               home=home, timeout=180, limit=1_000_000, check=lambda: None)
@@ -132,8 +157,10 @@ def run(output: Path):
             if not observation.get("finished") or observation.get("exit_code") != result.returncode:
                 raise ValueError("collection session did not finish")
             (output / "collection.json").write_text(json.dumps(observation, indent=2, sort_keys=True) + "\n")
+            public_paths = {row["path"] for row in tree["blobs"]}
+            collected_paths = {row["path"] for row in observation["items"]}
             report.update(status="collection_observed", collected=len(observation["items"]),
-                          collected_files=len({row["path"] for row in observation["items"]}),
+                          collected_files=len(collected_paths), nonpublic_collected_files=sorted(collected_paths - public_paths),
                           collection_errors=observation["collection_errors"], collection_skips=observation["collection_skips"])
         except Exception as error:
             report.update(error_type=type(error).__name__, error=str(error)[:500])
