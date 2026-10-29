@@ -2,6 +2,10 @@
 
 Работать в `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`, ветка `experimental`, draft PR №2. Начать с `docs/PROJECT_CONTEXT.md`; Git-команды выполнять только в этом клоне. Перед продолжением сверить HEAD, remote SHA и рабочий diff. P07 остаётся **OPEN**.
 
+## Requests863 ограниченный health
+
+[CI 40837223989](https://github.com/Akseleu-J/atomic-flow/actions/runs/40837223989) на `a841f55baaa50e3240b3b574fddff6f204cfe22b`: source-free реальный SSLv3/TLS/wire/Digest fixture принят под 1 ГиБ, 2 CPU, 128 PID, non-root и network=none. Контейнер удалён, raw stdout/stderr и archive SHA256 сверены. Отчёт: `docs/P07_REQUESTS863_BOUNDED_HEALTH_2026-10-29.md`. Это только health; полный 863 ordinary TaskRunner и generic dispatch ещё не приняты. Далее интегрировать CA overlay, same-container service lifecycle, receipt и проверить полный public ordinary путь.
+
 ## Requests2674 завершён в ordinary scripted scope
 
 CI 40835105105 на `520158504af00ab1f08899553458916943ad52b1`: 163 collected, 162 required PASS плюс один source-declared XPASS после исправления synthetic probe, один replan и fresh final gate. Сверены 841 raw hashes, восемь ресурсных квитанций и все 132 Git blob публичной базы. Общий exact-source CI 40835100470 SUCCESS. Отчёт: `docs/P07_REQUESTS2674_TASK_ACCEPTANCE_2026-10-29.md`. Это не model/oracle grade. Следующий профиль — Requests863 SSLv3/wire. Текст ранее отражает исторические этапы.
