@@ -1,0 +1,434 @@
+{
+  "schema_version": 1,
+  "scope": "conservative evidence index; no runtime admission or model quality claim",
+  "corpus_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920",
+  "calibration_inventory_sha256": "0d8fbc79bac8cfb37bf6302579f9a7ae137aaf9d2865712779d4c122705c4979",
+  "counts": {
+    "tasks": 30,
+    "retained_calibrations": 30,
+    "accepted_scripted_ordinary": 6,
+    "ordinary_not_established": 24
+  },
+  "tasks": [
+    {
+      "instance_id": "psf__requests-863",
+      "repo": "psf/requests",
+      "base_commit": "a0df2cbb10419037d11d04352b3175405ab52941",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/requests863-calibration-v8/oracle/calibration.json",
+        "report_sha256": "39d08d4cd8a9dc008e74fcd110f35567f66ce3f15f45e79b9218dca28f7b9807"
+      },
+      "full_public_ordinary": {
+        "status": "accepted_scripted_synthetic_repair_scope",
+        "assessment": "validation/p07-budget20/requests863-task-v1/assessment.json",
+        "assessment_sha256": "f5e3a8b5d43b3e9c708925c2f04fe7af38ae957ded5603f277ad012996e43c95",
+        "workflow_run": 40841965525,
+        "tested_commit": "3feda8c33b058768f4f1c2348d8b233fdcaf8d37",
+        "artifact_id": 12883775725
+      }
+    },
+    {
+      "instance_id": "psf__requests-1963",
+      "repo": "psf/requests",
+      "base_commit": "110048f9837f8441ea536804115e80b69f400277",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/function-calibration-v2/psf__requests-1963.json",
+        "report_sha256": "588601a468046381fbe6ad99272e876fcb18ef1c265b001e8548ad2eb49cfee7"
+      },
+      "full_public_ordinary": {
+        "status": "accepted_scripted_synthetic_repair_scope",
+        "assessment": "validation/p07-budget20/function36-task-v1/psf__requests-1963-assessment.json",
+        "assessment_sha256": "f8c87737cefcc8bcec21c0171bf80598be7a6fd420278eef66899e372370e4aa",
+        "workflow_run": 40824311185,
+        "tested_commit": "875fd01b1f3f4b4521b887688d27a82678f47df1",
+        "artifact_id": 12875842403
+      }
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "repo": "psf/requests",
+      "base_commit": "091991be0da19de9108dbe5e3752917fea3d7fdc",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/function-calibration-v2/psf__requests-2317.json",
+        "report_sha256": "59305e639e31234e437775f0d1fd49770f60f83643400e9299f5bb0fd4f2c583"
+      },
+      "full_public_ordinary": {
+        "status": "accepted_scripted_synthetic_repair_scope",
+        "assessment": "validation/p07-budget20/function36-task-v1/psf__requests-2317-assessment.json",
+        "assessment_sha256": "6af0f7196c8b8ae25b25032151a0eb97b6825e66a3052e6c834f473dcad4ba73",
+        "workflow_run": 40824311185,
+        "tested_commit": "875fd01b1f3f4b4521b887688d27a82678f47df1",
+        "artifact_id": 12876291075
+      }
+    },
+    {
+      "instance_id": "psf__requests-2674",
+      "repo": "psf/requests",
+      "base_commit": "0be38a0c37c59c4b66ce908731da15b401655113",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/requests2674-calibration-v3/oracle/calibration.json",
+        "report_sha256": "ef441d2972ce02ead7308f57f27b6a1dec1738bce22b7e6da31a45edc08458c4"
+      },
+      "full_public_ordinary": {
+        "status": "accepted_scripted_synthetic_repair_scope",
+        "assessment": "validation/p07-budget20/requests2674-task-v1/assessment.json",
+        "assessment_sha256": "2ec0964730e91ef2cc7b6c6bd8fb81611becbd90dfcab059ab74b2644df34d1f",
+        "workflow_run": 40835105105,
+        "tested_commit": "520158504af00ab1f08899553458916943ad52b1",
+        "artifact_id": 12879763821
+      }
+    },
+    {
+      "instance_id": "psf__requests-3362",
+      "repo": "psf/requests",
+      "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/requests3362-calibration-v4/calibration.json",
+        "report_sha256": "85ff1fddba8c59a7078f86cd9685c77a604457ad560a147ce980e4dd34292847"
+      },
+      "full_public_ordinary": {
+        "status": "accepted_scripted_synthetic_repair_scope",
+        "assessment": "validation/p07-budget20/requests3362-full-public-v5/assessment.json",
+        "assessment_sha256": "92b6e27209580e8e2ac1c6304bebcde7aa26126a304ba08ff11e3c3e3f1a6b7c",
+        "workflow_run": 40818355491,
+        "tested_commit": "4d3c08e3eedcc47509ba700a8b8ec9029f335b13",
+        "artifact_id": 12872864520
+      }
+    },
+    {
+      "instance_id": "psf__requests-2148",
+      "repo": "psf/requests",
+      "base_commit": "fe693c492242ae532211e0c173324f09ca8cf227",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/function-calibration-v2/psf__requests-2148.json",
+        "report_sha256": "4fe4743a522cc9e46f2ae4d3bf6cf14812646e4ef8ff875312caea42a7719e3d"
+      },
+      "full_public_ordinary": {
+        "status": "accepted_scripted_synthetic_repair_scope",
+        "assessment": "validation/p07-budget20/function36-task-v1/psf__requests-2148-assessment.json",
+        "assessment_sha256": "d95735df12d77035edeeac9e5072d8ff6ad8b1db2d634da4173f082f56a12407",
+        "workflow_run": 40824311185,
+        "tested_commit": "875fd01b1f3f4b4521b887688d27a82678f47df1",
+        "artifact_id": 12875134258
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-6116",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "e670ff76cbad80108bde9bab616b66771b8653cf",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/pytest-dev__pytest-6116.json",
+        "report_sha256": "b98f6e53c349c6d43421c448d0aabc3aefaa84c003dac274da3a24a8c11fd8e4"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5227",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "2051e30b9b596e944524ccb787ed20f9f5be93e3",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-5227.json",
+        "report_sha256": "52481b44b08d1f5ab30afa2fcca848deb22f063b20432fc20e6cbe480fea6572"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7432",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "e6e300e729dd33956e5448d8be9a0b1540b4e53a",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-7432.json",
+        "report_sha256": "920ce4dae2973e50110f3488f44ac831a8bbde54559dcf13b20f80b3d97ac1b3"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-11148",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "2f7415cfbc4b6ca62f9013f1abd27136f46b9653",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-11148.json",
+        "report_sha256": "01011e3973e75c191614a4ad1e98d7aa7cbd37a068faf7af9112baff1c29bab6"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7168",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "4787fd64a4ca0dba5528b5651bddd254102fe9f3",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/pytest7168-short/calibration.json",
+        "report_sha256": "c1c97e76ad6d6d52ed34808e33a923699275789526faa1ed5429db108f1848a6"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-11143",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "6995257cf470d2143ad1683824962de4071c0eb7",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/controls-v3/pytest-dev__pytest-11143.json",
+        "report_sha256": "ad56fd3f62336bb951d3f2b72a89ccb59c2cbfb1a7dc5169b5edb68c6f02d610"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7080",
+      "repo": "pylint-dev/pylint",
+      "base_commit": "3c5eca2ded3dd2b59ebaf23eb289453b5d2930f0",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/pylint-profile-v1/pylint-dev__pylint-7080.json",
+        "report_sha256": "b89593b737efefe591148aa67ed3dc2f4ff99e32979ec3248edf00e7ee4dc7a0"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7993",
+      "repo": "pylint-dev/pylint",
+      "base_commit": "e90702074e68e20dc8e5df5013ee3ecf22139c3e",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7993.json",
+        "report_sha256": "45c933fe5eebc53ceaa86f02d27442365fe44d4780a966c05778b18383e02e73"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pylint-dev__pylint-5859",
+      "repo": "pylint-dev/pylint",
+      "base_commit": "182cc539b8154c0710fcea7e522267e42eba8899",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-5859.json",
+        "report_sha256": "497f9e303d9e97ed10dcdb0bb91c525377d3187da9001b57e582c5b00ba26f7a"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pylint-dev__pylint-6506",
+      "repo": "pylint-dev/pylint",
+      "base_commit": "0a4204fd7555cfedd43f43017c94d24ef48244a5",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-6506.json",
+        "report_sha256": "62c51aa52004a32dd04603ef74b1e47f944deab2f690953dfdc64ce5cf15cf4b"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7114",
+      "repo": "pylint-dev/pylint",
+      "base_commit": "397c1703e8ae6349d33f7b99f45b2ccaf581e666",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/pylint-controls-v5/pylint-dev__pylint-7114.json",
+        "report_sha256": "c7cce3238c8be176d6d95babe8f22dc3d7620fc6887937c3b9caaf8dea1ca7f4"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "pylint-dev__pylint-7228",
+      "repo": "pylint-dev/pylint",
+      "base_commit": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/pylint-dev__pylint-7228.json",
+        "report_sha256": "b7e7722c6c3f31cf5d819bf65ee88ca8ad80249d1bbcb750db2d6e21119b0df5"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7738",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "c087d717f6ed183dd422359bf91210dc59689d63",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-7738.json",
+        "report_sha256": "25ec74efcdc66e1732d940e942fcf7acf355928a2fac66a0e4b5121e93bd4b7b"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8721",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "82ef497a8c88f0f6e50d84520e7276bfbf65025d",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/sphinx-controls-v4/sphinx-doc__sphinx-8721.json",
+        "report_sha256": "389fe9ef013f85f3dd87919167cd0a8470fb07d65e0fc3efcb9471706da54a89"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8595",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "b19bce971e82f2497d67fdacdeca8db08ae0ba56",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/sphinx-doc__sphinx-8595.json",
+        "report_sha256": "e35f210393a4d1b9166afc28628ca88a4ee6dbd32ab68e612e704edb05cf436c"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8474",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "3ea1ec84cc610f7a9f4f6b354e264565254923ff",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/sphinx-profile-v1/sphinx-doc__sphinx-8474.json",
+        "report_sha256": "296db11a623fbcf1931183ce35bcdb5c682eb9e3c539fd3419b6f9269ae6a917"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8506",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "e4bd3bd3ddd42c6642ff779a4f7381f219655c2c",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/sphinx-controls-v4/sphinx-doc__sphinx-8506.json",
+        "report_sha256": "9a41424828445fe0015ec45be562f7a2714d5667a233b0d9e94a0d4d235b4058"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8713",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "3ed7590ed411bd93b26098faab4f23619cdb2267",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/sphinx-controls-v4/sphinx-doc__sphinx-8713.json",
+        "report_sha256": "56f6a8f48b1f25a588575d271f1f72f621ae84e90391ca5cf7f05e6338e7198a"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-18057",
+      "repo": "sympy/sympy",
+      "base_commit": "62000f37b8821573ba00280524ffb4ac4a380875",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/sympy-focused/sympy__sympy-18057.json",
+        "report_sha256": "01b6d9d00ee049fe7c08d100308e52d018f63640f1b0eb7ee15a529c7c507afe"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-17139",
+      "repo": "sympy/sympy",
+      "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/controls-v3/sympy__sympy-17139.json",
+        "report_sha256": "131ead7eb9d2169c8d429e81b2eb1b8c3825ecf27b5ddffaefce669c24be024c"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-20212",
+      "repo": "sympy/sympy",
+      "base_commit": "a106f4782a9dbe7f8fd16030f15401d977e03ae9",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/sympy__sympy-20212.json",
+        "report_sha256": "a350ee6ce2f7b0108eb58632a57925ff5dc6be9338bb7ffa371e0aaee70af817"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-16988",
+      "repo": "sympy/sympy",
+      "base_commit": "e727339af6dc22321b00f52d971cda39e4ce89fb",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/calibration-v2/sympy__sympy-16988.json",
+        "report_sha256": "951981efcb3759e361ac31e7eafe9dacb8201726dedf210a889e9062dab329f7"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-21614",
+      "repo": "sympy/sympy",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/controls-v3/sympy__sympy-21614.json",
+        "report_sha256": "68837ebd59239c955b07b3252e38a1599a0cf2cbd33040f078e2af47b3416128"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-13971",
+      "repo": "sympy/sympy",
+      "base_commit": "84c125972ad535b2dfb245f8d311d347b45e5b8a",
+      "calibration": {
+        "status": "accepted_in_retained_inventory",
+        "report": "validation/p07-budget20/sympy13971-legacy/calibration.json",
+        "report_sha256": "ed0fad34eaa8816b288db958df5cff69cd5b39437d5a0c261607416d409e6c94"
+      },
+      "full_public_ordinary": {
+        "status": "not_established_in_this_inventory"
+      }
+    }
+  ]
+}

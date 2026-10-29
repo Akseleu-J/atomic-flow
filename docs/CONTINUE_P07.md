@@ -2,6 +2,10 @@
 
 Работать в `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`, ветка `experimental`, draft PR №2. Начать с `docs/PROJECT_CONTEXT.md`; Git-команды выполнять только в этом клоне. Перед продолжением сверить HEAD, remote SHA и рабочий diff. P07 остаётся **OPEN**.
 
+## Реестр оставшихся ordinary-проходов
+
+`benchmarks/stage4/p07-ordinary-coverage-v1.json` связывает 30 калибровок и шесть принятых Requests ordinary journeys с конкретными evidence hashes. Для 24 остальных полная public ordinary приёмка в этом реестре не установлена; отдельные более узкие executor и synthetic journey evidence не обесценены. Ближайший профиль — pytest6116, где native `tox.ini` задаёт `testpaths=testing`, исключает example_scripts и использует дополнительные шаблоны файлов. Подготовлена отдельная bounded native collection reconnaissance. Подробный список условий закрытия: `docs/P07_REMAINING_AND_ORDINARY_COVERAGE_2026-10-29.md`.
+
 ## Requests863 public ordinary TaskRunner принят
 
 CI 40841965525 на `3feda8c33b058768f4f1c2348d8b233fdcaf8d37`: пять публичных pytest файлов и synthetic probe, 107 PASS после одного replanning; проверены 982 raw hashes и восемь resource receipts. 167 public Git blobs сверены; известные исключения source filter и неформальный скрипт без pytest tests записаны в `docs/P07_REQUESTS863_TASK_ACCEPTANCE_2026-10-29.md`. Общий CI 40841952407 SUCCESS. Это scripted ordinary execution, без модели и hidden oracle. Далее определить и закрыть оставшиеся ordinary profiles, затем frozen matched study gates.
