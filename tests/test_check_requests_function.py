@@ -11,6 +11,7 @@ from test_check_private_pytest import NONCE, observation
 from test_check_requests_execution_overlay import ORIGINAL_CA, PUBLIC_CA
 
 from atomic_flow.agents.execution import CommandResult
+from atomic_flow.check_execution import CheckReceipt, completed_check_receipt
 from atomic_flow.check_requests_execution_overlay import prepare_requests_execution_overlay
 from atomic_flow.check_requests_function import POLICY, function_args, function_receipt, health_bytes
 from atomic_flow.check_requests_resources import RequestsCAIdentity
@@ -68,6 +69,9 @@ def test_complete_pass_or_required_failure_retains_exact_execution_resources(sea
     value = raw_observation(spec, overlay, failed=failed)
     assert function_receipt(packet(value), spec, NONCE) == value
     assert spec.requests_ca_identity.validate_bytes(ORIGINAL_CA, PUBLIC_CA) == spec.requests_ca_identity.digest
+    host_receipt = CheckReceipt(spec.digest, spec.source_revision, spec.source_revision, not failed, value, packet(value))
+    assert completed_check_receipt(spec, host_receipt)
+    assert completed_check_receipt(spec, host_receipt, negative=True) is failed
 
 
 def test_source_keeps_private_grammar_and_starts_health_before_target_import(sealed):

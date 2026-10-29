@@ -1,0 +1,9 @@
+{
+  "sha": "06d1948ac3c239eea8f133dd8024aca228e44f26",
+  "ref": "experimental",
+  "workflow": "p07-requests3362-task-journey.yml",
+  "inputs": {
+    "ordinary_mode": "full-public"
+  },
+  "reason": "Common owned controller now checks exact host/sysctl inventory"
+}

@@ -9,7 +9,7 @@ from atomic_flow import check_requests_function_execution as host
 from atomic_flow.agents.execution import ExecutionUnavailable
 from atomic_flow.agents.source import SourceConflict
 from atomic_flow.agents.verify import check_source_snapshot
-from atomic_flow.check_execution import CheckReceipt
+from atomic_flow.check_execution import CheckReceipt, completed_check_receipt, run_check_spec
 
 
 @pytest.fixture
@@ -79,3 +79,10 @@ def test_preexisting_cancellation_starts_no_resource_or_target_execution(setup):
     with pytest.raises(RuntimeError, match="synthetic cancellation"):
         host.run_function36_check(setup.spec, setup.candidate, cancel_check=cancelled)
     assert not setup.executions
+
+
+def test_generic_dispatch_keeps_exact_resource_receipt_for_revalidation(setup):
+    checked = run_check_spec(setup.spec, setup.candidate)
+    assert checked.check_passed and completed_check_receipt(setup.spec, checked)
+    checked.runner_receipt["requests_function_fixture"]["servers_stopped"] = False
+    assert not completed_check_receipt(setup.spec, checked)

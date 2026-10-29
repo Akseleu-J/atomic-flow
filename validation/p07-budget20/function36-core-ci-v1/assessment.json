@@ -1,0 +1,113 @@
+{
+  "run_id": 40822037685,
+  "tested_commit": "06d1948ac3c239eea8f133dd8024aca228e44f26",
+  "status": "verified_scoped_ci",
+  "artifacts": [
+    {
+      "artifact": {
+        "id": 12875360589,
+        "bytes": 37090,
+        "sha256": "6698d3476b71a5e77e8e5e9bb8f3b067c64823331fcba428d875f3106c3977df"
+      },
+      "name": "windows-runtime-06d1948ac3c239eea8f133dd8024aca228e44f26",
+      "python": "3.12.10",
+      "platform": "Windows",
+      "passed": 4,
+      "skipped": 0,
+      "source_hashes_verified": 400,
+      "source_policy": "both sides LF-normalized"
+    },
+    {
+      "artifact": {
+        "id": 12875196607,
+        "bytes": 95411,
+        "sha256": "040f114dec0f731840b976b2eb01cc3d2e4b875d6e15be5cc68a042ee6e7f7e9"
+      },
+      "name": "host-tests-3.11-06d1948ac3c239eea8f133dd8024aca228e44f26",
+      "python": "3.11.17",
+      "platform": "Linux",
+      "passed": 3254,
+      "skipped": 14,
+      "source_hashes_verified": 400,
+      "source_policy": "raw Git blobs"
+    },
+    {
+      "artifact": {
+        "id": 12875021319,
+        "bytes": 95559,
+        "sha256": "8f9d5e3653e17a4a6190d8867a5b3280b3b93d75b2dfa1d3ff118e9426995dd2"
+      },
+      "name": "host-tests-3.12-06d1948ac3c239eea8f133dd8024aca228e44f26",
+      "python": "3.12.15",
+      "platform": "Linux",
+      "passed": 3254,
+      "skipped": 14,
+      "source_hashes_verified": 400,
+      "source_policy": "raw Git blobs"
+    },
+    {
+      "artifact": {
+        "id": 12874768770,
+        "bytes": 1277008,
+        "sha256": "d603ba29cdaa819410f2a584d64ffe2fd61dbcc8f5ba90e2eef16532185faa6e"
+      },
+      "name": "wheel-acceptance-3.11-06d1948ac3c239eea8f133dd8024aca228e44f26",
+      "distribution_hashes_verified": true
+    },
+    {
+      "artifact": {
+        "id": 12874549591,
+        "bytes": 1277040,
+        "sha256": "e7290143cbbd0bea3a05905001edd0107f70d1fdcf6f4f528246711b2e2dc289"
+      },
+      "name": "wheel-acceptance-3.12-06d1948ac3c239eea8f133dd8024aca228e44f26",
+      "distribution_hashes_verified": true
+    },
+    {
+      "artifact": {
+        "id": 12875400230,
+        "bytes": 9927,
+        "sha256": "24c12bf6b16878c569f86b37bc7ae331d44b5243762e14429adc1d9404c20f19"
+      },
+      "name": "validation-06d1948ac3c239eea8f133dd8024aca228e44f26",
+      "results": {
+        "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+        "gpu_requested": false,
+        "model_calls": 0,
+        "container": "PASS",
+        "tests_exit": 0,
+        "extra_tests_exit": 0,
+        "compile_exit": 0,
+        "image_id": "sha256:858fbfded5a95b64f5525a99278c484e175899d5a102432c3abdb9a7e4b0b2d9"
+      }
+    }
+  ],
+  "job_conclusions": [
+    {
+      "name": "Real Docker acceptance",
+      "conclusion": "success"
+    },
+    {
+      "name": "Windows-specific runtime acceptance",
+      "conclusion": "success"
+    },
+    {
+      "name": "Installed wheel acceptance (3.12)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Installed wheel acceptance (3.11)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Python 3.11",
+      "conclusion": "success"
+    },
+    {
+      "name": "Python 3.12",
+      "conclusion": "success"
+    }
+  ],
+  "provider_calls": 0
+}

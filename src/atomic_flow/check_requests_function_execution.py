@@ -85,7 +85,7 @@ def _public_resources(spec, home, check):
             absent = worker._control([worker.ENGINE, "container", "ls", "-a", "--no-trunc", "--filter", "id=" + cid,
                                       "--format", "{{.ID}}"], home=home, check=lambda: None)
             if not removed or absent.strip():
-                raise ExecutionUnavailable("public resource container cleanup is unresolved")
+                raise ExecutionUnavailable("public resource container cleanup is unresolved; container_id=" + cid)
         elif attempted:
             raise ExecutionUnavailable("public resource creation has no immutable ID; reconcile worker")
     return (*values, {"container_id": cid, "image_id": spec.image, "started": False, "cleanup_confirmed": True,

@@ -1,0 +1,41 @@
+name: P07 full public function36 Requests TaskRunner journeys
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        task: [psf__requests-1963, psf__requests-2148, psf__requests-2317]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install '.[dev]' swebench==3.0.15 packaging==25.0 cryptography==46.0.3
+      - name: Provision independently admitted own-base runtime
+        run: |
+          mkdir -p p07-function-task-worker
+          git rev-parse HEAD > p07-function-task-worker/tested-commit.txt
+          python tools/p07_requests_function_image.py prepare --task "${{ matrix.task }}" --output /tmp/p07-function-task-runtime
+          python tools/p07_requests_function_image.py build --context /tmp/p07-function-task-runtime --output p07-function-task-worker/runtime
+      - name: Run complete public ordinary inventory through TaskRunner and resource executor
+        run: |
+          sudo -- "$(command -v python)" tools/p07_requests_function_task_journey.py --runtime-receipt p07-function-task-worker/runtime --output p07-function-task-worker/journey
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-function-task-${{ matrix.task }}-${{ github.sha }}
+          path: p07-function-task-worker/
+          retention-days: 14
+          if-no-files-found: error

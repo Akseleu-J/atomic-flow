@@ -48,7 +48,7 @@ SKIP = ORDINARY.replace("    from requests.p07_function_probe import value\n    
                         "    import pytest\n    pytest.skip('synthetic required skip must refuse')")
 
 
-def smoke(runtime_receipt, output):
+def smoke(runtime_receipt, output, *, host_callback=None):
     if (platform.system() != "Linux" or not hasattr(os, "geteuid") or os.geteuid() != 0
             or output.exists()):
         raise ValueError("explicit root Linux worker and fresh output required")
@@ -238,6 +238,10 @@ def smoke(runtime_receipt, output):
                     "fixture_servers_stopped": True, "controller_returned_after_cleanup": True})
             report.pop("current_case", None)
             report["status"] = "function36_private_resource_boundary_qualified"
+            if host_callback is not None:
+                if not callable(host_callback):
+                    raise ValueError("trusted host callback required")
+                host_callback(candidate, runtime, identity, fixture, ca, target, report, output)
     except Exception as error:
         report.update(status="not_qualified", error_type=type(error).__name__, error=str(error)[:500])
     finally:
@@ -257,7 +261,7 @@ def smoke(runtime_receipt, output):
         except (OSError, ValueError, subprocess.SubprocessError) as error:
             cleanup["error_type"] = type(error).__name__
         report["source_container_cleanup"] = cleanup
-        report["cleanup_confirmed"] = cleanup["confirmed"] and len(report["cases"]) == 3
+        report["cleanup_confirmed"] = cleanup["confirmed"] and len(report["cases"]) == 3 and not report.get("task_controller_errors")
         if not cleanup["confirmed"]:
             report["status"] = "cleanup_uncertain"
         save(output / "summary.json", report)

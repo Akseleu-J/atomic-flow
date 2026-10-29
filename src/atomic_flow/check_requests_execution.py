@@ -273,7 +273,7 @@ def _run_requests_check(spec: CheckSpec, workspace: Path, *, cancel_check=None, 
                 absent = _control([ENGINE, "container", "ls", "-a", "--no-trunc", "--filter", "id=" + container_id,
                                    "--format", "{{.ID}}"], home=home, check=lambda: None)
                 if not removed or absent.strip():
-                    raise ExecutionUnavailable("Requests owned container cleanup is unresolved")
+                    raise ExecutionUnavailable("Requests owned container cleanup is unresolved; container_id=" + container_id)
             elif attempted_create:
                 raise ExecutionUnavailable("Requests container creation outcome has no immutable ID; reconcile worker")
         return receipt, topology

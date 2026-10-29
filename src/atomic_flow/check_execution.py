@@ -316,7 +316,12 @@ def _runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str) -> dict 
     if type(result.returncode) is not int or result.timed_out or result.stdout_truncated or result.stderr_truncated:
         return None
     if spec.private_pytest_identity is not None:
-        if spec.fixture_identity is None or spec.fixture_identity.variant != "3362-cn":
+        if spec.fixture_identity is None:
+            return None
+        if spec.fixture_identity.variant == "function36-v3" and spec.requests_ca_identity is not None:
+            from atomic_flow.check_requests_function import function_receipt
+            return function_receipt(result, spec, nonce)
+        if spec.fixture_identity.variant != "3362-cn":
             return None
         from atomic_flow.check_requests3362 import requests3362_receipt
         return requests3362_receipt(result, spec, nonce)
@@ -449,6 +454,11 @@ def run_check_spec(spec: CheckSpec, workspace: Path, *, cancel_check=None) -> Ch
     if type(spec) is not CheckSpec:
         raise ExecutionUnavailable("An immutable host-owned CheckSpec is required")
     if spec.private_pytest_identity is not None:
+        if (spec.fixture_identity is not None and spec.fixture_identity.variant == "function36-v3"
+                and spec.requests_ca_identity is not None):
+            from atomic_flow.check_requests_function_execution import run_function36_check
+            receipt, _, _ = run_function36_check(spec, workspace, cancel_check=cancel_check)
+            return receipt
         if spec.fixture_identity is None or spec.fixture_identity.variant != "3362-cn":
             raise ExecutionUnavailable("Private Requests fixture lifecycle is not implemented for this cohort")
         from atomic_flow.check_requests_execution import run_requests3362_check

@@ -1,0 +1,137 @@
+{
+  "check_passed": false,
+  "result": {
+    "returncode": 1,
+    "stderr": "127.0.0.1 - - [29/Oct/2026 05:14:04] \"GET /get?health=p07 HTTP/1.1\" 200 326\n127.0.0.1 - - [29/Oct/2026 05:14:04] \"GET /get?health=p07 HTTP/1.1\" 200 326\n127.0.0.1 - - [29/Oct/2026 05:14:04] \"GET /basic-auth/p07/fixture HTTP/1.1\" 200 46\n127.0.0.1 - - [29/Oct/2026 05:14:04] \"GET /get?health=p07 HTTP/1.1\" 200 336\n",
+    "stderr_truncated": false,
+    "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.6.15, pytest-2.8.7, py-1.4.31, pluggy-0.3.1 -- /opt/p07-python36/bin/python3.6\nrootdir: /testbed, inifile: \ncollecting ... collected 2 items\n\ntest_p07_function_fixture.py::test_actual_target_http_and_execution_ca_https PASSED\ntest_p07_function_fixture.py::test_required_production_value FAILED\n\n=================================== FAILURES ===================================\n________________________ test_required_production_value ________________________\n\n    def test_required_production_value():\n        from requests.p07_function_probe import value\n>       assert value==42\nE       assert 1 == 42\n\ntest_p07_function_fixture.py:11: AssertionError\n====================== 1 failed, 1 passed in 0.03 seconds ======================\n\nATOMIC_CHECK_SPEC_RECEIPT:{\"_pytest_module\": \"/opt/p07-python36/lib/python3.6/site-packages/_pytest/__init__.py\", \"argv\": [\"-p\", \"no:cacheprovider\", \"-p\", \"no:httpbin\", \"-p\", \"pytest_httpbin.plugin\", \"-p\", \"pytest_mock\", \"-rA\", \"-v\", \"test_p07_function_fixture.py\"], \"call_failed\": 1, \"check_spec_digest\": \"4e9e3184b53923947b7bbdbaff751ebc9fb42b0e0437c4cd48c752354057106a\", \"collected\": 2, \"collection_complete\": true, \"collection_errors\": 0, \"completed\": 2, \"exit_code\": 1, \"failed\": 1, \"files\": [\"test_p07_function_fixture.py\"], \"finished\": true, \"fixture_lifecycle\": \"requires_separate_host_admission\", \"installed_inventory_sha256\": \"5bc516aa09982490b2655f4e14ce6aab9d53ee1bf441c4256250b5bdd9c6ed3c\", \"interpreter\": \"/opt/p07-python36/bin/python3.6\", \"interpreter_resolved\": \"/opt/p07-python36/bin/python3.6\", \"launcher_sha256\": \"7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81\", \"nonce\": \"9733a3e38d934b41aafe531944c97369\", \"passed\": 1, \"private_pytest_identity_digest\": \"541cb7052993e4bea22209f4f8141b9c5b47a9aa45b6ab65b3bdea84e000d420\", \"pytest_module\": \"/opt/p07-python36/lib/python3.6/site-packages/pytest.py\", \"pytest_version\": \"2.8.7\", \"python_version\": [3, 6, 15], \"requests_function_fixture\": {\"ca_identity_digest\": \"3c5970a3330d5c6b9cd67b0b0da977582c129d1bcf84acc993731c1ffff29010\", \"certificate_files\": {\"/opt/p07-function-fixture/cacert.pem\": \"c3a978ceca23a30b454bcdfdc7aa1c1f69e8409e3c8135b27ed17fde425be64b\", \"/opt/p07-function-fixture/cert.pem\": \"0022688d8299e8a04366b78a0fd564deb3e2b176f2a6b8309ce7a37a3c38e3ab\"}, \"check_spec_digest\": \"4e9e3184b53923947b7bbdbaff751ebc9fb42b0e0437c4cd48c752354057106a\", \"execution_ca_sha256\": \"9d3242e2cd393dbec1205004a87cfb9e3edccd26628a9eb763ba98a6f5e7d717\", \"execution_overlay\": {\"after_manifest_sha256\": \"b8275cac499bfa999ec737957ecfc6f9135635da5507d460895c6be72941565c\", \"before_manifest_sha256\": \"5e4bdf27d395142fcca350f2993add0b5c28cb438c62497831ce09f6d8f7d9c9\", \"candidate_core_revision\": \"a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb\", \"candidate_revision\": \"5e4bdf27d395142fcca350f2993add0b5c28cb438c62497831ce09f6d8f7d9c9\", \"check_spec_digest\": \"4e9e3184b53923947b7bbdbaff751ebc9fb42b0e0437c4cd48c752354057106a\", \"execution_core_revision\": \"a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb\", \"execution_revision\": \"b8275cac499bfa999ec737957ecfc6f9135635da5507d460895c6be72941565c\", \"fixture_ca_sha256\": \"c3a978ceca23a30b454bcdfdc7aa1c1f69e8409e3c8135b27ed17fde425be64b\", \"fixture_digest\": \"9f3f817ceea915939c726ef3bf008893bc500c790c693312a094744c37a7c3cf\", \"hidden_mount\": false, \"kind\": \"host_requests_execution_overlay\", \"operation\": \"append_fixture_ca\", \"original_ca_sha256\": \"6a4eeafeaf28cc7750f5f7f6ed4f84d6f08dacb8ac151412332f732647694253\", \"path\": \"requests/cacert.pem\", \"result_ca_sha256\": \"9d3242e2cd393dbec1205004a87cfb9e3edccd26628a9eb763ba98a6f5e7d717\", \"runtime_digest\": \"f7e38ffb6ee7f4996bae1c015d6a34448d02ff168243e4c186413af7ce69069d\", \"schema_version\": 2, \"source_manifest_policy\": \"core_plus_fixed_requests_ca_sha1_v1\", \"task_id\": \"psf__requests-2317\"}, \"fixture_digest\": \"9f3f817ceea915939c726ef3bf008893bc500c790c693312a094744c37a7c3cf\", \"health\": {\"basic_auth\": {\"authenticated\": true, \"status\": 200, \"user\": \"p07\"}, \"http\": {\"args\": {\"health\": \"p07\"}, \"status\": 200}, \"https\": {\"args\": {\"health\": \"p07\"}, \"status\": 200}, \"mapped_http_alias\": {\"host\": \"www.google.co.uk\", \"status\": 200}, \"port1\": \"connection_refused\", \"wrong_ca\": \"certificate_verification_failed\"}, \"health_before_target_import\": true, \"host_mappings\": {\"httpbin.org\": \"127.0.0.1\", \"www.google.co.uk\": \"127.0.0.1\"}, \"key_material_binding\": \"admitted_immutable_image_and_provisioning_receipt\", \"policy\": \"requests-function36-owned-lifecycle/1\", \"ports\": [80, 443], \"runtime_digest\": \"f7e38ffb6ee7f4996bae1c015d6a34448d02ff168243e4c186413af7ce69069d\", \"servers_stopped\": true, \"source_revision\": \"a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb\"}, \"requests_module\": \"/testbed/requests/__init__.py\", \"root\": \"/testbed\", \"runner\": \"pytest-private\", \"runtime_digest\": \"f7e38ffb6ee7f4996bae1c015d6a34448d02ff168243e4c186413af7ce69069d\", \"setup_failed\": 0, \"skipped\": 0, \"source_revision\": \"a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb\", \"teardown_failed\": 0, \"xpassed\": 0}\n",
+    "stdout_truncated": false,
+    "timed_out": false
+  },
+  "runner_receipt": {
+    "_pytest_module": "/opt/p07-python36/lib/python3.6/site-packages/_pytest/__init__.py",
+    "argv": [
+      "-p",
+      "no:cacheprovider",
+      "-p",
+      "no:httpbin",
+      "-p",
+      "pytest_httpbin.plugin",
+      "-p",
+      "pytest_mock",
+      "-rA",
+      "-v",
+      "test_p07_function_fixture.py"
+    ],
+    "call_failed": 1,
+    "check_spec_digest": "4e9e3184b53923947b7bbdbaff751ebc9fb42b0e0437c4cd48c752354057106a",
+    "collected": 2,
+    "collection_complete": true,
+    "collection_errors": 0,
+    "completed": 2,
+    "exit_code": 1,
+    "failed": 1,
+    "files": [
+      "test_p07_function_fixture.py"
+    ],
+    "finished": true,
+    "fixture_lifecycle": "requires_separate_host_admission",
+    "installed_inventory_sha256": "5bc516aa09982490b2655f4e14ce6aab9d53ee1bf441c4256250b5bdd9c6ed3c",
+    "interpreter": "/opt/p07-python36/bin/python3.6",
+    "interpreter_resolved": "/opt/p07-python36/bin/python3.6",
+    "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+    "nonce": "9733a3e38d934b41aafe531944c97369",
+    "passed": 1,
+    "private_pytest_identity_digest": "541cb7052993e4bea22209f4f8141b9c5b47a9aa45b6ab65b3bdea84e000d420",
+    "pytest_module": "/opt/p07-python36/lib/python3.6/site-packages/pytest.py",
+    "pytest_version": "2.8.7",
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "requests_function_fixture": {
+      "ca_identity_digest": "3c5970a3330d5c6b9cd67b0b0da977582c129d1bcf84acc993731c1ffff29010",
+      "certificate_files": {
+        "/opt/p07-function-fixture/cacert.pem": "c3a978ceca23a30b454bcdfdc7aa1c1f69e8409e3c8135b27ed17fde425be64b",
+        "/opt/p07-function-fixture/cert.pem": "0022688d8299e8a04366b78a0fd564deb3e2b176f2a6b8309ce7a37a3c38e3ab"
+      },
+      "check_spec_digest": "4e9e3184b53923947b7bbdbaff751ebc9fb42b0e0437c4cd48c752354057106a",
+      "execution_ca_sha256": "9d3242e2cd393dbec1205004a87cfb9e3edccd26628a9eb763ba98a6f5e7d717",
+      "execution_overlay": {
+        "after_manifest_sha256": "b8275cac499bfa999ec737957ecfc6f9135635da5507d460895c6be72941565c",
+        "before_manifest_sha256": "5e4bdf27d395142fcca350f2993add0b5c28cb438c62497831ce09f6d8f7d9c9",
+        "candidate_core_revision": "a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb",
+        "candidate_revision": "5e4bdf27d395142fcca350f2993add0b5c28cb438c62497831ce09f6d8f7d9c9",
+        "check_spec_digest": "4e9e3184b53923947b7bbdbaff751ebc9fb42b0e0437c4cd48c752354057106a",
+        "execution_core_revision": "a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb",
+        "execution_revision": "b8275cac499bfa999ec737957ecfc6f9135635da5507d460895c6be72941565c",
+        "fixture_ca_sha256": "c3a978ceca23a30b454bcdfdc7aa1c1f69e8409e3c8135b27ed17fde425be64b",
+        "fixture_digest": "9f3f817ceea915939c726ef3bf008893bc500c790c693312a094744c37a7c3cf",
+        "hidden_mount": false,
+        "kind": "host_requests_execution_overlay",
+        "operation": "append_fixture_ca",
+        "original_ca_sha256": "6a4eeafeaf28cc7750f5f7f6ed4f84d6f08dacb8ac151412332f732647694253",
+        "path": "requests/cacert.pem",
+        "result_ca_sha256": "9d3242e2cd393dbec1205004a87cfb9e3edccd26628a9eb763ba98a6f5e7d717",
+        "runtime_digest": "f7e38ffb6ee7f4996bae1c015d6a34448d02ff168243e4c186413af7ce69069d",
+        "schema_version": 2,
+        "source_manifest_policy": "core_plus_fixed_requests_ca_sha1_v1",
+        "task_id": "psf__requests-2317"
+      },
+      "fixture_digest": "9f3f817ceea915939c726ef3bf008893bc500c790c693312a094744c37a7c3cf",
+      "health": {
+        "basic_auth": {
+          "authenticated": true,
+          "status": 200,
+          "user": "p07"
+        },
+        "http": {
+          "args": {
+            "health": "p07"
+          },
+          "status": 200
+        },
+        "https": {
+          "args": {
+            "health": "p07"
+          },
+          "status": 200
+        },
+        "mapped_http_alias": {
+          "host": "www.google.co.uk",
+          "status": 200
+        },
+        "port1": "connection_refused",
+        "wrong_ca": "certificate_verification_failed"
+      },
+      "health_before_target_import": true,
+      "host_mappings": {
+        "httpbin.org": "127.0.0.1",
+        "www.google.co.uk": "127.0.0.1"
+      },
+      "key_material_binding": "admitted_immutable_image_and_provisioning_receipt",
+      "policy": "requests-function36-owned-lifecycle/1",
+      "ports": [
+        80,
+        443
+      ],
+      "runtime_digest": "f7e38ffb6ee7f4996bae1c015d6a34448d02ff168243e4c186413af7ce69069d",
+      "servers_stopped": true,
+      "source_revision": "a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb"
+    },
+    "requests_module": "/testbed/requests/__init__.py",
+    "root": "/testbed",
+    "runner": "pytest-private",
+    "runtime_digest": "f7e38ffb6ee7f4996bae1c015d6a34448d02ff168243e4c186413af7ce69069d",
+    "setup_failed": 0,
+    "skipped": 0,
+    "source_revision": "a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb",
+    "teardown_failed": 0,
+    "xpassed": 0
+  },
+  "source_after": "a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb",
+  "source_before": "a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb",
+  "spec_digest": "4e9e3184b53923947b7bbdbaff751ebc9fb42b0e0437c4cd48c752354057106a",
+  "verified_success": false
+}
