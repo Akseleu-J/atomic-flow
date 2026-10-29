@@ -11,3 +11,6 @@ thiserror.workspace = true
 sha2.workspace = true
 af-entropy.workspace = true
 af-journal.workspace = true
+
+[dev-dependencies]
+af-entropy.workspace = true

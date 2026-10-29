@@ -3,6 +3,8 @@
 //! thin; all authority checks live in the crates. Sandbox mutations require
 //! the explicit `--host-approved` flag: the human running the CLI is the host.
 
+mod server;
+
 use clap::{Parser, Subcommand};
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
@@ -21,6 +23,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Self-host HTTP API (headless; non-loopback bind requires --token).
+    Serve {
+        #[arg(long, default_value = "127.0.0.1:8787")]
+        bind: String,
+        #[arg(long)]
+        token: Option<String>,
+    },
     /// Structural graph operations (roadmap P01/P02 core).
     Graph {
         #[command(subcommand)]
@@ -207,6 +216,23 @@ enum BackendCommand {
 
 fn main() {
     let cli = Cli::parse();
+    if let Command::Serve { bind, token } = cli.command {
+        let runtime = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .map_err(|error| format!("tokio runtime failed: {error}"));
+        let result = match runtime {
+            Ok(runtime) => runtime.block_on(server::run(&bind, token)),
+            Err(error) => Err(error),
+        };
+        match result {
+            Ok(()) => std::process::exit(0),
+            Err(error) => {
+                eprintln!("af: {error}");
+                std::process::exit(1);
+            }
+        }
+    }
     let code = match run(cli.command) {
         Ok(output) => {
             println!("{output}");
@@ -222,6 +248,7 @@ fn main() {
 
 fn run(command: Command) -> Result<String, String> {
     match command {
+        Command::Serve { .. } => unreachable!("serve is handled in main"),
         Command::SelfTest => self_test(),
         Command::Agent { command } => match command {
             AgentCommand::Journey {
@@ -428,6 +455,40 @@ fn agent_journey(
     } else {
         Err(serde_json::to_string(&value).map_err(|e| e.to_string())?)
     }
+}
+
+/// Build the guided-edit toolset for a granted root: context pack over the
+/// root's graph (built on the fly from the admitted snapshot) and the default
+/// check job. Server and CLI share this construction.
+pub fn edit_toolset_for<'a>(
+    registry: &'a af_sandbox::SandboxRegistry,
+    root_id: &str,
+) -> Result<af_loop::edit::EditToolset<'a>, String> {
+    let root_item = registry.get(root_id).map_err(|e| e.0)?;
+    let root = PathBuf::from(root_item["path"].as_str().unwrap_or_default());
+    let files = af_graph::project::collect_source_files(&root)?;
+    let build = af_graph::project::clean_build(&files).map_err(|e| e.0)?;
+    let store_dir = af_sandbox::user_dir().join("graphs");
+    std::fs::create_dir_all(&store_dir).map_err(|e| e.to_string())?;
+    let document = json!({
+        "schema_version": 1, "generation": 0,
+        "nodes": build["nodes"], "edges": build["edges"],
+    });
+    std::fs::write(
+        store_dir.join(format!("{root_id}.json")),
+        af_graph::canonical::canonical_bytes(&document),
+    )
+    .map_err(|e| e.to_string())?;
+    let document: Value =
+        serde_json::from_slice(&af_graph::canonical::canonical_bytes(&document))
+            .map_err(|e| e.to_string())?;
+    let runner =
+        af_exec::JobRunner::open(&af_sandbox::user_dir().join("jobs")).map_err(|e| e.0)?;
+    #[cfg(windows)]
+    let check_argv = vec!["cmd".to_string(), "/C".to_string(), "exit 0".to_string()];
+    #[cfg(not(windows))]
+    let check_argv = vec!["sh".to_string(), "-c".to_string(), "exit 0".to_string()];
+    af_loop::edit::EditToolset::new(registry, root_id, runner, document, check_argv, root, 4)
 }
 
 fn sandbox_grant(

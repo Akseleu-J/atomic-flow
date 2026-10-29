@@ -215,6 +215,52 @@ impl FileMemory {
     }
 }
 
+/// Block memory wired to the append-only journal: every create/edit event is
+/// journaled (as a `tool_result` observation with the memory payload), so a
+/// crash never loses a memory revision. The journal is the record; blocks
+/// are the projection.
+pub struct JournalledBlocks<'a> {
+    blocks: BlockMemory,
+    journal: &'a mut af_journal::SessionJournal,
+}
+
+impl<'a> JournalledBlocks<'a> {
+    pub fn new(journal: &'a mut af_journal::SessionJournal) -> JournalledBlocks<'a> {
+        JournalledBlocks { blocks: BlockMemory::new(), journal }
+    }
+
+    pub fn blocks(&self) -> &[MemoryBlock] {
+        self.blocks.blocks()
+    }
+
+    pub fn create(&mut self, title: &str, content: &str, author: &str, reason: &str) -> MemoryResult<Value> {
+        let event = self.blocks.create(title, content, author, reason)?;
+        self.journal
+            .append("tool_result", &json!({"memory_event": event}), None, Some("success"), None)
+            .map_err(|error| MemoryError(error.0))?;
+        Ok(event)
+    }
+
+    pub fn edit(
+        &mut self,
+        id: &str,
+        new_content: &str,
+        author: &str,
+        reason: &str,
+        known_content_sha256: &str,
+    ) -> MemoryResult<Value> {
+        let event = self.blocks.edit(id, new_content, author, reason, known_content_sha256)?;
+        self.journal
+            .append("tool_result", &json!({"memory_event": event}), None, Some("success"), None)
+            .map_err(|error| MemoryError(error.0))?;
+        Ok(event)
+    }
+
+    pub fn render(&self, byte_budget: usize) -> Value {
+        self.blocks.render(byte_budget)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -316,5 +362,45 @@ mod tests {
             .unwrap();
         assert_eq!(files.read("state.md").unwrap()["content"], json!("file-v1"));
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn journalled_blocks_record_every_revision() {
+        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        let home = std::env::temp_dir().join(format!("af-jmem-{}", af_entropy::token()));
+        std::fs::create_dir_all(&home).unwrap();
+        let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
+        std::env::set_var("ATOMIC_FLOW_HOME", &home);
+        let project = home.join("proj");
+        std::fs::create_dir_all(&project).unwrap();
+        let mut journal = af_journal::SessionJournal::create(&project, Some("mem"), None).unwrap();
+        let mut memory = JournalledBlocks::new(&mut journal);
+        let created = memory.create("profile", "v1", "agent", "intake").unwrap();
+        let id = created["id"].as_str().unwrap().to_string();
+        let digest = created["content_sha256"].as_str().unwrap().to_string();
+        memory.edit(&id, "v2", "agent", "correction", &digest).unwrap();
+        match previous {
+            Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
+            None => std::env::remove_var("ATOMIC_FLOW_HOME"),
+        }
+        drop(guard);
+        // Both revisions are in the journal with provenance.
+        let snapshot = journal.read().unwrap();
+        let memory_events: Vec<&Value> = snapshot
+            .events
+            .iter()
+            .filter(|event| event.pointer("/payload/memory_event").is_some())
+            .collect();
+        assert_eq!(memory_events.len(), 2);
+        assert_eq!(
+            memory_events[0].pointer("/payload/memory_event/event"),
+            Some(&json!("memory_block_created"))
+        );
+        assert_eq!(
+            memory_events[1].pointer("/payload/memory_event/revision"),
+            Some(&json!(2))
+        );
+        assert!(snapshot.unresolved_call_ids().is_empty());
     }
 }

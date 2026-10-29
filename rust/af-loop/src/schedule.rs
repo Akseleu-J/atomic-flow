@@ -207,6 +207,38 @@ impl ScheduleRegistry {
         }))
     }
 
+    /// Host scheduler tick: for every due, unpaused schedule — call `submit`
+    /// (e.g. admission into the fenced queue or a journal append) and mark
+    /// the run. Submission failures abort the tick with the schedule named;
+    /// already-marked schedules are never double-fired within one tick.
+    pub fn tick(
+        &mut self,
+        now_unix: f64,
+        mut submit: impl FnMut(&ScheduleRecord) -> Result<u64, String>,
+    ) -> ScheduleResult<Vec<Value>> {
+        let due = self.due(now_unix);
+        let mut dispatched = Vec::new();
+        for id in due {
+            let (title, task) = match self.records.get(&id) {
+                Some(record) => (record.title.clone(), record.task.clone()),
+                None => continue,
+            };
+            let seq = submit(&ScheduleRecord {
+                id: id.clone(),
+                title: title.clone(),
+                task,
+                trigger: self.records[&id].trigger.clone(),
+                last_run_unix: self.records[&id].last_run_unix,
+                created_at_unix: self.records[&id].created_at_unix,
+                paused: false,
+            })
+            .map_err(|error| ScheduleError(format!("schedule {id} ({title}) submit failed: {error}")))?;
+            self.mark_run(&id, now_unix)?;
+            dispatched.push(json!({"schedule_id": id, "title": title, "queue_seq": seq}));
+        }
+        Ok(dispatched)
+    }
+
     pub fn as_value(&self) -> Value {
         json!({
             "schedules": self.records.values().map(|record| json!({
@@ -327,5 +359,35 @@ mod tests {
         assert!(registry.pause("sched_unknown", true).is_err());
         let document = registry.as_value();
         assert_eq!(document["schedules"].as_array().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn tick_dispatches_due_schedules_once_and_marks_runs() {
+        let mut registry = ScheduleRegistry::new();
+        let fast = registry.add_interval("fast", json!({"goal": "fast"}), 60).unwrap();
+        let slow = registry.add_interval("slow", json!({"goal": "slow"}), 7200).unwrap();
+        let t0 = 1_800_000_000.0;
+        // Baseline runs: both fire once at t0 (never-run schedules are due).
+        registry.tick(t0, |_| Ok(1)).unwrap();
+        // Next tick at +3600s: only the 60s interval is due again.
+        let mut submissions: Vec<String> = Vec::new();
+        let dispatched = registry
+            .tick(t0 + 3600.0, |record| {
+                submissions.push(record.title.clone());
+                Ok(42)
+            })
+            .unwrap();
+        assert_eq!(dispatched.len(), 1, "only the 60s interval is due at t0+3600");
+        assert_eq!(dispatched[0]["queue_seq"], json!(42));
+        assert_eq!(submissions, vec!["fast"]);
+        let _ = (&fast, &slow);
+        // The fired schedule is marked: a tick one second later is empty.
+        let again = registry.tick(t0 + 3601.0, |_| Ok(43)).unwrap();
+        assert!(again.is_empty());
+        // Submit failure aborts the tick and names the schedule.
+        let error = registry
+            .tick(t0 + 7200.0, |_| Err("queue at capacity".into()))
+            .unwrap_err();
+        assert!(error.0.contains("queue at capacity"));
     }
 }

@@ -5,6 +5,7 @@
 //! per-subtask: no shared mutable state, every row keeps its own outcome and
 //! cost; unknown outcomes hold the aggregation instead of becoming zeros.
 
+use std::collections::BTreeMap;
 use af_exec::queue::AdmissionQueue;
 use serde_json::{json, Value};
 
@@ -107,6 +108,64 @@ pub fn aggregate(_queue: &AdmissionQueue, items: &[SweepItem], rows: &[SweepRow]
     })
 }
 
+/// Execute the sweep through the fenced admission queue: for each queued
+/// item — claim with the live fence, run the injected executor (the real one
+/// binds a SandboxDriver/router), resolve with the fence. The executor
+/// returns `Err` for an UNKNOWN outcome (timeout after dispatch, worker
+/// loss): the epoch then moves, the dead fence dies, and the item returns to
+/// the queue as a NEW claim — never a resume. Unknown rows are not recorded
+/// as results.
+pub fn execute_sweep(
+    queue: &mut AdmissionQueue,
+    items: &[SweepItem],
+    mut execute: impl FnMut(&SweepItem) -> Result<(String, Option<String>, Option<f64>), String>,
+    max_reclaims: usize,
+) -> SwarmResult<Vec<SweepRow>> {
+    let mut rows: Vec<SweepRow> = Vec::new();
+    let mut reclaims: BTreeMap<u64, usize> = BTreeMap::new();
+    let mut pending: std::collections::VecDeque<u64> = items.iter().map(|item| item.seq).collect();
+    while let Some(seq) = pending.pop_front() {
+        let Some(ticket) = queue.claim().map_err(|error| SwarmError(error.0))? else {
+            return Err(SwarmError(format!("sweep item {seq} is not claimable; queue state diverged")));
+        };
+        if ticket.seq != seq {
+            return Err(SwarmError(format!(
+                "sweep queue offered seq {} while executing seq {seq}; state diverged",
+                ticket.seq
+            )));
+        }
+        let Some(item) = items.iter().find(|item| item.seq == seq) else {
+            return Err(SwarmError(format!("sweep item {seq} vanished")));
+        };
+        match execute(item) {
+            Ok((status, answer, cost_usd)) => {
+                queue
+                    .resolve(seq, &ticket.fence, json!({"status": status}))
+                    .map_err(|error| SwarmError(error.0))?;
+                rows.push(SweepRow {
+                    seq,
+                    description: item.description.clone(),
+                    status,
+                    answer,
+                    cost_usd,
+                });
+            }
+            Err(detail) => {
+                let seen = reclaims.entry(seq).or_insert(0);
+                *seen += 1;
+                if *seen > max_reclaims {
+                    return Err(SwarmError(format!(
+                        "sweep item {seq} exceeded reclaim bound ({max_reclaims}): {detail}"
+                    )));
+                }
+                queue.bump_epoch(&format!("sweep item {seq} unknown: {detail}"));
+                pending.push_front(seq);
+            }
+        }
+    }
+    Ok(rows)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -180,5 +239,71 @@ mod tests {
         }];
         let report = aggregate(&queue, &items, &rows);
         assert_eq!(report["summary"]["complete"], json!(true));
+    }
+
+    #[test]
+    fn execute_sweep_claims_resolves_and_aggregates() {
+        let mut queue = queue_with_capacity(8);
+        let items = plan_sweep(
+            &mut queue,
+            "scan",
+            &["one".into(), "two".into(), "three".into()],
+            8,
+        )
+        .unwrap();
+        let mut executed: Vec<String> = Vec::new();
+        let rows = execute_sweep(
+            &mut queue,
+            &items,
+            |item| {
+                executed.push(item.description.clone());
+                Ok(("succeeded".into(), Some(format!("answer for {}", item.description)), Some(0.01)))
+            },
+            2,
+        )
+        .unwrap();
+        assert_eq!(executed, vec!["one", "two", "three"], "FIFO, each item exactly once");
+        assert_eq!(rows.len(), 3);
+        let report = aggregate(&queue, &items, &rows);
+        assert_eq!(report["summary"]["complete"], json!(true));
+        assert_eq!(report["summary"]["known_cost_usd"], json!(0.03));
+    }
+
+    #[test]
+    fn unknown_outcome_reclaims_as_new_claim_under_new_epoch() {
+        let mut queue = queue_with_capacity(4);
+        let items = plan_sweep(&mut queue, "g", &["a".into()], 2).unwrap();
+        let mut attempts = 0usize;
+        let rows = execute_sweep(
+            &mut queue,
+            &items,
+            |_item| {
+                attempts += 1;
+                if attempts == 1 {
+                    // First execution is lost: outcome unknown, must NOT be
+                    // recorded as a result — the item re-runs from scratch.
+                    Err("worker lost after dispatch".into())
+                } else {
+                    Ok(("succeeded".into(), Some("fresh run".into()), Some(0.01)))
+                }
+            },
+            2,
+        )
+        .unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].status, "succeeded");
+        assert_eq!(rows[0].answer.as_deref(), Some("fresh run"));
+        assert_eq!(attempts, 2, "the item was re-run exactly once as a new claim");
+        let snapshot = queue.snapshot();
+        assert!(snapshot["epoch"].as_u64().unwrap() >= 2);
+        // The reclaim bound eventually holds the sweep instead of looping.
+        let fresh = plan_sweep(&mut queue, "g2", &["b".into()], 2).unwrap();
+        let bounded = execute_sweep(
+            &mut queue,
+            &fresh,
+            |_item| Err("always lost".into()),
+            1,
+        );
+        assert!(bounded.is_err());
     }
 }
