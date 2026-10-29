@@ -9,3 +9,4 @@ benchmarks/stage4/p07-pytest6116-py38-full-v1.json -text
 benchmarks/stage4/p07-pytest6116-py38-pexpect-v1.json -text
 benchmarks/stage4/p07-pytest6116-py38-optional-v1.json -text
 benchmarks/stage4/p07-pytest6116-py38-optional-pexpect-v1.json -text whitespace=cr-at-eol
+benchmarks/stage4/p07-pytest6116-xdist-build-v1.json -text

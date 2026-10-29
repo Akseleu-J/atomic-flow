@@ -1,0 +1,23 @@
+{
+  "run": 40930969344,
+  "artifact": 12923017273,
+  "archive_sha256": "c19b1aa71ef44d7e09edd1fc9cd212c590bbe9a3fcca318701539ba4f79b3ab0",
+  "tested_commit": "9fc88fe919f661b5ac402782b668479f8e001fad",
+  "status": "complete_diagnostic_with_unresolved_skips",
+  "native_summary": "2560 passed, 47 skipped, 10 xfailed",
+  "collected": 2617,
+  "completed": 2617,
+  "previous_nonpassing_now_passed": 28,
+  "node_ids_match_previous": true,
+  "installed_publisher_files_verified": 796,
+  "generated_console_scripts_content_verified": false,
+  "markupsafe_native_probe": {
+    "escape_ok": true,
+    "module": "/usr/local/lib/python3.8/site-packages/markupsafe/_speedups.cpython-38-x86_64-linux-gnu.so"
+  },
+  "stdout_sha256": "0c430d31a273031f82f76c158fcd047fc5ca0946e9283409d19d97a7979c0a60",
+  "source_blobs_verified": 474,
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}
