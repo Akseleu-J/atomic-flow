@@ -23,7 +23,8 @@ def test_derived_collection_only_adds_fixed_dependency_path_and_single_plugin_bl
     assert collection_source(None) == SOURCE
     generated = collection_source("/opt/p07-pytest6116-deps")
     assert "['-p','no:typeguard','--collect-only','-q','testing']" in generated
-    assert generated.count("no:typeguard") == 1
+    assert generated.count("no:typeguard") == 2
+    assert "os.environ['PYTEST_ADDOPTS']='-p no:typeguard'" in generated
     assert "sys.path.insert(0,'/opt/p07-pytest6116-deps')" in generated
     assert "os.environ['HYPOTHESIS_STORAGE_DIRECTORY']='/tmp/p07-hypothesis'" in generated
     execute = collection_source("/opt/p07-pytest6116-deps", execute_public_tests=True)

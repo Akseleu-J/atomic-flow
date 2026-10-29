@@ -105,6 +105,7 @@ def collection_source(dependency_prefix: str | None, *, execute_public_tests: bo
         raise ValueError("fixed derived collection source changed")
     code = SOURCE.replace("sys.path.insert(0,'/testbed/src')",
                           "os.environ['HYPOTHESIS_STORAGE_DIRECTORY']='/tmp/p07-hypothesis'\n"
+                          "os.environ['PYTEST_ADDOPTS']='-p no:typeguard'\n"
                           "sys.path.insert(0,'/opt/p07-pytest6116-deps')\nsys.path.insert(0,'/testbed/src')")
     # Modern setuptools exposes its vendored typeguard pytest11 entrypoint,
     # which this old pytest cannot register. Block only this exact name.
@@ -206,7 +207,8 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
             (output / "container-inspect.json").write_bytes(inspected.stdout)
             code = collection_source(dependency_prefix, execute_public_tests=execute_public_tests)
             if dependency_prefix:
-                report["fixed_plugin_policy"] = {"disabled": ["typeguard"], "reason": "incompatible vendored host plugin"}
+                report["fixed_plugin_policy"] = {"disabled": ["typeguard"], "reason": "incompatible vendored host plugin",
+                                                 "inherited_via": "PYTEST_ADDOPTS"}
                 report["hypothesis_storage"] = "/tmp/p07-hypothesis"
             result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", code],
                               home=home, timeout=180, limit=1_000_000, check=lambda: None)
