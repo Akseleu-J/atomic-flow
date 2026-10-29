@@ -85,7 +85,7 @@ test('already normalized openapi base and optional reviewed temperature', async 
   assert.equal((await proxy.complete(request({temperature: '0.25'}))).truncated, true);
 });
 
-test('cost precedence and both token-counter naming forms match known usage fields', async () => {
+test('matching cost and token aliases are reconciled exactly', async () => {
   const variants = [
     [{prompt_tokens: 1, completion_tokens: 2, cost_usd: 0}, '0'],
     [{input_tokens: 1, output_tokens: 2, total_cost_usd: 0.003}, '0.003'],
@@ -93,11 +93,38 @@ test('cost precedence and both token-counter naming forms match known usage fiel
     [{prompt_tokens: 1, completion_tokens: 2, cost: {input_tokens_cost_nanodollars: 20, output_tokens_cost_nanodollars: 30}}, '0.00000005'],
     [{prompt_tokens: 1, completion_tokens: 2, input_tokens_cost_nanodollars: 40, output_tokens_cost_nanodollars: 60}, '0.0000001'],
     [{prompt_tokens: 1, completion_tokens: 2, cost: {input_tokens_cost_nanodollars: 12.5}, output_tokens_cost_nanodollars: 7.5}, '0.00000002'],
-    [{prompt_tokens: 1, completion_tokens: 2, cost_usd: 0.005, total_cost_usd: 3, cost: 6}, '0.005'],
+    [{prompt_tokens: 1, input_tokens: 1, completion_tokens: 2, output_tokens: 2,
+      cost_usd: 0.005, total_cost_usd: 0.005, cost: 0.005}, '0.005'],
+    [{prompt_tokens: 1, completion_tokens: 2, cost_usd: 0.00000002,
+      input_tokens_cost_nanodollars: 12.5, output_tokens_cost_nanodollars: 7.5,
+      cost: {input_tokens_cost_nanodollars: 12.5, output_tokens_cost_nanodollars: 7.5}}, '0.00000002'],
   ];
   for (const [usage, expected] of variants) {
     const proxy = fixture(async () => response(payload(usage)));
     assert.equal((await proxy.complete(request())).cost_usd, expected);
+  }
+});
+
+test('conflicting or partial redundant usage is unknown, never a selected cheaper estimate', async () => {
+  const variants = [
+    {prompt_tokens: 1, completion_tokens: 2, cost_usd: 0.005, total_cost_usd: 3},
+    {prompt_tokens: 1, completion_tokens: 2, cost_usd: 0.005, cost: 6},
+    {prompt_tokens: 1, input_tokens: 2, completion_tokens: 2, cost_usd: 0.005},
+    {prompt_tokens: 1, completion_tokens: 2, output_tokens: 1, cost_usd: 0.005},
+    {prompt_tokens: 1, completion_tokens: 2, cost_usd: 0.00000002,
+      input_tokens_cost_nanodollars: 12, output_tokens_cost_nanodollars: 9},
+    {prompt_tokens: 1, completion_tokens: 2, cost_usd: 0.005, input_tokens_cost_nanodollars: 1},
+    {prompt_tokens: 1, completion_tokens: 2, input_tokens_cost_nanodollars: 12,
+      output_tokens_cost_nanodollars: 8, cost: {input_tokens_cost_nanodollars: 11}},
+  ];
+  for (const usage of variants) {
+    let sends = 0;
+    const proxy = fixture(async () => { sends++; return response(payload(usage)); });
+    const req = request();
+    await assert.rejects(proxy.complete(req), error => error.message === 'kaggle_proxy_usage_unknown'
+      && error.request_outcome === 'unknown' && error.usage_result === undefined);
+    await assert.rejects(proxy.complete(req), /kaggle_proxy_request_refused/);
+    assert.equal(sends, 1);
   }
 });
 

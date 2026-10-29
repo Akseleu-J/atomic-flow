@@ -108,22 +108,34 @@ function tokens(value, maximum) {
 function usage(payload, req) {
   const data = payload.usage;
   if (!plain(data)) throw Error('usage');
-  const incoming = tokens(has(data, 'prompt_tokens') ? data.prompt_tokens : data.input_tokens, req.config.max_input_tokens);
-  const outgoing = tokens(has(data, 'completion_tokens') ? data.completion_tokens : data.output_tokens, req.config.max_output_tokens);
-  let cost;
-  if (has(data, 'cost_usd') || has(data, 'total_cost_usd')) {
-    cost = amount(has(data, 'cost_usd') ? data.cost_usd : data.total_cost_usd);
-  } else if (has(data, 'cost') && !plain(data.cost)) {
-    cost = amount(data.cost);
-  } else {
-    const nested = plain(data.cost) ? data.cost : Object.create(null);
-    const input = 'input_tokens_cost_nanodollars', output = 'output_tokens_cost_nanodollars';
-    if (!(has(nested, input) || has(data, input)) || !(has(nested, output) || has(data, output))) throw Error('usage');
-    cost = add(amount(has(nested, input) ? nested[input] : data[input]),
-      amount(has(nested, output) ? nested[output] : data[output]));
-    cost.scale += 9;
+  function consistentTokens(names, maximum) {
+    const values = names.filter(name => has(data, name)).map(name => tokens(data[name], maximum));
+    if (!values.length || values.some(value => value !== values[0])) throw Error('usage');
+    return values[0];
   }
-  return {tokens_in: incoming, tokens_out: outgoing, cost_usd: decimal(cost)};
+  function consistentComponents(name, nested) {
+    const values = [nested, data].filter(object => has(object, name)).map(object => decimal(amount(object[name])));
+    if (values.some(value => value !== values[0])) throw Error('usage');
+    return values[0];
+  }
+  const incoming = consistentTokens(['prompt_tokens', 'input_tokens'], req.config.max_input_tokens);
+  const outgoing = consistentTokens(['completion_tokens', 'output_tokens'], req.config.max_output_tokens);
+  const totals = [];
+  for (const name of ['cost_usd', 'total_cost_usd']) {
+    if (has(data, name)) totals.push(decimal(amount(data[name])));
+  }
+  if (has(data, 'cost') && !plain(data.cost)) totals.push(decimal(amount(data.cost)));
+  const nested = plain(data.cost) ? data.cost : Object.create(null);
+  const input = consistentComponents('input_tokens_cost_nanodollars', nested);
+  const output = consistentComponents('output_tokens_cost_nanodollars', nested);
+  if ((input === undefined) !== (output === undefined)) throw Error('usage');
+  if (input !== undefined) {
+    const cost = add(amount(new JsonNumber(input)), amount(new JsonNumber(output)));
+    cost.scale += 9;
+    totals.push(decimal(cost));
+  }
+  if (!totals.length || totals.some(value => value !== totals[0])) throw Error('usage');
+  return {tokens_in: incoming, tokens_out: outgoing, cost_usd: totals[0]};
 }
 async function boundedBody(response) {
   const length = response.headers?.get?.('content-length');

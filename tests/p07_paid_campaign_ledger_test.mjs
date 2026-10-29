@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {MODEL, canonical, digest, processOne} from '../tools/p07_model_broker.mjs';
 import {createPaidCampaignLedger, nanoUsd, decimalUsd} from '../tools/p07_paid_campaign_ledger.mjs';
+import {createKaggleProxy} from '../tools/p07_kaggle_proxy_adapter.mjs';
 
 const NOW = 100000;
 let sequence = 0;
@@ -185,6 +186,24 @@ test('settlement missing actual provider provenance stays unknown with reservati
   assert.equal(state.known_actual_usd, '0');
   assert.equal(state.unresolved_reserved_usd, '0.1');
   assert.equal(state.calls[req.call_id].settlement, null);
+});
+
+test('conflicting provider costs retain reservation and block all later physical sends', async t => {
+  const h = await fixture(t), original = request(h.profile);
+  h.proxy = createKaggleProxy({baseUrl: 'https://reviewed-proxy.example/session', apiKey: 'synthetic-only',
+    expiresAt: NOW + 60000, now: () => NOW, fetchImpl: async () => {
+      h.sends++;
+      return new Response(JSON.stringify({model: MODEL,
+        usage: {prompt_tokens: 10, completion_tokens: 8, cost_usd: 0.001, total_cost_usd: 0.5},
+        choices: [{message: {content: 'candidate'}, finish_reason: 'stop'}]}));
+    }});
+  assert.equal((await h.run(original)).state, 'unknown');
+  assert.equal((await h.run(request(h.profile, {owner: 'umirbayulgaisha', task_id: 'requests_2', arm: 'baseline'}))).state, 'unknown');
+  const snapshot = await h.adapter.snapshot();
+  assert.equal(snapshot.known_actual_usd, '0');
+  assert.equal(snapshot.unresolved_reserved_usd, '0.1');
+  assert.equal(snapshot.calls[original.call_id].settlement, null);
+  assert.equal(h.sends, 1);
 });
 
 test('completion response publication can reconcile after reopen without inference', async t => {
