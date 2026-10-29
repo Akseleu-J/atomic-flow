@@ -4,6 +4,60 @@ P07 remains **OPEN**. No provider calls were made in this package. Recorded
 campaign spend remains $0.035931375 of the authorized $20 ceiling; no fresh
 quota/billing query or paid main pair is implied.
 
+## Current accepted full public ordinary boundary
+
+[CI 40818355491](https://github.com/Akseleu-J/atomic-flow/actions/runs/40818355491)
+completed SUCCESS on `4d3c08e3eedcc47509ba700a8b8ec9029f335b13`.
+Artifact 12872864520 SHA256:
+`4ce5d17e20198a0f3e2f31b40d288a2e623785d01d0f6b70e2af68b73ca8f4a1`.
+Its ZIP digest, CRCs, tested commit and all 810 raw hashes were checked. Eighty
+independent audit assertions verify source/spec/runtime/fixture/namespace
+bindings, raw/canonical optional node IDs, complete inventories and publication.
+Evidence: `validation/p07-budget20/requests3362-full-public-v5/assessment.json`.
+
+The complete public inventory contains all six original test files, independently
+compared with upstream base commit `36453b95b13079296776d11b09cab2567ea3e703`,
+plus the fixed synthetic probe/health file: 353 collected/completed items.
+Five actual in-loop checks completed:
+
+| Check | Required PASS | Required FAIL | Native exit |
+| --- | --- | --- | --- |
+| Initial probe negative | 349 | 1 | 1 |
+| After probe repair | 350 | 0 | 0 |
+| Explicit ordinary check | 350 | 0 | 0 |
+| Step verification | 350 | 0 | 0 |
+| Fresh final gate | 350 | 0 | 0 |
+
+Each also retained exactly three source-declared optional observations: one
+XFAIL, one non-strict XPASS and the cStringIO setup skip. They are not counted
+as required PASS. Native exit is preserved without transformation; no required
+skip, collection/setup/teardown failure or unreviewed optional node is admitted.
+The same runtime separately requalified the four-test strict negative/positive/
+required-SKIP controls; required-SKIP still exits5 with no completed receipt.
+
+TaskRunner performed one replan, changed/published only the exact probe bytes,
+passed a fresh final check on the published core revision and synchronized its
+graph with complete coverage/no omissions. Core snapshots retained142files;
+the copied image source before filtering retained280files. All source-before/
+after comparisons and stopped HTTP/TLS fixtures were checked; controller return
+requires immutable-container cleanup. Source extraction cleanup also completed.
+The summary's original private_pytest_digest describes standalone controls;
+the full TaskRunner uses a separately sealed schema2 identity, explicitly
+recorded as task_private_pytest_digest in the independent assessment.
+
+[General CI 40818353076](https://github.com/Akseleu-J/atomic-flow/actions/runs/40818353076)
+on the same runtime passed: Python3.11/3.12 each **3229 PASS / 14 SKIP**,
+Windows4PASS, both wheels and real Docker PASS. All six artifact ZIPs, JUnit
+outcomes, distribution checksums and395source hashes were checked against Git.
+Evidence: `validation/p07-budget20/requests-full-public-core-ci-v2/assessment.json`.
+
+This accepts historical **public ordinary execution** and a scripted repair
+journey. The repaired requirement is synthetic. No model-generated historical
+issue fix, hidden oracle grade, matched utility, other Requests lifecycle or
+P07 closure is claimed. Remaining Requests paths are function36 (three tasks),
+Python2.7.18 Requests2674 and Python2.7.13/SSLv3 Requests863. Their resource,
+fixture and executor contracts still require integration and fresh acceptance.
+
 ## Accepted real Requests3362 boundary
 
 [CI 40813084358](https://github.com/Akseleu-J/atomic-flow/actions/runs/40813084358)
@@ -150,9 +204,9 @@ all original test bytes stay protected by the obligation. Empty policy preserves
 legacy identity bytes and required-SKIP refusal.
 
 The optional policy retains native exit status and each optional category
-separately, counts required tests only and normalizes the required-test exit
-only after complete inventories and clean setup/teardown. Native infrastructure
-errors never normalize into success. Focused contracts/dispatch/grammar tests:
+separately and counts required tests only. The final v5 correction below keeps
+native exit unchanged; no native infrastructure failure can become success.
+Focused contracts/dispatch/grammar tests:
 193PASS locally, Ruff PASS. A fresh full public run is required.
 
 Further retained attempts: v2 (CI40816702406) was sent to the previous SHA

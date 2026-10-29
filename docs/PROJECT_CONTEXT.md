@@ -1,5 +1,16 @@
 # atomic-flow — рабочая карта проекта
 
+29 октября: полный public ordinary Requests3362 TaskRunner принят на
+`4d3c08e3eedcc47509ba700a8b8ec9029f335b13`, CI 40818355491 SUCCESS.
+Все шесть исходных test files + synthetic probe: 353 collected/completed,
+350 required PASS после repair; три объявленных optional outcomes отдельно.
+Один replan, пять checks, fresh final PASS, публикация только probe и graph sync;
+810 hashes и 80 условий приёмки сверены. Общий CI 40818353076: по 3229 PASS /
+14 SKIP, 395 source hashes и шесть ZIP проверены; Windows/wheel/Docker PASS.
+Provider calls = 0; исторический issue fix/hidden grade/paired utility не измерены.
+Остальные пять Requests lifecycles, driver/profiles и P07 остаются OPEN.
+[Приёмка и история попыток](P07_REQUESTS_BOUNDARY_ACCEPTANCE_2026-10-29.md).
+
 29 октября: полный synthetic Requests3362 TaskRunner принят на `500a0fd`,
 CI 40814165859: один replan, FAIL → repair → fresh PASS/final → публикация
 только probe → graph sync. Пять raw in-loop checks и 810 hashes проверены.

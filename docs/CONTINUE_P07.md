@@ -1,133 +1,46 @@
-# Передача работы: atomic-flow / P07
+# Продолжение P07 — 29 октября 2026
 
-Рабочий checkpoint: `fa43d65d660d727d76adfa193f123864733551d5` опубликован.
-Полный public ordinary inventory (шесть исходных test files + synthetic probe)
-проверяется отдельной попыткой `requests3362-full-public-v4`. Перед продолжением
-сверить её run/head_sha и скачать outputs; dispatch ещё не означает приёмку.
-V1 обнаружил URL-callable fixtures и неподдержанные public xfail/skip. V2 был
-ошибочно отправлен на старый SHA и отменён. V3 подтвердил устранение всех 115
-teardown errors, но отказал из-за отсутствующего отображения raw `::()::` IDs.
-Fa43d65 добавляет точное отображение трёх объявленных optional nodes; их native
-categories и native exit сохраняются отдельно от required outcome. Требуется
-доказать FAIL → repair → fresh required PASS с полной исторической коллекцией.
-Required-SKIP вне этих трёх source-declared nodes по-прежнему запрещён.
+Работать в `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`, ветка `experimental`, draft PR №2. Начать с `docs/PROJECT_CONTEXT.md`; Git-команды выполнять только в этом клоне. Перед продолжением сверить HEAD, remote SHA и рабочий diff. P07 остаётся **OPEN**.
 
-Последний принятый runtime: `500a0fdea0ab9258269cc0ace45338607c8ce917`.
-Requests3362 full synthetic TaskRunner: CI 40814165859 SUCCESS. Проверены
-810 hashes, пять raw checks, один replan, публикация только probe, свежий
-final PASS и graph sync. Main CI 40814163106 SUCCESS: по 3198 PASS / 14 SKIP
-на Python 3.11/3.12, 392 source hashes; Windows/wheel/Docker. Все шесть ZIP
-digests сверены. Evidence: requests3362-task-v1 и requests-integration-core-ci-v1.
-Follow-up усиливает acceptance validator и добавляет 12 offline attack tests;
-сверить HEAD/remote перед продолжением.
+## Текущий checkpoint
 
-Следующий пакет: полный historical ordinary Requests3362 (пока проверены
-четыре synthetic tests), затем function36 fixture/controller/receipt с новым
-resource manifest «core + fixed CA». CA overlay пока pure, без execution wiring.
-Generic dispatch разрешает только 3362-cn через root Linux owned controller;
-другие cohorts отклоняются. Нужны все 30 ordinary profiles, равный driver,
-paired runs, holdout/ablations и final review. P07 OPEN; provider calls = 0.
+Последний принятый runtime: `4d3c08e3eedcc47509ba700a8b8ec9029f335b13`. Полный public ordinary Requests3362 принят: CI 40818355491 SUCCESS, artifact 12872864520, SHA256 `4ce5d17e20198a0f3e2f31b40d288a2e623785d01d0f6b70e2af68b73ca8f4a1`. Сверены 810 raw hashes и 80 условий приёмки. Один replan, пять полных checks: 349 required PASS + один ожидаемый probe FAIL, затем четыре раза 350 required PASS. Три source-declared optional outcomes сохранены отдельно; все 353 collected items завершены. Fresh final gate, публикация только probe, graph sync и cleanup подтверждены. Evidence: `validation/p07-budget20/requests3362-full-public-v5/`. Это обычные public tests и synthetic repair probe, без модели и hidden grade.
 
-Обновление29октября: Requests3362 smokev3 принят на72bb7ef,
-CI40813084358,779rawhashes/FAIL/PASS/requiredSKIP/cleanup проверены.
-Отчёт: `P07_REQUESTS_BOUNDARY_ACCEPTANCE_2026-10-29.md`.
-CA-overlay pure helper исправлен через отдельные core/resource manifests,
-236PASS/3symlinkSKIP. Подготовлены Requests3362 ordinary dispatch и отдельный
-full TaskRunner synthetic workflow; до приёмки его CI не считать интеграцию
-завершённой. Нижние пункты о незакоммиченном skip fix и17FAIL — старый checkpoint,
-заменённый этим обновлением. P07OPEN; новыхprovidercalls0.
+Подтверждено:
 
-Состояние проверено **29 октября 2026**. Цель — полностью закрыть P07 доказательствами; не объявлять production readiness по локальным тестам или синтетическим прогонам.
+- Synthetic Requests3362 controller: CI 40813084358 на `72bb7ef`, FAIL → edited PASS → required-SKIP refusal; 779 raw hashes проверены.
+- Полный synthetic TaskRunner: CI 40814165859 на `500a0fd`, один replan, пять raw checks, публикация только probe, fresh final PASS и graph sync; 810 hashes проверены. Историческое качество модели этим не измерено.
+- General CI 40818353076 на `4d3c08e`: по 3229 PASS / 14 SKIP на Python 3.11/3.12, Windows 4 PASS, wheel/Docker PASS; шесть ZIP digests, JUnit и 395 source hashes сверены с Git. Evidence: requests-full-public-core-ci-v2.
+- Pure function36 CA overlay исправлен: core revision отдельно от resource manifest «core + единственный requests/cacert.pem». Копия кандидата не меняется, глобальный PEM-фильтр не расширен. Docker/obligation/resource receipt integration этого пути ещё нет.
 
-## Где работать
+Подробный отчёт и границы всех результатов: `docs/P07_REQUESTS_BOUNDARY_ACCEPTANCE_2026-10-29.md`.
 
-Репозиторий: `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`.
-Ветка `experimental`, GitHub `Akseleu-J/atomic-flow`, draft PR №2. Локальный HEAD и удалённая ветка совпадают:
-`f173dd6c9bda35a99c2c024b110c3f26f2052c87`.
-Начать с `docs/PROJECT_CONTEXT.md`; подробности — `docs/P07_STATUS_2026-10-28.md` и `docs/P07_PRIVATE_REQUESTS_EXECUTION_DESIGN_2026-10-28.md`.
+## Полный ordinary inventory Requests3362
 
-## Подтверждено и что ещё осталось
+Все шесть `tests/**/test_*.py` независимо сверены с публичным base commit `36453b95b13079296776d11b09cab2567ea3e703`; hidden patch и gold не использовались. Дополнительно включён фиксированный synthetic repair probe. Всего 353 collected items.
 
-P00–P06 приняты в пределах записанных host contracts. **30/30 отдельных сред калиброваны**, но это не 30 решённых моделью задач. Приняты отдельные synthetic TaskRunner/queue/Atomic–flat Docker journeys и прямой live API diagnostic Sonnet5. Историческое качество агента ещё не измерено.
+V1 выявил URL-callable wrappers над plugin-owned HTTPBin servers и неподдержанную отчётность исторических xfail/skip. V2 ошибочно ушёл на прежний SHA и отменён; запись сохранена. V3 подтвердил устранение 115 teardown errors, но потребовал точного отображения raw pytest2.8 `::()::` IDs. V4 принял полный negative receipt и replan, затем получил 350 required PASS после исправления probe, но host validator ошибочно ожидал native exit 1 из-за non-strict XPASS. Правка откатилась; V4 NOT QUALIFIED.
 
-Осталось: полный исторический Atomic/flat driver с равными лимитами; Requests6 и ordinary-профили всех30; 30 парных сравнений с независимым oracle; свежий holdout и ablations; итоговый анализ и независимый review. **P07 OPEN.**
+В 4d3c08e исправлено последнее предположение: native exit остаётся неизменным и должен соответствовать required failures. Три source-declared optional nodes закреплены точной неизменяемой политикой: два отмеченных xfail-теста сохраняют XFAIL/XPASS отдельно, Python3 cStringIO setup skip сохраняется отдельно. Для них проверяются raw и canonical IDs и точная фаза. Required-SKIP вне этих трёх nodes остаётся запрещённым. Новые skips, неизвестные nodes, setup/teardown errors и неполные inventories не принимаются.
 
-## Непосредственный следующий шаг
+## Следующая работа
 
-Довести Requests3362 smoke до полной приёмки:
+Полный Requests3362 ordinary путь принят в указанном scope. Продолжить function36 fixture/controller/resource receipt integration для Requests1963/2148/2317; затем Python2.7 Requests2674 и SSLv3/wire Requests863. Generic ordinary dispatch допускает только 3362-cn через отдельный owned root-Linux controller; остальные private Requests cohorts отклоняются. Не включать их по metadata/unit tests.
 
-1. [Первая попытка 40750378642](https://github.com/Akseleu-J/atomic-flow/actions/runs/40750378642): три HTTP/TLS health-теста прошли, затем pytest2.8 пытался писать кэш в read-only `/testbed`. Исправление `-p no:cacheprovider` уже закоммичено; 124 focused tests прошли.
-2. [Вторая попытка 40751447691](https://github.com/Akseleu-J/atomic-flow/actions/runs/40751447691): завершённые FAIL → edited PASS и остановка серверов подтверждены; весь smoke **FAILED**, потому что pytest2.8 проигнорировал современный `@pytest.mark.skip`.
-3. **Локально уже исправлен** `tools/p07_requests3362_check_smoke.py`: используется `pytest.skip(...)`. Этот фикс ещё НЕ закоммичен/запушен, третья попытка НЕ запущена. Проверить diff, опубликовать и запустить `.github/workflows/p07-requests3362-check-smoke.yml`; затем скачать архив, сверить SHA/raw outputs, source/cleanup и отказ принимать required-SKIP. Generic Requests dispatch пока выключен.
+Далее нужны все 30 ordinary profiles, полный исторический Atomic/flat driver с равными лимитами, замороженный study profile/cohort/order/owner caps, 30 пар с независимым oracle, свежий holdout, ablations и final review. 30/30 environment calibrations уже приняты, но это не 30 решённых моделью задач.
 
-Артефакты двух попыток: `validation/p07-budget20/requests3362-check-v1/` и `requests3362-check-v2/`. Вторая папка пока untracked; не потерять её.
+## Бюджет и разрешения
 
-## Незавершённая параллельная работа
+Пользователь разрешил автономное продолжение P07, осторожные push и CI. Merge/release не разрешены. Paid ceiling $20; записанный расход $0.035931375, новых provider calls в этой работе нет. Модель: `anthropic/claude-sonnet-5@default`. Owner2 `akseley` и participant3 `umirbayulgaisha` — отдельные авторизованные контуры; не менять аккаунты для обхода квоты. Старая quota не является текущим балансом.
 
-Новые untracked файлы `src/atomic_flow/check_requests_execution_overlay.py` и `tests/test_check_requests_execution_overlay.py` готовят отдельную execution-копию для Requests1963/2148/2317 с единственным CA append. **Пакет не готов:** последний завершённый тест — 17 FAIL / 43 PASS / 2 SKIP; после него могли быть дополнительные правки.
+Перед paid send: frozen cohort/owner/model/profile/caps, durable reserve → remote checkpoint ACK → единственный send → actual usage settlement. UNKNOWN блокирует новые physical calls до сверки. Не откатывать и не удалять data/checkpoint branch `codex/p07-model-queue-paid-20261028-01`. Не смешивать scripted callbacks, live model calls, ordinary checks и hidden grading.
 
-Причина: core source manifest исключает `.pem`, а реализация ошибочно ожидает там `requests/cacert.pem`. Не расширять глобально индексирование PEM и не отдавать ключи модели. Требуется явно разделить core source revision и отдельный manifest ресурсов «core + единственный фиксированный CA», сохранив неизменность кандидата и строгую проверку execution-копии. Существующий `ExecutionOverlay`/его описание политики тоже надо согласовать. Docker/controller/receipt integration этого пути ещё нет.
+## Доступ и инструменты
 
-## Рабочие ограничения
+Vault: `C:\Users\omirb\OneDrive\Документы\ChatGPT\computer_control\shared-access\.env.enc`; README и `shared-secrets.ps1` рядом. PowerShell 7.2+. Пароль владелец передаёт отдельно; его, tokens, headers и расшифрованный vault не писать в команды, файлы, artifacts или логи. Предпочитать узкий `.local-tools/with-github.ps1` с SecureString вместо импорта всех переменных.
 
-Общий разрешённый paid-бюджет **$20**, подтверждённый расход **$0.035931375**; новых paid main pairs нет. Модель `anthropic/claude-sonnet-5@default`. Ключи/пароли не переносить в документ или логи; существующий локальный оператор — `.local-tools/p07-operator.mjs`, credentials process-only. UNKNOWN paid attempts не повторять вслепую.
+Локальный `.local-tools/p07-operator.mjs` предоставляет `github`, `git`, `artifact`; credentials остаются в процессе. `artifact` сверяет GitHub SHA256. `.local-tools/p07-zip.mjs` проверяет ZIP members/CRC; при извлечении отдельно проверять confinement и свежую папку. Helpers не входят в clone; старые Node REPL bindings не считать существующими. Kaggle-контур operator закреплён за owner2, не использовать его как переключатель аккаунтов.
 
-Тесты запускать последовательно: Windows испытывала MemoryError. Использовать `.venv/Scripts/python.exe -m pytest <нужные tests> -p no:cacheprovider -q`, затем `.venv/Scripts/ruff.exe check <изменённые файлы>`. Перед коммитом обновить `tools/update_project_index.py` и дождаться завершения. Не делать `git add .`: в checkout много исторических untracked evidence и `.atomic_flow/tree.lock`. Ничего не удалять, не merge/release. Core/client Docker-free; исполнение недоверенного кода требует изолированного worker.
+Python/Ruff: `.venv/Scripts/python.exe`, `.venv/Scripts/ruff.exe`. Node: `C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`. Тесты выполнять последовательно с `-p no:cacheprovider`; Windows испытывала MemoryError. Перед commit обновлять `tools/update_project_index.py` и **дожидаться завершения**. Не запускать зависимый push, пока commit ещё работает в фоновой exec session. После push проверить полный remote SHA, после dispatch — actual head_sha и tested-commit в архиве.
 
-## Хранилище и доступ
-
-Зашифрованный vault: `C:\Users\omirb\OneDrive\Документы\ChatGPT\computer_control\shared-access\.env.enc`.
-Загрузчик и инструкция находятся рядом: `shared-secrets.ps1`, `README.md`. Нужен PowerShell **7.2+**. Использовать именно этот vault, не `C:\.env.enc`.
-
-**Пароль доступа владелец передаёт преемнику отдельно через защищённый канал. В этом Git-документе его нет.** В прошлой сессии владелец разрешил разблокировку для работы с переменными; это не разрешение публиковать пароль или передавать все ключи любому получателю документа. При переносе на другой компьютер владелец отдельно предоставляет нужный доступ.
-
-Общий загрузчик импортирует переменные только в текущий процесс и дочерние процессы, без вывода значений:
-
-```powershell
-. 'C:\Users\omirb\OneDrive\Документы\ChatGPT\computer_control\shared-access\shared-secrets.ps1'
-Import-SharedSecrets   # пароль вводится в скрытом интерактивном prompt
-```
-
-Предпочитать узкие helpers вместо импорта всех секретов:
-
-- `.local-tools/with-github.ps1`: достаёт только `GITHUB_TOKEN` и передаёт его дочернему `git`/`gh`.
-- `.local-tools/with-kaggle.ps1`: параметры `-Password <SecureString> -TokenName <имя> -ScriptFile <проверенный Python-файл>`; поддерживаемые имена — `Kaggle2_TOKEN`, `Kaggle3_TOKEN`, `Kaggle4_TOKEN`. Поддержка имени не означает разрешение использовать аккаунт: сначала сверить реальную identity и полномочия владельца.
-
-Пример безопасного push из корня репозитория:
-
-```powershell
-$p07VaultPassword = Read-Host 'Пароль vault' -AsSecureString
-try {
-    & .local-tools/with-github.ps1 -Password $p07VaultPassword `
-        -GitArguments @('push', 'origin', 'experimental')
-} finally { $p07VaultPassword.Dispose() }
-```
-
-Не выводить environment целиком, расшифрованный vault, headers, `gh auth token` или proxy credentials. Не помещать пароль в командную строку, историю, исходники, notebook или artifacts. Kaggle login token и Model Proxy credentials — разные сущности; proxy grant может истечь, его обновление не означает разрешение повторить inference.
-
-## Инструменты, которыми велась эта сессия
-
-- `.local-tools/p07-operator.mjs`: локальный Node-оператор. Использовались `github(path, method, body)`, `git(args)` и `artifact(metadata, freshZipPath)`. GitHub paths относительны `repos/Akseleu-J/atomic-flow/`. `artifact` сверяет SHA256 с digest GitHub. Kaggle-контур этого оператора закреплён за owner2 `akseley`; это не переключатель аккаунтов.
-- `.local-tools/p07-zip.mjs`: чтение ZIP с проверками путей/дубликатов/CRC. Извлекать только в свежую папку с проверкой confinement.
-- Node runtime: `C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`. Python/Ruff — проектные `.venv/Scripts/`.
-- `.local-tools/`, сам vault, содержимое памяти процесса и Node REPL **не переносятся обычным Git clone**. Не коммитить их автоматически. Другой исполнитель должен проверить наличие helpers и получить минимальный доступ от владельца; старые JS-переменные сессии не считать существующими.
-
-## Протоколы, которые соблюдать
-
-Все ссылки ниже относительны этому документу:
-
-| Область | Документ |
-|---|---|
-| GitHub, vault-helper, staging, draft PR | [GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md) |
-| Живая модель, Kaggle, квота, неизвестные исходы | [REAL_API_BENCHMARK_PROTOCOL.md](REAL_API_BENCHMARK_PROTOCOL.md) |
-| Общий справочник и исторические границы приёмки | [ASSISTANT_HANDOFF.md](ASSISTANT_HANDOFF.md) |
-| Равное сравнение, queue, provenance, независимый oracle | [P07_MATCHED_QUEUE_EXECUTION_DESIGN_2026-10-28.md](P07_MATCHED_QUEUE_EXECUTION_DESIGN_2026-10-28.md) |
-| Резервирование, durable ledger и remote checkpoint | [P07_PAID_QUEUE_PREPARATION_2026-10-28.md](P07_PAID_QUEUE_PREPARATION_2026-10-28.md) |
-
-Практические правила:
-
-1. Пользователь уже разрешил продолжение P07, осторожные push и CI, параллельных субагентов и суммарный paid-потолок $20. Сохранять эти разрешения; новая модель, расширение бюджета или чужой аккаунт из этого не следуют. Цифры в бюджетном proposal не являются замороженным исполняемым профилем.
-2. Перед paid-send зафиксировать cohort/owner/model/profile/caps и учесть старый расход. Все роли и неудачные попытки входят в бюджет. Не менять аккаунты для обхода квоты; participant3 `umirbayulgaisha` — отдельный авторизованный контур. Историческую account quota не считать текущим балансом кампании.
-3. Каждый физический вызов — durable reserve → remote checkpoint ACK → единственный send → actual usage settlement. UNKNOWN блокирует новые paid-вызовы до сверки; таймаут не доказывает отсутствие списания. Сохранённый ответ можно повторно опубликовать без inference. Data/checkpoint branch `codex/p07-model-queue-paid-20261028-01` не откатывать и не удалять.
-4. После push сверить полный remote SHA. Workflow dispatch делается на `ref: experimental`, затем сверяется фактический `head_sha`. У PR-запуска checkout может быть merge SHA: проверять `tested-commit` внутри artifacts. SUCCESS без скачанных и сверенных outputs не закрывает приёмку. Новые попытки хранить отдельно, старые не перезаписывать.
-5. Не смешивать unit/mock, CI, remote execution, реальный model call, обычный check и независимый hidden grade. Очередь/HTTP200/ответ модели не доказывают исправление задачи. Не давать модели gold/test_patch; full public source scope не выводить из solution. Holdout выбирать metadata-only с заранее фиксированными исключениями/seed; раскрытый кейс больше не blind.
+Не делать `git add .`: есть исторические untracked evidence и `.atomic_flow/tree.lock`. Ничего не удалять. Core/client Docker-free; недоверенное исполнение требует принятого isolated worker. Протоколы: `GITHUB_WORKFLOW.md`, `REAL_API_BENCHMARK_PROTOCOL.md`, `P07_MATCHED_QUEUE_EXECUTION_DESIGN_2026-10-28.md`, `P07_PAID_QUEUE_PREPARATION_2026-10-28.md`.
