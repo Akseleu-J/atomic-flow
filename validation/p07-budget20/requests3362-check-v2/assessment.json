@@ -1,0 +1,15 @@
+{
+  "status": "not_qualified",
+  "run_id": 40751447691,
+  "source_sha": "f173dd6c9bda35a99c2c024b110c3f26f2052c87",
+  "raw_hashes_verified": 778,
+  "accepted_partial_observations": [
+    "completed_negative",
+    "edited_pass",
+    "HTTP_TLS_wrong_CA_health",
+    "fixture_servers_stopped",
+    "source_unchanged"
+  ],
+  "remaining_failure": "Synthetic @pytest.mark.skip ignored by pytest2.8; test executed and failed instead of skipping. Replace only smoke fixture with native pytest.skip call.",
+  "provider_calls": 0
+}

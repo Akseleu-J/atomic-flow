@@ -250,6 +250,8 @@ class ExecutionOverlay(_Canonical):
     result_ca_sha256: str
     before_manifest_sha256: str
     after_manifest_sha256: str
+    candidate_core_revision: str
+    execution_core_revision: str
     path: str = "requests/cacert.pem"
     operation: str = "append_fixture_ca"
 
@@ -265,11 +267,13 @@ class ExecutionOverlay(_Canonical):
         if (self.candidate_revision != self.before_manifest_sha256 or self.execution_revision != self.after_manifest_sha256
                 or self.candidate_revision == self.execution_revision):
             raise ValueError("distinct candidate/execution revisions must match their source manifests")
+        if self.candidate_core_revision != self.execution_core_revision:
+            raise ValueError("CA overlay must preserve the core source revision")
 
     def as_dict(self):
-        return {"schema_version": 1, "kind": "host_requests_execution_overlay", **{
+        return {"schema_version": 2, "kind": "host_requests_execution_overlay", **{
             name: getattr(self, name) for name in self.__dataclass_fields__},
-            "source_manifest_policy": "core_manifest_digest_with_sha1_file_hashes", "hidden_mount": False}
+            "source_manifest_policy": "core_plus_fixed_requests_ca_sha1_v1", "hidden_mount": False}
 
     def validate_bytes(self, *, original: bytes, fixture_ca: bytes, result: bytes,
                        before_manifest: dict, after_manifest: dict) -> str:
@@ -283,12 +287,15 @@ class ExecutionOverlay(_Canonical):
         if (type(before_manifest) is not dict or type(after_manifest) is not dict
                 or set(before_manifest) != set(after_manifest) or self.path not in before_manifest):
             raise ValueError("overlay must preserve the complete candidate file inventory")
-        # Core admitted source manifests use SHA1 per-file values. The separate
-        # CA byte fields above remain SHA256. Preserve core manifest_digest.
+        # PEM stays outside core source admission. These resource manifests add
+        # exactly the fixed CA path; removing it reconstructs the core manifest.
         if (before_manifest[self.path] != hashlib.sha1(original).hexdigest()
                 or after_manifest[self.path] != hashlib.sha1(result).hexdigest()
                 or any(before_manifest[path] != after_manifest[path] for path in before_manifest if path != self.path)
                 or manifest_digest(before_manifest) != self.candidate_revision
                 or manifest_digest(after_manifest) != self.execution_revision):
             raise ValueError("execution overlay changed unrelated source or candidate/execution manifest identity")
+        if (manifest_digest({p: h for p, h in before_manifest.items() if p != self.path}) != self.candidate_core_revision
+                or manifest_digest({p: h for p, h in after_manifest.items() if p != self.path}) != self.execution_core_revision):
+            raise ValueError("resource manifest differs from the separately bound core source revision")
         return self.digest

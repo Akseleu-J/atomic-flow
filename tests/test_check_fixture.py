@@ -52,8 +52,9 @@ def overlay():
     before = {"requests/cacert.pem": hashlib.sha1(original).hexdigest(), "requests/api.py": "a" * 40}
     after = before | {"requests/cacert.pem": hashlib.sha1(result).hexdigest()}
     candidate, execution = manifest_digest(before), manifest_digest(after)
+    core = manifest_digest({p: h for p, h in before.items() if p != "requests/cacert.pem"})
     identity = ExecutionOverlay("psf__requests-1963", candidate, execution, "b" * 64, "c" * 64, "d" * 64,
-                                sha(original), sha(CA), sha(result), candidate, execution)
+                                sha(original), sha(CA), sha(result), candidate, execution, core, core)
     return identity, dict(original=original, fixture_ca=CA, result=result, before_manifest=before, after_manifest=after)
 
 
@@ -136,6 +137,8 @@ def test_overlay_reuses_core_sha1_file_manifests_and_sha256_byte_bindings():
     assert identity.candidate_revision == manifest_digest(supplied["before_manifest"])
     assert identity.execution_revision == manifest_digest(supplied["after_manifest"])
     assert identity.as_dict()["hidden_mount"] is False
+    assert identity.as_dict()["schema_version"] == 2
+    assert identity.candidate_core_revision == identity.execution_core_revision
 
 
 @pytest.mark.parametrize("change", ["other_file", "new_file", "missing_file", "sha256_file_value", "different_original", "different_ca", "different_result"])
@@ -162,3 +165,12 @@ def test_overlay_rejects_arbitrary_operations_identical_source_and_3362():
                     {"execution_revision": identity.candidate_revision, "after_manifest_sha256": identity.candidate_revision}):
         with pytest.raises(ValueError):
             replace(identity, **changes)
+
+
+def test_overlay_refuses_forged_core_binding_even_with_exact_resource_revisions():
+    identity, supplied = overlay()
+    with pytest.raises(ValueError, match="preserve the core"):
+        replace(identity, execution_core_revision="e" * 64)
+    forged = replace(identity, candidate_core_revision="e" * 64, execution_core_revision="e" * 64)
+    with pytest.raises(ValueError, match="separately bound core"):
+        forged.validate_bytes(**supplied)

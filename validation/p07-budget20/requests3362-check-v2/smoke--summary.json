@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "case": "base_fail",
+      "check_passed": false,
+      "container_id": "ec3f86d13d55e0cc5f8b9333c78626a39ca8eb5f5963b9b2c39bd843b0aa0557",
+      "controller_returned_after_immutable_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 1,
+      "source_after": "968248fcd0d3863e5b2042eb5a9887bd2400dab5ad51b7fd9f30521e40c342f2",
+      "source_before": "968248fcd0d3863e5b2042eb5a9887bd2400dab5ad51b7fd9f30521e40c342f2",
+      "status": "expected_private_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d5aa131f81afeef1c265ff5aa5d256e66a8eff5f4a14f86a5a952a0adacd3f35"
+    },
+    {
+      "case": "edited_pass",
+      "check_passed": true,
+      "container_id": "0bd352fbb440a10a0d912516359c74d0d91190cf0a0ccf807ee66c80668377ed",
+      "controller_returned_after_immutable_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 0,
+      "source_after": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5",
+      "source_before": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5",
+      "status": "expected_private_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "9085da4f704416c68965e6f2791ed3b84c641639630c478ffc0f09f3e725488b"
+    }
+  ],
+  "cleanup_confirmed": false,
+  "current_case": "required_skip",
+  "error": "Private fixture completion, source or owned namespace binding differs",
+  "error_type": "ValueError",
+  "fixture_digest": "9c189d3591403c7dab2ff7f82d3928ff6a501e408eb15a019abcc737dd5682fc",
+  "full_source_file_count": 280,
+  "full_source_revision": "7a55a0e62452d3fe3acdcf45b29a23c4b8729c0a7f28f541f2018f16bd41b949",
+  "generic_dispatch_enabled": false,
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "httpbin_version": "0.5.0",
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "private_pytest_digest": "eac1b9d52501906c84e9bf927fc8144bc758d1e2e0fa20a86995d3732c8c3f9f",
+  "provider_calls": 0,
+  "runtime_digest": "ac544140465f7069fca1e6d22e480f48eefed2b8245d6d1802dbe2b1f36898e4",
+  "scope": "synthetic full-source Requests3362 private CheckSpec fixture boundary",
+  "source_container_cleanup": {
+    "confirmed": true,
+    "container_id": "6dce6b0dad91f15491bf193dd8e5d198813d372f1534ca7568f6b874047f7379",
+    "remove_exit": 0
+  },
+  "status": "not_qualified",
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "f173dd6c9bda35a99c2c024b110c3f26f2052c87",
+  "verified_success": false
+}

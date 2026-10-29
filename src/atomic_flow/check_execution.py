@@ -315,6 +315,11 @@ class CheckReceipt:
 def _runner_receipt(result: CommandResult, spec: CheckSpec, nonce: str) -> dict | None:
     if type(result.returncode) is not int or result.timed_out or result.stdout_truncated or result.stderr_truncated:
         return None
+    if spec.private_pytest_identity is not None:
+        if spec.fixture_identity is None or spec.fixture_identity.variant != "3362-cn":
+            return None
+        from atomic_flow.check_requests3362 import requests3362_receipt
+        return requests3362_receipt(result, spec, nonce)
     if spec.runner == "pytest-self":
         if spec.pytest_self_identity is None:
             return None
@@ -443,6 +448,12 @@ def run_check_spec(spec: CheckSpec, workspace: Path, *, cancel_check=None) -> Ch
     from atomic_flow.agents.verify import check_source_revision
     if type(spec) is not CheckSpec:
         raise ExecutionUnavailable("An immutable host-owned CheckSpec is required")
+    if spec.private_pytest_identity is not None:
+        if spec.fixture_identity is None or spec.fixture_identity.variant != "3362-cn":
+            raise ExecutionUnavailable("Private Requests fixture lifecycle is not implemented for this cohort")
+        from atomic_flow.check_requests_execution import run_requests3362_check
+        receipt, _ = run_requests3362_check(spec, workspace, cancel_check=cancel_check)
+        return receipt
     config = ExecutionConfig(mode="docker", profile="checks", image=spec.image,
                              output_bytes=spec.resources.output_bytes_per_stream)
     args = list(spec.argv[1:])

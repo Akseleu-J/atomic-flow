@@ -1,5 +1,13 @@
 # atomic-flow — рабочая карта проекта
 
+29 октября: Requests3362 synthetic controller boundary принят по CI40813084358
+на72bb7efa0d76f968d198d51a0caab3442fb1a846: FAIL→editedPASS→required-SKIP refusal,
+HTTP/TLS, source/namespace/cleanup и779rawhashes проверены. Pure function36
+CA-overlay исправлен: core revision отдельно от core+fixedCA resource manifest;
+236PASS/3Windows symlinkSKIP, Docker integration ещё нет. TaskRunner/historical
+ordinary/paidpairs/holdout/ablations/finalreview OPEN. Providercalls0.
+Подробности: [приёмка](P07_REQUESTS_BOUNDARY_ACCEPTANCE_2026-10-29.md).
+
 28 октября: исправление Linux topology-test принято на `0fb21baf855c38f1eabc73edb93c54dc5f5a5d34`, общий CI40748973134 SUCCESS. Python3.11/3.12: по3107PASS/14SKIP, JUnit и389 source hashes сверены; Windows/wheel/real Docker jobs SUCCESS. Requests3362 controller и private fixture composition пока проверены только локально/моками; отдельный реальный smoke готовится. Пять пакетов P07 остаются OPEN, paid main pairs ещё не запускались.
 
 28 октября: Atomic/flat Docker safety matrix CI40742941290 на24368249867437b6629235b6cc326c599e4a1c81 принята по ZIP/session hashes. Обе системыFAIL→repair1→2-file publish→freshPASS→graph sync; flat6scriptedcallbacks безparser/critic/planner. MainLinuxCI выявил globalosmock→pytestFDcapture bug в topologytest, фикслокальный43PASS; нуженсвежийCI. DirectSonnet5 APIv2 принят,response/usage25/11,cost0.00016,knownaggregate0.035931375USD; P07 OPEN.

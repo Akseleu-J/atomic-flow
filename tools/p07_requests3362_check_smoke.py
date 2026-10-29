@@ -97,7 +97,7 @@ def _case_observation(label, spec, receipt, topology):
     return observed
 
 
-def smoke(certificate_receipt: Path, health_receipt: Path, output: Path):
+def smoke(certificate_receipt: Path, health_receipt: Path, output: Path, *, host_callback=None):
     if platform.system() != "Linux" or not hasattr(os, "geteuid") or os.geteuid() != 0 or output.exists():
         raise ValueError("Fresh output and explicitly selected root Linux Docker worker required")
     output.mkdir(parents=True)
@@ -306,6 +306,10 @@ def smoke(certificate_receipt: Path, health_receipt: Path, output: Path):
             report.pop("current_case", None)
             if len(report["cases"]) == 3:
                 report["status"] = "requests3362_private_check_boundary_qualified"
+                if host_callback is not None:
+                    if not callable(host_callback):
+                        raise ValueError("trusted host journey callback required")
+                    host_callback(workspace, runtime, pytest_identity, fixture, report, output)
     except Exception as error:
         report.update(status="not_qualified", error_type=type(error).__name__, error=str(error)[:500])
     finally:

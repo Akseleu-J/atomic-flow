@@ -10,6 +10,7 @@ from test_check_requests3362 import spec as private_spec
 from atomic_flow import check_requests_execution as controller
 from atomic_flow.agents.execution import CommandResult, ExecutionUnavailable, TaskCancelled
 from atomic_flow.agents.verify import check_source_revision
+from atomic_flow.check_execution import completed_check_receipt, run_check_spec
 from atomic_flow.check_fixture_topology import OwnedTimeoutTopologyReceipt
 from atomic_flow.check_private_pytest import MARKER
 
@@ -120,6 +121,34 @@ def test_exact_owned_start_topology_exec_stop_and_absence_proof(host, code):
     assert CID in command and timeout == host.spec.timeout_seconds
     assert bound == host.spec.resources.output_bytes_per_stream
     assert host.controls[-1][1:3] == ["container", "ls"]
+
+
+@pytest.mark.parametrize("code", [0, 1])
+def test_ordinary_dispatch_revalidates_private_receipt_after_owned_cleanup(host, code):
+    host.code = code
+    receipt = run_check_spec(host.spec, host.root)
+    assert host.removed == [(controller.ENGINE, CID)]
+    assert completed_check_receipt(host.spec, receipt)
+    assert completed_check_receipt(host.spec, receipt, negative=True) is (code == 1)
+    assert receipt.check_passed is (code == 0)
+
+
+def test_ordinary_completion_refuses_tampered_fixture_lifecycle(host):
+    receipt = run_check_spec(host.spec, host.root)
+    receipt.runner_receipt["requests3362_fixture"]["servers_stopped"] = False
+    assert not completed_check_receipt(host.spec, receipt)
+
+
+def test_ordinary_dispatch_propagates_cleanup_uncertainty_without_completed_receipt(host):
+    host.cleanup_ok = False
+    with pytest.raises(ExecutionUnavailable, match="cleanup"):
+        run_check_spec(host.spec, host.root)
+
+
+def test_ordinary_dispatch_refuses_missing_private_fixture(host):
+    with pytest.raises(ExecutionUnavailable, match="not implemented"):
+        run_check_spec(replace(host.spec, fixture_identity=None), host.root)
+    assert not host.controls and not host.executions
 
 
 def test_nonroot_or_nonlinux_refuses_before_any_command(host, monkeypatch):
