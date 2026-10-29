@@ -1,0 +1,26 @@
+{
+  "run": 40832039669,
+  "head": "e3ae5fc908bbced6ff2afc97e85675e5c4ef87f9",
+  "artifact": 12879460458,
+  "archive_sha256": "64a3fb73f4292d61d119140fd987989de28e2bcfae3ee7dd203500bce7733b35",
+  "cases": [
+    {
+      "case": "pass",
+      "exit": 0,
+      "admitted": true
+    },
+    {
+      "case": "fail",
+      "exit": 1,
+      "admitted": true
+    },
+    {
+      "case": "skip",
+      "exit": 5,
+      "admitted": false
+    }
+  ],
+  "raw_hashes_verified": 6,
+  "scope": "synthetic private pytest bootstrap only",
+  "provider_calls": 0
+}
