@@ -1,0 +1,76 @@
+{
+  "active_edges": [
+    {
+      "from": "hypothesis",
+      "requirement": "attrs>=16.0.0",
+      "resolved": "23.1.0"
+    },
+    {
+      "from": "xmlschema",
+      "requirement": "elementpath~=1.3.0",
+      "resolved": "1.3.3"
+    }
+  ],
+  "assumed_base_packages": {
+    "attrs": "23.1.0"
+  },
+  "image_built": false,
+  "ordinary_acceptance": false,
+  "profile_sha256": "3660484ba011a657c3f4dc90318e527a8dc7aa1957f31b30538e2cba5eccd70d",
+  "provider_calls": 0,
+  "status": "prospective_wheelhouse_verified_no_execution",
+  "target_imports": false,
+  "target_python": "3.9.20",
+  "wheels": [
+    {
+      "filename": "hypothesis-4.38.1-py3-none-any.whl",
+      "files": 88,
+      "name": "hypothesis",
+      "requires_dist": [
+        "attrs (>=16.0.0)",
+        "enum34 ; python_version == \"2.7\"",
+        "django (>=1.11) ; extra == 'all'",
+        "dpcontracts (>=0.4) ; extra == 'all'",
+        "lark-parser (>=0.6.5) ; extra == 'all'",
+        "numpy (>=1.9.0) ; extra == 'all'",
+        "pandas (>=0.19) ; extra == 'all'",
+        "pytest (>=3.0) ; extra == 'all'",
+        "python-dateutil (>=1.4) ; extra == 'all'",
+        "pytz ; extra == 'all'",
+        "pytz (>=2014.1) ; extra == 'all'",
+        "python-dateutil (>=1.4) ; extra == 'dateutil'",
+        "pytz ; extra == 'django'",
+        "django (>=1.11) ; extra == 'django'",
+        "dpcontracts (>=0.4) ; extra == 'dpcontracts'",
+        "lark-parser (>=0.6.5) ; extra == 'lark'",
+        "numpy (>=1.9.0) ; extra == 'numpy'",
+        "pandas (>=0.19) ; extra == 'pandas'",
+        "pytest (>=3.0) ; extra == 'pytest'",
+        "pytz (>=2014.1) ; extra == 'pytz'"
+      ],
+      "requires_python": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
+      "sha256": "d66286a7a67946d843b37c5656321ea3fd318c259dc0ed9aeb6f2d4b037b876a",
+      "version": "4.38.1"
+    },
+    {
+      "filename": "xmlschema-1.0.18-py2.py3-none-any.whl",
+      "files": 209,
+      "name": "xmlschema",
+      "requires_dist": [
+        "elementpath (~=1.3.0)"
+      ],
+      "requires_python": null,
+      "sha256": "4082a2053ad23ac0ac5e0d3a09b6c90d309622bcf1c720790c90277cc3a2bc50",
+      "version": "1.0.18"
+    },
+    {
+      "filename": "elementpath-1.3.3-py2.py3-none-any.whl",
+      "files": 20,
+      "name": "elementpath",
+      "requires_dist": [],
+      "requires_python": null,
+      "sha256": "4b1fc2120d69c126a2d9993ea206c214b4098ded9135318ad382ebfced537619",
+      "version": "1.3.3"
+    }
+  ]
+}

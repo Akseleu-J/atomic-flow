@@ -1,0 +1,22 @@
+{
+  "run": 40865844382,
+  "artifact": 12893751414,
+  "archive_sha256": "5707eb55ae643df57860cb682e20e3744daa194475e493f4a8cfd6085706ab3a",
+  "tested_commit": "099ce0e1d32f592b229e87b33c981743353f4e31",
+  "status": "collection_observed_with_errors",
+  "public_git_blobs_matched": 474,
+  "collected": 2414,
+  "collected_files": 59,
+  "nonpublic_collected_files": 0,
+  "collection_errors": [
+    "testing/test_junitxml.py",
+    "testing/python/metafunc.py"
+  ],
+  "exit_code": 2,
+  "stdout_sha256": "84826e00c100e683734a061d64fe085bb4f36256d29b7444e9fe1bca63f3a5fe",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dependency_inventory_sha256": "64e3cd2da3f6265215c33ab760da6475af7d06245e215e53f59d8ccff98feb87",
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}
