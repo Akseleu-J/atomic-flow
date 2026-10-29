@@ -37,7 +37,7 @@ WRONG_CA = "p07_private_wrongca.pem"
 SITE = transplant.PREFIX + "/lib/python3.6/site-packages/"
 HEALTH_SOURCE = health.TEST_SOURCE.replace("'/tmp/p07-health/wrongca.pem'", repr("/testbed/" + WRONG_CA))
 ORDINARY_SOURCE = HEALTH_SOURCE + "\n\ndef test_required_production_value():\n    from requests.p07_private_probe import value\n    assert value == 42\n"
-SKIP_SOURCE = HEALTH_SOURCE + "\n\n@pytest.mark.skip(reason='synthetic required-test skip must refuse')\ndef test_required_production_value():\n    assert False\n"
+SKIP_SOURCE = HEALTH_SOURCE + "\n\ndef test_required_production_value():\n    pytest.skip('synthetic required-test skip must refuse')\n"
 
 
 def sha(raw):

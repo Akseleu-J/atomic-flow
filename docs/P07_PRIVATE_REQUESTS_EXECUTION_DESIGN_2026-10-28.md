@@ -283,3 +283,11 @@ attempt is preserved in `validation/p07-budget20/requests3362-check-v1`.
 The fixed sealed plugin argv now explicitly disables cacheprovider; source
 remains read-only. Focused profile/controller tests124PASS locally. A fresh run
 is required, with no upgrade of the first result.
+
+Second attempt CI40751447691 onf173dd6 has accepted partial observations:
+completed negative receipt, edited PASS, real HTTP/TLS/wrong-CA checks and
+fixture shutdown. Full smoke remains NOT QUALIFIED: pytest2.8 ignored the
+synthetic `@pytest.mark.skip` decorator and executed its failing body. The
+fixture now uses historical `pytest.skip(...)`; production completion/SKIP
+guards are unchanged. All778 smoke hashes were verified and the second attempt
+is retained separately in `validation/p07-budget20/requests3362-check-v2`.
