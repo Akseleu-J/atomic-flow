@@ -1,0 +1,23 @@
+{
+  "run": 40840875659,
+  "artifact": 12883006338,
+  "archive_sha256": "sha256:c28d8a430b86b6425544e1979cc37a2cc56c3f354d9509ac0770a8f13ff37065",
+  "tested_commit": "1c8562b97e3e313d57ad987012538b9684007b81",
+  "manifest_verified": 936,
+  "cases": [
+    {
+      "case": "base_fail",
+      "passed": false
+    },
+    {
+      "case": "edited_pass",
+      "passed": true
+    },
+    {
+      "case": "required_skip",
+      "passed": false
+    }
+  ],
+  "scope": "synthetic full-source requests863 ordinary resource boundary",
+  "provider_calls": 0
+}
