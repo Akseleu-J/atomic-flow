@@ -1,0 +1,10 @@
+{
+  "run": 40934640652,
+  "artifact": 12923474451,
+  "archive_sha256": "b973a18704512c617cdc36ba2a3d3fe3305abc89589ca661d703ad2261567f5f",
+  "tested_commit": "c517aad0bedbd9031d9daf72a9356c3e37a3d4dc",
+  "status": "two_public_lsof_tests_passed",
+  "scope": "isolated focused diagnostic only",
+  "ordinary_acceptance": false,
+  "provider_calls": 0
+}
