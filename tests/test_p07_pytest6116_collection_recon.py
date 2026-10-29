@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from p07_pytest6116_collection_recon import parse_collection  # noqa: E402
+from p07_pytest6116_collection_recon import SOURCE, collection_source, parse_collection  # noqa: E402
 
 
 def test_parse_actual_native_error_without_promoting_it():
@@ -17,3 +17,13 @@ def test_parse_actual_native_error_without_promoting_it():
     for invalid, code in ((raw, 0), (raw + raw, 2), (raw.replace("COLLECTION=", "COLLECTION:"), 2)):
         with pytest.raises(ValueError):
             parse_collection(invalid, code)
+
+
+def test_derived_collection_only_adds_fixed_dependency_path_and_single_plugin_block():
+    assert collection_source(None) == SOURCE
+    generated = collection_source("/opt/p07-pytest6116-deps")
+    assert "['-p','no:typeguard','--collect-only','-q','testing']" in generated
+    assert generated.count("no:typeguard") == 1
+    assert "sys.path.insert(0,'/opt/p07-pytest6116-deps')" in generated
+    with pytest.raises(ValueError, match="fixed derived"):
+        collection_source("/unreviewed")

@@ -84,6 +84,22 @@ def parse_collection(stdout: str, exit_code: int):
     return observation
 
 
+def collection_source(dependency_prefix: str | None):
+    if dependency_prefix is None:
+        return SOURCE
+    if dependency_prefix != "/opt/p07-pytest6116-deps":
+        raise ValueError("fixed derived dependency prefix required")
+    if (SOURCE.count("sys.path.insert(0,'/testbed/src')") != 1
+            or SOURCE.count("pytest.main(['--collect-only','-q','testing']") != 1):
+        raise ValueError("fixed derived collection source changed")
+    code = SOURCE.replace("sys.path.insert(0,'/testbed/src')",
+                          "sys.path.insert(0,'/opt/p07-pytest6116-deps')\nsys.path.insert(0,'/testbed/src')")
+    # Modern setuptools exposes its vendored typeguard pytest11 entrypoint,
+    # which this old pytest cannot register. Block only this exact name.
+    return code.replace("pytest.main(['--collect-only','-q','testing']",
+                        "pytest.main(['-p','no:typeguard','--collect-only','-q','testing']")
+
+
 def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: str | None = None):
     """Observe collection; callers must independently admit any derived image."""
     if output.exists() or os.name != "posix":
@@ -172,10 +188,9 @@ def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: s
                 raise ValueError("private dependency inventory unavailable")
             report["dependency_inventory_sha256"] = sha(dependencies.stdout)
             (output / "container-inspect.json").write_bytes(inspected.stdout)
-            code = SOURCE
+            code = collection_source(dependency_prefix)
             if dependency_prefix:
-                code = code.replace("sys.path.insert(0,'/testbed/src')",
-                                    "sys.path.insert(0,'/opt/p07-pytest6116-deps')\nsys.path.insert(0,'/testbed/src')")
+                report["fixed_plugin_policy"] = {"disabled": ["typeguard"], "reason": "incompatible vendored host plugin"}
             result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", code],
                               home=home, timeout=180, limit=1_000_000, check=lambda: None)
             (output / "collection.stdout").write_bytes(result.stdout.encode())
