@@ -1,9 +1,10 @@
-"""Owned Requests3362 Docker controller; no generic check dispatch integration.
+"""Owned Requests Docker lifecycle: qualified3362 plus explicit function36 path.
 
 The caller must separately admit actual runtime/fixture provisioning evidence.
 This controller verifies its fixed worker/source/lifecycle observations and
 returns only after immutable-ID cleanup and absence proof. It never uses sudo,
-provider credentials, an arbitrary command, a host service or a CA overlay.
+provider credentials, arbitrary commands or a host service. The explicit
+function36 wrapper separately validates its sole typed CA overlay before/after.
 """
 from __future__ import annotations
 
@@ -146,6 +147,9 @@ def _inspect(container_id, spec, workspace, user, environment, *, home, check, e
     except (TypeError, ValueError):
         raise ExecutionUnavailable("Requests worker environment differs") from None
     resources = spec.resources
+    function = spec.fixture_identity is not None and spec.fixture_identity.variant == "function36-v3"
+    expected_hosts = [host + ":" + address for host, address in spec.fixture_identity.host_mappings] if function else []
+    expected_sysctls = {"net.ipv4.ip_unprivileged_port_start": "0"} if function else {}
     if (value.get("Id") != container_id or value.get("Image") != spec.image
             or running.get("Running") is not True or running.get("Paused") is not False
             or running.get("Restarting") is not False or config.get("User") != user
@@ -157,6 +161,7 @@ def _inspect(container_id, spec, workspace, user, environment, *, home, check, e
             or "no-new-privileges" not in host.get("SecurityOpt", [])
             or host.get("Memory") != resources.memory_bytes or host.get("NanoCpus") != resources.cpus * 1_000_000_000
             or host.get("PidsLimit") != resources.pids or host.get("Binds") or host.get("VolumesFrom")
+            or sorted(host.get("ExtraHosts") or []) != expected_hosts or (host.get("Sysctls") or {}) != expected_sysctls
             or len(binds) != 1 or binds[0].get("Source") != str(workspace.resolve())
             or binds[0].get("Destination") != spec.target_root or binds[0].get("RW") is not False
             or any(mount.get("Type") != "tmpfs" or mount.get("Destination") != "/tmp" for mount in extra)
@@ -179,6 +184,11 @@ def _cid(cidfile):
 
 def run_requests3362_check(spec: CheckSpec, workspace: Path, *, cancel_check=None
                            ) -> tuple[CheckReceipt, OwnedTimeoutTopologyReceipt]:
+    return _run_requests_check(spec, workspace, cancel_check=cancel_check)
+
+
+def _run_requests_check(spec: CheckSpec, workspace: Path, *, cancel_check=None, _function_overlay=None
+                        ) -> tuple[CheckReceipt, OwnedTimeoutTopologyReceipt]:
     """Run exact admitted Requests3362 check in its owned root-worker namespace."""
     if platform.system() != "Linux" or not hasattr(os, "geteuid") or os.geteuid() != 0:
         raise ExecutionUnavailable("Requests3362 requires an explicitly accepted root Linux worker")
@@ -187,7 +197,13 @@ def run_requests3362_check(spec: CheckSpec, workspace: Path, *, cancel_check=Non
     check = cancel_check or (lambda: None)
     check()
     nonce = uuid.uuid4().hex
-    launcher_args = requests3362_args(spec, nonce)
+    if _function_overlay is None:
+        launcher_args = requests3362_args(spec, nonce)
+        parse_receipt = requests3362_receipt
+    else:
+        from atomic_flow.check_requests_function import function_args, function_receipt
+        launcher_args = function_args(spec, nonce, _function_overlay)
+        parse_receipt = function_receipt
     workspace = Path(workspace).absolute()
     mount_source = str(workspace.resolve())
     if any(character in mount_source for character in (",", "\n", "\r", "\0")):
@@ -218,6 +234,10 @@ def run_requests3362_check(spec: CheckSpec, workspace: Path, *, cancel_check=Non
                       "type=bind,src=" + mount_source + ",dst=" + spec.target_root + ",readonly",
                       "--env=HOME=/tmp", "--env=PYTHONDONTWRITEBYTECODE=1",
                       "--entrypoint=/bin/sleep", "--", spec.image, "infinity"]
+            if _function_overlay is not None:
+                transport = ["--sysctl=net.ipv4.ip_unprivileged_port_start=0",
+                             *["--add-host=" + host + ":" + address for host, address in spec.fixture_identity.host_mappings]]
+                create[2:2] = transport
             attempted_create = True
             _control(create, home=home, check=check)
             container_id = _cid(cidfile)
@@ -242,7 +262,7 @@ def run_requests3362_check(spec: CheckSpec, workspace: Path, *, cancel_check=Non
             after = check_source_revision(workspace, check)
             if after != before:
                 raise ExecutionUnavailable("Requests source changed during ordinary execution")
-            parsed = requests3362_receipt(result, spec, nonce)
+            parsed = parse_receipt(result, spec, nonce)
             receipt = CheckReceipt(spec.digest, before, after, parsed is not None and result.returncode == 0,
                                    parsed, result)
         finally:

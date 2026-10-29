@@ -15,6 +15,7 @@ from typing import Literal
 
 from atomic_flow.check_fixture import FixtureIdentity, PrivatePytestIdentity
 from atomic_flow.check_pytest_self import PytestSelfIdentity
+from atomic_flow.check_requests_resources import RequestsCAIdentity
 from atomic_flow.check_runtime import RuntimeIdentity
 
 _IMAGE = re.compile(r"[a-z0-9]+(?:[._-][a-z0-9]+)*(?::[0-9]+)?(?:/[a-z0-9]+(?:[._-][a-z0-9]+)*)*@sha256:[0-9a-f]{64}")
@@ -115,6 +116,7 @@ class CheckSpec:
     runtime_identity: RuntimeIdentity | None = None
     private_pytest_identity: PrivatePytestIdentity | None = None
     fixture_identity: FixtureIdentity | None = None
+    requests_ca_identity: RequestsCAIdentity | None = None
 
     def __post_init__(self) -> None:
         if type(self.task_id) is not str or _TASK.fullmatch(self.task_id) is None:
@@ -176,6 +178,12 @@ class CheckSpec:
                     or fixture.task_id != self.task_id or fixture.variant != identity.variant
                     or fixture.runtime_digest != runtime.digest or fixture.image_id != runtime.image_id):
                 raise ValueError("fixture identity differs from its exact private task/runtime")
+        if self.requests_ca_identity is not None:
+            ca, fixture = self.requests_ca_identity, self.fixture_identity
+            if (type(ca) is not RequestsCAIdentity or fixture is None or fixture.variant != "function36-v3"
+                    or ca.task_id != self.task_id or self.target_root != "/testbed"
+                    or ca.fixture_ca_sha256 != dict(fixture.certificate_files)[fixture.certificate_root + "cacert.pem"]):
+                raise ValueError("public CA identity differs from exact function36 fixture/task/root")
         _integer("timeout_seconds", self.timeout_seconds, 180)
         if type(self.resources) is not CheckResources:
             raise ValueError("resource bounds must use the immutable host contract")
@@ -212,6 +220,8 @@ class CheckSpec:
             value["private_pytest_identity"] = self.private_pytest_identity.as_dict()
         if self.fixture_identity is not None:
             value["fixture_identity"] = self.fixture_identity.as_dict()
+        if self.requests_ca_identity is not None:
+            value["requests_ca_identity"] = self.requests_ca_identity.as_dict()
         return value
 
     def canonical_bytes(self) -> bytes:
