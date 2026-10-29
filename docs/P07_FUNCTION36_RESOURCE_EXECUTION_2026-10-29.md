@@ -11,7 +11,7 @@ function36-v3 fixture. New RequestsCAIdentity seals original/fixture/result CA
 SHA256 and a disclosed unrelated public CA. It has no path, shell, generic
 environment or mount input. Optional CheckSpec serialization is unchanged
 when this identity is absent; existing obligations and approvals keep their
-canonical bytes. Function cohorts remain disconnected from generic dispatch.
+canonical bytes. At the original resource checkpoint function cohorts were disconnected from generic dispatch. The later TaskRunner acceptance and dispatch update are recorded in `docs/P07_FUNCTION36_TASK_JOURNEYS_2026-10-29.md`.
 
 The physical model/publication candidate C contains the admitted core and no
 requests/cacert.pem. A stopped immutable image container supplies only that

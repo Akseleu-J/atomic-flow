@@ -2,7 +2,13 @@
 
 Работать в `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`, ветка `experimental`, draft PR №2. Начать с `docs/PROJECT_CONTEXT.md`; Git-команды выполнять только в этом клоне. Перед продолжением сверить HEAD, remote SHA и рабочий diff. P07 остаётся **OPEN**.
 
-## Текущий checkpoint
+## Новый checkpoint: function36 TaskRunner
+
+Runtime `875fd01b1f3f4b4521b887688d27a82678f47df1`: три полных public ordinary journey Requests1963/2148/2317 приняты в scripted synthetic scope; CI 40824311185 SUCCESS, соответственно 122/134/144 PASS после probe repair, required SKIP отклонён. По 823 raw hashes и восемь resource receipts на задачу независимо сверены. Публичные базовые деревья сверены полностью: единственное ресурсное исключение — CA вне candidate; добавлены два synthetic файла. General CI 40824307411 SUCCESS, Python 3.11/3.12 по 3267 PASS / 14 SKIP, Windows 4 PASS. Отчёт: `docs/P07_FUNCTION36_TASK_JOURNEYS_2026-10-29.md`; локальные архивы и assessments: `validation/p07-budget20/function36-task-v1/`. Model calls 0, hidden oracle не запускался, P07 OPEN.
+
+Следующий приоритет: Requests2674 Python2.7, затем Requests863 SSLv3/wire; далее остальные ordinary profiles и study gates. Function36 generic dispatch теперь включён только для трёх указанных принятых контуров; прежний текст checkpoint ниже исторический.
+
+## Предыдущий checkpoint
 
 Последний принятый runtime: `4d3c08e3eedcc47509ba700a8b8ec9029f335b13`. Полный public ordinary Requests3362 принят: CI 40818355491 SUCCESS, artifact 12872864520, SHA256 `4ce5d17e20198a0f3e2f31b40d288a2e623785d01d0f6b70e2af68b73ca8f4a1`. Сверены 810 raw hashes и 80 условий приёмки. Один replan, пять полных checks: 349 required PASS + один ожидаемый probe FAIL, затем четыре раза 350 required PASS. Три source-declared optional outcomes сохранены отдельно; все 353 collected items завершены. Fresh final gate, публикация только probe, graph sync и cleanup подтверждены. Evidence: `validation/p07-budget20/requests3362-full-public-v5/`. Это обычные public tests и synthetic repair probe, без модели и hidden grade.
 
@@ -25,7 +31,7 @@ V1 выявил URL-callable wrappers над plugin-owned HTTPBin servers и н�
 
 ## Следующая работа
 
-Полный Requests3362 ordinary путь принят в указанном scope. Продолжить function36 fixture/controller/resource receipt integration для Requests1963/2148/2317; затем Python2.7 Requests2674 и SSLv3/wire Requests863. Generic ordinary dispatch допускает только 3362-cn через отдельный owned root-Linux controller; остальные private Requests cohorts отклоняются. Не включать их по metadata/unit tests.
+Полный Requests3362 ordinary путь и function36 journeys Requests1963/2148/2317 приняты в указанном synthetic scope. Продолжить Python2.7 Requests2674, затем SSLv3/wire Requests863. Остальные private Requests cohorts отклоняются до evidence-gated приёмки; не включать их по metadata/unit tests.
 
 Далее нужны все 30 ordinary profiles, полный исторический Atomic/flat driver с равными лимитами, замороженный study profile/cohort/order/owner caps, 30 пар с независимым oracle, свежий holdout, ablations и final review. 30/30 environment calibrations уже приняты, но это не 30 решённых моделью задач.
 
