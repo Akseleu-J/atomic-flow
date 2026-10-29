@@ -43,14 +43,16 @@ def validate_journey(task, *, before_spec, obligation, final_revision, changed, 
     negative, positive = False, False
     ids = set()
     for spec, receipt, topology in raw_checks:
-        if (topology.container_id in ids or topology.host_netns_inode == topology.netns_inode
-                or receipt.source_before != receipt.source_after or receipt.source_before != spec.source_revision
-                or not completed_check_receipt(spec, receipt)):
+        if (not completed_check_receipt(spec, receipt)
+                or topology.container_id in ids or topology.host_netns_inode == topology.netns_inode
+                or topology.nonce != receipt.runner_receipt.get("nonce")
+                or topology.image_id != spec.image or topology.fixture_digest != spec.fixture_identity.digest
+                or receipt.source_before != receipt.source_after or receipt.source_before != spec.source_revision):
             return False
         ids.add(topology.container_id)
         negative |= (completed_check_receipt(spec, receipt, negative=True)
                      and spec.source_revision == before_spec.source_revision)
-        positive |= receipt.check_passed and spec.source_revision == final_revision
+        positive |= receipt.check_passed and receipt.result.returncode == 0 and spec.source_revision == final_revision
     if not negative or not positive:
         return False
     completion = task.completion_report
@@ -59,6 +61,7 @@ def validate_journey(task, *, before_spec, obligation, final_revision, changed, 
             or completion.get("check_completed") is not True or completion.get("check_result_exit_code") != 0
             or completion.get("check_runner") != "pytest" or completion.get("checked_source_revision") != final_revision
             or completion.get("check_obligation_digest") != obligation.digest or graph.get("failed") is not False
+            or type(graph.get("coverage_complete")) is not bool
             or type(graph.get("coverage_omissions")) is not list
             or graph.get("coverage_complete") != (not graph["coverage_omissions"])):
         return False
@@ -77,10 +80,11 @@ def validate_journey(task, *, before_spec, obligation, final_revision, changed, 
     return True
 
 
-def _journey(workspace, runtime, identity, fixture, report, output):
+def _journey(workspace, runtime, identity, fixture, report, output, *, ordinary_mode="synthetic"):
     report.update(scope="synthetic full admitted Requests3362 public TaskRunner journey",
                   taskrunner_wired=True, generic_dispatch_enabled=True, model_transport="scripted",
-                  historical_target_tests=False, hidden_oracle="not_run", whole30_qualified=False)
+                  historical_target_tests=ordinary_mode == "full-public", ordinary_mode=ordinary_mode,
+                  hidden_oracle="not_run", whole30_qualified=False)
     previous_home = os.environ.get("ATOMIC_FLOW_HOME")
     old_path = list(sys.path)
     original_controller = controller.run_requests3362_check
@@ -114,10 +118,21 @@ def _journey(workspace, runtime, identity, fixture, report, output):
         trust_project(workspace)
         before = check_source_snapshot(workspace)
         save(output / "task-source-before.json", before)
+        # Complete public-base test-file inventory, selected from source paths
+        # only. No hidden patch, calibration outcome or solution selects it.
+        ordinary_paths = tuple(sorted(p for p in before if p.startswith("tests/")
+                                     and Path(p).name.startswith("test_") and p.endswith(".py")))
+        if ordinary_mode == "full-public" and not ordinary_paths:
+            raise ValueError("Complete public historical ordinary test inventory is missing")
+        selected_paths = tuple(sorted((*ordinary_paths, TEST_PATH))) if ordinary_mode == "full-public" else (TEST_PATH,)
+        report["ordinary_test_paths"] = list(selected_paths)
+        report["ordinary_selection_policy"] = "all-admitted-tests-dir-test-prefix-python-files-plus-fixed-probe/1"
+        if ordinary_mode == "full-public":
+            report["scope"] = "full public ordinary Requests3362 inventory plus synthetic repair probe"
         spec = CheckSpec(runtime_identity=runtime, private_pytest_identity=identity, fixture_identity=fixture,
                          task_id=identity.task_id, task_commit=report["tested_commit"],
                          base_commit="36453b95b13079296776d11b09cab2567ea3e703", source_revision=check_source_revision(workspace),
-                         image=runtime.image_id, interpreter=runtime.interpreter, runner="pytest", test_paths=(TEST_PATH,),
+                         image=runtime.image_id, interpreter=runtime.interpreter, runner="pytest", test_paths=selected_paths,
                          target_root="/testbed", resources=CheckResources(output_bytes_per_stream=1_000_000))
         syntax = run_private_syntax(spec, workspace, MODULE_PATH)
         save(output / "target-syntax.json", syntax)
@@ -184,8 +199,11 @@ def _journey(workspace, runtime, identity, fixture, report, output):
             os.environ["ATOMIC_FLOW_HOME"] = previous_home
 
 
-def journey(certificate_receipt, health_receipt, output):
-    return smoke(certificate_receipt, health_receipt, output, host_callback=_journey)
+def journey(certificate_receipt, health_receipt, output, ordinary_mode="synthetic"):
+    if ordinary_mode not in {"synthetic", "full-public"}:
+        raise ValueError("Fixed host ordinary inventory mode required")
+    return smoke(certificate_receipt, health_receipt, output,
+                 host_callback=lambda *args: _journey(*args, ordinary_mode=ordinary_mode))
 
 
 if __name__ == "__main__":
@@ -193,7 +211,8 @@ if __name__ == "__main__":
     parser.add_argument("--certificate-receipt", type=Path, required=True)
     parser.add_argument("--health-receipt", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--ordinary-mode", choices=("synthetic", "full-public"), default="synthetic")
     args = parser.parse_args()
-    result = journey(args.certificate_receipt, args.health_receipt, args.output)
+    result = journey(args.certificate_receipt, args.health_receipt, args.output, args.ordinary_mode)
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result["status"] == QUALIFIED else 1)

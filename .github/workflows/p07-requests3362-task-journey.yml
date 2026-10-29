@@ -2,6 +2,12 @@ name: P07 private Requests3362 full TaskRunner journey
 
 on:
   workflow_dispatch:
+    inputs:
+      ordinary_mode:
+        description: Full public historical inventory or synthetic boundary only
+        type: choice
+        options: [synthetic, full-public]
+        default: synthetic
 
 permissions:
   contents: read
@@ -29,8 +35,10 @@ jobs:
       - name: Independently qualify same-image HTTP TLS plugin health
         run: python tools/p07_requests3362_health.py --certificate-receipt p07-requests3362-task-worker/certificate --output p07-requests3362-task-worker/health
       - name: Root worker runs public TaskRunner failure replan repair final check and publication
+        env:
+          ORDINARY_MODE: ${{ inputs.ordinary_mode }}
         run: |
-          sudo -- "$(command -v python)" tools/p07_requests3362_task_journey.py --certificate-receipt p07-requests3362-task-worker/certificate --health-receipt p07-requests3362-task-worker/health --output p07-requests3362-task-worker/journey
+          sudo -- "$(command -v python)" tools/p07_requests3362_task_journey.py --certificate-receipt p07-requests3362-task-worker/certificate --health-receipt p07-requests3362-task-worker/health --output p07-requests3362-task-worker/journey --ordinary-mode "$ORDINARY_MODE"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

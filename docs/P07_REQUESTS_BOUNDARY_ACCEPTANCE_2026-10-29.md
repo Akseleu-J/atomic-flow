@@ -68,7 +68,7 @@ fixture lifecycle before its own fresh Docker smoke. Python2.7/SSLv3 paths,
 all30 ordinary profiles, matched driver/pairs, holdout/ablations and final
 independent review remain open.
 
-## Next integration prepared, awaiting its own remote evidence
+## Accepted full synthetic TaskRunner integration
 
 `run_check_spec` now routes only exact private Requests3362 metadata to the
 qualified owned controller. Completion revalidates its original private raw
@@ -83,4 +83,43 @@ publication and graph synchronization. They retain each actual controller
 receipt/topology/stdout. A disclosed synthetic wrong-CA `.txt` file is protected
 by the obligation and copied through ordinary staging; PEM/key filtering stays
 unchanged. This journey's tests remain synthetic. No full historical ordinary
-inventory or TaskRunner acceptance is implied before its outputs are audited.
+inventory acceptance is implied by this synthetic journey.
+
+[CI40814165859](https://github.com/Akseleu-J/atomic-flow/actions/runs/40814165859)
+completed SUCCESS on `500a0fdea0ab9258269cc0ace45338607c8ce917`.
+Artifact12871697420 SHA256
+`87a8453bf6c45c13e7807919f5e3a41570229a90d6b1cbd0b78aa0a141ae2e56`
+and all810raw hashes were verified.33external audit assertions check raw
+receipts, spec/source/runtime/fixture/namespace bindings, unique owned CIDs,
+full four-test inventories and stopped HTTP/TLS servers. Five actual checks
+were retained: one completed negative and four positive checks, including the
+fresh final gate on the published revision. TaskRunner performed one replan,
+published only `requests/p07_private_probe.py`, and synchronized its graph
+with coverage_complete=true/no omissions. The snapshot admitted142files;
+the original image copy before source filtering contained280files. This is
+not a claim that the core snapshot includes ignored/generated/private files.
+
+Raw evidence is retained under `validation/p07-budget20/requests3362-task-v1`.
+Provider/model calls remain0, hidden_oracle=not_run and historical_target_tests=false.
+The follow-up acceptance validator additionally checks topology nonce/image/
+fixture equality and requires a true boolean graph coverage flag;12offline
+tests reject substituted/missing receipts and publication/failure evidence.
+
+## General CI
+
+[CI40814163106](https://github.com/Akseleu-J/atomic-flow/actions/runs/40814163106)
+on500a0fd completed SUCCESS. All six artifact ZIP digests were verified:
+Python3.11/3.12 each3198PASS/14SKIP; Windows4PASS; realDocker PASS;
+both installed-wheel smoke jobs PASS. JUnit hashes and392src/tests hashes
+were checked against Git objects (raw Linux bytes; both sides LF-normalized
+for Windows). Both wheel/sdist distribution checksums were verified.
+Three historical fixture files already contain CRLF in Git; they remain
+byte-preserved rather than rewritten to fit normalization assumptions.
+Evidence: `validation/p07-budget20/requests-integration-core-ci-v1/assessment.json`.
+
+The follow-up adds an explicit `full-public` ordinary mode. It declares every
+admitted `tests/**/test_*.py` file plus the fixed synthetic repair probe, seals
+the complete list in the same obligation and retains its raw execution. It
+uses no hidden calibration selectors or patches. Missing resources, required
+skips and unsupported runners must remain visible failures. This mode requires
+its own remote run and is not covered by the accepted four-test journey above.

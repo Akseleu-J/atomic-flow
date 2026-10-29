@@ -1,0 +1,77 @@
+{
+  "status": "accepted_scoped_synthetic_requests3362_taskrunner",
+  "run_id": 40814165859,
+  "tested_commit": "500a0fdea0ab9258269cc0ace45338607c8ce917",
+  "artifact": {
+    "id": 12871697420,
+    "bytes": 680301,
+    "sha256": "87a8453bf6c45c13e7807919f5e3a41570229a90d6b1cbd0b78aa0a141ae2e56"
+  },
+  "raw_hashes_verified": 810,
+  "checks": [
+    "qualified task and cleanup",
+    "one replan and sole probe publication",
+    "fresh ordinary completion gate",
+    "graph synchronization",
+    "five raw in-loop checks",
+    "one raw receipt journey/task-check-000/",
+    "receipt equals raw stream journey/task-check-000/",
+    "spec/source binding journey/task-check-000/",
+    "unique owned namespace journey/task-check-000/",
+    "complete inventory and shutdown journey/task-check-000/",
+    "one raw receipt journey/task-check-001/",
+    "receipt equals raw stream journey/task-check-001/",
+    "spec/source binding journey/task-check-001/",
+    "unique owned namespace journey/task-check-001/",
+    "complete inventory and shutdown journey/task-check-001/",
+    "one raw receipt journey/task-check-002/",
+    "receipt equals raw stream journey/task-check-002/",
+    "spec/source binding journey/task-check-002/",
+    "unique owned namespace journey/task-check-002/",
+    "complete inventory and shutdown journey/task-check-002/",
+    "one raw receipt journey/task-check-003/",
+    "receipt equals raw stream journey/task-check-003/",
+    "spec/source binding journey/task-check-003/",
+    "unique owned namespace journey/task-check-003/",
+    "complete inventory and shutdown journey/task-check-003/",
+    "one raw receipt journey/task-check-004/",
+    "receipt equals raw stream journey/task-check-004/",
+    "spec/source binding journey/task-check-004/",
+    "unique owned namespace journey/task-check-004/",
+    "complete inventory and shutdown journey/task-check-004/",
+    "negative and positive controls",
+    "final check on published source",
+    "failure v2 exact ordinary obligation"
+  ],
+  "in_loop_checks": [
+    {
+      "exit": 1,
+      "revision": "71b276995691b7319213b226833e2a99d2d39515f6e9077d0c179cc1f374e693",
+      "passed": false
+    },
+    {
+      "exit": 0,
+      "revision": "b062498ef7e4b3babec27739c8f913361550c2b290f680bd0a687a4a3364c675",
+      "passed": true
+    },
+    {
+      "exit": 0,
+      "revision": "b062498ef7e4b3babec27739c8f913361550c2b290f680bd0a687a4a3364c675",
+      "passed": true
+    },
+    {
+      "exit": 0,
+      "revision": "b062498ef7e4b3babec27739c8f913361550c2b290f680bd0a687a4a3364c675",
+      "passed": true
+    },
+    {
+      "exit": 0,
+      "revision": "b062498ef7e4b3babec27739c8f913361550c2b290f680bd0a687a4a3364c675",
+      "passed": true
+    }
+  ],
+  "provider_calls": 0,
+  "historical_target_tests": false,
+  "independent_requirement_success": false,
+  "p07_status": "OPEN"
+}

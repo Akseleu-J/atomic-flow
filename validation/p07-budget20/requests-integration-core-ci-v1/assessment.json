@@ -1,0 +1,121 @@
+{
+  "run_id": 40814163106,
+  "tested_commit": "500a0fdea0ab9258269cc0ace45338607c8ce917",
+  "status": "verified_scoped_ci",
+  "artifacts": [
+    {
+      "artifact": {
+        "id": 12872090184,
+        "bytes": 94106,
+        "sha256": "c390d8017c1522185e88986c9effc7412199172f56037abe96d9b05498497f3d"
+      },
+      "name": "host-tests-3.12-500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "tested_commit": "500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "python": "3.12.15",
+      "platform": "Linux",
+      "testcases": 3212,
+      "skipped": 14,
+      "failures": 0,
+      "source_hashes_verified": 392,
+      "source_policy": "raw Git blob bytes"
+    },
+    {
+      "artifact": {
+        "id": 12871935776,
+        "bytes": 36394,
+        "sha256": "6ce48c14e53d4bd90f04a8b43b438534b29df81860b431e4c9402bf04e3caef1"
+      },
+      "name": "windows-runtime-500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "tested_commit": "500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "python": "3.12.10",
+      "platform": "Windows",
+      "testcases": 4,
+      "skipped": 0,
+      "failures": 0,
+      "source_hashes_verified": 392,
+      "source_policy": "both Git and captured bytes LF-normalized"
+    },
+    {
+      "artifact": {
+        "id": 12870724888,
+        "bytes": 93997,
+        "sha256": "d99f1e98dcbb42b5bb1eb278189aba51c90810341971b83aa0ad3b0e37f1adcd"
+      },
+      "name": "host-tests-3.11-500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "tested_commit": "500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "python": "3.11.17",
+      "platform": "Linux",
+      "testcases": 3212,
+      "skipped": 14,
+      "failures": 0,
+      "source_hashes_verified": 392,
+      "source_policy": "raw Git blob bytes"
+    },
+    {
+      "artifact": {
+        "id": 12871642592,
+        "bytes": 1249987,
+        "sha256": "4f1144b2a7578a79914f15b27bb0c03b79fdd767d832c16b682f83c82ee6a7b8"
+      },
+      "name": "wheel-acceptance-3.12-500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "distribution_hashes_verified": true,
+      "smoke": "import location: /tmp/atomic-wheel-venv/lib/python3.12/site-packages/atomic_flow/__init__.py\npackaged fixtures: cases.json (7053 bytes)\ntree build/save/load: ok\nsdk import: ok\napi health/ready: ok\ncli --help: ok\nwheel smoke: PASS\n"
+    },
+    {
+      "artifact": {
+        "id": 12871333682,
+        "bytes": 1249845,
+        "sha256": "dbe9f70dab1759c6246365cd46ac34054945a7814eff1e1f81a39f785784040a"
+      },
+      "name": "wheel-acceptance-3.11-500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "distribution_hashes_verified": true,
+      "smoke": "import location: /tmp/atomic-wheel-venv/lib/python3.11/site-packages/atomic_flow/__init__.py\npackaged fixtures: cases.json (7053 bytes)\ntree build/save/load: ok\nsdk import: ok\napi health/ready: ok\ncli --help: ok\nwheel smoke: PASS\n"
+    },
+    {
+      "artifact": {
+        "id": 12871372872,
+        "bytes": 9873,
+        "sha256": "70bc83049e1037686d5b1af89b3724172ac599ea37ff039e90b0ae802d790f35"
+      },
+      "name": "validation-500a0fdea0ab9258269cc0ace45338607c8ce917",
+      "results": {
+        "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+        "gpu_requested": false,
+        "model_calls": 0,
+        "container": "PASS",
+        "tests_exit": 0,
+        "extra_tests_exit": 0,
+        "compile_exit": 0,
+        "image_id": "sha256:24d5621cf306cb048164951f55758b1a70a865a40007a5ca7cd9cfe53fe2a8e3"
+      }
+    }
+  ],
+  "job_conclusions": [
+    {
+      "name": "Windows-specific runtime acceptance",
+      "conclusion": "success"
+    },
+    {
+      "name": "Python 3.11",
+      "conclusion": "success"
+    },
+    {
+      "name": "Installed wheel acceptance (3.12)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Python 3.12",
+      "conclusion": "success"
+    },
+    {
+      "name": "Real Docker acceptance",
+      "conclusion": "success"
+    },
+    {
+      "name": "Installed wheel acceptance (3.11)",
+      "conclusion": "success"
+    }
+  ],
+  "provider_calls": 0
+}

@@ -1,5 +1,21 @@
 # Передача работы: atomic-flow / P07
 
+Последний принятый runtime: `500a0fdea0ab9258269cc0ace45338607c8ce917`.
+Requests3362 full synthetic TaskRunner: CI 40814165859 SUCCESS. Проверены
+810 hashes, пять raw checks, один replan, публикация только probe, свежий
+final PASS и graph sync. Main CI 40814163106 SUCCESS: по 3198 PASS / 14 SKIP
+на Python 3.11/3.12, 392 source hashes; Windows/wheel/Docker. Все шесть ZIP
+digests сверены. Evidence: requests3362-task-v1 и requests-integration-core-ci-v1.
+Follow-up усиливает acceptance validator и добавляет 12 offline attack tests;
+сверить HEAD/remote перед продолжением.
+
+Следующий пакет: полный historical ordinary Requests3362 (пока проверены
+четыре synthetic tests), затем function36 fixture/controller/receipt с новым
+resource manifest «core + fixed CA». CA overlay пока pure, без execution wiring.
+Generic dispatch разрешает только 3362-cn через root Linux owned controller;
+другие cohorts отклоняются. Нужны все 30 ordinary profiles, равный driver,
+paired runs, holdout/ablations и final review. P07 OPEN; provider calls = 0.
+
 Обновление29октября: Requests3362 smokev3 принят на72bb7ef,
 CI40813084358,779rawhashes/FAIL/PASS/requiredSKIP/cleanup проверены.
 Отчёт: `P07_REQUESTS_BOUNDARY_ACCEPTANCE_2026-10-29.md`.

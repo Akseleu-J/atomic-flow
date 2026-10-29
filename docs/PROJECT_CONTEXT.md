@@ -1,5 +1,13 @@
 # atomic-flow — рабочая карта проекта
 
+29 октября: полный synthetic Requests3362 TaskRunner принят на `500a0fd`,
+CI 40814165859: один replan, FAIL → repair → fresh PASS/final → публикация
+только probe → graph sync. Пять raw in-loop checks и 810 hashes проверены.
+Общий CI 40814163106 SUCCESS: по 3198 PASS / 14 SKIP, 392 source hashes
+и шесть архивов сверены; Windows/wheel/Docker PASS. Исторические ordinary
+profiles, Requests CA execution и paired quality остаются OPEN; provider calls = 0.
+[Отчёт](P07_REQUESTS_BOUNDARY_ACCEPTANCE_2026-10-29.md).
+
 29 октября: Requests3362 synthetic controller boundary принят по CI40813084358
 на72bb7efa0d76f968d198d51a0caab3442fb1a846: FAIL→editedPASS→required-SKIP refusal,
 HTTP/TLS, source/namespace/cleanup и779rawhashes проверены. Pure function36
