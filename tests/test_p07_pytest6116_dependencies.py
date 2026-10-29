@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+from p07_pytest6116_derived_collection import validate_installed  # noqa: E402
 from p07_pytest6116_prepare_dependencies import inspect_wheel  # noqa: E402
 
 
@@ -51,3 +52,14 @@ def test_wheel_requires_matching_publisher_digest_and_complete_record():
     escaped = wheel_bytes(unsafe=True)
     with pytest.raises(ValueError, match="path or size"):
         inspect_wheel(escaped, item(escaped))
+
+
+def test_installed_inventory_must_preserve_wheel_files_and_only_fixed_metadata():
+    expected = {"sample/__init__.py": "a" * 64, "sample-1.0.dist-info/METADATA": "b" * 64}
+    valid = {**expected, "sample-1.0.dist-info/INSTALLER": "c" * 64,
+             "sample-1.0.dist-info/RECORD": "d" * 64}
+    assert validate_installed(expected, valid) == ["sample-1.0.dist-info/INSTALLER", "sample-1.0.dist-info/RECORD"]
+    with pytest.raises(ValueError, match="publisher wheel bytes"):
+        validate_installed(expected, {**valid, "sample/__init__.py": "e" * 64})
+    with pytest.raises(ValueError, match="unexpected installed"):
+        validate_installed(expected, {**valid, "sample/extra.py": "f" * 64})

@@ -84,12 +84,17 @@ def parse_collection(stdout: str, exit_code: int):
     return observation
 
 
-def run(output: Path):
+def run(output: Path, *, admitted_image: str | None = None, dependency_prefix: str | None = None):
+    """Observe collection; callers must independently admit any derived image."""
     if output.exists() or os.name != "posix":
         raise ValueError("fresh output and Linux Docker host required")
+    if admitted_image is not None and (re.fullmatch(r"sha256:[a-f0-9]{64}", admitted_image) is None
+                                       or dependency_prefix != "/opt/p07-pytest6116-deps"):
+        raise ValueError("fixed derived image identity and dependency prefix required")
+    image = admitted_image or IMAGE
     output.mkdir(parents=True)
     report = {"status": "not_qualified", "scope": "public native collection reconnaissance only",
-              "task_id": "pytest-dev__pytest-6116", "base_commit": BASE, "image": IMAGE,
+              "task_id": "pytest-dev__pytest-6116", "base_commit": BASE, "image": image,
               "provider_calls": 0, "test_execution": False, "taskrunner_wired": False,
               "ordinary_acceptance": False, "hidden_oracle": "not_run"}
     env = {"PATH": "/usr/sbin:/usr/bin:/sbin:/bin", "LANG": "C", "LC_ALL": "C", "HOME": "/tmp"}
@@ -106,15 +111,16 @@ def run(output: Path):
             report["tested_commit"] = commit.stdout.decode().strip()
             if commit.returncode or not re.fullmatch(r"[a-f0-9]{40}", report["tested_commit"]):
                 raise ValueError("exact tested commit unavailable")
-            pull = control([ENGINE, "pull", IMAGE], timeout=240)
-            (output / "pull.stdout").write_bytes(pull.stdout)
-            (output / "pull.stderr").write_bytes(pull.stderr)
-            if pull.returncode:
-                raise ValueError("pinned image pull failed")
+            if admitted_image is None:
+                pull = control([ENGINE, "pull", IMAGE], timeout=240)
+                (output / "pull.stdout").write_bytes(pull.stdout)
+                (output / "pull.stderr").write_bytes(pull.stderr)
+                if pull.returncode:
+                    raise ValueError("pinned image pull failed")
             created = control([ENGINE, "create", "--cidfile", str(cidfile), "--init", "--pull=never", "--network=none",
                 "--read-only", "--user=65534:65534", "--cap-drop=ALL", "--security-opt=no-new-privileges",
                 "--memory=1g", "--cpus=2", "--pids-limit=128", "--tmpfs=/tmp:rw,noexec,nosuid,size=134217728,mode=1777",
-                "--workdir=/testbed", "--env=HOME=/tmp", "--entrypoint=/bin/sleep", IMAGE, "infinity"])
+                "--workdir=/testbed", "--env=HOME=/tmp", "--entrypoint=/bin/sleep", image, "infinity"])
             if created.returncode:
                 raise ValueError("isolated container creation failed")
             cid = cidfile.read_text(encoding="ascii").strip()
@@ -131,8 +137,8 @@ def run(output: Path):
                     or host["Memory"] != 1024**3 or host["NanoCpus"] != 2_000_000_000 or host["PidsLimit"] != 128
                     or config["User"] != "65534:65534" or host.get("Binds") or host.get("VolumesFrom")):
                 raise ValueError("container isolation does not match fixed controls")
-            image = control([ENGINE, "image", "inspect", IMAGE])
-            if image.returncode or json.loads(image.stdout)[0]["Id"] != item["Image"]:
+            inspected_image = control([ENGINE, "image", "inspect", image])
+            if inspected_image.returncode or json.loads(inspected_image.stdout)[0]["Id"] != item["Image"]:
                 raise ValueError("actual immutable image differs")
             head = control([ENGINE, "exec", "--user=0:0", cid, "git", "-c", "safe.directory=/testbed",
                             "-C", "/testbed", "rev-parse", "HEAD"])
@@ -166,7 +172,11 @@ def run(output: Path):
                 raise ValueError("private dependency inventory unavailable")
             report["dependency_inventory_sha256"] = sha(dependencies.stdout)
             (output / "container-inspect.json").write_bytes(inspected.stdout)
-            result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", SOURCE],
+            code = SOURCE
+            if dependency_prefix:
+                code = code.replace("sys.path.insert(0,'/testbed/src')",
+                                    "sys.path.insert(0,'/opt/p07-pytest6116-deps')\nsys.path.insert(0,'/testbed/src')")
+            result = _bounded([ENGINE, "exec", "--user=65534:65534", "-w", "/testbed", cid, PYTHON, "-I", "-B", "-c", code],
                               home=home, timeout=180, limit=1_000_000, check=lambda: None)
             (output / "collection.stdout").write_bytes(result.stdout.encode())
             (output / "collection.stderr").write_bytes(result.stderr.encode())
