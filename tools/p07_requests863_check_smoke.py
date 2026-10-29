@@ -32,13 +32,14 @@ ROOT = Path(__file__).resolve().parents[1]
 ENGINE = "/usr/bin/docker"
 MODULE = "requests/p07_function_probe.py"
 TEST = "test_p07_function_fixture.py"
-ORDINARY = '''import requests
+ORDINARY = '''import json
+import requests
 
 def test_actual_target_http_and_execution_ca_https():
     for scheme in ('http','https'):
         response=requests.get(scheme+'://httpbin.org/get?ordinary=p07',timeout=3,verify='/testbed/requests/cacert.pem')
         assert response.status_code==200
-        assert response.json()['args']=={'ordinary':'p07'}
+        assert json.loads(response.text)['args']=={'ordinary':'p07'}
 
 def test_required_production_value():
     from requests.p07_function_probe import value

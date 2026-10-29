@@ -153,14 +153,14 @@ try:
         raise RuntimeError('client TLS chain or hostname verification disabled')
     for scheme in ('http','https'):
         with fetch(data['urls'][scheme]+'get?health=p07',context if scheme=='https' else None) as response:
-            payload=json.loads(response.read(65536).decode())
-            if response.code!=200 or payload.get('args')!={'health':'p07'}:
+            health_payload=json.loads(response.read(65536).decode())
+            if response.code!=200 or health_payload.get('args')!={'health':'p07'}:
                 raise RuntimeError('real HTTPBin response mismatch')
         checks[scheme]={'status':200,'args':{'health':'p07'}}
     authorization='Basic '+base64.b64encode(b'p07:fixture').decode()
     with fetch(data['urls']['http']+'basic-auth/p07/fixture',authorization=authorization) as response:
-        payload=json.loads(response.read(65536).decode())
-        if response.code!=200 or payload.get('authenticated') is not True or payload.get('user')!='p07':
+        health_payload=json.loads(response.read(65536).decode())
+        if response.code!=200 or health_payload.get('authenticated') is not True or health_payload.get('user')!='p07':
             raise RuntimeError('real HTTPBin basic authentication mismatch')
     checks['basic_auth']={'status':200,'authenticated':True,'user':'p07'}
     wrong_path='/tmp/p07-function-wrongca.pem'
@@ -203,9 +203,9 @@ try:
     connection.endheaders()
     connection.send(b'3\r\nabc\r\n0\r\n\r\n')
     response=connection.getresponse()
-    payload=json.loads(response.read())
+    health_payload=json.loads(response.read())
     connection.close()
-    if response.status!=200 or payload.get('data')!='abc':raise RuntimeError('real chunked WSGI input differs: '+repr((response.status,payload)))
+    if response.status!=200 or health_payload.get('data')!='abc':raise RuntimeError('real chunked WSGI input differs: '+repr((response.status,health_payload)))
     checks['chunked_request']='abc'
     connection=socket.create_connection(('t.co',80),3)
     connection.sendall(b'HEAD /NFrx0zLG HTTP/1.1\r\nHost: t.co\r\nConnection: close\r\n\r\n')
@@ -241,9 +241,9 @@ try:
             if expected!=401 or error.code!=401:raise
             error.close()
         else:
-            payload=json.loads(response.read())
+            health_payload=json.loads(response.read())
             response.close()
-            if expected!=200 or payload!={'authenticated':True,'user':'user'}:raise RuntimeError('Digest response validation differs')
+            if expected!=200 or health_payload!={'authenticated':True,'user':'user'}:raise RuntimeError('Digest response validation differs')
     checks['digest']='real_response_hash_validated_wrong_password_rejected'
     try:
         with fetch('https://kennethreitz.com/',context) as response:response.read(1)
