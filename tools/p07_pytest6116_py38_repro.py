@@ -16,6 +16,7 @@ import urllib.request
 from pathlib import Path
 
 import p07_pytest6116_collection_recon as recon
+import p07_pytest6116_derived_collection as derived
 import p07_pytest6116_prepare_dependencies as audit
 from packaging.requirements import Requirement
 from packaging.specifiers import SpecifierSet
@@ -95,6 +96,23 @@ def target_source(full_public):
     return TARGET.replace("'-q','--tb=short'", "'-q','--tb=line'").replace(focused, "'testing'")
 
 
+def audit_installed_wheels(command, cid, wheelhouse, profile, destination):
+    """Copy only publisher-owned roots from a stopped container; reject extra files."""
+    expected = derived.expected_wheel_files(wheelhouse, profile)
+    if not expected:
+        raise ValueError('empty installed wheel inventory')
+    roots = sorted({name.split('/', 1)[0] for name in expected})
+    destination.mkdir()
+    for name in roots:
+        result = command([recon.ENGINE, 'cp', cid + ':/usr/local/lib/python3.8/site-packages/' + name,
+                          str(destination / name)])
+        if result.returncode:
+            raise ValueError('installed wheel root unavailable: ' + name)
+    actual = derived.installed_files(destination)
+    extras = derived.validate_installed(expected, actual)
+    return expected, actual, extras
+
+
 def run(output, *, full_public=False, source_for_subprocesses=False):
     if os.name != 'posix' or output.exists():
         raise ValueError('fresh output on Linux required')
@@ -154,8 +172,8 @@ def run(output, *, full_public=False, source_for_subprocesses=False):
             if create.returncode:
                 raise ValueError('container creation failed')
             cid = cidfile.read_text().strip()
-            if not re.fullmatch(r'[0-9a-f]{64}', cid) or command([recon.ENGINE, 'start', cid]).returncode:
-                raise ValueError('container start failed')
+            if not re.fullmatch(r'[0-9a-f]{64}', cid):
+                raise ValueError('container ID missing')
             inspected = command([recon.ENGINE, 'inspect', cid])
             container = json.loads(inspected.stdout)[0]
             host = container['HostConfig']
@@ -164,9 +182,14 @@ def run(output, *, full_public=False, source_for_subprocesses=False):
                     or host['CapDrop'] != ['ALL'] or host.get('CapAdd') or host.get('Binds')
                     or host.get('VolumesFrom') or container.get('Mounts') or host['Init'] is not True
                     or host['Memory'] != 1024**3 or host['NanoCpus'] != 2_000_000_000 or host['PidsLimit'] != 128
-                    or 'no-new-privileges' not in host.get('SecurityOpt', [])):
+                    or 'no-new-privileges' not in host.get('SecurityOpt', []) or container['State']['Running'] is not False):
                 raise ValueError('container controls differ')
             (output / 'container-inspect.json').write_bytes(inspected.stdout)
+            expected, installed, extras = audit_installed_wheels(command, cid, tmp, profile, tmp / 'installed')
+            (output / 'installed-inventory.json').write_text(json.dumps(installed, indent=2, sort_keys=True) + '\n')
+            report.update(installed_publisher_files=len(expected), installed_total_files=len(installed), pip_metadata_extras=extras)
+            if command([recon.ENGINE, 'start', cid]).returncode:
+                raise ValueError('container start failed')
             tree = json.loads(recon.PUBLIC_TREE.read_bytes())
             if tree.get('base_commit') != recon.BASE or tree.get('repo') != 'pytest-dev/pytest' or len(tree.get('blobs', [])) != 474:
                 raise ValueError('public tree inventory differs')
