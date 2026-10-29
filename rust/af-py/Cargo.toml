@@ -1,0 +1,29 @@
+[package]
+name = "af-py"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "PyO3 facade for the atomic-flow Rust kernel: the Python lab drives graph, sessions, sandbox and the backend plane"
+# Standalone on purpose: the extension module links the Python DLL and must
+# never participate in the kernel workspace's test builds.
+[workspace]
+
+[lib]
+name = "af_core_py"
+crate-type = ["cdylib"]
+
+[features]
+default = ["pyo3/extension-module"]
+
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module"] }
+serde_json = "1"
+sha2 = "0.10"
+af-graph = { path = "../af-graph" }
+af-sandbox = { path = "../af-sandbox" }
+af-journal = { path = "../af-journal" }
+af-llm = { path = "../af-llm" }
+af-entropy = { path = "../af-entropy" }
+
+[profile.dev]
+debug = 0
