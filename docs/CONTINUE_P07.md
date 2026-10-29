@@ -2,6 +2,10 @@
 
 Работать в `C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow`, ветка `experimental`, draft PR №2. Начать с `docs/PROJECT_CONTEXT.md`; Git-команды выполнять только в этом клоне. Перед продолжением сверить HEAD, remote SHA и рабочий diff. P07 остаётся **OPEN**.
 
+## Requests2674 завершён в ordinary scripted scope
+
+CI 40835105105 на `520158504af00ab1f08899553458916943ad52b1`: 163 collected, 162 required PASS плюс один source-declared XPASS после исправления synthetic probe, один replan и fresh final gate. Сверены 841 raw hashes, восемь ресурсных квитанций и все 132 Git blob публичной базы. Общий exact-source CI 40835100470 SUCCESS. Отчёт: `docs/P07_REQUESTS2674_TASK_ACCEPTANCE_2026-10-29.md`. Это не model/oracle grade. Следующий профиль — Requests863 SSLv3/wire. Текст ранее отражает исторические этапы.
+
 ## Начало интеграции Requests2674
 
 Подготовлен bootstrap для Python2: JSON-имена модулей и argv преобразуются в ограниченные ASCII native str. Для 2674 добавлена отдельная точная политика публичного `test_requests.py::RequestsTestCase::test_response_iter_lines_reentrant` (source-declared xfail; calibration наблюдала XPASS с raw ID без `::()::`). Разрешены только xfailed/xpassed этого узла, новые SKIP/XPASS по-прежнему не проходят. Это только локальные контракты: 110 профильных тестов PASS; реальный synthetic bootstrap на Python2.7.18 принят в узком scope: CI 40832039669 на e3ae5fc908bbced6ff2afc97e85675e5c4ef87f9 SUCCESS, artifact 12879460458 SHA256 64a3fb73f4292d61d119140fd987989de28e2bcfae3ee7dd203500bce7733b35; шесть raw hashes, PASS/FAIL/required-SKIP refusal и точный XPASS проверены. Fixture/controller/TaskRunner integration ещё не приняты. Никакой generic dispatch 2674 не открыт. Продолжать с owned fixture/CA controller; не считать калибровку модели или качеством.
@@ -10,7 +14,7 @@
 
 Runtime `875fd01b1f3f4b4521b887688d27a82678f47df1`: три полных public ordinary journey Requests1963/2148/2317 приняты в scripted synthetic scope; CI 40824311185 SUCCESS, соответственно 122/134/144 PASS после probe repair, required SKIP отклонён. По 823 raw hashes и восемь resource receipts на задачу независимо сверены. Публичные базовые деревья сверены полностью: единственное ресурсное исключение — CA вне candidate; добавлены два synthetic файла. General CI 40824307411 SUCCESS, Python 3.11/3.12 по 3267 PASS / 14 SKIP, Windows 4 PASS. Отчёт: `docs/P07_FUNCTION36_TASK_JOURNEYS_2026-10-29.md`; локальные архивы и assessments: `validation/p07-budget20/function36-task-v1/`. Model calls 0, hidden oracle не запускался, P07 OPEN.
 
-Следующий приоритет: Requests2674 Python2.7, затем Requests863 SSLv3/wire; далее остальные ordinary profiles и study gates. Function36 generic dispatch теперь включён только для трёх указанных принятых контуров; прежний текст checkpoint ниже исторический.
+Следующий приоритет: Requests863 SSLv3/wire; далее остальные ordinary profiles и study gates. Function36 generic dispatch теперь включён только для трёх указанных принятых контуров; прежний текст checkpoint ниже исторический.
 
 ## Предыдущий checkpoint
 
@@ -35,7 +39,7 @@ V1 выявил URL-callable wrappers над plugin-owned HTTPBin servers и н�
 
 ## Следующая работа
 
-Полный Requests3362 ordinary путь и function36 journeys Requests1963/2148/2317 приняты в указанном synthetic scope. Продолжить Python2.7 Requests2674, затем SSLv3/wire Requests863. Остальные private Requests cohorts отклоняются до evidence-gated приёмки; не включать их по metadata/unit tests.
+Полный Requests3362 ordinary путь и function36 journeys Requests1963/2148/2317 приняты в указанном synthetic scope. Продолжить SSLv3/wire Requests863. Остальные private Requests cohorts отклоняются до evidence-gated приёмки; не включать их по metadata/unit tests.
 
 Далее нужны все 30 ordinary profiles, полный исторический Atomic/flat driver с равными лимитами, замороженный study profile/cohort/order/owner caps, 30 пар с независимым oracle, свежий holdout, ablations и final review. 30/30 environment calibrations уже приняты, но это не 30 решённых моделью задач.
 

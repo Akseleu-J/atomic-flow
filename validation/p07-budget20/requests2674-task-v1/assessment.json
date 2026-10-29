@@ -1,0 +1,56 @@
+{
+  "status": "qualified_scripted_full_public_ordinary",
+  "run": 40835105105,
+  "tested_commit": "520158504af00ab1f08899553458916943ad52b1",
+  "artifact": 12879763821,
+  "archive_sha256": "cf591bc485b4d30bd076085728d2f9a1bcfe6e58ae2657296a7ce159396376fd",
+  "raw_files_verified": 841,
+  "resource_receipts_verified": 8,
+  "public_base_commit": "0be38a0c37c59c4b66ce908731da15b401655113",
+  "public_base_archive_sha256": "9ef1b1ddca679879b8cf4a36c2ba22689bee758fa3a33c61fbe2ccae6092536e",
+  "public_git_blobs_verified": 132,
+  "public_core_differences": [
+    "requests/cacert.pem (separate execution resource)"
+  ],
+  "synthetic_additions": [
+    "requests/p07_function_probe.py",
+    "test_p07_function_fixture.py"
+  ],
+  "changed_paths": [
+    "requests/p07_function_probe.py"
+  ],
+  "checks": [
+    {
+      "required_pass": 161,
+      "required_fail": 1,
+      "optional_xpass": 1
+    },
+    {
+      "required_pass": 162,
+      "required_fail": 0,
+      "optional_xpass": 1
+    },
+    {
+      "required_pass": 162,
+      "required_fail": 0,
+      "optional_xpass": 1
+    },
+    {
+      "required_pass": 162,
+      "required_fail": 0,
+      "optional_xpass": 1
+    },
+    {
+      "required_pass": 162,
+      "required_fail": 0,
+      "optional_xpass": 1
+    }
+  ],
+  "replans": 1,
+  "final_receipt_sha256": "f915e7f1c1044da49438f6bfc4cec570f448f9edbaabcadd32aa63d82a4b4b2c",
+  "graph_sync_complete": true,
+  "model_calls": 0,
+  "provider_calls": 0,
+  "hidden_oracle": "not_run",
+  "verified_success": false
+}
