@@ -9,14 +9,30 @@ use serde_json::{json, Value};
 pub const REPAIR_BUDGET_FRACTION: f64 = 0.25;
 
 const V1_FIELDS: [&str; 8] = [
-    "version", "check", "exit_code", "step_index", "started_at", "source_revision",
-    "checked_source_revision", "outcome",
+    "version",
+    "check",
+    "exit_code",
+    "step_index",
+    "started_at",
+    "source_revision",
+    "checked_source_revision",
+    "outcome",
 ];
 const V2_FIELDS: [&str; 14] = [
-    "version", "check", "exit_code", "step_index", "started_at", "source_revision",
-    "checked_source_revision", "outcome",
-    "runner", "check_completed", "check_failed_completed",
-    "check_obligation_digest", "check_spec_digest", "check_receipt_digest",
+    "version",
+    "check",
+    "exit_code",
+    "step_index",
+    "started_at",
+    "source_revision",
+    "checked_source_revision",
+    "outcome",
+    "runner",
+    "check_completed",
+    "check_failed_completed",
+    "check_obligation_digest",
+    "check_spec_digest",
+    "check_receipt_digest",
 ];
 
 fn is_hex64(value: &str) -> bool {
@@ -36,7 +52,11 @@ pub fn validate_failure_evidence(evidence: &Value) -> Result<(), String> {
     let Some(version) = evidence.get("version").and_then(Value::as_i64) else {
         return Err("missing or invalid host failing-check evidence".into());
     };
-    let fields: &[&str] = if version == 1 { &V1_FIELDS } else if version == 2 { &V2_FIELDS } else {
+    let fields: &[&str] = if version == 1 {
+        &V1_FIELDS
+    } else if version == 2 {
+        &V2_FIELDS
+    } else {
         return Err("missing or invalid host failing-check evidence".into());
     };
     if object.len() != fields.len() || fields.iter().any(|field| !object.contains_key(*field)) {
@@ -61,7 +81,11 @@ pub fn validate_failure_evidence(evidence: &Value) -> Result<(), String> {
         return Err("missing or invalid host failing-check evidence".into());
     }
     for key in ["source_revision", "checked_source_revision"] {
-        if !evidence.get(key).and_then(Value::as_str).is_some_and(is_hex64) {
+        if !evidence
+            .get(key)
+            .and_then(Value::as_str)
+            .is_some_and(is_hex64)
+        {
             return Err("missing or invalid host failing-check evidence".into());
         }
     }
@@ -78,14 +102,24 @@ pub fn validate_failure_evidence(evidence: &Value) -> Result<(), String> {
         {
             return Err("missing or invalid completed ordinary-check evidence".into());
         }
-        if evidence["check_completed"] != json!(true) || evidence["check_failed_completed"] != json!(true) {
+        if evidence["check_completed"] != json!(true)
+            || evidence["check_failed_completed"] != json!(true)
+        {
             return Err("missing or invalid completed ordinary-check evidence".into());
         }
         if evidence["source_revision"] != evidence["checked_source_revision"] {
             return Err("missing or invalid completed ordinary-check evidence".into());
         }
-        for key in ["check_obligation_digest", "check_spec_digest", "check_receipt_digest"] {
-            if !evidence.get(key).and_then(Value::as_str).is_some_and(is_hex64) {
+        for key in [
+            "check_obligation_digest",
+            "check_spec_digest",
+            "check_receipt_digest",
+        ] {
+            if !evidence
+                .get(key)
+                .and_then(Value::as_str)
+                .is_some_and(is_hex64)
+            {
                 return Err("missing or invalid completed ordinary-check evidence".into());
             }
         }
@@ -104,7 +138,10 @@ pub const FAILURE_KINDS: [&str; 5] = [
 /// The failure-kind gate: deterministic test failures require pytest-family
 /// evidence; anything else stops with the mismatch named.
 pub fn classify(failure: &Value) -> Value {
-    let kind = failure.get("kind").and_then(Value::as_str).unwrap_or_default();
+    let kind = failure
+        .get("kind")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
     if !FAILURE_KINDS.contains(&kind) {
         return json!({"action": "stop", "kind": kind, "reason": "unknown failure kind"});
     }
@@ -216,7 +253,11 @@ mod tests {
         assert_eq!(decision["action"], json!("stop"));
         assert_eq!(decision["reason"], json!("failure kind/check mismatch"));
         mismatch["evidence"] = json!({"version": 1});
-        assert_eq!(classify(&mismatch)["action"], json!("stop"), "invalid evidence stops");
+        assert_eq!(
+            classify(&mismatch)["action"],
+            json!("stop"),
+            "invalid evidence stops"
+        );
         let unknown = classify(&json!({
             "kind": "unknown_effect",
             "evidence": v1_evidence(),

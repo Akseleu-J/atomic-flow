@@ -5,14 +5,14 @@
 //! crash the previous consistent snapshot stays visible. A fallback full
 //! rebuild is an explicit operation with a recorded reason.
 
-use std::collections::BTreeMap;
-use std::collections::BTreeSet;
-use serde_json::{json, Value};
 use crate::adapter_resource::adapt_source;
 use crate::project::clean_build;
 use crate::resolve::{exports_by_file, infer_file_edges, module_map};
 use crate::schema::{file_id, GraphContractError};
 use crate::store::GraphStore;
+use serde_json::{json, Value};
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 
 /// Ops for one file; optionally bind planning to a specific generation.
 /// `None`/empty old digest means the file must be absent — never an
@@ -25,7 +25,9 @@ pub fn file_delta(
 ) -> Result<Value, GraphContractError> {
     if let Some(value) = base_generation {
         if value < 0 {
-            return Err(GraphContractError("base generation must be a non-negative integer".into()));
+            return Err(GraphContractError(
+                "base generation must be a non-negative integer".into(),
+            ));
         }
     }
     let owned = file_id(path);
@@ -39,7 +41,10 @@ pub fn file_delta(
         }));
     };
     let payload = adapt_source(path, bytes)?;
-    let new_digest = payload["nodes"][0]["source"]["digest"].as_str().unwrap_or_default().to_string();
+    let new_digest = payload["nodes"][0]["source"]["digest"]
+        .as_str()
+        .unwrap_or_default()
+        .to_string();
     Ok(json!({
         "path": path,
         "put_nodes": payload["nodes"],
@@ -85,7 +90,12 @@ fn relink(
     let file_nodes: BTreeMap<String, Value> = post_nodes
         .iter()
         .filter(|node| node["kind"] == "file")
-        .map(|node| (node["path"].as_str().unwrap_or_default().to_string(), node.clone()))
+        .map(|node| {
+            (
+                node["path"].as_str().unwrap_or_default().to_string(),
+                node.clone(),
+            )
+        })
         .collect();
 
     let old_edges = store.edges();
@@ -93,7 +103,12 @@ fn relink(
     let pre_files: BTreeMap<String, Value> = nodes_pre
         .iter()
         .filter(|node| node["kind"] == "file")
-        .map(|node| (node["path"].as_str().unwrap_or_default().to_string(), node.clone()))
+        .map(|node| {
+            (
+                node["path"].as_str().unwrap_or_default().to_string(),
+                node.clone(),
+            )
+        })
         .collect();
     let pre_paths: Vec<String> = pre_files.keys().cloned().collect();
     let post_paths: Vec<String> = file_nodes.keys().cloned().collect();
@@ -121,7 +136,13 @@ fn relink(
         let imports: Vec<String> = node
             .pointer("/facts/imports")
             .and_then(Value::as_array)
-            .map(|items| items.iter().filter_map(Value::as_str).map(str::to_string).collect())
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
             .unwrap_or_default();
         let mut hit = false;
         for name in &imports {
@@ -174,13 +195,24 @@ fn relink(
     let mut new_edges: Vec<Value> = Vec::new();
     let mut unresolved: Vec<String> = Vec::new();
     for affected_path in &affected {
-        let Some(node) = file_nodes.get(affected_path) else { continue };
+        let Some(node) = file_nodes.get(affected_path) else {
+            continue;
+        };
         let (inferred, items) = infer_file_edges(node, &post_modules, &post_exports);
         new_edges.extend(inferred);
-        unresolved.extend(items.into_iter().map(|item| format!("{affected_path}: {item}")));
+        unresolved.extend(
+            items
+                .into_iter()
+                .map(|item| format!("{affected_path}: {item}")),
+        );
     }
     unresolved.sort();
-    (new_edges, dropped.into_iter().collect(), affected.len(), unresolved)
+    (
+        new_edges,
+        dropped.into_iter().collect(),
+        affected.len(),
+        unresolved,
+    )
 }
 
 /// Validate digests, then commit; returns instrumentation for the report.
@@ -192,11 +224,19 @@ pub fn apply_delta(store: &mut GraphStore, delta: &Value) -> Result<Value, Graph
         None => store.generation(),
     };
     if base_generation != store.generation() {
-        return Err(GraphContractError("delta superseded: store generation moved since planning".into()));
+        return Err(GraphContractError(
+            "delta superseded: store generation moved since planning".into(),
+        ));
     }
     let mut drop_ids: BTreeSet<String> = delta["drop_node_ids"]
         .as_array()
-        .map(|items| items.iter().filter_map(Value::as_str).map(str::to_string).collect())
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_string)
+                .collect()
+        })
         .unwrap_or_default();
     // A file-level delta owns every node of that path; stale symbols of the
     // previous revision must not survive the replacement.
@@ -215,11 +255,23 @@ pub fn apply_delta(store: &mut GraphStore, delta: &Value) -> Result<Value, Graph
         .to_string();
     let expected_value = expected.unwrap_or("");
     if stored_digest != expected_value {
-    fn short(value: &str) -> &str {
-        if value.len() > 12 { &value[..12] } else { value }
-    }
-    let expected_label = if expected_value.is_empty() { "no file" } else { short(expected_value) };
-    let stored_label = if stored_digest.is_empty() { "no file" } else { short(&stored_digest) };
+        fn short(value: &str) -> &str {
+            if value.len() > 12 {
+                &value[..12]
+            } else {
+                value
+            }
+        }
+        let expected_label = if expected_value.is_empty() {
+            "no file"
+        } else {
+            short(expected_value)
+        };
+        let stored_label = if stored_digest.is_empty() {
+            "no file"
+        } else {
+            short(&stored_digest)
+        };
         return Err(GraphContractError(format!(
             "source changed since delta was built: {path} (expected {expected_label}, store has {stored_label})"
         )));
@@ -239,7 +291,13 @@ pub fn apply_delta(store: &mut GraphStore, delta: &Value) -> Result<Value, Graph
     let put_nodes = delta["put_nodes"].as_array().cloned().unwrap_or_default();
     let drop_node_ids: Vec<String> = drop_ids.iter().cloned().collect();
     let generation = store
-        .commit(base_generation, &put_nodes, &put_edges, &drop_node_ids, &dropped_edges)
+        .commit(
+            base_generation,
+            &put_nodes,
+            &put_edges,
+            &drop_node_ids,
+            &dropped_edges,
+        )
         .map_err(|error| {
             if error.is_conflict() {
                 GraphContractError(format!("delta superseded: {error}"))
@@ -263,10 +321,16 @@ pub fn fallback_rebuild(
     reason: &str,
 ) -> Result<Value, GraphContractError> {
     if reason.is_empty() {
-        return Err(GraphContractError("fallback rebuild requires an explicit reason".into()));
+        return Err(GraphContractError(
+            "fallback rebuild requires an explicit reason".into(),
+        ));
     }
     let clean = clean_build(files)?;
-    let old_ids: Vec<String> = store.nodes().iter().map(|n| n["id"].as_str().unwrap_or_default().to_string()).collect();
+    let old_ids: Vec<String> = store
+        .nodes()
+        .iter()
+        .map(|n| n["id"].as_str().unwrap_or_default().to_string())
+        .collect();
     let nodes = clean["nodes"].as_array().cloned().unwrap_or_default();
     let edges = clean["edges"].as_array().cloned().unwrap_or_default();
     let generation = store.commit(store.generation(), &nodes, &edges, &old_ids, &[])?;
@@ -307,22 +371,37 @@ mod tests {
     fn body_edit_deltas_to_equal_clean_build() {
         let (_dir, mut store) = setup(&[
             ("lib.py", b"def helper(): pass\ndef extra(): pass\n"),
-            ("app.py", b"from lib import helper\n\ndef main():\n    helper()\n"),
+            (
+                "app.py",
+                b"from lib import helper\n\ndef main():\n    helper()\n",
+            ),
         ]);
         let generation_before = store.generation();
-        let delta = file_delta("lib.py", Some(b"def helper(): pass  # changed\ndef extra(): pass\n"),
-            Some(digest_of(b"def helper(): pass\ndef extra(): pass\n").as_str()), None).unwrap();
+        let delta = file_delta(
+            "lib.py",
+            Some(b"def helper(): pass  # changed\ndef extra(): pass\n"),
+            Some(digest_of(b"def helper(): pass\ndef extra(): pass\n").as_str()),
+            None,
+        )
+        .unwrap();
         let report = apply_delta(&mut store, &delta).unwrap();
         assert_eq!(report["generation"], json!(generation_before + 1));
         assert_eq!(report["parsed_files"], json!(1));
         // Parity: fresh clean build over the new bytes equals the delta graph.
         let files = BTreeMap::from([
-            ("lib.py".to_string(), b"def helper(): pass  # changed\ndef extra(): pass\n".to_vec()),
-            ("app.py".to_string(), b"from lib import helper\n\ndef main():\n    helper()\n".to_vec()),
+            (
+                "lib.py".to_string(),
+                b"def helper(): pass  # changed\ndef extra(): pass\n".to_vec(),
+            ),
+            (
+                "app.py".to_string(),
+                b"from lib import helper\n\ndef main():\n    helper()\n".to_vec(),
+            ),
         ]);
         let clean = clean_build(&files).unwrap();
         assert_eq!(
-            sorted_ids(&clean["edges"]), sorted_edges(&store),
+            sorted_ids(&clean["edges"]),
+            sorted_edges(&store),
             "delta result must equal clean build"
         );
     }
@@ -330,8 +409,13 @@ mod tests {
     #[test]
     fn content_cas_refuses_stale_digest() {
         let (_dir, mut store) = setup(&[("lib.py", b"def helper(): pass\n")]);
-        let delta = file_delta("lib.py", Some(b"def helper(): pass\n"),
-            Some(digest_of(b"OLD").as_str()), None).unwrap();
+        let delta = file_delta(
+            "lib.py",
+            Some(b"def helper(): pass\n"),
+            Some(digest_of(b"OLD").as_str()),
+            None,
+        )
+        .unwrap();
         let error = apply_delta(&mut store, &delta).unwrap_err();
         assert!(error.0.contains("source changed since delta was built"));
     }
@@ -340,31 +424,55 @@ mod tests {
     fn delete_and_readd_updates_unresolved_consumer() {
         let (_dir, mut store) = setup(&[
             ("lib.py", b"def helper(): pass\n"),
-            ("app.py", b"from lib import helper\n\ndef main():\n    helper()\n"),
+            (
+                "app.py",
+                b"from lib import helper\n\ndef main():\n    helper()\n",
+            ),
         ]);
         // Delete lib.py: app.py's calls edge must be dropped, import unresolved.
-        let delta = file_delta("lib.py", None, Some(digest_of(b"def helper(): pass\n").as_str()), None).unwrap();
+        let delta = file_delta(
+            "lib.py",
+            None,
+            Some(digest_of(b"def helper(): pass\n").as_str()),
+            None,
+        )
+        .unwrap();
         let report = apply_delta(&mut store, &delta).unwrap();
         assert_eq!(report["deleted"], json!(true));
         let edges = store.edges();
-        assert!(!edges.iter().any(|e| e["kind"] == "calls" && e["src"] == "file:app.py"));
-        assert!(!edges.iter().any(|e| e["kind"] == "imports" && e["dst"] == "file:lib.py"));
+        assert!(!edges
+            .iter()
+            .any(|e| e["kind"] == "calls" && e["src"] == "file:app.py"));
+        assert!(!edges
+            .iter()
+            .any(|e| e["kind"] == "imports" && e["dst"] == "file:lib.py"));
         // Re-add lib.py with helper: consumer resolves again via relink closure.
-        let delta = file_delta("lib.py", Some(b"def helper(): pass\n"),
-            None, None).unwrap();
+        let delta = file_delta("lib.py", Some(b"def helper(): pass\n"), None, None).unwrap();
         apply_delta(&mut store, &delta).unwrap();
         let edges = store.edges();
-        assert!(edges.iter().any(|e| e["kind"] == "calls" && e["dst"] == "sym:lib.py::helper"));
+        assert!(edges
+            .iter()
+            .any(|e| e["kind"] == "calls" && e["dst"] == "sym:lib.py::helper"));
     }
 
     #[test]
     fn generation_binding_rejects_moved_store() {
         let (_dir, mut store) = setup(&[("lib.py", b"def a(): pass\n")]);
-        let bound = file_delta("lib.py", Some(b"def a(): pass\n"),
-            Some(digest_of(b"def a(): pass\n").as_str()), Some(store.generation())).unwrap();
+        let bound = file_delta(
+            "lib.py",
+            Some(b"def a(): pass\n"),
+            Some(digest_of(b"def a(): pass\n").as_str()),
+            Some(store.generation()),
+        )
+        .unwrap();
         // Someone else commits in between.
-        let other = file_delta("lib.py", Some(b"def a(): pass\ndef b(): pass\n"),
-            Some(digest_of(b"def a(): pass\n").as_str()), None).unwrap();
+        let other = file_delta(
+            "lib.py",
+            Some(b"def a(): pass\ndef b(): pass\n"),
+            Some(digest_of(b"def a(): pass\n").as_str()),
+            None,
+        )
+        .unwrap();
         apply_delta(&mut store, &other).unwrap();
         let error = apply_delta(&mut store, &bound).unwrap_err();
         assert!(error.0.contains("delta superseded"));
@@ -378,15 +486,22 @@ mod tests {
     }
 
     fn sorted_ids(edges: &Value) -> Vec<String> {
-        let mut ids: Vec<String> = edges.as_array().unwrap()
-            .iter().map(|e| e["id"].as_str().unwrap_or_default().to_string()).collect();
+        let mut ids: Vec<String> = edges
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|e| e["id"].as_str().unwrap_or_default().to_string())
+            .collect();
         ids.sort();
         ids
     }
 
     fn sorted_edges(store: &GraphStore) -> Vec<String> {
-        let mut ids: Vec<String> = store.edges().iter()
-            .map(|e| e["id"].as_str().unwrap_or_default().to_string()).collect();
+        let mut ids: Vec<String> = store
+            .edges()
+            .iter()
+            .map(|e| e["id"].as_str().unwrap_or_default().to_string())
+            .collect();
         ids.sort();
         ids
     }

@@ -5,8 +5,8 @@
 //! per-subtask: no shared mutable state, every row keeps its own outcome and
 //! cost; unknown outcomes hold the aggregation instead of becoming zeros.
 
-use serde_json::{json, Value};
 use af_exec::queue::AdmissionQueue;
+use serde_json::{json, Value};
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -45,7 +45,10 @@ pub fn plan_sweep(
                 "item": description,
             }))
             .map_err(|error| SwarmError(error.0))?;
-        items.push(SweepItem { seq, description: description.clone() });
+        items.push(SweepItem {
+            seq,
+            description: description.clone(),
+        });
     }
     Ok(items)
 }
@@ -63,7 +66,7 @@ pub struct SweepRow {
 /// Aggregate resolved rows into the sortable table. Rows still queued or
 /// claimed are listed as pending; the sweep is not declared complete over
 /// them.
-pub fn aggregate(queue: &AdmissionQueue, items: &[SweepItem], rows: &[SweepRow]) -> Value {
+pub fn aggregate(_queue: &AdmissionQueue, items: &[SweepItem], rows: &[SweepRow]) -> Value {
     let resolved: std::collections::BTreeMap<u64, &SweepRow> =
         rows.iter().map(|row| (row.seq, row)).collect();
     let mut table: Vec<Value> = Vec::new();

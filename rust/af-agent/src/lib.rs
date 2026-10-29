@@ -6,8 +6,8 @@
 //! journey refuses; without full read proofs the sandbox already refuses.
 //! Live-model planning is the P07 layer above this machinery.
 
-use serde_json::{json, Value};
 use rustpython_parser::Parse;
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
 pub mod swarm;
@@ -58,7 +58,11 @@ impl Journey<'_> {
         journal: &'a mut af_journal::SessionJournal,
         limits: JourneyLimits,
     ) -> Journey<'a> {
-        Journey { registry, journal, limits }
+        Journey {
+            registry,
+            journal,
+            limits,
+        }
     }
 
     fn record(&mut self, event_type: &str, payload: Value) {
@@ -76,29 +80,41 @@ impl Journey<'_> {
         );
 
         // --- observe ---------------------------------------------------------
-        let mut session = af_sandbox::SandboxSession::new(self.registry).map_err(|e| AgentError(e.0))?;
+        let mut session =
+            af_sandbox::SandboxSession::new(self.registry).map_err(|e| AgentError(e.0))?;
         let page = session
             .read(&plan.root_id, &plan.file, 0, 12000, true)
             .map_err(|e| AgentError(e.0))?;
         if page["read_complete"] != json!(true) {
-            let refusal = "journey requires the complete current source; increase the read window".to_string();
+            let refusal = "journey requires the complete current source; increase the read window"
+                .to_string();
             self.record("failed", json!({"phase": "observe", "refusal": refusal}));
             return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
         }
-        let before_hash = page["content_hash"].as_str().unwrap_or_default().to_string();
+        let before_hash = page["content_hash"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string();
         let before_source = page["source"].as_str().unwrap_or_default().to_string();
         let symbols = af_graph::adapter_ast::adapt_file(&plan.file, before_source.as_bytes());
-        let symbol_count = symbols["nodes"].as_array().map(|nodes| nodes.len() - 1).unwrap_or(0);
+        let symbol_count = symbols["nodes"]
+            .as_array()
+            .map(|nodes| nodes.len() - 1)
+            .unwrap_or(0);
         steps.push(json!({
             "phase": "observe", "ok": true, "content_hash": before_hash,
             "symbols": symbol_count,
             "parse_ok": symbols.pointer("/nodes/0/facts/parse_ok"),
         }));
-        self.record("tool_result", json!({"phase": "observe", "content_hash": before_hash, "symbols": symbol_count}));
+        self.record(
+            "tool_result",
+            json!({"phase": "observe", "content_hash": before_hash, "symbols": symbol_count}),
+        );
 
         // --- exact reviewed plan --------------------------------------------
         let Some(replacement) = &plan.replacement else {
-            let refusal = "journey needs an exact reviewed replacement; no model text is trusted".to_string();
+            let refusal =
+                "journey needs an exact reviewed replacement; no model text is trusted".to_string();
             self.record("failed", json!({"phase": "plan", "refusal": refusal}));
             return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
         };
@@ -125,7 +141,10 @@ impl Journey<'_> {
                 return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
             }
         };
-        let token = preview["preview_token"].as_str().unwrap_or_default().to_string();
+        let token = preview["preview_token"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string();
         let applied = match session.apply(&token, true) {
             Ok(applied) => applied,
             Err(error) => {
@@ -145,10 +164,14 @@ impl Journey<'_> {
         let after = session
             .read(&plan.root_id, &plan.file, 0, 12000, true)
             .map_err(|e| AgentError(e.0))?;
-        let after_hash = after["content_hash"].as_str().unwrap_or_default().to_string();
+        let after_hash = after["content_hash"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string();
         let expected_hash = sha_hex(replacement.as_bytes());
         let content_verified = after_hash == expected_hash && after_hash != before_hash;
-        let syntax_verified = rustpython_parser::ast::Suite::parse(replacement, "<journey>").is_ok();
+        let syntax_verified =
+            rustpython_parser::ast::Suite::parse(replacement, "<journey>").is_ok();
         let verified = content_verified && syntax_verified;
         steps.push(json!({
             "phase": "verify", "ok": verified,
@@ -164,7 +187,11 @@ impl Journey<'_> {
             &plan.goal,
             &steps,
             verified,
-            if verified { None } else { Some("post-apply verification failed".into()) },
+            if verified {
+                None
+            } else {
+                Some("post-apply verification failed".into())
+            },
         ))
     }
 }
@@ -175,7 +202,13 @@ fn sha_hex(bytes: &[u8]) -> String {
     format!("{:x}", hasher.finalize())
 }
 
-fn make_report(ok: bool, goal: &str, steps: &[Value], verified: bool, refusal: Option<String>) -> JourneyReport {
+fn make_report(
+    ok: bool,
+    goal: &str,
+    steps: &[Value],
+    verified: bool,
+    refusal: Option<String>,
+) -> JourneyReport {
     JourneyReport {
         ok,
         goal: goal.to_string(),
@@ -248,7 +281,11 @@ mod tests {
         let report = journey.run(&plan).unwrap();
         assert!(report.ok, "{report:?}");
         assert!(report.verified);
-        let phases: Vec<&str> = report.steps.iter().map(|s| s["phase"].as_str().unwrap()).collect();
+        let phases: Vec<&str> = report
+            .steps
+            .iter()
+            .map(|s| s["phase"].as_str().unwrap())
+            .collect();
         assert_eq!(phases, vec!["observe", "plan", "act", "verify"]);
         let content = std::fs::read_to_string(pair.root.join("src/lib.py")).unwrap();
         assert!(content.contains("return 2  # reviewed"));
@@ -277,7 +314,11 @@ mod tests {
         };
         let report = journey.run(&plan).unwrap();
         assert!(!report.ok);
-        assert!(report.refusal.as_deref().unwrap().contains("exact reviewed replacement"));
+        assert!(report
+            .refusal
+            .as_deref()
+            .unwrap()
+            .contains("exact reviewed replacement"));
     }
 
     #[test]
@@ -293,7 +334,11 @@ mod tests {
         };
         let report = journey.run(&plan).unwrap();
         assert!(!report.ok);
-        assert!(report.refusal.as_deref().unwrap().contains("nothing to apply"));
+        assert!(report
+            .refusal
+            .as_deref()
+            .unwrap()
+            .contains("nothing to apply"));
     }
 
     #[test]
@@ -309,7 +354,11 @@ mod tests {
         };
         let report = journey.run(&plan).unwrap();
         assert!(!report.ok);
-        assert!(report.refusal.as_deref().unwrap().contains("edit budget is zero"));
+        assert!(report
+            .refusal
+            .as_deref()
+            .unwrap()
+            .contains("edit budget is zero"));
     }
 
     #[test]
@@ -325,7 +374,11 @@ mod tests {
         };
         let report = journey.run(&plan).unwrap();
         assert!(!report.ok);
-        assert!(report.refusal.as_deref().unwrap().contains("preview refused"));
+        assert!(report
+            .refusal
+            .as_deref()
+            .unwrap()
+            .contains("preview refused"));
         // The file on disk is untouched.
         let content = std::fs::read_to_string(pair.root.join("src/lib.py")).unwrap();
         assert!(content.contains("return 1"));

@@ -2,9 +2,9 @@
 //! `graph/adapter_resource.py`). No YAML constructors, templates, workflow
 //! steps or repository code are executed. Classification is path-based.
 
-use serde_json::{json, Map, Value};
 use crate::adapter_ast;
 use crate::schema::{all_fresh, edge_id, file_id, symbol_id, GraphContractError};
+use serde_json::{json, Map, Value};
 
 pub const RESOURCE_EXTRACTOR: &str = "resource-metadata/1";
 
@@ -14,7 +14,10 @@ pub fn resource_kind(path: &str) -> Option<&'static str> {
     if path.starts_with(".github/workflows/") && (dot == ".yaml" || dot == ".yml") {
         return Some("pipeline");
     }
-    if matches!(dot.to_ascii_lowercase().as_str(), ".toml" | ".json" | ".yaml" | ".yml") {
+    if matches!(
+        dot.to_ascii_lowercase().as_str(),
+        ".toml" | ".json" | ".yaml" | ".yml"
+    ) {
         return Some("config");
     }
     if dot.to_ascii_lowercase() == ".md" {
@@ -31,12 +34,16 @@ pub fn adapt_source(path: &str, source: &[u8]) -> Result<Value, GraphContractErr
         return Ok(adapter_ast::adapt_file(path, source));
     }
     let Some(kind) = resource_kind(path) else {
-        return Err(GraphContractError(format!("unsupported source adapter: {path}")));
+        return Err(GraphContractError(format!(
+            "unsupported source adapter: {path}"
+        )));
     };
     let text = std::str::from_utf8(source)
         .map_err(|_| GraphContractError("resource must be bounded UTF-8 source".into()))?;
     if source.contains(&0u8) || source.len() > 1_000_000 {
-        return Err(GraphContractError("resource must be bounded UTF-8 source".into()));
+        return Err(GraphContractError(
+            "resource must be bounded UTF-8 source".into(),
+        ));
     }
     let digest = {
         use sha2::{Digest, Sha256};
@@ -44,7 +51,10 @@ pub fn adapt_source(path: &str, source: &[u8]) -> Result<Value, GraphContractErr
         hasher.update(source);
         format!("{:x}", hasher.finalize())
     };
-    let suffix = path.rfind('.').map(|i| path[i + 1..].to_ascii_lowercase()).unwrap_or_default();
+    let suffix = path
+        .rfind('.')
+        .map(|i| path[i + 1..].to_ascii_lowercase())
+        .unwrap_or_default();
     let mut facts = Map::new();
     facts.insert("extractor".into(), json!(RESOURCE_EXTRACTOR));
     facts.insert("imports".into(), json!([]));

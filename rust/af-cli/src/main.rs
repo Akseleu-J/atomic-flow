@@ -3,13 +3,17 @@
 //! thin; all authority checks live in the crates. Sandbox mutations require
 //! the explicit `--host-approved` flag: the human running the CLI is the host.
 
-use std::collections::BTreeMap;
-use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use serde_json::{json, Value};
+use std::collections::BTreeMap;
+use std::path::PathBuf;
 
 #[derive(Parser)]
-#[command(name = "af", version, about = "atomic-flow: project-aware LLM agent core")]
+#[command(
+    name = "af",
+    version,
+    about = "atomic-flow: project-aware LLM agent core"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -21,7 +25,8 @@ enum Command {
     Graph {
         #[command(subcommand)]
         command: GraphCommand,
-    },    /// Host-approved sandboxed workspace operations.
+    },
+    /// Host-approved sandboxed workspace operations.
     Sandbox {
         #[command(subcommand)]
         command: SandboxCommand,
@@ -219,43 +224,68 @@ fn run(command: Command) -> Result<String, String> {
     match command {
         Command::SelfTest => self_test(),
         Command::Agent { command } => match command {
-            AgentCommand::Journey { root_id, file, replacement, goal, session_id } => {
-                agent_journey(root_id, file, replacement, goal, session_id)
-            }
+            AgentCommand::Journey {
+                root_id,
+                file,
+                replacement,
+                goal,
+                session_id,
+            } => agent_journey(root_id, file, replacement, goal, session_id),
         },
         Command::Graph { command } => match command {
             GraphCommand::Build { root, store } => graph_build(root, store),
             GraphCommand::Show { store } => graph_show(store),
         },
         Command::Sandbox { command } => match command {
-            SandboxCommand::Grant { root_id, path, write, host_approved } => {
-                sandbox_grant(root_id, path, write, host_approved)
-            }
+            SandboxCommand::Grant {
+                root_id,
+                path,
+                write,
+                host_approved,
+            } => sandbox_grant(root_id, path, write, host_approved),
             SandboxCommand::List => sandbox_list(),
-            SandboxCommand::Read { root_id, path, offset, limit } => {
-                sandbox_read(root_id, path, offset, limit)
-            }
+            SandboxCommand::Read {
+                root_id,
+                path,
+                offset,
+                limit,
+            } => sandbox_read(root_id, path, offset, limit),
         },
         Command::Session { command } => match command {
             SessionCommand::Create { id, project } => session_create(id, project),
-            SessionCommand::Append { id, event_type, payload_json, call_id, outcome } => {
-                session_append(id, event_type, payload_json, call_id, outcome)
-            }
+            SessionCommand::Append {
+                id,
+                event_type,
+                payload_json,
+                call_id,
+                outcome,
+            } => session_append(id, event_type, payload_json, call_id, outcome),
             SessionCommand::Read { id } => session_read(id),
             SessionCommand::Recover { id } => session_recover(id),
         },
         Command::Job { command } => match command {
-            JobCommand::Run { argv, cwd, timeout_secs, store } => job_run(argv, cwd, timeout_secs, store),
+            JobCommand::Run {
+                argv,
+                cwd,
+                timeout_secs,
+                store,
+            } => job_run(argv, cwd, timeout_secs, store),
             JobCommand::Status { store } => job_status(store),
-            JobCommand::Reconcile { store, job_id, actor, reason } => {
-                job_reconcile(store, job_id, actor, reason)
-            }
+            JobCommand::Reconcile {
+                store,
+                job_id,
+                actor,
+                reason,
+            } => job_reconcile(store, job_id, actor, reason),
         },
         Command::Backend { command } => match command {
             BackendCommand::Ping => backend_ping(),
-            BackendCommand::Call { base_url, api_key_env, model, prompt } => {
-                backend_call(base_url, api_key_env, model, prompt)
-            }
+            BackendCommand::Call {
+                base_url,
+                api_key_env,
+                model,
+                prompt,
+            } => backend_call(base_url, api_key_env, model, prompt),
         },
     }
 }
@@ -365,14 +395,21 @@ fn sha_hex(bytes: &[u8]) -> String {
     format!("{:x}", hasher.finalize())
 }
 
-fn agent_journey(root_id: String, file: String, replacement: String, goal: String, session_id: String) -> Result<String, String> {
+fn agent_journey(
+    root_id: String,
+    file: String,
+    replacement: String,
+    goal: String,
+    session_id: String,
+) -> Result<String, String> {
     // A session bound to the operator's cwd provides the journey evidence.
     let project = std::env::current_dir().map_err(|e| e.to_string())?;
     let mut journal = af_journal::SessionJournal::create(&project, Some(&session_id), None)
         .or_else(|_| af_journal::SessionJournal::open(&session_id))
         .map_err(|e| e.0)?;
     let registry = af_sandbox::SandboxRegistry::new("default").map_err(|e| e.0)?;
-    let mut journey = af_agent::Journey::new(&registry, &mut journal, af_agent::JourneyLimits::default());
+    let mut journey =
+        af_agent::Journey::new(&registry, &mut journal, af_agent::JourneyLimits::default());
     let plan = af_agent::JourneyPlan {
         root_id,
         file,
@@ -393,9 +430,16 @@ fn agent_journey(root_id: String, file: String, replacement: String, goal: Strin
     }
 }
 
-fn sandbox_grant(root_id: String, path: PathBuf, write: Vec<String>, host_approved: bool) -> Result<String, String> {
+fn sandbox_grant(
+    root_id: String,
+    path: PathBuf,
+    write: Vec<String>,
+    host_approved: bool,
+) -> Result<String, String> {
     if !host_approved {
-        return Err("sandbox grant requires --host-approved (the human running af is the host)".into());
+        return Err(
+            "sandbox grant requires --host-approved (the human running af is the host)".into(),
+        );
     }
     let registry = af_sandbox::SandboxRegistry::new("default").map_err(|e| e.0)?;
     let granted = registry
@@ -410,7 +454,12 @@ fn sandbox_list() -> Result<String, String> {
     Ok(json!({"ok": true, "roots": roots}).to_string())
 }
 
-fn sandbox_read(root_id: String, path: String, offset: usize, limit: usize) -> Result<String, String> {
+fn sandbox_read(
+    root_id: String,
+    path: String,
+    offset: usize,
+    limit: usize,
+) -> Result<String, String> {
     let registry = af_sandbox::SandboxRegistry::new("default").map_err(|e| e.0)?;
     let mut session = af_sandbox::SandboxSession::new(&registry).map_err(|e| e.0)?;
     let page = session
@@ -420,16 +469,29 @@ fn sandbox_read(root_id: String, path: String, offset: usize, limit: usize) -> R
 }
 
 fn session_create(id: Option<String>, project: PathBuf) -> Result<String, String> {
-    let journal = af_journal::SessionJournal::create(&project, id.as_deref(), None).map_err(|e| e.0)?;
+    let journal =
+        af_journal::SessionJournal::create(&project, id.as_deref(), None).map_err(|e| e.0)?;
     Ok(json!({"ok": true, "session_id": journal.session_id, "path": journal.path.to_string_lossy()}).to_string())
 }
 
-fn session_append(id: String, event_type: String, payload_json: String, call_id: Option<String>, outcome: Option<String>) -> Result<String, String> {
+fn session_append(
+    id: String,
+    event_type: String,
+    payload_json: String,
+    call_id: Option<String>,
+    outcome: Option<String>,
+) -> Result<String, String> {
     let payload: Value = serde_json::from_str(&payload_json)
         .map_err(|error| format!("payload_json is not valid JSON: {error}"))?;
     let mut journal = af_journal::SessionJournal::open(&id).map_err(|e| e.0)?;
     let event = journal
-        .append(&event_type, &payload, call_id.as_deref(), outcome.as_deref(), None)
+        .append(
+            &event_type,
+            &payload,
+            call_id.as_deref(),
+            outcome.as_deref(),
+            None,
+        )
         .map_err(|e| e.0)?;
     Ok(serde_json::to_string(&event).map_err(|e| e.to_string())?)
 }
@@ -456,7 +518,12 @@ fn session_recover(id: String) -> Result<String, String> {
     }
 }
 
-fn job_run(argv: Vec<String>, cwd: PathBuf, timeout_secs: u64, store: PathBuf) -> Result<String, String> {
+fn job_run(
+    argv: Vec<String>,
+    cwd: PathBuf,
+    timeout_secs: u64,
+    store: PathBuf,
+) -> Result<String, String> {
     let runner = af_exec::JobRunner::open(&store).map_err(|e| e.0)?;
     let spec = af_exec::JobSpec::new(argv, cwd, timeout_secs).map_err(|e| e.0)?;
     let status = runner.run(&spec).map_err(|e| e.0)?;
@@ -474,38 +541,56 @@ fn job_status(store: PathBuf) -> Result<String, String> {
     .to_string())
 }
 
-fn job_reconcile(store: PathBuf, job_id: String, actor: String, reason: String) -> Result<String, String> {
+fn job_reconcile(
+    store: PathBuf,
+    job_id: String,
+    actor: String,
+    reason: String,
+) -> Result<String, String> {
     let runner = af_exec::JobRunner::open(&store).map_err(|e| e.0)?;
     if runner.unresolved_unknown_ids().map_err(|e| e.0)?.is_empty() {
         return Err("no unknown outcomes to reconcile".into());
     }
     let reconciled = runner
-        .reconcile(&job_id, &actor, &reason, &json!({"via": "af cli", "evidence": af_entropy::token64()}))
+        .reconcile(
+            &job_id,
+            &actor,
+            &reason,
+            &json!({"via": "af cli", "evidence": af_entropy::token64()}),
+        )
         .map_err(|e| e.0)?;
     Ok(serde_json::to_string(&reconciled).map_err(|e| e.to_string())?)
 }
 
 fn backend_ping() -> Result<String, String> {
     let router = af_llm::Router::new(vec![Box::new(af_llm::ScriptedBackend::echo())]);
-    let mut request = af_llm::ChatRequest::new("scripted", vec![af_llm::ChatMessage::new("user", "ping")]);
+    let mut request =
+        af_llm::ChatRequest::new("scripted", vec![af_llm::ChatMessage::new("user", "ping")]);
     request.max_output_tokens = Some(8);
     match router.route(&request, &af_llm::Cancel::new()) {
         af_llm::RouteOutcome::Completed { backend, result } => Ok(json!({
             "ok": true, "backend": backend, "content": result.content,
             "cost_usd": result.usage.cost_usd,
-        }).to_string()),
-        af_llm::RouteOutcome::Hold { backend, detail } => {
-            Err(format!("HOLD {backend}: {detail}"))
-        }
-        af_llm::RouteOutcome::Exhausted { refusals } => {
-            Err(format!("exhausted: {refusals:?}"))
-        }
+        })
+        .to_string()),
+        af_llm::RouteOutcome::Hold { backend, detail } => Err(format!("HOLD {backend}: {detail}")),
+        af_llm::RouteOutcome::Exhausted { refusals } => Err(format!("exhausted: {refusals:?}")),
     }
 }
 
-fn backend_call(base_url: String, api_key_env: String, model: String, prompt: String) -> Result<String, String> {
-    let router = af_llm::Router::new(vec![Box::new(af_llm::OpenAiBackend::new("openai", &base_url, &api_key_env))]);
-    let mut request = af_llm::ChatRequest::new(&model, vec![af_llm::ChatMessage::new("user", &prompt)]);
+fn backend_call(
+    base_url: String,
+    api_key_env: String,
+    model: String,
+    prompt: String,
+) -> Result<String, String> {
+    let router = af_llm::Router::new(vec![Box::new(af_llm::OpenAiBackend::new(
+        "openai",
+        &base_url,
+        &api_key_env,
+    ))]);
+    let mut request =
+        af_llm::ChatRequest::new(&model, vec![af_llm::ChatMessage::new("user", &prompt)]);
     request.max_output_tokens = Some(256);
     match router.route(&request, &af_llm::Cancel::new()) {
         af_llm::RouteOutcome::Completed { backend, result } => Ok(json!({
@@ -513,13 +598,12 @@ fn backend_call(base_url: String, api_key_env: String, model: String, prompt: St
             "content_chars": result.content.chars().count(),
             "tokens_in": result.usage.tokens_in, "tokens_out": result.usage.tokens_out,
             "truncated": result.truncated,
-        }).to_string()),
-        af_llm::RouteOutcome::Hold { backend, detail } => {
-            Err(format!("HOLD {backend}: {detail} (unknown outcomes are never retried)"))
-        }
-        af_llm::RouteOutcome::Exhausted { refusals } => {
-            Err(format!("exhausted: {refusals:?}"))
-        }
+        })
+        .to_string()),
+        af_llm::RouteOutcome::Hold { backend, detail } => Err(format!(
+            "HOLD {backend}: {detail} (unknown outcomes are never retried)"
+        )),
+        af_llm::RouteOutcome::Exhausted { refusals } => Err(format!("exhausted: {refusals:?}")),
     }
 }
 

@@ -5,9 +5,9 @@
 //! the legacy tree, never a silent merge. Parser failure is reported in facts
 //! (`parse_ok: false`), never raised.
 
-use std::collections::{BTreeMap, BTreeSet};
-use serde_json::{json, Map, Value};
 use crate::schema::{all_fresh, edge_id, file_id, symbol_id};
+use serde_json::{json, Map, Value};
+use std::collections::{BTreeMap, BTreeSet};
 
 pub const EXTRACTOR: &str = "python-ast/1";
 
@@ -82,9 +82,17 @@ pub fn adapt_file(path: &str, source: &[u8]) -> Value {
     for stmt in parsed {
         collector.visit_stmt(stmt);
     }
-    let facts = file_node["facts"].as_object_mut().expect("file facts object");
-    facts.insert("imports".into(), json!(collector.imports.iter().collect::<Vec<_>>()));
-    facts.insert("raw_calls".into(), json!(collector.raw_calls.iter().collect::<Vec<_>>()));
+    let facts = file_node["facts"]
+        .as_object_mut()
+        .expect("file facts object");
+    facts.insert(
+        "imports".into(),
+        json!(collector.imports.iter().collect::<Vec<_>>()),
+    );
+    facts.insert(
+        "raw_calls".into(),
+        json!(collector.raw_calls.iter().collect::<Vec<_>>()),
+    );
     file_node["fact_status"] = json!(all_fresh(facts));
     nodes[0] = file_node;
     nodes.extend(collector.nodes);
@@ -93,7 +101,9 @@ pub fn adapt_file(path: &str, source: &[u8]) -> Value {
 }
 
 fn parse_failure(file_node: &mut Value, message: &str, nodes: &mut Vec<Value>) -> Value {
-    let facts = file_node["facts"].as_object_mut().expect("file facts object");
+    let facts = file_node["facts"]
+        .as_object_mut()
+        .expect("file facts object");
     facts.insert("parse_ok".into(), json!(false));
     facts.insert("parse_error".into(), json!(message));
     file_node["fact_status"] = json!(all_fresh(facts));
@@ -116,10 +126,21 @@ struct Collector {
 
 impl Collector {
     fn qualified(parent: &str, name: &str) -> String {
-        if parent.is_empty() { name.to_string() } else { format!("{parent}.{name}") }
+        if parent.is_empty() {
+            name.to_string()
+        } else {
+            format!("{parent}.{name}")
+        }
     }
 
-    fn record_symbol(&mut self, name: &str, kind: &str, start: usize, end: usize, signature: String) {
+    fn record_symbol(
+        &mut self,
+        name: &str,
+        kind: &str,
+        start: usize,
+        end: usize,
+        signature: String,
+    ) {
         let qualified = Self::qualified(&self.parent_symbol, name);
         let seen = self.seen.entry(qualified.clone()).or_insert(0);
         *seen += 1;
@@ -151,27 +172,57 @@ impl Collector {
     }
 }
 
-use rustpython_parser::ast::{self, Visitor, Ranged};
+use rustpython_parser::ast::{self, Ranged, Visitor};
 use rustpython_parser::Parse;
 
 impl Visitor for Collector {
     fn visit_stmt(&mut self, node: ast::Stmt) {
         use ast::Stmt;
-        let is_def = matches!(node, Stmt::FunctionDef(_) | Stmt::AsyncFunctionDef(_) | Stmt::ClassDef(_));
+        let is_def = matches!(
+            node,
+            Stmt::FunctionDef(_) | Stmt::AsyncFunctionDef(_) | Stmt::ClassDef(_)
+        );
         let saved = (self.parent_symbol.clone(), self.parent_id.clone());
         if is_def {
             let (name, kind, signature) = match &node {
-                Stmt::FunctionDef(f) => (f.name.to_string(), "function",
-                    format!("def {}({})", f.name,
-                        f.args.args.iter().map(|a| a.def.arg.to_string()).collect::<Vec<_>>().join(", "))),
-                Stmt::AsyncFunctionDef(f) => (f.name.to_string(), "function",
-                    format!("def {}({})", f.name,
-                        f.args.args.iter().map(|a| a.def.arg.to_string()).collect::<Vec<_>>().join(", "))),
+                Stmt::FunctionDef(f) => (
+                    f.name.to_string(),
+                    "function",
+                    format!(
+                        "def {}({})",
+                        f.name,
+                        f.args
+                            .args
+                            .iter()
+                            .map(|a| a.def.arg.to_string())
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    ),
+                ),
+                Stmt::AsyncFunctionDef(f) => (
+                    f.name.to_string(),
+                    "function",
+                    format!(
+                        "def {}({})",
+                        f.name,
+                        f.args
+                            .args
+                            .iter()
+                            .map(|a| a.def.arg.to_string())
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    ),
+                ),
                 Stmt::ClassDef(c) => (c.name.to_string(), "class", format!("class {}", c.name)),
                 _ => unreachable!(),
             };
-            self.record_symbol(&name, kind, self.lines.line_of(node.range().start().to_u32() as usize),
-                self.lines.line_of(node.range().end().to_u32() as usize), signature);
+            self.record_symbol(
+                &name,
+                kind,
+                self.lines.line_of(node.range().start().to_u32() as usize),
+                self.lines.line_of(node.range().end().to_u32() as usize),
+                signature,
+            );
         }
         match &node {
             Stmt::Import(s) => {
@@ -182,8 +233,11 @@ impl Visitor for Collector {
             Stmt::ImportFrom(s) => {
                 let prefix = s.module.as_ref().map(|m| m.to_string()).unwrap_or_default();
                 for alias in &s.names {
-                    let name = if prefix.is_empty() { alias.name.to_string() }
-                        else { format!("{prefix}.{}", alias.name) };
+                    let name = if prefix.is_empty() {
+                        alias.name.to_string()
+                    } else {
+                        format!("{prefix}.{}", alias.name)
+                    };
                     self.imports.insert(name);
                 }
             }
@@ -233,20 +287,32 @@ mod tests {
         assert_eq!(run["facts"]["signature"], "def run(self)");
         let edges = payload["edges"].as_array().unwrap();
         assert_eq!(edges.len(), 2); // file->A, A->A.run
-        assert!(edges.iter().all(|e| e["kind"] == "contains" && e["facts_class"] == "extracted"));
+        assert!(edges
+            .iter()
+            .all(|e| e["kind"] == "contains" && e["facts_class"] == "extracted"));
     }
 
     #[test]
     fn duplicate_names_get_disambiguator() {
-        let payload = source(b"def f(): pass\nclass C:\n    def f(): pass\nclass C:\n    def f(): pass\n");
-        let symbols: Vec<&Value> = payload["nodes"].as_array().unwrap().iter()
-            .filter(|n| n["kind"] != "file").collect();
+        let payload =
+            source(b"def f(): pass\nclass C:\n    def f(): pass\nclass C:\n    def f(): pass\n");
+        let symbols: Vec<&Value> = payload["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|n| n["kind"] != "file")
+            .collect();
         let ids: Vec<&str> = symbols.iter().map(|n| n["id"].as_str().unwrap()).collect();
         assert_eq!(ids.len(), 5);
         // Disambiguation keys on the raw qualified name: the second class is
         // C#2, and its method is C.f#2 — never a silent merge.
-        for expected in ["sym:pkg/mod.py::f", "sym:pkg/mod.py::C", "sym:pkg/mod.py::C.f",
-                         "sym:pkg/mod.py::C#2", "sym:pkg/mod.py::C.f#2"] {
+        for expected in [
+            "sym:pkg/mod.py::f",
+            "sym:pkg/mod.py::C",
+            "sym:pkg/mod.py::C.f",
+            "sym:pkg/mod.py::C#2",
+            "sym:pkg/mod.py::C.f#2",
+        ] {
             assert!(ids.contains(&expected), "missing {expected} in {ids:?}");
         }
     }
@@ -264,15 +330,22 @@ mod tests {
         let payload = source(b"def broken(:\n");
         let file_node = &payload["nodes"][0];
         assert_eq!(file_node["facts"]["parse_ok"], false);
-        assert!(file_node["facts"]["parse_error"].as_str().unwrap().contains("line"));
+        assert!(file_node["facts"]["parse_error"]
+            .as_str()
+            .unwrap()
+            .contains("line"));
         assert_eq!(payload["edges"].as_array().unwrap().len(), 0);
     }
 
     #[test]
     fn async_and_nested_defs() {
         let payload = source(b"class Outer:\n    async def go(self):\n        def inner(): pass\n");
-        let symbols: Vec<&Value> = payload["nodes"].as_array().unwrap().iter()
-            .filter(|n| n["kind"] == "function").collect();
+        let symbols: Vec<&Value> = payload["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|n| n["kind"] == "function")
+            .collect();
         assert_eq!(symbols.len(), 2);
         assert!(symbols.iter().any(|n| n["symbol"] == "Outer.go"));
         assert!(symbols.iter().any(|n| n["symbol"] == "Outer.go.inner"));

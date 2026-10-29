@@ -3,9 +3,9 @@
 //! manifest. A missing section is an explicit omission — the manifest
 //! refuses to be built from silence.
 
-use std::collections::BTreeMap;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 
 /// One bound section of the publication report.
 #[derive(Debug, Clone, PartialEq)]
@@ -78,7 +78,9 @@ impl PublicationBuilder {
             return Err("steps section is empty; a publication needs the journey record".into());
         }
         if checks.is_empty() {
-            return Err("checks section is empty; unknown impact must widen checks, not skip them".into());
+            return Err(
+                "checks section is empty; unknown impact must widen checks, not skip them".into(),
+            );
         }
         if evidence.len() != 64 || !evidence.bytes().all(|b| b.is_ascii_hexdigit()) {
             return Err("evidence must be a 64-hex journal digest".into());
@@ -132,33 +134,64 @@ mod tests {
             .requirement("helper returns 2")
             .steps(vec![json!({"phase": "verify", "ok": true})])
             .impact(vec!["app.py".into()])
-            .checks(vec![json!({"runner": "pytest", "paths": ["tests/test_helper.py"]})])
+            .checks(vec![
+                json!({"runner": "pytest", "paths": ["tests/test_helper.py"]}),
+            ])
             .evidence("a".repeat(64))
             .build()
             .unwrap();
         assert!(manifest["requirement"]["sha256"].as_str().unwrap().len() == 64);
-        assert_eq!(manifest["claim"], json!("verifiable report, not a mathematical proof"));
-        assert!(manifest["impact"]["note"].as_str().unwrap().contains("not proof of absence"));
+        assert_eq!(
+            manifest["claim"],
+            json!("verifiable report, not a mathematical proof")
+        );
+        assert!(manifest["impact"]["note"]
+            .as_str()
+            .unwrap()
+            .contains("not proof of absence"));
     }
 
     #[test]
     fn missing_sections_are_named_never_filled() {
         let base = PublicationBuilder::new().requirement("r");
-        assert!(base.clone().build().unwrap_err().contains("steps section is missing"));
+        assert!(base
+            .clone()
+            .build()
+            .unwrap_err()
+            .contains("steps section is missing"));
         let base = base.steps(vec![json!({"phase": "act"})]);
-        assert!(base.clone().build().unwrap_err().contains("impact section is missing"));
+        assert!(base
+            .clone()
+            .build()
+            .unwrap_err()
+            .contains("impact section is missing"));
         let base = base.impact(vec![]);
-        assert!(base.clone().build().unwrap_err().contains("checks section is missing"));
+        assert!(base
+            .clone()
+            .build()
+            .unwrap_err()
+            .contains("checks section is missing"));
         let base = base.checks(vec![json!({"runner": "pytest"})]);
-        assert!(base.clone().build().unwrap_err().contains("evidence section is missing"));
-        assert!(base.evidence("short".into()).build().unwrap_err().contains("64-hex"));
+        assert!(base
+            .clone()
+            .build()
+            .unwrap_err()
+            .contains("evidence section is missing"));
+        assert!(base
+            .evidence("short".into())
+            .build()
+            .unwrap_err()
+            .contains("64-hex"));
         let empty_steps = PublicationBuilder::new()
             .requirement("r")
             .steps(vec![])
             .impact(vec![])
             .checks(vec![])
             .evidence("a".repeat(64));
-        assert!(empty_steps.build().unwrap_err().contains("steps section is empty"));
+        assert!(empty_steps
+            .build()
+            .unwrap_err()
+            .contains("steps section is empty"));
         // Empty checks refuse: unknown impact must widen checks, not skip them.
         let empty_checks = PublicationBuilder::new()
             .requirement("r")
@@ -166,7 +199,10 @@ mod tests {
             .impact(vec![])
             .checks(vec![])
             .evidence("a".repeat(64));
-        assert!(empty_checks.build().unwrap_err().contains("checks section is empty"));
+        assert!(empty_checks
+            .build()
+            .unwrap_err()
+            .contains("checks section is empty"));
     }
 
     #[test]

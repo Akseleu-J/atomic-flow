@@ -19,8 +19,8 @@ pub type SandboxResult<T> = Result<T, SandboxError>;
 
 /// Same suffix set as `tree/defaults.py::SOURCE_SUFFIXES` (lowercase, with dot).
 pub const SOURCE_SUFFIXES: [&str; 16] = [
-    ".py", ".pyi", ".js", ".jsx", ".ts", ".tsx", ".go", ".rs", ".java", ".c", ".h", ".cpp",
-    ".md", ".yaml", ".yml", ".json",
+    ".py", ".pyi", ".js", ".jsx", ".ts", ".tsx", ".go", ".rs", ".java", ".c", ".h", ".cpp", ".md",
+    ".yaml", ".yml", ".json",
 ];
 
 /// Minimal `fnmatch` for the ignore patterns actually in use (`*`, `?`).

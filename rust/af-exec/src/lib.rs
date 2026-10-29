@@ -8,11 +8,11 @@
 //! about. Process-tree isolation (Job Objects / cgroups) lands with the full
 //! worker image; this slice is the durable accounting core.
 
+use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
-use serde_json::{json, Value};
 
 pub mod driver;
 pub mod git;
@@ -32,7 +32,10 @@ fn err<T>(message: impl Into<String>) -> ExecResult<T> {
 }
 
 fn now_unix() -> f64 {
-    SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_secs_f64()
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs_f64()
 }
 
 fn is_hex32(value: &str) -> bool {
@@ -74,9 +77,14 @@ fn process_alive(pid: u32) -> bool {
 #[cfg(windows)]
 #[link(name = "kernel32")]
 extern "system" {
-    fn OpenProcess(desired_access: u32, inherit_handle: i32, process_id: u32) -> *mut std::ffi::c_void;
+    fn OpenProcess(
+        desired_access: u32,
+        inherit_handle: i32,
+        process_id: u32,
+    ) -> *mut std::ffi::c_void;
     fn GetExitCodeProcess(handle: *mut std::ffi::c_void, exit_code: *mut u32) -> i32;
     fn CloseHandle(handle: *mut std::ffi::c_void) -> i32;
+    #[allow(dead_code)]
     fn TerminateProcess(handle: *mut std::ffi::c_void, exit_code: u32) -> i32;
 }
 
@@ -91,6 +99,10 @@ pub struct JobSpec {
     pub argv: Vec<String>,
     pub cwd: PathBuf,
     pub timeout_secs: u64,
+    /// Optional sandbox image/kernel for SandboxDriver execution.
+    pub image: Option<String>,
+    /// Working directory inside the sandbox (driver-dependent).
+    pub sandbox_workdir: Option<String>,
 }
 
 impl JobSpec {
@@ -104,7 +116,14 @@ impl JobSpec {
         if timeout_secs == 0 || timeout_secs > 3600 {
             return err("job timeout must be 1-3600 seconds");
         }
-        Ok(JobSpec { job_id: af_entropy::token(), argv, cwd, timeout_secs })
+        Ok(JobSpec {
+            job_id: af_entropy::token(),
+            argv,
+            cwd,
+            timeout_secs,
+            image: None,
+            sandbox_workdir: None,
+        })
     }
 }
 
@@ -120,7 +139,9 @@ impl JobRunner {
         }
         std::fs::create_dir_all(root.join("jobs"))
             .map_err(|error| ExecError(format!("job store create failed: {error}")))?;
-        Ok(JobRunner { root: root.to_path_buf() })
+        Ok(JobRunner {
+            root: root.to_path_buf(),
+        })
     }
 
     fn status_path(&self, job_id: &str) -> PathBuf {
@@ -148,11 +169,13 @@ impl JobRunner {
                 .create_new(true)
                 .open(&temp)
                 .map_err(|error| ExecError(format!("job status temp failed: {error}")))?;
-            file.write_all(&serde_json::to_vec_pretty(status).map_err(|e| ExecError(format!("{e}")))?)
-                .and_then(|_| file.write_all(b"\n"))
-                .and_then(|_| file.flush())
-                .and_then(|_| file.sync_all())
-                .map_err(|error| ExecError(format!("job status fsync failed: {error}")))?;
+            file.write_all(
+                &serde_json::to_vec_pretty(status).map_err(|e| ExecError(format!("{e}")))?,
+            )
+            .and_then(|_| file.write_all(b"\n"))
+            .and_then(|_| file.flush())
+            .and_then(|_| file.sync_all())
+            .map_err(|error| ExecError(format!("job status fsync failed: {error}")))?;
         }
         std::fs::rename(&temp, &path)
             .map_err(|error| ExecError(format!("job status replace failed: {error}")))?;
@@ -259,9 +282,12 @@ impl JobRunner {
                 status
             }
         };
-        let timed_out = final_status.get("reason").and_then(Value::as_str)
+        let timed_out = final_status
+            .get("reason")
+            .and_then(Value::as_str)
             .is_some_and(|reason| reason.starts_with("kill wait failed"))
-            .then_some(true).unwrap_or(false);
+            .then_some(true)
+            .unwrap_or(false);
         if timed_out {
             final_status.insert("reason".into(), json!("timeout"));
         }
@@ -271,6 +297,36 @@ impl JobRunner {
         self.truncate_output(&stdout_path)?;
         self.truncate_output(&stderr_path)?;
         Ok(value)
+    }
+
+    /// Run the job inside a sandbox boundary: the driver rewrites argv into
+    /// its runtime command, and the returned status carries the isolation
+    /// evidence (driver kind, network/read-only posture). Requires the spec
+    /// to carry an image; local-trusted drivers may pass it through.
+    pub fn run_with_driver(
+        &self,
+        spec: &JobSpec,
+        driver: &dyn driver::SandboxDriver,
+    ) -> ExecResult<Value> {
+        let Some(image) = spec.image.clone() else {
+            return err("sandboxed run requires spec.image");
+        };
+        let sandbox_job = driver::SandboxJob {
+            image_or_kernel: image,
+            argv: spec.argv.clone(),
+            workdir_in_sandbox: spec
+                .sandbox_workdir
+                .clone()
+                .unwrap_or_else(|| "/workspace".into()),
+            timeout_secs: spec.timeout_secs,
+            network_none: true,
+            root_read_only: true,
+        };
+        let mut sandboxed = spec.clone();
+        sandboxed.argv = driver.command(&sandbox_job);
+        let mut status = self.run(&sandboxed)?;
+        status["sandbox"] = driver::run_evidence(driver, &sandbox_job, &status);
+        Ok(status)
     }
 
     fn truncate_output(&self, path: &Path) -> ExecResult<()> {
@@ -294,7 +350,11 @@ impl JobRunner {
             .map_err(|error| ExecError(format!("job store list failed: {error}")))?;
         for entry in entries.filter_map(|e| e.ok()) {
             let path = entry.path();
-            let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default().to_string();
+            let name = path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or_default()
+                .to_string();
             if let Some(job_id) = name.strip_suffix(".json") {
                 if !is_hex32(job_id) {
                     continue;
@@ -347,7 +407,13 @@ impl JobRunner {
 
     /// Host reconciliation closes an unknown with explicit evidence. This is
     /// the only path that releases the runner's latch — never a retry.
-    pub fn reconcile(&self, job_id: &str, actor: &str, reason: &str, evidence: &Value) -> ExecResult<Value> {
+    pub fn reconcile(
+        &self,
+        job_id: &str,
+        actor: &str,
+        reason: &str,
+        evidence: &Value,
+    ) -> ExecResult<Value> {
         if actor.trim().is_empty() || reason.trim().is_empty() {
             return err("reconciliation requires actor and reason");
         }
@@ -417,7 +483,11 @@ mod tests {
         let root = temp_root();
         let runner = JobRunner::open(&root).unwrap();
         #[cfg(windows)]
-        let argv = vec!["cmd".to_string(), "/C".to_string(), "ping -n 30 127.0.0.1 >nul".to_string()];
+        let argv = vec![
+            "cmd".to_string(),
+            "/C".to_string(),
+            "ping -n 30 127.0.0.1 >nul".to_string(),
+        ];
         #[cfg(not(windows))]
         let argv = vec!["sleep".to_string(), "30".to_string()];
         let spec = JobSpec::new(argv, root.clone(), 1).unwrap();
@@ -445,14 +515,22 @@ mod tests {
         std::fs::write(&path, serde_json::to_vec_pretty(&record).unwrap()).unwrap();
         // The runner cannot testify: reconcile marks unknown.
         runner.mark_unknown(&job_id).unwrap();
-        assert_eq!(runner.read_status(&job_id).unwrap()["status"], json!("unknown"));
+        assert_eq!(
+            runner.read_status(&job_id).unwrap()["status"],
+            json!("unknown")
+        );
         // Latch: no new submissions while an unknown is unresolved.
         let (runner2, spec) = echo_job(&root, 0);
         let error = runner2.submit(&spec).unwrap_err();
         assert!(error.0.contains("unknown job outcome holds the runner"));
         // Explicit host reconciliation releases the latch; no replay happened.
         let reconciled = runner
-            .reconcile(&job_id, "host", "verified the child never produced effects", &json!({"checked": true}))
+            .reconcile(
+                &job_id,
+                "host",
+                "verified the child never produced effects",
+                &json!({"checked": true}),
+            )
             .unwrap();
         assert_eq!(reconciled["status"], json!("reconciled"));
         assert!(runner.unresolved_unknown_ids().unwrap().is_empty());

@@ -5,9 +5,9 @@
 //! Manus-style layer: bounded notes under a dedicated memory directory,
 //! addressed like any other file and hashed on every read.
 
-use std::path::{Path, PathBuf};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -61,7 +61,13 @@ impl BlockMemory {
     }
 
     /// Create a block; the creation event is returned for the caller's journal.
-    pub fn create(&mut self, title: &str, content: &str, author: &str, reason: &str) -> MemoryResult<Value> {
+    pub fn create(
+        &mut self,
+        title: &str,
+        content: &str,
+        author: &str,
+        reason: &str,
+    ) -> MemoryResult<Value> {
         if self.blocks.len() >= MAX_BLOCKS {
             return err("memory block limit reached");
         }
@@ -154,7 +160,9 @@ impl FileMemory {
     pub fn open(dir: &Path) -> MemoryResult<FileMemory> {
         std::fs::create_dir_all(dir)
             .map_err(|error| MemoryError(format!("memory directory failed: {error}")))?;
-        Ok(FileMemory { dir: dir.to_path_buf() })
+        Ok(FileMemory {
+            dir: dir.to_path_buf(),
+        })
     }
 
     fn note_path(&self, name: &str) -> MemoryResult<PathBuf> {
@@ -184,7 +192,8 @@ impl FileMemory {
     /// Read a note with its digest; missing notes are explicit, not empty.
     pub fn read(&self, name: &str) -> MemoryResult<Value> {
         let path = self.note_path(name)?;
-        let bytes = std::fs::read(&path).map_err(|error| MemoryError(format!("memory note read failed: {error}")))?;
+        let bytes = std::fs::read(&path)
+            .map_err(|error| MemoryError(format!("memory note read failed: {error}")))?;
         Ok(json!({
             "name": name,
             "content": String::from_utf8_lossy(&bytes),
@@ -213,16 +222,26 @@ mod tests {
     #[test]
     fn blocks_record_provenance_and_refuse_stale_edits() {
         let mut memory = BlockMemory::new();
-        let created = memory.create("user profile", "prefers rust", "agent", "initial intake").unwrap();
+        let created = memory
+            .create("user profile", "prefers rust", "agent", "initial intake")
+            .unwrap();
         let id = created["id"].as_str().unwrap().to_string();
         let digest = created["content_sha256"].as_str().unwrap().to_string();
         let edited = memory
-            .edit(&id, "prefers rust and zero-CT", "agent", "user correction", &digest)
+            .edit(
+                &id,
+                "prefers rust and zero-CT",
+                "agent",
+                "user correction",
+                &digest,
+            )
             .unwrap();
         assert_eq!(edited["revision"], json!(2));
         assert_eq!(edited["prior_sha256"], json!(digest));
         // Stale digest cannot overwrite: re-read first.
-        let error = memory.edit(&id, "overwritten", "agent", "stale write", &digest).unwrap_err();
+        let error = memory
+            .edit(&id, "overwritten", "agent", "stale write", &digest)
+            .unwrap_err();
         assert!(error.0.contains("changed since it was read"));
         // Provenance chain is complete.
         let block = &memory.blocks()[0];
@@ -234,21 +253,39 @@ mod tests {
     #[test]
     fn block_limits_and_render_budget() {
         let mut memory = BlockMemory::new();
-        let created = memory.create("big", &"x".repeat(MAX_BLOCK_CONTENT_BYTES + 1), "agent", "t").unwrap_err();
+        let created = memory
+            .create(
+                "big",
+                &"x".repeat(MAX_BLOCK_CONTENT_BYTES + 1),
+                "agent",
+                "t",
+            )
+            .unwrap_err();
         assert!(created.0.contains("byte cap"));
         for index in 0..MAX_BLOCKS {
-            memory.create(&format!("block {index}"), "content", "agent", "fill").unwrap();
+            memory
+                .create(&format!("block {index}"), "content", "agent", "fill")
+                .unwrap();
         }
-        assert!(memory.create("one more", "c", "agent", "t").is_err(), "block limit enforced");
+        assert!(
+            memory.create("one more", "c", "agent", "t").is_err(),
+            "block limit enforced"
+        );
         let render = memory.render(300);
-        assert!(render["blocks"].as_array().unwrap().iter().any(|block| block["omitted"] == json!(true)));
+        assert!(render["blocks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|block| block["omitted"] == json!(true)));
     }
 
     #[test]
     fn file_memory_is_cas_addressed_and_explicit_about_missing() {
         let dir = std::env::temp_dir().join(format!("af-fmem-{}", af_entropy::token()));
         let memory = FileMemory::open(&dir).unwrap();
-        let written = memory.write("task-context.md", "# context\n- item 1\n").unwrap();
+        let written = memory
+            .write("task-context.md", "# context\n- item 1\n")
+            .unwrap();
         let read = memory.read("task-context.md").unwrap();
         assert_eq!(written["sha256"], read["sha256"]);
         assert!(read["content"].as_str().unwrap().contains("item 1"));
@@ -258,7 +295,10 @@ mod tests {
         assert!(memory.write("../escape.md", "x").is_err());
         assert!(memory.write("a/b.md", "x").is_err());
         let listing = memory.list();
-        assert!(listing["notes"].as_array().unwrap().contains(&json!("task-context.md")));
+        assert!(listing["notes"]
+            .as_array()
+            .unwrap()
+            .contains(&json!("task-context.md")));
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -271,7 +311,9 @@ mod tests {
         let created = blocks.create("state", "v1", "agent", "t").unwrap();
         files.write("state.md", "file-v1").unwrap();
         let digest = created["content_sha256"].as_str().unwrap().to_string();
-        blocks.edit(created["id"].as_str().unwrap(), "v2", "agent", "t", &digest).unwrap();
+        blocks
+            .edit(created["id"].as_str().unwrap(), "v2", "agent", "t", &digest)
+            .unwrap();
         assert_eq!(files.read("state.md").unwrap()["content"], json!("file-v1"));
         let _ = std::fs::remove_dir_all(&dir);
     }

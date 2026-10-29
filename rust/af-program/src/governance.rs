@@ -3,9 +3,9 @@
 //! and development signing for release manifests. Symmetric dev signing is
 //! labelled as such; asymmetric signatures are a separate accepted change.
 
-use std::collections::BTreeMap;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 
 /// Kernel roles (E03). Capabilities grow monotonically: viewer < operator <
 /// admin. Nothing here grants authority by itself — the host binds roles to
@@ -68,7 +68,11 @@ impl AuditLog {
         hasher.update(actor.as_bytes());
         hasher.update(action.as_bytes());
         hasher.update(target.as_bytes());
-        hasher.update(serde_json::to_string(payload).unwrap_or_default().as_bytes());
+        hasher.update(
+            serde_json::to_string(payload)
+                .unwrap_or_default()
+                .as_bytes(),
+        );
         let hash = format!("{:x}", hasher.finalize());
         let entry = AuditEntry {
             seq,
@@ -96,7 +100,11 @@ impl AuditLog {
             hasher.update(entry.actor.as_bytes());
             hasher.update(entry.action.as_bytes());
             hasher.update(entry.target.as_bytes());
-            hasher.update(serde_json::to_string(&entry.payload).unwrap_or_default().as_bytes());
+            hasher.update(
+                serde_json::to_string(&entry.payload)
+                    .unwrap_or_default()
+                    .as_bytes(),
+            );
             let recomputed = format!("{:x}", hasher.finalize());
             if entry.seq != expected_seq as u64
                 || entry.prev_hash != previous
@@ -183,8 +191,18 @@ mod tests {
     #[test]
     fn audit_chain_detects_any_tamper() {
         let mut log = AuditLog::default();
-        log.append("agent", "apply_edit", "src/lib.py", &json!({"before": "1", "after": "2"}));
-        log.append("owner", "reconcile", "job-1", &json!({"reason": "verified"}));
+        log.append(
+            "agent",
+            "apply_edit",
+            "src/lib.py",
+            &json!({"before": "1", "after": "2"}),
+        );
+        log.append(
+            "owner",
+            "reconcile",
+            "job-1",
+            &json!({"reason": "verified"}),
+        );
         assert_eq!(log.verify()["ok"], json!(true));
         // Tamper with the first record's payload: the chain breaks.
         let first = &mut log.entries[0];
@@ -211,7 +229,10 @@ mod tests {
         };
         let exported = span.export("trace-1");
         assert_eq!(exported["span_count"], json!(2));
-        assert!(exported["format"].as_str().unwrap().contains("OTLP transport"));
+        assert!(exported["format"]
+            .as_str()
+            .unwrap()
+            .contains("OTLP transport"));
     }
 
     #[test]

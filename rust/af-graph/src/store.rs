@@ -4,13 +4,13 @@
 //! writers compare the persisted generation while holding a persistent OS
 //! lease on a marker lock file that is never unlinked.
 
+use crate::canonical::canonical_bytes;
+use crate::schema::{validate_edge, validate_node, GraphContractError, GRAPH_SCHEMA_VERSION};
+use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use serde_json::{json, Value};
-use crate::canonical::canonical_bytes;
-use crate::schema::{validate_edge, validate_node, GraphContractError, GRAPH_SCHEMA_VERSION};
 
 /// A persistently marked lock file lease (blocking with a deadline, like the
 /// Python `exclusive_file(blocking=True)` wrapper: on timeout the refusal is a
@@ -39,10 +39,14 @@ impl GraphStore {
         if path.exists() {
             let text = std::fs::read_to_string(path)
                 .map_err(|error| GraphContractError(format!("graph store read failed: {error}")))?;
-            let document: Value = serde_json::from_str(&text)
-                .map_err(|error| GraphContractError(format!("graph store is not valid JSON: {error}")))?;
-            if document.get("schema_version").and_then(Value::as_i64) != Some(GRAPH_SCHEMA_VERSION) {
-                return Err(GraphContractError("graph store schema mismatch; migrate explicitly".into()));
+            let document: Value = serde_json::from_str(&text).map_err(|error| {
+                GraphContractError(format!("graph store is not valid JSON: {error}"))
+            })?;
+            if document.get("schema_version").and_then(Value::as_i64) != Some(GRAPH_SCHEMA_VERSION)
+            {
+                return Err(GraphContractError(
+                    "graph store schema mismatch; migrate explicitly".into(),
+                ));
             }
             let mut nodes = BTreeMap::new();
             for node in document["nodes"].as_array().cloned().unwrap_or_default() {
@@ -54,12 +58,25 @@ impl GraphStore {
                 let id = edge["id"].as_str().unwrap_or_default().to_string();
                 edges.insert(id, edge);
             }
-            let generation = document.get("generation").and_then(Value::as_i64).unwrap_or(0);
-            let store = GraphStore { path: path.to_path_buf(), nodes, edges, generation };
+            let generation = document
+                .get("generation")
+                .and_then(Value::as_i64)
+                .unwrap_or(0);
+            let store = GraphStore {
+                path: path.to_path_buf(),
+                nodes,
+                edges,
+                generation,
+            };
             store.validate()?;
             Ok(store)
         } else {
-            Ok(GraphStore { path: path.to_path_buf(), nodes: BTreeMap::new(), edges: BTreeMap::new(), generation: 0 })
+            Ok(GraphStore {
+                path: path.to_path_buf(),
+                nodes: BTreeMap::new(),
+                edges: BTreeMap::new(),
+                generation: 0,
+            })
         }
     }
 
@@ -111,14 +128,25 @@ impl GraphStore {
         drop_edge_ids: &[String],
     ) -> Result<i64, GraphContractError> {
         if base_generation < 0 {
-            return Err(GraphContractError("base generation must be a non-negative integer".into()));
+            return Err(GraphContractError(
+                "base generation must be a non-negative integer".into(),
+            ));
         }
         let lock_path = self.path.with_file_name(format!(
             "{}.lock",
-            self.path.file_name().and_then(|n| n.to_str()).unwrap_or("graph.json")
+            self.path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("graph.json")
         ));
         let _lease = StoreLease::acquire(&lock_path, "graph writer lease is held")?;
-        self.commit_locked(base_generation, put_nodes, put_edges, drop_node_ids, drop_edge_ids)
+        self.commit_locked(
+            base_generation,
+            put_nodes,
+            put_edges,
+            drop_node_ids,
+            drop_edge_ids,
+        )
     }
 
     fn commit_locked(
@@ -133,12 +161,20 @@ impl GraphStore {
             Ok(text) => {
                 let persisted: Value = serde_json::from_str(&text)
                     .map_err(|_| GraphContractError("graph store is not valid JSON".into()))?;
-                if persisted.get("schema_version").and_then(Value::as_i64) != Some(GRAPH_SCHEMA_VERSION) {
-                    return Err(GraphContractError("graph store schema mismatch; migrate explicitly".into()));
+                if persisted.get("schema_version").and_then(Value::as_i64)
+                    != Some(GRAPH_SCHEMA_VERSION)
+                {
+                    return Err(GraphContractError(
+                        "graph store schema mismatch; migrate explicitly".into(),
+                    ));
                 }
                 match persisted.get("generation").and_then(Value::as_i64) {
                     Some(value) if value >= 0 => value,
-                    _ => return Err(GraphContractError("persisted graph generation is malformed".into())),
+                    _ => {
+                        return Err(GraphContractError(
+                            "persisted graph generation is malformed".into(),
+                        ))
+                    }
                 }
             }
             Err(_) => 0,
@@ -150,7 +186,8 @@ impl GraphStore {
         }
         if base_generation != self.generation {
             return Err(GraphContractError::conflict(format!(
-                "store generation moved to {}; re-read and retry", self.generation
+                "store generation moved to {}; re-read and retry",
+                self.generation
             )));
         }
         let mut nodes = self.nodes.clone();
@@ -158,7 +195,8 @@ impl GraphStore {
         for node_id in drop_node_ids {
             nodes.remove(node_id);
             edges.retain(|_, edge| {
-                edge["src"].as_str() != Some(node_id.as_str()) && edge["dst"].as_str() != Some(node_id.as_str())
+                edge["src"].as_str() != Some(node_id.as_str())
+                    && edge["dst"].as_str() != Some(node_id.as_str())
             });
         }
         for edge_id_value in drop_edge_ids {
@@ -166,11 +204,17 @@ impl GraphStore {
         }
         for node in put_nodes {
             validate_node(node)?;
-            nodes.insert(node["id"].as_str().unwrap_or_default().to_string(), node.clone());
+            nodes.insert(
+                node["id"].as_str().unwrap_or_default().to_string(),
+                node.clone(),
+            );
         }
         for edge in put_edges {
             validate_edge(edge)?;
-            edges.insert(edge["id"].as_str().unwrap_or_default().to_string(), edge.clone());
+            edges.insert(
+                edge["id"].as_str().unwrap_or_default().to_string(),
+                edge.clone(),
+            );
         }
         let candidate = GraphStore {
             path: self.path.clone(),
@@ -185,8 +229,11 @@ impl GraphStore {
         }
         let temp_path = self.path.with_file_name(format!(
             "graph-{}.tmp",
-            std::process::id() as u64 ^ std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_nanos() as u64
+            std::process::id() as u64
+                ^ std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_nanos() as u64
         ));
         {
             let mut file = File::create(&temp_path)
@@ -253,11 +300,8 @@ mod tests {
     }
 
     fn temp_dir(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!(
-            "af-graph-test-{}-{}",
-            std::process::id(),
-            name
-        ));
+        let dir =
+            std::env::temp_dir().join(format!("af-graph-test-{}-{}", std::process::id(), name));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         dir
@@ -268,7 +312,9 @@ mod tests {
         let dir = temp_dir("commit");
         let path = dir.join("graph.json");
         let mut store = GraphStore::open(&path).unwrap();
-        let generation = store.commit(0, &[file_node("a.py", "d1")], &[], &[], &[]).unwrap();
+        let generation = store
+            .commit(0, &[file_node("a.py", "d1")], &[], &[], &[])
+            .unwrap();
         assert_eq!(generation, 1);
         let reopened = GraphStore::open(&path).unwrap();
         assert_eq!(reopened.generation(), 1);
@@ -280,8 +326,12 @@ mod tests {
         let dir = temp_dir("stale");
         let path = dir.join("graph.json");
         let mut store = GraphStore::open(&path).unwrap();
-        store.commit(0, &[file_node("a.py", "d1")], &[], &[], &[]).unwrap();
-        let error = store.commit(0, &[file_node("b.py", "d2")], &[], &[], &[]).unwrap_err();
+        store
+            .commit(0, &[file_node("a.py", "d1")], &[], &[], &[])
+            .unwrap();
+        let error = store
+            .commit(0, &[file_node("b.py", "d2")], &[], &[], &[])
+            .unwrap_err();
         assert!(error.is_conflict());
         assert_eq!(store.generation(), 1);
     }
@@ -293,9 +343,19 @@ mod tests {
         let mut store = GraphStore::open(&path).unwrap();
         let edge = json!({"id": "file:a.py-contains->file:b.py", "kind": "contains",
                           "src": "file:a.py", "dst": "file:b.py", "status": "active"});
-        store.commit(0, &[file_node("a.py", "d1"), file_node("b.py", "d2")], &[edge], &[], &[]).unwrap();
+        store
+            .commit(
+                0,
+                &[file_node("a.py", "d1"), file_node("b.py", "d2")],
+                &[edge],
+                &[],
+                &[],
+            )
+            .unwrap();
         assert_eq!(store.edge_count(), 1);
-        store.commit(1, &[], &[], &["file:a.py".to_string()], &[]).unwrap();
+        store
+            .commit(1, &[], &[], &["file:a.py".to_string()], &[])
+            .unwrap();
         assert_eq!(store.node_count(), 1);
         assert_eq!(store.edge_count(), 0);
     }
@@ -307,7 +367,9 @@ mod tests {
         let mut store = GraphStore::open(&path).unwrap();
         let edge = json!({"id": "file:a.py-contains->file:ghost.py", "kind": "contains",
                           "src": "file:a.py", "dst": "file:ghost.py", "status": "active"});
-        let error = store.commit(0, &[file_node("a.py", "d1")], &[edge], &[], &[]).unwrap_err();
+        let error = store
+            .commit(0, &[file_node("a.py", "d1")], &[edge], &[], &[])
+            .unwrap_err();
         assert!(error.0.contains("dangling"));
     }
 
@@ -316,7 +378,15 @@ mod tests {
         let dir = temp_dir("canonical");
         let path = dir.join("graph.json");
         let mut store = GraphStore::open(&path).unwrap();
-        store.commit(0, &[file_node("b.py", "d2"), file_node("a.py", "d1")], &[], &[], &[]).unwrap();
+        store
+            .commit(
+                0,
+                &[file_node("b.py", "d2"), file_node("a.py", "d1")],
+                &[],
+                &[],
+                &[],
+            )
+            .unwrap();
         let first = store.export_canonical();
         let reopened = GraphStore::open(&path).unwrap();
         assert_eq!(first, reopened.export_canonical());
@@ -330,11 +400,15 @@ mod tests {
         let path = dir.join("graph.json");
         let mut a = GraphStore::open(&path).unwrap();
         let mut b = GraphStore::open(&path).unwrap();
-        a.commit(0, &[file_node("a.py", "d1")], &[], &[], &[]).unwrap();
-        let error = b.commit(0, &[file_node("b.py", "d2")], &[], &[], &[]).unwrap_err();
+        a.commit(0, &[file_node("a.py", "d1")], &[], &[], &[])
+            .unwrap();
+        let error = b
+            .commit(0, &[file_node("b.py", "d2")], &[], &[], &[])
+            .unwrap_err();
         assert!(error.is_conflict());
         // b re-reads and can now commit on top.
         let mut b = GraphStore::open(&path).unwrap();
-        b.commit(1, &[file_node("b.py", "d2")], &[], &[], &[]).unwrap();
+        b.commit(1, &[file_node("b.py", "d2")], &[], &[], &[])
+            .unwrap();
     }
 }

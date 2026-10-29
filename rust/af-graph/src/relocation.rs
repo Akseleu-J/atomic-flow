@@ -2,9 +2,9 @@
 //! `graph/relocation.py`); never rename authority. Mappings are revision
 //! observations, not read or write grants.
 
-use std::collections::{BTreeMap, BTreeSet};
-use serde_json::{json, Value};
 use crate::schema::{file_id, GraphContractError};
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
 
 /// Compose observed, successful moves; never infer them from model arguments.
 pub fn owned_move_hints(
@@ -20,16 +20,24 @@ pub fn owned_move_hints(
         if tool != "move_file" || summary.get("status").and_then(Value::as_str) != Some("applied") {
             continue;
         }
-        let changes = summary.get("changes").and_then(Value::as_array).cloned().unwrap_or_default();
+        let changes = summary
+            .get("changes")
+            .and_then(Value::as_array)
+            .cloned()
+            .unwrap_or_default();
         let removed: Vec<&Value> = changes
             .iter()
-            .filter(|row| row.get("before_hash").and_then(Value::as_str).is_some()
-                && row.get("after_hash").is_some_and(Value::is_null))
+            .filter(|row| {
+                row.get("before_hash").and_then(Value::as_str).is_some()
+                    && row.get("after_hash").is_some_and(Value::is_null)
+            })
             .collect();
         let added: Vec<&Value> = changes
             .iter()
-            .filter(|row| row.get("before_hash").is_some_and(Value::is_null)
-                && row.get("after_hash").and_then(Value::as_str).is_some())
+            .filter(|row| {
+                row.get("before_hash").is_some_and(Value::is_null)
+                    && row.get("after_hash").and_then(Value::as_str).is_some()
+            })
             .collect();
         if changes.len() != 2 || removed.len() != 1 || added.len() != 1 {
             continue;
@@ -51,7 +59,8 @@ pub fn owned_move_hints(
             .iter()
             .filter(|(_, destination)| destination.as_str() == left.as_str())
             .map(|(origin, _)| origin.clone())
-            .collect();        if !origins.is_empty() {
+            .collect();
+        if !origins.is_empty() {
             for origin in origins {
                 hints.insert(origin, right.clone());
             }
@@ -60,7 +69,9 @@ pub fn owned_move_hints(
         }
     }
     if hints.len() > 4096 {
-        return Err(GraphContractError("owned move hints exceed observation cap".into()));
+        return Err(GraphContractError(
+            "owned move hints exceed observation cap".into(),
+        ));
     }
     Ok(hints)
 }
@@ -90,18 +101,26 @@ pub fn relocation_report(
 ) -> Result<Value, GraphContractError> {
     let old = file_nodes(before);
     let new = file_nodes(after);
-    let removed: BTreeSet<String> = old.keys().cloned().collect::<BTreeSet<_>>()
+    let removed: BTreeSet<String> = old
+        .keys()
+        .cloned()
+        .collect::<BTreeSet<_>>()
         .difference(&new.keys().cloned().collect::<BTreeSet<_>>())
         .cloned()
         .collect();
-    let added: BTreeSet<String> = new.keys().cloned().collect::<BTreeSet<_>>()
+    let added: BTreeSet<String> = new
+        .keys()
+        .cloned()
+        .collect::<BTreeSet<_>>()
         .difference(&old.keys().cloned().collect::<BTreeSet<_>>())
         .cloned()
         .collect();
     if let Some(moves) = moves {
         for (left, right) in moves {
             if left.is_empty() || right.is_empty() {
-                return Err(GraphContractError("move mapping requires exact old/new path pairs".into()));
+                return Err(GraphContractError(
+                    "move mapping requires exact old/new path pairs".into(),
+                ));
             }
         }
     }
@@ -128,8 +147,14 @@ pub fn relocation_report(
         let node = old[path];
         groups_old
             .entry((
-                node.pointer("/source/algorithm").and_then(Value::as_str).unwrap_or_default().to_string(),
-                node.pointer("/source/digest").and_then(Value::as_str).unwrap_or_default().to_string(),
+                node.pointer("/source/algorithm")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string(),
+                node.pointer("/source/digest")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string(),
             ))
             .or_default()
             .push(path.clone());
@@ -138,19 +163,31 @@ pub fn relocation_report(
         let node = new[path];
         groups_new
             .entry((
-                node.pointer("/source/algorithm").and_then(Value::as_str).unwrap_or_default().to_string(),
-                node.pointer("/source/digest").and_then(Value::as_str).unwrap_or_default().to_string(),
+                node.pointer("/source/algorithm")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string(),
+                node.pointer("/source/digest")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string(),
             ))
             .or_default()
             .push(path.clone());
     }
     let mut ambiguous: Vec<Value> = Vec::new();
-    for key in groups_old.keys().collect::<BTreeSet<_>>().intersection(&groups_new.keys().collect::<BTreeSet<_>>()) {
+    for key in groups_old
+        .keys()
+        .collect::<BTreeSet<_>>()
+        .intersection(&groups_new.keys().collect::<BTreeSet<_>>())
+    {
         let lefts = &groups_old[key];
         let rights = &groups_new[key];
         if key.0 == "sha256" && lefts.len() == 1 && rights.len() == 1 {
             let (left, right) = (lefts[0].clone(), rights[0].clone());
-            pairs.push(json!({"old_path": left, "new_path": right, "method": "unique_content_relocation"}));
+            pairs.push(
+                json!({"old_path": left, "new_path": right, "method": "unique_content_relocation"}),
+            );
             used_old.insert(left);
             used_new.insert(right);
         } else {
@@ -171,21 +208,35 @@ pub fn relocation_report(
             if node["path"].as_str() == Some(left) && node["kind"] != json!("file") {
                 let key = (
                     node["kind"].as_str().unwrap_or_default().to_string(),
-                    node.get("symbol").and_then(Value::as_str).map(str::to_string),
+                    node.get("symbol")
+                        .and_then(Value::as_str)
+                        .map(str::to_string),
                 );
-                old_symbols.entry(key).or_default().push(node["id"].as_str().unwrap_or_default().to_string());
+                old_symbols
+                    .entry(key)
+                    .or_default()
+                    .push(node["id"].as_str().unwrap_or_default().to_string());
             }
         }
         for node in after["nodes"].as_array().cloned().unwrap_or_default() {
             if node["path"].as_str() == Some(right) && node["kind"] != json!("file") {
                 let key = (
                     node["kind"].as_str().unwrap_or_default().to_string(),
-                    node.get("symbol").and_then(Value::as_str).map(str::to_string),
+                    node.get("symbol")
+                        .and_then(Value::as_str)
+                        .map(str::to_string),
                 );
-                new_symbols.entry(key).or_default().push(node["id"].as_str().unwrap_or_default().to_string());
+                new_symbols
+                    .entry(key)
+                    .or_default()
+                    .push(node["id"].as_str().unwrap_or_default().to_string());
             }
         }
-        for key in old_symbols.keys().collect::<BTreeSet<_>>().intersection(&new_symbols.keys().collect::<BTreeSet<_>>()) {
+        for key in old_symbols
+            .keys()
+            .collect::<BTreeSet<_>>()
+            .intersection(&new_symbols.keys().collect::<BTreeSet<_>>())
+        {
             let old_ids = &old_symbols[key];
             let new_ids = &new_symbols[key];
             if old_ids.len() == 1 && new_ids.len() == 1 {
@@ -245,10 +296,19 @@ mod tests {
         let moves = report["path_moves"].as_array().unwrap();
         assert_eq!(moves.len(), 1);
         assert_eq!(moves[0]["method"], json!("unique_content_relocation"));
-        assert_eq!(report["identity_mapping"][format!("file:old.py")], json!("file:new.py"));
-        assert_eq!(report["identity_mapping"][format!("sym:old.py::run")], json!("sym:new.py::run"));
+        assert_eq!(
+            report["identity_mapping"][format!("file:old.py")],
+            json!("file:new.py")
+        );
+        assert_eq!(
+            report["identity_mapping"][format!("sym:old.py::run")],
+            json!("sym:new.py::run")
+        );
         assert!(report["ambiguous_moves"].as_array().unwrap().is_empty());
-        assert_eq!(report["authority"].as_str().unwrap(), "none; mappings are revision observations, not read or write grants");
+        assert_eq!(
+            report["authority"].as_str().unwrap(),
+            "none; mappings are revision observations, not read or write grants"
+        );
     }
 
     #[test]
@@ -300,9 +360,15 @@ mod tests {
         assert_eq!(hints.get("a.py").map(String::as_str), Some("b.py"));
         // Failed moves and wrong shapes are never hints.
         let rejected = vec![json!({"tool": "move_file", "result_summary": {"status": "failed"}})];
-        assert!(owned_move_hints(&previous, &rejected, &before, &after).unwrap().is_empty());
+        assert!(owned_move_hints(&previous, &rejected, &before, &after)
+            .unwrap()
+            .is_empty());
         previous.insert("z.py".to_string(), "a.py".to_string());
         let hints = owned_move_hints(&previous, &calls, &before, &after).unwrap();
-        assert_eq!(hints.get("z.py").map(String::as_str), Some("b.py"), "chains follow the moved identity");
+        assert_eq!(
+            hints.get("z.py").map(String::as_str),
+            Some("b.py"),
+            "chains follow the moved identity"
+        );
     }
 }

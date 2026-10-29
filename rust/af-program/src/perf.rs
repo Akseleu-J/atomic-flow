@@ -2,10 +2,10 @@
 //! a delta-vs-clean benchmark over the graph core. Provisional targets are
 //! engineering targets, never claims; every report carries its sample count.
 
+use af_graph::{delta, project, GraphStore};
+use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::time::Instant;
-use serde_json::{json, Value};
-use af_graph::{delta, project, GraphStore};
 
 /// Sorted-sample statistics with honest dispersion reporting.
 #[derive(Debug, Clone, PartialEq)]
@@ -54,8 +54,14 @@ pub fn measure_samples(n: usize, mut run: impl FnMut() -> f64) -> Vec<f64> {
 
 fn scratch_files() -> BTreeMap<String, Vec<u8>> {
     BTreeMap::from([
-        ("lib.py".to_string(), b"def helper():\n    return 1\n".to_vec()),
-        ("app.py".to_string(), b"from lib import helper\n\ndef main():\n    return helper()\n".to_vec()),
+        (
+            "lib.py".to_string(),
+            b"def helper():\n    return 1\n".to_vec(),
+        ),
+        (
+            "app.py".to_string(),
+            b"from lib import helper\n\ndef main():\n    return helper()\n".to_vec(),
+        ),
     ])
 }
 
@@ -86,7 +92,8 @@ pub fn warm_delta_ms() -> f64 {
         hasher.update(files["lib.py"].as_slice());
         format!("{:x}", hasher.finalize())
     };
-    let plan = delta::file_delta("lib.py", Some(changed.as_slice()), Some(&digest), None).expect("delta plan");
+    let plan = delta::file_delta("lib.py", Some(changed.as_slice()), Some(&digest), None)
+        .expect("delta plan");
     delta::apply_delta(&mut store, &plan).expect("delta apply");
     started.elapsed().as_secs_f64() * 1000.0
 }
@@ -120,14 +127,18 @@ mod tests {
 
     #[test]
     fn sample_stats_report_dispersion_honestly() {
-        let stats = SampleStats::from_samples(&[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]).unwrap();
+        let stats = SampleStats::from_samples(&[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+            .unwrap();
         assert_eq!(stats.n, 10);
         assert_eq!(stats.min_ms, 1.0);
         assert_eq!(stats.p50_ms, 5.0);
         assert_eq!(stats.p95_ms, 10.0);
         assert_eq!(stats.max_ms, 10.0);
         assert!(SampleStats::from_samples(&[]).is_none());
-        assert!(stats.as_value("x")["note"].as_str().unwrap().contains("never hidden"));
+        assert!(stats.as_value("x")["note"]
+            .as_str()
+            .unwrap()
+            .contains("never hidden"));
     }
 
     #[test]

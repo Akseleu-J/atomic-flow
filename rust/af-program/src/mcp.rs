@@ -4,8 +4,8 @@
 //! `af_llm::ToolSpec`. The stdio transport loop is a thin host concern; this
 //! module owns the message contract.
 
-use serde_json::{json, Value};
 use af_llm::ToolSpec;
+use serde_json::{json, Value};
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -24,11 +24,13 @@ pub fn parse_request(line: &str) -> McpResult<Value> {
     if value.get("method").and_then(Value::as_str).is_none() {
         return Err(McpError("JSON-RPC request requires a method".into()));
     }
-    let id_ok = value.get("id").is_some_and(|id| {
-        id.is_string() || id.is_u64() || id.is_i64()
-    });
+    let id_ok = value
+        .get("id")
+        .is_some_and(|id| id.is_string() || id.is_u64() || id.is_i64());
     if !id_ok {
-        return Err(McpError("JSON-RPC request requires a string or integer id".into()));
+        return Err(McpError(
+            "JSON-RPC request requires a string or integer id".into(),
+        ));
     }
     Ok(value)
 }
@@ -82,16 +84,23 @@ pub fn tools_call(
     let Some(spec) = tools.iter().find(|tool| tool.name == name) else {
         return Err(McpError(format!("unknown tool {name}")));
     };
-    let arguments = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
+    let arguments = params
+        .get("arguments")
+        .cloned()
+        .unwrap_or_else(|| json!({}));
     if !arguments.is_object() {
         return Err(McpError("tools/call arguments must be an object".into()));
     }
     // Required-property pre-check against the schema we advertised.
     if let Some(required) = spec.parameters.get("required").and_then(Value::as_array) {
         for property in required {
-            let Some(property) = property.as_str() else { continue };
+            let Some(property) = property.as_str() else {
+                continue;
+            };
             if arguments.get(property).is_none() {
-                return Err(McpError(format!("tools/call missing required argument {property}")));
+                return Err(McpError(format!(
+                    "tools/call missing required argument {property}"
+                )));
             }
         }
     }
@@ -122,32 +131,40 @@ mod tests {
 
     #[test]
     fn handshake_and_tools_list() {
-        let request = parse_request(r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}"#).unwrap();
+        let request =
+            parse_request(r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}"#).unwrap();
         let result = initialize_result("af");
         assert_eq!(result["protocolVersion"], json!("2025-06-18"));
         assert_eq!(request["id"], json!(1));
         let listed = tools_list_result(&probe_tools());
         assert_eq!(listed["tools"][0]["name"], json!("read_file"));
-        assert_eq!(listed["tools"][0]["inputSchema"]["required"][0], json!("path"));
+        assert_eq!(
+            listed["tools"][0]["inputSchema"]["required"][0],
+            json!("path")
+        );
     }
 
     #[test]
     fn malformed_requests_are_refused() {
         assert!(parse_request("not json").is_err());
         assert!(parse_request("[1,2]").is_err(), "batches refused");
-        assert!(parse_request(r#"{"jsonrpc":"2.0","id":1}"#).is_err(), "no method");
+        assert!(
+            parse_request(r#"{"jsonrpc":"2.0","id":1}"#).is_err(),
+            "no method"
+        );
         assert!(
             parse_request(r#"{"jsonrpc":"2.0","method":"x"}"#).is_err(),
             "missing id"
         );
-        assert!(parse_request(r#"{"jsonrpc":"2.0","id":1.5,"method":"x"}"#).is_err(), "float id");
+        assert!(
+            parse_request(r#"{"jsonrpc":"2.0","id":1.5,"method":"x"}"#).is_err(),
+            "float id"
+        );
     }
 
     #[test]
     fn tools_call_validates_and_wraps() {
-        let execute = |_name: &str, arguments: &Value| {
-            json!({"content": arguments["path"].as_str().unwrap_or_default()})
-        };
+        let execute = |_name: &str, arguments: &Value| json!({"content": arguments["path"].as_str().unwrap_or_default()});
         let ok = tools_call(
             &json!({"name": "read_file", "arguments": {"path": "a.py"}}),
             &probe_tools(),

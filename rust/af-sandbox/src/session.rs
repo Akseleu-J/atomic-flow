@@ -6,16 +6,17 @@
 //! (grant identity, full-read proof, manifest equality, per-file content CAS)
 //! are preserved exactly.
 
-use std::collections::{BTreeMap, BTreeSet};
-use std::path::{Path, PathBuf};
-use serde_json::{json, Value};
 use crate::admission::admit_rel;
-use crate::registry::{
-    SandboxRegistry, MANIFEST_FILE_BYTES, MANIFEST_TOTAL_BYTES, MAX_SOURCE_BYTES, SCAN_ENTRIES, SCAN_SECONDS,
-};
 use crate::redact::redact;
+use crate::registry::{
+    SandboxRegistry, MANIFEST_FILE_BYTES, MANIFEST_TOTAL_BYTES, MAX_SOURCE_BYTES, SCAN_ENTRIES,
+    SCAN_SECONDS,
+};
 use crate::{glob_match, sha1_hex, sha256_hex, SandboxError, SandboxResult, SOURCE_SUFFIXES};
 use rustpython_parser::Parse;
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
+use std::path::{Path, PathBuf};
 
 const MAX_READ_PROOFS: usize = 256;
 const MAX_PREVIEWS: usize = 16;
@@ -59,14 +60,30 @@ fn scan_guard(checks: &mut usize, deadline: std::time::Instant) -> SandboxResult
 const ALWAYS_KEEP_DIR: &str = ".github";
 const ALWAYS_KEEP_FILES: [&str; 3] = [".gitignore", ".coveragerc", ".python-version"];
 const DEFAULT_IGNORE: [&str; 15] = [
-    ".git", ".venv", "venv", "node_modules", "__pycache__", ".atomic_flow", "dist", "build",
-    ".mypy_cache", ".pytest_cache", ".ruff_cache", "*.egg-info",
-    "package-lock.json", "poetry.lock", "*.min.js",
+    ".git",
+    ".venv",
+    "venv",
+    "node_modules",
+    "__pycache__",
+    ".atomic_flow",
+    "dist",
+    "build",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    "*.egg-info",
+    "package-lock.json",
+    "poetry.lock",
+    "*.min.js",
 ];
 
 /// Bounded traversal matching the ChangeSet snapshot filters: hidden entries
 /// are skipped except an explicit allowlist; matched names are never yielded.
-fn scan_files(root: &Path, checks: &mut usize, deadline: std::time::Instant) -> SandboxResult<Vec<PathBuf>> {
+fn scan_files(
+    root: &Path,
+    checks: &mut usize,
+    deadline: std::time::Instant,
+) -> SandboxResult<Vec<PathBuf>> {
     let mut result = Vec::new();
     let mut stack = vec![root.to_path_buf()];
     while let Some(folder) = stack.pop() {
@@ -78,13 +95,20 @@ fn scan_files(root: &Path, checks: &mut usize, deadline: std::time::Instant) -> 
         };
         for entry in entries {
             scan_guard(checks, deadline)?;
-            let entry = entry.map_err(|error| SandboxError(format!("workspace scan failed: {error}")))?;
+            let entry =
+                entry.map_err(|error| SandboxError(format!("workspace scan failed: {error}")))?;
             let name = entry.file_name().to_string_lossy().to_string();
-            if DEFAULT_IGNORE.iter().any(|pattern| glob_match(pattern, &name)) {
+            if DEFAULT_IGNORE
+                .iter()
+                .any(|pattern| glob_match(pattern, &name))
+            {
                 continue;
             }
             let path = entry.path();
-            let is_dir = entry.file_type().map_err(|e| SandboxError(format!("{e}")))?.is_dir();
+            let is_dir = entry
+                .file_type()
+                .map_err(|e| SandboxError(format!("{e}")))?
+                .is_dir();
             let hidden = name.starts_with('.');
             if is_dir {
                 if hidden && name != ALWAYS_KEEP_DIR {
@@ -98,7 +122,9 @@ fn scan_files(root: &Path, checks: &mut usize, deadline: std::time::Instant) -> 
                 let meta = std::fs::symlink_metadata(&path)
                     .map_err(|error| SandboxError(format!("workspace scan failed: {error}")))?;
                 if !meta.is_file() {
-                    return Err(SandboxError("workspace snapshot requires regular source files".into()));
+                    return Err(SandboxError(
+                        "workspace snapshot requires regular source files".into(),
+                    ));
                 }
                 result.push(path);
             }
@@ -111,7 +137,9 @@ fn ensure_regular_dir(path: &Path) -> SandboxResult<()> {
     let meta = std::fs::symlink_metadata(path)
         .map_err(|error| SandboxError(format!("workspace scan failed: {error}")))?;
     if meta.file_type().is_symlink() {
-        return Err(SandboxError("workspace paths may not contain links or junctions".into()));
+        return Err(SandboxError(
+            "workspace paths may not contain links or junctions".into(),
+        ));
     }
     Ok(())
 }
@@ -129,13 +157,17 @@ pub fn manifest(root: &Path) -> SandboxResult<BTreeMap<String, String>> {
             .map_err(|error| SandboxError(format!("manifest stat failed: {error}")))?
             .len();
         if size > MANIFEST_FILE_BYTES {
-            return Err(SandboxError("workspace snapshot file exceeds its byte cap".into()));
+            return Err(SandboxError(
+                "workspace snapshot file exceeds its byte cap".into(),
+            ));
         }
         let bytes = std::fs::read(&path)
             .map_err(|error| SandboxError(format!("manifest read failed: {error}")))?;
         total += bytes.len() as u64;
         if bytes.len() as u64 > MANIFEST_FILE_BYTES || total > MANIFEST_TOTAL_BYTES {
-            return Err(SandboxError("workspace snapshot exceeds its byte cap".into()));
+            return Err(SandboxError(
+                "workspace snapshot exceeds its byte cap".into(),
+            ));
         }
         let rel = path
             .strip_prefix(root)
@@ -149,10 +181,18 @@ pub fn manifest(root: &Path) -> SandboxResult<BTreeMap<String, String>> {
 
 impl<'a> SandboxSession<'a> {
     pub fn new(registry: &'a SandboxRegistry) -> SandboxResult<SandboxSession<'a>> {
-        Ok(SandboxSession { registry, reads: BTreeMap::new(), previews: BTreeMap::new() })
+        Ok(SandboxSession {
+            registry,
+            reads: BTreeMap::new(),
+            previews: BTreeMap::new(),
+        })
     }
 
-    fn source(&self, root_id: &str, rel: &str) -> SandboxResult<(Value, PathBuf, Option<Vec<u8>>, Option<String>)> {
+    fn source(
+        &self,
+        root_id: &str,
+        rel: &str,
+    ) -> SandboxResult<(Value, PathBuf, Option<Vec<u8>>, Option<String>)> {
         let item = self.registry.get(root_id)?;
         let root = PathBuf::from(item["path"].as_str().unwrap_or_default());
         let path = admit_rel(&root, rel)?;
@@ -163,13 +203,16 @@ impl<'a> SandboxSession<'a> {
             use std::io::Read;
             let mut limited = handle.take((MAX_SOURCE_BYTES + 1) as u64);
             let mut buffer = Vec::new();
-            limited.read_to_end(&mut buffer)
+            limited
+                .read_to_end(&mut buffer)
                 .map_err(|error| SandboxError(format!("source read failed: {error}")))?;
             data = Some(buffer);
         }
         if let Some(bytes) = &data {
             if bytes.contains(&0u8) || bytes.len() > MAX_SOURCE_BYTES {
-                return Err(SandboxError("workspace source must be bounded UTF-8 text".into()));
+                return Err(SandboxError(
+                    "workspace source must be bounded UTF-8 text".into(),
+                ));
             }
         }
         let current = data.as_ref().map(|bytes| sha256_hex(bytes));
@@ -189,13 +232,25 @@ impl<'a> SandboxSession<'a> {
     }
 
     /// Paged, redacted, root-qualified read with merged read proofs.
-    pub fn read(&mut self, root_id: &str, path: &str, offset: usize, limit: usize, record_proof: bool) -> SandboxResult<Value> {
+    pub fn read(
+        &mut self,
+        root_id: &str,
+        path: &str,
+        offset: usize,
+        limit: usize,
+        record_proof: bool,
+    ) -> SandboxResult<Value> {
         if limit == 0 || limit > 12000 {
             return Err(SandboxError("invalid source page".into()));
         }
         let (item, _path, data, current) = self.source(root_id, path)?;
         let rendered = self.rendered(&data)?;
-        let key = read_key(root_id, item["generation"].as_str().unwrap_or_default(), path, current.as_deref());
+        let key = read_key(
+            root_id,
+            item["generation"].as_str().unwrap_or_default(),
+            path,
+            current.as_deref(),
+        );
         if record_proof && !self.reads.contains_key(&key) && self.reads.len() >= MAX_READ_PROOFS {
             return Err(SandboxError("session read-evidence limit reached".into()));
         }
@@ -224,7 +279,8 @@ impl<'a> SandboxSession<'a> {
             self.reads.insert(key, merged.clone());
         }
         let total_chars = rendered.chars().count();
-        let read_complete = rendered.is_empty() || (merged.len() == 1 && merged[0] == (0, rendered.len()));
+        let read_complete =
+            rendered.is_empty() || (merged.len() == 1 && merged[0] == (0, rendered.len()));
         Ok(json!({
             "workspace_id": self.registry.id, "root_id": root_id, "path": path,
             "source": rendered.chars().skip(start).take(stop - start).collect::<String>(),
@@ -255,7 +311,10 @@ impl<'a> SandboxSession<'a> {
                         Ok(rel) => rel.to_string_lossy().replace('\\', "/"),
                         Err(_) => continue,
                     };
-                    let dot = rel.rfind('.').map(|i| rel[i..].to_ascii_lowercase()).unwrap_or_default();
+                    let dot = rel
+                        .rfind('.')
+                        .map(|i| rel[i..].to_ascii_lowercase())
+                        .unwrap_or_default();
                     if !SOURCE_SUFFIXES.contains(&dot.as_str()) {
                         continue;
                     }
@@ -287,14 +346,28 @@ impl<'a> SandboxSession<'a> {
     }
 
     /// Prepare a bounded, read-proof-backed change set; nothing is written yet.
-    pub fn preview(&mut self, root_id: &str, changes: &BTreeMap<String, Option<String>>) -> SandboxResult<Value> {
-        if changes.is_empty() || changes.len() > MAX_PREVIEW_PATHS || self.previews.len() >= MAX_PREVIEWS {
-            return Err(SandboxError("preview requires 1-32 paths and at most 16 pending previews".into()));
+    pub fn preview(
+        &mut self,
+        root_id: &str,
+        changes: &BTreeMap<String, Option<String>>,
+    ) -> SandboxResult<Value> {
+        if changes.is_empty()
+            || changes.len() > MAX_PREVIEW_PATHS
+            || self.previews.len() >= MAX_PREVIEWS
+        {
+            return Err(SandboxError(
+                "preview requires 1-32 paths and at most 16 pending previews".into(),
+            ));
         }
         let item = self.registry.get(root_id)?;
         let write_paths: BTreeSet<&str> = item["write_paths"]
             .as_array()
-            .map(|items| items.iter().filter_map(Value::as_str).collect::<Vec<&str>>())
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .collect::<Vec<&str>>()
+            })
             .unwrap_or_default()
             .into_iter()
             .collect();
@@ -302,17 +375,26 @@ impl<'a> SandboxSession<'a> {
         let mut total = 0usize;
         for (rel, text) in changes {
             if !write_paths.contains(rel.as_str()) {
-                return Err(SandboxError("path is outside the exact approved root write scope".into()));
+                return Err(SandboxError(
+                    "path is outside the exact approved root write scope".into(),
+                ));
             }
             let (before_item, _, data, current) = self.source(root_id, rel)?;
             if before_item != item {
                 return Err(SandboxError("root grant changed".into()));
             }
             let rendered = self.rendered(&data)?;
-            let key = read_key(root_id, item["generation"].as_str().unwrap_or_default(), rel, current.as_deref());
+            let key = read_key(
+                root_id,
+                item["generation"].as_str().unwrap_or_default(),
+                rel,
+                current.as_deref(),
+            );
             let full = vec![(0usize, rendered.len())];
             if self.reads.get(&key) != Some(&full) {
-                return Err(SandboxError("read the complete current root-qualified source before preview".into()));
+                return Err(SandboxError(
+                    "read the complete current root-qualified source before preview".into(),
+                ));
             }
             let after: Option<Vec<u8>> = match text {
                 Some(text) => Some(text.as_bytes().to_vec()),
@@ -365,7 +447,11 @@ impl<'a> SandboxSession<'a> {
             .collect();
         self.previews.insert(
             token.clone(),
-            Preview { grant: item, changes: prepared, manifest },
+            Preview {
+                grant: item,
+                changes: prepared,
+                manifest,
+            },
         );
         Ok(json!({
             "workspace_id": self.registry.id, "root_id": root_id, "preview_token": token,
@@ -379,7 +465,9 @@ impl<'a> SandboxSession<'a> {
     /// restored from backups and the journal records the abort.
     pub fn apply(&mut self, preview_token: &str, approved: bool) -> SandboxResult<Value> {
         if approved != true {
-            return Err(SandboxError("publication needs explicit host approval of the preview".into()));
+            return Err(SandboxError(
+                "publication needs explicit host approval of the preview".into(),
+            ));
         }
         let preview = self
             .previews
@@ -391,7 +479,9 @@ impl<'a> SandboxSession<'a> {
 
         let authority = || -> SandboxResult<()> {
             if self.registry.get(&root_id)? != item {
-                return Err(SandboxError("root grant was revoked or changed after preview".into()));
+                return Err(SandboxError(
+                    "root grant was revoked or changed after preview".into(),
+                ));
             }
             Ok(())
         };
@@ -403,13 +493,18 @@ impl<'a> SandboxSession<'a> {
             }
         }
         if manifest(&root)? != preview.manifest {
-            return Err(SandboxError("root source manifest changed after preview".into()));
+            return Err(SandboxError(
+                "root source manifest changed after preview".into(),
+            ));
         }
         let changeset_id = af_entropy::token();
         let mut applied: Vec<(String, Option<Vec<u8>>)> = Vec::new();
         let journal_dir = self.registry.directory.join("changesets");
         let journal_path = journal_dir.join(format!("{changeset_id}.json"));
-        let mut journal = |status: &str, paths: Vec<String>, error: Option<String>| -> SandboxResult<()> {
+        let journal = |status: &str,
+                       paths: Vec<String>,
+                       error: Option<String>|
+         -> SandboxResult<()> {
             std::fs::create_dir_all(&journal_dir)
                 .map_err(|error| SandboxError(format!("changeset journal failed: {error}")))?;
             let record = json!({
@@ -418,7 +513,10 @@ impl<'a> SandboxSession<'a> {
                 "baseline": preview.manifest, "cross_root_atomic": false,
                 "error": error,
             });
-            let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&journal_path)
+            let mut file = std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&journal_path)
                 .map_err(|error| SandboxError(format!("changeset journal failed: {error}")))?;
             file.write_all(&serde_json::to_vec(&record).map_err(|e| SandboxError(format!("{e}")))?)
                 .and_then(|_| file.flush())
@@ -431,7 +529,10 @@ impl<'a> SandboxSession<'a> {
                 authority()?;
                 let path = admit_rel(&root, rel)?;
                 let original = if path.exists() {
-                    Some(std::fs::read(&path).map_err(|error| SandboxError(format!("apply read failed: {error}")))?)
+                    Some(
+                        std::fs::read(&path)
+                            .map_err(|error| SandboxError(format!("apply read failed: {error}")))?,
+                    )
                 } else {
                     None
                 };
@@ -443,22 +544,31 @@ impl<'a> SandboxSession<'a> {
                 match &change.after {
                     None => {
                         if path.exists() {
-                            std::fs::remove_file(&path)
-                                .map_err(|error| SandboxError(format!("apply delete failed: {error}")))?;
+                            std::fs::remove_file(&path).map_err(|error| {
+                                SandboxError(format!("apply delete failed: {error}"))
+                            })?;
                         }
                     }
                     Some(bytes) => {
                         let temp = root.join(format!("{}.atomic-tmp", af_entropy::token()));
                         {
-                            let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&temp)
-                                .map_err(|error| SandboxError(format!("apply temp write failed: {error}")))?;
+                            let mut file = std::fs::OpenOptions::new()
+                                .write(true)
+                                .create_new(true)
+                                .open(&temp)
+                                .map_err(|error| {
+                                    SandboxError(format!("apply temp write failed: {error}"))
+                                })?;
                             file.write_all(bytes)
                                 .and_then(|_| file.flush())
                                 .and_then(|_| file.sync_all())
-                                .map_err(|error| SandboxError(format!("apply fsync failed: {error}")))?;
+                                .map_err(|error| {
+                                    SandboxError(format!("apply fsync failed: {error}"))
+                                })?;
                         }
-                        std::fs::rename(&temp, &path)
-                            .map_err(|error| SandboxError(format!("apply replace failed: {error}")))?;
+                        std::fs::rename(&temp, &path).map_err(|error| {
+                            SandboxError(format!("apply replace failed: {error}"))
+                        })?;
                     }
                 }
                 applied.push((rel.clone(), original));
@@ -477,7 +587,11 @@ impl<'a> SandboxSession<'a> {
                     }
                 }
             }
-            journal("aborted", preview.changes.keys().cloned().collect(), Some(error.0.clone()))?;
+            journal(
+                "aborted",
+                preview.changes.keys().cloned().collect(),
+                Some(error.0.clone()),
+            )?;
             return Err(error);
         }
         authority()?;
@@ -530,7 +644,11 @@ mod tests {
             .grant("main", &root_path, &["src/lib.py".to_string()], true)
             .unwrap();
         std::fs::create_dir_all(root_path.join("src")).unwrap();
-        std::fs::write(root_path.join("src/lib.py"), b"def helper():\n    return 1\n").unwrap();
+        std::fs::write(
+            root_path.join("src/lib.py"),
+            b"def helper():\n    return 1\n",
+        )
+        .unwrap();
         (pair, registry)
     }
 
@@ -542,7 +660,10 @@ mod tests {
         assert_eq!(page["read_complete"], json!(false));
         assert_eq!(page["next_offset"], json!(5));
         // Preview without the complete proof is refused.
-        let changes = BTreeMap::from([("src/lib.py".to_string(), Some("def helper():\n    return 2\n".to_string()))]);
+        let changes = BTreeMap::from([(
+            "src/lib.py".to_string(),
+            Some("def helper():\n    return 2\n".to_string()),
+        )]);
         assert!(session.preview("main", &changes).is_err());
         // Full read then preview works.
         let full = session.read("main", "src/lib.py", 0, 12000, true).unwrap();
@@ -553,7 +674,11 @@ mod tests {
     #[test]
     fn secrets_are_redacted_in_reads() {
         let (pair, registry) = setup();
-        std::fs::write(pair.root.join("src/lib.py"), b"token = 'ghq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'\n").unwrap();
+        std::fs::write(
+            pair.root.join("src/lib.py"),
+            b"token = 'ghq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'\n",
+        )
+        .unwrap();
         let mut session = SandboxSession::new(&registry).unwrap();
         let page = session.read("main", "src/lib.py", 0, 12000, true).unwrap();
         let source = page["source"].as_str().unwrap();
@@ -565,10 +690,14 @@ mod tests {
     fn preview_outside_write_scope_refused() {
         let (_pair, registry) = setup();
         let mut session = SandboxSession::new(&registry).unwrap();
-        session.read("main", "src/other.py", 0, 12000, true).unwrap();
+        session
+            .read("main", "src/other.py", 0, 12000, true)
+            .unwrap();
         let changes = BTreeMap::from([("src/other.py".to_string(), Some("x = 1\n".to_string()))]);
         let error = session.preview("main", &changes).unwrap_err();
-        assert!(error.0.contains("outside the exact approved root write scope"));
+        assert!(error
+            .0
+            .contains("outside the exact approved root write scope"));
     }
 
     #[test]
@@ -576,7 +705,8 @@ mod tests {
         let (_pair, registry) = setup();
         let mut session = SandboxSession::new(&registry).unwrap();
         session.read("main", "src/lib.py", 0, 12000, true).unwrap();
-        let changes = BTreeMap::from([("src/lib.py".to_string(), Some("def broken(:\n".to_string()))]);
+        let changes =
+            BTreeMap::from([("src/lib.py".to_string(), Some("def broken(:\n".to_string()))]);
         let error = session.preview("main", &changes).unwrap_err();
         assert!(error.0.contains("does not compile"));
     }
@@ -586,7 +716,10 @@ mod tests {
         let (pair, registry) = setup();
         let mut session = SandboxSession::new(&registry).unwrap();
         session.read("main", "src/lib.py", 0, 12000, true).unwrap();
-        let changes = BTreeMap::from([("src/lib.py".to_string(), Some("def helper():\n    return 2\n".to_string()))]);
+        let changes = BTreeMap::from([(
+            "src/lib.py".to_string(),
+            Some("def helper():\n    return 2\n".to_string()),
+        )]);
         let preview = session.preview("main", &changes).unwrap();
         let token = preview["preview_token"].as_str().unwrap().to_string();
         assert!(session.apply(&token, false).is_err());
@@ -607,7 +740,11 @@ mod tests {
         let preview = session.preview("main", &changes).unwrap();
         let token = preview["preview_token"].as_str().unwrap().to_string();
         // Out-of-band edit between preview and apply.
-        std::fs::write(pair.root.join("src/lib.py"), b"def helper():\n    return 9\n").unwrap();
+        std::fs::write(
+            pair.root.join("src/lib.py"),
+            b"def helper():\n    return 9\n",
+        )
+        .unwrap();
         let error = session.apply(&token, true).unwrap_err();
         assert!(error.0.contains("changed after preview"));
     }

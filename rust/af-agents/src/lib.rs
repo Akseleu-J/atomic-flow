@@ -13,16 +13,44 @@ pub mod constraints;
 pub mod failure_evidence;
 pub mod repair;
 
-use std::collections::BTreeSet;
 use serde_json::{json, Value};
+use std::collections::BTreeSet;
 
-pub const MUTATING_TOOLS: [&str; 6] = ["edit_node", "patch_file", "notebook_edit", "create_file", "move_file", "delete_file"];
-pub const SOURCE_TOOLS: [&str; 8] = ["read_node", "find_callers", "search_tree", "search_text", "read_result", "read_file", "find_files", "notebook_read"];
+pub const MUTATING_TOOLS: [&str; 6] = [
+    "edit_node",
+    "patch_file",
+    "notebook_edit",
+    "create_file",
+    "move_file",
+    "delete_file",
+];
+pub const SOURCE_TOOLS: [&str; 8] = [
+    "read_node",
+    "find_callers",
+    "search_tree",
+    "search_text",
+    "read_result",
+    "read_file",
+    "find_files",
+    "notebook_read",
+];
 pub const SUPPORTED_TOOLS: [&str; 16] = [
-    "read_node", "find_callers", "search_tree", "search_text", "read_result",
-    "read_file", "find_files", "notebook_read",
-    "edit_node", "patch_file", "notebook_edit", "create_file", "move_file", "delete_file",
-    "run_command", "ask_user",
+    "read_node",
+    "find_callers",
+    "search_tree",
+    "search_text",
+    "read_result",
+    "read_file",
+    "find_files",
+    "notebook_read",
+    "edit_node",
+    "patch_file",
+    "notebook_edit",
+    "create_file",
+    "move_file",
+    "delete_file",
+    "run_command",
+    "ask_user",
 ];
 
 /// verify floor ranking: none < py_compile < pytest.
@@ -36,8 +64,14 @@ pub fn verify_rank(kind: &str) -> Option<u8> {
 }
 
 pub const ENVELOPE_FIELDS: [&str; 8] = [
-    "version", "allowed_tools", "required_verify", "max_budget_usd", "max_model_calls",
-    "max_replans", "runtime_digest", "replan_failures",
+    "version",
+    "allowed_tools",
+    "required_verify",
+    "max_budget_usd",
+    "max_model_calls",
+    "max_replans",
+    "runtime_digest",
+    "replan_failures",
 ];
 
 fn is_hex64(value: &str) -> bool {
@@ -49,7 +83,11 @@ pub fn validate_envelope(value: &Value) -> Result<(), String> {
     let Some(object) = value.as_object() else {
         return Err("invalid internal replan envelope fields".into());
     };
-    if object.len() != ENVELOPE_FIELDS.len() || ENVELOPE_FIELDS.iter().any(|field| !object.contains_key(*field)) {
+    if object.len() != ENVELOPE_FIELDS.len()
+        || ENVELOPE_FIELDS
+            .iter()
+            .any(|field| !object.contains_key(*field))
+    {
         return Err("invalid internal replan envelope fields".into());
     }
     if value["version"].as_i64() != Some(1) || value["version"].is_f64() {
@@ -65,9 +103,7 @@ pub fn validate_envelope(value: &Value) -> Result<(), String> {
         };
         names.push(name);
     }
-    let sorted_and_unique = names
-        .windows(2)
-        .all(|pair| pair[0] < pair[1]);
+    let sorted_and_unique = names.windows(2).all(|pair| pair[0] < pair[1]);
     if !sorted_and_unique || names.iter().any(|name| !SUPPORTED_TOOLS.contains(name)) {
         return Err("invalid internal replan allowed tools".into());
     }
@@ -86,7 +122,9 @@ pub fn validate_envelope(value: &Value) -> Result<(), String> {
         return Err("internal replans require a finite positive enforced budget".into());
     }
     for (name, maximum) in [("max_model_calls", 1000), ("max_replans", 5)] {
-        let valid = value[name].as_u64().is_some_and(|v| (1..=maximum).contains(&v));
+        let valid = value[name]
+            .as_u64()
+            .is_some_and(|v| (1..=maximum).contains(&v));
         if !valid {
             return Err(format!("invalid internal replan {name}"));
         }
@@ -132,7 +170,9 @@ pub fn no_progress(approval: &Value, failure: &str, limit: usize) -> bool {
     if signature.is_empty() {
         return false;
     }
-    let Some(envelope) = envelope_of(approval) else { return false };
+    let Some(envelope) = envelope_of(approval) else {
+        return false;
+    };
     let history = envelope
         .get("replan_failures")
         .and_then(Value::as_array)
@@ -160,16 +200,30 @@ fn is_mutating(name: &str) -> bool {
 /// This is not a source/sandbox check: the runner validates source and runtime
 /// before calling it and applies its tool set to the actual dispatcher.
 /// Returns (preserved, reasons).
-pub fn envelope_preserved(approval: &Value, new_steps: &[Value], failure: &str, budget_spent: f64) -> (bool, Vec<String>) {
+pub fn envelope_preserved(
+    approval: &Value,
+    new_steps: &[Value],
+    failure: &str,
+    budget_spent: f64,
+) -> (bool, Vec<String>) {
     let mut reasons: Vec<String> = Vec::new();
     if !approval.is_object() || approval.get("schema_version").and_then(Value::as_i64) != Some(2) {
-        return (false, vec!["internal replan was not explicitly approved; fresh review required".to_string()]);
+        return (
+            false,
+            vec!["internal replan was not explicitly approved; fresh review required".to_string()],
+        );
     }
     let Some(envelope) = approval.get("internal_replan") else {
-        return (false, vec!["invalid internal replan envelope: missing".to_string()]);
+        return (
+            false,
+            vec!["invalid internal replan envelope: missing".to_string()],
+        );
     };
     if let Err(error) = validate_envelope(envelope) {
-        return (false, vec![format!("invalid internal replan envelope: {error}")]);
+        return (
+            false,
+            vec![format!("invalid internal replan envelope: {error}")],
+        );
     }
     if !budget_spent.is_finite() || budget_spent < 0.0 {
         reasons.push("invalid budget accounting".to_string());
@@ -184,30 +238,54 @@ pub fn envelope_preserved(approval: &Value, new_steps: &[Value], failure: &str, 
         .map(|items| items.iter().filter_map(Value::as_str).collect())
         .unwrap_or_default();
     let proposed: BTreeSet<&str> = new_steps.iter().flat_map(step_tools).collect();
-    let allowed_mutating: BTreeSet<&str> = allowed.iter().copied().filter(|name| is_mutating(name)).collect();
-    let proposed_mutating: BTreeSet<&str> = proposed.iter().copied().filter(|name| is_mutating(name)).collect();
+    let allowed_mutating: BTreeSet<&str> = allowed
+        .iter()
+        .copied()
+        .filter(|name| is_mutating(name))
+        .collect();
+    let proposed_mutating: BTreeSet<&str> = proposed
+        .iter()
+        .copied()
+        .filter(|name| is_mutating(name))
+        .collect();
     if !allowed_mutating.is_empty() && proposed_mutating.is_empty() {
         reasons.push("replan would drop the approved verified edit obligation".to_string());
     }
     if allowed.contains("run_command")
         && !proposed.contains("run_command")
-        && !new_steps.iter().any(|step| step.get("verify_with").and_then(Value::as_str) == Some("pytest"))
+        && !new_steps
+            .iter()
+            .any(|step| step.get("verify_with").and_then(Value::as_str) == Some("pytest"))
     {
         reasons.push("replan would drop the approved execution/check obligation".to_string());
     }
-    let required_rank = verify_rank(envelope["required_verify"].as_str().unwrap_or("none")).unwrap_or(0);
+    let required_rank =
+        verify_rank(envelope["required_verify"].as_str().unwrap_or("none")).unwrap_or(0);
     for (position, step) in new_steps.iter().enumerate() {
         let tools = step_tools(step);
-        let unknown: Vec<&str> = tools.iter().copied().filter(|name| !allowed.contains(*name)).collect();
+        let unknown: Vec<&str> = tools
+            .iter()
+            .copied()
+            .filter(|name| !allowed.contains(*name))
+            .collect();
         if !unknown.is_empty() {
             let mut sorted = unknown.clone();
             sorted.sort();
-            reasons.push(format!("step {}: tools outside approved envelope: {:?}", position, sorted));
+            reasons.push(format!(
+                "step {}: tools outside approved envelope: {:?}",
+                position, sorted
+            ));
         }
         if tools.iter().copied().any(is_mutating) && allowed_mutating.is_empty() {
-            reasons.push(format!("step {}: introduces a mutating tool the plan never had", position));
+            reasons.push(format!(
+                "step {}: introduces a mutating tool the plan never had",
+                position
+            ));
         }
-        let verify = step.get("verify_with").and_then(Value::as_str).unwrap_or("none");
+        let verify = step
+            .get("verify_with")
+            .and_then(Value::as_str)
+            .unwrap_or("none");
         let rank = verify_rank(verify).unwrap_or(0);
         if rank < required_rank {
             reasons.push(format!(
@@ -215,9 +293,14 @@ pub fn envelope_preserved(approval: &Value, new_steps: &[Value], failure: &str, 
                 position
             ));
         }
-        if verify == "pytest" && envelope["required_verify"].as_str() != Some("pytest") && !allowed.contains("run_command")
+        if verify == "pytest"
+            && envelope["required_verify"].as_str() != Some("pytest")
+            && !allowed.contains("run_command")
         {
-            reasons.push(format!("step {}: pytest execution was not approved", position));
+            reasons.push(format!(
+                "step {}: pytest execution was not approved",
+                position
+            ));
         }
     }
     if no_progress(approval, failure, 2) {
@@ -288,17 +371,25 @@ mod tests {
     #[test]
     fn tool_widening_is_refused() {
         let approval = envelope();
-        let steps = vec![step(0, &["edit_node", "run_command", "delete_file"], "pytest")];
+        let steps = vec![step(
+            0,
+            &["edit_node", "run_command", "delete_file"],
+            "pytest",
+        )];
         let (preserved, reasons) = envelope_preserved(&approval, &steps, "f", 0.1);
         assert!(!preserved);
-        assert!(reasons.iter().any(|r| r.contains("tools outside approved envelope")));
+        assert!(reasons
+            .iter()
+            .any(|r| r.contains("tools outside approved envelope")));
         // The "never had" reason only fires when the approved plan contained
         // no mutating tool at all (parity with the Python predicate).
         let read_only = example_envelope(&["read_file", "run_command"], "pytest");
         let steps = vec![step(0, &["edit_node", "run_command"], "pytest")];
         let (preserved, reasons) = envelope_preserved(&read_only, &steps, "f", 0.1);
         assert!(!preserved);
-        assert!(reasons.iter().any(|r| r.contains("mutating tool the plan never had")));
+        assert!(reasons
+            .iter()
+            .any(|r| r.contains("mutating tool the plan never had")));
     }
 
     #[test]
@@ -307,7 +398,9 @@ mod tests {
         let steps = vec![step(0, &["edit_node", "run_command"], "py_compile")];
         let (preserved, reasons) = envelope_preserved(&approval, &steps, "f", 0.1);
         assert!(!preserved);
-        assert!(reasons.iter().any(|r| r.contains("weaken the approved verification")));
+        assert!(reasons
+            .iter()
+            .any(|r| r.contains("weaken the approved verification")));
     }
 
     #[test]
@@ -316,7 +409,9 @@ mod tests {
         let steps = vec![step(0, &["edit_node", "run_command"], "pytest")];
         let (preserved, reasons) = envelope_preserved(&approval, &steps, "f", 1.0);
         assert!(!preserved);
-        assert!(reasons.iter().any(|r| r.contains("budget reached the approved cap")));
+        assert!(reasons
+            .iter()
+            .any(|r| r.contains("budget reached the approved cap")));
         let (preserved, _) = envelope_preserved(&approval, &steps, "f", f64::NAN);
         assert!(!preserved, "non-finite accounting must fail closed");
     }
@@ -329,9 +424,15 @@ mod tests {
         let steps = vec![step(0, &["read_file"], "none")];
         let (preserved, reasons) = envelope_preserved(&approval, &steps, "f", 0.1);
         assert!(!preserved);
-        assert!(reasons.iter().any(|r| r.contains("verified edit obligation")));
-        assert!(reasons.iter().any(|r| r.contains("execution/check obligation")));
-        assert!(reasons.iter().any(|r| r.contains("weaken the approved verification")));
+        assert!(reasons
+            .iter()
+            .any(|r| r.contains("verified edit obligation")));
+        assert!(reasons
+            .iter()
+            .any(|r| r.contains("execution/check obligation")));
+        assert!(reasons
+            .iter()
+            .any(|r| r.contains("weaken the approved verification")));
     }
 
     #[test]
@@ -345,9 +446,11 @@ mod tests {
     #[test]
     fn no_progress_guard_requires_review() {
         let mut approval = envelope();
-        approval["internal_replan"]["replan_failures"] = json!(["syntax error at line 3", "syntax error at line 3"]);
+        approval["internal_replan"]["replan_failures"] =
+            json!(["syntax error at line 3", "syntax error at line 3"]);
         let steps = vec![step(0, &["edit_node", "run_command"], "pytest")];
-        let (preserved, reasons) = envelope_preserved(&approval, &steps, "syntax error at line 3", 0.1);
+        let (preserved, reasons) =
+            envelope_preserved(&approval, &steps, "syntax error at line 3", 0.1);
         assert!(!preserved);
         assert!(reasons.iter().any(|r| r.contains("no-progress guard")));
         // A different failure does not trigger the guard.
@@ -363,7 +466,10 @@ mod tests {
         assert!(validate_envelope(&value).is_err());
         let mut value = envelope()["internal_replan"].clone();
         value["max_budget_usd"] = json!(true);
-        assert!(validate_envelope(&value).is_err(), "bool must not pass as a number");
+        assert!(
+            validate_envelope(&value).is_err(),
+            "bool must not pass as a number"
+        );
         let mut value = envelope()["internal_replan"].clone();
         value["runtime_digest"] = json!("short");
         assert!(validate_envelope(&value).is_err());

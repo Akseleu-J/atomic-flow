@@ -3,11 +3,11 @@
 //! never creates grants. Every mutation requires `approved: true` from the
 //! host — never from repository text or model output.
 
+use crate::{SandboxError, SandboxResult};
+use serde_json::{json, Map, Value};
 use std::collections::BTreeMap;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use serde_json::{json, Map, Value};
-use crate::{SandboxError, SandboxResult};
 
 pub const SCAN_ENTRIES: usize = 20_000;
 pub const SCAN_SECONDS: u64 = 5;
@@ -38,7 +38,10 @@ pub fn valid_identifier(value: &str) -> bool {
         _ => return false,
     }
     let rest = chars.count();
-    rest <= 47 && value[1..].bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+    rest <= 47
+        && value[1..]
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
 }
 
 /// Workspace paths may not contain links or junctions anywhere in the chain.
@@ -50,11 +53,17 @@ pub fn ensure_no_links(path: &Path) -> SandboxResult<()> {
         match std::fs::symlink_metadata(item) {
             Ok(meta) => {
                 if meta.file_type().is_symlink() {
-                    return Err(SandboxError("workspace paths may not contain links or junctions".into()));
+                    return Err(SandboxError(
+                        "workspace paths may not contain links or junctions".into(),
+                    ));
                 }
             }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
-            Err(error) => return Err(SandboxError(format!("workspace path check failed: {error}"))),
+            Err(error) => {
+                return Err(SandboxError(format!(
+                    "workspace path check failed: {error}"
+                )))
+            }
         }
         current = item.parent();
     }
@@ -131,7 +140,8 @@ impl SandboxRegistry {
     pub fn with_home(workspace_id: &str, home: PathBuf) -> SandboxResult<SandboxRegistry> {
         if !valid_identifier(workspace_id) {
             return Err(SandboxError(
-                "workspace/root ID must start with a letter and contain at most 48 safe characters".into(),
+                "workspace/root ID must start with a letter and contain at most 48 safe characters"
+                    .into(),
             ));
         }
         let directory = home.join("workspaces").join(workspace_id);
@@ -149,10 +159,13 @@ impl SandboxRegistry {
     fn check_paths(&self) -> SandboxResult<()> {
         for path in [&self.path, &self.lock_path] {
             if path.exists() {
-                let meta = std::fs::symlink_metadata(path)
-                    .map_err(|error| SandboxError(format!("workspace registry check failed: {error}")))?;
+                let meta = std::fs::symlink_metadata(path).map_err(|error| {
+                    SandboxError(format!("workspace registry check failed: {error}"))
+                })?;
                 if meta.file_type().is_symlink() || !meta.is_file() {
-                    return Err(SandboxError("workspace registry requires regular files".into()));
+                    return Err(SandboxError(
+                        "workspace registry requires regular files".into(),
+                    ));
                 }
             }
         }
@@ -171,17 +184,21 @@ impl SandboxRegistry {
     /// Canonical, strict root validation (read-only checks; no grants created).
     pub fn canonical_root(raw: &Path, home: &Path) -> SandboxResult<PathBuf> {
         if !raw.is_absolute() {
-            return Err(SandboxError("root must be an explicit absolute directory".into()));
+            return Err(SandboxError(
+                "root must be an explicit absolute directory".into(),
+            ));
         }
         ensure_no_links(raw)?;
-        let canonical = std::fs::canonicalize(raw)
-            .map_err(|_| SandboxError("root is unavailable".into()))?;
+        let canonical =
+            std::fs::canonicalize(raw).map_err(|_| SandboxError("root is unavailable".into()))?;
         if !canonical.is_dir() {
             return Err(SandboxError("root must be a directory".into()));
         }
         let home = std::fs::canonicalize(home).unwrap_or_else(|_| home.to_path_buf());
         if canonical.starts_with(&home) || home.starts_with(&canonical) {
-            return Err(SandboxError("application state and source roots must be disjoint".into()));
+            return Err(SandboxError(
+                "application state and source roots must be disjoint".into(),
+            ));
         }
         for part in canonical.components() {
             if part.as_os_str().eq_ignore_ascii_case(".git") {
@@ -194,28 +211,39 @@ impl SandboxRegistry {
     fn load(&self, validate_roots: bool) -> SandboxResult<(BTreeMap<String, Value>, Value)> {
         self.check_paths()?;
         if !self.path.exists() {
-            return Ok((BTreeMap::new(), json!({"schema_version": 1, "workspace_id": self.id, "roots": {}})));
+            return Ok((
+                BTreeMap::new(),
+                json!({"schema_version": 1, "workspace_id": self.id, "roots": {}}),
+            ));
         }
         let text = std::fs::read_to_string(&self.path)
             .map_err(|error| SandboxError(format!("workspace registry read failed: {error}")))?;
         if text.len() > 65536 {
-            return Err(SandboxError("workspace registry exceeds its size limit".into()));
+            return Err(SandboxError(
+                "workspace registry exceeds its size limit".into(),
+            ));
         }
         let state: Value = serde_json::from_str(&text)
             .map_err(|_| SandboxError("invalid or unavailable workspace registry".into()))?;
-        let object = state.as_object().ok_or_else(|| SandboxError("invalid or unavailable workspace registry".into()))?;
+        let object = state
+            .as_object()
+            .ok_or_else(|| SandboxError("invalid or unavailable workspace registry".into()))?;
         if object.len() != 3
             || object.get("schema_version").and_then(Value::as_i64) != Some(1)
             || object.get("workspace_id").and_then(Value::as_str) != Some(self.id.as_str())
             || !state["roots"].is_object()
             || state["roots"].as_object().map(|r| r.len()).unwrap_or(0) > MAX_ROOTS
         {
-            return Err(SandboxError("invalid or unavailable workspace registry".into()));
+            return Err(SandboxError(
+                "invalid or unavailable workspace registry".into(),
+            ));
         }
         let mut roots = BTreeMap::new();
         for (root_id, item) in state["roots"].as_object().expect("checked") {
             if !valid_identifier(root_id) {
-                return Err(SandboxError("invalid or unavailable workspace registry".into()));
+                return Err(SandboxError(
+                    "invalid or unavailable workspace registry".into(),
+                ));
             }
             let fields_ok = item.as_object().is_some_and(|o| {
                 o.len() == 5
@@ -226,14 +254,22 @@ impl SandboxRegistry {
                     && o.contains_key("root_identity")
             });
             if !fields_ok || item["root_id"].as_str() != Some(root_id.as_str()) {
-                return Err(SandboxError("invalid or unavailable workspace registry".into()));
+                return Err(SandboxError(
+                    "invalid or unavailable workspace registry".into(),
+                ));
             }
             let generation = item["generation"].as_str().unwrap_or_default();
-            let generation_ok = generation.len() == 32
-                && generation.bytes().all(|b| b.is_ascii_hexdigit());
+            let generation_ok =
+                generation.len() == 32 && generation.bytes().all(|b| b.is_ascii_hexdigit());
             let write_paths: Vec<String> = item["write_paths"]
                 .as_array()
-                .map(|items| items.iter().filter_map(Value::as_str).map(str::to_string).collect())
+                .map(|items| {
+                    items
+                        .iter()
+                        .filter_map(Value::as_str)
+                        .map(str::to_string)
+                        .collect()
+                })
                 .unwrap_or_default();
             let write_paths_ok = item["write_paths"].is_array()
                 && write_paths.len() <= MAX_WRITE_PATHS
@@ -243,17 +279,23 @@ impl SandboxRegistry {
                 .map(|items| items.iter().filter_map(Value::as_u64).collect())
                 .unwrap_or_default();
             if !generation_ok || !write_paths_ok || identity.len() != 2 {
-                return Err(SandboxError("invalid or unavailable workspace registry".into()));
+                return Err(SandboxError(
+                    "invalid or unavailable workspace registry".into(),
+                ));
             }
             if validate_roots {
                 let raw = PathBuf::from(item["path"].as_str().unwrap_or_default());
                 if !raw.is_absolute() {
-                    return Err(SandboxError("invalid or unavailable workspace registry".into()));
+                    return Err(SandboxError(
+                        "invalid or unavailable workspace registry".into(),
+                    ));
                 }
                 let root = Self::canonical_root(&raw, &self.home)?;
                 let found = root_identity(&root)?;
                 if found != [identity[0], identity[1]] {
-                    return Err(SandboxError("invalid or unavailable workspace registry".into()));
+                    return Err(SandboxError(
+                        "invalid or unavailable workspace registry".into(),
+                    ));
                 }
                 for rel in &write_paths {
                     crate::admission::admit_rel(&root, rel)?;
@@ -267,9 +309,13 @@ impl SandboxRegistry {
     fn save(&self, state: &Value) -> SandboxResult<()> {
         self.check_paths()?;
         let temp = self.directory.join(format!("{}.tmp", af_entropy::token()));
-        let payload = serde_json::to_vec(state).map_err(|error| SandboxError(format!("registry encode failed: {error}")))?;
+        let payload = serde_json::to_vec(state)
+            .map_err(|error| SandboxError(format!("registry encode failed: {error}")))?;
         {
-            let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&temp)
+            let mut file = std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&temp)
                 .map_err(|error| SandboxError(format!("registry temp write failed: {error}")))?;
             file.write_all(&payload)
                 .and_then(|_| file.flush())
@@ -282,18 +328,29 @@ impl SandboxRegistry {
     }
 
     /// Grant a root; `approved` must be an explicit host decision.
-    pub fn grant(&self, root_id: &str, path: &Path, write_paths: &[String], approved: bool) -> SandboxResult<Value> {
+    pub fn grant(
+        &self,
+        root_id: &str,
+        path: &Path,
+        write_paths: &[String],
+        approved: bool,
+    ) -> SandboxResult<Value> {
         if approved != true {
-            return Err(SandboxError("root access needs explicit host approval".into()));
+            return Err(SandboxError(
+                "root access needs explicit host approval".into(),
+            ));
         }
         if !valid_identifier(root_id) {
             return Err(SandboxError(
-                "workspace/root ID must start with a letter and contain at most 48 safe characters".into(),
+                "workspace/root ID must start with a letter and contain at most 48 safe characters"
+                    .into(),
             ));
         }
         let root = Self::canonical_root(path, &self.home)?;
         if write_paths.len() > MAX_WRITE_PATHS {
-            return Err(SandboxError("write scope must contain at most 64 exact source paths".into()));
+            return Err(SandboxError(
+                "write scope must contain at most 64 exact source paths".into(),
+            ));
         }
         for rel in write_paths {
             crate::admission::admit_rel(&root, rel)?;
@@ -304,9 +361,14 @@ impl SandboxRegistry {
             if other_id == root_id {
                 continue;
             }
-            let other = Self::canonical_root(Path::new(item["path"].as_str().unwrap_or_default()), &self.home)?;
+            let other = Self::canonical_root(
+                Path::new(item["path"].as_str().unwrap_or_default()),
+                &self.home,
+            )?;
             if root.starts_with(&other) || other.starts_with(&root) {
-                return Err(SandboxError("overlapping or aliased roots are not permitted".into()));
+                return Err(SandboxError(
+                    "overlapping or aliased roots are not permitted".into(),
+                ));
             }
         }
         if !roots.contains_key(root_id) && roots.len() >= MAX_ROOTS {
@@ -325,14 +387,21 @@ impl SandboxRegistry {
         };
         let value = item.to_value();
         roots.insert(root_id.to_string(), value.clone());
-        state["roots"] = Value::Object(roots.iter().map(|(k, v)| (k.clone(), v.clone())).collect::<Map<String, Value>>());
+        state["roots"] = Value::Object(
+            roots
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect::<Map<String, Value>>(),
+        );
         self.save(&state)?;
         Ok(value)
     }
 
     pub fn revoke(&self, root_id: &str, approved: bool) -> SandboxResult<Value> {
         if approved != true {
-            return Err(SandboxError("revocation needs explicit host approval".into()));
+            return Err(SandboxError(
+                "revocation needs explicit host approval".into(),
+            ));
         }
         if !valid_identifier(root_id) {
             return Err(SandboxError("invalid root id".into()));
@@ -340,7 +409,12 @@ impl SandboxRegistry {
         let _lease = self.lease()?;
         let (mut roots, mut state) = self.load(false)?;
         let existed = roots.remove(root_id).is_some();
-        state["roots"] = Value::Object(roots.iter().map(|(k, v)| (k.clone(), v.clone())).collect::<Map<String, Value>>());
+        state["roots"] = Value::Object(
+            roots
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect::<Map<String, Value>>(),
+        );
         self.save(&state)?;
         Ok(json!({"root_id": root_id, "revoked": existed}))
     }

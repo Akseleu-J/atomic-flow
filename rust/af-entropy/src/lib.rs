@@ -63,12 +63,15 @@ fn mix_fallback(buffer: &mut [u8]) {
         ^ (std::process::id() as u64) << 32
         ^ (&buffer as *const _ as u64);
     for byte in buffer.iter_mut() {
-        state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        state = state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         *byte = (state >> 33) as u8;
     }
 }
 
 #[cfg(windows)]
+#[allow(non_camel_case_types)]
 type BCRYPT_ALG_HANDLE = *mut std::ffi::c_void;
 
 #[cfg(windows)]
@@ -89,7 +92,11 @@ pub struct FileLease {
 }
 
 impl FileLease {
-    pub fn acquire(path: &std::path::Path, blocking: bool, busy_message: &str) -> Result<FileLease, String> {
+    pub fn acquire(
+        path: &std::path::Path,
+        blocking: bool,
+        busy_message: &str,
+    ) -> Result<FileLease, String> {
         if let Some(parent) = path.parent() {
             let _ = std::fs::create_dir_all(parent);
         }
@@ -139,12 +146,12 @@ fn try_lock(file: &File) -> Result<(), std::io::Error> {
         let mut overlapped = OVERLAPPED {
             internal: 0,
             internal_high: 0,
-            u: OverlappedUnion { pointer: std::ptr::null_mut() },
+            u: OverlappedUnion {
+                pointer: std::ptr::null_mut(),
+            },
             h_event: std::ptr::null_mut(),
         };
-        let ok = unsafe {
-            LockFileEx(handle, flags, 0, 1, 0, &mut overlapped)
-        };
+        let ok = unsafe { LockFileEx(handle, flags, 0, 1, 0, &mut overlapped) };
         if ok == 0 {
             return Err(std::io::Error::last_os_error());
         }
@@ -174,7 +181,9 @@ fn unlock(file: &File) -> Result<(), std::io::Error> {
         let mut overlapped = OVERLAPPED {
             internal: 0,
             internal_high: 0,
-            u: OverlappedUnion { pointer: std::ptr::null_mut() },
+            u: OverlappedUnion {
+                pointer: std::ptr::null_mut(),
+            },
             h_event: std::ptr::null_mut(),
         };
         let ok = unsafe { UnlockFileEx(handle, 0, 1, 0, &mut overlapped) };

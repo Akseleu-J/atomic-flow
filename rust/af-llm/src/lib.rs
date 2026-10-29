@@ -4,9 +4,9 @@
 //! confirmed pre-inference refusal; an unknown outcome after send holds the
 //! route and is never retried or failed over.
 
+use serde_json::{json, Value};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use serde_json::{json, Value};
 
 #[derive(Debug, Clone)]
 pub struct Cancel(Arc<AtomicBool>);
@@ -43,15 +43,30 @@ pub struct ChatMessage {
 
 impl ChatMessage {
     pub fn new(role: &str, content: &str) -> ChatMessage {
-        ChatMessage { role: role.to_string(), content: content.to_string(), tool_calls: None, tool_call_id: None }
+        ChatMessage {
+            role: role.to_string(),
+            content: content.to_string(),
+            tool_calls: None,
+            tool_call_id: None,
+        }
     }
 
     pub fn assistant_with_tool_calls(content: &str, tool_calls: Value) -> ChatMessage {
-        ChatMessage { role: "assistant".into(), content: content.to_string(), tool_calls: Some(tool_calls), tool_call_id: None }
+        ChatMessage {
+            role: "assistant".into(),
+            content: content.to_string(),
+            tool_calls: Some(tool_calls),
+            tool_call_id: None,
+        }
     }
 
     pub fn tool_result(call_id: &str, content: &str) -> ChatMessage {
-        ChatMessage { role: "tool".into(), content: content.to_string(), tool_calls: None, tool_call_id: Some(call_id.to_string()) }
+        ChatMessage {
+            role: "tool".into(),
+            content: content.to_string(),
+            tool_calls: None,
+            tool_call_id: Some(call_id.to_string()),
+        }
     }
 }
 
@@ -82,7 +97,12 @@ pub struct ChatRequest {
 
 impl ChatRequest {
     pub fn new(model: &str, messages: Vec<ChatMessage>) -> ChatRequest {
-        ChatRequest { model: model.to_string(), messages, max_output_tokens: None, tools: None }
+        ChatRequest {
+            model: model.to_string(),
+            messages,
+            max_output_tokens: None,
+            tools: None,
+        }
     }
 }
 
@@ -95,8 +115,14 @@ pub struct Usage {
 }
 
 impl Usage {
+    #[allow(dead_code)]
     fn unknown() -> Usage {
-        Usage { tokens_in: None, tokens_out: None, cost_usd: None, latency_ms: None }
+        Usage {
+            tokens_in: None,
+            tokens_out: None,
+            cost_usd: None,
+            latency_ms: None,
+        }
     }
 }
 
@@ -133,7 +159,10 @@ pub struct ScriptedBackend {
 
 impl ScriptedBackend {
     pub fn new(name: &str, script: Vec<BackendOutcome>) -> ScriptedBackend {
-        ScriptedBackend { name: name.to_string(), script: std::sync::Mutex::new(script) }
+        ScriptedBackend {
+            name: name.to_string(),
+            script: std::sync::Mutex::new(script),
+        }
     }
 
     pub fn echo() -> ScriptedBackend {
@@ -141,7 +170,12 @@ impl ScriptedBackend {
             "scripted",
             vec![BackendOutcome::Completed(ChatResult {
                 content: "scripted-echo".to_string(),
-                usage: Usage { tokens_in: Some(1), tokens_out: Some(1), cost_usd: Some(0.0), latency_ms: Some(0) },
+                usage: Usage {
+                    tokens_in: Some(1),
+                    tokens_out: Some(1),
+                    cost_usd: Some(0.0),
+                    latency_ms: Some(0),
+                },
                 truncated: false,
                 tool_calls: Vec::new(),
             })],
@@ -149,7 +183,7 @@ impl ScriptedBackend {
     }
 
     /// Script one assistant turn that requests tool calls.
-    pub fn tool_calls(name: &str, calls: &[( &str, &str, &str )]) -> ScriptedBackend {
+    pub fn tool_calls(name: &str, calls: &[(&str, &str, &str)]) -> ScriptedBackend {
         let mapped: Vec<Value> = calls
             .iter()
             .map(|(id, tool, arguments)| {
@@ -160,7 +194,12 @@ impl ScriptedBackend {
             name,
             vec![BackendOutcome::Completed(ChatResult {
                 content: String::new(),
-                usage: Usage { tokens_in: Some(1), tokens_out: Some(1), cost_usd: Some(0.0), latency_ms: Some(0) },
+                usage: Usage {
+                    tokens_in: Some(1),
+                    tokens_out: Some(1),
+                    cost_usd: Some(0.0),
+                    latency_ms: Some(0),
+                },
                 truncated: false,
                 tool_calls: parsed_tool_calls(&json!(mapped)),
             })],
@@ -183,7 +222,11 @@ pub fn parsed_tool_calls(value: &Value) -> Vec<ToolCall> {
                         .and_then(Value::as_str)
                         .unwrap_or("{}")
                         .to_string();
-                    Some(ToolCall { id, name, arguments })
+                    Some(ToolCall {
+                        id,
+                        name,
+                        arguments,
+                    })
                 })
                 .collect()
         })
@@ -197,13 +240,21 @@ impl ChatBackend for ScriptedBackend {
 
     fn chat(&self, _request: &ChatRequest, cancel: &Cancel) -> BackendOutcome {
         if cancel.is_cancelled() {
-            return BackendOutcome::Refused { sent: false, reason: "cancelled before send".into() };
+            return BackendOutcome::Refused {
+                sent: false,
+                reason: "cancelled before send".into(),
+            };
         }
         let mut script = self.script.lock().expect("script lock");
         if script.is_empty() {
             return BackendOutcome::Completed(ChatResult {
                 content: String::new(),
-                usage: Usage { tokens_in: Some(0), tokens_out: Some(0), cost_usd: Some(0.0), latency_ms: Some(0) },
+                usage: Usage {
+                    tokens_in: Some(0),
+                    tokens_out: Some(0),
+                    cost_usd: Some(0.0),
+                    latency_ms: Some(0),
+                },
                 truncated: false,
                 tool_calls: Vec::new(),
             });
@@ -264,13 +315,19 @@ impl ChatBackend for OpenAiBackend {
 
     fn chat(&self, request: &ChatRequest, cancel: &Cancel) -> BackendOutcome {
         if cancel.is_cancelled() {
-            return BackendOutcome::Refused { sent: false, reason: "cancelled before send".into() };
+            return BackendOutcome::Refused {
+                sent: false,
+                reason: "cancelled before send".into(),
+            };
         }
         let started = std::time::Instant::now();
         let Ok(api_key) = std::env::var(&self.api_key_env) else {
             return BackendOutcome::Refused {
                 sent: false,
-                reason: format!("api key environment variable {} is not set", self.api_key_env),
+                reason: format!(
+                    "api key environment variable {} is not set",
+                    self.api_key_env
+                ),
             };
         };
         let agent = match ureq::AgentBuilder::new()
@@ -308,8 +365,12 @@ impl ChatBackend for OpenAiBackend {
                                 .map(|calls| parsed_tool_calls(&calls))
                                 .unwrap_or_default();
                             let usage = Usage {
-                                tokens_in: document.pointer("/usage/prompt_tokens").and_then(Value::as_u64),
-                                tokens_out: document.pointer("/usage/completion_tokens").and_then(Value::as_u64),
+                                tokens_in: document
+                                    .pointer("/usage/prompt_tokens")
+                                    .and_then(Value::as_u64),
+                                tokens_out: document
+                                    .pointer("/usage/completion_tokens")
+                                    .and_then(Value::as_u64),
                                 cost_usd: None, // tariff table is a later, separately accepted change
                                 latency_ms,
                             };
@@ -346,7 +407,10 @@ impl ChatBackend for OpenAiBackend {
                 }
             }
             Err(ureq::Error::Transport(transport)) => {
-                let sent = !matches!(transport.kind(), ureq::ErrorKind::Dns | ureq::ErrorKind::ConnectionFailed);
+                let sent = !matches!(
+                    transport.kind(),
+                    ureq::ErrorKind::Dns | ureq::ErrorKind::ConnectionFailed
+                );
                 if cancel.is_cancelled() && sent {
                     BackendOutcome::Unknown {
                         sent: true,
@@ -391,17 +455,29 @@ impl Router {
         for backend in &self.backends {
             match backend.chat(request, cancel) {
                 BackendOutcome::Completed(result) => {
-                    return RouteOutcome::Completed { backend: backend.name().to_string(), result };
+                    return RouteOutcome::Completed {
+                        backend: backend.name().to_string(),
+                        result,
+                    };
                 }
-                BackendOutcome::Refused { sent: false, reason } => {
+                BackendOutcome::Refused {
+                    sent: false,
+                    reason,
+                } => {
                     refusals.push(format!("{}: {reason}", backend.name()));
                 }
                 BackendOutcome::Refused { sent: true, reason } => {
-                    return RouteOutcome::Hold { backend: backend.name().to_string(), detail: format!("refused after send: {reason}") };
+                    return RouteOutcome::Hold {
+                        backend: backend.name().to_string(),
+                        detail: format!("refused after send: {reason}"),
+                    };
                 }
                 BackendOutcome::Unknown { sent, detail } => {
                     if sent {
-                        return RouteOutcome::Hold { backend: backend.name().to_string(), detail };
+                        return RouteOutcome::Hold {
+                            backend: backend.name().to_string(),
+                            detail,
+                        };
                     }
                     refusals.push(format!("{}: {detail}", backend.name()));
                 }
@@ -442,13 +518,21 @@ mod tests {
         let router = Router::new(vec![
             Box::new(ScriptedBackend::new(
                 "first",
-                vec![BackendOutcome::Refused { sent: false, reason: "no key".into() }],
+                vec![BackendOutcome::Refused {
+                    sent: false,
+                    reason: "no key".into(),
+                }],
             )),
             Box::new(ScriptedBackend::new(
                 "second",
                 vec![BackendOutcome::Completed(ChatResult {
                     content: "ok".into(),
-                    usage: Usage { tokens_in: Some(2), tokens_out: Some(1), cost_usd: Some(0.01), latency_ms: Some(5) },
+                    usage: Usage {
+                        tokens_in: Some(2),
+                        tokens_out: Some(1),
+                        cost_usd: Some(0.01),
+                        latency_ms: Some(5),
+                    },
                     truncated: false,
                     tool_calls: Vec::new(),
                 })],
@@ -464,7 +548,10 @@ mod tests {
         // Everything refused before send → exhausted with all refusals listed.
         let empty = Router::new(vec![Box::new(ScriptedBackend::new(
             "only",
-            vec![BackendOutcome::Refused { sent: false, reason: "down".into() }],
+            vec![BackendOutcome::Refused {
+                sent: false,
+                reason: "down".into(),
+            }],
         ))]);
         match empty.route(&request(), &Cancel::new()) {
             RouteOutcome::Exhausted { refusals } => assert_eq!(refusals.len(), 1),
@@ -477,7 +564,10 @@ mod tests {
         let router = Router::new(vec![
             Box::new(ScriptedBackend::new(
                 "flaky",
-                vec![BackendOutcome::Unknown { sent: true, detail: "timeout after send".into() }],
+                vec![BackendOutcome::Unknown {
+                    sent: true,
+                    detail: "timeout after send".into(),
+                }],
             )),
             Box::new(ScriptedBackend::echo()),
         ]);
@@ -495,7 +585,10 @@ mod tests {
         let router = Router::new(vec![
             Box::new(ScriptedBackend::new(
                 "strict",
-                vec![BackendOutcome::Refused { sent: true, reason: "content policy after streaming started".into() }],
+                vec![BackendOutcome::Refused {
+                    sent: true,
+                    reason: "content policy after streaming started".into(),
+                }],
             )),
             Box::new(ScriptedBackend::echo()),
         ]);
@@ -527,7 +620,10 @@ mod tests {
         let router = Router::new(vec![
             Box::new(ScriptedBackend::new(
                 "unreachable",
-                vec![BackendOutcome::Unknown { sent: false, detail: "connection refused".into() }],
+                vec![BackendOutcome::Unknown {
+                    sent: false,
+                    detail: "connection refused".into(),
+                }],
             )),
             Box::new(ScriptedBackend::echo()),
         ]);

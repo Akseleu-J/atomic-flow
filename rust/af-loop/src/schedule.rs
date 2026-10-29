@@ -5,8 +5,8 @@
 //! queue; this module owns the state and the honesty rules (no silent
 //! schedule drift: `last_run` and `next_due` are explicit records).
 
-use std::collections::BTreeMap;
 use serde_json::{json, Value};
+use std::collections::BTreeMap;
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -25,7 +25,11 @@ pub enum Trigger {
     /// Daily at HH:MM (local wall clock evaluated by the host loop).
     DailyAt { hour: u8, minute: u8 },
     /// Fires when a named event arrives with matching key/value.
-    EventTrigger { event: String, key: String, value: String },
+    EventTrigger {
+        event: String,
+        key: String,
+        value: String,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -54,29 +58,51 @@ impl ScheduleRegistry {
         ScheduleRegistry::default()
     }
 
-    pub fn add_interval(&mut self, title: &str, task: Value, seconds: u64) -> ScheduleResult<String> {
+    pub fn add_interval(
+        &mut self,
+        title: &str,
+        task: Value,
+        seconds: u64,
+    ) -> ScheduleResult<String> {
         if seconds < 60 {
             return err("interval schedules run at most once a minute");
         }
         self.add(title, task, Trigger::Interval { seconds })
     }
 
-    pub fn add_daily(&mut self, title: &str, task: Value, hour: u8, minute: u8) -> ScheduleResult<String> {
+    pub fn add_daily(
+        &mut self,
+        title: &str,
+        task: Value,
+        hour: u8,
+        minute: u8,
+    ) -> ScheduleResult<String> {
         if !valid_hhmm(hour, minute) {
             return err("daily schedules need a valid wall-clock time");
         }
         self.add(title, task, Trigger::DailyAt { hour, minute })
     }
 
-    pub fn add_event(&mut self, title: &str, task: Value, event: &str, key: &str, value: &str) -> ScheduleResult<String> {
+    pub fn add_event(
+        &mut self,
+        title: &str,
+        task: Value,
+        event: &str,
+        key: &str,
+        value: &str,
+    ) -> ScheduleResult<String> {
         if event.trim().is_empty() || key.trim().is_empty() {
             return err("event triggers require an event name and a key");
         }
-        self.add(title, task, Trigger::EventTrigger {
-            event: event.to_string(),
-            key: key.to_string(),
-            value: value.to_string(),
-        })
+        self.add(
+            title,
+            task,
+            Trigger::EventTrigger {
+                event: event.to_string(),
+                key: key.to_string(),
+                value: value.to_string(),
+            },
+        )
     }
 
     fn add(&mut self, title: &str, task: Value, trigger: Trigger) -> ScheduleResult<String> {
@@ -136,7 +162,9 @@ impl ScheduleRegistry {
             .filter(|record| !record.paused)
             .filter(|record| match &record.trigger {
                 Trigger::Interval { seconds } => Self::interval_due(record, *seconds, now_unix),
-                Trigger::DailyAt { hour, minute } => Self::daily_due(record, *hour, *minute, now_unix),
+                Trigger::DailyAt { hour, minute } => {
+                    Self::daily_due(record, *hour, *minute, now_unix)
+                }
                 Trigger::EventTrigger { .. } => false,
             })
             .map(|record| record.id.clone())
@@ -149,7 +177,11 @@ impl ScheduleRegistry {
             .values()
             .filter(|record| !record.paused)
             .filter(|record| match &record.trigger {
-                Trigger::EventTrigger { event: want, key, value } => {
+                Trigger::EventTrigger {
+                    event: want,
+                    key,
+                    value,
+                } => {
                     event == want
                         && payload.get(key).and_then(Value::as_str) == Some(value.as_str())
                 }
@@ -214,12 +246,20 @@ mod tests {
     #[test]
     fn interval_schedule_fires_repeatedly_not_stacked() {
         let mut registry = ScheduleRegistry::new();
-        let id = registry.add_interval("news", json!({"goal": "brief"}), 3600).unwrap();
+        let id = registry
+            .add_interval("news", json!({"goal": "brief"}), 3600)
+            .unwrap();
         let t0 = 1_800_000_000.0;
         assert!(registry.due(t0).contains(&id), "never-run schedule is due");
         registry.mark_run(&id, t0).unwrap();
-        assert!(registry.due(t0 + 1800.0).is_empty(), "half-interval is not due");
-        assert!(registry.due(t0 + 3600.0).contains(&id), "interval elapsed fires again");
+        assert!(
+            registry.due(t0 + 1800.0).is_empty(),
+            "half-interval is not due"
+        );
+        assert!(
+            registry.due(t0 + 3600.0).contains(&id),
+            "interval elapsed fires again"
+        );
         // Sub-minute intervals are refused.
         assert!(registry.add_interval("spam", json!({}), 30).is_err());
     }
@@ -227,15 +267,23 @@ mod tests {
     #[test]
     fn daily_schedule_fires_once_per_day() {
         let mut registry = ScheduleRegistry::new();
-        let id = registry.add_daily("morning brief", json!({"goal": "digest"}), 9, 0).unwrap();
+        let id = registry
+            .add_daily("morning brief", json!({"goal": "digest"}), 9, 0)
+            .unwrap();
         let day_start = 1_800_000_000.0 - (1_800_000_000.0 % 86_400.0);
         let before = day_start + 8.0 * 3600.0;
         let after = day_start + 9.0 * 3600.0 + 60.0;
         assert!(!registry.due(before).contains(&id));
         assert!(registry.due(after).contains(&id));
         registry.mark_run(&id, after).unwrap();
-        assert!(!registry.due(after + 3600.0).contains(&id), "same-day refire refused");
-        assert!(registry.due(after + 86_400.0).contains(&id), "next day fires again");
+        assert!(
+            !registry.due(after + 3600.0).contains(&id),
+            "same-day refire refused"
+        );
+        assert!(
+            registry.due(after + 86_400.0).contains(&id),
+            "next day fires again"
+        );
         assert!(registry.add_daily("bad", json!({}), 24, 0).is_err());
     }
 
@@ -243,19 +291,34 @@ mod tests {
     fn event_triggers_match_exact_key_values() {
         let mut registry = ScheduleRegistry::new();
         let id = registry
-            .add_event("ci failure response", json!({"goal": "triage"}), "ci_finished", "status", "failed")
+            .add_event(
+                "ci failure response",
+                json!({"goal": "triage"}),
+                "ci_finished",
+                "status",
+                "failed",
+            )
             .unwrap();
         assert!(registry
-            .match_event("ci_finished", &json!({"status": "failed", "branch": "main"}))
+            .match_event(
+                "ci_finished",
+                &json!({"status": "failed", "branch": "main"})
+            )
             .contains(&id));
-        assert!(registry.match_event("ci_finished", &json!({"status": "passed"})).is_empty());
-        assert!(registry.match_event("other_event", &json!({"status": "failed"})).is_empty());
+        assert!(registry
+            .match_event("ci_finished", &json!({"status": "passed"}))
+            .is_empty());
+        assert!(registry
+            .match_event("other_event", &json!({"status": "failed"}))
+            .is_empty());
     }
 
     #[test]
     fn pause_and_persistence() {
         let mut registry = ScheduleRegistry::new();
-        let id = registry.add_interval("paused task", json!({"goal": "x"}), 60).unwrap();
+        let id = registry
+            .add_interval("paused task", json!({"goal": "x"}), 60)
+            .unwrap();
         registry.pause(&id, true).unwrap();
         let t0 = 1_800_000_000.0;
         assert!(registry.due(t0).is_empty(), "paused schedules never fire");

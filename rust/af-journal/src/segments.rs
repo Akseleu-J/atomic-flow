@@ -5,10 +5,10 @@
 //! append. This replaces the linear-per-append rehash of the single-file
 //! journal while keeping integrity and crash recovery.
 
-use std::io::{BufRead, Read, Write};
-use std::path::{Path, PathBuf};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::io::{BufRead, Write};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -35,7 +35,11 @@ pub struct SegmentStore {
 }
 
 impl SegmentStore {
-    pub fn open(dir: &Path, session_id: &str, segment_cap_bytes: u64) -> SegmentResult<SegmentStore> {
+    pub fn open(
+        dir: &Path,
+        session_id: &str,
+        segment_cap_bytes: u64,
+    ) -> SegmentResult<SegmentStore> {
         if session_id.is_empty()
             || !session_id
                 .bytes()
@@ -62,7 +66,13 @@ impl SegmentStore {
         } else {
             0
         };
-        Ok(SegmentStore { dir, session_id: session_id.to_string(), segment_cap_bytes, current, current_bytes })
+        Ok(SegmentStore {
+            dir,
+            session_id: session_id.to_string(),
+            segment_cap_bytes,
+            current,
+            current_bytes,
+        })
     }
 
     fn segment_path(dir: &Path, index: usize) -> PathBuf {
@@ -89,7 +99,8 @@ impl SegmentStore {
                     .as_secs_f64(),
             }
         });
-        let mut line = serde_json::to_string(&checkpoint).map_err(|e| SegmentError(format!("{e}")))?;
+        let mut line =
+            serde_json::to_string(&checkpoint).map_err(|e| SegmentError(format!("{e}")))?;
         line.push('\n');
         let mut file = std::fs::OpenOptions::new()
             .write(true)
@@ -148,7 +159,8 @@ impl SegmentStore {
                     .and_then(Value::as_str)
                     .unwrap_or_default();
                 if recorded != expected {
-                    broken.push(json!({"segment": index, "recorded": recorded, "actual": expected}));
+                    broken
+                        .push(json!({"segment": index, "recorded": recorded, "actual": expected}));
                 }
             }
             checked += 1;
@@ -174,7 +186,8 @@ impl SegmentStore {
             let mut first = true;
             loop {
                 let mut line = Vec::new();
-                let read = reader.read_until(b'\n', &mut line)
+                let read = reader
+                    .read_until(b'\n', &mut line)
                     .map_err(|error| SegmentError(format!("{error}")))?;
                 if read == 0 {
                     break;
@@ -235,7 +248,8 @@ fn first_line(path: &Path) -> SegmentResult<String> {
     let file = std::fs::File::open(path).map_err(|error| SegmentError(format!("{error}")))?;
     let mut reader = std::io::BufReader::new(file);
     let mut line = Vec::new();
-    reader.read_until(b'\n', &mut line)
+    reader
+        .read_until(b'\n', &mut line)
         .map_err(|error| SegmentError(format!("{error}")))?;
     String::from_utf8(line).map_err(|error| SegmentError(format!("{error}")))
 }
@@ -256,7 +270,9 @@ mod tests {
         let dir = temp_dir();
         let mut store = SegmentStore::open(&dir, "rotate", 200).unwrap();
         for index in 0..6 {
-            store.append(&json!({"seq": index, "text": format!("event {index}")})).unwrap();
+            store
+                .append(&json!({"seq": index, "text": format!("event {index}")}))
+                .unwrap();
         }
         let (events, incomplete) = store.read().unwrap();
         assert!(!incomplete);
@@ -265,7 +281,10 @@ mod tests {
         assert_eq!(events[5]["seq"], json!(5));
         let chain = store.verify_chain().unwrap();
         assert_eq!(chain["ok"], json!(true));
-        assert!(chain["segments_checked"].as_u64().unwrap() >= 2, "small cap must rotate");
+        assert!(
+            chain["segments_checked"].as_u64().unwrap() >= 2,
+            "small cap must rotate"
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -282,7 +301,10 @@ mod tests {
         // Rewrite an older segment's committed bytes out of band.
         let old = dir.join("segments_tamper").join("seg-000000.jsonl");
         let bytes = std::fs::read(&old).unwrap();
-        let poisoned: Vec<u8> = bytes.iter().map(|b| if *b == b'0' { b'9' } else { *b }).collect();
+        let poisoned: Vec<u8> = bytes
+            .iter()
+            .map(|b| if *b == b'0' { b'9' } else { *b })
+            .collect();
         std::fs::write(&old, &poisoned).unwrap();
         let chain = store.verify_chain().unwrap();
         assert_eq!(chain["ok"], json!(false));
@@ -296,12 +318,19 @@ mod tests {
         let mut store = SegmentStore::open(&dir, "tail", 400).unwrap();
         store.append(&json!({"seq": 0})).unwrap();
         let path = dir.join("segments_tail").join("seg-000000.jsonl");
-        let mut file = std::fs::OpenOptions::new().append(true).open(&path).unwrap();
+        let mut file = std::fs::OpenOptions::new()
+            .append(true)
+            .open(&path)
+            .unwrap();
         file.write_all(b"{\"partial\":").unwrap();
         drop(file);
         let (events, incomplete) = store.read().unwrap();
         assert!(incomplete);
-        assert_eq!(events.len(), 1, "committed events survive; the tail is not executed");
+        assert_eq!(
+            events.len(),
+            1,
+            "committed events survive; the tail is not executed"
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -317,7 +346,9 @@ mod tests {
         }
         let report = store.retain(1).unwrap();
         assert!(report["removed_segments"].as_u64().unwrap() >= 1);
-        assert!(report["archive_digest"].as_str().is_some_and(|digest| digest.len() == 64));
+        assert!(report["archive_digest"]
+            .as_str()
+            .is_some_and(|digest| digest.len() == 64));
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

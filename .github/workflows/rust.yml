@@ -1,0 +1,53 @@
+name: Rust kernel checks
+
+on:
+  push:
+    branches: [main, experimental]
+  pull_request:
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  CARGO_TERM_COLOR: always
+
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    name: cargo test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          profile: minimal
+      - name: Record tested source
+        shell: bash
+        run: |
+          mkdir -p validation/rust
+          git rev-parse HEAD > validation/rust/commit.txt
+      - name: cargo test (single job, no incremental; 3.4 GiB-host parity flags)
+        shell: bash
+        working-directory: rust
+        env:
+          CARGO_BUILD_JOBS: "1"
+        run: cargo test --workspace --locked 2>&1 | tee ../validation/rust/cargo-test-${{ matrix.os }}.log
+      - name: cargo fmt/clippy gate
+        shell: bash
+        working-directory: rust
+        if: matrix.os == 'ubuntu-24.04'
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --workspace --all-targets -- -D warnings
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rust-tests-${{ matrix.os }}-${{ github.sha }}
+          path: validation/rust/

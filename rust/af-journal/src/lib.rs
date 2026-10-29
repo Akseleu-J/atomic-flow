@@ -4,13 +4,13 @@
 //! blocks further appends until explicit recovery. A model or tool request
 //! without a terminal event remains pending: reading never retries it.
 
+use regex::Regex;
+use serde_json::{json, Map, Value};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::io::{BufRead, Read, Seek, SeekFrom, Write};
 use std::path::PathBuf;
 use std::sync::OnceLock;
-use regex::Regex;
-use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 
 pub mod segments;
 
@@ -19,14 +19,40 @@ pub const MAX_EVENT_BYTES: usize = 256 * 1024;
 pub const MAX_SESSION_BYTES: u64 = 64 * 1024 * 1024;
 
 pub const EVENT_TYPES: [&str; 22] = [
-    "session_created", "user_input", "model_request", "model_response", "model_failed",
-    "tool_request", "tool_result", "tool_effect_unknown", "question", "answer", "completed",
-    "failed", "tail_recovered", "steering_applied", "response_discarded", "context_summary",
-    "continuation", "dialogue_state", "snapshot_created", "rewind_applied", "fork_created",
+    "session_created",
+    "user_input",
+    "model_request",
+    "model_response",
+    "model_failed",
+    "tool_request",
+    "tool_result",
+    "tool_effect_unknown",
+    "question",
+    "answer",
+    "completed",
+    "failed",
+    "tail_recovered",
+    "steering_applied",
+    "response_discarded",
+    "context_summary",
+    "continuation",
+    "dialogue_state",
+    "snapshot_created",
+    "rewind_applied",
+    "fork_created",
     "host_reconciliation",
 ];
 
-const OUTCOMES: [&str; 8] = ["success", "error", "denied", "cancelled", "unknown", "pending", "refused", "not_sent"];
+const OUTCOMES: [&str; 8] = [
+    "success",
+    "error",
+    "denied",
+    "cancelled",
+    "unknown",
+    "pending",
+    "refused",
+    "not_sent",
+];
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -39,13 +65,19 @@ fn err<T>(message: impl Into<String>) -> JournalResult<T> {
 }
 
 fn valid_session_id(value: &str) -> bool {
-    !value.is_empty() && value.len() <= 64
-        && value.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+    !value.is_empty()
+        && value.len() <= 64
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
 }
 
 fn valid_call_id(value: &str) -> bool {
-    !value.is_empty() && value.len() <= 128
-        && value.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'.' | b':' | b'-'))
+    !value.is_empty()
+        && value.len() <= 128
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'.' | b':' | b'-'))
 }
 
 fn is_hex32(value: &str) -> bool {
@@ -56,6 +88,7 @@ fn is_hex64(value: &str) -> bool {
     value.len() == 64 && value.bytes().all(|b| b.is_ascii_hexdigit())
 }
 
+#[allow(dead_code)]
 fn sha256_hex(bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(bytes);
@@ -76,7 +109,8 @@ pub fn user_dir() -> PathBuf {
 }
 
 static SECRET_KEY: OnceLock<Regex> = OnceLock::new();
-static SECRET_RE: &str = "(?i)(?:password|passwd|secret|authorization|api[_-]?key|(?:^|_)token(?:$|_))";
+static SECRET_RE: &str =
+    "(?i)(?:password|passwd|secret|authorization|api[_-]?key|(?:^|_)token(?:$|_))";
 
 /// Recursive payload sanitizer: strings redacted, finite JSON only, secret
 /// keys replaced wholesale. Depth is bounded.
@@ -123,7 +157,8 @@ pub fn redact_text(text: &str) -> String {
     static TOKENS: OnceLock<Regex> = OnceLock::new();
     static LITERAL: OnceLock<Regex> = OnceLock::new();
     let block = BLOCK.get_or_init(|| {
-        Regex::new(r"(?s)-----BEGIN [A-Z ]*PRIVATE KEY-----.*?-----END [A-Z ]*PRIVATE KEY-----").unwrap()
+        Regex::new(r"(?s)-----BEGIN [A-Z ]*PRIVATE KEY-----.*?-----END [A-Z ]*PRIVATE KEY-----")
+            .unwrap()
     });
     let tokens = TOKENS.get_or_init(|| {
         Regex::new(r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b|\bsk-[A-Za-z0-9_-]{20,}\b|\bgh[pousr]_[A-Za-z0-9]{36,}\b|\bxox[abprs]-[A-Za-z0-9-]{10,}\b").unwrap()
@@ -140,7 +175,10 @@ pub fn redact_text(text: &str) -> String {
             if caps[4] != caps[6] || caps[2].to_lowercase().contains("_env") {
                 caps[0].to_string()
             } else {
-                format!("{}{}{}{}[REDACTED]{}", &caps[1], &caps[2], &caps[3], &caps[4], &caps[4])
+                format!(
+                    "{}{}{}{}[REDACTED]{}",
+                    &caps[1], &caps[2], &caps[3], &caps[4], &caps[4]
+                )
             }
         })
         .into_owned()
@@ -172,7 +210,9 @@ impl SessionSnapshot {
     pub fn pending_call_ids(&self) -> Vec<String> {
         let mut pending: BTreeMap<String, bool> = BTreeMap::new();
         for event in &self.events {
-            let Some(call_id) = call_id_of(event) else { continue };
+            let Some(call_id) = call_id_of(event) else {
+                continue;
+            };
             match event["event_type"].as_str().unwrap_or_default() {
                 "model_request" | "tool_request" => {
                     pending.insert(call_id, true);
@@ -196,9 +236,14 @@ impl SessionSnapshot {
         let mut unknown_charges: BTreeMap<String, ()> = BTreeMap::new();
         let mut unknown_effects: BTreeMap<String, ()> = BTreeMap::new();
         for event in &self.events {
-            let Some(call_id) = call_id_of(event) else { continue };
+            let Some(call_id) = call_id_of(event) else {
+                continue;
+            };
             let kind = event["event_type"].as_str().unwrap_or_default();
-            let outcome = event.get("outcome").and_then(Value::as_str).unwrap_or_default();
+            let outcome = event
+                .get("outcome")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
             match kind {
                 "model_request" => {
                     charges.insert(call_id.clone(), ());
@@ -255,7 +300,9 @@ impl SessionSnapshot {
                             item.get("status").and_then(Value::as_str) == Some("rollback_failed")
                                 || item
                                     .get("side_effects_may_have_occurred")
-                                    .is_some_and(|flag| !flag.is_boolean() || flag.as_bool() != Some(false))
+                                    .is_some_and(|flag| {
+                                        !flag.is_boolean() || flag.as_bool() != Some(false)
+                                    })
                                 || matches!(
                                     item.get("outcome").and_then(Value::as_str),
                                     Some("unknown") | Some("pending")
@@ -270,7 +317,10 @@ impl SessionSnapshot {
                     }
                 }
                 "host_reconciliation" => {
-                    let scope = event.pointer("/payload/scope").and_then(Value::as_str).unwrap_or_default();
+                    let scope = event
+                        .pointer("/payload/scope")
+                        .and_then(Value::as_str)
+                        .unwrap_or_default();
                     if scope == "charge" {
                         charges.remove(&call_id);
                         unknown_charges.remove(&call_id);
@@ -315,12 +365,18 @@ impl SessionJournal {
         // Fixed prefix also avoids Windows reserved device names, e.g. CON.
         Ok(SessionJournal {
             session_id: session_id.to_string(),
-            path: user_dir().join("sessions").join(format!("session_{session_id}.jsonl")),
+            path: user_dir()
+                .join("sessions")
+                .join(format!("session_{session_id}.jsonl")),
             validated: None,
         })
     }
 
-    pub fn create(project: &std::path::Path, session_id: Option<&str>, metadata: Option<&Value>) -> JournalResult<SessionJournal> {
+    pub fn create(
+        project: &std::path::Path,
+        session_id: Option<&str>,
+        metadata: Option<&Value>,
+    ) -> JournalResult<SessionJournal> {
         let journal = SessionJournal::new(session_id.unwrap_or(&af_entropy::token()))?;
         std::fs::create_dir_all(journal.path.parent().expect("sessions dir"))
             .map_err(|error| JournalError(format!("sessions directory failed: {error}")))?;
@@ -373,12 +429,18 @@ impl SessionJournal {
             return err("session event payload must be an object");
         }
         if event_type == "host_reconciliation" {
-            let scope_ok = matches!(payload.get("scope").and_then(Value::as_str), Some("charge") | Some("effect"));
+            let scope_ok = matches!(
+                payload.get("scope").and_then(Value::as_str),
+                Some("charge") | Some("effect")
+            );
             let recon_ok = payload
                 .get("reconciliation_id")
                 .and_then(Value::as_str)
                 .is_some_and(|id| id.strip_prefix("reconcile_").is_some_and(is_hex64));
-            let evidence_ok = payload.get("evidence_sha256").and_then(Value::as_str).is_some_and(is_hex64);
+            let evidence_ok = payload
+                .get("evidence_sha256")
+                .and_then(Value::as_str)
+                .is_some_and(is_hex64);
             let actor = payload.get("actor").is_some_and(Value::is_string);
             let reason = payload.get("reason").is_some_and(Value::is_string);
             if !scope_ok || !recon_ok || !evidence_ok || !actor || !reason || call_id.is_none() {
@@ -436,7 +498,9 @@ impl SessionJournal {
         let (sequence, size, mut hasher) = self.append_position()?;
         if let Some(expected) = expected_sequence {
             if sequence != expected {
-                return err("session changed before host checkpoint; inspect the latest observations");
+                return err(
+                    "session changed before host checkpoint; inspect the latest observations",
+                );
             }
         }
         let event = self.build_event(sequence + 1, event_type, payload, call_id, outcome)?;
@@ -483,7 +547,8 @@ impl SessionJournal {
         let mut buffer = vec![0u8; 1024 * 1024];
         while remaining > 0 {
             let chunk = buffer.len().min(remaining as usize);
-            let read = file.read(&mut buffer[..chunk])
+            let read = file
+                .read(&mut buffer[..chunk])
                 .map_err(|error| JournalError(format!("session read failed: {error}")))?;
             if read == 0 {
                 return err("validated session prefix was truncated");
@@ -501,7 +566,8 @@ impl SessionJournal {
         let mut reader = std::io::BufReader::new(file);
         loop {
             let mut line = Vec::new();
-            let read = reader.read_until(b'\n', &mut line)
+            let read = reader
+                .read_until(b'\n', &mut line)
                 .map_err(|error| JournalError(format!("session read failed: {error}")))?;
             if read == 0 {
                 break;
@@ -513,8 +579,9 @@ impl SessionJournal {
                 return err("session has an interrupted tail; call recover_tail() before appending; never replay pending calls");
             }
             sequence += 1;
-            let event: Value = serde_json::from_slice(&line)
-                .map_err(|error| JournalError(format!("invalid committed session event: {error}")))?;
+            let event: Value = serde_json::from_slice(&line).map_err(|error| {
+                JournalError(format!("invalid committed session event: {error}"))
+            })?;
             self.validate_event(&event, sequence)?;
             hasher.update(&line);
             offset += line.len() as u64;
@@ -539,7 +606,8 @@ impl SessionJournal {
         let mut reader = std::io::BufReader::new(&mut file);
         loop {
             let mut line = Vec::new();
-            let read = reader.read_until(b'\n', &mut line)
+            let read = reader
+                .read_until(b'\n', &mut line)
                 .map_err(|error| JournalError(format!("session read failed: {error}")))?;
             if read == 0 {
                 break;
@@ -560,7 +628,8 @@ impl SessionJournal {
                     }
                     line.clear();
                     let mut limited = reader.by_ref().take((MAX_EVENT_BYTES + 1) as u64);
-                    let more = limited.read_to_end(&mut line)
+                    let more = limited
+                        .read_to_end(&mut line)
                         .map_err(|error| JournalError(format!("session read failed: {error}")))?;
                     if more == 0 {
                         break;
@@ -611,7 +680,10 @@ impl SessionJournal {
             Some(value) if value == sequence as u64 => {}
             _ => return err("session identity/sequence mismatch"),
         }
-        let event_id = event.get("event_id").and_then(Value::as_str).unwrap_or_default();
+        let event_id = event
+            .get("event_id")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         if !is_hex32(event_id) {
             return err("invalid event id");
         }
@@ -624,7 +696,10 @@ impl SessionJournal {
             }
             _ => return err("invalid event timestamp"),
         }
-        let event_type = event.get("event_type").and_then(Value::as_str).unwrap_or_default();
+        let event_type = event
+            .get("event_type")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         if event_type.is_empty() {
             return err("unsupported session event type: ");
         }
@@ -648,13 +723,17 @@ impl SessionJournal {
         let (sequence, split, _known) = self.validated.clone().expect("read sets validated");
         let backup = self.path.with_file_name(format!(
             "{}.interrupted-{}.tail",
-            self.path.file_name().and_then(|n| n.to_str()).unwrap_or("session.jsonl"),
+            self.path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("session.jsonl"),
             af_entropy::token()
         ));
         {
             let mut source = std::fs::File::open(&self.path)
                 .map_err(|error| JournalError(format!("session open failed: {error}")))?;
-            source.seek(SeekFrom::Start(split))
+            source
+                .seek(SeekFrom::Start(split))
                 .map_err(|error| JournalError(format!("session seek failed: {error}")))?;
             let mut target = std::fs::OpenOptions::new()
                 .write(true)
@@ -665,20 +744,27 @@ impl SessionJournal {
             let mut buffer = vec![0u8; MAX_EVENT_BYTES];
             while remaining > 0 {
                 let chunk = buffer.len().min(remaining);
-                let read = source.read(&mut buffer[..chunk])
+                let read = source
+                    .read(&mut buffer[..chunk])
                     .map_err(|error| JournalError(format!("tail read failed: {error}")))?;
                 if read == 0 {
                     return err("session tail changed during recovery; inspect preserved backup");
                 }
-                target.write_all(&buffer[..read])
+                target
+                    .write_all(&buffer[..read])
                     .map_err(|error| JournalError(format!("tail backup failed: {error}")))?;
                 remaining -= read;
             }
             let mut probe = [0u8; 1];
-            if source.read(&mut probe).map_err(|e| JournalError(format!("{e}")))? != 0 {
+            if source
+                .read(&mut probe)
+                .map_err(|e| JournalError(format!("{e}")))?
+                != 0
+            {
                 return err("session tail changed during recovery; inspect preserved backup");
             }
-            target.flush()
+            target
+                .flush()
                 .and_then(|_| target.sync_all())
                 .map_err(|error| JournalError(format!("tail backup fsync failed: {error}")))?;
         }
@@ -687,7 +773,8 @@ impl SessionJournal {
                 .write(true)
                 .open(&self.path)
                 .map_err(|error| JournalError(format!("session open failed: {error}")))?;
-            handle.set_len(split)
+            handle
+                .set_len(split)
                 .and_then(|_| handle.flush())
                 .and_then(|_| handle.sync_all())
                 .map_err(|error| JournalError(format!("session truncate failed: {error}")))?;
@@ -715,8 +802,13 @@ impl SessionJournal {
     /// Export a bounded JSON inspection document; replay is never supported.
     pub fn export(&mut self, destination: &std::path::Path) -> JournalResult<PathBuf> {
         let snapshot = self.read()?;
-        if destination.canonicalize().unwrap_or_else(|_| destination.to_path_buf())
-            == self.path.canonicalize().unwrap_or_else(|_| self.path.clone())
+        if destination
+            .canonicalize()
+            .unwrap_or_else(|_| destination.to_path_buf())
+            == self
+                .path
+                .canonicalize()
+                .unwrap_or_else(|_| self.path.clone())
         {
             return err("export destination must differ from journal");
         }
@@ -735,10 +827,12 @@ impl SessionJournal {
             .create_new(true)
             .open(destination)
             .map_err(|error| JournalError(format!("export failed: {error}")))?;
-        file.write_all(&serde_json::to_vec_pretty(&document).map_err(|e| JournalError(format!("{e}")))?)
-            .and_then(|_| file.write_all(b"\n"))
-            .and_then(|_| file.flush())
-            .map_err(|error| JournalError(format!("export write failed: {error}")))?;
+        file.write_all(
+            &serde_json::to_vec_pretty(&document).map_err(|e| JournalError(format!("{e}")))?,
+        )
+        .and_then(|_| file.write_all(b"\n"))
+        .and_then(|_| file.flush())
+        .map_err(|error| JournalError(format!("export write failed: {error}")))?;
         Ok(destination.to_path_buf())
     }
 }
@@ -766,7 +860,10 @@ pub fn list_sessions(limit: usize) -> JournalResult<Vec<Value>> {
     paths.reverse();
     let mut out = Vec::new();
     for path in paths.into_iter().take(limit) {
-        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default();
+        let name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or_default();
         let session_id = &name["session_".len()..name.len() - ".jsonl".len()];
         let result = (|| -> JournalResult<Value> {
             let mut file = std::io::BufReader::new(
@@ -778,8 +875,8 @@ pub fn list_sessions(limit: usize) -> JournalResult<Vec<Value>> {
             if line.last() != Some(&b'\n') || line.len() > MAX_EVENT_BYTES {
                 return err("invalid creation record");
             }
-            let first: Value = serde_json::from_slice(&line)
-                .map_err(|error| JournalError(format!("{error}")))?;
+            let first: Value =
+                serde_json::from_slice(&line).map_err(|error| JournalError(format!("{error}")))?;
             let journal = SessionJournal::new(session_id)?;
             journal.validate_event(&first, 1)?;
             if first["event_type"] != json!("session_created") {
@@ -872,16 +969,52 @@ mod tests {
         let home = temp_home();
         with_env(&home, || {
             let mut journal = make_journal(&home, "holds");
-            journal.append("model_request", &json!({"model": "m"}), Some("call-1"), None, None).unwrap();
-            journal.append("tool_request", &json!({"tool": "run"}), Some("call-2"), None, None).unwrap();
+            journal
+                .append(
+                    "model_request",
+                    &json!({"model": "m"}),
+                    Some("call-1"),
+                    None,
+                    None,
+                )
+                .unwrap();
+            journal
+                .append(
+                    "tool_request",
+                    &json!({"tool": "run"}),
+                    Some("call-2"),
+                    None,
+                    None,
+                )
+                .unwrap();
             let snapshot = journal.read().unwrap();
-            assert_eq!(snapshot.pending_call_ids(), vec!["call-1".to_string(), "call-2".to_string()]);
-            assert_eq!(snapshot.unresolved_call_ids(), vec!["call-1".to_string(), "call-2".to_string()]);
+            assert_eq!(
+                snapshot.pending_call_ids(),
+                vec!["call-1".to_string(), "call-2".to_string()]
+            );
+            assert_eq!(
+                snapshot.unresolved_call_ids(),
+                vec!["call-1".to_string(), "call-2".to_string()]
+            );
             // Terminal response with a settled cost clears the charge;
             // rollback_failed tool keeps its effect on hold.
-            journal.append("model_response", &json!({"cost_usd": 0.01}), Some("call-1"), Some("success"), None).unwrap();
             journal
-                .append("tool_result", &json!({"result": {"status": "rollback_failed"}}), Some("call-2"), Some("error"), None)
+                .append(
+                    "model_response",
+                    &json!({"cost_usd": 0.01}),
+                    Some("call-1"),
+                    Some("success"),
+                    None,
+                )
+                .unwrap();
+            journal
+                .append(
+                    "tool_result",
+                    &json!({"result": {"status": "rollback_failed"}}),
+                    Some("call-2"),
+                    Some("error"),
+                    None,
+                )
                 .unwrap();
             let snapshot = journal.read().unwrap();
             assert!(snapshot.pending_call_ids().is_empty());
@@ -912,14 +1045,36 @@ mod tests {
         let home = temp_home();
         with_env(&home, || {
             let mut journal = make_journal(&home, "unknown");
-            journal.append("model_request", &json!({}), Some("call-x"), None, None).unwrap();
-            journal.append("model_failed", &json!({"error": "timeout after send"}), Some("call-x"), Some("error"), None).unwrap();
+            journal
+                .append("model_request", &json!({}), Some("call-x"), None, None)
+                .unwrap();
+            journal
+                .append(
+                    "model_failed",
+                    &json!({"error": "timeout after send"}),
+                    Some("call-x"),
+                    Some("error"),
+                    None,
+                )
+                .unwrap();
             let snapshot = journal.read().unwrap();
             assert_eq!(snapshot.unresolved_call_ids(), vec!["call-x".to_string()]);
-            journal.append("model_request", &json!({}), Some("call-y"), None, None).unwrap();
-            journal.append("model_failed", &json!({"error": "pre-send cancel"}), Some("call-y"), Some("not_sent"), None).unwrap();
+            journal
+                .append("model_request", &json!({}), Some("call-y"), None, None)
+                .unwrap();
+            journal
+                .append(
+                    "model_failed",
+                    &json!({"error": "pre-send cancel"}),
+                    Some("call-y"),
+                    Some("not_sent"),
+                    None,
+                )
+                .unwrap();
             let snapshot = journal.read().unwrap();
-            assert!(!snapshot.unresolved_call_ids().contains(&"call-y".to_string()));
+            assert!(!snapshot
+                .unresolved_call_ids()
+                .contains(&"call-y".to_string()));
         });
     }
 
@@ -932,20 +1087,30 @@ mod tests {
             }
             let path = user_dir().join("sessions").join("session_tail.jsonl");
             // Simulate a crash mid-append: bytes without the trailing newline.
-            let mut file = std::fs::OpenOptions::new().append(true).open(&path).unwrap();
+            let mut file = std::fs::OpenOptions::new()
+                .append(true)
+                .open(&path)
+                .unwrap();
             file.write_all(b"{\"partial\": tru").unwrap();
             drop(file);
             let mut journal = SessionJournal::new("tail").unwrap();
             let snapshot = journal.read().unwrap();
             assert!(snapshot.incomplete_tail);
             assert!(snapshot.tail_bytes > 0);
-            assert!(journal.append("user_input", &json!({}), None, None, None).is_err());
+            assert!(journal
+                .append("user_input", &json!({}), None, None, None)
+                .is_err());
             let backup = journal.recover_tail().unwrap().expect("backup path");
             assert!(backup.exists());
             let snapshot = journal.read().unwrap();
             assert!(!snapshot.incomplete_tail);
-            assert_eq!(snapshot.events.last().unwrap()["event_type"], json!("tail_recovered"));
-            assert!(journal.append("user_input", &json!({"text": "ok"}), None, None, None).is_ok());
+            assert_eq!(
+                snapshot.events.last().unwrap()["event_type"],
+                json!("tail_recovered")
+            );
+            assert!(journal
+                .append("user_input", &json!({"text": "ok"}), None, None, None)
+                .is_ok());
         });
     }
 
@@ -954,7 +1119,9 @@ mod tests {
         let home = temp_home();
         with_env(&home, || {
             let mut journal = make_journal(&home, "cas");
-            assert!(journal.append("user_input", &json!({}), None, None, None).is_ok());
+            assert!(journal
+                .append("user_input", &json!({}), None, None, None)
+                .is_ok());
             let stale = journal
                 .append("user_input", &json!({}), None, None, Some(1))
                 .unwrap_err();
@@ -980,16 +1147,23 @@ mod tests {
         let home = temp_home();
         with_env(&home, || {
             let mut journal = make_journal(&home, "tamper");
-            journal.append("user_input", &json!({"text": "original"}), None, None, None).unwrap();
+            journal
+                .append("user_input", &json!({"text": "original"}), None, None, None)
+                .unwrap();
             // Out-of-band rewrite of committed bytes.
             let path = user_dir().join("sessions").join("session_tamper.jsonl");
             let bytes = std::fs::read(&path).unwrap();
-            let poisoned: Vec<u8> = bytes.iter().map(|b| if *b == b'o' { b'0' } else { *b }).collect();
+            let poisoned: Vec<u8> = bytes
+                .iter()
+                .map(|b| if *b == b'o' { b'0' } else { *b })
+                .collect();
             std::fs::write(&path, &poisoned).unwrap();
             let error = journal
                 .append("user_input", &json!({}), None, None, None)
                 .unwrap_err();
-            assert!(error.0.contains("changed") || error.0.contains("invalid committed session event"));
+            assert!(
+                error.0.contains("changed") || error.0.contains("invalid committed session event")
+            );
         });
     }
 
@@ -999,7 +1173,9 @@ mod tests {
         with_env(&home, || {
             make_journal(&home, "listed");
             let sessions = list_sessions(100).unwrap();
-            assert!(sessions.iter().any(|item| item["session_id"] == json!("listed")));
+            assert!(sessions
+                .iter()
+                .any(|item| item["session_id"] == json!("listed")));
         });
     }
 
@@ -1008,10 +1184,13 @@ mod tests {
         let home = temp_home();
         with_env(&home, || {
             let mut journal = make_journal(&home, "exported");
-            journal.append("user_input", &json!({"text": "hi"}), None, None, None).unwrap();
+            journal
+                .append("user_input", &json!({"text": "hi"}), None, None, None)
+                .unwrap();
             let target = home.join("export.json");
             journal.export(&target).unwrap();
-            let document: Value = serde_json::from_str(&std::fs::read_to_string(&target).unwrap()).unwrap();
+            let document: Value =
+                serde_json::from_str(&std::fs::read_to_string(&target).unwrap()).unwrap();
             assert_eq!(document["replay_supported"], json!(false));
             assert_eq!(document["events"].as_array().unwrap().len(), 2);
         });

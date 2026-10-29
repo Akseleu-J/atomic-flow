@@ -50,7 +50,10 @@ pub fn redact(text: &str) -> String {
             if suffix.contains("_env") {
                 caps[0].to_string()
             } else {
-                format!("{}{}{}{}[REDACTED]{}", &caps[1], &caps[2], &caps[3], &caps[4], &caps[4])
+                format!(
+                    "{}{}{}{}[REDACTED]{}",
+                    &caps[1], &caps[2], &caps[3], &caps[4], &caps[4]
+                )
             }
         })
         .into_owned()
@@ -81,9 +84,14 @@ mod tests {
 
     #[test]
     fn masks_literal_key_value_assignments() {
-        let out = redact("api_key = 'supersecretvalue'\ntoken_env = 'keepme'\npassword: \"hunter2hunter2\"");
+        let out = redact(
+            "api_key = 'supersecretvalue'\ntoken_env = 'keepme'\npassword: \"hunter2hunter2\"",
+        );
         assert!(!out.contains("supersecretvalue"));
         assert!(!out.contains("hunter2hunter2"));
-        assert!(out.contains("token_env = 'keepme'"), "token_env must not match the (?!\\w*_env) guard");
+        assert!(
+            out.contains("token_env = 'keepme'"),
+            "token_env must not match the (?!\\w*_env) guard"
+        );
     }
 }

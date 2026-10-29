@@ -3,15 +3,17 @@
 //! POSIX-style relative paths only, no traversal, no link escape, confined
 //! under the granted root.
 
-use std::path::{Path, PathBuf};
 use crate::registry::ensure_no_links;
 use crate::{SandboxError, SandboxResult};
+use std::path::{Path, PathBuf};
 
 /// Validate and resolve a root-relative POSIX path. Refuses absolute paths,
 /// backslashes, `..`, empty components, drive letters and any link component.
 pub fn admit_rel(root: &Path, rel: &str) -> SandboxResult<PathBuf> {
     if rel.is_empty() {
-        return Err(SandboxError("path must be a non-empty relative POSIX path".into()));
+        return Err(SandboxError(
+            "path must be a non-empty relative POSIX path".into(),
+        ));
     }
     if rel.contains('\\') {
         return Err(SandboxError("path must use POSIX separators".into()));
@@ -20,7 +22,9 @@ pub fn admit_rel(root: &Path, rel: &str) -> SandboxResult<PathBuf> {
         return Err(SandboxError("path must be relative to the root".into()));
     }
     if rel.contains(':') {
-        return Err(SandboxError("drive-qualified paths are not admitted".into()));
+        return Err(SandboxError(
+            "drive-qualified paths are not admitted".into(),
+        ));
     }
     for component in rel.split('/') {
         if component.is_empty() || component == "." {

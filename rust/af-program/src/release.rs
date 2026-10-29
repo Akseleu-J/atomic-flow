@@ -2,9 +2,9 @@
 //! verification steps and upgrade/rollback records. Rollback of a binary
 //! never reverts spend or external effects — the record says so explicitly.
 
-use std::path::Path;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::path::Path;
 
 fn sha256_file(path: &Path) -> Result<String, String> {
     let bytes = std::fs::read(path).map_err(|error| format!("artifact read failed: {error}"))?;
@@ -90,12 +90,16 @@ impl ReleaseManifest {
                         json!({"name": artifact.name, "status": "verified"})
                     }
                     Ok(_) => json!({"name": artifact.name, "status": "digest_mismatch"}),
-                    Err(error) => json!({"name": artifact.name, "status": "unreadable", "detail": error}),
+                    Err(error) => {
+                        json!({"name": artifact.name, "status": "unreadable", "detail": error})
+                    }
                 },
             };
             results.push(result);
         }
-        let verified = results.iter().all(|result| result["status"] == json!("verified"));
+        let verified = results
+            .iter()
+            .all(|result| result["status"] == json!("verified"));
         json!({"ok": verified, "artifacts": results})
     }
 }
@@ -140,7 +144,10 @@ mod tests {
         )
         .unwrap();
         let document = manifest.as_value();
-        assert_eq!(document["artifacts"][0]["sha256"], json!(sha256_file(&binary).unwrap()));
+        assert_eq!(
+            document["artifacts"][0]["sha256"],
+            json!(sha256_file(&binary).unwrap())
+        );
         // Same bytes verify; changed bytes fail hard.
         let same = manifest.verify_consumer(&[("af.exe".into(), &binary)]);
         assert_eq!(same["ok"], json!(true));

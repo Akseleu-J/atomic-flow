@@ -14,7 +14,12 @@ pub type GitResult<T> = Result<T, GitError>;
 
 /// The command runner abstraction (real host: std::process; tests: fake).
 pub trait CommandRunner {
-    fn run(&self, argv: &[String], cwd: &Path, extra_env: &[(&str, &str)]) -> Result<(i32, String, String), String>;
+    fn run(
+        &self,
+        argv: &[String],
+        cwd: &Path,
+        extra_env: &[(&str, &str)],
+    ) -> Result<(i32, String, String), String>;
 }
 
 use std::path::Path;
@@ -23,7 +28,12 @@ use std::path::Path;
 pub struct ProcessRunner;
 
 impl CommandRunner for ProcessRunner {
-    fn run(&self, argv: &[String], cwd: &Path, extra_env: &[(&str, &str)]) -> Result<(i32, String, String), String> {
+    fn run(
+        &self,
+        argv: &[String],
+        cwd: &Path,
+        extra_env: &[(&str, &str)],
+    ) -> Result<(i32, String, String), String> {
         use std::process::Command;
         let mut command = Command::new(&argv[0]);
         command.args(&argv[1..]).current_dir(cwd);
@@ -92,7 +102,9 @@ impl GitWorkflow<'_> {
     /// (never `git add .`) and commit with the journaled message.
     pub fn auto_commit(&self, paths: &[&str], message: &str) -> GitResult<String> {
         if paths.is_empty() {
-            return Err(GitError("auto-commit requires at least one changed path".into()));
+            return Err(GitError(
+                "auto-commit requires at least one changed path".into(),
+            ));
         }
         if message.trim().is_empty() {
             return Err(GitError("auto-commit requires a non-empty message".into()));
@@ -110,7 +122,9 @@ impl GitWorkflow<'_> {
     /// argv, logs, or this module — the host exports it before the call.
     pub fn publish(&self, branch: &str, credential_env: &str, remote: &str) -> GitResult<Value> {
         if credential_env.trim().is_empty() {
-            return Err(GitError("publish requires a credential environment variable name".into()));
+            return Err(GitError(
+                "publish requires a credential environment variable name".into(),
+            ));
         }
         if std::env::var(credential_env).is_err() {
             return Err(GitError(format!(
@@ -138,7 +152,7 @@ mod tests {
     use super::*;
     use std::cell::RefCell;
     use std::collections::BTreeMap;
-    use std::path::{Path, PathBuf};
+    use std::path::Path;
 
     struct FakeRunner {
         calls: RefCell<Vec<(Vec<String>, BTreeMap<String, String>)>>,
@@ -147,16 +161,26 @@ mod tests {
 
     impl FakeRunner {
         fn new() -> FakeRunner {
-            FakeRunner { calls: RefCell::new(Vec::new()), fail_on: RefCell::new(BTreeMap::new()) }
+            FakeRunner {
+                calls: RefCell::new(Vec::new()),
+                fail_on: RefCell::new(BTreeMap::new()),
+            }
         }
 
         fn fail_when(&self, first_arg: &str, code: i32) {
-            self.fail_on.borrow_mut().insert(first_arg.to_string(), code);
+            self.fail_on
+                .borrow_mut()
+                .insert(first_arg.to_string(), code);
         }
     }
 
     impl CommandRunner for FakeRunner {
-        fn run(&self, argv: &[String], _cwd: &Path, extra_env: &[(&str, &str)]) -> Result<(i32, String, String), String> {
+        fn run(
+            &self,
+            argv: &[String],
+            _cwd: &Path,
+            extra_env: &[(&str, &str)],
+        ) -> Result<(i32, String, String), String> {
             let env: BTreeMap<String, String> = extra_env
                 .iter()
                 .map(|(key, value)| (key.to_string(), value.to_string()))
@@ -174,7 +198,10 @@ mod tests {
     }
 
     fn workflow<'a>(runner: &'a FakeRunner) -> GitWorkflow<'a> {
-        GitWorkflow { repo_root: Path::new("/repo"), runner }
+        GitWorkflow {
+            repo_root: Path::new("/repo"),
+            runner,
+        }
     }
 
     #[test]
@@ -184,19 +211,31 @@ mod tests {
         let branch = git.ensure_task_branch("fix scheduler!").unwrap();
         assert_eq!(branch, "af/task-fix-scheduler-");
         let calls = runner.calls.borrow();
-        assert_eq!(calls[0].0, vec!["git", "branch", "--list", "af/task-fix-scheduler-"]);
-        assert_eq!(calls[1].0, vec!["git", "checkout", "-b", "af/task-fix-scheduler-"]);
+        assert_eq!(
+            calls[0].0,
+            vec!["git", "branch", "--list", "af/task-fix-scheduler-"]
+        );
+        assert_eq!(
+            calls[1].0,
+            vec!["git", "checkout", "-b", "af/task-fix-scheduler-"]
+        );
     }
 
     #[test]
     fn auto_commit_stages_exact_paths_and_never_add_dot() {
         let runner = FakeRunner::new();
         let git = workflow(&runner);
-        let head = git.auto_commit(&["src/lib.py", "src/app.py"], "af: bump helper").unwrap();
+        let head = git
+            .auto_commit(&["src/lib.py", "src/app.py"], "af: bump helper")
+            .unwrap();
         assert_eq!(head, ""); // fake runner returns empty stdout
         let calls = runner.calls.borrow();
         assert_eq!(calls[0].0[0..3].to_vec(), vec!["git", "add", "--"]);
-        assert!(calls.iter().all(|(argv, _)| !argv.contains(&".".to_string()) || argv[0] != "git" || argv[1] != "add"));
+        assert!(calls
+            .iter()
+            .all(|(argv, _)| !argv.contains(&".".to_string())
+                || argv[0] != "git"
+                || argv[1] != "add"));
         assert_eq!(calls[1].0, vec!["git", "commit", "-m", "af: bump helper"]);
         assert_eq!(calls[2].0, vec!["git", "rev-parse", "--short", "HEAD"]);
         assert!(git.auto_commit(&[], "x").is_err());
@@ -207,11 +246,15 @@ mod tests {
     fn publish_requires_exported_credential_and_never_inlines_it() {
         let runner = FakeRunner::new();
         let git = workflow(&runner);
-        let error = git.publish("af/task-x", "AF_DEFINITELY_MISSING_TOKEN", "origin").unwrap_err();
+        let error = git
+            .publish("af/task-x", "AF_DEFINITELY_MISSING_TOKEN", "origin")
+            .unwrap_err();
         assert!(error.0.contains("not exported"));
         // With the variable exported the push runs with the env *name* only.
         std::env::set_var("AF_TEST_PUBLISH_TOKEN", "secret-value");
-        let report = git.publish("af/task-x", "AF_TEST_PUBLISH_TOKEN", "origin").unwrap();
+        let report = git
+            .publish("af/task-x", "AF_TEST_PUBLISH_TOKEN", "origin")
+            .unwrap();
         assert_eq!(report["published"], json!(true));
         assert_eq!(report["credential"], json!("AF_TEST_PUBLISH_TOKEN"));
         let calls = runner.calls.borrow();
@@ -221,7 +264,9 @@ mod tests {
             .unwrap();
         assert_eq!(push.0, vec!["git", "push", "origin", "af/task-x:af/task-x"]);
         assert!(
-            !serde_json::to_string(&push.0).unwrap().contains("secret-value"),
+            !serde_json::to_string(&push.0)
+                .unwrap()
+                .contains("secret-value"),
             "the token value must never appear in argv"
         );
         std::env::remove_var("AF_TEST_PUBLISH_TOKEN");

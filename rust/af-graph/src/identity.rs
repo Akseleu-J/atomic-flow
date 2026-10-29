@@ -3,10 +3,10 @@
 //! principal/workspace/project/root/policy and read contexts require the
 //! binding to match host grants.
 
+use crate::schema::GraphContractError;
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
-use crate::schema::GraphContractError;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GraphIdentity {
@@ -25,7 +25,13 @@ impl GraphIdentity {
         root_id: &str,
         policy_version: &str,
     ) -> Result<Self, GraphContractError> {
-        for value in [principal_id, workspace_id, project_id, root_id, policy_version] {
+        for value in [
+            principal_id,
+            workspace_id,
+            project_id,
+            root_id,
+            policy_version,
+        ] {
             validate_component(value)?;
         }
         Ok(GraphIdentity {
@@ -70,27 +76,43 @@ pub struct GraphReadContext {
 
 impl GraphReadContext {
     /// Grants are immutable trusted (workspace, project, root) tuples.
-    pub fn new(identity: GraphIdentity, grants: &[(String, String, String)]) -> Result<Self, GraphContractError> {
+    pub fn new(
+        identity: GraphIdentity,
+        grants: &[(String, String, String)],
+    ) -> Result<Self, GraphContractError> {
         let mut set = BTreeSet::new();
         for grant in grants {
             let (workspace, project, root) = grant;
             if workspace.is_empty() || project.is_empty() || root.is_empty() {
-                return Err(GraphContractError("graph grants require immutable trusted root tuples".into()));
+                return Err(GraphContractError(
+                    "graph grants require immutable trusted root tuples".into(),
+                ));
             }
             set.insert((workspace.clone(), project.clone(), root.clone()));
         }
-        Ok(GraphReadContext { identity, grants: set })
+        Ok(GraphReadContext {
+            identity,
+            grants: set,
+        })
     }
 
     /// The read context must bind exactly this identity, and its
     /// workspace/project/root triple must be inside the host grants.
     pub fn require(&self, expected: &GraphIdentity) -> Result<(), GraphContractError> {
         if self.identity != *expected {
-            return Err(GraphContractError("graph principal/project/root/policy binding differs".into()));
+            return Err(GraphContractError(
+                "graph principal/project/root/policy binding differs".into(),
+            ));
         }
-        let key = (expected.workspace_id.clone(), expected.project_id.clone(), expected.root_id.clone());
+        let key = (
+            expected.workspace_id.clone(),
+            expected.project_id.clone(),
+            expected.root_id.clone(),
+        );
         if !self.grants.contains(&key) {
-            return Err(GraphContractError("graph root is outside host grants".into()));
+            return Err(GraphContractError(
+                "graph root is outside host grants".into(),
+            ));
         }
         Ok(())
     }
@@ -101,7 +123,8 @@ mod tests {
     use super::*;
 
     fn identity() -> GraphIdentity {
-        GraphIdentity::new("principal-1", "ws-1", "proj-1", "root-1", "policy-v1").expect("valid identity")
+        GraphIdentity::new("principal-1", "ws-1", "proj-1", "root-1", "policy-v1")
+            .expect("valid identity")
     }
 
     #[test]
@@ -111,7 +134,12 @@ mod tests {
             .expect("valid")
             .namespace();
         assert_eq!(a, b);
-        assert_ne!(a, GraphIdentity::new("principal-1", "ws-1", "proj-1", "root-1", "policy-v2").unwrap().namespace());
+        assert_ne!(
+            a,
+            GraphIdentity::new("principal-1", "ws-1", "proj-1", "root-1", "policy-v2")
+                .unwrap()
+                .namespace()
+        );
         assert_eq!(a.len(), 64);
     }
 
@@ -130,18 +158,28 @@ mod tests {
     #[test]
     fn read_context_requires_identity_and_grant() {
         let identity = identity();
-        let grants = vec![("ws-1".to_string(), "proj-1".to_string(), "root-1".to_string())];
+        let grants = vec![(
+            "ws-1".to_string(),
+            "proj-1".to_string(),
+            "root-1".to_string(),
+        )];
         let context = GraphReadContext::new(identity.clone(), &grants).expect("context");
         context.require(&identity).expect("bound identity passes");
-        let other = GraphIdentity::new("principal-1", "ws-1", "proj-1", "root-2", "policy-v1").unwrap();
+        let other =
+            GraphIdentity::new("principal-1", "ws-1", "proj-1", "root-2", "policy-v1").unwrap();
         let error = context.require(&other).unwrap_err();
         assert!(error.0.contains("binding differs"));
         // Identity matches, but its triple is not granted.
-        let other_root = GraphIdentity::new("principal-1", "ws-1", "proj-2", "root-1", "policy-v1").unwrap();
+        let other_root =
+            GraphIdentity::new("principal-1", "ws-1", "proj-2", "root-1", "policy-v1").unwrap();
         let other_context = GraphReadContext::new(other_root.clone(), &grants).expect("context");
         let error = other_context.require(&other_root).unwrap_err();
         assert!(error.0.contains("outside host grants"));
         // Empty grant components are refused at construction.
-        assert!(GraphReadContext::new(identity, &[("ws-1".into(), String::new(), "root-1".into())]).is_err());
+        assert!(GraphReadContext::new(
+            identity,
+            &[("ws-1".into(), String::new(), "root-1".into())]
+        )
+        .is_err());
     }
 }

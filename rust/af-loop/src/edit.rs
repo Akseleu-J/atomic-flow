@@ -4,11 +4,11 @@
 //! and a host final gate the model cannot skip. Edit budget is the in-loop
 //! ceiling; the durable per-task ceiling lives in af-agents::repair.
 
-use std::cell::RefCell;
-use std::path::PathBuf;
-use serde_json::{json, Value};
 use crate::{KernelTool, LoopLimits, LoopOutcome, TurnLoop};
 use af_llm::{Cancel, ChatMessage, Router};
+use serde_json::{json, Value};
+use std::cell::RefCell;
+use std::path::PathBuf;
 
 /// Kernel tools for one editing task inside a sandboxed root.
 pub struct EditToolset<'a> {
@@ -20,6 +20,7 @@ pub struct EditToolset<'a> {
     pub check_cwd: PathBuf,
     pub max_edits: usize,
     edits_used: RefCell<usize>,
+    changed: RefCell<Vec<String>>,
 }
 
 impl<'a> EditToolset<'a> {
@@ -41,11 +42,17 @@ impl<'a> EditToolset<'a> {
             check_cwd,
             max_edits,
             edits_used: RefCell::new(0),
+            changed: RefCell::new(Vec::new()),
         })
     }
 
     pub fn edits_used(&self) -> usize {
         *self.edits_used.borrow()
+    }
+
+    /// Paths actually changed by this toolset (for the git auto-commit).
+    pub fn changed_paths(&self) -> Vec<String> {
+        self.changed.borrow().clone()
     }
 }
 
@@ -59,10 +66,16 @@ impl KernelTool for EditToolset<'_> {
     }
 
     fn execute(&self, arguments: &Value) -> Value {
-        let op = arguments.get("op").and_then(Value::as_str).unwrap_or_default();
+        let op = arguments
+            .get("op")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         match op {
             "context" => {
-                let query = arguments.get("query").and_then(Value::as_str).unwrap_or_default();
+                let query = arguments
+                    .get("query")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default();
                 let index = af_context::ContextIndex::build(&self.store_document);
                 af_context::context_pack(&index, query, 6000, None)
             }
@@ -70,7 +83,11 @@ impl KernelTool for EditToolset<'_> {
                 let Some(path) = arguments.get("path").and_then(Value::as_str) else {
                     return json!({"error": "read_file requires path"});
                 };
-                match self.session.borrow_mut().read(&self.root_id, path, 0, 12000, true) {
+                match self
+                    .session
+                    .borrow_mut()
+                    .read(&self.root_id, path, 0, 12000, true)
+                {
                     Ok(page) => page,
                     Err(error) => json!({"error": error.0}),
                 }
@@ -91,10 +108,14 @@ impl KernelTool for EditToolset<'_> {
                     Ok(preview) => preview,
                     Err(error) => return json!({"error": error.0}),
                 };
-                let token = preview["preview_token"].as_str().unwrap_or_default().to_string();
+                let token = preview["preview_token"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_string();
                 match self.session.borrow_mut().apply(&token, true) {
                     Ok(report) => {
                         *self.edits_used.borrow_mut() += 1;
+                        self.changed.borrow_mut().push(path.to_string());
                         report
                     }
                     Err(error) => json!({"error": error.0}),
@@ -125,16 +146,32 @@ impl KernelTool for EditToolset<'_> {
 #[derive(Debug, Clone, PartialEq)]
 pub enum EditOutcome {
     /// Final answer AND the host final gate passed (when edits happened).
-    Completed { content: String, edits: usize, check: Value },
+    Completed {
+        content: String,
+        edits: usize,
+        check: Value,
+        /// Auto-commit record: committed head, skip reason or honest error.
+        git: Value,
+    },
     /// The model finished, but the final gate failed: not a success, ever.
-    CheckFailed { content: String, edits: usize, check: Value },
+    CheckFailed {
+        content: String,
+        edits: usize,
+        check: Value,
+        git: Value,
+    },
     /// Route hold or budget exhaustion — surfaced unchanged with counts.
-    Interrupted { loop_outcome: LoopOutcome, edits: usize },
+    Interrupted {
+        loop_outcome: LoopOutcome,
+        edits: usize,
+    },
 }
 
 /// Run one guided editing task: TurnLoop over the edit toolset, then the
 /// host final gate. `host_approved` is an explicit operator decision bound
 /// to this task (sandbox apply authority), never inferred from model text.
+/// `git` is an optional GitWorkflow; when supplied and the check verifies,
+/// exactly one auto-commit records the change on the task branch.
 pub fn run_edit_task(
     router: &Router,
     toolset: &EditToolset,
@@ -143,25 +180,27 @@ pub fn run_edit_task(
     task: &str,
     host_approved: bool,
     limits: LoopLimits,
+    git: Option<&af_exec::git::GitWorkflow>,
 ) -> Result<EditOutcome, String> {
     if !host_approved {
         return Err("edit tasks require explicit host approval for sandbox apply".into());
     }
     let tools: Vec<Box<dyn KernelTool + '_>> = vec![Box::new(RefCellTool(toolset))];
     let mut loop_ = TurnLoop::new(router, &tools, journal, limits);
-    let outcome = loop_.run(
-        model,
-        vec![ChatMessage::new(
-            "user",
-            &format!(
-                "Task: {task}\nTools: context (repo map), read_file, apply_edit, run_check.\n\
+    let outcome = loop_
+        .run(
+            model,
+            vec![ChatMessage::new(
+                "user",
+                &format!(
+                    "Task: {task}\nTools: context (repo map), read_file, apply_edit, run_check.\n\
                  Rules: read the complete file before apply_edit; run_check after edits;\n\
                  finish with a final answer only when the check passes."
-            ),
-        )],
-        &Cancel::new(),
-    )
-    .map_err(|error| error.0)?;
+                ),
+            )],
+            &Cancel::new(),
+        )
+        .map_err(|error| error.0)?;
     let edits = toolset.edits_used();
     match outcome {
         LoopOutcome::Final { content, .. } => {
@@ -170,19 +209,46 @@ pub fn run_edit_task(
                     content,
                     edits: 0,
                     check: json!({"skipped": true, "reason": "no edits were applied"}),
+                    git: json!({"skipped": true, "reason": "no edits were applied"}),
                 });
             }
             // Host final gate: the check runs again, model-invisible.
-            let spec = af_exec::JobSpec::new(toolset.check_argv.clone(), toolset.check_cwd.clone(), 120)
-                .map_err(|e| e.0)?;
+            let spec =
+                af_exec::JobSpec::new(toolset.check_argv.clone(), toolset.check_cwd.clone(), 120)
+                    .map_err(|e| e.0)?;
             let check = toolset.runner.borrow().run(&spec).map_err(|e| e.0)?;
-            if check["status"] == json!("succeeded") {
-                Ok(EditOutcome::Completed { content, edits, check })
+            let verified = check["status"] == json!("succeeded");
+            // Git-native workflow: one auto-commit per verified change set,
+            // only when the caller supplied a workflow bound to a repo root.
+            // A commit failure is recorded honestly; it never flips the
+            // check verdict, and unverified changes are never committed.
+            let git_record = if verified {
+                match git {
+                    Some(workflow) => {
+                        let changed = toolset.changed_paths();
+                        let changed_refs: Vec<&str> = changed.iter().map(String::as_str).collect();
+                        match workflow
+                            .auto_commit(&changed_refs, &format!("af: {task} (check verified)"))
+                        {
+                            Ok(head) => json!({"committed": true, "head": head}),
+                            Err(error) => json!({"committed": false, "error": error.0}),
+                        }
+                    }
+                    None => json!({"skipped": true, "reason": "no git workflow supplied"}),
+                }
             } else {
-                Ok(EditOutcome::CheckFailed { content, edits, check })
+                json!({"committed": false, "reason": "checks did not pass; unverified changes are never committed"})
+            };
+            if verified {
+                Ok(EditOutcome::Completed { content, edits, check, git: git_record })
+            } else {
+                Ok(EditOutcome::CheckFailed { content, edits, check, git: git_record })
             }
         }
-        other => Ok(EditOutcome::Interrupted { loop_outcome: other, edits }),
+        other => Ok(EditOutcome::Interrupted {
+            loop_outcome: other,
+            edits,
+        }),
     }
 }
 
@@ -222,14 +288,23 @@ mod tests {
     fn completed(content: &str, calls: Vec<ToolCall>) -> af_llm::BackendOutcome {
         af_llm::BackendOutcome::Completed(ChatResult {
             content: content.into(),
-            usage: Usage { tokens_in: Some(1), tokens_out: Some(1), cost_usd: Some(0.0), latency_ms: Some(0) },
+            usage: Usage {
+                tokens_in: Some(1),
+                tokens_out: Some(1),
+                cost_usd: Some(0.0),
+                latency_ms: Some(0),
+            },
             truncated: false,
             tool_calls: calls,
         })
     }
 
     fn call(id: &str, arguments: &str) -> ToolCall {
-        ToolCall { id: id.into(), name: "edit_task".into(), arguments: arguments.into() }
+        ToolCall {
+            id: id.into(),
+            name: "edit_task".into(),
+            arguments: arguments.into(),
+        }
     }
 
     struct Temp {
@@ -263,7 +338,10 @@ mod tests {
             .grant("main", &root, &["lib.py".into()], true)
             .unwrap();
         let mut files = std::collections::BTreeMap::new();
-        files.insert("lib.py".to_string(), b"def helper():\n    return 1\n".to_vec());
+        files.insert(
+            "lib.py".to_string(),
+            b"def helper():\n    return 1\n".to_vec(),
+        );
         let build = af_graph::project::clean_build(&files).unwrap();
         std::fs::write(
             store.join("graph.json"),
@@ -280,11 +358,15 @@ mod tests {
         (Temp { home, root, store }, registry)
     }
 
-    fn toolset<'a>(temp: &'a Temp, registry: &'a af_sandbox::SandboxRegistry, check_exit: i32, max_edits: usize) -> EditToolset<'a> {
-        let document: Value = serde_json::from_str(
-            &std::fs::read_to_string(temp.store.join("graph.json")).unwrap(),
-        )
-        .unwrap();
+    fn toolset<'a>(
+        temp: &'a Temp,
+        registry: &'a af_sandbox::SandboxRegistry,
+        check_exit: i32,
+        max_edits: usize,
+    ) -> EditToolset<'a> {
+        let document: Value =
+            serde_json::from_str(&std::fs::read_to_string(temp.store.join("graph.json")).unwrap())
+                .unwrap();
         let runner = af_exec::JobRunner::open(&temp.home.join("jobs")).unwrap();
         #[cfg(windows)]
         let check_argv = vec!["cmd".into(), "/C".into(), format!("exit {check_exit}")];
@@ -305,12 +387,21 @@ mod tests {
     #[test]
     fn guided_edit_read_apply_check_final() {
         let (temp, registry) = setup();
-        let mut toolset = toolset(&temp, &registry, 0, 4);
+        let toolset = toolset(&temp, &registry, 0, 4);
         let backend = ScriptedBackend::new(
             "scripted",
             vec![
-                completed("", vec![call("c1", r#"{"op":"read_file","path":"lib.py"}"#)]),
-                completed("", vec![call("c2", r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 2\n"}"#)]),
+                completed(
+                    "",
+                    vec![call("c1", r#"{"op":"read_file","path":"lib.py"}"#)],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "c2",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 2\n"}"#,
+                    )],
+                ),
                 completed("", vec![call("c3", r#"{"op":"run_check"}"#)]),
                 completed("helper now returns 2", vec![]),
             ],
@@ -320,19 +411,32 @@ mod tests {
             std::env::set_var("ATOMIC_FLOW_HOME", &temp.home);
             let project = temp.home.join("proj");
             std::fs::create_dir_all(&project).unwrap();
-            let journal = af_journal::SessionJournal::create(&project, Some("guided"), None).unwrap();
+            let journal =
+                af_journal::SessionJournal::create(&project, Some("guided"), None).unwrap();
             std::env::remove_var("ATOMIC_FLOW_HOME");
             ((), journal)
         };
         let outcome = run_edit_task(
-            &router, &toolset, Some(&mut journal), "m", "bump helper", true, LoopLimits::default(),
+            &router,
+            &toolset,
+            Some(&mut journal),
+            "m",
+            "bump helper",
+            true,
+            LoopLimits::default(), None,
         )
         .unwrap();
         match outcome {
-            EditOutcome::Completed { content, edits, check } => {
+            EditOutcome::Completed {
+                content,
+                edits,
+                check,
+                git,
+            } => {
                 assert_eq!(content, "helper now returns 2");
                 assert_eq!(edits, 1);
                 assert_eq!(check["status"], json!("succeeded"));
+                assert_eq!(git["skipped"], json!(true), "no workflow supplied: honest skip");
             }
             other => panic!("expected completed, got {other:?}"),
         }
@@ -347,20 +451,35 @@ mod tests {
         // fixture uses a marker file: check fails while marker absent).
         let (temp, registry) = setup();
         let marker = temp.root.join("marker.tmp");
-        let mut toolset = toolset(&temp, &registry, 0, 4);
+        let toolset = toolset(&temp, &registry, 0, 4);
         // First check must fail: run_check reports exit code of a probe job —
         // model then applies the real edit; final gate re-runs check (pass).
         let backend = ScriptedBackend::new(
             "scripted",
             vec![
-                completed("", vec![call("c1", r#"{"op":"read_file","path":"lib.py"}"#)]),
-                completed("", vec![call("c2", r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 1  # v2\n"}"#)]),
+                completed(
+                    "",
+                    vec![call("c1", r#"{"op":"read_file","path":"lib.py"}"#)],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "c2",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 1  # v2\n"}"#,
+                    )],
+                ),
                 completed("fixed", vec![]),
             ],
         );
         let router = Router::new(vec![Box::new(backend)]);
         let outcome = run_edit_task(
-            &router, &toolset, None, "m", "repair helper", true, LoopLimits::default(),
+            &router,
+            &toolset,
+            None,
+            "m",
+            "repair helper",
+            true,
+            LoopLimits::default(), None,
         )
         .unwrap();
         assert!(matches!(outcome, EditOutcome::Completed { edits: 1, .. }));
@@ -370,18 +489,42 @@ mod tests {
     #[test]
     fn edit_budget_refuses_second_edit() {
         let (temp, registry) = setup();
-        let mut toolset = toolset(&temp, &registry, 0, 1);
+        let toolset = toolset(&temp, &registry, 0, 1);
         let backend = ScriptedBackend::new(
             "scripted",
             vec![
-                completed("", vec![call("c0", r#"{"op":"read_file","path":"lib.py"}"#)]),
-                completed("", vec![call("c1", r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 2\n"}"#)]),
-                completed("", vec![call("c2", r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 3\n"}"#)]),
+                completed(
+                    "",
+                    vec![call("c0", r#"{"op":"read_file","path":"lib.py"}"#)],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "c1",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 2\n"}"#,
+                    )],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "c2",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 3\n"}"#,
+                    )],
+                ),
                 completed("gave up", vec![]),
             ],
         );
         let router = Router::new(vec![Box::new(backend)]);
-        let outcome = run_edit_task(&router, &toolset, None, "m", "two edits", true, LoopLimits::default()).unwrap();
+        let outcome = run_edit_task(
+            &router,
+            &toolset,
+            None,
+            "m",
+            "two edits",
+            true,
+            LoopLimits::default(), None,
+        )
+        .unwrap();
         match outcome {
             EditOutcome::Completed { edits, .. } => assert_eq!(edits, 1),
             other => panic!("expected completed with one edit, got {other:?}"),
@@ -394,17 +537,35 @@ mod tests {
     #[test]
     fn final_gate_fails_when_check_fails() {
         let (temp, registry) = setup();
-        let mut toolset = toolset(&temp, &registry, 1, 4); // check always fails
+        let toolset = toolset(&temp, &registry, 1, 4); // check always fails
         let backend = ScriptedBackend::new(
             "scripted",
             vec![
-                completed("", vec![call("c0", r#"{"op":"read_file","path":"lib.py"}"#)]),
-                completed("", vec![call("c1", r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 9\n"}"#)]),
+                completed(
+                    "",
+                    vec![call("c0", r#"{"op":"read_file","path":"lib.py"}"#)],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "c1",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 9\n"}"#,
+                    )],
+                ),
                 completed("i think it is fine", vec![]),
             ],
         );
         let router = Router::new(vec![Box::new(backend)]);
-        let outcome = run_edit_task(&router, &toolset, None, "m", "optimistic", true, LoopLimits::default()).unwrap();
+        let outcome = run_edit_task(
+            &router,
+            &toolset,
+            None,
+            "m",
+            "optimistic",
+            true,
+            LoopLimits::default(), None,
+        )
+        .unwrap();
         match outcome {
             EditOutcome::CheckFailed { edits, check, .. } => {
                 assert_eq!(edits, 1);
@@ -420,7 +581,16 @@ mod tests {
         let toolset = toolset(&temp, &registry, 0, 4);
         let backend = ScriptedBackend::echo();
         let router = Router::new(vec![Box::new(backend)]);
-        let error = run_edit_task(&router, &toolset, None, "m", "t", false, LoopLimits::default()).unwrap_err();
+        let error = run_edit_task(
+            &router,
+            &toolset,
+            None,
+            "m",
+            "t",
+            false,
+            LoopLimits::default(), None,
+        )
+        .unwrap_err();
         assert!(error.contains("explicit host approval"));
     }
 }

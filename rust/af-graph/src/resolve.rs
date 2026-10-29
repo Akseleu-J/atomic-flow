@@ -5,9 +5,9 @@
 //! uniquely. Ambiguous or unmatched names go to the unresolved report instead
 //! of a guessed edge. Edges carry `facts_class: "inferred"`.
 
-use std::collections::{BTreeMap, BTreeSet};
-use serde_json::{json, Map, Value};
 use crate::schema::edge_id;
+use serde_json::{json, Map, Value};
+use std::collections::{BTreeMap, BTreeSet};
 
 pub const RESOLVER: &str = "name-resolver/1";
 
@@ -26,7 +26,10 @@ pub fn module_map(paths: &[String]) -> BTreeMap<String, String> {
         }
         let dotted = path.strip_suffix(".py").unwrap_or(path).replace('/', ".");
         if path.ends_with("__init__.py") {
-            let package = dotted.strip_suffix(".__init__").unwrap_or(&dotted).to_string();
+            let package = dotted
+                .strip_suffix(".__init__")
+                .unwrap_or(&dotted)
+                .to_string();
             mapping.entry(package).or_insert_with(|| path.clone());
             continue;
         }
@@ -46,11 +49,27 @@ pub fn exports_by_file(nodes: &[Value]) -> BTreeMap<String, BTreeMap<String, Vec
         if kind != "class" && kind != "function" {
             continue;
         }
-        let path = node.get("path").and_then(Value::as_str).unwrap_or_default().to_string();
-        let symbol = node.get("symbol").and_then(Value::as_str).unwrap_or_default();
+        let path = node
+            .get("path")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string();
+        let symbol = node
+            .get("symbol")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         let leaf = symbol.rsplit('.').next().unwrap_or(symbol).to_string();
-        let id = node.get("id").and_then(Value::as_str).unwrap_or_default().to_string();
-        result.entry(path).or_default().entry(leaf).or_default().push(id);
+        let id = node
+            .get("id")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string();
+        result
+            .entry(path)
+            .or_default()
+            .entry(leaf)
+            .or_default()
+            .push(id);
     }
     result
 }
@@ -74,8 +93,16 @@ pub fn infer_file_edges(
     modules: &BTreeMap<String, String>,
     exports: &BTreeMap<String, BTreeMap<String, Vec<String>>>,
 ) -> (Vec<Value>, Vec<String>) {
-    let path = file_node.get("path").and_then(Value::as_str).unwrap_or_default().to_string();
-    let node_id = file_node.get("id").and_then(Value::as_str).unwrap_or_default().to_string();
+    let path = file_node
+        .get("path")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_string();
+    let node_id = file_node
+        .get("id")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_string();
     let imports: Vec<&str> = file_node
         .pointer("/facts/imports")
         .and_then(Value::as_array)
@@ -118,14 +145,20 @@ pub fn infer_file_edges(
     for call in &raw_calls {
         let mut targets: Vec<&String> = Vec::new();
         for target_file in &imported_files {
-            if let Some(found) = exports.get(target_file).and_then(|leaves| leaves.get(*call)) {
+            if let Some(found) = exports
+                .get(target_file)
+                .and_then(|leaves| leaves.get(*call))
+            {
                 targets.extend(found.iter());
             }
         }
         if targets.len() == 1 && imported_leaves.contains(call) {
             edges.push(resolver_edge(&node_id, "calls", targets[0]));
         } else if targets.len() > 1 {
-            unresolved.insert(format!("call {call} (ambiguous: {} candidates)", targets.len()));
+            unresolved.insert(format!(
+                "call {call} (ambiguous: {} candidates)",
+                targets.len()
+            ));
         } else {
             unresolved.insert(format!("call {call} (no imported exporter)"));
         }
@@ -150,11 +183,22 @@ mod tests {
     #[test]
     fn packages_map_to_init() {
         let paths: Vec<String> = ["pkg/__init__.py", "pkg/mod.py", "pkg/sub/__init__.py"]
-            .iter().map(|p| p.to_string()).collect();
+            .iter()
+            .map(|p| p.to_string())
+            .collect();
         let modules = module_map(&paths);
-        assert_eq!(modules.get("pkg").map(String::as_str), Some("pkg/__init__.py"));
-        assert_eq!(modules.get("pkg.mod").map(String::as_str), Some("pkg/mod.py"));
-        assert_eq!(modules.get("pkg.sub").map(String::as_str), Some("pkg/sub/__init__.py"));
+        assert_eq!(
+            modules.get("pkg").map(String::as_str),
+            Some("pkg/__init__.py")
+        );
+        assert_eq!(
+            modules.get("pkg.mod").map(String::as_str),
+            Some("pkg/mod.py")
+        );
+        assert_eq!(
+            modules.get("pkg.sub").map(String::as_str),
+            Some("pkg/sub/__init__.py")
+        );
     }
 
     #[test]
@@ -168,14 +212,21 @@ mod tests {
         )]);
         let (edges, unresolved) = infer_file_edges(&a, &modules, &exports);
         assert_eq!(edges.len(), 2);
-        assert!(edges.iter().any(|e| e["kind"] == "imports" && e["dst"] == "file:b.py"));
-        assert!(edges.iter().any(|e| e["kind"] == "calls" && e["dst"] == "sym:b.py::helper"));
+        assert!(edges
+            .iter()
+            .any(|e| e["kind"] == "imports" && e["dst"] == "file:b.py"));
+        assert!(edges
+            .iter()
+            .any(|e| e["kind"] == "calls" && e["dst"] == "sym:b.py::helper"));
         assert!(unresolved.is_empty());
         assert_eq!(edges[0]["facts_class"], "inferred");
 
         let doubled = BTreeMap::from([(
             "b.py".to_string(),
-            BTreeMap::from([("helper".to_string(), vec!["sym:b.py::helper".into(), "sym:b.py::helper#2".into()])]),
+            BTreeMap::from([(
+                "helper".to_string(),
+                vec!["sym:b.py::helper".into(), "sym:b.py::helper#2".into()],
+            )]),
         )]);
         let (_, unresolved) = infer_file_edges(&a, &modules, &doubled);
         assert!(unresolved.iter().any(|u| u.contains("ambiguous")));
@@ -187,7 +238,10 @@ mod tests {
         let modules = module_map(&["a.py".to_string()]);
         let (edges, unresolved) = infer_file_edges(&a, &modules, &BTreeMap::new());
         assert!(edges.is_empty());
-        assert_eq!(unresolved, vec!["import a".to_string(), "import nowhere.deep".to_string()]);
+        assert_eq!(
+            unresolved,
+            vec!["import a".to_string(), "import nowhere.deep".to_string()]
+        );
     }
 
     #[test]
@@ -202,6 +256,8 @@ mod tests {
         )]);
         let (edges, unresolved) = infer_file_edges(&a, &modules, &exports);
         assert_eq!(edges.len(), 1); // only the imports edge
-        assert!(unresolved.iter().any(|u| u.contains("no imported exporter")));
+        assert!(unresolved
+            .iter()
+            .any(|u| u.contains("no imported exporter")));
     }
 }

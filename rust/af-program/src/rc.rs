@@ -8,7 +8,10 @@ use serde_json::{json, Value};
 #[derive(Debug, Clone, PartialEq)]
 pub enum ChapterStatus {
     /// Accepted in an explicitly stated scope (never "everything").
-    Accepted { scope: String, manifest_sha256: String },
+    Accepted {
+        scope: String,
+        manifest_sha256: String,
+    },
     /// Open with the exact remainder named.
     Open { remainder: String },
 }
@@ -93,9 +96,27 @@ mod tests {
 
     fn registry() -> RcRegistry {
         let mut registry = RcRegistry::new();
-        registry.push(Chapter { id: "P05".into(), required_for_rc: true, status: ChapterStatus::Open { remainder: "evidence follow-up".into() } });
-        registry.push(Chapter { id: "P09".into(), required_for_rc: true, status: ChapterStatus::Open { remainder: "crash matrix".into() } });
-        registry.push(Chapter { id: "P13".into(), required_for_rc: false, status: ChapterStatus::Open { remainder: "surfaces".into() } });
+        registry.push(Chapter {
+            id: "P05".into(),
+            required_for_rc: true,
+            status: ChapterStatus::Open {
+                remainder: "evidence follow-up".into(),
+            },
+        });
+        registry.push(Chapter {
+            id: "P09".into(),
+            required_for_rc: true,
+            status: ChapterStatus::Open {
+                remainder: "crash matrix".into(),
+            },
+        });
+        registry.push(Chapter {
+            id: "P13".into(),
+            required_for_rc: false,
+            status: ChapterStatus::Open {
+                remainder: "surfaces".into(),
+            },
+        });
         registry
     }
 
@@ -104,12 +125,16 @@ mod tests {
         let mut registry = registry();
         assert_eq!(registry.rc_decision()["decision"], json!("not_ready"));
         // Manifest digest is mandatory: renaming a gate cannot pass it.
-        assert!(registry.accept("P05", "functional host core", "short").is_err());
+        assert!(registry
+            .accept("P05", "functional host core", "short")
+            .is_err());
         registry
             .accept("P05", "functional host core", &"a".repeat(64))
             .expect("accept with manifest");
         assert_eq!(registry.rc_decision()["decision"], json!("not_ready"));
-        registry.accept("P09", "crash matrix slice", &"b".repeat(64)).unwrap();
+        registry
+            .accept("P09", "crash matrix slice", &"b".repeat(64))
+            .unwrap();
         let decision = registry.rc_decision();
         assert_eq!(decision["decision"], json!("accepted_in_stated_scopes"));
         // Optional chapters never block the RC gate.

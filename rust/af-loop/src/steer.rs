@@ -80,7 +80,9 @@ impl Steering {
     ) -> SteerResult<af_journal::SessionJournal> {
         let snapshot = parent.read().map_err(|error| SteerError(error.0))?;
         if snapshot.incomplete_tail {
-            return Err(SteerError("fork refuses a session with an interrupted tail".into()));
+            return Err(SteerError(
+                "fork refuses a session with an interrupted tail".into(),
+            ));
         }
         let parent_digest = {
             use sha2::{Digest, Sha256};
@@ -143,7 +145,10 @@ mod tests {
         let resumed = Steering::resume(&mut journal, "owner", "yes, include tests/").unwrap();
         assert_eq!(resumed["event_type"], json!("steering_applied"));
         let snapshot = journal.read().unwrap();
-        assert!(snapshot.events.iter().any(|event| event["event_type"] == json!("question")));
+        assert!(snapshot
+            .events
+            .iter()
+            .any(|event| event["event_type"] == json!("question")));
         assert!(snapshot.unresolved_call_ids().is_empty());
     }
 
@@ -158,7 +163,13 @@ mod tests {
             .append("model_request", &json!({}), Some("call-x"), None, None)
             .unwrap();
         journal
-            .append("model_failed", &json!({}), Some("call-x"), Some("error"), None)
+            .append(
+                "model_failed",
+                &json!({}),
+                Some("call-x"),
+                Some("error"),
+                None,
+            )
             .unwrap();
         let error = Steering::resume(&mut journal, "owner", "go").unwrap_err();
         assert!(error.0.contains("unresolved calls hold the run"));

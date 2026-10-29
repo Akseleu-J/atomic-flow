@@ -3,8 +3,8 @@
 //! headless multi-principal acceptance record (E08). UI is deliberately
 //! absent; every check is machine-readable.
 
-use serde_json::{json, Value};
 use af_llm::{BackendOutcome, ChatBackend, ChatRequest, RouteOutcome, Router};
+use serde_json::{json, Value};
 
 /// E03: a principal scope binds a named principal to its own application
 /// state namespace. Different principals never share registries or journals.
@@ -22,7 +22,10 @@ impl PrincipalScope {
         if self.policy_version.trim().is_empty() {
             return Err("policy version must be bound".into());
         }
-        Ok(format!("principals/{}/policy-{}", self.principal_id, self.policy_version))
+        Ok(format!(
+            "principals/{}/policy-{}",
+            self.principal_id, self.policy_version
+        ))
     }
 }
 
@@ -49,7 +52,10 @@ pub fn egress_allows(class: DataClass, destination: Destination) -> bool {
     match class {
         DataClass::Public => true,
         DataClass::Internal => !matches!(destination, Destination::Browser),
-        DataClass::Confidential => matches!(destination, Destination::LocalDisk | Destination::RemoteWorker),
+        DataClass::Confidential => matches!(
+            destination,
+            Destination::LocalDisk | Destination::RemoteWorker
+        ),
         DataClass::Restricted => matches!(destination, Destination::LocalDisk),
     }
 }
@@ -100,7 +106,10 @@ pub fn router_hold_conformance() -> Value {
     // A scripted hold: unknown after send must produce RouteOutcome::Hold.
     let scripted = af_llm::ScriptedBackend::new(
         "hold-probe",
-        vec![BackendOutcome::Unknown { sent: true, detail: "post-send loss".into() }],
+        vec![BackendOutcome::Unknown {
+            sent: true,
+            detail: "post-send loss".into(),
+        }],
     );
     let router = Router::new(vec![Box::new(scripted)]);
     let request = ChatRequest {
@@ -133,7 +142,10 @@ impl PrincipalAcceptance {
         for scope in &self.scopes {
             namespaces.push(scope.state_namespace()?);
         }
-        let unique = namespaces.iter().collect::<std::collections::BTreeSet<_>>().len();
+        let unique = namespaces
+            .iter()
+            .collect::<std::collections::BTreeSet<_>>()
+            .len();
         if unique != namespaces.len() {
             return Err("principal namespaces must be distinct; shared state is refused".into());
         }
@@ -156,21 +168,40 @@ mod tests {
 
     #[test]
     fn principal_namespaces_are_distinct_and_validated() {
-        let scope_a = PrincipalScope { principal_id: "owner".into(), policy_version: "v1".into() };
-        let scope_b = PrincipalScope { principal_id: "team".into(), policy_version: "v1".into() };
-        assert_ne!(scope_a.state_namespace().unwrap(), scope_b.state_namespace().unwrap());
-        assert!(PrincipalScope { principal_id: String::new(), policy_version: "v1".into() }
-            .state_namespace()
-            .is_err());
-        assert!(PrincipalScope { principal_id: "owner".into(), policy_version: String::new() }
-            .state_namespace()
-            .is_err());
-        let acceptance = PrincipalAcceptance { scopes: vec![scope_a.clone(), scope_b.clone()] };
+        let scope_a = PrincipalScope {
+            principal_id: "owner".into(),
+            policy_version: "v1".into(),
+        };
+        let scope_b = PrincipalScope {
+            principal_id: "team".into(),
+            policy_version: "v1".into(),
+        };
+        assert_ne!(
+            scope_a.state_namespace().unwrap(),
+            scope_b.state_namespace().unwrap()
+        );
+        assert!(PrincipalScope {
+            principal_id: String::new(),
+            policy_version: "v1".into()
+        }
+        .state_namespace()
+        .is_err());
+        assert!(PrincipalScope {
+            principal_id: "owner".into(),
+            policy_version: String::new()
+        }
+        .state_namespace()
+        .is_err());
+        let acceptance = PrincipalAcceptance {
+            scopes: vec![scope_a.clone(), scope_b.clone()],
+        };
         let record = acceptance.build().unwrap();
         assert_eq!(record["headless"], json!(true));
         assert_eq!(record["principals"].as_array().unwrap().len(), 2);
         // Fewer than two principals and duplicated namespaces refuse.
-        let solo = PrincipalAcceptance { scopes: vec![scope_b.clone()] };
+        let solo = PrincipalAcceptance {
+            scopes: vec![scope_b.clone()],
+        };
         assert!(solo.build().is_err());
         let dup = PrincipalAcceptance {
             scopes: vec![scope_b.clone(), scope_b],
@@ -182,10 +213,19 @@ mod tests {
     fn egress_matrix_is_deny_by_default() {
         assert!(egress_allows(DataClass::Public, Destination::ModelProvider));
         assert!(!egress_allows(DataClass::Internal, Destination::Browser));
-        assert!(!egress_allows(DataClass::Confidential, Destination::ModelProvider));
-        assert!(egress_allows(DataClass::Confidential, Destination::RemoteWorker));
+        assert!(!egress_allows(
+            DataClass::Confidential,
+            Destination::ModelProvider
+        ));
+        assert!(egress_allows(
+            DataClass::Confidential,
+            Destination::RemoteWorker
+        ));
         assert!(egress_allows(DataClass::Restricted, Destination::LocalDisk));
-        assert!(!egress_allows(DataClass::Restricted, Destination::RemoteWorker));
+        assert!(!egress_allows(
+            DataClass::Restricted,
+            Destination::RemoteWorker
+        ));
     }
 
     #[test]

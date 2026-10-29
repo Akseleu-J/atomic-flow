@@ -5,8 +5,8 @@
 //! reason (the P04 contract). A weak match is reported as weak; it is never
 //! dressed up as confidence.
 
-use std::collections::{BTreeMap, BTreeSet};
 use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
 
 const STOP_WORDS: [&str; 18] = [
     "the", "a", "an", "of", "for", "and", "to", "in", "is", "are", "on", "at", "by", "with",
@@ -55,7 +55,10 @@ pub fn split_identifier(value: &str) -> Vec<String> {
 
 /// Minimal suffix stemming (the Python draft's "simple stemming").
 pub fn stem(word: &str) -> String {
-    for suffix in ["ations", "ation", "ities", "ingly", "ments", "ness", "ings", "ing", "ies", "ers", "ed", "es", "er", "ly", "s"] {
+    for suffix in [
+        "ations", "ation", "ities", "ingly", "ments", "ness", "ings", "ing", "ies", "ers", "ed",
+        "es", "er", "ly", "s",
+    ] {
         if word.len() > suffix.len() + 2 && word.ends_with(suffix) {
             let stem = &word[..word.len() - suffix.len()];
             return match suffix {
@@ -117,12 +120,18 @@ impl ContextIndex {
             let id = node["id"].as_str().unwrap_or_default().to_string();
             let kind = node["kind"].as_str().unwrap_or_default().to_string();
             let path = node["path"].as_str().unwrap_or_default().to_string();
-            let symbol = node.get("symbol").and_then(Value::as_str).map(str::to_string);
+            let symbol = node
+                .get("symbol")
+                .and_then(Value::as_str)
+                .map(str::to_string);
             let signature = node
                 .pointer("/facts/signature")
                 .and_then(Value::as_str)
                 .map(str::to_string);
-            let summary = node.pointer("/facts/summary").and_then(Value::as_str).map(str::to_string);
+            let summary = node
+                .pointer("/facts/summary")
+                .and_then(Value::as_str)
+                .map(str::to_string);
             let lines = match (
                 node.get("start_line").and_then(Value::as_u64),
                 node.get("end_line").and_then(Value::as_u64),
@@ -131,7 +140,7 @@ impl ContextIndex {
                 _ => None,
             };
             let mut tokens: BTreeMap<String, f64> = BTreeMap::new();
-            let mut add = |text: &str, weight: f64, tokens: &mut BTreeMap<String, f64>| {
+            let add = |text: &str, weight: f64, tokens: &mut BTreeMap<String, f64>| {
                 for token in tokenize(text) {
                     *tokens.entry(token).or_insert(0.0) += weight;
                 }
@@ -146,12 +155,22 @@ impl ContextIndex {
             if let Some(summary) = &summary {
                 add(summary, W_SUMMARY, &mut tokens);
             }
-            for import in node.pointer("/facts/imports").and_then(Value::as_array).into_iter().flatten() {
+            for import in node
+                .pointer("/facts/imports")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+            {
                 if let Some(name) = import.as_str() {
                     add(name, W_IMPORTS, &mut tokens);
                 }
             }
-            for call in node.pointer("/facts/raw_calls").and_then(Value::as_array).into_iter().flatten() {
+            for call in node
+                .pointer("/facts/raw_calls")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+            {
                 if let Some(name) = call.as_str() {
                     add(name, W_CALLEES, &mut tokens);
                 }
@@ -164,14 +183,25 @@ impl ContextIndex {
             let index = entries.len();
             by_id.insert(id.clone(), index);
             entries.push(Entry {
-                id, kind, path, symbol, signature, lines, tokens, neighbors: Vec::new(), is_test,
+                id,
+                kind,
+                path,
+                symbol,
+                signature,
+                lines,
+                tokens,
+                neighbors: Vec::new(),
+                is_test,
             });
         }
         let mut index = ContextIndex { entries, by_id };
         for edge in document["edges"].as_array().cloned().unwrap_or_default() {
             let src = edge["src"].as_str().unwrap_or_default().to_string();
             let dst = edge["dst"].as_str().unwrap_or_default().to_string();
-            let (Some(a), Some(b)) = (index.by_id.get(&src).copied(), index.by_id.get(&dst).copied()) else {
+            let (Some(a), Some(b)) = (
+                index.by_id.get(&src).copied(),
+                index.by_id.get(&dst).copied(),
+            ) else {
                 continue;
             };
             index.entries[a].neighbors.push(dst);
@@ -218,14 +248,21 @@ impl ContextIndex {
 
     /// Lexical search blended with PageRank (0.75/0.25), one-hop spreading,
     /// exact-symbol prior and test-path penalty. Weak coverage is reported.
-    pub fn search(&self, query: &str, k: usize, graph_bias: Option<&BTreeMap<String, f64>>) -> Value {
+    pub fn search(
+        &self,
+        query: &str,
+        k: usize,
+        graph_bias: Option<&BTreeMap<String, f64>>,
+    ) -> Value {
         let query_terms: BTreeSet<String> = tokenize(query).into_iter().collect();
         let mut scored: Vec<(usize, f64, usize)> = Vec::new(); // index, lexical, covered terms
         for (index, entry) in self.entries.iter().enumerate() {
             let mut score = 0.0f64;
             let mut covered = 0usize;
             for term in &query_terms {
-                let Some(weight) = entry.tokens.get(term) else { continue };
+                let Some(weight) = entry.tokens.get(term) else {
+                    continue;
+                };
                 covered += 1;
                 score += weight;
             }
@@ -246,13 +283,26 @@ impl ContextIndex {
         if scored.is_empty() {
             return json!({"results": [], "weak": true, "note": "no lexical match; weak fallback is not confidence"});
         }
-        let max_lexical = scored.iter().map(|(_, score, _)| *score).fold(0.0f64, f64::max);
-        let graph_bias = graph_bias.cloned().unwrap_or_else(|| self.pagerank(0.85, 20));
-        let max_rank = graph_bias.values().cloned().fold(0.0f64, f64::max).max(f64::MIN_POSITIVE);
+        let max_lexical = scored
+            .iter()
+            .map(|(_, score, _)| *score)
+            .fold(0.0f64, f64::max);
+        let graph_bias = graph_bias
+            .cloned()
+            .unwrap_or_else(|| self.pagerank(0.85, 20));
+        let max_rank = graph_bias
+            .values()
+            .cloned()
+            .fold(0.0f64, f64::max)
+            .max(f64::MIN_POSITIVE);
         let mut blended: BTreeMap<usize, f64> = BTreeMap::new();
         for (index, lexical, _) in &scored {
             let lexical_norm = lexical / max_lexical;
-            let rank_norm = graph_bias.get(&self.entries[*index].id).copied().unwrap_or(0.0) / max_rank;
+            let rank_norm = graph_bias
+                .get(&self.entries[*index].id)
+                .copied()
+                .unwrap_or(0.0)
+                / max_rank;
             *blended.entry(*index).or_insert(0.0) += 0.75 * lexical_norm + 0.25 * rank_norm;
         }
         // One-hop spreading: neighbors inherit a fraction of the entry score.
@@ -260,9 +310,15 @@ impl ContextIndex {
             .iter()
             .flat_map(|(index, lexical, _)| {
                 let base = 0.3 * lexical / max_lexical;
-                self.entries[*index].neighbors.iter().filter_map(move |neighbor| {
-                    self.by_id.get(neighbor).copied().map(|target| (target, base))
-                })
+                self.entries[*index]
+                    .neighbors
+                    .iter()
+                    .filter_map(move |neighbor| {
+                        self.by_id
+                            .get(neighbor)
+                            .copied()
+                            .map(|target| (target, base))
+                    })
             })
             .collect();
         for (target, share) in spread {
@@ -270,7 +326,11 @@ impl ContextIndex {
         }
         let mut ranked: Vec<(usize, f64)> = blended.into_iter().collect();
         ranked.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
-        let full_coverage = scored.iter().filter(|(_, _, covered)| *covered == query_terms.len()).count() > 0;
+        let full_coverage = scored
+            .iter()
+            .filter(|(_, _, covered)| *covered == query_terms.len())
+            .count()
+            > 0;
         let results: Vec<Value> = ranked
             .iter()
             .take(k)
@@ -296,7 +356,7 @@ impl ContextIndex {
 
 fn reason_for(entry: &Entry) -> String {
     match (&entry.symbol, &entry.signature) {
-        (Some(symbol), Some(signature)) => format!("symbol match: {signature} at {}", entry.path),
+        (Some(_symbol), Some(signature)) => format!("symbol match: {signature} at {}", entry.path),
         (Some(symbol), None) => format!("symbol match: {symbol} at {}", entry.path),
         (None, _) => format!("path match: {}", entry.path),
     }
@@ -325,7 +385,9 @@ pub fn context_pack(
         let rendered = serde_json::to_string(&entry_json).unwrap_or_default();
         let bytes = rendered.len();
         if used + bytes > byte_budget {
-            items.push(json!({"omitted": true, "reason": "byte budget exhausted", "path": result["path"]}));
+            items.push(
+                json!({"omitted": true, "reason": "byte budget exhausted", "path": result["path"]}),
+            );
             continue;
         }
         used += bytes;
@@ -394,8 +456,14 @@ mod tests {
     #[test]
     fn identifiers_split_and_stem() {
         assert_eq!(split_identifier("TaskScheduler"), vec!["task", "scheduler"]);
-        assert_eq!(split_identifier("HTTPServer_v2"), vec!["httpserver", "v", "2"]);
-        assert_eq!(tokenize("ScheduledTasks runner"), vec!["schedul", "task", "runn"]);
+        assert_eq!(
+            split_identifier("HTTPServer_v2"),
+            vec!["httpserver", "v", "2"]
+        );
+        assert_eq!(
+            tokenize("ScheduledTasks runner"),
+            vec!["schedul", "task", "runn"]
+        );
         assert!(tokenize("the of and").is_empty(), "stop words dropped");
     }
 
@@ -406,22 +474,39 @@ mod tests {
         assert_eq!(results["weak"], json!(false));
         let first = &results["results"][0];
         assert_eq!(first["symbol"], json!("TaskScheduler"));
-        assert!(first["reason"].as_str().unwrap().starts_with("symbol match"));
+        assert!(first["reason"]
+            .as_str()
+            .unwrap()
+            .starts_with("symbol match"));
         // Exact symbol name beats the test file despite the same stem.
         let exact = index.search("TaskScheduler", 5, None);
         assert_eq!(exact["results"][0]["symbol"], json!("TaskScheduler"));
-        let paths: Vec<&str> = exact["results"].as_array().unwrap()
-            .iter().filter_map(|r| r["path"].as_str()).collect();
-        assert!(paths.contains(&"tests/test_scheduler.py"), "test file still retrievable, ranked lower");
+        let paths: Vec<&str> = exact["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|r| r["path"].as_str())
+            .collect();
+        assert!(
+            paths.contains(&"tests/test_scheduler.py"),
+            "test file still retrievable, ranked lower"
+        );
     }
 
     #[test]
     fn spreading_lifts_connected_neighbors() {
         let index = ContextIndex::build(&document());
         let results = index.search("dispatch", 5, None);
-        let paths: Vec<&str> = results["results"].as_array().unwrap()
-            .iter().filter_map(|r| r["path"].as_str()).collect();
-        assert!(paths.contains(&"src/scheduler.py"), "file node lifted by run-method match");
+        let paths: Vec<&str> = results["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|r| r["path"].as_str())
+            .collect();
+        assert!(
+            paths.contains(&"src/scheduler.py"),
+            "file node lifted by run-method match"
+        );
     }
 
     #[test]
@@ -437,12 +522,21 @@ mod tests {
         let index = ContextIndex::build(&document());
         let pack = context_pack(&index, "scheduler tasks", 400, None);
         assert!(pack["bytes_used"].as_u64().unwrap() <= 400);
-        assert!(pack["repo_map"].as_str().unwrap().contains("src/scheduler.py"));
+        assert!(pack["repo_map"]
+            .as_str()
+            .unwrap()
+            .contains("src/scheduler.py"));
         let items = pack["items"].as_array().unwrap();
-        assert!(items.iter().all(|item| item.get("reason").is_some() || item.get("omitted").is_some()));
+        assert!(items
+            .iter()
+            .all(|item| item.get("reason").is_some() || item.get("omitted").is_some()));
         // Tiny budget: nothing fits, omissions are named — never silent.
         let tiny = context_pack(&index, "scheduler tasks", 10, None);
-        assert!(tiny["items"].as_array().unwrap().iter().any(|item| item["omitted"] == json!(true)));
+        assert!(tiny["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["omitted"] == json!(true)));
     }
 
     #[test]

@@ -31,10 +31,15 @@ pub struct RuntimeIdentity {
 
 impl RuntimeIdentity {
     pub fn validate(&self) -> Result<(), String> {
-        for (name, value) in [("base_image_id", &self.base_image_id), ("image_id", &self.image_id)] {
+        for (name, value) in [
+            ("base_image_id", &self.base_image_id),
+            ("image_id", &self.image_id),
+        ] {
             let digest = value.rsplit(':').next().unwrap_or_default();
             if !exact_digest(digest, 64) {
-                return Err(format!("{name} must be an exact image name at SHA256 digest"));
+                return Err(format!(
+                    "{name} must be an exact image name at SHA256 digest"
+                ));
             }
         }
         if self.interpreter.is_empty() || !self.interpreter.starts_with('/') {
@@ -132,7 +137,11 @@ pub struct PrivatePytestIdentity {
     pub optional_test_outcomes: Vec<(String, String)>,
 }
 
-pub const SYMPY_RUNNER_PATHS: [&str; 3] = ["bin/get_sympy.py", "bin/test", "sympy/utilities/runtests.py"];
+pub const SYMPY_RUNNER_PATHS: [&str; 3] = [
+    "bin/get_sympy.py",
+    "bin/test",
+    "sympy/utilities/runtests.py",
+];
 
 fn valid_task_id(value: &str) -> bool {
     let mut chars = value.chars();
@@ -140,7 +149,10 @@ fn valid_task_id(value: &str) -> bool {
         Some(c) if c.is_ascii_alphanumeric() => {}
         _ => return false,
     }
-    value.len() <= 128 && value[1..].bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+    value.len() <= 128
+        && value[1..]
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
 }
 
 fn valid_path_id(value: &str) -> bool {
@@ -149,18 +161,29 @@ fn valid_path_id(value: &str) -> bool {
         Some(c) if c.is_ascii_alphanumeric() || c == '_' => {}
         _ => return false,
     }
-    value[1..].bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'.' | b'/' | b'-'))
+    value[1..]
+        .bytes()
+        .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'.' | b'/' | b'-'))
 }
 
 fn exact_digest(value: &str, size: usize) -> bool {
-    value.len() == size && value.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    value.len() == size
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
 fn valid_test_path(value: &str) -> bool {
     if !valid_path_id(value) || !value.ends_with(".py") {
         return false;
     }
-    value.split('/').all(|part| !part.is_empty() && part != "." && part != ".." && !part.starts_with('.') && !part.starts_with('-'))
+    value.split('/').all(|part| {
+        !part.is_empty()
+            && part != "."
+            && part != ".."
+            && !part.starts_with('.')
+            && !part.starts_with('-')
+    })
 }
 
 /// At most the existing checks profile; independent oracle bounds differ.
@@ -190,14 +213,21 @@ impl CheckResources {
         let caps = [
             ("memory_bytes", self.memory_bytes, 1024u64 * 1024 * 1024),
             ("tmpfs_bytes", self.tmpfs_bytes, 128 * 1024 * 1024),
-            ("output_bytes_per_stream", self.output_bytes_per_stream, 1_000_000),
+            (
+                "output_bytes_per_stream",
+                self.output_bytes_per_stream,
+                1_000_000,
+            ),
         ];
         for (name, value, maximum) in caps {
             if value == 0 || value > maximum {
                 return Err(format!("{name} must be an integer between1 and{maximum}"));
             }
         }
-        for (name, value, maximum) in [("cpus", self.cpus as u64, 2u64), ("pids", self.pids as u64, 128)] {
+        for (name, value, maximum) in [
+            ("cpus", self.cpus as u64, 2u64),
+            ("pids", self.pids as u64, 128),
+        ] {
             if value == 0 || value > maximum {
                 return Err(format!("{name} must be an integer between1 and{maximum}"));
             }
@@ -234,8 +264,15 @@ impl SymPyRunnerIdentity {
         }
         let version_ok = !self.sympy_version.is_empty()
             && self.sympy_version.len() <= 128
-            && self.sympy_version.chars().next().is_some_and(|c| c.is_ascii_alphanumeric())
-            && self.sympy_version.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'.' | b'+' | b'-'));
+            && self
+                .sympy_version
+                .chars()
+                .next()
+                .is_some_and(|c| c.is_ascii_alphanumeric())
+            && self
+                .sympy_version
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'.' | b'+' | b'-'));
         if !version_ok {
             return Err("native SymPy requires an exact bounded package version".into());
         }
@@ -296,7 +333,9 @@ pub struct CheckSpec {
 
 fn valid_image(value: &str) -> bool {
     // [a-z0-9]+([._-][a-z0-9]+)*(:port)?(/segment)*@sha256:[0-9a-f]{64}
-    let Some((reference, digest)) = value.split_once("@sha256:") else { return false };
+    let Some((reference, digest)) = value.split_once("@sha256:") else {
+        return false;
+    };
     if !exact_digest(digest, 64) {
         return false;
     }
@@ -314,15 +353,13 @@ fn valid_image(value: &str) -> bool {
             return false;
         }
     }
-    segments
-        .split('/')
-        .all(|segment| {
-            !segment.is_empty()
-                && segment
-                    .replace(|c: char| c == '.' || c == '_' || c == '-', "")
-                    .chars()
-                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
-        })
+    segments.split('/').all(|segment| {
+        !segment.is_empty()
+            && segment
+                .replace(|c: char| c == '.' || c == '_' || c == '-', "")
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
+    })
 }
 
 impl CheckSpec {
@@ -351,7 +388,8 @@ impl CheckSpec {
                 || self.runner != identity.runner
             {
                 return Err(
-                    "image, interpreter and runner must match the exact private runtime identity".into(),
+                    "image, interpreter and runner must match the exact private runtime identity"
+                        .into(),
                 );
             }
         } else {
@@ -362,7 +400,8 @@ impl CheckSpec {
                 return Err("interpreter must be an admitted absolute image path".into());
             }
         }
-        if self.runner != "pytest" && self.runner != "sympy-native" && self.runner != "pytest-self" {
+        if self.runner != "pytest" && self.runner != "sympy-native" && self.runner != "pytest-self"
+        {
             return Err("unreviewed test runner".into());
         }
         if self.target_root != "/workspace" && self.target_root != "/testbed" {
@@ -379,11 +418,18 @@ impl CheckSpec {
         if self.test_paths.iter().collect::<BTreeSet<_>>().len() != self.test_paths.len() {
             return Err("duplicate test obligations are not admitted".into());
         }
-        if self.runner == "sympy-native" && self.test_paths.iter().any(|path| !path.starts_with("sympy/")) {
+        if self.runner == "sympy-native"
+            && self
+                .test_paths
+                .iter()
+                .any(|path| !path.starts_with("sympy/"))
+        {
             return Err("native SymPy obligations must be under sympy/".into());
         }
         if self.sympy_identity.is_some() && self.runner != "sympy-native" {
-            return Err("native SymPy identity belongs only to a native runner specification".into());
+            return Err(
+                "native SymPy identity belongs only to a native runner specification".into(),
+            );
         }
         if let Some(identity) = &self.sympy_identity {
             identity.validate()?;
@@ -391,21 +437,33 @@ impl CheckSpec {
             // runtime identity with the same version.
             if identity.python_version == (3, 6, 15) {
                 let Some(runtime) = &runtime else {
-                    return Err("Python3.6.15 native SymPy requires an eligible private runtime identity".into());
+                    return Err(
+                        "Python3.6.15 native SymPy requires an eligible private runtime identity"
+                            .into(),
+                    );
                 };
                 if identity.python_version != runtime.python_version {
-                    return Err("native SymPy Python version differs from the private runtime identity".into());
+                    return Err(
+                        "native SymPy Python version differs from the private runtime identity"
+                            .into(),
+                    );
                 }
             }
         }
         if let Some(self_identity) = &self.pytest_self_identity {
             self_identity.validate()?;
             if self.runner != "pytest-self" {
-                return Err("pytest self identity belongs only to a pytest self runner specification".into());
+                return Err(
+                    "pytest self identity belongs only to a pytest self runner specification"
+                        .into(),
+                );
             }
             if let Some(runtime) = &runtime {
                 if self_identity.python_version != runtime.python_version {
-                    return Err("pytest self Python version differs from the private runtime identity".into());
+                    return Err(
+                        "pytest self Python version differs from the private runtime identity"
+                            .into(),
+                    );
                 }
             }
         }
@@ -418,7 +476,9 @@ impl CheckSpec {
                 || private.runtime_digest != runtime.digest()
                 || private.python_version != runtime.python_version
             {
-                return Err("private pytest identity differs from its exact task/runtime/runner".into());
+                return Err(
+                    "private pytest identity differs from its exact task/runtime/runner".into(),
+                );
             }
             let declared_files: BTreeSet<&str> = private
                 .optional_test_outcomes
@@ -427,7 +487,9 @@ impl CheckSpec {
                 .collect();
             let allowed: BTreeSet<&str> = self.test_paths.iter().map(String::as_str).collect();
             if !declared_files.is_subset(&allowed) {
-                return Err("declared optional outcomes require their complete ordinary test files".into());
+                return Err(
+                    "declared optional outcomes require their complete ordinary test files".into(),
+                );
             }
         }
         if self.timeout_seconds == 0 || self.timeout_seconds > 180 {
@@ -458,7 +520,12 @@ impl CheckSpec {
             argv.extend(self.test_paths.iter().cloned());
             argv
         } else if self.runner == "pytest-self" {
-            let mut argv = vec![self.interpreter.clone(), "-m".into(), "pytest".into(), "-rA".into()];
+            let mut argv = vec![
+                self.interpreter.clone(),
+                "-m".into(),
+                "pytest".into(),
+                "-rA".into(),
+            ];
             if self
                 .pytest_self_identity
                 .as_ref()
@@ -469,7 +536,12 @@ impl CheckSpec {
             argv.extend(self.test_paths.iter().cloned());
             argv
         } else {
-            let mut argv = vec![self.interpreter.clone(), "bin/test".into(), "-C".into(), "--verbose".into()];
+            let mut argv = vec![
+                self.interpreter.clone(),
+                "bin/test".into(),
+                "-C".into(),
+                "--verbose".into(),
+            ];
             argv.extend(self.test_paths.iter().cloned());
             argv
         }
@@ -519,7 +591,8 @@ impl CheckSpec {
     }
 }
 
-fn sort_json_in_place(value: &mut Value) {    match value {
+fn sort_json_in_place(value: &mut Value) {
+    match value {
         Value::Object(map) => {
             let keys: Vec<String> = map.keys().cloned().collect();
             let sorted: BTreeMap<String, Value> = keys
@@ -571,7 +644,15 @@ mod tests {
         spec.validate().expect("valid spec");
         assert_eq!(
             spec.argv(),
-            vec!["/usr/local/bin/python", "-m", "pytest", "-q", "--no-header", "-x", "tests/test_basic.py"]
+            vec![
+                "/usr/local/bin/python",
+                "-m",
+                "pytest",
+                "-q",
+                "--no-header",
+                "-x",
+                "tests/test_basic.py"
+            ]
         );
     }
 
@@ -579,7 +660,10 @@ mod tests {
     fn unreviewed_runners_interpreters_and_roots_refuse() {
         let mut bad = spec();
         bad.runner = "shell".into();
-        assert!(bad.validate().unwrap_err().contains("unreviewed test runner"));
+        assert!(bad
+            .validate()
+            .unwrap_err()
+            .contains("unreviewed test runner"));
         let mut bad = spec();
         bad.interpreter = "/bin/sh".into();
         assert!(bad.validate().unwrap_err().contains("interpreter"));
@@ -635,7 +719,13 @@ mod tests {
         native.validate().expect("native spec valid");
         assert_eq!(
             native.argv(),
-            vec!["/opt/miniconda3/envs/testbed/bin/python", "bin/test", "-C", "--verbose", "sympy/core/tests/test_assumptions.py"]
+            vec![
+                "/opt/miniconda3/envs/testbed/bin/python",
+                "bin/test",
+                "-C",
+                "--verbose",
+                "sympy/core/tests/test_assumptions.py"
+            ]
         );
         // Identity belongs only to the native runner.
         let mut wrong = spec();
@@ -663,7 +753,13 @@ mod tests {
         native.validate().expect("pytest-self valid");
         assert_eq!(
             native.argv(),
-            vec!["/usr/local/bin/python", "-m", "pytest", "-rA", "tests/test_self.py"]
+            vec![
+                "/usr/local/bin/python",
+                "-m",
+                "pytest",
+                "-rA",
+                "tests/test_self.py"
+            ]
         );
         native.pytest_self_identity = Some(PytestSelfIdentity {
             python_version: (3, 11, 0),
@@ -703,9 +799,16 @@ mod tests {
             .contains("must match the exact private runtime identity"));
         // Ineligible identity (image equals base) is refused.
         let mut ineligible = bound;
-        ineligible.runtime_identity.as_mut().unwrap().image_id =
-            ineligible.runtime_identity.as_ref().unwrap().base_image_id.clone();
-        assert!(ineligible.validate().unwrap_err().contains("execution-eligible"));
+        ineligible.runtime_identity.as_mut().unwrap().image_id = ineligible
+            .runtime_identity
+            .as_ref()
+            .unwrap()
+            .base_image_id
+            .clone();
+        assert!(ineligible
+            .validate()
+            .unwrap_err()
+            .contains("execution-eligible"));
     }
 
     #[test]
@@ -734,15 +837,22 @@ mod tests {
         assert!(bound.argv().contains(&"no:cacheprovider".to_string()));
         // Optional outcomes outside the ordinary test files are refused.
         let mut drifting = bound.clone();
-        drifting.private_pytest_identity.as_mut().unwrap().optional_test_outcomes =
-            vec![("tests/other.py::test_x".into(), "skip".into())];
+        drifting
+            .private_pytest_identity
+            .as_mut()
+            .unwrap()
+            .optional_test_outcomes = vec![("tests/other.py::test_x".into(), "skip".into())];
         assert!(drifting
             .validate()
             .unwrap_err()
             .contains("require their complete ordinary test files"));
         // Digest drift is refused.
         let mut digest_drift = bound;
-        digest_drift.private_pytest_identity.as_mut().unwrap().runtime_digest = "f".repeat(64);
+        digest_drift
+            .private_pytest_identity
+            .as_mut()
+            .unwrap()
+            .runtime_digest = "f".repeat(64);
         assert!(digest_drift
             .validate()
             .unwrap_err()

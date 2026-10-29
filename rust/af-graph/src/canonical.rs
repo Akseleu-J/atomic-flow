@@ -97,7 +97,10 @@ mod tests {
         let value = json!({"b": 1, "a": {"z": [1, 2], "": "x\"y"}, "list": []});
         // Python: json.dumps(value, sort_keys=True, ensure_ascii=False, indent=1) + "\n"
         let expected = "{\n \"a\": {\n  \"\": \"x\\\"y\",\n  \"z\": [\n   1,\n   2\n  ]\n },\n \"b\": 1,\n \"list\": []\n}\n";
-        assert_eq!(String::from_utf8(canonical_bytes(&value)).unwrap(), expected);
+        assert_eq!(
+            String::from_utf8(canonical_bytes(&value)).unwrap(),
+            expected
+        );
     }
 
     #[test]

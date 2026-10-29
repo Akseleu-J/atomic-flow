@@ -6,11 +6,8 @@
 //! here. Tools come from the caller (kernel tools wire the sandbox/executor);
 //! the loop itself is provider-shaped, not provider-bound.
 
+use af_llm::{Cancel, ChatMessage, ChatRequest, RouteOutcome, Router, ToolCall, ToolSpec};
 use serde_json::{json, Value};
-use af_llm::{
-    parsed_tool_calls, BackendOutcome, Cancel, ChatMessage, ChatRequest, ChatResult, Router,
-    RouteOutcome, ToolCall, ToolSpec,
-};
 
 pub mod edit;
 pub mod schedule;
@@ -38,18 +35,29 @@ pub struct LoopLimits {
 
 impl Default for LoopLimits {
     fn default() -> Self {
-        LoopLimits { max_turns: 12, max_tool_calls: 24 }
+        LoopLimits {
+            max_turns: 12,
+            max_tool_calls: 24,
+        }
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum LoopOutcome {
     /// The model produced a final answer without further tool requests.
-    Final { content: String, turns: usize, tool_calls_used: usize },
+    Final {
+        content: String,
+        turns: usize,
+        tool_calls_used: usize,
+    },
     /// The route is on hold (unknown outcome after send); never retried here.
     Hold { backend: String, detail: String },
     /// Turn or tool-call budget exhausted; the transcript is preserved.
-    BudgetExhausted { reason: String, turns: usize, tool_calls_used: usize },
+    BudgetExhausted {
+        reason: String,
+        turns: usize,
+        tool_calls_used: usize,
+    },
 }
 
 pub struct TurnLoop<'a> {
@@ -66,10 +74,21 @@ impl<'a> TurnLoop<'a> {
         journal: Option<&'a mut af_journal::SessionJournal>,
         limits: LoopLimits,
     ) -> TurnLoop<'a> {
-        TurnLoop { router, tools, journal, limits }
+        TurnLoop {
+            router,
+            tools,
+            journal,
+            limits,
+        }
     }
 
-    fn record(&mut self, event_type: &str, payload: Value, call_id: Option<&str>, outcome: Option<&str>) {
+    fn record(
+        &mut self,
+        event_type: &str,
+        payload: Value,
+        call_id: Option<&str>,
+        outcome: Option<&str>,
+    ) {
         if let Some(journal) = self.journal.as_deref_mut() {
             let _ = journal.append(event_type, &payload, call_id, outcome, None);
         }
@@ -80,9 +99,9 @@ impl<'a> TurnLoop<'a> {
     }
 
     fn execute_tool(&self, call: &ToolCall) -> Value {
-        let arguments: Value = serde_json::from_str(&call.arguments).unwrap_or_else(|error| {
-            json!({"error": format!("arguments are not valid JSON: {error}")})
-        });
+        let arguments: Value = serde_json::from_str(&call.arguments).unwrap_or_else(
+            |error| json!({"error": format!("arguments are not valid JSON: {error}")}),
+        );
         let Some(tool) = self.tools.iter().find(|tool| tool.spec().name == call.name) else {
             return json!({"error": format!("unknown tool {}", call.name)});
         };
@@ -90,7 +109,12 @@ impl<'a> TurnLoop<'a> {
     }
 
     /// Run the bounded loop from the given conversation.
-    pub fn run(&mut self, model: &str, mut messages: Vec<ChatMessage>, cancel: &Cancel) -> LoopResult<LoopOutcome> {
+    pub fn run(
+        &mut self,
+        model: &str,
+        mut messages: Vec<ChatMessage>,
+        cancel: &Cancel,
+    ) -> LoopResult<LoopOutcome> {
         let mut turns = 0usize;
         let mut tool_calls_used = 0usize;
         loop {
@@ -141,8 +165,15 @@ impl<'a> TurnLoop<'a> {
                         });
                     }
                     // Assistant message with the requested calls…
-                    let calls_value = json!(result.tool_calls.iter().map(raw_tool_call).collect::<Vec<_>>());
-                    messages.push(ChatMessage::assistant_with_tool_calls(&result.content, calls_value));
+                    let calls_value = json!(result
+                        .tool_calls
+                        .iter()
+                        .map(raw_tool_call)
+                        .collect::<Vec<_>>());
+                    messages.push(ChatMessage::assistant_with_tool_calls(
+                        &result.content,
+                        calls_value,
+                    ));
                     // …and one tool result per call, executed by the kernel.
                     for call in &result.tool_calls {
                         if tool_calls_used >= self.limits.max_tool_calls {
@@ -161,17 +192,35 @@ impl<'a> TurnLoop<'a> {
                         );
                         let result_value = self.execute_tool(call);
                         tool_calls_used += 1;
-                        self.record("tool_result", json!({"name": call.name, "result": result_value}), Some(&tool_call_id), Some("success"));
-                        messages.push(ChatMessage::tool_result(&call.id, &result_value.to_string()));
+                        self.record(
+                            "tool_result",
+                            json!({"name": call.name, "result": result_value}),
+                            Some(&tool_call_id),
+                            Some("success"),
+                        );
+                        messages.push(ChatMessage::tool_result(
+                            &call.id,
+                            &result_value.to_string(),
+                        ));
                     }
                 }
                 RouteOutcome::Hold { backend, detail } => {
                     // Unknown after send: the charge is unknown, the loop holds.
-                    self.record("model_failed", json!({"detail": detail}), Some(&call_id), Some("unknown"));
+                    self.record(
+                        "model_failed",
+                        json!({"detail": detail}),
+                        Some(&call_id),
+                        Some("unknown"),
+                    );
                     return Ok(LoopOutcome::Hold { backend, detail });
                 }
                 RouteOutcome::Exhausted { refusals } => {
-                    self.record("model_failed", json!({"refusals": refusals}), Some(&call_id), Some("refused"));
+                    self.record(
+                        "model_failed",
+                        json!({"refusals": refusals}),
+                        Some(&call_id),
+                        Some("refused"),
+                    );
                     return Ok(LoopOutcome::BudgetExhausted {
                         reason: format!("route exhausted before inference: {refusals:?}"),
                         turns,
@@ -193,7 +242,7 @@ fn raw_tool_call(call: &ToolCall) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use af_llm::{ScriptedBackend, Usage};
+    use af_llm::{parsed_tool_calls, BackendOutcome, ChatResult, ScriptedBackend, Usage};
     use serde_json::json;
     use std::cell::RefCell;
 
@@ -205,7 +254,10 @@ mod tests {
 
     impl CountingTool {
         fn new(name: &str) -> CountingTool {
-            CountingTool { name: name.to_string(), counter: RefCell::new(0) }
+            CountingTool {
+                name: name.to_string(),
+                counter: RefCell::new(0),
+            }
         }
     }
 
@@ -227,28 +279,44 @@ mod tests {
     fn completed(content: &str, tool_calls: Vec<ToolCall>) -> BackendOutcome {
         BackendOutcome::Completed(ChatResult {
             content: content.to_string(),
-            usage: Usage { tokens_in: Some(1), tokens_out: Some(1), cost_usd: Some(0.0), latency_ms: Some(0) },
+            usage: Usage {
+                tokens_in: Some(1),
+                tokens_out: Some(1),
+                cost_usd: Some(0.0),
+                latency_ms: Some(0),
+            },
             truncated: false,
             tool_calls,
         })
     }
 
     fn call(id: &str, name: &str, arguments: &str) -> ToolCall {
-        ToolCall { id: id.into(), name: name.into(), arguments: arguments.into() }
+        ToolCall {
+            id: id.into(),
+            name: name.into(),
+            arguments: arguments.into(),
+        }
     }
 
     fn temp_journal() -> (std::path::PathBuf, af_journal::SessionJournal) {
         // The environment variable is process-wide: serialize the window in
         // which it is repointed, like the af-journal tests do.
         static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let guard = ENV_LOCK.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+        let guard = ENV_LOCK
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
         let home = std::env::temp_dir().join(format!("af-loop-{}", af_entropy::token()));
         std::fs::create_dir_all(&home).unwrap();
         let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
         std::env::set_var("ATOMIC_FLOW_HOME", &home);
         let project = home.join("proj");
         std::fs::create_dir_all(&project).unwrap();
-        let journal = af_journal::SessionJournal::create(&project, Some(&format!("loop{}", af_entropy::token())), None).unwrap();
+        let journal = af_journal::SessionJournal::create(
+            &project,
+            Some(&format!("loop{}", af_entropy::token())),
+            None,
+        )
+        .unwrap();
         match previous {
             Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
             None => std::env::remove_var("ATOMIC_FLOW_HOME"),
@@ -271,13 +339,22 @@ mod tests {
         let tools: Vec<Box<dyn KernelTool>> = vec![Box::new(tool)];
         let (_home, mut journal) = temp_journal();
         let outcome = {
-            let mut loop_ = TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
+            let mut loop_ =
+                TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
             loop_
-                .run("test-model", vec![ChatMessage::new("user", "probe it")], &Cancel::new())
+                .run(
+                    "test-model",
+                    vec![ChatMessage::new("user", "probe it")],
+                    &Cancel::new(),
+                )
                 .unwrap()
         };
         match outcome {
-            LoopOutcome::Final { content, turns, tool_calls_used } => {
+            LoopOutcome::Final {
+                content,
+                turns,
+                tool_calls_used,
+            } => {
                 assert_eq!(content, "done");
                 assert_eq!(turns, 2);
                 assert_eq!(tool_calls_used, 1);
@@ -305,7 +382,11 @@ mod tests {
         struct AssertingTool;
         impl KernelTool for AssertingTool {
             fn spec(&self) -> ToolSpec {
-                ToolSpec { name: "probe".into(), description: String::new(), parameters: json!({"type": "object"}) }
+                ToolSpec {
+                    name: "probe".into(),
+                    description: String::new(),
+                    parameters: json!({"type": "object"}),
+                }
             }
             fn execute(&self, arguments: &Value) -> Value {
                 assert_eq!(arguments["x"], json!(7));
@@ -315,13 +396,17 @@ mod tests {
         let tools: Vec<Box<dyn KernelTool>> = vec![Box::new(AssertingTool)];
         let (_home, mut journal) = temp_journal();
         let mut loop_ = TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
-        let outcome = loop_.run("m", vec![ChatMessage::new("user", "go")], &Cancel::new()).unwrap();
+        let outcome = loop_
+            .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new())
+            .unwrap();
         assert!(matches!(outcome, LoopOutcome::Final { content, .. } if content == "model-saw-7"));
     }
 
     #[test]
     fn turn_budget_exhausts_and_preserves_counts() {
-        let calls = (0..10).map(|i| call(&format!("c{i}"), "probe", "{}")).collect();
+        let calls = (0..10)
+            .map(|i| call(&format!("c{i}"), "probe", "{}"))
+            .collect();
         let backend = ScriptedBackend::new("scripted", vec![completed("", calls)]);
         let router = Router::new(vec![Box::new(backend)]);
         let tool = CountingTool::new("probe");
@@ -331,11 +416,20 @@ mod tests {
             &router,
             &tools,
             Some(&mut journal),
-            LoopLimits { max_turns: 12, max_tool_calls: 3 },
+            LoopLimits {
+                max_turns: 12,
+                max_tool_calls: 3,
+            },
         );
-        let outcome = loop_.run("m", vec![ChatMessage::new("user", "go")], &Cancel::new()).unwrap();
+        let outcome = loop_
+            .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new())
+            .unwrap();
         match outcome {
-            LoopOutcome::BudgetExhausted { reason, tool_calls_used, .. } => {
+            LoopOutcome::BudgetExhausted {
+                reason,
+                tool_calls_used,
+                ..
+            } => {
                 assert!(reason.contains("mid-turn"));
                 assert_eq!(tool_calls_used, 3);
             }
@@ -347,14 +441,20 @@ mod tests {
     fn hold_stops_the_loop_with_unresolved_journal_evidence() {
         let backend = ScriptedBackend::new(
             "scripted",
-            vec![BackendOutcome::Unknown { sent: true, detail: "timeout after send".into() }],
+            vec![BackendOutcome::Unknown {
+                sent: true,
+                detail: "timeout after send".into(),
+            }],
         );
         let router = Router::new(vec![Box::new(backend)]);
         let tools: Vec<Box<dyn KernelTool>> = vec![Box::new(CountingTool::new("probe"))];
         let (_home, mut journal) = temp_journal();
         let outcome = {
-            let mut loop_ = TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
-            loop_.run("m", vec![ChatMessage::new("user", "go")], &Cancel::new()).unwrap()
+            let mut loop_ =
+                TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
+            loop_
+                .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new())
+                .unwrap()
         };
         match outcome {
             LoopOutcome::Hold { backend, detail } => {
@@ -381,7 +481,9 @@ mod tests {
         let tools: Vec<Box<dyn KernelTool>> = vec![Box::new(CountingTool::new("probe"))];
         let (_home, mut journal) = temp_journal();
         let mut loop_ = TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default());
-        let outcome = loop_.run("m", vec![ChatMessage::new("user", "go")], &Cancel::new()).unwrap();
+        let outcome = loop_
+            .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new())
+            .unwrap();
         assert!(matches!(outcome, LoopOutcome::Final { content, .. } if content == "recovered"));
     }
 

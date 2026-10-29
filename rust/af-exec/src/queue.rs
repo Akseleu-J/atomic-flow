@@ -4,8 +4,8 @@
 //! can start or resume a job twice. Backpressure refuses new submissions at
 //! the cap instead of silently queueing forever.
 
-use std::collections::{BTreeMap, BTreeSet};
 use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum EntryState {
@@ -67,14 +67,22 @@ impl AdmissionQueue {
             .filter(|entry| matches!(entry.state, EntryState::Queued | EntryState::Claimed { .. }))
             .count();
         if queued >= self.max_queued {
-            return Err(QueueError("admission queue is at capacity; backpressure applied".into()));
+            return Err(QueueError(
+                "admission queue is at capacity; backpressure applied".into(),
+            ));
         }
         if !spec.is_object() {
             return Err(QueueError("job spec must be an object".into()));
         }
         let seq = self.next_seq;
         self.next_seq += 1;
-        self.entries.insert(seq, Entry { spec, state: EntryState::Queued });
+        self.entries.insert(
+            seq,
+            Entry {
+                spec,
+                state: EntryState::Queued,
+            },
+        );
         Ok(seq)
     }
 
@@ -89,8 +97,14 @@ impl AdmissionQueue {
             return Ok(None);
         };
         let fence = format!("fence_{}:{}", self.epoch, seq);
-        self.entries.get_mut(&seq).unwrap().state = EntryState::Claimed { fence: fence.clone() };
-        Ok(Some(ClaimTicket { seq, fence, spec: _entry.spec }))
+        self.entries.get_mut(&seq).unwrap().state = EntryState::Claimed {
+            fence: fence.clone(),
+        };
+        Ok(Some(ClaimTicket {
+            seq,
+            fence,
+            spec: _entry.spec,
+        }))
     }
 
     /// After an unknown claim outcome: bump the epoch; all outstanding fences
@@ -118,11 +132,18 @@ impl AdmissionQueue {
             return Err(QueueError(format!("unknown seq {seq}")));
         };
         match &entry.state {
-            EntryState::Claimed { fence: held } if held == fence && fence_is_live(fence, self.epoch) => {
-                entry.state = EntryState::Resolved { fence: fence.to_string(), outcome };
+            EntryState::Claimed { fence: held }
+                if held == fence && fence_is_live(fence, self.epoch) =>
+            {
+                entry.state = EntryState::Resolved {
+                    fence: fence.to_string(),
+                    outcome,
+                };
                 Ok(())
             }
-            _ => Err(QueueError("stale or foreign fence; reconcile through a new epoch".into())),
+            _ => Err(QueueError(
+                "stale or foreign fence; reconcile through a new epoch".into(),
+            )),
         }
     }
 
@@ -191,7 +212,10 @@ mod tests {
         let ticket = queue.claim().unwrap().expect("claim");
         assert_eq!(ticket.seq, first);
         assert!(ticket.fence.starts_with("fence_1:"));
-        assert_eq!(queue.snapshot()["entries"][0]["state"], json!(format!("claimed:{}", ticket.fence)));
+        assert_eq!(
+            queue.snapshot()["entries"][0]["state"],
+            json!(format!("claimed:{}", ticket.fence))
+        );
     }
 
     #[test]
@@ -209,14 +233,24 @@ mod tests {
         let ticket = queue.claim().unwrap().unwrap();
         // Unknown outcome: bump the epoch; the old fence must die.
         queue.bump_epoch("claim outcome unknown after worker disconnect");
-        let error = queue.resolve(seq, &ticket.fence, json!("succeeded")).unwrap_err();
+        let error = queue
+            .resolve(seq, &ticket.fence, json!("succeeded"))
+            .unwrap_err();
         assert!(error.0.contains("stale or foreign fence"));
         // A claim under the new epoch gets a fresh, live fence.
         let new_ticket = queue.claim().unwrap().expect("re-claim under new epoch");
-        assert_eq!(new_ticket.seq, seq, "the same job is offered, never silently duplicated elsewhere");
+        assert_eq!(
+            new_ticket.seq, seq,
+            "the same job is offered, never silently duplicated elsewhere"
+        );
         assert!(new_ticket.fence.starts_with("fence_2:"));
-        queue.resolve(seq, &new_ticket.fence, json!({"status": "succeeded"})).unwrap();
-        assert_eq!(queue.snapshot()["entries"][0]["state"], json!(format!("resolved:{}", json!({"status": "succeeded"}))));
+        queue
+            .resolve(seq, &new_ticket.fence, json!({"status": "succeeded"}))
+            .unwrap();
+        assert_eq!(
+            queue.snapshot()["entries"][0]["state"],
+            json!(format!("resolved:{}", json!({"status": "succeeded"})))
+        );
     }
 
     #[test]
@@ -224,10 +258,16 @@ mod tests {
         let mut queue = AdmissionQueue::new(2).unwrap();
         let seq = queue.submit(spec("a")).unwrap();
         assert!(queue.cancel(seq).unwrap());
-        assert!(queue.claim().unwrap().is_none(), "cancelled entries are not claimable");
+        assert!(
+            queue.claim().unwrap().is_none(),
+            "cancelled entries are not claimable"
+        );
         let other = queue.submit(spec("b")).unwrap();
         let _ticket = queue.claim().unwrap().unwrap();
-        assert!(!queue.cancel(other).unwrap(), "claimed entries need reconciliation, not cancel");
+        assert!(
+            !queue.cancel(other).unwrap(),
+            "claimed entries need reconciliation, not cancel"
+        );
         assert!(queue.cancel(999).is_err());
     }
 

@@ -5,8 +5,8 @@
 //! binary or platform is unavailable; the driver kind is recorded with every
 //! job so the isolation boundary is always visible in evidence.
 
-use std::path::{Path, PathBuf};
 use serde_json::{json, Value};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverKind {
@@ -29,9 +29,7 @@ impl DriverKind {
     /// The honest isolation statement for evidence records.
     pub fn isolation_statement(&self) -> &'static str {
         match self {
-            DriverKind::LocalTrusted => {
-                "lifetime control only; NO filesystem or network isolation"
-            }
+            DriverKind::LocalTrusted => "lifetime control only; NO filesystem or network isolation",
             DriverKind::Docker => "container boundary; shared kernel",
             DriverKind::Gvisor => "user-space kernel interception; strong syscall boundary",
             DriverKind::Firecracker => "microVM; kernel-level isolation",
@@ -174,7 +172,9 @@ impl SandboxDriver for FirecrackerDriver {
     }
 
     fn probe(&self) -> DriverProbe {
-        DriverProbe { binary: "firecracker" }
+        DriverProbe {
+            binary: "firecracker",
+        }
     }
 
     fn available(&self) -> bool {
@@ -211,8 +211,11 @@ pub fn select_driver<'a>(candidates: &[&'a dyn SandboxDriver]) -> Option<&'a dyn
         DriverKind::Docker => 2,
         DriverKind::LocalTrusted => 3,
     };
-    let mut available: Vec<&'a dyn SandboxDriver> =
-        candidates.iter().filter(|driver| driver.available()).copied().collect();
+    let mut available: Vec<&'a dyn SandboxDriver> = candidates
+        .iter()
+        .filter(|driver| driver.available())
+        .copied()
+        .collect();
     available.sort_by_key(|driver| order(driver.kind()));
     available.first().copied()
 }
@@ -256,8 +259,18 @@ mod tests {
     #[test]
     fn docker_argv_carries_the_control_matrix() {
         let command = DockerDriver.command(&job());
-        for expected in ["--network", "none", "--read-only", "--cap-drop", "ALL", "no-new-privileges"] {
-            assert!(command.iter().any(|part| part.contains(expected)), "missing {expected}");
+        for expected in [
+            "--network",
+            "none",
+            "--read-only",
+            "--cap-drop",
+            "ALL",
+            "no-new-privileges",
+        ] {
+            assert!(
+                command.iter().any(|part| part.contains(expected)),
+                "missing {expected}"
+            );
         }
         let expected_image = format!("p07-oracle@sha256:{}", "a".repeat(64));
         assert!(command.contains(&expected_image));
@@ -279,7 +292,9 @@ mod tests {
 
     #[test]
     fn local_trusted_is_named_honestly() {
-        assert!(DriverKind::LocalTrusted.isolation_statement().contains("NO filesystem"));
+        assert!(DriverKind::LocalTrusted
+            .isolation_statement()
+            .contains("NO filesystem"));
         let evidence = run_evidence(&LocalTrustedDriver, &job(), &json!({"status": "succeeded"}));
         assert_eq!(evidence["driver"], json!("local-trusted"));
         assert!(evidence["isolation"].as_str().unwrap().contains("NO"));
@@ -289,11 +304,23 @@ mod tests {
     fn selection_prefers_the_strongest_available_boundary() {
         // Only local-trusted and docker are plausibly on this machine; the
         // selector must prefer docker when present and never invent drivers.
-        let candidates: [&dyn SandboxDriver; 4] =
-            [&FirecrackerDriver { kernel_image: "k".into(), rootfs_image: "r".into() }, &GvisorDriver, &DockerDriver, &LocalTrustedDriver];
+        let candidates: [&dyn SandboxDriver; 4] = [
+            &FirecrackerDriver {
+                kernel_image: "k".into(),
+                rootfs_image: "r".into(),
+            },
+            &GvisorDriver,
+            &DockerDriver,
+            &LocalTrustedDriver,
+        ];
         let selected = select_driver(&candidates);
-        let chosen = selected.expect("at least local-trusted is available").kind();
-        assert!(matches!(chosen, DriverKind::Docker | DriverKind::LocalTrusted | DriverKind::Gvisor));
+        let chosen = selected
+            .expect("at least local-trusted is available")
+            .kind();
+        assert!(matches!(
+            chosen,
+            DriverKind::Docker | DriverKind::LocalTrusted | DriverKind::Gvisor
+        ));
         // An empty candidate list selects nothing.
         let none: [&dyn SandboxDriver; 0] = [];
         assert!(select_driver(&none).is_none());
@@ -301,7 +328,10 @@ mod tests {
 
     #[test]
     fn firecracker_is_unavailable_off_linux() {
-        let driver = FirecrackerDriver { kernel_image: "k".into(), rootfs_image: "r".into() };
+        let driver = FirecrackerDriver {
+            kernel_image: "k".into(),
+            rootfs_image: "r".into(),
+        };
         if !cfg!(target_os = "linux") {
             assert!(!driver.available(), "honest refusal off Linux");
         }

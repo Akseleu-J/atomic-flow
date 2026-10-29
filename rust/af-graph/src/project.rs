@@ -3,13 +3,15 @@
 //! deliberately NOT resolution; true call/import resolution lives in the
 //! resolver and is what deltas recompute.
 
-use std::collections::BTreeMap;
-use serde_json::{json, Value};
 use crate::adapter_resource::adapt_source;
 use crate::resolve::{exports_by_file, infer_file_edges, module_map};
+use serde_json::{json, Value};
+use std::collections::BTreeMap;
 
 /// Full clean build: per-file adapters + resolver over all files.
-pub fn clean_build(files: &BTreeMap<String, Vec<u8>>) -> Result<Value, crate::schema::GraphContractError> {
+pub fn clean_build(
+    files: &BTreeMap<String, Vec<u8>>,
+) -> Result<Value, crate::schema::GraphContractError> {
     let mut nodes: Vec<Value> = Vec::new();
     let mut edges: Vec<Value> = Vec::new();
     let mut reverse_imports: BTreeMap<String, Vec<String>> = BTreeMap::new();
@@ -19,14 +21,30 @@ pub fn clean_build(files: &BTreeMap<String, Vec<u8>>) -> Result<Value, crate::sc
         nodes.extend(payload["nodes"].as_array().cloned().unwrap_or_default());
         edges.extend(payload["edges"].as_array().cloned().unwrap_or_default());
         let file_node = &payload["nodes"].as_array().unwrap()[0];
-        for name in file_node.pointer("/facts/imports").and_then(Value::as_array).into_iter().flatten() {
+        for name in file_node
+            .pointer("/facts/imports")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+        {
             if let Some(name) = name.as_str() {
-                reverse_imports.entry(name.to_string()).or_default().push(path.clone());
+                reverse_imports
+                    .entry(name.to_string())
+                    .or_default()
+                    .push(path.clone());
             }
         }
-        for name in file_node.pointer("/facts/raw_calls").and_then(Value::as_array).into_iter().flatten() {
+        for name in file_node
+            .pointer("/facts/raw_calls")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+        {
             if let Some(name) = name.as_str() {
-                reverse_calls.entry(name.to_string()).or_default().push(path.clone());
+                reverse_calls
+                    .entry(name.to_string())
+                    .or_default()
+                    .push(path.clone());
             }
         }
     }
@@ -36,7 +54,10 @@ pub fn clean_build(files: &BTreeMap<String, Vec<u8>>) -> Result<Value, crate::sc
         if kind == "class" || kind == "function" {
             let symbol = node["symbol"].as_str().unwrap_or_default();
             let leaf = symbol.rsplit('.').next().unwrap_or(symbol).to_string();
-            exports.entry(leaf).or_default().push(node["id"].as_str().unwrap_or_default().to_string());
+            exports
+                .entry(leaf)
+                .or_default()
+                .push(node["id"].as_str().unwrap_or_default().to_string());
         }
     }
     let paths: Vec<String> = files.keys().cloned().collect();
@@ -79,8 +100,19 @@ pub fn affected_by_name(reverse: &Value, names: &[&str]) -> Vec<String> {
 
 /// Ignore patterns from `tree/defaults.py::DEFAULT_IGNORE` (subset in use).
 pub const DEFAULT_IGNORE: [&str; 13] = [
-    ".git", ".venv", "venv", "node_modules", "__pycache__", ".atomic_flow", "dist", "build",
-    ".mypy_cache", ".pytest_cache", ".ruff_cache", "*.egg-info", "package-lock.json",
+    ".git",
+    ".venv",
+    "venv",
+    "node_modules",
+    "__pycache__",
+    ".atomic_flow",
+    "dist",
+    "build",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    "*.egg-info",
+    "package-lock.json",
 ];
 
 /// Extensions adapted by the structural graph: Python sources and UA
@@ -99,7 +131,8 @@ pub fn collect_source_files(root: &std::path::Path) -> Result<BTreeMap<String, V
     let mut stack = vec![root.to_path_buf()];
     let mut visited = 0usize;
     while let Some(folder) = stack.pop() {
-        let entries = std::fs::read_dir(&folder).map_err(|error| format!("scan failed: {error}"))?;
+        let entries =
+            std::fs::read_dir(&folder).map_err(|error| format!("scan failed: {error}"))?;
         for entry in entries.filter_map(|e| e.ok()) {
             visited += 1;
             if visited > 200_000 {
@@ -109,11 +142,16 @@ pub fn collect_source_files(root: &std::path::Path) -> Result<BTreeMap<String, V
             if name.starts_with('.') && name != ".github" {
                 continue;
             }
-            if DEFAULT_IGNORE.iter().any(|pattern| project_glob(pattern, &name)) {
+            if DEFAULT_IGNORE
+                .iter()
+                .any(|pattern| project_glob(pattern, &name))
+            {
                 continue;
             }
             let path = entry.path();
-            let file_type = entry.file_type().map_err(|error| format!("scan failed: {error}"))?;
+            let file_type = entry
+                .file_type()
+                .map_err(|error| format!("scan failed: {error}"))?;
             if file_type.is_dir() {
                 stack.push(path);
                 continue;
@@ -121,12 +159,16 @@ pub fn collect_source_files(root: &std::path::Path) -> Result<BTreeMap<String, V
             if file_type.is_symlink() {
                 return Err("graph snapshot requires regular source files".into());
             }
-            let dot = path.extension().and_then(|e| e.to_str()).map(|e| format!(".{}", e.to_ascii_lowercase()));
+            let dot = path
+                .extension()
+                .and_then(|e| e.to_str())
+                .map(|e| format!(".{}", e.to_ascii_lowercase()));
             let Some(dot) = dot else { continue };
             if !GRAPH_SUFFIXES.contains(&dot.as_str()) || name.ends_with(".pyc") {
                 continue;
             }
-            let bytes = std::fs::read(&path).map_err(|error| format!("read failed for {name:?}: {error}"))?;
+            let bytes = std::fs::read(&path)
+                .map_err(|error| format!("read failed for {name:?}: {error}"))?;
             if bytes.len() > 1_000_000 {
                 return Err(format!("source file {name:?} exceeds its byte cap"));
             }
@@ -159,7 +201,10 @@ mod tests {
 
     fn files() -> BTreeMap<String, Vec<u8>> {
         BTreeMap::from([
-            ("app.py".to_string(), b"from lib import helper\n\ndef main():\n    helper()\n".to_vec()),
+            (
+                "app.py".to_string(),
+                b"from lib import helper\n\ndef main():\n    helper()\n".to_vec(),
+            ),
             ("lib.py".to_string(), b"def helper(): pass\n".to_vec()),
         ])
     }
@@ -169,8 +214,12 @@ mod tests {
         let build = clean_build(&files()).unwrap();
         assert_eq!(build["parsed_files"], json!(2));
         let edges = build["edges"].as_array().unwrap();
-        assert!(edges.iter().any(|e| e["kind"] == "imports" && e["dst"] == "file:lib.py"));
-        assert!(edges.iter().any(|e| e["kind"] == "calls" && e["dst"] == "sym:lib.py::helper"));
+        assert!(edges
+            .iter()
+            .any(|e| e["kind"] == "imports" && e["dst"] == "file:lib.py"));
+        assert!(edges
+            .iter()
+            .any(|e| e["kind"] == "calls" && e["dst"] == "sym:lib.py::helper"));
         assert!(build["unresolved"].as_array().unwrap().is_empty());
     }
 
