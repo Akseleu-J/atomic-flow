@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "scope": "three-test Python 3.8 diagnostic; not runtime acceptance",
+  "python_image": "python@sha256:1d52838af602b4b5a831beb13a0e4d073280665ea7be7f69ce2382f29c5a613f",
+  "source_image": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9",
+  "wheels": [
+    {
+      "name": "pytest",
+      "version": "5.2.2",
+      "filename": "pytest-5.2.2-py3-none-any.whl",
+      "sha256": "58cee9e09242937e136dbb3dab466116ba20d6b7828c7620f23947f37eb4dae4",
+      "url": "https://files.pythonhosted.org/packages/93/16/f6dec5178f5f4141e80dfc4812a9aba88f5f29ca881f174ab1851181d016/pytest-5.2.2-py3-none-any.whl"
+    },
+    {
+      "name": "py",
+      "version": "1.8.0",
+      "filename": "py-1.8.0-py2.py3-none-any.whl",
+      "sha256": "64f65755aee5b381cea27766a3a147c3f15b9b6b9ac88676de66ba2ae36793fa",
+      "url": "https://files.pythonhosted.org/packages/76/bc/394ad449851729244a97857ee14d7cba61ddb268dce3db538ba2f2ba1f0f/py-1.8.0-py2.py3-none-any.whl"
+    },
+    {
+      "name": "pluggy",
+      "version": "0.13.1",
+      "filename": "pluggy-0.13.1-py2.py3-none-any.whl",
+      "sha256": "966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d",
+      "url": "https://files.pythonhosted.org/packages/a0/28/85c7aa31b80d150b772fbe4a229487bc6644da9ccb7e427dd8cc60cb8a62/pluggy-0.13.1-py2.py3-none-any.whl"
+    },
+    {
+      "name": "packaging",
+      "version": "23.1",
+      "filename": "packaging-23.1-py3-none-any.whl",
+      "sha256": "994793af429502c4ea2ebf6bf664629d07c1a9fe974af92966e4b8d2df7edc61",
+      "url": "https://files.pythonhosted.org/packages/ab/c3/57f0601a2d4fe15de7a553c00adbc901425661bf048f2a22dfc500caf121/packaging-23.1-py3-none-any.whl"
+    },
+    {
+      "name": "attrs",
+      "version": "23.1.0",
+      "filename": "attrs-23.1.0-py3-none-any.whl",
+      "sha256": "1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04",
+      "url": "https://files.pythonhosted.org/packages/f0/eb/fcb708c7bf5056045e9e98f62b93bd7467eb718b0202e7698eb11d66416c/attrs-23.1.0-py3-none-any.whl"
+    },
+    {
+      "name": "more-itertools",
+      "version": "10.1.0",
+      "filename": "more_itertools-10.1.0-py3-none-any.whl",
+      "sha256": "64e0735fcfdc6f3464ea133afe8ea4483b1c5fe3a3d69852e6503b43a0b222e6",
+      "url": "https://files.pythonhosted.org/packages/5a/cb/6dce742ea14e47d6f565589e859ad225f2a5de576d7696e0623b784e226b/more_itertools-10.1.0-py3-none-any.whl"
+    },
+    {
+      "name": "wcwidth",
+      "version": "0.2.6",
+      "filename": "wcwidth-0.2.6-py2.py3-none-any.whl",
+      "sha256": "795b138f6875577cd91bba52baf9e445cd5118fd32723b460e30a0af30ea230e",
+      "url": "https://files.pythonhosted.org/packages/20/f4/c0584a25144ce20bfcf1aecd041768b8c762c1eb0aa77502a3f0baa83f11/wcwidth-0.2.6-py2.py3-none-any.whl"
+    },
+    {
+      "name": "atomicwrites",
+      "version": "1.4.0",
+      "filename": "atomicwrites-1.4.0-py2.py3-none-any.whl",
+      "sha256": "6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197",
+      "url": "https://files.pythonhosted.org/packages/2c/a0/da5f49008ec6e9a658dbf5d7310a4debd397bce0b4db03cf8a410066bb87/atomicwrites-1.4.0-py2.py3-none-any.whl"
+    }
+  ]
+}
