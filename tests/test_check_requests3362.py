@@ -3,6 +3,7 @@ import ast
 import copy
 import json
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 
@@ -12,6 +13,38 @@ from atomic_flow.check_private_pytest import MARKER
 from atomic_flow.check_requests3362 import LIFECYCLE_POLICY, requests3362_args, requests3362_receipt
 from atomic_flow.check_runtime import RuntimeIdentity
 from atomic_flow.check_spec import CheckSpec
+
+
+def test_historical_wrapper_resolves_actual_cached_plugin_server_without_accepting_url_alone():
+    from atomic_flow.check_requests3362 import _SETUP
+
+    class Server:
+        host, port, protocol, url, _server = "127.0.0.1", 35001, "http", "http://127.0.0.1:35001", object()
+
+        def is_alive(self):
+            return True
+
+    server = Server()
+
+    def wrapper():
+        return server.url + "/"
+    definitions = [SimpleNamespace(cached_result=(server, 0, None)), SimpleNamespace(cached_result=(wrapper, 0, None))]
+    manager = SimpleNamespace(getfixturedefs=lambda name, nodeid: definitions)
+    item = SimpleNamespace(nodeid="tests/test_requests.py::test_example", funcargs={"httpbin": wrapper},
+                           _request=SimpleNamespace(_fixturemanager=manager))
+    # Execute only the trusted generated host template function against fakes;
+    # no target/plugin imports, certificate reads, threads or sockets execute.
+    function = next(n for n in ast.parse(_SETUP).body if isinstance(n, ast.FunctionDef) and n.name == "fixture_capture")
+    scope = {"threading": SimpleNamespace(Thread=Server), "fixture_servers": [], "fixture_ca_seen": False}
+    exec(compile(ast.Module(body=[function], type_ignores=[]), "host-fixture-capture-test", "exec"), scope)
+    scope["fixture_capture"](item)
+    assert scope["fixture_servers"][0]["server"] is server
+    item.funcargs["httpbin"] = lambda: "http://unrelated.example/"
+    with pytest.raises(RuntimeError, match="wrapper differs"):
+        scope["fixture_capture"](item)
+    definitions.clear()
+    with pytest.raises(RuntimeError, match="wrapped plugin server"):
+        scope["fixture_capture"](item)
 
 NONCE = "7" * 32
 

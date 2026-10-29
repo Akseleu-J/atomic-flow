@@ -2,6 +2,7 @@
 import ast
 import copy
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 from test_check_requests3362 import NONCE, receipt, result, spec
@@ -19,7 +20,8 @@ def admitted(*, failed=False):
     value.update(collected=value["collected"] + 3, completed=value["completed"] + 3,
                  native_exit_code=1, counter_scope="required_only", optional_outcome_policy=POLICY,
                  optional_outcomes={node: {"category": "skipped" if kinds == ("skipped",) else "xfailed" if index == 0 else "xpassed",
-                                          "when": "setup" if kinds == ("skipped",) else "call"}
+                                          "when": "setup" if kinds == ("skipped",) else "call",
+                                          "raw_nodeid": node.rsplit("::", 1)[0] + "::()::" + node.rsplit("::", 1)[1]}
                                     for index, (node, kinds) in enumerate(REQUESTS3362_OPTIONAL_OUTCOMES)})
     return bound, value
 
@@ -43,9 +45,37 @@ def test_optional_bootstrap_and_wrapped_fixture_composition_keep_exact_python36_
     assert "getfixturedefs(name,item.nodeid)" in source
 
 
+def test_actual_generated_report_handler_maps_only_exact_native_class_collector_ids():
+    from atomic_flow.check_private_outcomes import _EVIDENCE
+
+    class Evidence:
+        def __init__(self):
+            self.completed, self.required = set(), []
+
+        def pytest_runtest_logreport(self, report):
+            self.required.append(report.nodeid)
+
+    scope = {"identity": {"optional_test_outcomes": dict(REQUESTS3362_OPTIONAL_OUTCOMES)}, "Evidence": Evidence}
+    exec(compile(_EVIDENCE, "trusted-historical-evidence-test", "exec"), scope)
+    generated = scope["evidence"]
+    generated.pytest_configure(SimpleNamespace(hook=SimpleNamespace(
+        pytest_report_teststatus=lambda report: (report.category, "", ""))))
+    for node, kinds in REQUESTS3362_OPTIONAL_OUTCOMES:
+        raw = node.rsplit("::", 1)[0] + "::()::" + node.rsplit("::", 1)[1]
+        category = kinds[0]
+        generated.pytest_runtest_logreport(SimpleNamespace(nodeid=raw, category=category,
+                                                          when="setup" if category == "skipped" else "call"))
+    assert set(generated.optional_seen) == {node for node, _ in REQUESTS3362_OPTIONAL_OUTCOMES}
+    assert generated.required == [] and generated.invalid_optional is False
+    # A canonical display name is not itself the admitted raw native identity.
+    node = REQUESTS3362_OPTIONAL_OUTCOMES[0][0]
+    generated.pytest_runtest_logreport(SimpleNamespace(nodeid=node, category="xfailed", when="call"))
+    assert generated.required == [node]
+
+
 @pytest.mark.parametrize("attack", ["required_skip", "required_xpass", "unknown_node", "missing_node",
                                    "wrong_phase", "changed_category", "native_exit_hidden", "native_infra_exit",
-                                   "claim_all_passed", "bool_native_exit", "teardown_error"])
+                                   "claim_all_passed", "bool_native_exit", "teardown_error", "wrong_raw_alias"])
 def test_unreviewed_exceptions_or_infrastructure_cannot_satisfy_required_obligation(attack):
     bound, value = admitted()
     value = copy.deepcopy(value)
@@ -72,6 +102,8 @@ def test_unreviewed_exceptions_or_infrastructure_cannot_satisfy_required_obligat
         value["native_exit_code"] = True
     elif attack == "teardown_error":
         value["teardown_failed"] = value["failed"] = 1
+    elif attack == "wrong_raw_alias":
+        optional[next(iter(optional))]["raw_nodeid"] = "tests/test_requests.py::()::unknown"
     assert requests3362_receipt(result(value), bound, NONCE) is None
 
 

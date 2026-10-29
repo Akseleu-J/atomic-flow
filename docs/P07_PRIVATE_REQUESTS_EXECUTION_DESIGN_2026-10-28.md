@@ -182,6 +182,11 @@ nonce, immutable container ID, health results and shutdown/absence proofs.
 revision, execution-source revision, fixture/runtime/check-spec digests,
 original file hash, exact fixture CA hash, resulting file hash, complete
 before/after manifest digests, unchanged-file proof and operation version.
+29 October correction: core source admission excludes PEM. Schema2 therefore
+binds candidate/execution **resource** revisions over core plus exactly this CA
+path, and separately binds both unchanged core revisions. The CheckSpec core
+revision alone cannot seal these additional resource bytes. The pure helper
+implements this distinction; execution/obligation/receipt integration is pending.
 It must verify bytes are exactly `original + b'\n' + fixture_ca`, matching the
 accepted function/2674/863 helpers. No arbitrary path, replacement text, file
 mount or second overlay is admitted. 3362 has no such overlay unless separately
@@ -200,14 +205,18 @@ candidate** to a private disposable execution snapshot. Remove only copied
 bytecode with an explicit removal receipt as the private SymPy smoke does.
 Verify all original admitted candidate bytes match C. Before sealing execution,
 append only the exact fixture CA if this cohort requires it, producing E.
-Require unchanged path set and exact equality of every other file. Seal a
-separate execution CheckSpec bound to E and the typed overlay digest; protect
-the overlaid CA bytes/configuration/test inventory in that execution snapshot.
+The explicit resource inventory contains the core plus the sole admitted CA;
+it preserves its path set and every other file. CA append leaves the filtered
+core revision unchanged. Future execution admission must seal both the core
+CheckSpec and the separate resource/typed-overlay identity; a replacement core
+source_revision alone is insufficient. Protect the overlaid CA bytes,
+configuration and test inventory in that execution snapshot.
 Mount the whole E readonly. There is no hidden CA-only mount over C.
 
 Retain original candidate-bound obligation O and its approved scope/deadline.
-A new host execution receipt must bind O.digest, C, execution CheckSpec.digest,
-E, overlay digest, runtime/fixture identities and the actual counted receipt.
+A new host execution receipt must bind O.digest, candidate core/resource
+identities, execution CheckSpec.digest, execution resource revision, overlay
+digest, runtime/fixture identities and the actual counted receipt.
 The ordinary completion validator checks E before/after, reconstructs E from
 current C plus the sole authorized overlay, and verifies C remains unchanged.
 Only then does check_observation associate this execution with O/C. The generic

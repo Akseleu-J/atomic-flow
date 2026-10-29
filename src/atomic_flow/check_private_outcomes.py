@@ -9,6 +9,8 @@ from __future__ import annotations
 POLICY = "requests3362-public-declared-xfail-and-python3-cstringio/1"
 
 _EVIDENCE = r'''optional_policy=identity['optional_test_outcomes']
+optional_raw={parts[0]+'::'+parts[1]+'::()::'+parts[2]:node
+              for node in optional_policy for parts in [node.split('::')]}
 class HistoricalEvidence(Evidence):
     def __init__(self):
         Evidence.__init__(self)
@@ -18,11 +20,12 @@ class HistoricalEvidence(Evidence):
     def pytest_runtest_logreport(self,report):
         if report.when=='teardown':self.completed.add(report.nodeid)
         category=self.config.hook.pytest_report_teststatus(report=report)[0]
-        if report.nodeid in optional_policy and category in optional_policy[report.nodeid]:
+        node=optional_raw.get(report.nodeid)
+        if node is not None and category in optional_policy[node]:
             phase='setup' if category=='skipped' else 'call'
-            if report.when!=phase or report.nodeid in self.optional_seen:
+            if report.when!=phase or node in self.optional_seen:
                 self.invalid_optional=True
-            self.optional_seen[report.nodeid]={'category':category,'when':report.when}
+            self.optional_seen[node]={'category':category,'when':report.when,'raw_nodeid':report.nodeid}
             return
         Evidence.pytest_runtest_logreport(self,report)
 evidence=HistoricalEvidence()'''
@@ -68,7 +71,10 @@ def optional_receipt_valid(value: dict, policy: tuple) -> bool:
     xpassed = False
     for node, kinds in allowed.items():
         row = observed[node]
-        if (type(row) is not dict or set(row) != {"category", "when"}
+        parts = node.split("::")
+        raw_node = parts[0] + "::" + parts[1] + "::()::" + parts[2]
+        if (type(row) is not dict or set(row) != {"category", "when", "raw_nodeid"}
+                or row["raw_nodeid"] != raw_node
                 or type(row["category"]) is not str or row["category"] not in kinds
                 or row["when"] != ("setup" if row["category"] == "skipped" else "call")):
             return False
