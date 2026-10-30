@@ -1,0 +1,14 @@
+{
+  "run": 40993867055,
+  "artifact": 12950448399,
+  "archive_sha256": "eb637e827ffb41a2ba603b38cd7ff5d37678c2fce7878f1d5111dd2e3ff516f1",
+  "tested_commit": "f24a59c3076e72a3d12d92f04590bc8bdb21480d",
+  "stdout_sha256": "e5200a4ae0473b62399acccefa076c44a77e29fa5660af09fc959c919a36cd7c",
+  "native_summary": "6 failed, 2584 passed, 16 skipped, 11 xfailed",
+  "collected": 2617,
+  "completed": 2617,
+  "cleanup": true,
+  "status": "full_diagnostic_failed",
+  "ordinary_acceptance": false,
+  "provider_calls": 0
+}

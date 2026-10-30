@@ -51,6 +51,7 @@ TRIAL_NODES = frozenset('testing/test_unittest.py::TestTrialUnittest::' + name f
 FOCUSED = r'''
 import json,os,sys
 sys.dont_write_bytecode=True
+os.environ['HYPOTHESIS_STORAGE_DIRECTORY']='/tmp/p07-hypothesis'
 sys.path.insert(0,'/testbed/src')
 import pytest,_pytest
 assert sys.version_info[:3]==(3,8,20) and os.path.realpath(pytest.__file__)=='/testbed/src/pytest.py'
@@ -219,6 +220,7 @@ def run(output, *, focused=False):
                 if verify.returncode or json.loads(verify.stdout) != {'checked': 474, 'differences': []}:
                     raise ValueError('public source bytes differ')
                 report['source_blobs_verified'] = 474
+                report['hypothesis_storage'] = '/tmp/p07-hypothesis'
             for name, code in (('scheme', py38.SCHEME_PROBE), ('native', PROBE)):
                 run = _bounded([recon.ENGINE, 'exec', '--user=65534:65534', '-w', '/tmp', cid,
                                 py38.PYTHON, '-I', '-B', '-c', code], home=tmp, timeout=60, limit=100000, check=lambda: None)

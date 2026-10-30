@@ -40,3 +40,11 @@ def test_focused_trial_requires_exact_nodes_and_completed_teardowns():
     with pytest.raises(ValueError, match='collection'):
         smoke.parse_focused('P07_TRIAL_FOCUSED=' + json.dumps(obs), 0)
     compile(smoke.FOCUSED, '<trial-focused>', 'exec')
+
+
+def test_focused_hypothesis_storage_uses_fixed_tmpfs_and_keeps_warnings():
+    line = "os.environ['HYPOTHESIS_STORAGE_DIRECTORY']='/tmp/p07-hypothesis'"
+    assert smoke.FOCUSED.count(line) == 1
+    assert smoke.FOCUSED.index(line) < smoke.FOCUSED.index('import pytest,_pytest')
+    assert 'PYTEST_ADDOPTS' not in smoke.FOCUSED
+    assert 'filterwarnings' not in smoke.FOCUSED
