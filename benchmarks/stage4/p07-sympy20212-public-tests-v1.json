@@ -1,0 +1,3273 @@
+{
+  "base_commit": "a106f4782a9dbe7f8fd16030f15401d977e03ae9",
+  "blacklisted_candidate_count": 14,
+  "candidate_count": 543,
+  "default_blacklist_substring": "sympy/integrals/rubi/rubi_tests/tests",
+  "default_candidate_count": 529,
+  "ordinary_acceptance": false,
+  "provider_calls": 0,
+  "repo": "sympy/sympy",
+  "root_tree": "6d5f0f379a0b28d6c83718311890449280202d0e",
+  "schema_version": 1,
+  "scope": "static public Git tree; native runtime discovery and ordinary execution not established",
+  "test_candidates": [
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/algebras/tests/test_quaternion.py",
+      "sha": "724a7d2411e216434fae25908c50794f78d5b2a3",
+      "size": 7721
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/assumptions/tests/test_assumptions_2.py",
+      "sha": "85bc04e448175804cf7c20f9f461944a086958c4",
+      "size": 1763
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/assumptions/tests/test_context.py",
+      "sha": "be162f1c69492218ff90ea69492925d7779567a4",
+      "size": 1153
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/assumptions/tests/test_matrices.py",
+      "sha": "ca9898d077b59e1847c041d8a2137da3fbd9df75",
+      "size": 12162
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/assumptions/tests/test_query.py",
+      "sha": "a6228a4827ea7128886e2bf1f84a59fa72a357c2",
+      "size": 94561
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/assumptions/tests/test_refine.py",
+      "sha": "23ae279023e38fcbaffb9ec0ada8dd9413f2bc79",
+      "size": 9510
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/assumptions/tests/test_satask.py",
+      "sha": "ab30ba3d9f56d6d63e8a7d36447ac72b282c4097",
+      "size": 13920
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/assumptions/tests/test_sathandlers.py",
+      "sha": "b48f578dc0f03a2b971c9a51670b54128f2a50e7",
+      "size": 3989
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/calculus/tests/test_euler.py",
+      "sha": "2ac85fd871c8ed84dfde788d45a268d819e96bc4",
+      "size": 2322
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/calculus/tests/test_finite_diff.py",
+      "sha": "9d8287f904111ec982f56d896a23babaf55a3eda",
+      "size": 7752
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/calculus/tests/test_singularities.py",
+      "sha": "8bcbc3fee3f3c2acb5305d9596140fca0e3930a4",
+      "size": 3661
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/calculus/tests/test_util.py",
+      "sha": "e64aa5785a2924d320a8bf3c5f00263c9cac9650",
+      "size": 24766
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/categories/tests/test_baseclasses.py",
+      "sha": "36ac4492becd3071d2fa08c8cba94e934add0eb5",
+      "size": 5700
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/categories/tests/test_drawing.py",
+      "sha": "3ebdb518d7d00b97e4423b59ccf58922cb988a2b",
+      "size": 27838
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_algorithms.py",
+      "sha": "fb58686cfb6560890d3d4c8acb42853f5b2ff908",
+      "size": 4734
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_applications.py",
+      "sha": "7743f6444a35fab4ede6bd496d42c9151f42bfb8",
+      "size": 2178
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_approximations.py",
+      "sha": "dd05b105f9e9dc5c74e2b88051809d81815a1610",
+      "size": 1973
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_array_utils.py",
+      "sha": "6cf16381db1ac0b2a3058a887bdefd05a2cc2c7d",
+      "size": 24111
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_ast.py",
+      "sha": "824f07604ce7a8401879fd4d01cfbcf2ac81de25",
+      "size": 21355
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_cfunctions.py",
+      "sha": "79b3c73b211961d3f13516f1d4d79687c7070970",
+      "size": 4535
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_cnodes.py",
+      "sha": "5766db3a6d641ace2ee54fa0458289d658f7f40b",
+      "size": 2582
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_cxxnodes.py",
+      "sha": "431e0afc0bbc41a6a0abc5a8166a49bc2ca27e0c",
+      "size": 354
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_fnodes.py",
+      "sha": "e7d356a2d535446884e9ad0a1e1e98409d75dba4",
+      "size": 6502
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_numpy_nodes.py",
+      "sha": "6b4a9ceff43bcf034cb89e14b01886a4f6aac756",
+      "size": 1501
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_pyutils.py",
+      "sha": "d1084f8dbd620fbdb8a9211b46368eb4ddc628e8",
+      "size": 400
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_rewriting.py",
+      "sha": "224b1ba1e06339fccc0b1f848024736485ee14ab",
+      "size": 8643
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/codegen/tests/test_scipy_nodes.py",
+      "sha": "cd7122579d2403746232fbdb721806d9718389a9",
+      "size": 589
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_coset_table.py",
+      "sha": "9ab7f875218134170103ece437965db9fda392ba",
+      "size": 28460
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_fp_groups.py",
+      "sha": "9b68600eb8496321845c7cec3de75e5d78cc853c",
+      "size": 10011
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_free_groups.py",
+      "sha": "b02065881835bfad7ef9ef32a3b84dfd1ffdf876",
+      "size": 6148
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_generators.py",
+      "sha": "795ef8f08f6ec212879f528c6a0c2f0bd73037f0",
+      "size": 3567
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_graycode.py",
+      "sha": "a754a3c401b07c9c12cb9bdeeefdfc94f6cb8b5c",
+      "size": 2800
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_group_constructs.py",
+      "sha": "d0f7d6394bbc2e285650ea95d36be8e2ed5ea69e",
+      "size": 450
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_homomorphisms.py",
+      "sha": "8740c3cf7de03ddef7ccca9ee348bcfed4bd65bb",
+      "size": 3621
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_named_groups.py",
+      "sha": "59bcb6ef3f020335de76d7a72152a0b58cbc6976",
+      "size": 1931
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_partitions.py",
+      "sha": "28a30c9b45f9ebda34958ae9560f663f95fee7a9",
+      "size": 4103
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_pc_groups.py",
+      "sha": "dbf11a992265a2ce7db712cf8a4790833d2a72a2",
+      "size": 2739
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_perm_groups.py",
+      "sha": "ff91a3311e5aad31367900aec7aed2e2ad106ab2",
+      "size": 39338
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_permutations.py",
+      "sha": "48a13788837ee0340b2db383a70d036481045724",
+      "size": 20199
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_polyhedron.py",
+      "sha": "ba5cf922dac6bed72cf56748945983f6ec841670",
+      "size": 4217
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_prufer.py",
+      "sha": "b077c7cf3f023a4c36d7039505e6165ab29f275a",
+      "size": 2649
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_rewriting.py",
+      "sha": "97c562bd57a2cd6318fa1dcb13c6f6278c861cca",
+      "size": 1787
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_schur_number.py",
+      "sha": "77d1d7aca0adfc6e3c8f019358a41afea8e85072",
+      "size": 1723
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_subsets.py",
+      "sha": "a2cff52a890c3b67bc52de0d1a7c90c23b1f4fec",
+      "size": 2503
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_tensor_can.py",
+      "sha": "3922419f20b92536426bfaae4b7e94df5db671b5",
+      "size": 24676
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_testutil.py",
+      "sha": "393746ce0bd8036f22357db1a66af55fde3139f9",
+      "size": 1718
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/combinatorics/tests/test_util.py",
+      "sha": "bca183e81f354e398aee9ae809fe79b20c7f2468",
+      "size": 4499
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/concrete/tests/test_delta.py",
+      "sha": "9e9db86ac403be0961a983d6f9765c8adac4dbd6",
+      "size": 23694
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/concrete/tests/test_gosper.py",
+      "sha": "1a6214164598f362e69b9eefd4a1f7707cf01eb0",
+      "size": 7640
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/concrete/tests/test_guess.py",
+      "sha": "402534d86011290eaf71943a66dc93b3c81c8974",
+      "size": 3059
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/concrete/tests/test_products.py",
+      "sha": "0d2de4a4510951beafcd369d234d96a8e1865126",
+      "size": 13170
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/concrete/tests/test_sums_products.py",
+      "sha": "c64dcdb57448e929da087d3d529a3c551d672849",
+      "size": 54859
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_args.py",
+      "sha": "f799fdf7b1f299218c4f8f363d2f9207161ac0af",
+      "size": 170117
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_arit.py",
+      "sha": "e05cdf6ac190d4565b3cf3525a61b80d5ba0d8d2",
+      "size": 72094
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_assumptions.py",
+      "sha": "de71bf5371cbdd7f542caf84a437459c1849625a",
+      "size": 39675
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_basic.py",
+      "sha": "faa27b9f22365e240fa31fe9e165377cef6bd491",
+      "size": 9579
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_cache.py",
+      "sha": "f9d27411d09f1962dc6e8f5b71d19f37e76d80a4",
+      "size": 434
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_compatibility.py",
+      "sha": "3dcbdaf6f975baa3d15de5e290331fdde742c00b",
+      "size": 2458
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_complex.py",
+      "sha": "5b60731cb3daaad7756dabab1fdc9651b886ecfe",
+      "size": 21517
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_constructor_postprocessor.py",
+      "sha": "c997ee8dbc21d8ed7366ba7ae2b7c32022f1fc6b",
+      "size": 2373
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_containers.py",
+      "sha": "6f57ef4262cde0d586eac8ec95c5f6c8e3eeeb34",
+      "size": 6867
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_count_ops.py",
+      "sha": "80fab1caf2c79d40398877fdc7f74354622278a9",
+      "size": 5017
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_diff.py",
+      "sha": "effc9cd91d2e7b6f8f8e5fd04bb667ed71c0ffaf",
+      "size": 5421
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_equal.py",
+      "sha": "fa2e37a7bae489fd735c74d14d26b1bc89e85406",
+      "size": 1584
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_eval.py",
+      "sha": "db8249780155050c51829859afb5441d14401f76",
+      "size": 2103
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_evalf.py",
+      "sha": "dc3a1663ca75b31d648347711e8bb82f470486f4",
+      "size": 21590
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_expand.py",
+      "sha": "f39d250784a30d91495fb170b82d26eda6fc7692",
+      "size": 11603
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_expr.py",
+      "sha": "e60a163da74c5e6d2e912d529a8b591123417ba4",
+      "size": 71291
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_exprtools.py",
+      "sha": "31fe465eb041a90eee5ac216ee142c779d94df48",
+      "size": 17773
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_facts.py",
+      "sha": "7ca04877d0bdaf8124258ea1d25a10bcfa0f5f3a",
+      "size": 11579
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_function.py",
+      "sha": "1521c70c498e07fd7633c538e786ec082b6adb69",
+      "size": 49156
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_logic.py",
+      "sha": "48a0f3f80752b6e388f4582df498fa73c7b8c570",
+      "size": 5698
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_match.py",
+      "sha": "255ce674d58ff788ca24376a4becedc33552996e",
+      "size": 21194
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_multidimensional.py",
+      "sha": "30befc92b6c68629e9f689bcd59e9a08664e616c",
+      "size": 751
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_noncommutative.py",
+      "sha": "fab2b367873c7cf6a22cf731837830b1b5938a4f",
+      "size": 4092
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_numbers.py",
+      "sha": "8b3e99126e2ee377cf583bf9b6a9a0ce5ce8086a",
+      "size": 67067
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_operations.py",
+      "sha": "6f07446bd17a291d938847246ace69c06566463d",
+      "size": 2756
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_parameters.py",
+      "sha": "4cc1239cc3310cb2b7f66e19c8a0bfffffe380c6",
+      "size": 2734
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_power.py",
+      "sha": "413fbd453217de6583eced915c4b3ab3b85f73c1",
+      "size": 21016
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_priority.py",
+      "sha": "7be30f24033698e43ed68bdbaa0f3566465de173",
+      "size": 3190
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_relational.py",
+      "sha": "e94437a575f21e09a9233f110fd93393982c2f24",
+      "size": 40630
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_rules.py",
+      "sha": "31cb88b52db21f39653033b4567526e992be99f0",
+      "size": 349
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_singleton.py",
+      "sha": "6f9c145b5a0a19ff5888efc8eb53c0b55e62f405",
+      "size": 3383
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_subs.py",
+      "sha": "8a3d81d1589173ea73f60dd5c34ed4907c6fb4c3",
+      "size": 28941
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_symbol.py",
+      "sha": "a07a1d2f36598dd5626cb09a73c153b5b5d62ec1",
+      "size": 12044
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_sympify.py",
+      "sha": "55e77292de1934574d3ee6ceda3044100e965fe6",
+      "size": 24483
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_trace.py",
+      "sha": "5ac70050e16b7a12ef7002512e1bba0550de9e28",
+      "size": 2823
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_truediv.py",
+      "sha": "a721f986e19df9e8c67ab522b8809736aef15e37",
+      "size": 810
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/core/tests/test_var.py",
+      "sha": "fe634ef8e12b2ec4993797e99c08ff50217ce0c4",
+      "size": 1547
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/crypto/tests/test_crypto.py",
+      "sha": "a38af2297dd284668be6a92b428c0f02bd8217e3",
+      "size": 19752
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/deprecated/tests/test_class_registry.py",
+      "sha": "a8ae8fbdc3fa987240ed18bc1871da0a116a6737",
+      "size": 170
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/deprecated/tests/test_deprecated_imports.py",
+      "sha": "4a08a5a7f8b6d3d06d11db0136e73a196ac7335e",
+      "size": 838
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/diffgeom/tests/test_class_structure.py",
+      "sha": "920180be669a9b4ba8c22bfaeb59c4b059bb6f59",
+      "size": 1005
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/diffgeom/tests/test_diffgeom.py",
+      "sha": "0c9cc397cb12db065c88f1f7c1b1e13125eed5fb",
+      "size": 10407
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/diffgeom/tests/test_function_diffgeom_book.py",
+      "sha": "a7317a7d1191e61a074fcaa07e1859b11bdc0d10",
+      "size": 5258
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/diffgeom/tests/test_hyperbolic_space.py",
+      "sha": "ea8c6a21b8687d2d6100b558dfacbc632d26e356",
+      "size": 2583
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/discrete/tests/test_convolutions.py",
+      "sha": "66a9dbe907dea64c398e3f73c70f874b96146daf",
+      "size": 16950
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/discrete/tests/test_recurrences.py",
+      "sha": "db3e8a4e9aa931896762885cabe9d002e7df9c8d",
+      "size": 2957
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/discrete/tests/test_transforms.py",
+      "sha": "b6ccf90010025fb1740a4d4f436075c01ef0842f",
+      "size": 5533
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/external/tests/test_autowrap.py",
+      "sha": "091beb9c7119ff98b3179505022703691b99afe3",
+      "size": 9619
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/external/tests/test_codegen.py",
+      "sha": "f0962e40b85fce1046fb1cecd56e90621a6eb9c2",
+      "size": 12082
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/external/tests/test_importtools.py",
+      "sha": "0b954070c179282ed2bcf5735d802c5f22a3a261",
+      "size": 1394
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/external/tests/test_numpy.py",
+      "sha": "363172fefdaf057b426b3b03441229addbffe018",
+      "size": 9542
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/external/tests/test_sage.py",
+      "sha": "f26dbc8de9009ff79b79d972fd6f06706b0f604c",
+      "size": 9020
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/external/tests/test_scipy.py",
+      "sha": "24516d1755c858931838e3525673fc39a7e306d4",
+      "size": 1147
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/combinatorial/tests/test_comb_factorials.py",
+      "sha": "4704fccdcdcd7f862bae8720e3f932117c0668d8",
+      "size": 25685
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/combinatorial/tests/test_comb_numbers.py",
+      "sha": "461783358d821d7ca85c1f851728c5ff4d04c4af",
+      "size": 25385
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_complexes.py",
+      "sha": "78031aac9351426d85e575e3f9661578df405df4",
+      "size": 31639
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_exponential.py",
+      "sha": "bad76c2b169d17a30ec4a70a8f04371ed8aaa86e",
+      "size": 23817
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_hyperbolic.py",
+      "sha": "582edd42e78c83f425ea5cb61e352f947dda2b41",
+      "size": 35466
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_integers.py",
+      "sha": "76d20afc81ce44ce6b1bfd9c10af088f67fa6f22",
+      "size": 17642
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_interface.py",
+      "sha": "7be1fb94c63e39d9198f45b9e377ebeec643a33e",
+      "size": 1876
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_miscellaneous.py",
+      "sha": "0e1a5b1d08cefafddc8e8b1840ccffc4b190902f",
+      "size": 15765
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_piecewise.py",
+      "sha": "461bcd0936e126979408d28d36472e941471fe59",
+      "size": 50518
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/elementary/tests/test_trigonometric.py",
+      "sha": "fd941ff1504d05099fbcecb08b9d77642e133a1d",
+      "size": 80737
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_bessel.py",
+      "sha": "5d96cd4a53a14ae3c08e2eb24d345b0800ad6a2d",
+      "size": 26836
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_beta_functions.py",
+      "sha": "2e4a8c6dab431994deb57da2ca6b1cb891c4b6b2",
+      "size": 923
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_bsplines.py",
+      "sha": "6a838e38495e82566c3db7f30b1bf837d8e14a3c",
+      "size": 6967
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_delta_functions.py",
+      "sha": "72ba93e2c96e868f322354774bac9f75136f402d",
+      "size": 7074
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_elliptic_integrals.py",
+      "sha": "9c987b74a6303dcfaaf9be32846c66bd1ab80715",
+      "size": 6330
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_error_functions.py",
+      "sha": "9d4206522917707bcc2bd4f2f43f48ae1daec446",
+      "size": 28478
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_gamma_functions.py",
+      "sha": "68d883fdaebc64980c7ace9077e9e6a0505f7945",
+      "size": 28489
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_hyper.py",
+      "sha": "eb14631aab8a69dfe837fb227ee601c4c90481e6",
+      "size": 15208
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_mathieu.py",
+      "sha": "7689c5587d0807d382e18d66ec7655ca1c7d0d78",
+      "size": 1080
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_singularity_functions.py",
+      "sha": "ec87e0ac7b9a965985ddad58b03014c2c18d7d69",
+      "size": 3969
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_spec_polynomials.py",
+      "sha": "a6be6b1984937ffee4125e1a4fd93a25a6fdf318",
+      "size": 15644
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_spherical_harmonics.py",
+      "sha": "5e81eaf5d7e60cb2450c81dd11a2e57f573f9463",
+      "size": 3571
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_tensor_functions.py",
+      "sha": "53266704f8cd69f6db16f06dcfce13dab5c5ff73",
+      "size": 5354
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/functions/special/tests/test_zeta_functions.py",
+      "sha": "f971d6fbe6e01cb25a0defd59d581494c1c9d24b",
+      "size": 8562
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_curve.py",
+      "sha": "786508de03d979ba4393ef3c9125b5ad235a1bf1",
+      "size": 4189
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_ellipse.py",
+      "sha": "96c944b901d03ac987f06b87583d289fb69fc54a",
+      "size": 24202
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_entity.py",
+      "sha": "aa46a4fa190d3f6eed6492a095b390ae3a5c7e64",
+      "size": 2069
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_geometrysets.py",
+      "sha": "1a01a0c7c97dad728d902ccf52e17398aa601745",
+      "size": 1866
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_line.py",
+      "sha": "89af9cfc844db831e5817cd577d92e50b07ab0ee",
+      "size": 35532
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_parabola.py",
+      "sha": "c940eefbda043d8aed4b49bc075f054e3916fc15",
+      "size": 4943
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_plane.py",
+      "sha": "e698c4daa1a46d187b26c37f6a0bdd617386021c",
+      "size": 11357
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_point.py",
+      "sha": "f66a7ddda80ceb94f85f26859c87519f3eb8275f",
+      "size": 13898
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_polygon.py",
+      "sha": "daf093e4e171533bb3ecf01af22704ded3e5173b",
+      "size": 26680
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/geometry/tests/test_util.py",
+      "sha": "76b04935ce092af6e14294a23f9270c1f90314dc",
+      "size": 5771
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/holonomic/tests/test_holonomic.py",
+      "sha": "18564f02c4ea6c18d7116e36527c1ed5b7920a49",
+      "size": 34042
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/holonomic/tests/test_recurrence.py",
+      "sha": "441da8f0cdf998a88d92429c00f4bbcbd8f4f2ab",
+      "size": 999
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/rubi/parsetools/tests/test_parse.py",
+      "sha": "c1bc13b9ed035d901cfd6c03e667ad829de4b545",
+      "size": 8211
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_1_2.py",
+      "sha": "b6cccbf5af1e1cc3600396cc73ed980777257cce",
+      "size": 30426
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_1_3.py",
+      "sha": "d1dfc81080007c982d66d98709563309b2fde30b",
+      "size": 61185
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_1_4.py",
+      "sha": "978ab0267aa9ca7b2dbe924850752def322fc989",
+      "size": 10426
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_exponential.py",
+      "sha": "d5d02658cc9757ad409bf4b42c3425eecb4c2ed9",
+      "size": 250958
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_hyperbolic_sine.py",
+      "sha": "119a3647f65212dafadfcb8c91eee224d60a37fd",
+      "size": 79552
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_inverse_hyperbolic_sine.py",
+      "sha": "d014691f314a1393ef11926703ce3a728208a0f0",
+      "size": 65172
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_inverse_sine.py",
+      "sha": "4a9902769dc6c8b19e485a38b6036f56f5a67afa",
+      "size": 84206
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_logarithms.py",
+      "sha": "8822c3990a44c0befe7df9fb8cf2603beefeff5b",
+      "size": 442127
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_miscellaneous_algebra.py",
+      "sha": "d91ff441a8cfbdb9f553c9ed7f5c633b157f98f6",
+      "size": 526173
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_secant.py",
+      "sha": "231e0e593650a0c635ddf3b56ce4eba617438a4e",
+      "size": 93397
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_sine.py",
+      "sha": "f8027147ff23d87a050037c002fb94fb7cc376e4",
+      "size": 164373
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_special_functions.py",
+      "sha": "61c1765dd46d6da790fe2845f8c72a467747901f",
+      "size": 48347
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_tangent.py",
+      "sha": "9d5a76c6137e43993dc968c445b787f37be403b3",
+      "size": 132374
+    },
+    {
+      "native_default_blacklisted": true,
+      "path": "sympy/integrals/rubi/rubi_tests/tests/test_trinomials.py",
+      "sha": "448e3cc4d359b375439190f9946e89346f9679eb",
+      "size": 1508403
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/rubi/tests/test_rubi_integrate.py",
+      "sha": "c4cc3454f718b2b0f789a91c1038307d42ebb67d",
+      "size": 2684
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/rubi/tests/test_utility_function.py",
+      "sha": "e6841eb0c0eb7dd5a4dbb52615e22c63ce98a3a0",
+      "size": 81616
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_deltafunctions.py",
+      "sha": "87a5b02be3e0b38e929b7f7f4b3ede101fde09b8",
+      "size": 3495
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_failing_integrals.py",
+      "sha": "e65dd888d17cc2d7699050d5dc36d299a68e34fb",
+      "size": 6858
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_heurisch.py",
+      "sha": "49ca5d7acdd739b4d8f39aba72e7aad85efb8829",
+      "size": 11224
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_integrals.py",
+      "sha": "d58adb12fcbe8ac2b140749c342fbf0b769800a6",
+      "size": 62560
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_intpoly.py",
+      "sha": "a1dcdb33c5936a859e8a16bbdb7ed6c3769b8267",
+      "size": 36169
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_lineintegrals.py",
+      "sha": "263d444dc88e987ca1095267f1a83696c04172f8",
+      "size": 235
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_manual.py",
+      "sha": "a364bf4c70e74d8716652c9d9c5a2d41710a5cdf",
+      "size": 25912
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_meijerint.py",
+      "sha": "c4cc4df23989bbf2e5e0ea5fe186546e349f5480",
+      "size": 30202
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_prde.py",
+      "sha": "24e94791212bb9e7ba5124e39a3d390c189629c2",
+      "size": 15937
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_quadrature.py",
+      "sha": "97471dbdbc13fda0bce7a8823ff2cefac4ab8802",
+      "size": 19919
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_rationaltools.py",
+      "sha": "bdcdfaddbcc513e139998d7521c8f43215a52b6e",
+      "size": 4979
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_rde.py",
+      "sha": "9f8fc4e214afe2083b16a0d2e7616b0949728624",
+      "size": 9494
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_risch.py",
+      "sha": "5204c718a9f8f0ec457afa25eb5cbea407e72628",
+      "size": 37245
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_singularityfunctions.py",
+      "sha": "2c34804c0aa4d050afbb3e47c553c4f1f77f8929",
+      "size": 1166
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_transforms.py",
+      "sha": "4c3e79984ffb8bc843ee66157e05d0cdab5817b2",
+      "size": 35428
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/integrals/tests/test_trigonometry.py",
+      "sha": "857c8503c5aa690d66e9cdab49730b4ea655a52c",
+      "size": 3869
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/interactive/tests/test_interactive.py",
+      "sha": "58c31623152fa1f373b3c29eeeff85dbf9218eba",
+      "size": 486
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/interactive/tests/test_ipython.py",
+      "sha": "d81f1bb7d208cfd1647a865ad557c29da51b71e4",
+      "size": 2819
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/interactive/tests/test_ipythonprinting.py",
+      "sha": "c12888971bc030564fc8fa5d4f75454ea6b57b55",
+      "size": 9501
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_cartan_matrix.py",
+      "sha": "98b1793dee63e0e87c610768554a8388dfd641a1",
+      "size": 303
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_cartan_type.py",
+      "sha": "257eeca41d0f5f2eb240cc270f76d452848ed405",
+      "size": 339
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_dynkin_diagram.py",
+      "sha": "ad2ee4c162945c437ecf83d75c7fef9455c9464a",
+      "size": 260
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_root_system.py",
+      "sha": "42110da5a1c59a7e6b2e537ee13746bfce361579",
+      "size": 927
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_type_A.py",
+      "sha": "85d6f451ee167cf6db17ab20e59efab86ac0b691",
+      "size": 657
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_type_B.py",
+      "sha": "8f2a9011f96bc647e48d39e16cf10703a99d86b3",
+      "size": 642
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_type_C.py",
+      "sha": "8154c201e6c50adb7c74458b240ed98b9a0dd123",
+      "size": 927
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_type_D.py",
+      "sha": "f8779ba39197b772061358b4c859633925a8db4d",
+      "size": 765
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_type_E.py",
+      "sha": "95bb23e205bdfc5cb84e432e92d97b98beff540b",
+      "size": 775
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_type_F.py",
+      "sha": "fbb58223d0b5886e6044108c9c5cc3bbf371dd14",
+      "size": 1378
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_type_G.py",
+      "sha": "c427eeb85bad8fc77d17a1563a7b796d4e0f217f",
+      "size": 548
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/liealgebras/tests/test_weyl_group.py",
+      "sha": "e4e57246fdcb5a431d8bbd65f1f60e0254a9cdf0",
+      "size": 1501
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/logic/tests/test_boolalg.py",
+      "sha": "f990057ece4f442040acf22ea6a55a322932ccbb",
+      "size": 43158
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/logic/tests/test_dimacs.py",
+      "sha": "3a9a51a39d33fb807688614cb5809b621ce21a2c",
+      "size": 3886
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/logic/tests/test_inference.py",
+      "sha": "e87567dfea8cef8c54753d9fd354634633cf79f7",
+      "size": 10556
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_adjoint.py",
+      "sha": "7106b5740b1dc7c32f2c6f5ecb9d286b5e1dd222",
+      "size": 1065
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_applyfunc.py",
+      "sha": "0d6227497729e8c1a90ed446bd2f43d21fda1f9c",
+      "size": 3087
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_blockmatrix.py",
+      "sha": "ffba5b41b5885791fc31c8dcacbe653fea280f90",
+      "size": 14154
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_companion.py",
+      "sha": "bd40dfeb3bd8e0691e5d62ff0c9cec7ddf60ee23",
+      "size": 1650
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_derivatives.py",
+      "sha": "dd44a9b32eab86af0e1a4a7a749b800f700435cb",
+      "size": 14586
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_determinant.py",
+      "sha": "7f1e9ebd827dc6d609016eeca1d906fd893ab843",
+      "size": 1426
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_diagonal.py",
+      "sha": "6895f38a64be29613f60d8b34c57c19222beb490",
+      "size": 4294
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_dotproduct.py",
+      "sha": "abf8ab8e935cbd3039f25f83d3603ac444e5a7bb",
+      "size": 1171
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_factorizations.py",
+      "sha": "d3e8289142fc51e2776eca06d9b23b09daac5b45",
+      "size": 693
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_fourier.py",
+      "sha": "66f5326b3f24bd7ce01f973674efbb9aa144f164",
+      "size": 889
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_funcmatrix.py",
+      "sha": "4479b33dfcf9a0ee22c7fb1d487b89911dc3bf9d",
+      "size": 2247
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_hadamard.py",
+      "sha": "17539945d89b370a2e179a9076dbc3c3ceb3b311",
+      "size": 4029
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_indexing.py",
+      "sha": "dc3f8dbae88dbe38f216ee46cca8b6f279b2404c",
+      "size": 10373
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_inverse.py",
+      "sha": "83eb770b61035fa0a3d5f28d23979f2ba63522a8",
+      "size": 2122
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_kronecker.py",
+      "sha": "230df2119b44943aa31b17f38d88ff9c7f07d948",
+      "size": 5217
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_matadd.py",
+      "sha": "d13890557cca6b98c080271d9ee0ab7ca39b563d",
+      "size": 1604
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_matexpr.py",
+      "sha": "3d4dc39773b82750fe30ac58c7b0b3cc42e8d42e",
+      "size": 14636
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_matmul.py",
+      "sha": "529be8559f13456d4c98c7938098b909c32e06cc",
+      "size": 5212
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_matpow.py",
+      "sha": "4903b3506a8470c08e9a1b3badd20267040e496a",
+      "size": 6241
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_permutation.py",
+      "sha": "b3421d129f83194e62b0614eed7bf6c839261055",
+      "size": 5595
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_sets.py",
+      "sha": "a01221d5506cca9f8db733596dd01bd26ab1ddec",
+      "size": 1178
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_slice.py",
+      "sha": "36490719e26908b9e913ed99b7673d602647c492",
+      "size": 2027
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_special.py",
+      "sha": "ea62ff4f12a4691d4e6dc4bf3abdf5a79a03aa46",
+      "size": 6622
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_trace.py",
+      "sha": "2cfee936a6e10f67a2ceaae6a371206853050109",
+      "size": 2894
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/expressions/tests/test_transpose.py",
+      "sha": "27636d1bba00ce9d165be57150139f2cbd783a12",
+      "size": 1567
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_commonmatrix.py",
+      "sha": "b50b11eda48e21f57ba0caa4f230b70c2454e7a4",
+      "size": 34872
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_decompositions.py",
+      "sha": "a39a00c82833a2450dcd082e2349a9ad14d7d81d",
+      "size": 11171
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_densearith.py",
+      "sha": "40d0122f0feea1d33289d9af3f426d1e482e6cbd",
+      "size": 2080
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_densesolve.py",
+      "sha": "ab325819a8054a8071f2074ad63880d6fc32b9c4",
+      "size": 1096
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_densetools.py",
+      "sha": "6bc9d2fe7939e792f8e0af9c0f8b461767a57d1e",
+      "size": 688
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_determinant.py",
+      "sha": "c06712a98e099d9cfc8cd115af0cd122c4c16d1a",
+      "size": 12209
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_eigen.py",
+      "sha": "9e311cd42201ee7314057ac7c246ff3fc1bd2ed0",
+      "size": 20081
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_graph.py",
+      "sha": "ca25206d4297eb71159ec871495d2514a301acdd",
+      "size": 1587
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_immutable.py",
+      "sha": "5d8728f27f411da8363fc4ae2b1fa099c723d220",
+      "size": 4415
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_interactions.py",
+      "sha": "1ec67688f1ba6df98a2ee100c1f4e6de0d856031",
+      "size": 2054
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_matrices.py",
+      "sha": "d8646cd2d4cabb41965700f141d5a687edb2ff9e",
+      "size": 143153
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_normalforms.py",
+      "sha": "5be332446dac4ca65b0ac9c87b3e1e1666f6869d",
+      "size": 882
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_reductions.py",
+      "sha": "4d9aabe331876e4ed64aed59d7b2b41dfcca9e1d",
+      "size": 13909
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_solvers.py",
+      "sha": "65f263cf77c424de5299d3aad2f83a6f55dc9592",
+      "size": 19351
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_sparse.py",
+      "sha": "2d3a59300dd75dc3224661e4f1b4d7b381a0ebff",
+      "size": 21592
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_sparsetools.py",
+      "sha": "61fbbeb9c225be4d3b34ac59ab9a434f82cee02f",
+      "size": 4834
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/matrices/tests/test_subspaces.py",
+      "sha": "168da0d0689c853ebb001d195368f9ed3daa0ce7",
+      "size": 3839
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/multipledispatch/tests/test_conflict.py",
+      "sha": "5d2292c460585ae2a65a01795b38499e67706ff0",
+      "size": 1786
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/multipledispatch/tests/test_core.py",
+      "sha": "c8e60caf5f0dcb7e4bc860192d2a3d397669456e",
+      "size": 4020
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/multipledispatch/tests/test_dispatcher.py",
+      "sha": "437ae02597c6e78b212f7ba12dab4e6e63224f77",
+      "size": 6205
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_bbp_pi.py",
+      "sha": "806945a6a5504a3f7860ec0eaffeb9178f6ac6f7",
+      "size": 9422
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_continued_fraction.py",
+      "sha": "bd95f4efc74cc9bd2252c9efbbb8ce1f7dae1a7b",
+      "size": 2931
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_digits.py",
+      "sha": "6e58ff31aec7609407a8d90afd0bbdacebb66935",
+      "size": 1182
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_ecm.py",
+      "sha": "2da445cc0f304bc06109a5a49d8156330e6b3f70",
+      "size": 2290
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_egyptian_fraction.py",
+      "sha": "e1a7e9b346c9d58972a4b286d86822525af76786",
+      "size": 1882
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_elliptic_curve.py",
+      "sha": "7d49d8eac72cc622fb92dfca8c54e5cc6c8dfb8f",
+      "size": 624
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_factor_.py",
+      "sha": "9aec4e9341383a0eb86bf6518fecd2806bfdfc74",
+      "size": 24587
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_generate.py",
+      "sha": "32d70adccd7e95e719686dfb4ee72ee7383ed8a4",
+      "size": 7198
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_modular.py",
+      "sha": "10ebb1d3d3bdf5f736a6229579ae4c42a805745e",
+      "size": 1425
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_multinomial.py",
+      "sha": "076c5b1871cb19ef5092534a274b49b7976d23d0",
+      "size": 2322
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_partitions.py",
+      "sha": "1a347899c2efc8ae2b8a417dbb422a83cd529c61",
+      "size": 507
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_primetest.py",
+      "sha": "0d0b26427b26fc019f475c64d134360dfc93a303",
+      "size": 7049
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_qs.py",
+      "sha": "de5827494780f3e8c182a122b90e69981e94e0f1",
+      "size": 4116
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/ntheory/tests/test_residue.py",
+      "sha": "081acf2da4b443b3095947f5769b1a1d1176f1e9",
+      "size": 12856
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_ast_parser.py",
+      "sha": "338bdad3e5cea7fae43ea32f73f60e8d80fa911e",
+      "size": 555
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_autolev.py",
+      "sha": "1a69179e6f8b09ae3cf6ae9f5a2046f83e88454c",
+      "size": 6610
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_c_parser.py",
+      "sha": "0e525178529ed7c9dcc1d84384791d1f975da83e",
+      "size": 149117
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_fortran_parser.py",
+      "sha": "086645632fab982297b2ab13d66fb232355df64b",
+      "size": 11816
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_implicit_multiplication_application.py",
+      "sha": "f07567c7c3ee6cbb0bc5a223620932940c062ba9",
+      "size": 7002
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_latex.py",
+      "sha": "2eeddb0dc221724f73fcd71417e995b91ee20cd4",
+      "size": 9808
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_latex_deps.py",
+      "sha": "59470dd3940104b84ba31d20a4701738ff67cff6",
+      "size": 426
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_mathematica.py",
+      "sha": "d18de3a5042c5dee4a5e95a7992a4a707bc40fae",
+      "size": 2288
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_maxima.py",
+      "sha": "6104a1992be7995008911890d233cc80996fe67e",
+      "size": 1735
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_sym_expr.py",
+      "sha": "b8c3ee9d9fffa9d7f718c6b7360a289f49bfe9ef",
+      "size": 5657
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/parsing/tests/test_sympy_parser.py",
+      "sha": "06ad4f917ba8c13316877bcac0bab83a7e3af4ee",
+      "size": 8343
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/continuum_mechanics/tests/test_beam.py",
+      "sha": "cac0ac426547291300e1c53b6c065ac0aa7602d7",
+      "size": 24875
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/control/tests/test_lti.py",
+      "sha": "209c79ddbe533a2d5f3faba8042477fd0de768e2",
+      "size": 31108
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/hep/tests/test_gamma_matrices.py",
+      "sha": "f65ae7204d324e244e0967abe3d8016e943d9498",
+      "size": 13812
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_body.py",
+      "sha": "44dfea8ca1e6e3bbee2d2bb72f45da67fc26e67d",
+      "size": 4974
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_functions.py",
+      "sha": "64adbdec0877fcefca1bbf2f4c1a3d5a3a915d0e",
+      "size": 9101
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_kane.py",
+      "sha": "8391d429a319c9c46caa03176fd2598017beee53",
+      "size": 13608
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_kane2.py",
+      "sha": "ab9f200efbc492fdd8a7c0a3ca7d34979a1811cb",
+      "size": 19315
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_kane3.py",
+      "sha": "d14a419a69253f176e32f1741c6a111e971b6123",
+      "size": 14334
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_kane4.py",
+      "sha": "cce7ca5040524c4dc7a5a6be55e90afb139f552e",
+      "size": 4722
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_lagrange.py",
+      "sha": "a33a19a11ef0d5bf7351fa67d5450294fc9d9c09",
+      "size": 9387
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_lagrange2.py",
+      "sha": "8ff02c9f92d209d33c9fd0a1c7c130b5973f4a86",
+      "size": 1413
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_linearize.py",
+      "sha": "0ebb139fe0c6c4ef7e2e84ab1d218e53dcf61929",
+      "size": 11826
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_models.py",
+      "sha": "dcc5835b182f9f2d0a8aa993ed28f4020dd1d4c0",
+      "size": 5073
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_particle.py",
+      "sha": "4276663947b444812e39924e0c948566f156ad8e",
+      "size": 1920
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_rigidbody.py",
+      "sha": "dc3c836cec12d2b9004f1ebd4baee5e3d869a956",
+      "size": 4053
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/mechanics/tests/test_system.py",
+      "sha": "717eb2de0fb22fb3d9212f58d3de30f8a72ed69c",
+      "size": 8695
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/optics/tests/test_gaussopt.py",
+      "sha": "01d4d68a5c37a636e28796918587eae60f521951",
+      "size": 3760
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/optics/tests/test_medium.py",
+      "sha": "833c76070d76f059f02ca79e779e72fc93cc2bdd",
+      "size": 2137
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/optics/tests/test_polarization.py",
+      "sha": "b3b07813b4ddf5a2034841618754a9f5d4e736c5",
+      "size": 2447
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/optics/tests/test_utils.py",
+      "sha": "f7b86174e5658bb6cff625ab2eb2c571e65fb197",
+      "size": 7790
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/optics/tests/test_waves.py",
+      "sha": "675efe72d97afdd30a77a2151b782381371a5010",
+      "size": 2127
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_anticommutator.py",
+      "sha": "247215c2c044b960ff58999b096c727591009bf4",
+      "size": 1262
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_boson.py",
+      "sha": "00abf43fb00dea5e721fdf1fab9a1daf701c2386",
+      "size": 1544
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_cartesian.py",
+      "sha": "9e9b8dd2985d792a39ad2f8dc99d0700f397b878",
+      "size": 3856
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_cg.py",
+      "sha": "aaefcff15163e5ff314a1c03ab601d8000ffc993",
+      "size": 8715
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_circuitplot.py",
+      "sha": "fcc89f77047450ad3f8663f371f483654dc70ea9",
+      "size": 2096
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_circuitutils.py",
+      "sha": "bd64d40c90a9304a0f1936659a981152e1d2a63e",
+      "size": 13119
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_commutator.py",
+      "sha": "a8aa1589b75397fe083bff8f7575510387dc948d",
+      "size": 2685
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_constants.py",
+      "sha": "9afc19c8c220c3c30a13657f925c48bf74ee8dc0",
+      "size": 325
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_dagger.py",
+      "sha": "ed93087790c1ed2539efd0d9654713db41450bec",
+      "size": 1833
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_density.py",
+      "sha": "846cb42832b58a3789af12dd675bc61bfd1b5eab",
+      "size": 9598
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_fermion.py",
+      "sha": "681c6d8797a5942c41d71536ad472d7434dee760",
+      "size": 1135
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_gate.py",
+      "sha": "835c0beee606aca1557fc807ecc4b34228796659",
+      "size": 12322
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_grover.py",
+      "sha": "2f4f2e69685bf6d8c774bb90b9327dac06c25adc",
+      "size": 3573
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_hilbert.py",
+      "sha": "c6fe2b9dadc29f327a38882e5145477da4281fdb",
+      "size": 2513
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_identitysearch.py",
+      "sha": "752324fd4f49bc5a5bbbf9b6bf3520fce98e5741",
+      "size": 17841
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_innerproduct.py",
+      "sha": "07efc0306c19f25071765a228f9964ab9c82725f",
+      "size": 1468
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_matrixutils.py",
+      "sha": "967da65b142789ad28fc01b35e3dcca29077f22e",
+      "size": 4063
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_operator.py",
+      "sha": "a00bd8cf9f30e86d7004291e162fb7a2576e529c",
+      "size": 6946
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_operatorordering.py",
+      "sha": "b4703d846ce86dbb6c0e317872a4fe42e852fd64",
+      "size": 1402
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_operatorset.py",
+      "sha": "8881a95c9526185df8757a18ac58c096490176c0",
+      "size": 2613
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_pauli.py",
+      "sha": "d054e30f40ca995ee11e7e820edea21da30fe0bf",
+      "size": 4802
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_piab.py",
+      "sha": "217f2e1e9f10a764fb23742fa73ea31d1854489c",
+      "size": 881
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_printing.py",
+      "sha": "fe08a658e287ad6ab99e70875b3a0a9a18c4eec8",
+      "size": 30054
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_qapply.py",
+      "sha": "9f287239bce2420b3999e7662f7e5ef4cf849148",
+      "size": 4438
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_qasm.py",
+      "sha": "fa477bb0c71025c7fab4c3bb3dedf8bb9d38e5a8",
+      "size": 3079
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_qexpr.py",
+      "sha": "0d7f207c5054b73242041d11bfff15ea47c22347",
+      "size": 1457
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_qft.py",
+      "sha": "1a6f5938f64a7f9bd7ded725c265bf6567b6268e",
+      "size": 1683
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_qubit.py",
+      "sha": "3bd6e7fc6bc2b65882ba1919479a0f4bed1ceec7",
+      "size": 8782
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_represent.py",
+      "sha": "764a6687fe9feeffe124eeebef146ef23e0b23c4",
+      "size": 5119
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_sho1d.py",
+      "sha": "7e8e302c1727874ad0595cb3238b462045cd9432",
+      "size": 4556
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_shor.py",
+      "sha": "0ebccbc199be8640f2021933abbe58716c68f788",
+      "size": 666
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_spin.py",
+      "sha": "d82b638a758f2fefd128e102b8e0daacc7468bef",
+      "size": 343974
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_state.py",
+      "sha": "1abbd244bb78fa7dfd29a0d89aa542b769c28a39",
+      "size": 6391
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/quantum/tests/test_tensorproduct.py",
+      "sha": "0c47f0c2f577563e0c52c228e247e1101ac76b65",
+      "size": 4259
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_clebsch_gordan.py",
+      "sha": "99c332a637e250d591ac2b78f910facf18eaa291",
+      "size": 9241
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_hydrogen.py",
+      "sha": "a7999f1e9ff4263e0c5218ff966a00610339e181",
+      "size": 4689
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_paulialgebra.py",
+      "sha": "b7f7e591267f6fb4871999fbb633f892e737e18b",
+      "size": 1435
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_physics_matrices.py",
+      "sha": "3a64d45f9a30fe5a851f755ff168abb0d98ec550",
+      "size": 2630
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_pring.py",
+      "sha": "e0229064f9abdd9fe685e634c94f3175a72ae087",
+      "size": 1072
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_qho_1d.py",
+      "sha": "02f031bd5bcb84ff77aa6892c0117b156a8a8e1b",
+      "size": 1525
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_secondquant.py",
+      "sha": "39662ee3189fd3b6c268595853abfdeddf8ba7c8",
+      "size": 48059
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/tests/test_sho.py",
+      "sha": "eca5e86809876da8024c21afb2fba02b5659ce92",
+      "size": 675
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/units/tests/test_dimensions.py",
+      "sha": "b0ccdda4cfe40c0529acd2c0eb3fbf069dedb7f5",
+      "size": 4440
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/units/tests/test_dimensionsystem.py",
+      "sha": "b24ab87bd33f9abeae29e906397dacab3469ad16",
+      "size": 3110
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/units/tests/test_prefixes.py",
+      "sha": "ffe436bdb7a5f665ba8826981b62c4ab72200c05",
+      "size": 2106
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/units/tests/test_quantities.py",
+      "sha": "fe8a84570c5482c000aab9ca8ab08608e4612224",
+      "size": 15990
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/units/tests/test_unit_system_cgs_gauss.py",
+      "sha": "98db77b287989ccd0cf5a4ce4a414a00e3187fb3",
+      "size": 2636
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/units/tests/test_unitsystem.py",
+      "sha": "49c6745f5bd8360cbfef6ea84028ec979fb8cef9",
+      "size": 2098
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/units/tests/test_util.py",
+      "sha": "ed2f7df27ec7ef5c1df6c95411c86b45f22fba8c",
+      "size": 6243
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_dyadic.py",
+      "sha": "58bb1c1edb3f676a50a77c7db0422ec513b11a86",
+      "size": 3368
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_fieldfunctions.py",
+      "sha": "9bbcf8acefb66457f28d2d42dd18980c961ad882",
+      "size": 5727
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_frame.py",
+      "sha": "ce5eb809b07387d9b42887c476dc87e4db2e6d27",
+      "size": 16627
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_functions.py",
+      "sha": "320e599ea424cb183f759df940aedfc3a448f0f3",
+      "size": 20546
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_output.py",
+      "sha": "6eddb02ec2c43cdff3b38b6ba41e5218e4c5a96a",
+      "size": 2616
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_point.py",
+      "sha": "ce53bec4bd362d8d09a7141a722a4673ebca9f15",
+      "size": 9867
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_printing.py",
+      "sha": "cdf76e8fca5db5ccd8ec7233292466610fb8937f",
+      "size": 10284
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/physics/vector/tests/test_vector.py",
+      "sha": "497991a1ffd39dc90721654cc33a2a18727fa3ef",
+      "size": 6647
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/intervalmath/tests/test_interval_functions.py",
+      "sha": "861c3660df024d3fbec788a027708348e9929655",
+      "size": 9862
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/intervalmath/tests/test_interval_membership.py",
+      "sha": "7b7f23680d60a64a6257a84c2476e31a8b5dfce8",
+      "size": 4216
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/intervalmath/tests/test_intervalmath.py",
+      "sha": "e30f217a44b4ea795270c0e2c66b6813b05e63ea",
+      "size": 9034
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/pygletplot/tests/test_plotting.py",
+      "sha": "5b292ec53b775442c907cd9d1869b940b7b9a578",
+      "size": 2584
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/tests/test_experimental_lambdify.py",
+      "sha": "95839d668762be7be94d0de5092594306ceeadbd",
+      "size": 3127
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/tests/test_plot.py",
+      "sha": "ef6bf678f3094e477eaab12c3840c7d8f7f34bcb",
+      "size": 20645
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/tests/test_plot_implicit.py",
+      "sha": "55cdf602eb76584cfefd9d6e874a6135c8550f04",
+      "size": 4848
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/plotting/tests/test_textplot.py",
+      "sha": "3eed58c91ab1e2e447278635dd15451171e9b3ba",
+      "size": 12191
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/agca/tests/test_extensions.py",
+      "sha": "432687e2cf206d43defc266968477425685c04e4",
+      "size": 1699
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/agca/tests/test_homomorphisms.py",
+      "sha": "4ad27ca2df1ec5242f9da5c0fbba92f02a1e762d",
+      "size": 4164
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/agca/tests/test_ideals.py",
+      "sha": "b7fff0674b54a22e2a5acba5110d62d96a877074",
+      "size": 3788
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/agca/tests/test_modules.py",
+      "sha": "79fa55b4b76d80a174bf1a149cbd452003b5eba1",
+      "size": 13539
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/domains/tests/test_domains.py",
+      "sha": "255e51be37ce6c011392cf2d756fd5873a30c25a",
+      "size": 33620
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/domains/tests/test_polynomialring.py",
+      "sha": "ce40c5b4f903f29b9bbe2a0e18073286462f50c0",
+      "size": 3312
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/domains/tests/test_quotientring.py",
+      "sha": "8fa0667e147086eabc5141a7a170c4707d4d1517",
+      "size": 1388
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_constructor.py",
+      "sha": "33e2ede9dca5b8badfa5c310804997209b3b9b79",
+      "size": 5756
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_densearith.py",
+      "sha": "55b2f47ba6a56ffa8453b6d25a21bbc96fe37074",
+      "size": 40017
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_densebasic.py",
+      "sha": "4bca1baa7fd576907663b9638a1ea01352b14e02",
+      "size": 21464
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_densetools.py",
+      "sha": "ca78e1b0e1a4570c691bab6d2f0428f9096eac9b",
+      "size": 24475
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_dispersion.py",
+      "sha": "5fc4c078bd4b0e1d89add93979787ec7b40899b1",
+      "size": 3183
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_distributedmodules.py",
+      "sha": "c95672f99f878f3def660aadec901afbde9adf8b",
+      "size": 7639
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_domainmatrix.py",
+      "sha": "1b20741aafeb85c605f1823030ae59c1139cf82c",
+      "size": 31996
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_euclidtools.py",
+      "sha": "3061be73f987163951a5836ff50125d29abc60c7",
+      "size": 19482
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_factortools.py",
+      "sha": "f8537b195c0e7a2007e14d11e2582e406f63b0c9",
+      "size": 24409
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_fields.py",
+      "sha": "733816f6544a786547146dc06f033f2c832cc88f",
+      "size": 9892
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_galoistools.py",
+      "sha": "8663955e0a181a05a799ae51f81ab1a3175c1335",
+      "size": 27866
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_groebnertools.py",
+      "sha": "b7d0fc112047ac26f67d096db02eb8a1c91cab89",
+      "size": 18584
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_heuristicgcd.py",
+      "sha": "4f2d6c8f55283b0b0234000660748737cef23c00",
+      "size": 4031
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_injections.py",
+      "sha": "63a5537c94f00e52a3899c97f0d78bfadab78a67",
+      "size": 1286
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_modulargcd.py",
+      "sha": "d03ca5ce83b3e5a6fdb239f59c6e95404abb6f96",
+      "size": 9007
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_monomials.py",
+      "sha": "482cbee30dfd6716e97285ae4e766c25098c1eac",
+      "size": 10302
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_multivariate_resultants.py",
+      "sha": "ab2cea3a2636f0aa5a70e9a020256ed6e79130f8",
+      "size": 9453
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_numberfields.py",
+      "sha": "29aa928e2ac5ed42f310edb15768b4c6ba33433f",
+      "size": 31244
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_orderings.py",
+      "sha": "d61d4887754c9d9f49905c2e131d253a45cf2ffd",
+      "size": 4254
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_orthopolys.py",
+      "sha": "86b2ecb5010b29e36d9acd260bb3dc978c5361b3",
+      "size": 5322
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_partfrac.py",
+      "sha": "7808bc6be9538591950368ba81ab15bd1f79d9d8",
+      "size": 6880
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_polyclasses.py",
+      "sha": "3a54ba5077ea1d734af10e8346b7b1e2094db916",
+      "size": 12998
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_polyfuncs.py",
+      "sha": "ce761daf7c657f73fb158171db8783f3c9c95397",
+      "size": 4486
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_polymatrix.py",
+      "sha": "867cf085f03d0f6add8a42ab5a2597b7c15ee3ad",
+      "size": 1676
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_polyoptions.py",
+      "sha": "d820c72210ab057e78e9fee121666d7c80d3f5dc",
+      "size": 12320
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_polyroots.py",
+      "sha": "17fe9b6b20f28868b37e4ab6479f10f4c953d5bf",
+      "size": 24872
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_polytools.py",
+      "sha": "c774fc41e2942b5dc4cfab675a54fd7b4098fa4a",
+      "size": 118742
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_polyutils.py",
+      "sha": "d376426fd8272ffeb8c7ba395453163996b02301",
+      "size": 11062
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_pythonrational.py",
+      "sha": "9a44d2585a16f93f0dc4e4c7ff9c0643c8a05203",
+      "size": 3909
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_rationaltools.py",
+      "sha": "66c3f2274e2df9b25b8012dfe3fc9fc29e4d788d",
+      "size": 2125
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_ring_series.py",
+      "sha": "1af5abda906af1c3fa353808749e12c8c9c6660d",
+      "size": 24233
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_rings.py",
+      "sha": "274ac4c7029a54457424806099ae2cb6abcb5c8c",
+      "size": 42909
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_rootisolation.py",
+      "sha": "360fb5d6e8910f6df7a8763b9b1a1476495153ca",
+      "size": 31460
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_rootoftools.py",
+      "sha": "5ef5fd96fb15dee4028c8c3e990b895ea2ee9244",
+      "size": 19720
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_solvers.py",
+      "sha": "9b7c2b3c9f74f9626e2d1aa973fccb3011e4d808",
+      "size": 13655
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_specialpolys.py",
+      "sha": "86f057a101a1ed68daaf2dd6852884225f25b87e",
+      "size": 4795
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_sqfreetools.py",
+      "sha": "abe229e713d06134638c54740a2f4da8d48de05b",
+      "size": 4387
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/polys/tests/test_subresultants_qq_zz.py",
+      "sha": "ad63561674f546a0a3c9ffce7749228363b00605",
+      "size": 13091
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/pretty/tests/test_pretty.py",
+      "sha": "3f0f3950ca038ddc7b0d553f275e9026d42dc413",
+      "size": 159723
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_c.py",
+      "sha": "5471f064b1a98abc9d2fa5529e5e8224a7b2e2bc",
+      "size": 28766
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_codeprinter.py",
+      "sha": "69389a811f4d71742307f5cd0be332e18cdc9582",
+      "size": 1410
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_conventions.py",
+      "sha": "87689aa8fce4e2ae92867c37844b3aa91f3474cd",
+      "size": 4345
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_cxx.py",
+      "sha": "94fcdd4d9ac50a55cb8eca24b10764b8a56ac34c",
+      "size": 1964
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_dot.py",
+      "sha": "518bbcaef5c22377281df02fa46be297e0142930",
+      "size": 4369
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_fortran.py",
+      "sha": "6b2e216f29e785d93f770b217c5db023d3ce2c92",
+      "size": 33695
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_glsl.py",
+      "sha": "3544d63dae4827c3332f7b9b468a11e01f08f021",
+      "size": 24826
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_gtk.py",
+      "sha": "9c41c0c49ac1ce682d7098e5bd02916f511bed85",
+      "size": 435
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_jscode.py",
+      "sha": "ec65f91d74364afd9107878c4f9e0a9cbe9fe048",
+      "size": 11280
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_julia.py",
+      "sha": "002a4525833bc485866cf0c903825ee3db0dee62",
+      "size": 13517
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_lambdarepr.py",
+      "sha": "fcf2d9dab59f984d055dca4e1b78b02d2dbb8eb2",
+      "size": 6281
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_latex.py",
+      "sha": "aa2d09955c897a6d9e0c758eda03bc529b1aabf2",
+      "size": 111010
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_llvmjit.py",
+      "sha": "52d44383b2d0b85598a4e62d124352226ee48505",
+      "size": 5349
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_maple.py",
+      "sha": "efa69202827fd05113a62b79caf1a53459f71758",
+      "size": 12928
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_mathematica.py",
+      "sha": "1dfc040db0f9d31b0c7e6ffbd501348d8683ca07",
+      "size": 10933
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_mathml.py",
+      "sha": "22f41c7cbc2931ffc885c165051df9954fe4a548",
+      "size": 94825
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_numpy.py",
+      "sha": "515729f60844f6a592dc9786efabb0f210b7d9db",
+      "size": 8436
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_octave.py",
+      "sha": "947af6190702b3175311b5d52823a5ca39de7f03",
+      "size": 18362
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_precedence.py",
+      "sha": "372a5b0356b7a7473ecf595df45ae31c3bfaff71",
+      "size": 2787
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_preview.py",
+      "sha": "fc9beb8a7f8821f900983051e71e08c59905fb2a",
+      "size": 895
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_pycode.py",
+      "sha": "7d787fa0e08a379df769040d96f1e295ead16ffb",
+      "size": 13933
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_python.py",
+      "sha": "87395fea63fd6e6a5586b6065c57f519d5c03442",
+      "size": 7486
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_rcode.py",
+      "sha": "584d5d89e656acc0da2678d60bfb59cf773a9dc3",
+      "size": 14101
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_repr.py",
+      "sha": "59a558a23fbaac47187caddac8371f3bd7602807",
+      "size": 11173
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_rust.py",
+      "sha": "1b6a318b3523e018b5752d0c7811f2b21fd0790e",
+      "size": 11644
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_str.py",
+      "sha": "68e7c4d8f79d8645da0ef46f60ef1125553872f1",
+      "size": 34149
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_tableform.py",
+      "sha": "0f5fc8e9dc363057d8bbb70be54e3eb7df3542c3",
+      "size": 5642
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_tensorflow.py",
+      "sha": "cfc68ccce8d4aaac2f7a29d7efd8326908882e86",
+      "size": 15704
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_theanocode.py",
+      "sha": "7beb98ba7dcfdd149644c8701ccc706ce00041aa",
+      "size": 20514
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/printing/tests/test_tree.py",
+      "sha": "cf116d0cac5d38f225815fcd2d4ac90cd0dd96d7",
+      "size": 6080
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sandbox/tests/test_indexed_integrals.py",
+      "sha": "5d183aed3d97cb6fa6830d7a6a71a542c98532e7",
+      "size": 1079
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_approximants.py",
+      "sha": "5288d3a6d99106f57f7bcb7b15ae615781db4155",
+      "size": 918
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_aseries.py",
+      "sha": "9cf5f5a40a18660ef1b6cbe2efaa8f53492ff38e",
+      "size": 1662
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_demidovich.py",
+      "sha": "5c9db347f8d1b0d24eced1a8ee09e96f419fc179",
+      "size": 4650
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_formal.py",
+      "sha": "02983bf36d8a5546ccf16c11c3afa3fa0ab03b05",
+      "size": 21897
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_fourier.py",
+      "sha": "24753e3506876b90ac8de6984f3375fa5b4d84a2",
+      "size": 5632
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_gruntz.py",
+      "sha": "c1b2b55db310f48f1c6430c79feb99854b2cd2b0",
+      "size": 15656
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_kauers.py",
+      "sha": "6ef070f1b4a90bcf3accf1b7cbaa3c156c04968a",
+      "size": 1032
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_limits.py",
+      "sha": "61ed840506bc6522a5cf23e7eee63503c9ea8a02",
+      "size": 28762
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_limitseq.py",
+      "sha": "b216f1ba5b5d2cc92fa132e12970bab2170b62c5",
+      "size": 5049
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_lseries.py",
+      "sha": "e5f9ba772aefcf12b23926b567d01f45a25f9e42",
+      "size": 1670
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_nseries.py",
+      "sha": "209c0fd151df0da6e456456c2e38f8f6011c17a5",
+      "size": 16495
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_order.py",
+      "sha": "76f433bcecbc4003a553969c4cd117193a4b844a",
+      "size": 15168
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_residues.py",
+      "sha": "e3b3f38e08642ffde1cf989344e1df84e5e2ee42",
+      "size": 2188
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_sequences.py",
+      "sha": "4af2a041c4cd51f4efb7a1da7065b11505846520",
+      "size": 10604
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/series/tests/test_series.py",
+      "sha": "854b875191dd6125881125ddd7f3597a46cc9675",
+      "size": 12895
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sets/tests/test_conditionset.py",
+      "sha": "112fb3187a1b822110c3d47a7a2c3a33fbd805af",
+      "size": 9496
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sets/tests/test_contains.py",
+      "sha": "11b0fa851c4ada9a9b9c7841a8193f1ef2396768",
+      "size": 1335
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sets/tests/test_fancysets.py",
+      "sha": "a01f3101fa7c4970e761b9a2111d916a64d799e9",
+      "size": 43202
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sets/tests/test_ordinals.py",
+      "sha": "b396a17fd94cfd3f19874d85bc0488b1ab4ca04e",
+      "size": 2339
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sets/tests/test_powerset.py",
+      "sha": "fdb5f501e8cdb6c2ccf4578ca0b9c77500ec4ca5",
+      "size": 4407
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sets/tests/test_setexpr.py",
+      "sha": "e6490e77576f7e6e943bd590dfd0165fce1ceb0d",
+      "size": 14487
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/sets/tests/test_sets.py",
+      "sha": "e92cb1f23f6a6521e82a6e009646ece36a2b3f41",
+      "size": 61833
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_combsimp.py",
+      "sha": "8de69ec9d6652376a5d97c31696398954f01d2ff",
+      "size": 2787
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_cse.py",
+      "sha": "f076d8f533ae50a2ce80444d997111738ec08a4e",
+      "size": 17899
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_epathtools.py",
+      "sha": "d3b2f7737363d1abccd249646d55248265268315",
+      "size": 3458
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_fu.py",
+      "sha": "9c1b15ec6d32d0ac7fb2425a6d1c1617795a4759",
+      "size": 17987
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_function.py",
+      "sha": "441b9faf1bb3c5e7f2279b2a61066d050e45f773",
+      "size": 2199
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_gammasimp.py",
+      "sha": "9c66538eae3f736475f6b2d1e945f4b13a7a4b15",
+      "size": 4416
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_hyperexpand.py",
+      "sha": "856d291686402bec8458635bc7f5c5f51702e96c",
+      "size": 39828
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_powsimp.py",
+      "sha": "e31413b7ada1258bcb44a6f8601e77767c9bdb1f",
+      "size": 13006
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_radsimp.py",
+      "sha": "47b143615d70878192b6a9902700eb590e74cd00",
+      "size": 17829
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_ratsimp.py",
+      "sha": "3f00f9231396b7fdb8679371265c130edca7fad0",
+      "size": 1963
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_rewrite.py",
+      "sha": "06d487eb28512f470d2053896f8b51bf858b18a9",
+      "size": 877
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_simplify.py",
+      "sha": "52934ff97fdbff034cf150b655dc3e227679bcad",
+      "size": 36326
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_sqrtdenest.py",
+      "sha": "e89def9007b026d8efece395520dbc97d779114a",
+      "size": 7379
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_traversaltools.py",
+      "sha": "dcf49afddd0ace163452ddbdc5114a2a7a946127",
+      "size": 875
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/simplify/tests/test_trigsimp.py",
+      "sha": "d399d5b94ae36a447e66470e3f8327082a276d75",
+      "size": 18441
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/diophantine/tests/test_diophantine.py",
+      "sha": "8e5e8cc8a71772368728a5dea102fc267f74db30",
+      "size": 40957
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/ode/tests/test_ode.py",
+      "sha": "0dcba001581b5749461d6322a69ca33d24c51f15",
+      "size": 113048
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/ode/tests/test_single.py",
+      "sha": "56f6dbaf6d902011b2098b57391eaeea09369579",
+      "size": 42282
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/ode/tests/test_subscheck.py",
+      "sha": "31f784a5e59a1a1b12e5c61678053106fa4ea3e3",
+      "size": 12135
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/ode/tests/test_systems.py",
+      "sha": "72231bab96c315d358418f9d06f6462662464595",
+      "size": 115503
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_constantsimp.py",
+      "sha": "64ec580fc9bcc268d57848d0db5854f4ae38f81b",
+      "size": 8318
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_decompogen.py",
+      "sha": "9b7652b404cfb3baceadad49169caf8dd11d107a",
+      "size": 2449
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_inequalities.py",
+      "sha": "83a1cfd3c88fd1a7785df5a40c42f86aef8a578a",
+      "size": 19465
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_numeric.py",
+      "sha": "8953f79a26edde22565812292666b1358755e631",
+      "size": 4396
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_pde.py",
+      "sha": "1b43eb0b0886235a8a8b1b4a593e4e7d486fcfae",
+      "size": 9057
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_polysys.py",
+      "sha": "8f931ed3baa1f430baf0eef950464932d784ac46",
+      "size": 4859
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_recurr.py",
+      "sha": "2be1c37f0156be700b0240d39a7251915131b360",
+      "size": 7871
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_solvers.py",
+      "sha": "3eaa90ce31c605263d28ab164b6139f409983a59",
+      "size": 91425
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/solvers/tests/test_solveset.py",
+      "sha": "a7161a83698c5181b9e579fc963022b45118f5ff",
+      "size": 101525
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_compound_rv.py",
+      "sha": "8a8a1564e6c29dfef99f7117908ca1712ca1645a",
+      "size": 5511
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_continuous_rv.py",
+      "sha": "14a71a9be86eaee9ebc3930bad5ff2655725418d",
+      "size": 59524
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_discrete_rv.py",
+      "sha": "4321587b42a41f69d03ee17e425223adc0b19d29",
+      "size": 14032
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_error_prop.py",
+      "sha": "88c30015b120fd4f75c670b46519c7206ee9ada9",
+      "size": 1840
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_finite_rv.py",
+      "sha": "699476a7bb0f2ee9f1dd4fcd7a696aa168b7338f",
+      "size": 19934
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_joint_rv.py",
+      "sha": "a0a63e7c34c1a53dfdef0c831793cf0bafe17d56",
+      "size": 14748
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_matrix_distributions.py",
+      "sha": "68da9475ad8f0f8dff2b2991ea6ac50c70386881",
+      "size": 6274
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_mix.py",
+      "sha": "a47f7beae8e65f64b10a45c0ea56a423b42a8795",
+      "size": 3417
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_random_matrix.py",
+      "sha": "87f9bca09ada5df787c74fdc7c701c7da4a962f7",
+      "size": 5373
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_rv.py",
+      "sha": "086e5f78df795fb9ddba73e40a923e7298b30bb8",
+      "size": 11124
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_stochastic_process.py",
+      "sha": "3abd19a46e6e61e5fd3033d66e7030cfb719dea6",
+      "size": 28496
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_symbolic_multivariate.py",
+      "sha": "680a2a21533f399f7a7313bac4ff7226a3f77587",
+      "size": 5433
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/stats/tests/test_symbolic_probability.py",
+      "sha": "1dc1d9cff0f351565a45353513930cbceba374ae",
+      "size": 9081
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/branch/tests/test_core.py",
+      "sha": "cc6e115b97bb365aa0a92424eb06a16c0654a688",
+      "size": 2359
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/branch/tests/test_tools.py",
+      "sha": "8477ef49d8c34b9899c6d61c5408b819d39d83d6",
+      "size": 783
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/branch/tests/test_traverse.py",
+      "sha": "6e0e60e9240c54228744d6da187a8c6724698696",
+      "size": 1143
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/tests/test_core.py",
+      "sha": "082a286b9576318f997fd7bf18e608a50f0208a1",
+      "size": 1953
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/tests/test_rl.py",
+      "sha": "30dabd614ce261654569925bb14c8f80c5a8369f",
+      "size": 1740
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/tests/test_strat.py",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/tests/test_tools.py",
+      "sha": "dca398c36586342d9a4f8b31e537d3001af6e34c",
+      "size": 774
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/tests/test_traverse.py",
+      "sha": "1329d828c57d0c02c7c54a066384ad73f739a931",
+      "size": 1752
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/strategies/tests/test_tree.py",
+      "sha": "46ae462a45782c9f627d7b0015d621dd5cc4448c",
+      "size": 2595
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/array/tests/test_array_comprehension.py",
+      "sha": "d9e6e372a87d0ec8ccf37252261420006d319e16",
+      "size": 4596
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/array/tests/test_array_derivatives.py",
+      "sha": "e48eb59b93663489b8e0b45320f25b100bd54aa8",
+      "size": 1478
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/array/tests/test_arrayop.py",
+      "sha": "065984563145d0c0130707b78f2950b452f708de",
+      "size": 22456
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/array/tests/test_immutable_ndim_array.py",
+      "sha": "ac22b87d30a5da97fec0444f376d12dfb6649ff5",
+      "size": 15452
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/array/tests/test_mutable_ndim_array.py",
+      "sha": "bcdbf7f8b5f0e881ee7cab49c6aed63caf95468a",
+      "size": 12888
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/array/tests/test_ndim_array.py",
+      "sha": "5fa14822bc0e7cd96618c1a6e9e35fc3a1ed7aa3",
+      "size": 1462
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/array/tests/test_ndim_array_conversions.py",
+      "sha": "f43260ccc636ac461ba0c06dbfcf3fe3a8d5338d",
+      "size": 648
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/tests/test_functions.py",
+      "sha": "5d942ae26a14855b18361770889fe0b68867154b",
+      "size": 1433
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/tests/test_index_methods.py",
+      "sha": "8a2f076c1233ab4e0f0c5c06fae436b539b9dcf2",
+      "size": 7419
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/tests/test_indexed.py",
+      "sha": "3872b52ca52bdedae78624d1684fbc044e32fd21",
+      "size": 15823
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/tests/test_tensor.py",
+      "sha": "b2830cc13337ebd857e645c23cf517a4ea0a2c9f",
+      "size": 70560
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/tests/test_tensor_element.py",
+      "sha": "76d1647709e47bb02946bfc5685a3d5383982371",
+      "size": 896
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/tensor/tests/test_tensor_operators.py",
+      "sha": "3b52e28e25501c2f792e1a609893ee641c0709a5",
+      "size": 17126
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/testing/tests/test_code_quality.py",
+      "sha": "b9f8fb3b50661b93c0da74c32a313c81c2a05404",
+      "size": 18619
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/testing/tests/test_module_imports.py",
+      "sha": "508843515602ac6af9065244c1e22083acbbbbb9",
+      "size": 1498
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/testing/tests/test_pytest.py",
+      "sha": "99b5199269356d9d7fad162d0563c673396fddda",
+      "size": 7753
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/unify/tests/test_rewrite.py",
+      "sha": "949fe41a4c42d1badc997ef82adca2a16746204a",
+      "size": 1842
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/unify/tests/test_sympy.py",
+      "sha": "4e84378cc90072868fc58301cf38c4101ef74946",
+      "size": 5552
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/unify/tests/test_unify.py",
+      "sha": "e62780e105e271aa044e1093779a696d477f85ed",
+      "size": 3036
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/_compilation/tests/test_compilation.py",
+      "sha": "083335327d6396fc53fdfc23a883569b6ee89f0e",
+      "size": 1733
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_autowrap.py",
+      "sha": "70638167fdf2854103819d687ff12b3b41b1efef",
+      "size": 14709
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_codegen.py",
+      "sha": "be2f593fadd3c22b3760a0821ee0cca97ebde637",
+      "size": 53705
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_codegen_julia.py",
+      "sha": "186677b77131683ece08ca8ceeb77f1bbf0174b3",
+      "size": 18289
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_codegen_octave.py",
+      "sha": "cbdae19f61b610a48b24d133b055818a6c59f307",
+      "size": 17709
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_codegen_rust.py",
+      "sha": "915b0c6a0779c5053a117e6b84bfc31c43718aa4",
+      "size": 12223
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_decorator.py",
+      "sha": "269d1b8a63349557081fd5b5f22c75ef337582ca",
+      "size": 1504
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_deprecated.py",
+      "sha": "8991d4e0cb158b37d3c6285ce8696cdb5dce7e68",
+      "size": 781
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_enumerative.py",
+      "sha": "a0996157b47526393783afce99582beb1770b494",
+      "size": 6089
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_iterables.py",
+      "sha": "73fec908a8c65c38f42d26064462fcebcf50766b",
+      "size": 31194
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_lambdify.py",
+      "sha": "26eb22356d9705dc974fe23cd202981de87e3ac4",
+      "size": 42745
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_misc.py",
+      "sha": "5d57fad96884a27e491f3f30d33f6c9e1a6728fe",
+      "size": 3399
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_pickling.py",
+      "sha": "c659e6ce8b86a5183f7b6fb7f7824f58a5c07cea",
+      "size": 22426
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_source.py",
+      "sha": "d4df63c09bc0706065a80edeb8969b06a4f238b9",
+      "size": 797
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_timeutils.py",
+      "sha": "edaf66f9194af315cbe80b63018f966060846d2c",
+      "size": 324
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/utilities/tests/test_wester.py",
+      "sha": "164f2cfcda3dee852d07ed12c3b85124d32706f3",
+      "size": 92668
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_coordsysrect.py",
+      "sha": "fd35f60ae95d7bb48956415a1669bc6bde78b10d",
+      "size": 19426
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_dyadic.py",
+      "sha": "f301a770a8a3d232914fa0575515587e41622743",
+      "size": 4194
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_field_functions.py",
+      "sha": "3f50e790bdd7aa3035708ee4f3a3567416bc52f4",
+      "size": 14058
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_functions.py",
+      "sha": "1785b4802dd3b8c26121d443706e9d4bd0be3948",
+      "size": 7829
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_implicitregion.py",
+      "sha": "862aab11f8414bf14ae6acf7d1fb88ad847ac19e",
+      "size": 4121
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_integrals.py",
+      "sha": "e5271a2111be288b2bf98f2ecc8bfba0c1d208e5",
+      "size": 4936
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_operators.py",
+      "sha": "2f3eccf65e3538020682bb5c170989af69f3b0f3",
+      "size": 1495
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_parametricregion.py",
+      "sha": "68cd82db55571e4aac25ed9a6b8cfc3f2e9748e4",
+      "size": 3942
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_printing.py",
+      "sha": "7edac35a0ed93a1e3ad3c884f6986e2d3a103e9f",
+      "size": 5804
+    },
+    {
+      "native_default_blacklisted": false,
+      "path": "sympy/vector/tests/test_vector.py",
+      "sha": "f7fc13d66f4ba8778d63027ffdb7ebbfc38e8ad6",
+      "size": 6934
+    }
+  ]
+}
