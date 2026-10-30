@@ -1,0 +1,9 @@
+{
+  "run": 40993871572,
+  "artifact": 12950537201,
+  "archive_sha256": "06311172dbab782f3655f7282ea68f1d072b4413e47d1232252f0719eebf1219",
+  "tested_commit": "f24a59c3076e72a3d12d92f04590bc8bdb21480d",
+  "status": "five_wrapper_bytes_verified",
+  "ordinary_acceptance": false,
+  "provider_calls": 0
+}

@@ -22,3 +22,21 @@ def test_trial_prepare_profile_does_not_conflate_ordinary_admission():
     assert profile['base_optional_profile_sha256'] == smoke.optional.PEXPECT_PROFILE_SHA256
     with pytest.raises(ValueError, match='fresh output'):
         smoke.run(Path('.'))
+
+
+def test_focused_trial_requires_exact_nodes_and_completed_teardowns():
+    nodes = sorted(smoke.TRIAL_NODES)
+    obs = {'items': nodes, 'finished': True, 'exit_code': 0, 'collection_errors': [], 'collection_skips': [],
+           'reports': [{'nodeid': node, 'phase': phase, 'outcome': 'passed', 'wasxfail': None}
+                       for node in nodes for phase in ('setup', 'call', 'teardown')]}
+    raw = 'P07_TRIAL_FOCUSED=' + json.dumps(obs) + '\n'
+    assert smoke.parse_focused(raw, 0) == obs
+    with pytest.raises(ValueError, match='exactly one'):
+        smoke.parse_focused(raw + raw, 0)
+    obs['reports'].pop()
+    with pytest.raises(ValueError, match='phase inventory'):
+        smoke.parse_focused('P07_TRIAL_FOCUSED=' + json.dumps(obs), 0)
+    obs['items'][0] = 'testing/unrelated.py::test_other'
+    with pytest.raises(ValueError, match='collection'):
+        smoke.parse_focused('P07_TRIAL_FOCUSED=' + json.dumps(obs), 0)
+    compile(smoke.FOCUSED, '<trial-focused>', 'exec')

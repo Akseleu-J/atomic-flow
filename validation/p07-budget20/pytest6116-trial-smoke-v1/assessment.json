@@ -1,0 +1,9 @@
+{
+  "run": 40993869379,
+  "artifact": 12950436515,
+  "archive_sha256": "8eae1efb70c7f62f706e9f396f3904ed747938878c58b683ba2e4905e32b9a05",
+  "tested_commit": "f24a59c3076e72a3d12d92f04590bc8bdb21480d",
+  "status": "trial_import_and_zope_abi_passed",
+  "ordinary_acceptance": false,
+  "provider_calls": 0
+}

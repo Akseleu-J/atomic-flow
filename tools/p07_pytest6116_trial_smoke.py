@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -43,13 +44,61 @@ assert trialpath==site+'twisted/trial/unittest.py'
 print(json.dumps({'twisted':metadata.version('Twisted'),'setuptools':metadata.version('setuptools'),
                   'native':nativepath,'trial':trialpath,'interface_ok':True},sort_keys=True))
 '''
+TRIAL_NODES = frozenset('testing/test_unittest.py::TestTrialUnittest::' + name for name in (
+    'test_trial_testcase_runtest_not_collected', 'test_trial_exceptions_with_skips', 'test_trial_error',
+    'test_trial_testcase_skip_property', 'test_trial_testfunction_skip_property',
+    'test_trial_testcase_todo_property', 'test_trial_testfunction_todo_property', 'test_trial_pdb'))
+FOCUSED = r'''
+import json,os,sys
+sys.dont_write_bytecode=True
+sys.path.insert(0,'/testbed/src')
+import pytest,_pytest
+assert sys.version_info[:3]==(3,8,20) and os.path.realpath(pytest.__file__)=='/testbed/src/pytest.py'
+assert os.path.realpath(_pytest.__file__)=='/testbed/src/_pytest/__init__.py'
+class Recorder:
+    def __init__(self):self.items=[];self.reports=[];self.finished=False;self.collection_errors=[];self.collection_skips=[]
+    def pytest_collection_finish(self,session):self.items=[item.nodeid for item in session.items]
+    def pytest_collectreport(self,report):
+        if report.failed:self.collection_errors.append(report.nodeid)
+        if report.skipped:self.collection_skips.append(report.nodeid)
+    def pytest_runtest_logreport(self,report):
+        self.reports.append({'nodeid':report.nodeid,'phase':report.when,'outcome':report.outcome,
+                             'wasxfail':getattr(report,'wasxfail',None)})
+    def pytest_sessionfinish(self,session,exitstatus):self.finished=True
+r=Recorder()
+code=int(pytest.main(['-q','--tb=short','-o','cache_dir=/tmp/p07-pytest-cache',
+                      'testing/test_unittest.py::TestTrialUnittest'],plugins=[r]))
+print('\nP07_TRIAL_FOCUSED='+json.dumps({'items':r.items,'reports':r.reports,'finished':r.finished,
+      'exit_code':code,'collection_errors':r.collection_errors,'collection_skips':r.collection_skips},sort_keys=True),flush=True)
+raise SystemExit(code)
+'''
 
 
-def run(output):
+def parse_focused(stdout, exit_code):
+    prefix = 'P07_TRIAL_FOCUSED='
+    markers = [line.removeprefix(prefix) for line in stdout.splitlines() if line.startswith(prefix)]
+    if len(markers) != 1:
+        raise ValueError('exactly one trial diagnostic marker required')
+    obs = json.loads(markers[0])
+    if (obs.get('finished') is not True or obs.get('exit_code') != exit_code
+            or type(obs.get('items')) is not list or len(obs['items']) != len(TRIAL_NODES)
+            or set(obs['items']) != TRIAL_NODES or len(set(obs['items'])) != len(obs['items'])
+            or obs.get('collection_errors') or obs.get('collection_skips') or type(obs.get('reports')) is not list):
+        raise ValueError('focused trial collection differs or is incomplete')
+    reports = obs['reports']
+    pairs = [(r.get('nodeid'), r.get('phase')) for r in reports]
+    if (len(set(pairs)) != len(pairs) or any(node not in TRIAL_NODES or phase not in ('setup','call','teardown')
+                                              for node, phase in pairs)
+            or any((node, 'teardown') not in pairs for node in TRIAL_NODES)):
+        raise ValueError('focused trial phase inventory incomplete')
+    return obs
+
+
+def run(output, *, focused=False):
     if os.name != 'posix' or output.exists():
         raise ValueError('fresh output on Linux required')
     output.mkdir(parents=True)
-    report = {'status': 'not_qualified', 'scope': 'Twisted trial installation and ABI smoke only',
+    report = {'status': 'not_qualified', 'scope': 'eight public trial nodes' if focused else 'Twisted trial installation and ABI smoke only',
               'ordinary_acceptance': False, 'provider_calls': 0, 'full_test_suite': 'not_run'}
     env = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'HOME': '/tmp', 'LANG': 'C', 'LC_ALL': 'C'}
     def command(args, timeout=120):
@@ -85,14 +134,31 @@ def run(output):
             base_image = json.loads(base_result.stdout)[0] if not base_result.returncode else {}
             if IMAGE not in base_image.get('RepoDigests', []) or base_image.get('Architecture') != 'amd64':
                 raise ValueError('pinned image identity differs')
+            if focused:
+                source_pull = command([recon.ENGINE, 'pull', recon.IMAGE], timeout=240)
+                (output / 'source-pull.stdout').write_bytes(source_pull.stdout)
+                (output / 'source-pull.stderr').write_bytes(source_pull.stderr)
+                if source_pull.returncode:
+                    raise ValueError('pinned source image pull failed')
+                source_inspect = command([recon.ENGINE, 'image', 'inspect', recon.IMAGE])
+                source_image = json.loads(source_inspect.stdout)[0] if not source_inspect.returncode else {}
+                if recon.IMAGE not in source_image.get('RepoDigests', []) or source_image.get('Architecture') != 'amd64':
+                    raise ValueError('pinned source image identity differs')
+                (output / 'source-image-inspect.json').write_bytes(source_inspect.stdout)
             scheme = ("import pip,sys,sysconfig; p=sysconfig.get_paths(); "
                       "x={'python':sys.executable,'version':list(sys.version_info[:3]),'pip':pip.__version__,"
                       "'data':p['data'],'scripts':p['scripts'],'purelib':p['purelib'],'platlib':p['platlib']}; "
                       'assert x==' + repr(py38.FIXED_SCHEME))
-            dockerfile = ('FROM ' + IMAGE + '\nCOPY *.whl /opt/p07-wheels/\n'
+            dockerfile = (('FROM ' + recon.IMAGE + ' AS target\n') if focused else '') + ('FROM ' + IMAGE + '\n'
+                          + ('COPY --from=target /testbed /testbed\n' if focused else '')
+                          + 'COPY *.whl /opt/p07-wheels/\n'
                           'RUN --network=none ' + py38.PYTHON + ' -I -B -c ' + shlex.quote(scheme) + '\n'
                           'RUN --network=none ' + py38.PYTHON + ' -I -B -m pip --isolated install '
                           '--no-index --no-deps --no-compile --force-reinstall /opt/p07-wheels/*.whl\n')
+            if focused:
+                inject = ("from pathlib import Path; p=Path('/usr/local/lib/python3.8/site-packages/p07-public-source.pth'); "
+                          "assert not p.exists(); p.write_text(\"import sys; sys.path.insert(0, '/testbed/src')\\n\")")
+                dockerfile += 'RUN --network=none ' + py38.PYTHON + ' -I -B -c ' + shlex.quote(inject) + '\n'
             (context / 'Dockerfile').write_text(dockerfile)
             (output / 'Dockerfile').write_text(dockerfile)
             build = command([recon.ENGINE, 'build', '--pull=false', '--network=none', '--iidfile', str(tmp / 'iid'), str(context)], timeout=300)
@@ -142,6 +208,17 @@ def run(output):
                           generated_wrappers_count=len(wrappers))
             if command([recon.ENGINE, 'start', cid]).returncode:
                 raise ValueError('container start failed')
+            if focused:
+                tree = json.loads(recon.PUBLIC_TREE.read_bytes())
+                if tree.get('base_commit') != recon.BASE or tree.get('repo') != 'pytest-dev/pytest' or len(tree.get('blobs', [])) != 474:
+                    raise ValueError('public source inventory differs')
+                verify = command([recon.ENGINE, 'exec', '--user=65534:65534', cid, py38.PYTHON, '-I', '-B', '-c',
+                                  recon.VERIFY_SOURCE, json.dumps(tree['blobs'], separators=(',', ':'))], timeout=90)
+                (output / 'source-verification.stdout').write_bytes(verify.stdout)
+                (output / 'source-verification.stderr').write_bytes(verify.stderr)
+                if verify.returncode or json.loads(verify.stdout) != {'checked': 474, 'differences': []}:
+                    raise ValueError('public source bytes differ')
+                report['source_blobs_verified'] = 474
             for name, code in (('scheme', py38.SCHEME_PROBE), ('native', PROBE)):
                 run = _bounded([recon.ENGINE, 'exec', '--user=65534:65534', '-w', '/tmp', cid,
                                 py38.PYTHON, '-I', '-B', '-c', code], home=tmp, timeout=60, limit=100000, check=lambda: None)
@@ -157,7 +234,28 @@ def run(output):
                         or observed.get('native') not in actual or observed.get('trial') not in actual):
                     raise ValueError('trial/native result differs from audited inventory')
                 report[name] = observed
-            report['status'] = 'trial_install_and_abi_smoke_passed'
+            if focused:
+                result = _bounded([recon.ENGINE, 'exec', '--user=65534:65534', '-w', '/testbed', cid,
+                                   py38.PYTHON, '-I', '-B', '-c', FOCUSED], home=tmp, timeout=180, limit=500000, check=lambda: None)
+                (output / 'focused.stdout').write_bytes(result.stdout.encode())
+                (output / 'focused.stderr').write_bytes(result.stderr.encode())
+                report.update(focused_stdout_sha256=hashlib.sha256(result.stdout.encode()).hexdigest(),
+                              focused_stderr_sha256=hashlib.sha256(result.stderr.encode()).hexdigest(),
+                              focused_timed_out=result.timed_out, focused_stdout_truncated=result.stdout_truncated,
+                              focused_stderr_truncated=result.stderr_truncated)
+                if result.timed_out or result.stdout_truncated or result.stderr_truncated:
+                    raise ValueError('focused trial diagnostic incomplete')
+                obs = parse_focused(result.stdout, result.returncode)
+                (output / 'focused-observation.json').write_text(json.dumps(obs, indent=2, sort_keys=True) + '\n')
+                report.update(focused_exit_code=result.returncode, focused_nodes=len(obs['items']),
+                              focused_reports=obs['reports'])
+                expected = {(node, phase) for node in TRIAL_NODES for phase in ('setup', 'call', 'teardown')}
+                actual = {(row['nodeid'], row['phase']) for row in obs['reports']}
+                report['status'] = ('focused_trial_passed' if result.returncode == 0 and actual == expected
+                                    and all(row['outcome'] == 'passed' and row['wasxfail'] is None for row in obs['reports'])
+                                    else 'focused_trial_observed_nonpassing')
+            else:
+                report['status'] = 'trial_install_and_abi_smoke_passed'
         except Exception as exc:
             report.update(error_type=type(exc).__name__, error=str(exc)[:500])
         finally:
@@ -176,5 +274,8 @@ def run(output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
-    result = run(parser.parse_args().output)
-    raise SystemExit(0 if result['status'] == 'trial_install_and_abi_smoke_passed' else 1)
+    parser.add_argument('--focused', action='store_true')
+    options = parser.parse_args()
+    result = run(options.output, focused=options.focused)
+    expected = 'focused_trial_passed' if options.focused else 'trial_install_and_abi_smoke_passed'
+    raise SystemExit(0 if result['status'] == expected else 1)
