@@ -1,0 +1,59 @@
+{
+  "base_optional_profile_sha256": "82a142fdd6e1ac6c5aee6b59cef0e415fa171f66be3b6f6edc8afaf935f2072d",
+  "python_version": "3.8.20",
+  "replacement_note": "setuptools 57.5.0 replaces base setuptools and needs full image/runtime qualification",
+  "schema_version": 1,
+  "scope": "prospective trial dependencies; no acceptance",
+  "task_id": "pytest-dev__pytest-6116",
+  "wheels": [
+    {
+      "filename": "Twisted-21.2.0-py3-none-any.whl",
+      "name": "Twisted",
+      "sha256": "aab38085ea6cda5b378b519a0ec99986874921ee8881318626b0a3414bb2631e",
+      "url": "https://files.pythonhosted.org/packages/f2/16/3eb9c66a7bfb5220c7bcbaaac33d359fe8a157b028959cd210983749b2e0/Twisted-21.2.0-py3-none-any.whl",
+      "version": "21.2.0"
+    },
+    {
+      "filename": "zope.interface-5.5.2-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+      "name": "zope.interface",
+      "sha256": "9d783213fab61832dbb10d385a319cb0e45451088abd45f95b5bb88ed0acca1a",
+      "url": "https://files.pythonhosted.org/packages/bf/0e/fc2272397b7fd6a907c9c8c8ed310749db0b451ce5ca5cf90de1ac01c166/zope.interface-5.5.2-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+      "version": "5.5.2"
+    },
+    {
+      "filename": "constantly-15.1.0-py2.py3-none-any.whl",
+      "name": "constantly",
+      "sha256": "dd2fa9d6b1a51a83f0d7dd76293d734046aa176e384bf6e33b7e44880eb37c5d",
+      "url": "https://files.pythonhosted.org/packages/b9/65/48c1909d0c0aeae6c10213340ce682db01b48ea900a7d9fce7a7910ff318/constantly-15.1.0-py2.py3-none-any.whl",
+      "version": "15.1.0"
+    },
+    {
+      "filename": "incremental-21.3.0-py2.py3-none-any.whl",
+      "name": "incremental",
+      "sha256": "92014aebc6a20b78a8084cdd5645eeaa7f74b8933f70fa3ada2cfbd1e3b54321",
+      "url": "https://files.pythonhosted.org/packages/99/3b/4f80dd10cb716f3a9e22ae88f026d25c47cc3fdf82c2747f3d59c98e4ff1/incremental-21.3.0-py2.py3-none-any.whl",
+      "version": "21.3.0"
+    },
+    {
+      "filename": "Automat-20.2.0-py2.py3-none-any.whl",
+      "name": "Automat",
+      "sha256": "b6feb6455337df834f6c9962d6ccf771515b7d939bca142b29c20c2376bc6111",
+      "url": "https://files.pythonhosted.org/packages/dd/83/5f6f3c1a562674d65efc320257bdc0873ec53147835aeef7762fe7585273/Automat-20.2.0-py2.py3-none-any.whl",
+      "version": "20.2.0"
+    },
+    {
+      "filename": "hyperlink-21.0.0-py2.py3-none-any.whl",
+      "name": "hyperlink",
+      "sha256": "e6b14c37ecb73e89c77d78cdb4c2cc8f3fb59a885c5b3f819ff4ed80f25af1b4",
+      "url": "https://files.pythonhosted.org/packages/6e/aa/8caf6a0a3e62863cbb9dab27135660acba46903b703e224f14f447e57934/hyperlink-21.0.0-py2.py3-none-any.whl",
+      "version": "21.0.0"
+    },
+    {
+      "filename": "setuptools-57.5.0-py3-none-any.whl",
+      "name": "setuptools",
+      "sha256": "60d78588f15b048f86e35cdab73003d8b21dd45108ee61a6693881a427f22073",
+      "url": "https://files.pythonhosted.org/packages/4b/b9/71687c5d2034c863db1db2e0704f5e27581ff3cb44d7f293968c5e08ceb3/setuptools-57.5.0-py3-none-any.whl",
+      "version": "57.5.0"
+    }
+  ]
+}
