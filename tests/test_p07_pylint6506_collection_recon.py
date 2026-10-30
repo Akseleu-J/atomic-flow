@@ -31,3 +31,26 @@ def test_partial_or_mismatched_collection_marker_is_refused():
         recon.parse_collection(text, 0)
     with pytest.raises(ValueError):
         recon.parse_collection(text + '\n' + text, 2)
+
+@pytest.mark.skipif(sys.platform == 'win32', reason='POSIX executable mode semantics')
+def test_source_verifier_distinguishes_modes_from_content(tmp_path):
+    import hashlib
+    import os
+    import subprocess
+
+    root = tmp_path / 'source'
+    root.mkdir()
+    target = root / 'test.py'
+    raw = b'original\n'
+    target.write_bytes(raw)
+    target.chmod(0o755)
+    digest = hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest()
+    rows = [{'path': 'test.py', 'sha': digest, 'size': len(raw), 'mode': '100644'}]
+    payload = base64.b64encode(zlib.compress(json.dumps(rows).encode())).decode()
+    code = recon.VERIFY_SOURCE.replace("os.path.join('/testbed',relative)", f"os.path.join({str(root)!r},relative)")
+    def observe():
+        out = subprocess.check_output([sys.executable, '-c', code, payload], env=os.environ.copy())
+        return json.loads(out)['differences']
+    assert observe()[0]['reason'] == 'executable_mode_differs'
+    target.write_bytes(b'corrupt\n')
+    assert observe()[0]['reason'] == 'content_differs'

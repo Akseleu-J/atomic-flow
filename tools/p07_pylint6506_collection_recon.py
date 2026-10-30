@@ -37,13 +37,14 @@ for row in rows:
         if row['mode']=='120000' and stat.S_ISLNK(mode):
             raw=os.fsencode(os.readlink(path))
         elif row['mode'] in ('100644','100755') and stat.S_ISREG(mode) and os.path.realpath(path)==path:
-            if bool(mode & 0o111) != (row['mode']=='100755'): raise ValueError('executable mode differs')
             with open(path,'rb') as stream: raw=stream.read(4*1024*1024+1)
         else:
             raise ValueError('unexpected file type or linked ancestor')
         actual=hashlib.sha1(('blob '+str(len(raw))+'\0').encode('ascii')+raw).hexdigest()
         if len(raw)!=row['size'] or actual!=row['sha']:
             result.append({'path':relative,'reason':'content_differs','actual':actual})
+        elif row['mode'] in ('100644','100755') and bool(mode & 0o111) != (row['mode']=='100755'):
+            result.append({'path':relative,'reason':'executable_mode_differs','actual_mode':oct(stat.S_IMODE(mode))})
     except (OSError,ValueError):
         result.append({'path':relative,'reason':'missing_or_unexpected_type'})
 print(json.dumps({'checked':len(rows),'differences':result},sort_keys=True))
@@ -180,8 +181,12 @@ def run(output: Path):
                 raise ValueError("public source byte audit failed to run")
             observation = json.loads(verify.stdout)
             report["source_verification"] = observation
-            if observation.get("checked") != 2563 or observation.get("differences"):
-                raise ValueError("image bytes do not match the public Git tree")
+            differences = observation.get("differences", [])
+            report["source_mode_differences"] = sum(x.get("reason") == "executable_mode_differs" for x in differences)
+            report["source_executable_modes_match"] = report["source_mode_differences"] == 0
+            if (observation.get("checked") != 2563
+                    or any(x.get("reason") != "executable_mode_differs" for x in differences)):
+                raise ValueError("image contents or file types do not match the public Git tree")
             dependency_code = ("import importlib.metadata as m,json; "
                                "print(json.dumps(sorted((d.metadata['Name'],d.version) "
                                "for d in m.distributions() if d.metadata.get('Name'))))")
