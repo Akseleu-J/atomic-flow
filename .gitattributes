@@ -21,3 +21,4 @@ benchmarks/stage4/p07-pylint6506-gitpython-v1.json -text
 benchmarks/stage4/p07-sphinx7738-collection-nodes-v1.json -text
 benchmarks/stage4/p07-pytest6116-xdist134-candidate-v1.json -text
 benchmarks/stage4/p07-pylint6506-collection-nodes-v1.json -text
+benchmarks/stage4/p07-pytest6116-combined-nodes-v1.json -text
