@@ -18,3 +18,4 @@ benchmarks/stage4/p07-sphinx7738-public-tree-v1.json -text
 tools/p07_pytest6116_boxed_adapter_v1.py -text whitespace=cr-at-eol
 benchmarks/stage4/p07-sympy20212-public-tests-v1.json -text
 benchmarks/stage4/p07-pylint6506-gitpython-v1.json -text
+benchmarks/stage4/p07-sphinx7738-collection-nodes-v1.json -text
