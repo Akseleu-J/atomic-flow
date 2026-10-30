@@ -1,7 +1,10 @@
 """Fail-closed scope and public tree checks for the Sphinx collection diagnostic."""
 import copy
+import hashlib
+import io
 import json
 import sys
+import tarfile
 from pathlib import Path
 
 import pytest
@@ -75,3 +78,54 @@ def test_inspected_container_requires_exact_tmpfs_and_refuses_other_mounts():
         mutate(candidate)
         with pytest.raises(ValueError, match='isolation'):
             recon.verify_container(candidate, cid)
+
+
+def test_source_archive_rejects_modified_extra_duplicate_and_traversal(tmp_path, monkeypatch):
+    payload = b'public source\n'
+    sha = hashlib.sha1(b'blob ' + str(len(payload)).encode() + b'\0' + payload).hexdigest()
+    rows = [{'path': 'tests/test_public.py', 'sha': sha, 'size': len(payload), 'mode': '100644'}]
+    prefix = 'sphinx-' + recon.BASE + '/'
+
+    def archive(entries):
+        output = io.BytesIO()
+        with tarfile.open(fileobj=output, mode='w:gz') as tar:
+            for name, data in entries:
+                info = tarfile.TarInfo(prefix + name)
+                info.size = len(data)
+                tar.addfile(info, io.BytesIO(data))
+        return output.getvalue()
+
+    def check(entries, destination):
+        raw = archive(entries)
+        monkeypatch.setattr(recon, 'ARCHIVE_SHA', hashlib.sha256(raw).hexdigest())
+        return recon.extract_verified_source(raw, rows, destination)
+
+    assert check([('tests/test_public.py', payload)], tmp_path / 'ok') == 1
+    assert (tmp_path / 'ok/tests/test_public.py').read_bytes() == payload
+    for number, entries in enumerate((
+        [('tests/test_public.py', b'x' * len(payload))],
+        [('tests/test_public.py', payload), ('other', b'x')],
+        [('tests/test_public.py', payload), ('tests/test_public.py', payload)],
+        [('../outside', b'x')],
+        [],
+    )):
+        with pytest.raises(ValueError):
+            check(entries, tmp_path / ('bad' + str(number)))
+    assert not (tmp_path / 'outside').exists()
+
+
+def test_derived_image_requires_pinned_base_and_layer_ancestry():
+    base = {'RepoDigests': [recon.IMAGE], 'Architecture': 'amd64', 'RootFS': {'Layers': ['a', 'b']}}
+    derived = {'Id': 'sha256:' + 'a' * 64, 'Architecture': 'amd64', 'RootFS': {'Layers': ['a', 'b', 'c']}}
+    recon.verify_image_lineage(base, derived, derived['Id'])
+    for mutate in (
+        lambda b, d: b.update({'RepoDigests': []}),
+        lambda b, d: b.update({'Architecture': 'arm64'}),
+        lambda b, d: d['RootFS'].update({'Layers': ['a', 'x', 'c']}),
+        lambda b, d: d['RootFS'].update({'Layers': ['a', 'b']}),
+        lambda b, d: d.update({'Id': 'other'}),
+    ):
+        b, d = copy.deepcopy(base), copy.deepcopy(derived)
+        mutate(b, d)
+        with pytest.raises(ValueError, match='lineage'):
+            recon.verify_image_lineage(b, d, derived['Id'])

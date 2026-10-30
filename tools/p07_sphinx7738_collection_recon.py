@@ -8,11 +8,14 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import os
 import re
 import subprocess
+import tarfile
 import tempfile
+import urllib.request
 from pathlib import Path
 
 import p07_pytest6116_collection_recon as common
@@ -24,6 +27,8 @@ IMAGE = 'swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-7738@sha256:908d80e3f2
 BASE = 'c087d717f6ed183dd422359bf91210dc59689d63'
 TREE = ROOT / 'benchmarks/stage4/p07-sphinx7738-public-tree-v1.json'
 TREE_SHA = '4db470eb97a3038dbc0b516b0d56ce676aac23c7459a4968c7c6faa492b30ce3'
+ARCHIVE_URL = 'https://codeload.github.com/sphinx-doc/sphinx/tar.gz/' + BASE
+ARCHIVE_SHA = 'edf40c2790c0f832faca73f4d1d9701c8406d36fb3b6dfeb6b5db795a4e8a092'
 ENGINE = '/usr/bin/docker'
 PYTHON = '/opt/miniconda3/envs/testbed/bin/python'
 SOURCE = r'''
@@ -65,6 +70,48 @@ def verify_tree(raw):
     return tree
 
 
+def extract_verified_source(raw, rows, destination):
+    """Copy only byte-verified regular public files; never extract archive paths."""
+    if len(raw) > 20_000_000 or hashlib.sha256(raw).hexdigest() != ARCHIVE_SHA:
+        raise ValueError('source archive digest differs')
+    expected = {row['path']: row for row in rows}
+    prefix = 'sphinx-' + BASE + '/'
+    found = {}
+    with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as archive:
+        for member in archive:
+            if member.name == prefix[:-1] and member.isdir():
+                continue
+            if not member.name.startswith(prefix):
+                raise ValueError('source archive prefix differs')
+            path = member.name[len(prefix):].rstrip('/')
+            if not path or any(p in ('', '.', '..') for p in path.split('/')) or '\\' in path:
+                raise ValueError('unsafe source archive path')
+            if member.isdir():
+                continue
+            if not member.isfile() or path not in expected or path in found:
+                raise ValueError('unexpected or duplicate archive file')
+            row = expected[path]
+            if member.size != row['size'] or member.size > 4_194_304:
+                raise ValueError('source archive member size differs')
+            stream = archive.extractfile(member)
+            if stream is None:
+                raise ValueError('source archive member unavailable')
+            data = stream.read(member.size + 1)
+            sha = hashlib.sha1(('blob ' + str(len(data)) + '\0').encode('ascii') + data).hexdigest()
+            if len(data) != row['size'] or sha != row['sha']:
+                raise ValueError('source archive blob differs')
+            found[path] = data
+    if set(found) != set(expected):
+        raise ValueError('source archive inventory differs')
+    destination.mkdir()
+    for path, data in found.items():
+        target = destination.joinpath(*path.split('/'))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        target.chmod(0o755 if expected[path]['mode'] == '100755' else 0o644)
+    return len(found)
+
+
 def verify_container(item, cid):
     host, config = item['HostConfig'], item['Config']
     tmpfs = {'/tmp': 'rw,noexec,nosuid,size=268435456,mode=1777'}
@@ -78,6 +125,16 @@ def verify_container(item, cid):
             or not isinstance(mounts, list) or len(mounts) > 1
             or any(m.get('Type') != 'tmpfs' or m.get('Destination') != '/tmp' or m.get('Source') for m in mounts)):
         raise ValueError('container isolation differs')
+
+
+def verify_image_lineage(base, derived, iid):
+    base_layers = base.get('RootFS', {}).get('Layers')
+    derived_layers = derived.get('RootFS', {}).get('Layers')
+    if (IMAGE not in base.get('RepoDigests', []) or base.get('Architecture') != 'amd64'
+            or derived.get('Architecture') != 'amd64' or derived.get('Id') != iid
+            or not isinstance(base_layers, list) or not base_layers or not isinstance(derived_layers, list)
+            or len(derived_layers) <= len(base_layers) or derived_layers[:len(base_layers)] != base_layers):
+        raise ValueError('derived image lineage differs')
 
 
 def assess_collection(observation, tree, exit_code):
@@ -102,7 +159,7 @@ def run(output):
               'task_id': 'sphinx-doc__sphinx-7738', 'base_commit': BASE, 'image': IMAGE,
               'provider_calls': 0, 'test_execution': False, 'hidden_oracle': 'not_run',
               'ordinary_acceptance': False, 'tox_environment_equivalence_verified': False,
-              'extra_testbed_files_audited': False}
+              'extra_testbed_files_audited': False, 'source_overlay': 'verified public base only'}
     env = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'HOME': '/tmp', 'LANG': 'C', 'LC_ALL': 'C'}
 
     def command(args, timeout=90):
@@ -124,10 +181,36 @@ def run(output):
             (output / 'pull.stderr').write_bytes(pulled.stderr)
             if pulled.returncode:
                 raise ValueError('pinned image pull failed')
+            base_inspect = command([ENGINE, 'image', 'inspect', IMAGE])
+            base = json.loads(base_inspect.stdout)[0] if not base_inspect.returncode else {}
+            if IMAGE not in base.get('RepoDigests', []) or base.get('Architecture') != 'amd64':
+                raise ValueError('base image digest differs')
+            (output / 'base-image-inspect.json').write_bytes(base_inspect.stdout)
+            request = urllib.request.Request(ARCHIVE_URL, headers={'User-Agent': 'atomic-flow-p07-sphinx7738/1'})
+            with urllib.request.urlopen(request, timeout=90) as response:
+                archive_raw = response.read(20_000_001)
+            context = home / 'context'
+            context.mkdir()
+            report['archive_blobs_verified'] = extract_verified_source(archive_raw, tree['blobs'], context / 'public')
+            report['source_archive_sha256'] = hashlib.sha256(archive_raw).hexdigest()
+            (output / 'public-source.tar.gz').write_bytes(archive_raw)
+            dockerfile = 'FROM ' + IMAGE + '\nCOPY public/ /testbed/\n'
+            (context / 'Dockerfile').write_text(dockerfile)
+            (output / 'Dockerfile').write_text(dockerfile)
+            iidfile = home / 'image.iid'
+            built = command([ENGINE, 'build', '--pull=false', '--network=none', '--iidfile', str(iidfile), str(context)], timeout=300)
+            (output / 'build.stdout').write_bytes(built.stdout)
+            (output / 'build.stderr').write_bytes(built.stderr)
+            if built.returncode:
+                raise ValueError('public-source overlay build failed')
+            iid = iidfile.read_text(encoding='ascii').strip()
+            if not re.fullmatch(r'sha256:[a-f0-9]{64}', iid):
+                raise ValueError('derived image identity unavailable')
+            report['derived_image_id'] = iid
             created = command([ENGINE, 'create', '--cidfile', str(cidfile), '--init', '--pull=never', '--network=none',
                 '--read-only', '--user=65534:65534', '--cap-drop=ALL', '--security-opt=no-new-privileges',
                 '--memory=1g', '--cpus=2', '--pids-limit=128', '--tmpfs=/tmp:rw,noexec,nosuid,size=268435456,mode=1777',
-                '--workdir=/testbed', '--env=HOME=/tmp', '--entrypoint=/bin/sleep', IMAGE, 'infinity'])
+                '--workdir=/testbed', '--env=HOME=/tmp', '--entrypoint=/bin/sleep', iid, 'infinity'])
             if created.returncode:
                 raise ValueError('isolated container creation failed')
             cid = cidfile.read_text(encoding='ascii').strip()
@@ -139,10 +222,11 @@ def run(output):
             (output / 'container-inspect.json').write_bytes(inspected.stdout)
             item = json.loads(inspected.stdout)[0]
             verify_container(item, cid)
-            inspected_image = command([ENGINE, 'image', 'inspect', IMAGE])
+            inspected_image = command([ENGINE, 'image', 'inspect', iid])
             image_item = json.loads(inspected_image.stdout)[0] if not inspected_image.returncode else {}
-            if image_item.get('Id') != item['Image'] or IMAGE not in image_item.get('RepoDigests', []):
+            if image_item.get('Id') != item['Image'] or image_item.get('Id') != iid:
                 raise ValueError('actual immutable image differs')
+            verify_image_lineage(base, image_item, iid)
             (output / 'image-inspect.json').write_bytes(inspected_image.stdout)
             checks = []
             # Chunked argv avoids Linux's per-argument size limit; every row is checked once.
