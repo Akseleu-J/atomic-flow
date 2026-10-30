@@ -15,6 +15,8 @@ import p07_pytest6116_six_failure_focus as focus  # noqa: E402
 def observation():
     return {'finished': True, 'items': list(focus.NODES), 'completed': list(focus.NODES), 'exit_code': 1,
             'nonpassing': [{'nodeid': node, 'phase': 'call'} for node in focus.NODES],
+            'phase_reports': [{'nodeid': node, 'phase': phase, 'outcome': 'passed'}
+                              for node in focus.NODES for phase in ('setup', 'call', 'teardown')],
             'plugins': {'xdist': True, 'xdist.boxed': True, 'xdist.looponfail': True},
             'collection_errors': [], 'collection_skips': []}
 
@@ -41,6 +43,10 @@ def test_result_requires_unique_nodes_phases_and_complete_streams():
         focus.verify_observation(changed, report())
     changed = observation()
     changed['nonpassing'].append(changed['nonpassing'][0])
+    with pytest.raises(ValueError, match='incomplete'):
+        focus.verify_observation(changed, report())
+    changed = observation()
+    changed['phase_reports'].append(changed['phase_reports'][0])
     with pytest.raises(ValueError, match='incomplete'):
         focus.verify_observation(changed, report())
     changed_report = {**report(), 'stdout_truncated': True}
