@@ -1,0 +1,219 @@
+{
+  "calibration_sha256": "a350ee6ce2f7b0108eb58632a57925ff5dc6be9338bb7ffa371e0aaee70af817",
+  "cases": [
+    {
+      "case": "base_fail",
+      "check_passed": false,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "process_exit": 1,
+      "runner_receipt": {
+        "collected": 2,
+        "collection": [
+          "sympy/core/tests/test_p07_native_check.py::test_native_identity",
+          "sympy/core/tests/test_p07_native_check.py::test_native_probe"
+        ],
+        "counts": {
+          "exceptions": 0,
+          "failed": 1,
+          "passed": 1,
+          "skipped": 0,
+          "xfailed": 0,
+          "xpassed": 0
+        },
+        "exit_code": 1,
+        "files": [
+          "sympy/core/tests/test_p07_native_check.py"
+        ],
+        "finished": true,
+        "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+        "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+        "native_argv": [
+          "/testbed/bin/test",
+          "-C",
+          "--verbose",
+          "sympy/core/tests/test_p07_native_check.py"
+        ],
+        "native_source_sha256": {
+          "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+          "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5",
+          "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"
+        },
+        "native_stdout_sha256": "ef326d454fbf29958db83bfaba14d58856ba656e6caff036a1fbe103617b0eac",
+        "nonce": "a600913a43c14819a6283873323347a2",
+        "python_version": [
+          3,
+          9,
+          20
+        ],
+        "root": "/testbed",
+        "runner": "sympy-native",
+        "sympy_module": "/testbed/sympy/__init__.py",
+        "sympy_version": "1.7.dev",
+        "test_statuses": {
+          "sympy/core/tests/test_p07_native_check.py::test_native_identity": "passed",
+          "sympy/core/tests/test_p07_native_check.py::test_native_probe": "failed"
+        }
+      },
+      "source_after": "dcba5fd20badf204904fde627a718f9ae7504c34b1e4b1ea041bea3eb9b3de5e",
+      "source_before": "dcba5fd20badf204904fde627a718f9ae7504c34b1e4b1ea041bea3eb9b3de5e",
+      "spec_digest": "9c8bddbd69d728b09d41526f4d51e25e1580608829614ef0c0149230febc53fb",
+      "status": "expected_native_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "6f806fb4d1c45efe7b1a2fa629ec0d15890ab73dac012dbf6f967564984e4627",
+      "verified_success": false
+    },
+    {
+      "case": "edited_pass",
+      "check_passed": true,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "process_exit": 0,
+      "runner_receipt": {
+        "collected": 2,
+        "collection": [
+          "sympy/core/tests/test_p07_native_check.py::test_native_identity",
+          "sympy/core/tests/test_p07_native_check.py::test_native_probe"
+        ],
+        "counts": {
+          "exceptions": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0,
+          "xfailed": 0,
+          "xpassed": 0
+        },
+        "exit_code": 0,
+        "files": [
+          "sympy/core/tests/test_p07_native_check.py"
+        ],
+        "finished": true,
+        "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+        "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+        "native_argv": [
+          "/testbed/bin/test",
+          "-C",
+          "--verbose",
+          "sympy/core/tests/test_p07_native_check.py"
+        ],
+        "native_source_sha256": {
+          "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+          "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5",
+          "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"
+        },
+        "native_stdout_sha256": "aaae191d3a2b1e47efb0912e273bd11184aaa5a033fa78efa385acb7fded6b36",
+        "nonce": "f52d272bdd7543e1aad795c31de12a27",
+        "python_version": [
+          3,
+          9,
+          20
+        ],
+        "root": "/testbed",
+        "runner": "sympy-native",
+        "sympy_module": "/testbed/sympy/__init__.py",
+        "sympy_version": "1.7.dev",
+        "test_statuses": {
+          "sympy/core/tests/test_p07_native_check.py::test_native_identity": "passed",
+          "sympy/core/tests/test_p07_native_check.py::test_native_probe": "passed"
+        }
+      },
+      "source_after": "4a228b188a061a826fcfbc1292b9efb45baddc5830d99ae8756b83e6e7917731",
+      "source_before": "4a228b188a061a826fcfbc1292b9efb45baddc5830d99ae8756b83e6e7917731",
+      "spec_digest": "b351a125551f2ef0466f3671825fa243042114a052469241eb1937f42430ddcc",
+      "status": "expected_native_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "acaf7184ac64398f06d7a8d259f521ca8ca50c46ba7556b5d3c46d4b9372b83c",
+      "verified_success": false
+    },
+    {
+      "case": "required_skip",
+      "check_passed": false,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "process_exit": 5,
+      "runner_receipt": {
+        "collected": 2,
+        "collection": [
+          "sympy/core/tests/test_p07_native_check.py::test_native_identity",
+          "sympy/core/tests/test_p07_native_check.py::test_native_probe"
+        ],
+        "counts": {
+          "exceptions": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 1,
+          "xfailed": 0,
+          "xpassed": 0
+        },
+        "exit_code": 0,
+        "files": [
+          "sympy/core/tests/test_p07_native_check.py"
+        ],
+        "finished": true,
+        "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+        "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+        "native_argv": [
+          "/testbed/bin/test",
+          "-C",
+          "--verbose",
+          "sympy/core/tests/test_p07_native_check.py"
+        ],
+        "native_source_sha256": {
+          "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+          "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5",
+          "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"
+        },
+        "native_stdout_sha256": "f17b861525b1e294bbf0da7f83aa1181311ffc0a6aec1a27e8511d3dbef3bbee",
+        "nonce": "7b44989ec3754517b6c61a7846eda1f0",
+        "python_version": [
+          3,
+          9,
+          20
+        ],
+        "root": "/testbed",
+        "runner": "sympy-native",
+        "sympy_module": "/testbed/sympy/__init__.py",
+        "sympy_version": "1.7.dev",
+        "test_statuses": {
+          "sympy/core/tests/test_p07_native_check.py::test_native_identity": "passed",
+          "sympy/core/tests/test_p07_native_check.py::test_native_probe": "skipped"
+        }
+      },
+      "source_after": "62b22f3cf5be3cc75cb73318a615eb3f146033ded96a81f98d4552cc3c3fc7a4",
+      "source_before": "62b22f3cf5be3cc75cb73318a615eb3f146033ded96a81f98d4552cc3c3fc7a4",
+      "spec_digest": "a3d27164df653828094d97d81cdd560aefadf4408a4a40af1fcdd48255f4e6b3",
+      "status": "expected_native_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "eb98576c3c11bf4a17c0bd37bd173b1f7e34c1d3ab92f356711aabac152e370f",
+      "verified_success": false
+    }
+  ],
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626",
+  "image_id": "sha256:95d456bfbccf33f8cfa63d410bd7df2e73da60fb286d4c411d9c51fb73ffc27f",
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "native_identity": {
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "source_sha256": {
+      "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+      "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5",
+      "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"
+    },
+    "sympy_version": "1.7.dev"
+  },
+  "provider_calls": 0,
+  "provider_credentials": "not_forwarded",
+  "scope": "native CheckSpec synthetic ordinary-test boundary only",
+  "source_container_cleanup_confirmed": true,
+  "source_container_cleanup_exit": 0,
+  "status": "native_sympy_check_boundary_qualified",
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "e026fe985c97b4fb78aa21d7b4a1a260978f42a9",
+  "verified_success": false,
+  "version_source": "sympy/release.py",
+  "version_source_sha256": "b277ce5aba24985577c9938485d8f9cc6819d75a64a5f7ecd37e0e02b6703ba6"
+}

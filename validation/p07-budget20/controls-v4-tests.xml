@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="6.349" timestamp="2026-10-26T20:22:25.098298+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_p07_controls_v4" name="test_materialization_binds_exact_predecessor_and_changes_only_three" time="0.163"><failure message="MemoryError">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-181/test_materialization_binds_exa0')
+
+    def test_materialization_binds_exact_predecessor_and_changes_only_three(tmp_path):
+        output = tmp_path / "controls-v4.json"
+        before = (prepare.BASE / "p07-controls-v3.json").read_bytes()
+&gt;       result = prepare.materialize(output)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_p07_controls_v4.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\prepare_p07_controls_v4.py:40: in materialize
+    tasks = {task["instance_id"]: task for task in json.loads(corpus.read_text(encoding="utf-8"))["tasks"]}
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py:1028: in read_text
+    return f.read()
+           ^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;encodings.utf_8.IncrementalDecoder object at 0x00000205D299C260&gt;
+input = b'{\n  "version": 1,\n  "dataset": "SWE-bench/SWE-bench_Lite",\n  "dataset_revision_observed": "b0dde1093fe417d83b7184...85",\n      "upstream_row_sha256": "80bed3d7ff4df966d31b573338c29a41971eca41120cbacc2518dce930e1b07b"\n    }\n  ]\n}\n'
+final = True
+
+&gt;   ???
+E   MemoryError
+
+&lt;frozen codecs&gt;:322: MemoryError</failure></testcase><testcase classname="tests.test_p07_controls_v4" name="test_unique_source_line_change_preserves_hunks_paths_and_gold_identity[sphinx-doc__sphinx-8506]" time="0.025" /><testcase classname="tests.test_p07_controls_v4" name="test_unique_source_line_change_preserves_hunks_paths_and_gold_identity[sphinx-doc__sphinx-8713]" time="0.067" /><testcase classname="tests.test_p07_controls_v4" name="test_unique_source_line_change_preserves_hunks_paths_and_gold_identity[sphinx-doc__sphinx-8721]" time="0.033" /><testcase classname="tests.test_p07_controls_v4" name="test_stale_gold_or_changed_source_is_refused_before_output" time="0.317" /></testsuite></testsuites>

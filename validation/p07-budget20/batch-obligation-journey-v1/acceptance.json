@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "kind": "scripted_public_coupled_taskrunner_acceptance",
+  "runtime_commit": "78d5abf68bb4482f1d4395028501028d0cb6f704",
+  "workflow_run": 40546120074,
+  "artifact_id": 12752667631,
+  "archive_sha256": "247f5dd3a4148196b9a20e74e73f61fcbf7f2cf49a038ca42941bfc0a5c005f2",
+  "provider_calls": 0,
+  "hidden_oracle_run": false,
+  "calibration_environment_count": 30,
+  "full_p07": "OPEN",
+  "checks": {
+    "public_builtin_tools": true,
+    "ordinary_failure": true,
+    "bounded_replan_count": 1,
+    "coupled_patch_paths": [
+      "a.py",
+      "b.py"
+    ],
+    "fresh_final_ordinary_check": true,
+    "ready_to_publish": true,
+    "exact_final_source_verified": true
+  },
+  "limits": "Scripted transport; no model-quality claim; transaction is journaled logical atomicity, not OS atomic multi-file writes"
+}

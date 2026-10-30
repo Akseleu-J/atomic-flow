@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "status": "prospective_ungraded",
+  "kind": "historical Sphinx dependency overlay, not a complete environment lock",
+  "created_date": "2026-10-26",
+  "model_calls": 0,
+  "target_execution": false,
+  "source_workflow": 40309674235,
+  "pins": {
+    "docutils": "0.16",
+    "Pygments": "2.7.4"
+  },
+  "wheels": [
+    {
+      "name": "docutils",
+      "version": "0.16",
+      "filename": "docutils-0.16-py2.py3-none-any.whl",
+      "sha256": "0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af",
+      "primary_metadata_url": "https://pypi.org/pypi/docutils/0.16/json",
+      "primary_metadata_response_sha256": "a507e05d2f22215f723cd3582278df8fe801b5a2440eed45d17cd62db2b62f0d",
+      "url": "https://files.pythonhosted.org/packages/81/44/8a15e45ffa96e6cf82956dd8d7af9e666357e16b0d93b253903475ee947f/docutils-0.16-py2.py3-none-any.whl",
+      "requires_python": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
+      "requires_dist": [
+        null
+      ],
+      "wheel_download_hash_verified": true,
+      "compatibility": "Universal pure Python wheel; metadata admits target CPython3.9. No package imports executed."
+    },
+    {
+      "name": "Pygments",
+      "version": "2.7.4",
+      "filename": "Pygments-2.7.4-py3-none-any.whl",
+      "sha256": "bc9591213a8f0e0ca1a5e68a479b4887fdc3e75d0774e5c71c31920c427de435",
+      "primary_metadata_url": "https://pypi.org/pypi/Pygments/2.7.4/json",
+      "primary_metadata_response_sha256": "20c76e2a50757fb27246b2fa84bc270762da0f1e60bfc63fdca22ab1237f6de1",
+      "url": "https://files.pythonhosted.org/packages/17/e3/c7ea888bd6e9849c60b1f378637850265177ed01297137f544a7ecf7d7ba/Pygments-2.7.4-py3-none-any.whl",
+      "requires_python": ">=3.5",
+      "requires_dist": [
+        null
+      ],
+      "wheel_download_hash_verified": true,
+      "compatibility": "Universal pure Python wheel; metadata admits target CPython3.9. No package imports executed."
+    }
+  ],
+  "tasks": [
+    {
+      "instance_id": "sphinx-doc__sphinx-8721",
+      "base_commit": "82ef497a8c88f0f6e50d84520e7276bfbf65025d",
+      "base_image_digest": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8721@sha256:8f02afdb324767a2e56b7940569ea822cfa58c3c1f0ef9a910162d21cf52c3f5",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sphinx/__init__.py",
+      "observed_gold_target_freeze": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.21.2\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.18.0\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==3.5.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1",
+      "observed_gold_target_freeze_sha256": "7d4f49deb82997c0f7b4ab8c4bb2d15721756b515301349094116872d8026f24",
+      "observed_versions": {
+        "docutils": "0.21.2",
+        "Pygments": "2.18.0",
+        "Jinja2": "2.11.3",
+        "pytest": "8.3.3"
+      },
+      "historical_source": [
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/82ef497a8c88f0f6e50d84520e7276bfbf65025d/setup.py",
+          "sha256": "405f72902a7781362504cf53d6d34a266a232f046b5f95ba2f3e8d07cfc8656d",
+          "relevant_lines": [
+            {
+              "line": 25,
+              "text": "    'Pygments>=2.0',"
+            },
+            {
+              "line": 26,
+              "text": "    'docutils>=0.12',"
+            },
+            {
+              "line": 48,
+              "text": "        'docutils-stubs',"
+            },
+            {
+              "line": 245,
+              "text": "    python_requires=\">=3.5\","
+            }
+          ]
+        },
+        {
+          "path": "tox.ini",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/82ef497a8c88f0f6e50d84520e7276bfbf65025d/tox.ini",
+          "sha256": "557124d03fa1dd51f2aa63065aae3e93cf0b5384504df35b0cad54eee6cf33d3",
+          "relevant_lines": [
+            {
+              "line": 18,
+              "text": "    du{12,13,14}: Run unit tests with the given version of docutils."
+            },
+            {
+              "line": 20,
+              "text": "    du12: docutils==0.12"
+            },
+            {
+              "line": 21,
+              "text": "    du13: docutils==0.13.1"
+            },
+            {
+              "line": 22,
+              "text": "    du14: docutils==0.14"
+            },
+            {
+              "line": 23,
+              "text": "    du15: docutils==0.15"
+            },
+            {
+              "line": 24,
+              "text": "    du16: docutils==0.16"
+            }
+          ]
+        }
+      ],
+      "compatibility": "Docutils0.16 is explicitly listed in base tox du16; Pygments2.7.4 satisfies setup Pygments>=2.0 but is not an exact historical tox pin. Both wheels support CPython3.9 by primary metadata. Leave all other image packages unchanged in the first prospective probe.",
+      "calibrated": false
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8474",
+      "base_commit": "3ea1ec84cc610f7a9f4f6b354e264565254923ff",
+      "base_image_digest": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8474@sha256:d43c7c58edc9f70a23b5b4d7a039d0cf0bbde72fbf667590b79772f3677f44f4",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sphinx/__init__.py",
+      "observed_gold_target_freeze": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.21.2\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.18.0\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==3.4.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\ntyped-ast==1.5.5\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1",
+      "observed_gold_target_freeze_sha256": "327c881fd011030b6e01091f962ba35622ea52a9180c2fb32f6f6c8fcc90935e",
+      "observed_versions": {
+        "docutils": "0.21.2",
+        "Pygments": "2.18.0",
+        "Jinja2": "2.11.3",
+        "pytest": "8.3.3"
+      },
+      "historical_source": [
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/3ea1ec84cc610f7a9f4f6b354e264565254923ff/setup.py",
+          "sha256": "4d43b01ffdf6ad75eca72e874dca2e965df6b224f0b53e42150b6388804c797a",
+          "relevant_lines": [
+            {
+              "line": 25,
+              "text": "    'Pygments>=2.0',"
+            },
+            {
+              "line": 26,
+              "text": "    'docutils>=0.12',"
+            },
+            {
+              "line": 48,
+              "text": "        'docutils-stubs',"
+            },
+            {
+              "line": 245,
+              "text": "    python_requires=\">=3.5\","
+            }
+          ]
+        },
+        {
+          "path": "tox.ini",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/3ea1ec84cc610f7a9f4f6b354e264565254923ff/tox.ini",
+          "sha256": "f7b15f4e599bddbc6aada7fafd8e6bc218eea596c32744fd726a3534ddce41e2",
+          "relevant_lines": [
+            {
+              "line": 18,
+              "text": "    du{12,13,14}: Run unit tests with the given version of docutils."
+            },
+            {
+              "line": 20,
+              "text": "    du12: docutils==0.12"
+            },
+            {
+              "line": 21,
+              "text": "    du13: docutils==0.13.1"
+            },
+            {
+              "line": 22,
+              "text": "    du14: docutils==0.14"
+            },
+            {
+              "line": 23,
+              "text": "    du15: docutils==0.15"
+            },
+            {
+              "line": 24,
+              "text": "    du16: docutils==0.16"
+            }
+          ]
+        }
+      ],
+      "compatibility": "Docutils0.16 is explicitly listed in base tox du16; Pygments2.7.4 satisfies setup Pygments>=2.0 but is not an exact historical tox pin. Both wheels support CPython3.9 by primary metadata. Leave all other image packages unchanged in the first prospective probe.",
+      "calibrated": false
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8506",
+      "base_commit": "e4bd3bd3ddd42c6642ff779a4f7381f219655c2c",
+      "base_image_digest": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8506@sha256:63dfc9e06aecd26d6b76eb4bda169638e26976d4318fb1baf20d6977dc6e1def",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sphinx/__init__.py",
+      "observed_gold_target_freeze": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.21.2\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.18.0\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==3.4.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1",
+      "observed_gold_target_freeze_sha256": "2d3161bb7a9829f6b8ca006e55d07ea2e009b27d6475fddd572366e764a67144",
+      "observed_versions": {
+        "docutils": "0.21.2",
+        "Pygments": "2.18.0",
+        "Jinja2": "2.11.3",
+        "pytest": "8.3.3"
+      },
+      "historical_source": [
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/e4bd3bd3ddd42c6642ff779a4f7381f219655c2c/setup.py",
+          "sha256": "405f72902a7781362504cf53d6d34a266a232f046b5f95ba2f3e8d07cfc8656d",
+          "relevant_lines": [
+            {
+              "line": 25,
+              "text": "    'Pygments>=2.0',"
+            },
+            {
+              "line": 26,
+              "text": "    'docutils>=0.12',"
+            },
+            {
+              "line": 48,
+              "text": "        'docutils-stubs',"
+            },
+            {
+              "line": 245,
+              "text": "    python_requires=\">=3.5\","
+            }
+          ]
+        },
+        {
+          "path": "tox.ini",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/e4bd3bd3ddd42c6642ff779a4f7381f219655c2c/tox.ini",
+          "sha256": "f7b15f4e599bddbc6aada7fafd8e6bc218eea596c32744fd726a3534ddce41e2",
+          "relevant_lines": [
+            {
+              "line": 18,
+              "text": "    du{12,13,14}: Run unit tests with the given version of docutils."
+            },
+            {
+              "line": 20,
+              "text": "    du12: docutils==0.12"
+            },
+            {
+              "line": 21,
+              "text": "    du13: docutils==0.13.1"
+            },
+            {
+              "line": 22,
+              "text": "    du14: docutils==0.14"
+            },
+            {
+              "line": 23,
+              "text": "    du15: docutils==0.15"
+            },
+            {
+              "line": 24,
+              "text": "    du16: docutils==0.16"
+            }
+          ]
+        }
+      ],
+      "compatibility": "Docutils0.16 is explicitly listed in base tox du16; Pygments2.7.4 satisfies setup Pygments>=2.0 but is not an exact historical tox pin. Both wheels support CPython3.9 by primary metadata. Leave all other image packages unchanged in the first prospective probe.",
+      "calibrated": false
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8713",
+      "base_commit": "3ed7590ed411bd93b26098faab4f23619cdb2267",
+      "base_image_digest": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8713@sha256:7ba9df7ec272f679584db9aede948951ff220b69c55076f0ca54e2777cd80f8e",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sphinx/__init__.py",
+      "observed_gold_target_freeze": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.21.2\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.18.0\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==4.0.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1",
+      "observed_gold_target_freeze_sha256": "4db4d78d37a5cd99d74aa01b12aa69da5ed4993636856437029902f67f3d032f",
+      "observed_versions": {
+        "docutils": "0.21.2",
+        "Pygments": "2.18.0",
+        "Jinja2": "2.11.3",
+        "pytest": "8.3.3"
+      },
+      "historical_source": [
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/3ed7590ed411bd93b26098faab4f23619cdb2267/setup.py",
+          "sha256": "206cf96e22cbebd1ddcea2333b07a57d161b5599942b0efcf43d89ecba37e50e",
+          "relevant_lines": [
+            {
+              "line": 25,
+              "text": "    'Pygments>=2.0',"
+            },
+            {
+              "line": 26,
+              "text": "    'docutils>=0.14',"
+            },
+            {
+              "line": 48,
+              "text": "        'docutils-stubs',"
+            },
+            {
+              "line": 244,
+              "text": "    python_requires=\">=3.6\","
+            }
+          ]
+        },
+        {
+          "path": "tox.ini",
+          "url": "https://raw.githubusercontent.com/sphinx-doc/sphinx/3ed7590ed411bd93b26098faab4f23619cdb2267/tox.ini",
+          "sha256": "e757e1c9f1979d73ac6799b6b83373209539436fde13898eb3c702cf0727fc7e",
+          "relevant_lines": [
+            {
+              "line": 18,
+              "text": "    du{12,13,14}: Run unit tests with the given version of docutils."
+            },
+            {
+              "line": 20,
+              "text": "    du14: docutils==0.14"
+            },
+            {
+              "line": 21,
+              "text": "    du15: docutils==0.15"
+            },
+            {
+              "line": 22,
+              "text": "    du16: docutils==0.16"
+            }
+          ]
+        }
+      ],
+      "compatibility": "Docutils0.16 is explicitly listed in base tox du16; Pygments2.7.4 satisfies setup Pygments>=2.0 but is not an exact historical tox pin. Both wheels support CPython3.9 by primary metadata. Leave all other image packages unchanged in the first prospective probe.",
+      "calibrated": false
+    }
+  ],
+  "acceptance": "OPEN until clean isolated base/gold/wrong all satisfy unchanged classifier"
+}

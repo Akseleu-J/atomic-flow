@@ -1,0 +1,208 @@
+{
+  "AppArmorProfile": "",
+  "Args": [
+    "infinity"
+  ],
+  "Config": {
+    "AttachStderr": true,
+    "AttachStdin": false,
+    "AttachStdout": true,
+    "Cmd": [
+      "infinity"
+    ],
+    "Domainname": "",
+    "Entrypoint": [
+      "/bin/sleep"
+    ],
+    "Env": [
+      "PATH=/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "TZ=Etc/UTC"
+    ],
+    "Hostname": "0a9d2c65eb95",
+    "Image": "sha256:cebf8f9441129ee8fc2853430a94e53bbc967868fd9b2a4e6389492490d50bb3",
+    "Labels": {
+      "org.opencontainers.image.version": "22.04"
+    },
+    "OnBuild": null,
+    "OpenStdin": false,
+    "StdinOnce": false,
+    "Tty": false,
+    "User": "65534:65534",
+    "Volumes": null,
+    "WorkingDir": "/testbed/"
+  },
+  "Created": "2026-10-28T10:03:34.117440078Z",
+  "Driver": "overlay2",
+  "ExecIDs": null,
+  "GraphDriver": {
+    "Data": {
+      "ID": "0a9d2c65eb9531bd9029f0a321cfed13f7c257c216881cf0d9c019059f469f55",
+      "LowerDir": "/var/lib/docker/overlay2/4cf51ac554d3dfad13cb9e4531ef7005c3254f4be4a966cd5af35f32c1b0765f-init/diff:/var/lib/docker/overlay2/1402fdf081913a47bace6eced1e5964f7be8c4124c32bca62e9df6d989c68778/diff:/var/lib/docker/overlay2/c9bf113e71f3752dafec1ea02b49e00fa94bf2e05f84d089b9a0aef103c7892e/diff:/var/lib/docker/overlay2/ac35b5c143eebf8b49b0cba35a70949349b1c8a86a362d2f12b0ce46da298a65/diff:/var/lib/docker/overlay2/3bf39b89c22952e8624ca98ac906c0061241f83d1b6a3aafbca75f1ac07aad77/diff:/var/lib/docker/overlay2/2515537dcbb9fffd7998661fa398675d493b9b6d323e1cf089904fca21a94359/diff:/var/lib/docker/overlay2/056404833a1f118ec64fc568973c78f83194a0a4a046ba3b1e18fa7e3f4889f3/diff:/var/lib/docker/overlay2/c973cfecde17dcb574719363e63f7f686e190073fab531e28d419d8bfd03b599/diff:/var/lib/docker/overlay2/0b3d03e85d2584ef3c0fc473ceee86c15d9c5e1ef172b26de2260c81cd97b13d/diff:/var/lib/docker/overlay2/492a0f641a564c09a36f14abaacad13a6fd1813d7ddcacf8516d4d35221b9796/diff:/var/lib/docker/overlay2/9b9071b2db2150f66215aac6371fb6308249641c808b7f65fadbe52ccf1fe330/diff",
+      "MergedDir": "/var/lib/docker/overlay2/4cf51ac554d3dfad13cb9e4531ef7005c3254f4be4a966cd5af35f32c1b0765f/merged",
+      "UpperDir": "/var/lib/docker/overlay2/4cf51ac554d3dfad13cb9e4531ef7005c3254f4be4a966cd5af35f32c1b0765f/diff",
+      "WorkDir": "/var/lib/docker/overlay2/4cf51ac554d3dfad13cb9e4531ef7005c3254f4be4a966cd5af35f32c1b0765f/work"
+    },
+    "Name": "overlay2"
+  },
+  "HostConfig": {
+    "AutoRemove": false,
+    "Binds": null,
+    "BlkioDeviceReadBps": [],
+    "BlkioDeviceReadIOps": [],
+    "BlkioDeviceWriteBps": [],
+    "BlkioDeviceWriteIOps": [],
+    "BlkioWeight": 0,
+    "BlkioWeightDevice": [],
+    "CapAdd": null,
+    "CapDrop": [
+      "ALL"
+    ],
+    "Cgroup": "",
+    "CgroupParent": "",
+    "CgroupnsMode": "private",
+    "ConsoleSize": [
+      0,
+      0
+    ],
+    "ContainerIDFile": "",
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "CpuShares": 0,
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "DeviceCgroupRules": null,
+    "DeviceRequests": null,
+    "Devices": [],
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": null,
+    "GroupAdd": null,
+    "IOMaximumBandwidth": 0,
+    "IOMaximumIOps": 0,
+    "IpcMode": "private",
+    "Isolation": "",
+    "Links": null,
+    "LogConfig": {
+      "Config": {},
+      "Type": "json-file"
+    },
+    "MaskedPaths": [
+      "/proc/asound",
+      "/proc/acpi",
+      "/proc/interrupts",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/sys/firmware",
+      "/sys/devices/virtual/powercap"
+    ],
+    "Memory": 1073741824,
+    "MemoryReservation": 0,
+    "MemorySwap": 2147483648,
+    "MemorySwappiness": null,
+    "NanoCpus": 2000000000,
+    "NetworkMode": "none",
+    "OomKillDisable": false,
+    "OomScoreAdj": 0,
+    "PidMode": "",
+    "PidsLimit": 128,
+    "PortBindings": {},
+    "Privileged": false,
+    "PublishAllPorts": false,
+    "ReadonlyPaths": [
+      "/proc/bus",
+      "/proc/fs",
+      "/proc/irq",
+      "/proc/sys",
+      "/proc/sysrq-trigger"
+    ],
+    "ReadonlyRootfs": true,
+    "RestartPolicy": {
+      "MaximumRetryCount": 0,
+      "Name": "no"
+    },
+    "Runtime": "runc",
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "ShmSize": 67108864,
+    "UTSMode": "",
+    "Ulimits": [],
+    "UsernsMode": "",
+    "VolumeDriver": "",
+    "VolumesFrom": null
+  },
+  "HostnamePath": "",
+  "HostsPath": "",
+  "Id": "0a9d2c65eb9531bd9029f0a321cfed13f7c257c216881cf0d9c019059f469f55",
+  "Image": "sha256:cebf8f9441129ee8fc2853430a94e53bbc967868fd9b2a4e6389492490d50bb3",
+  "LogPath": "",
+  "MountLabel": "",
+  "Mounts": [],
+  "Name": "/p07-pytest-source-631a6cc8db7b4bcd8f2c1031",
+  "NetworkSettings": {
+    "Bridge": "",
+    "EndpointID": "",
+    "Gateway": "",
+    "GlobalIPv6Address": "",
+    "GlobalIPv6PrefixLen": 0,
+    "HairpinMode": false,
+    "IPAddress": "",
+    "IPPrefixLen": 0,
+    "IPv6Gateway": "",
+    "LinkLocalIPv6Address": "",
+    "LinkLocalIPv6PrefixLen": 0,
+    "MacAddress": "",
+    "Networks": {
+      "none": {
+        "Aliases": null,
+        "DNSNames": null,
+        "DriverOpts": null,
+        "EndpointID": "",
+        "Gateway": "",
+        "GlobalIPv6Address": "",
+        "GlobalIPv6PrefixLen": 0,
+        "GwPriority": 0,
+        "IPAMConfig": null,
+        "IPAddress": "",
+        "IPPrefixLen": 0,
+        "IPv6Gateway": "",
+        "Links": null,
+        "MacAddress": "",
+        "NetworkID": ""
+      }
+    },
+    "Ports": {},
+    "SandboxID": "",
+    "SandboxKey": "",
+    "SecondaryIPAddresses": null,
+    "SecondaryIPv6Addresses": null
+  },
+  "Path": "/bin/sleep",
+  "Platform": "linux",
+  "ProcessLabel": "",
+  "ResolvConfPath": "",
+  "RestartCount": 0,
+  "State": {
+    "Dead": false,
+    "Error": "",
+    "ExitCode": 0,
+    "FinishedAt": "0001-01-01T00:00:00Z",
+    "OOMKilled": false,
+    "Paused": false,
+    "Pid": 0,
+    "Restarting": false,
+    "Running": false,
+    "StartedAt": "0001-01-01T00:00:00Z",
+    "Status": "created"
+  }
+}

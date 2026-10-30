@@ -1,0 +1,35 @@
+{
+  "receipt": {
+    "check_spec_digest": "98e52c9bcf7c6e829a5abe2d58328feb1703642bf55b1b43b52205cb770b67f1",
+    "diagnostic": {
+      "kind": "SyntaxError",
+      "line": 1,
+      "offset": 11
+    },
+    "file_sha256": "384edb03b25d0332480b8722dff21476bee76912de8e71de2bb8d3f837916850",
+    "finished": true,
+    "interpreter": "/opt/p07-python36/bin/python3.6",
+    "kind": "private_syntax_observation",
+    "nonce": "b4ab46b5829e471baf0858a3c384df3a",
+    "outcome": "failed",
+    "path": "sympy/p07_probe.py",
+    "policy": "private-target-grammar/1",
+    "prefix": "/opt/p07-python36",
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "request_digest": "8e75853e64cdbf5110b8b91683e81609a2ddb730702f26b7b29cb9f85a90d150",
+    "root": "/testbed",
+    "runtime_digest": "d2b93caacdebda1b387d59f57f4b8cabec24b40671311723604935a8ec343f55",
+    "schema_version": 1,
+    "source_revision": "80cb0cf37a4510aa491526af4cd8a0792ff01ed7934e243166a82dcbe22427f6"
+  },
+  "returncode": 1,
+  "source_after": "80cb0cf37a4510aa491526af4cd8a0792ff01ed7934e243166a82dcbe22427f6",
+  "source_before": "80cb0cf37a4510aa491526af4cd8a0792ff01ed7934e243166a82dcbe22427f6",
+  "stderr_truncated": false,
+  "stdout_truncated": false,
+  "timed_out": false
+}

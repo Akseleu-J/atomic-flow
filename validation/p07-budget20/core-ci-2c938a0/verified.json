@@ -1,0 +1,36 @@
+{
+  "runtime": "2c938a0b4e8db8636c8f9f26fc226e6fb3b46ba3",
+  "tested_commit": "551e9451c72b848502df4ca51075ac3df8554800",
+  "identical_git_tree": "d268daafd57a6e99998921fe79c615fc4762ee4a",
+  "archives_sha256_verified": true,
+  "provider_calls": 0,
+  "evidence": [
+    {
+      "archive": "12671119191.zip",
+      "platform": "Windows",
+      "python": "3.12.10",
+      "testcases": 4,
+      "failures": 0,
+      "skipped": 0,
+      "source_files": 317
+    },
+    {
+      "archive": "12671966621.zip",
+      "platform": "Linux",
+      "python": "3.11.17",
+      "testcases": 1645,
+      "failures": 0,
+      "skipped": 14,
+      "source_files": 317
+    },
+    {
+      "archive": "12672031487.zip",
+      "platform": "Linux",
+      "python": "3.12.15",
+      "testcases": 1645,
+      "failures": 0,
+      "skipped": 14,
+      "source_files": 317
+    }
+  ]
+}

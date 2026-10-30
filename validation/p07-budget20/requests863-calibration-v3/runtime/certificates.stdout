@@ -1,0 +1,1 @@
+{"certificate_files": {"/opt/p07-function-fixture/cacert.pem": "d313b1b02ffcaf79c1df18523d31583c3b07c84a9aba2cb4ebaee0afe5804ecc", "/opt/p07-function-fixture/cert.pem": "ee19d090d212a12aab220c4e64029f15301633d04cb7c7583625b8803f972e40", "/opt/p07-function-fixture/key.pem": "8a7e1b6d7502aeb5adca53a4900b1603497dd5ba31924002783e95e1a0177b1f"}, "target_imported": false}

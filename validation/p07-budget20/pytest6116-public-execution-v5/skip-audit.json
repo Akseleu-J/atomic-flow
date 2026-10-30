@@ -1,0 +1,239 @@
+{
+  "categories": {
+    "missing_python_dependency": 107,
+    "missing_system_tool": 2,
+    "platform_condition": 3,
+    "source_disabled": 3
+  },
+  "completed": 2617,
+  "missing_python_dependencies": {
+    "argcomplete": 1,
+    "decorator": 1,
+    "jinja2": 1,
+    "mock": 5,
+    "nose": 19,
+    "numpy": 13,
+    "pexpect": 40,
+    "requests": 1,
+    "twisted.trial.unittest": 8,
+    "xdist": 7,
+    "xdist.boxed": 11
+  },
+  "native_counts": {
+    "failed": 3,
+    "passed": 2489,
+    "skipped": 115,
+    "xfailed": 10
+  },
+  "ordinary_acceptance": false,
+  "provider_calls": 0,
+  "scope": "diagnostic grouping only; no skip admitted",
+  "skip_groups": [
+    {
+      "category": "missing_system_tool",
+      "count": 2,
+      "location": "/testbed/testing/test_capture.py:893",
+      "reason": "could not run 'lsof' (FileNotFoundError(2, 'No such file or directory'))"
+    },
+    {
+      "category": "platform_condition",
+      "count": 1,
+      "location": "testing/test_capture.py:1312",
+      "reason": "only py3.6+ on windows"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_monkeypatch.py:398",
+      "reason": "could not import 'requests': No module named 'requests'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 19,
+      "location": "/testbed/testing/test_nose.py:5",
+      "reason": "could not import 'nose': No module named 'nose'"
+    },
+    {
+      "category": "platform_condition",
+      "count": 1,
+      "location": "testing/test_tmpdir.py:212",
+      "reason": "win only"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/code/test_excinfo.py:250",
+      "reason": "could not import 'decorator': No module named 'decorator'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/code/test_excinfo.py:358",
+      "reason": "could not import 'jinja2': No module named 'jinja2'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 5,
+      "location": "/testbed/testing/python/approx.py:85",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/approx.py:343",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/approx.py:367",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/approx.py:391",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/approx.py:409",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/approx.py:423",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/approx.py:490",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/approx.py:501",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "platform_condition",
+      "count": 1,
+      "location": "testing/test_conftest.py:281",
+      "reason": "only relevant for case insensitive file systems"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_doctest.py:1365",
+      "reason": "could not import 'mock': No module named 'mock'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_junitxml.py:1178",
+      "reason": "could not import 'xdist': No module named 'xdist'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_junitxml.py:1228",
+      "reason": "could not import 'xdist': No module named 'xdist'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 11,
+      "location": "/testbed/testing/test_runner.py:424",
+      "reason": "could not import 'xdist.boxed': No module named 'xdist'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_terminal.py:706",
+      "reason": "xdist plugin not installed"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_terminal.py:1574",
+      "reason": "could not import 'xdist': No module named 'xdist'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_terminal.py:1580",
+      "reason": "could not import 'xdist': No module named 'xdist'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_terminal.py:1592",
+      "reason": "could not import 'xdist': No module named 'xdist'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_terminal.py:1688",
+      "reason": "could not import 'xdist': No module named 'xdist'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 8,
+      "location": "/testbed/testing/test_unittest.py:416",
+      "reason": "could not import 'twisted.trial.unittest': No module named 'twisted'"
+    },
+    {
+      "category": "source_disabled",
+      "count": 3,
+      "location": "testing/test_warnings.py:500",
+      "reason": "This test should be enabled again before pytest 6.0 is released"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/fixtures.py:4193",
+      "reason": "could not import 'numpy': No module named 'numpy'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/integration.py:159",
+      "reason": "could not import 'mock': No module named 'mock'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/integration.py:210",
+      "reason": "could not import 'mock': No module named 'mock'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/integration.py:243",
+      "reason": "could not import 'mock': No module named 'mock'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/python/integration.py:267",
+      "reason": "could not import 'mock': No module named 'mock'"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 1,
+      "location": "/testbed/testing/test_parseopt.py:320",
+      "reason": "argcomplete not available"
+    },
+    {
+      "category": "missing_python_dependency",
+      "count": 40,
+      "location": "/testbed/src/_pytest/pytester.py:1249",
+      "reason": "could not import 'pexpect': No module named 'pexpect'"
+    }
+  ],
+  "stdout_sha256": "7f2878d554df55e7b34280c8fb8d7c5a75ddc99ed1640f4cd26992e20d56d2af",
+  "tested_commit": "78fbf649fd58bbdc7b51230412c0ebe2ec5df7d8"
+}

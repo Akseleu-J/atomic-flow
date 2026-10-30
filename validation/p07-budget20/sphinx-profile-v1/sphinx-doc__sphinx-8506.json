@@ -1,0 +1,246 @@
+{
+  "instance_id": "sphinx-doc__sphinx-8506",
+  "status": "completed",
+  "calibrated": false,
+  "model_calls": 0,
+  "provider_credentials": "none",
+  "harness": "3.0.15",
+  "image_tag": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8506:latest",
+  "image_digest": "swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8506@sha256:63dfc9e06aecd26d6b76eb4bda169638e26976d4318fb1baf20d6977dc6e1def",
+  "image_id": "sha256:a3a40a9540e70f099e1254e1dc1a7752859b6e9d9fdd94aff39a64c512132922",
+  "base_commit": "e4bd3bd3ddd42c6642ff779a4f7381f219655c2c",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+  "negative_control_rationale": "Remove the first option character instead of the trailing bracket.",
+  "dependency_overlay": {
+    "image_id": "sha256:7f9cbec619031aa55fb035c3c70965e805b923b9aec30d771d3f7ba29850b24f",
+    "profile_sha256": "5a03463354da019955c0190d9704c84d09d4c8ccef48f071027814889d310434",
+    "pins": {
+      "docutils": "0.16",
+      "pygments": "2.7.4"
+    },
+    "build_receipt_sha256": "558e22dc8b5f222053df3103a479c4534a2861e3103a52c3068f9397e484df3d",
+    "source": {
+      "head": "fd07f219301a07d8976cfe8f669aaa020a010a85",
+      "diff": "",
+      "status": ""
+    },
+    "pip_freeze": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.16\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.7.4\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==3.4.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1"
+  },
+  "test_command": "tox --current-env -epy39 -v --",
+  "eval_script_sha256": "292d9ebb881c276bfaf3e35ae72d99e3c55abdc0b8fe8ee02dfd1514e13c862b",
+  "rows": [
+    {
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-sphinx-doc__sphinx-8506-045e1966af",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "sha256:7f9cbec619031aa55fb035c3c70965e805b923b9aec30d771d3f7ba29850b24f"
+      },
+      "dependency_overlay": {
+        "source": {
+          "head": "fd07f219301a07d8976cfe8f669aaa020a010a85",
+          "diff": "",
+          "status": ""
+        },
+        "overlay_versions": {
+          "docutils": "0.16",
+          "pygments": "2.7.4"
+        },
+        "pip_freeze_sha256": "271832068a424f703f7437a391543f03388134087f3896cd6ccaa014979e8e61",
+        "profile_sha256": "5a03463354da019955c0190d9704c84d09d4c8ccef48f071027814889d310434",
+        "build_receipt_sha256": "558e22dc8b5f222053df3103a479c4534a2861e3103a52c3068f9397e484df3d"
+      },
+      "image_checkout_head": "fd07f219301a07d8976cfe8f669aaa020a010a85",
+      "base_verified": "e4bd3bd3ddd42c6642ff779a4f7381f219655c2c",
+      "environment_packages": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.16\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.7.4\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==3.4.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sphinx/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/test_domain_std.py::test_process_doc_handle_figure_caption": "PASSED",
+        "tests/test_domain_std.py::test_process_doc_handle_table_title": "PASSED",
+        "tests/test_domain_std.py::test_get_full_qualified_name": "PASSED",
+        "tests/test_domain_std.py::test_cmd_option_with_optional_value": "PASSED",
+        "tests/test_domain_std.py::test_cmd_option_starting_with_bracket": "FAILED",
+        "tests/test_domain_std.py::test_glossary": "PASSED",
+        "tests/test_domain_std.py::test_glossary_warning": "PASSED",
+        "tests/test_domain_std.py::test_glossary_comment": "PASSED",
+        "tests/test_domain_std.py::test_glossary_comment2": "PASSED",
+        "tests/test_domain_std.py::test_glossary_sorted": "PASSED",
+        "tests/test_domain_std.py::test_glossary_alphanumeric": "PASSED",
+        "tests/test_domain_std.py::test_glossary_conflicted_labels": "PASSED",
+        "tests/test_domain_std.py::test_cmdoption": "PASSED",
+        "tests/test_domain_std.py::test_multiple_cmdoptions": "PASSED",
+        "tests/test_domain_std.py::test_productionlist": "PASSED",
+        "tests/test_domain_std.py::test_disabled_docref": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": true,
+        "verbose_status_normalized": true,
+        "native_status_normalized": false,
+        "failure_header_aliases": {},
+        "header_status_mismatches": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "test_body_exception_receipts": {},
+      "regressions_passed": true,
+      "assertion_failures": [
+        "tests/test_domain_std.py::test_cmd_option_starting_with_bracket"
+      ],
+      "requirement_exception_failures": [],
+      "requirement_exception_evidence": {},
+      "cleanup_exit": 0,
+      "wall_seconds": 4.5376731559999826,
+      "log_sha256": "d243a3a6f2741c07a3a64b622782068fcef62d8ed61d68c724bd6f06f2c4e1dd"
+    },
+    {
+      "label": "gold",
+      "patch_sha256": "a99517671ca1aec8033a000c5212ab6f1a80afe4563e0e8c76889577e67e4a7b",
+      "status": "verified_success",
+      "verified_success": true,
+      "container_name": "p07-sphinx-doc__sphinx-8506-a088bbb124",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "sha256:7f9cbec619031aa55fb035c3c70965e805b923b9aec30d771d3f7ba29850b24f"
+      },
+      "dependency_overlay": {
+        "source": {
+          "head": "fd07f219301a07d8976cfe8f669aaa020a010a85",
+          "diff": "",
+          "status": ""
+        },
+        "overlay_versions": {
+          "docutils": "0.16",
+          "pygments": "2.7.4"
+        },
+        "pip_freeze_sha256": "271832068a424f703f7437a391543f03388134087f3896cd6ccaa014979e8e61",
+        "profile_sha256": "5a03463354da019955c0190d9704c84d09d4c8ccef48f071027814889d310434",
+        "build_receipt_sha256": "558e22dc8b5f222053df3103a479c4534a2861e3103a52c3068f9397e484df3d"
+      },
+      "image_checkout_head": "fd07f219301a07d8976cfe8f669aaa020a010a85",
+      "base_verified": "e4bd3bd3ddd42c6642ff779a4f7381f219655c2c",
+      "environment_packages": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.16\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.7.4\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==3.4.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sphinx/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/test_domain_std.py::test_process_doc_handle_figure_caption": "PASSED",
+        "tests/test_domain_std.py::test_process_doc_handle_table_title": "PASSED",
+        "tests/test_domain_std.py::test_get_full_qualified_name": "PASSED",
+        "tests/test_domain_std.py::test_cmd_option_with_optional_value": "PASSED",
+        "tests/test_domain_std.py::test_cmd_option_starting_with_bracket": "PASSED",
+        "tests/test_domain_std.py::test_glossary": "PASSED",
+        "tests/test_domain_std.py::test_glossary_warning": "PASSED",
+        "tests/test_domain_std.py::test_glossary_comment": "PASSED",
+        "tests/test_domain_std.py::test_glossary_comment2": "PASSED",
+        "tests/test_domain_std.py::test_glossary_sorted": "PASSED",
+        "tests/test_domain_std.py::test_glossary_alphanumeric": "PASSED",
+        "tests/test_domain_std.py::test_glossary_conflicted_labels": "PASSED",
+        "tests/test_domain_std.py::test_cmdoption": "PASSED",
+        "tests/test_domain_std.py::test_multiple_cmdoptions": "PASSED",
+        "tests/test_domain_std.py::test_productionlist": "PASSED",
+        "tests/test_domain_std.py::test_disabled_docref": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": true,
+        "verbose_status_normalized": true,
+        "native_status_normalized": false,
+        "failure_header_aliases": {},
+        "header_status_mismatches": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "test_body_exception_receipts": {},
+      "regressions_passed": true,
+      "assertion_failures": [],
+      "requirement_exception_failures": [],
+      "requirement_exception_evidence": {},
+      "cleanup_exit": 0,
+      "wall_seconds": 4.513799199999994,
+      "log_sha256": "1e2380405cd7fbad806d6d6c2a790099e502f934e84a18cdaf6d77e4ee563dae"
+    },
+    {
+      "label": "wrong",
+      "patch_sha256": "e93efd4dbf817679ee9a791b7a0c7d7665ef778b707815595360da13e2f1523c",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-sphinx-doc__sphinx-8506-bf3b6d6e6c",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "sha256:7f9cbec619031aa55fb035c3c70965e805b923b9aec30d771d3f7ba29850b24f"
+      },
+      "dependency_overlay": {
+        "source": {
+          "head": "fd07f219301a07d8976cfe8f669aaa020a010a85",
+          "diff": "",
+          "status": ""
+        },
+        "overlay_versions": {
+          "docutils": "0.16",
+          "pygments": "2.7.4"
+        },
+        "pip_freeze_sha256": "271832068a424f703f7437a391543f03388134087f3896cd6ccaa014979e8e61",
+        "profile_sha256": "5a03463354da019955c0190d9704c84d09d4c8ccef48f071027814889d310434",
+        "build_receipt_sha256": "558e22dc8b5f222053df3103a479c4534a2861e3103a52c3068f9397e484df3d"
+      },
+      "image_checkout_head": "fd07f219301a07d8976cfe8f669aaa020a010a85",
+      "base_verified": "e4bd3bd3ddd42c6642ff779a4f7381f219655c2c",
+      "environment_packages": "alabaster==0.7.11\nbabel==2.16.0\ncachetools==5.5.0\ncertifi==2024.8.30\nchardet==5.2.0\ncharset-normalizer==3.4.0\ncolorama==0.4.6\ncoverage==7.6.4\nCython==3.0.11\ndistlib==0.3.9\ndocutils==0.16\nexceptiongroup==1.2.2\nfilelock==3.16.1\nhtml5lib==1.1\nidna==3.10\nimagesize==1.4.1\niniconfig==2.0.0\nJinja2==2.11.3\nMarkupSafe==2.0.1\npackaging==24.1\nplatformdirs==4.3.6\npluggy==1.5.0\nPygments==2.7.4\npyproject-api==1.8.0\npytest==8.3.3\npytest-cov==5.0.0\nrequests==2.32.3\nsix==1.16.0\nsnowballstemmer==2.2.0\n# Editable Git install with no remote (Sphinx==3.4.0.dev20260815)\n-e /testbed\nsphinxcontrib-applehelp==1.0.4\nsphinxcontrib-devhelp==1.0.2\nsphinxcontrib-htmlhelp==2.0.1\nsphinxcontrib-jsmath==1.0.1\nsphinxcontrib-qthelp==1.0.3\nsphinxcontrib-serializinghtml==1.1.5\ntomli==2.0.2\ntox==4.16.0\ntox-current-env==0.0.11\nurllib3==2.2.3\nvirtualenv==20.26.6\nwebencodings==0.5.1",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sphinx/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "tests/test_domain_std.py::test_process_doc_handle_figure_caption": "PASSED",
+        "tests/test_domain_std.py::test_process_doc_handle_table_title": "PASSED",
+        "tests/test_domain_std.py::test_get_full_qualified_name": "PASSED",
+        "tests/test_domain_std.py::test_cmd_option_with_optional_value": "FAILED",
+        "tests/test_domain_std.py::test_cmd_option_starting_with_bracket": "PASSED",
+        "tests/test_domain_std.py::test_glossary": "PASSED",
+        "tests/test_domain_std.py::test_glossary_warning": "PASSED",
+        "tests/test_domain_std.py::test_glossary_comment": "PASSED",
+        "tests/test_domain_std.py::test_glossary_comment2": "PASSED",
+        "tests/test_domain_std.py::test_glossary_sorted": "PASSED",
+        "tests/test_domain_std.py::test_glossary_alphanumeric": "PASSED",
+        "tests/test_domain_std.py::test_glossary_conflicted_labels": "PASSED",
+        "tests/test_domain_std.py::test_cmdoption": "PASSED",
+        "tests/test_domain_std.py::test_multiple_cmdoptions": "PASSED",
+        "tests/test_domain_std.py::test_productionlist": "PASSED",
+        "tests/test_domain_std.py::test_disabled_docref": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": true,
+        "verbose_status_normalized": true,
+        "native_status_normalized": false,
+        "failure_header_aliases": {},
+        "header_status_mismatches": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "test_body_exception_receipts": {},
+      "regressions_passed": false,
+      "assertion_failures": [],
+      "requirement_exception_failures": [],
+      "requirement_exception_evidence": {},
+      "cleanup_exit": 0,
+      "wall_seconds": 5.026905784000007,
+      "log_sha256": "f7ef74c8f33ec2da750a2994dc400a3f4953078852bc3236dcc78d30ea2d3513"
+    }
+  ]
+}

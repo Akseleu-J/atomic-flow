@@ -1,0 +1,655 @@
+{
+  "id": "task_18a8b1c3c850",
+  "query": "Rename original to renamed consistently across a.py and b.py and pass the existing ordinary test",
+  "project": "/tmp/p07-public-obligation-82x5gdoz/project",
+  "steps": [
+    {
+      "index": 0,
+      "description": "Check sample requirement and repair if needed",
+      "tools_needed": [
+        "read_file",
+        "patch_files",
+        "run_command"
+      ],
+      "expected_outcome": "",
+      "verify_with": "pytest",
+      "status": "superseded",
+      "result_summary": "StepFailure: host command check failed",
+      "started_at": 1793184378.2212896,
+      "finished_at": 1793184519.7875597,
+      "request_id": "req_990ae421ab40",
+      "depends_on": [],
+      "blocked_reason": "",
+      "invalidated_reason": "",
+      "parent_goal": "",
+      "acceptance_criteria": [],
+      "scope_paths": [
+        "a.py",
+        "b.py"
+      ],
+      "linked_code_nodes": [],
+      "linked_test_nodes": [],
+      "evidence": {},
+      "failure": {
+        "kind": "deterministic_test_failure",
+        "evidence": {
+          "version": 2,
+          "check": "ordinary_test",
+          "exit_code": 1,
+          "step_index": 0,
+          "started_at": 1793184378.2212896,
+          "outcome": "failed",
+          "source_revision": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20",
+          "checked_source_revision": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20",
+          "runner": "pytest",
+          "check_completed": true,
+          "check_failed_completed": true,
+          "check_obligation_digest": "cad5277ba6054d99c7bdcd067bcdb4cce8af87dafe07fbc2dc32406f6ea409db",
+          "check_spec_digest": "d2f931ffce012b832ca1cfe72d531e5b56b592c0077ecbc53c2a3c0036cc0185",
+          "check_receipt_digest": "592b30cafe54f0bb665e1295d327114fc63a29a04735ffac9e937b86b81f4b0a"
+        },
+        "rollback_revision": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20"
+      }
+    },
+    {
+      "index": 1,
+      "description": "Perform coupled original-to-renamed source edit and verify ordinary requirement",
+      "tools_needed": [
+        "read_file",
+        "patch_files",
+        "run_command"
+      ],
+      "expected_outcome": "",
+      "verify_with": "pytest",
+      "status": "done",
+      "result_summary": "ok (complete source-bound ordinary-test obligation passed)",
+      "started_at": 1793184528.987073,
+      "finished_at": 1793184771.1409793,
+      "request_id": "req_e4f49da27ee0",
+      "depends_on": [],
+      "blocked_reason": "",
+      "invalidated_reason": "",
+      "parent_goal": "",
+      "acceptance_criteria": [],
+      "scope_paths": [
+        "a.py",
+        "b.py"
+      ],
+      "linked_code_nodes": [],
+      "linked_test_nodes": [],
+      "evidence": {
+        "version": 1,
+        "task_id": "task_18a8b1c3c850",
+        "step_index": 1,
+        "request_id": "req_e4f49da27ee0",
+        "contract_sha256": "b6154d6cc3f0f23dc38165e34bacfa4afe0b9d23846ce3233f8dfc7fdb88ac17",
+        "before_manifest_sha256": "68fe933bc91029840551451e312d867e061fb226d411676645c708bdfa27cb20",
+        "after_manifest_sha256": "f1206d09344fff9eb60043569840dcf81e82f4984cf66df405cc8f3ca0c0d71e",
+        "approved_scope_sha256": "4d589daaf4c3ff587355f149210bb689f33e48fb4aba2ee67cf0c7cfd4226147",
+        "graph_revision": "aea043f4eb9d4657f62be06db42f17ae3931ec1e",
+        "context_revision": "0a0ab0735bfaf620a2a180d2feaecfec562434fe3736fa7a8396d6e91de893ab",
+        "linked_code_nodes": [],
+        "linked_test_nodes": [],
+        "verification": {
+          "method": "pytest",
+          "outcome": "passed"
+        },
+        "observed_hashes": null,
+        "tool_transcript_sha256": "790893cd82e09df0f1d094173a2fb98bd1ed3071470b6a2e59347f1873100259",
+        "digest": "d6efb8d070f92dcc99b9c9b9063cb1e91d74d9e2caeb65a3d7b6d1bb877c63ff"
+      },
+      "failure": {}
+    }
+  ],
+  "current_index": 2,
+  "status": "done",
+  "created_at": 1793184378.1808548,
+  "finished_at": 1793184771.5832345,
+  "tree_fingerprint": "aea043f4eb9d4657f62be06db42f17ae3931ec1e",
+  "budget_spent": 0.0,
+  "error": "",
+  "rationale": "Repair failed ordinary requirement under original scope",
+  "replan_count": 1,
+  "changeset_id": "change_0ce5537211a5",
+  "plan_ready": true,
+  "budget_events": [
+    {
+      "id": "call_13a2ff3e7f6443fcacbb1745a86c3bb2",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184378.3000078,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 4167,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184407.634611,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_e29f64efc4b246479ad2e084e98f81dd",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184407.6508942,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 9189,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184441.7338634,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_3144f39772ca491f83d4427202abc52b",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184442.1749969,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 13996,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184468.7078955,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_de06afe0bed94a62bc0303a5628bb09d",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184468.7194798,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 7522,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184519.777081,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_f52c86f401e143cfa3359dc5d729cc79",
+      "phase": "replan",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184519.8170474,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 4609,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 0,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184528.9597228,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_fe3bc097fd674ed1b496c13c3286b202",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184529.0099459,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 4397,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184539.233359,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_6e2321930fea492b9388c7a498261ee9",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184539.2483559,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 9405,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184600.172396,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_4a698f83274a461aa9f390d8a4be7d37",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184600.1846433,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 11209,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184617.2055926,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_2896a427df84453cb68d1dba17dcc65c",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184617.2181125,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 12981,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184648.6863198,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_78db9f240a944c10a08d651404d402b7",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184649.4726965,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 17401,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184670.878735,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_40e03da9678e47d6b2c3eec7d6601453",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184671.2710774,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 21400,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184729.776418,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    },
+    {
+      "id": "call_49fb77696d134866adabf451dc196d50",
+      "phase": "step",
+      "status": "completed",
+      "reserved_usd": 0.0,
+      "created_at": 1793184729.7902665,
+      "backend": "p07_github_queue:d4ce99d7a97bca156e1ac10202dff982120e924d451c8c14063105e2902cb069",
+      "model": "anthropic/claude-sonnet-5@default",
+      "input_allowance": 7743,
+      "max_output_tokens": 4096,
+      "price_in_per_mtok": 0.0,
+      "price_out_per_mtok": 0.0,
+      "step_index": 1,
+      "goal_ids": [],
+      "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b",
+      "cost_usd": 0.0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "finished_at": 1793184770.7411323,
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "cost_source": "scripted_zero_provider_calls"
+    }
+  ],
+  "schema_version": 2,
+  "completion_report": {
+    "schema_version": 1,
+    "ready_to_publish": true,
+    "checked_at": 1793184771.165201,
+    "checks": [
+      {
+        "name": "completed_steps",
+        "status": "passed",
+        "superseded_by_replanning": [
+          0
+        ]
+      },
+      {
+        "name": "approved_diff_and_freshness",
+        "status": "passed"
+      },
+      {
+        "name": "final_python_syntax",
+        "status": "passed",
+        "scope": "Changed surviving Python files only"
+      }
+    ],
+    "diagnostics": [],
+    "tests": "passed",
+    "model_calls": 0,
+    "step_observations": [
+      {
+        "index": 1,
+        "receipt": "d6efb8d070f92dcc99b9c9b9063cb1e91d74d9e2caeb65a3d7b6d1bb877c63ff",
+        "current": true,
+        "legacy_missing": false
+      }
+    ],
+    "changed_paths": [
+      {
+        "path": "a.py",
+        "before_hash": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+        "after_hash": "25a0807bf944cba473b3a90a0dbdb78d18f4d63c"
+      },
+      {
+        "path": "b.py",
+        "before_hash": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7",
+        "after_hash": "2625b0953cfbae9e02c11a18adcc56438a123773"
+      }
+    ],
+    "workspace_manifest_sha256": "c4f7536ae739b1d361c2e156cbed7d26c38254c139b01cba27ccb18dbe207cf5",
+    "impact_check_plan": {
+      "schema_version": 1,
+      "changed_paths": [
+        "a.py",
+        "b.py"
+      ],
+      "affected_paths": [
+        "a.py",
+        "b.py",
+        "tests/test_sample.py"
+      ],
+      "targeted_tests": [
+        "tests/test_sample.py"
+      ],
+      "impact_status": "unknown",
+      "unresolved": [
+        "tests/test_sample.py: call hasattr (no imported exporter or shadowed/dynamic binding)"
+      ],
+      "runtime_coverage": "not_assessed",
+      "omitted_unsupported": [],
+      "omitted_oversized": [],
+      "coverage_complete": true,
+      "coverage_omissions": [],
+      "projection_policy": "project-file-projection/1",
+      "loop_check": "full_pytest",
+      "required_final_check": "full_pytest",
+      "checks_executed": false,
+      "source_digests": {
+        "a.py": "6eafb4ba0d5cc4bb908f1393227bb34ec62aa5c9f7876683166e2608c3a8e0be",
+        "b.py": "53756f9541c8df37fc03afe8dd649b99ff72ec03a7372b075727123800c462e2",
+        "tests/test_sample.py": "1d8c38446bf23d40630fedbf010ef7aa8b5b1dc93e796f8249e757a842195c89"
+      },
+      "final_gate_applicable": true
+    },
+    "check_obligation_digest": "cad5277ba6054d99c7bdcd067bcdb4cce8af87dafe07fbc2dc32406f6ea409db",
+    "check_spec_digest": "162723b5157f674898740afca2d16f37de924e13bc7a8dae738fd4fde4cb3870",
+    "check_spec": {
+      "schema_version": 1,
+      "kind": "host_target_test_spec",
+      "task_id": "public-coupled-scripted-journey",
+      "task_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "base_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source_revision": "f1206d09344fff9eb60043569840dcf81e82f4984cf66df405cc8f3ca0c0d71e",
+      "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7080@sha256:3389f0d1319ca611d04a209fc30990c131e0bae9acfeb2163938c75ad23479fe",
+      "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+      "runner": "pytest",
+      "test_paths": [
+        "tests/test_sample.py"
+      ],
+      "target_root": "/workspace",
+      "timeout_seconds": 180,
+      "resources": {
+        "memory_bytes": 1073741824,
+        "cpus": 2,
+        "pids": 128,
+        "tmpfs_bytes": 134217728,
+        "output_bytes_per_stream": 16384
+      },
+      "argv": [
+        "/opt/miniconda3/envs/testbed/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--no-header",
+        "-x",
+        "tests/test_sample.py"
+      ],
+      "controls": {
+        "network": "none",
+        "root_read_only": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "no_new_privileges": true,
+        "non_root": true,
+        "automatic_pull": false,
+        "provider_environment": false
+      }
+    },
+    "check_passed": true,
+    "checked_source_revision": "f1206d09344fff9eb60043569840dcf81e82f4984cf66df405cc8f3ca0c0d71e",
+    "check_completed": true,
+    "check_failed_completed": false,
+    "check_runner": "pytest",
+    "check_timeout_seconds": 180,
+    "check_resources": {
+      "memory_bytes": 1073741824,
+      "cpus": 2,
+      "pids": 128,
+      "tmpfs_bytes": 134217728,
+      "output_bytes_per_stream": 16384
+    },
+    "check_result_exit_code": 0,
+    "check_receipt_digest": "a0907227235cc9af639fc5a84105890c7cc77947741209ba951bc5b572b2ca7b",
+    "test_exit_code": 0,
+    "test_timed_out": false,
+    "test_output_tail": ".                                                                        [100%]\n1 passed in 0.01s\n\nATOMIC_CHECK_SPEC_RECEIPT:{\"call_failed\": 0, \"collected\": 1, \"exit_code\": 0, \"failed\": 0, \"files\": [\"tests/test_sample.py\"], \"finished\": true, \"interpreter\": \"/opt/miniconda3/envs/testbed/bin/python\", \"interpreter_resolved\": \"/opt/miniconda3/envs/testbed/bin/python3.9\", \"nonce\": \"56ddde60004647b3bae383a3f6660b2b\", \"pytest_module\": \"/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/pytest/__init__.py\", \"pytest_version\": \"7.4.4\", \"root\": \"/workspace\", \"setup_failed\": 0, \"skipped\": 0, \"teardown_failed\": 0}\n",
+    "limits": "Host gates confirm declared checks and approved bytes, not semantic fulfillment of every user requirement."
+  },
+  "plan_approval": {
+    "schema_version": 2,
+    "task_id": "task_18a8b1c3c850",
+    "project": "/tmp/p07-public-obligation-82x5gdoz/project",
+    "plan": {
+      "query": "Rename original to renamed consistently across a.py and b.py and pass the existing ordinary test",
+      "rationale": "Repair failed ordinary requirement under original scope",
+      "steps": [
+        {
+          "index": 0,
+          "description": "Check sample requirement and repair if needed",
+          "tools_needed": [
+            "read_file",
+            "patch_files",
+            "run_command"
+          ],
+          "expected_outcome": "",
+          "verify_with": "pytest",
+          "depends_on": [],
+          "superseded": true,
+          "scope_paths": [
+            "a.py",
+            "b.py"
+          ]
+        },
+        {
+          "index": 1,
+          "description": "Perform coupled original-to-renamed source edit and verify ordinary requirement",
+          "tools_needed": [
+            "read_file",
+            "patch_files",
+            "run_command"
+          ],
+          "expected_outcome": "",
+          "verify_with": "pytest",
+          "depends_on": [],
+          "superseded": false,
+          "scope_paths": [
+            "a.py",
+            "b.py"
+          ]
+        }
+      ]
+    },
+    "source_manifest": {
+      "a.py": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+      "b.py": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7",
+      "tests/test_sample.py": "469cef575929bd50cc325acf85040a427cd748d5"
+    },
+    "allowed_paths": [
+      "a.py",
+      "b.py"
+    ],
+    "scope_hashes": {
+      "a.py": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+      "b.py": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7"
+    },
+    "workspace_manifest": {
+      "a.py": "4001f8de854fa15b5f8cd1222eaaa5d626301955",
+      "b.py": "e98f6fd4a33a1307f1b3baec68be17bbdb0100e7",
+      "tests/test_sample.py": "469cef575929bd50cc325acf85040a427cd748d5"
+    },
+    "check_obligation": {
+      "digest": "cad5277ba6054d99c7bdcd067bcdb4cce8af87dafe07fbc2dc32406f6ea409db",
+      "environment_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "deadline_at": 1793184978.177441
+    },
+    "internal_replan": {
+      "version": 2,
+      "deadline_at": 1793187978.1808548,
+      "allowed_tools": [
+        "find_callers",
+        "find_files",
+        "notebook_read",
+        "patch_files",
+        "read_file",
+        "read_node",
+        "read_result",
+        "run_command",
+        "search_text",
+        "search_tree"
+      ],
+      "required_verify": "pytest",
+      "max_budget_usd": 1,
+      "max_model_calls": 40,
+      "max_replans": 1,
+      "runtime_digest": "a26f4cd206e5e3830049aa32a25053ebcaf5bf621912dd8d577a0887c6bd6d0e",
+      "replan_failures": [
+        "StepFailure: host command check failed"
+      ]
+    },
+    "digest": "ae2e70cca645cab6ef93676c39f70df8694dc422b636e22bae917e96b53bab66"
+  },
+  "graph_sync": {
+    "deltas": 0,
+    "created": true,
+    "fallback": false,
+    "failed": false,
+    "relocation": {},
+    "coverage_complete": true,
+    "coverage_omissions": []
+  },
+  "last_failure_decision": {
+    "action": "continue_bounded_repair",
+    "kind": "deterministic_test_failure",
+    "repair_budget_usd": 0.25,
+    "requires": "envelope_preserved AND lineage_preserved AND fresh failing-check evidence",
+    "effective_repair_cap_usd": 0.25,
+    "repair_id": "repair_957408947a3c4bd88c88799f1bc1448b"
+  },
+  "repair_budget": {
+    "version": 1,
+    "id": "repair_957408947a3c4bd88c88799f1bc1448b",
+    "cap_usd": 0.25,
+    "start_spent_usd": 0.0,
+    "start_event": 4,
+    "failure_step": 0
+  },
+  "goals": [],
+  "expansion_count": 0
+}

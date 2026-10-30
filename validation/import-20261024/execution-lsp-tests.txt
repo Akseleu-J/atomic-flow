@@ -1,0 +1,56 @@
+.................F...FF.....F.............s                              [100%]
+================================== FAILURES ===================================
+___________ test_checked_multi_file_preview_and_apply[unversioned] ____________
+tests\test_lsp.py:148: in test_checked_multi_file_preview_and_apply
+    with client(project, mode) as peer:
+         ^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\lsp.py:212: in __enter__
+    return self.start()
+           ^^^^^^^^^^^^
+src\atomic_flow\lsp.py:306: in start
+    result = self._request("initialize", {"processId": None, "rootUri": self.project.as_uri(),
+src\atomic_flow\lsp.py:413: in _request
+    raise LSPError("LSP request timed out")
+E   atomic_flow.lsp.LSPError: LSP request timed out
+______ test_invalid_workspace_edits_are_never_applied[duplicate-target] _______
+tests\test_lsp.py:169: in test_invalid_workspace_edits_are_never_applied
+    with client(project, mode) as peer:
+         ^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\lsp.py:212: in __enter__
+    return self.start()
+           ^^^^^^^^^^^^
+src\atomic_flow\lsp.py:306: in start
+    result = self._request("initialize", {"processId": None, "rootUri": self.project.as_uri(),
+src\atomic_flow\lsp.py:413: in _request
+    raise LSPError("LSP request timed out")
+E   atomic_flow.lsp.LSPError: LSP request timed out
+________ test_preview_does_not_grant_complete_read_or_allow_tampering _________
+tests\test_lsp.py:177: in test_preview_does_not_grant_complete_read_or_allow_tampering
+    with client(project) as peer:
+         ^^^^^^^^^^^^^^^
+src\atomic_flow\lsp.py:212: in __enter__
+    return self.start()
+           ^^^^^^^^^^^^
+src\atomic_flow\lsp.py:306: in start
+    result = self._request("initialize", {"processId": None, "rootUri": self.project.as_uri(),
+src\atomic_flow\lsp.py:413: in _request
+    raise LSPError("LSP request timed out")
+E   atomic_flow.lsp.LSPError: LSP request timed out
+_____________ test_operation_binds_cancellation_to_active_request _____________
+tests\test_lsp.py:297: in test_operation_binds_cancellation_to_active_request
+    with client(project, "timeout") as peer:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\lsp.py:212: in __enter__
+    return self.start()
+           ^^^^^^^^^^^^
+src\atomic_flow\lsp.py:306: in start
+    result = self._request("initialize", {"processId": None, "rootUri": self.project.as_uri(),
+src\atomic_flow\lsp.py:413: in _request
+    raise LSPError("LSP request timed out")
+E   atomic_flow.lsp.LSPError: LSP request timed out
+=========================== short test summary info ===========================
+FAILED tests/test_lsp.py::test_checked_multi_file_preview_and_apply[unversioned]
+FAILED tests/test_lsp.py::test_invalid_workspace_edits_are_never_applied[duplicate-target]
+FAILED tests/test_lsp.py::test_preview_does_not_grant_complete_read_or_allow_tampering
+FAILED tests/test_lsp.py::test_operation_binds_cancellation_to_active_request
+4 failed, 38 passed, 1 skipped in 732.11s (0:12:12)

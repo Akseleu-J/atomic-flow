@@ -1,0 +1,311 @@
+{
+  "tasks": 30,
+  "calibrated": 0,
+  "model_calls": 0,
+  "errors": {
+    "image source does not match pinned task base": 30,
+    "patch modifies protected tests": 6
+  },
+  "rows": [
+    {
+      "task": "pylint-dev__pylint-7993",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8595",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-6116",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "patch modifies protected tests",
+        "patch modifies protected tests"
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-7228",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-7114",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-7738",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-11148",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "patch modifies protected tests",
+        "patch modifies protected tests"
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-7168",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "patch modifies protected tests",
+        "patch modifies protected tests"
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-5859",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8713",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "psf__requests-863",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-7080",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "psf__requests-2317",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-11143",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "patch modifies protected tests",
+        "patch modifies protected tests"
+      ]
+    },
+    {
+      "task": "psf__requests-2148",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8474",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-5227",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "patch modifies protected tests",
+        "patch modifies protected tests"
+      ]
+    },
+    {
+      "task": "psf__requests-2674",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-6506",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8721",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sympy__sympy-16988",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "psf__requests-3362",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sympy__sympy-20212",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "psf__requests-1963",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sympy__sympy-17139",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sympy__sympy-13971",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sympy__sympy-18057",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-7432",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "patch modifies protected tests",
+        "patch modifies protected tests"
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8506",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    },
+    {
+      "task": "sympy__sympy-21614",
+      "calibrated": false,
+      "status": "completed",
+      "errors": [
+        "image source does not match pinned task base",
+        "image source does not match pinned task base",
+        "image source does not match pinned task base"
+      ]
+    }
+  ]
+}

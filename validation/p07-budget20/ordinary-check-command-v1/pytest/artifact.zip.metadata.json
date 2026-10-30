@@ -1,0 +1,20 @@
+{
+  "id": 12792169663,
+  "node_id": "MDg6QXJ0aWZhY3QxMjc5MjE2OTY2Mw==",
+  "name": "p07-batch-obligation-journey-pytest-0de098aaeff5a6f6294353ef78730818b68aafe0",
+  "size_in_bytes": 7331,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12792169663",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12792169663/zip",
+  "expired": false,
+  "digest": "sha256:91f652e907a9b074c49175470174e6d2dc182b24d580a7cbb7a6e2489a082cba",
+  "created_at": "2026-10-28T04:45:55Z",
+  "updated_at": "2026-10-28T04:45:55Z",
+  "expires_at": "2026-11-11T04:45:55Z",
+  "workflow_run": {
+    "id": 40634036115,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "0de098aaeff5a6f6294353ef78730818b68aafe0"
+  }
+}

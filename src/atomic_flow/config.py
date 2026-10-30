@@ -27,7 +27,7 @@ BACKEND_DEFAULTS: dict[str, dict[str, Any]] = {
 }
 
 # A cloned repository must not be able to redirect your API key or source code.
-UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts")
+UNTRUSTED_PROJECT_KEYS = ("default_backend", "backends", "budget", "artifacts", "execution", "task", "conversation", "experimental", "routing")
 
 
 def user_dir() -> Path:
@@ -50,8 +50,21 @@ class BackendConfig(BaseModel):
     max_retries: int = Field(default=2, ge=0, le=5)
     temperature: float | None = Field(default=0.1, ge=0, le=2)   # null -> omit (some reasoning models reject it)
     max_output_tokens: int | None = Field(default=None, ge=16, le=200_000)
+    # Explicit per-model limits: no guessed provider catalogue or tokenizer download.
+    context_window_tokens: int | None = Field(default=None, ge=128, le=10_000_000)
+    max_input_tokens: int | None = Field(default=None, ge=1, le=10_000_000)
+    request_framing_tokens: int = Field(default=32, ge=0, le=100_000)
+    message_framing_tokens: int = Field(default=8, ge=0, le=10_000)
     price_in_per_mtok: float | None = Field(default=None, ge=0)  # lets budget enforcement work without provider cost
     price_out_per_mtok: float | None = Field(default=None, ge=0)
+    tool_protocol: Literal["text_json", "native"] = "text_json"
+    quota_scope: str = Field(default="", max_length=100)
+    requests_per_minute: int | None = Field(default=None, ge=1)
+    requests_per_day: int | None = Field(default=None, ge=1)
+    tokens_per_minute: int | None = Field(default=None, ge=1)
+    max_concurrent_requests: int = Field(default=1, ge=1, le=32)
+    # Host-confirmed tariff expiry, Unix UTC seconds. Routing never guesses free pricing.
+    free_until: float | None = Field(default=None, gt=0, allow_inf_nan=False)
 
     @field_validator("base_url")
     @classmethod
@@ -69,6 +82,15 @@ class BudgetConfig(BaseModel):
     daily_limit_usd: float = Field(default=10.0, ge=0)          # 0 disables; enforced locally in budget.py
 
 
+class RoutingConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    mode: Literal["fixed", "free_only", "capped_paid"] = "fixed"
+    routes: list[str] = Field(default_factory=list, max_length=8)
+    max_attempts: int = Field(default=3, ge=1, le=8)
+    timeout_seconds: float = Field(default=120, gt=0, le=600)
+    cooldown_seconds: float = Field(default=60, ge=1, le=86400)
+
+
 class ArtifactsConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     save: bool = True                                           # run artifacts contain source snippets: opt out here
@@ -80,13 +102,45 @@ class TreeConfig(BaseModel):
     ignore: list[str] = Field(default_factory=lambda: list(DEFAULT_IGNORE))
     respect_gitignore: bool = True
     auto_refresh: bool = True                                   # re-index changed files before every question
+    watch_external: bool = False
+    watch_interval_seconds: float = Field(default=0.25, ge=0.1, le=10)
+    watch_debounce_seconds: float = Field(default=0.2, ge=0, le=5)
 
 
 class TaskConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    execution_strategy: Literal["flat-baseline-v1"] | None = None
+    max_duration_seconds: float = Field(default=3600, ge=1, le=604800, allow_inf_nan=False,
+                                       description="Reviewed opt-in task envelope duration, measured from task creation")
     max_replans: int = Field(default=2, ge=0, le=5)
     max_budget_usd: float = Field(default=2.0, ge=0)
     fail_on_budget_exceeded: bool = True
+    max_model_calls: int = Field(default=100, ge=1, le=1000)
+    default_max_output_tokens: int = Field(default=4096, ge=16, le=200_000)
+    final_check: Literal["syntax", "pytest", "ordinary_test"] = "syntax"
+    workspace_backend: Literal["copy", "git-worktree"] = "copy"
+
+
+class ExecutionConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid", validate_default=True)
+    mode: Literal["docker", "local"] = Field(default_factory=lambda: os.getenv("ATOMIC_FLOW_EXECUTION_MODE", "docker"))
+    image: str = "atomic-flow-checks:local"
+    profile: Literal["checks", "read-only"] = "checks"
+    output_bytes: int = Field(default=16384, ge=1024, le=1_000_000)
+
+
+class ConversationConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    max_request_bytes: int = Field(default=131072, ge=4096, le=2_000_000)
+    recent_tool_results: int = Field(default=2, ge=1, le=12)
+    max_same_tool_call: int = Field(default=3, ge=1, le=12)
+    compact_at_ratio: float = Field(default=0.85, gt=0.1, le=1.0)
+
+
+class ExperimentalConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    parallel_reads: bool = False
+    native_tools: bool = False
 
 
 class AtomicConfig(BaseModel):
@@ -104,6 +158,10 @@ class AtomicConfig(BaseModel):
     budget: BudgetConfig = Field(default_factory=BudgetConfig)
     artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
     task: TaskConfig = Field(default_factory=TaskConfig)
+    execution: ExecutionConfig = Field(default_factory=ExecutionConfig)
+    conversation: ConversationConfig = Field(default_factory=ConversationConfig)
+    experimental: ExperimentalConfig = Field(default_factory=ExperimentalConfig)
+    routing: RoutingConfig = Field(default_factory=RoutingConfig)
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
@@ -150,10 +208,30 @@ def trust_project(project: str | Path) -> None:
 
 def load_config(project: str | Path | None = None) -> AtomicConfig:
     """defaults < user config < project config (trust-gated) < environment."""
+    return _resolve_config(project)[0]
+
+
+def _resolve_config(project: str | Path | None = None) -> tuple[AtomicConfig, dict]:
     merged = AtomicConfig().model_dump(mode="python")
-    _deep_update(merged, _read_yaml(user_dir() / "config.yaml"))
+    sources = {}
+
+    def record(values, source, prefix=""):
+        for key, value in values.items():
+            name = f"{prefix}.{key}" if prefix else str(key)
+            if isinstance(value, dict):
+                record(value, source, name)
+            else:
+                sources[name] = source
+
+    record(merged, "default")
+    user_yaml = _read_yaml(user_dir() / "config.yaml")
+    _deep_update(merged, user_yaml)
+    record(user_yaml, "user")
     project_yaml = _read_yaml(project_dir(project) / "config.yaml")
+    # Routing is a host egress decision, even a trusted repo cannot expand it.
+    project_yaml.pop("routing", None)
     root = Path(project or Path.cwd()).expanduser().resolve()
+    dropped = []
     if project_yaml and not is_trusted(root):
         dropped = [key for key in UNTRUSTED_PROJECT_KEYS if key in project_yaml]
         if dropped:
@@ -161,22 +239,51 @@ def load_config(project: str | Path | None = None) -> AtomicConfig:
                         ", ".join(dropped), root)
         project_yaml = {k: v for k, v in project_yaml.items() if k not in UNTRUSTED_PROJECT_KEYS}
     _deep_update(merged, project_yaml)
+    record(project_yaml, "project")
+    if "ATOMIC_FLOW_EXECUTION_MODE" in os.environ:
+        merged.setdefault("execution", {})["mode"] = os.environ["ATOMIC_FLOW_EXECUTION_MODE"]
+        sources["execution.mode"] = "environment:ATOMIC_FLOW_EXECUTION_MODE"
 
     backends = merged.setdefault("backends", {})
     for key, entry in backends.items():                                   # fill provider defaults per entry
+        if not isinstance(entry, dict):
+            raise ConfigurationError(f"Backend {key!r} must be a mapping")
         kind = entry.get("type") or (key if key in BACKEND_DEFAULTS else "openai-compatible")
+        if kind not in BACKEND_DEFAULTS:
+            raise ConfigurationError(f"Unknown backend type for {key!r}")
         entry["type"] = kind
+        sources.setdefault(f"backends.{key}.type", "provider_default")
         for field_name, default in BACKEND_DEFAULTS[kind].items():
             if not entry.get(field_name):
                 entry[field_name] = default
+                sources[f"backends.{key}.{field_name}"] = "provider_default"
     openai = backends.setdefault("openai-compatible", {"type": "openai-compatible"})
     openai["base_url"] = os.getenv("ATOMIC_FLOW_BASE_URL", openai.get("base_url") or BACKEND_DEFAULTS["openai-compatible"]["base_url"])
     openai["api_key"] = os.getenv("ATOMIC_FLOW_API_KEY", openai.get("api_key", ""))
     openai["model"] = os.getenv("ATOMIC_FLOW_MODEL", openai.get("model") or BACKEND_DEFAULTS["openai-compatible"]["model"])
+    for field_name, variable in (("base_url", "ATOMIC_FLOW_BASE_URL"), ("api_key", "ATOMIC_FLOW_API_KEY"),
+                                 ("model", "ATOMIC_FLOW_MODEL")):
+        if variable in os.environ:
+            sources[f"backends.openai-compatible.{field_name}"] = "environment:" + variable
     try:
-        return AtomicConfig.model_validate(merged)
+        config = AtomicConfig.model_validate(merged)
     except ValidationError as exc:
         raise ConfigurationError(f"Invalid atomic_flow configuration:\n{exc}") from exc
+    return config, {"sources": sources, "ignored_untrusted_project_keys": dropped,
+                    "project_trusted": is_trusted(root)}
+
+
+def explain_config(project: str | Path | None = None) -> dict:
+    """Masked effective values and leaf origins from the same resolver as runtime."""
+    config, explanation = _resolve_config(project)
+    explanation["effective"] = mask_secrets(config.model_dump(mode="json"))
+    explanation["credential_environment"] = {
+        name: {"variable": entry.api_key_env, "present": bool(os.getenv(entry.api_key_env))}
+        for name, entry in config.backends.items() if entry.api_key_env
+    }
+    from atomic_flow.backends.base import backend_capabilities
+    explanation["backend_capabilities"] = {name: backend_capabilities(entry) for name, entry in config.backends.items()}
+    return explanation
 
 
 def mask_secrets(value: Any) -> Any:

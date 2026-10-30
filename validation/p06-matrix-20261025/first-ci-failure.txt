@@ -1,0 +1,66 @@
+FAILURES ===================================
+2026-10-25T18:26:04.8274796Z __ test_hierarchical_multifile_failure_repair_publish_without_new_plan_review __
+2026-10-25T18:26:04.8275751Z 
+2026-10-25T18:26:04.8276314Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_hierarchical_multifile_fa0')
+2026-10-25T18:26:04.8277298Z 
+2026-10-25T18:26:04.8277903Z     def test_hierarchical_multifile_failure_repair_publish_without_new_plan_review(tmp_path):
+2026-10-25T18:26:04.8279186Z         project = tmp_path / "project"
+2026-10-25T18:26:04.8279922Z         project.mkdir()
+2026-10-25T18:26:04.8280534Z         tests = project / "tests"
+2026-10-25T18:26:04.8281244Z         tests.mkdir()
+2026-10-25T18:26:04.8281819Z         for name in ("left", "right"):
+2026-10-25T18:26:04.8283227Z             (project / f"{name}.py").write_text(f"def {name}():\n    return 1\n", encoding="utf-8")
+2026-10-25T18:26:04.8284227Z             (tests / f"test_{name}.py").write_text(
+2026-10-25T18:26:04.8285223Z                 f"from {name} import {name}\ndef test_{name}():\n    assert {name}() == 2\n", encoding="utf-8")
+2026-10-25T18:26:04.8286249Z         save_tree(project, build_tree(project))
+2026-10-25T18:26:04.8287114Z         sync_project_graph(project, {})
+2026-10-25T18:26:04.8287913Z         oracle = {p.name: p.read_bytes() for p in tests.glob("*.py")}
+2026-10-25T18:26:04.8288889Z         criteria = ["Both public functions return two", "Existing tests pass"]
+2026-10-25T18:26:04.8290101Z         goals = [PlanGoal(id="root", description="Update both public functions", acceptance_criteria=criteria,
+2026-10-25T18:26:04.8291448Z                           scope_paths=["left.py", "right.py"], max_model_calls=50, max_budget_usd=1.0),
+2026-10-25T18:26:04.8292924Z                  PlanGoal(id="implementation", parent_id="root", description="Implement both functions",
+2026-10-25T18:26:04.8294236Z                           acceptance_criteria=criteria, scope_paths=["left.py", "right.py"],
+2026-10-25T18:26:04.8295178Z                           max_model_calls=40, max_budget_usd=0.8)]
+2026-10-25T18:26:04.8295937Z         initial = Plan(goals=goals, steps=[PlanStep(
+2026-10-25T18:26:04.8297301Z             description="Update left and right functions", parent_goal="implementation", acceptance_criteria=criteria,
+2026-10-25T18:26:04.8298715Z             tools_needed=["edit_node"], verify_with="pytest", scope_paths=["left.py", "right.py"],
+2026-10-25T18:26:04.8299874Z             linked_test_nodes=["tests/test_left.py", "tests/test_right.py"])])
+2026-10-25T18:26:04.8300803Z         repaired = initial.model_copy(deep=True)
+2026-10-25T18:26:04.8301853Z         repaired.steps[0].description = "Repair both function implementations against existing tests"
+2026-10-25T18:26:04.8302957Z         answers = iter([
+2026-10-25T18:26:04.8303984Z             {"tool": "edit_node", "args": {"node_id": "left.py::left", "new_source": "def left():\n    return 3\n"}},
+2026-10-25T18:26:04.8305013Z             {"text": "First attempt completed.", "confidence": "high"},
+2026-10-25T18:26:04.8305867Z             {"tool": "edit_node", "args": {"node_id": "left.py::left", "new_source": "def left():\n    return 2\n"}},
+2026-10-25T18:26:04.8306996Z             {"tool": "edit_node", "args": {"node_id": "right.py::right", "new_source": "def right():\n    return 2\n"}},
+2026-10-25T18:26:04.8307863Z             {"text": "Both functions updated.", "confidence": "high"},
+2026-10-25T18:26:04.8308414Z         ])
+2026-10-25T18:26:04.8308747Z     
+2026-10-25T18:26:04.8309163Z         class Backend(ScriptedBackend):
+2026-10-25T18:26:04.8309641Z             def chat(self, messages, **kwargs):
+2026-10-25T18:26:04.8310130Z                 user = messages[1]["content"]
+2026-10-25T18:26:04.8310629Z                 if "<role>" in user:
+2026-10-25T18:26:04.8311149Z                     return super().chat(messages, **kwargs)
+2026-10-25T18:26:04.8311728Z                 is_replan = "COMPLETED STEPS" in user
+2026-10-25T18:26:04.8312400Z                 self.calls.append(("replan" if is_replan else "plan", messages))
+2026-10-25T18:26:04.8313223Z                 return ChatResult((repaired if is_replan else initial).model_dump_json(), 100, 50, 0.001, 5)
+2026-10-25T18:26:04.8313936Z     
+2026-10-25T18:26:04.8314477Z         backend = Backend({"parser": {"task_type": "modify", "focus_terms": ["left", "right"]},
+2026-10-25T18:26:04.8315291Z                            "answerer": lambda _user: next(answers), "critic": {"verdict": "ok"}})
+2026-10-25T18:26:04.8315910Z         approvals = []
+2026-10-25T18:26:04.8316362Z         runner = TaskRunner(AtomicConfig(), project, backend,
+2026-10-25T18:26:04.8317222Z                             approval_callback=lambda *a, **kw: approvals.append(1) or True)
+2026-10-25T18:26:04.8318258Z         task = runner.prepare("Make both functions return two", candidates=["left.py::left", "right.py::right"], n_files=4)
+2026-10-25T18:26:04.8319392Z         assert task.status == "paused" and not task.plan_approval
+2026-10-25T18:26:04.8319956Z         allowed = ["left.py", "right.py"]
+2026-10-25T18:26:04.8320564Z         review = runner.review(task, allowed_paths=allowed, allow_internal_replan=True)
+2026-10-25T18:26:04.8321510Z         task = runner.approve(task, review["digest"], allowed_paths=allowed, allow_internal_replan=True)
+2026-10-25T18:26:04.8322180Z         result = runner.resume(task)
+2026-10-25T18:26:04.8322743Z >       assert result.status == "done", result.error
+2026-10-25T18:26:04.8323869Z E       AssertionError: failure policy: unclassified failure kind: 'unclassified'; contract change required; step 1 outcome: StepFailure: edit rolled back: pytest FAIL on ['tests/test_left.py']
+2026-10-25T18:26:04.8324979Z E       assert 'paused' == 'done'
+2026-10-25T18:26:04.8325660Z E         
+2026-10-25T18:26:04.8326024Z E         - done
+2026-10-25T18:26:04.8326393Z E         + paused
+2026-10-25T18:26:04.8326844Z 
+2026-10-25T18:26:04.8327059Z tests/test_p06_public_repair.py:68: AssertionError
+2026-10-25T18:26:04.8327645Z =============================== 

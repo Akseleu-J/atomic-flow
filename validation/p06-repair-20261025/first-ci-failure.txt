@@ -1,0 +1,162 @@
+=================================== FAILURES ===================================
+2026-10-25T17:18:11.7953202Z _ test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner __
+2026-10-25T17:18:11.7953778Z 
+2026-10-25T17:18:11.7954209Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_model_check_uses_snapshot0')
+2026-10-25T17:18:11.7954820Z 
+2026-10-25T17:18:11.7955274Z     def test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner(tmp_path):
+2026-10-25T17:18:11.7956622Z         (tmp_path / "credentials.json").write_text('"arbitrary-secret-without-recognized-prefix"')
+2026-10-25T17:18:11.7957528Z         (tmp_path / "test_inputs.py").write_text(
+2026-10-25T17:18:11.7958150Z             'from pathlib import Path\ndef test_private_absent():\n'
+2026-10-25T17:18:11.7958836Z             '    assert not Path("credentials.json").exists()\n'
+2026-10-25T17:18:11.7959608Z             '    Path("check_side_effect.txt").write_text("private only")\n')
+2026-10-25T17:18:11.7960859Z         result = RunCommandTool().run(RunCommandArgs(command="pytest"),
+2026-10-25T17:18:11.7961748Z                                      ToolContext(tmp_path, {}, execution=ExecutionConfig(mode="local")))
+2026-10-25T17:18:11.7962454Z >       assert result["exit_code"] == 0, result
+2026-10-25T17:18:11.7962897Z                ^^^^^^^^^^^^^^^^^^^
+2026-10-25T17:18:11.7963288Z E       KeyError: 'exit_code'
+2026-10-25T17:18:11.7963530Z 
+2026-10-25T17:18:11.7963750Z tests/test_execution_confidentiality.py:89: KeyError
+2026-10-25T17:18:11.7964474Z _________ test_direct_edit_matching_checks_also_exclude_private_inputs _________
+2026-10-25T17:18:11.7965006Z 
+2026-10-25T17:18:11.7965662Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_direct_edit_matching_chec0')
+2026-10-25T17:18:11.7966354Z 
+2026-10-25T17:18:11.7966963Z     def test_direct_edit_matching_checks_also_exclude_private_inputs(tmp_path):
+2026-10-25T17:18:11.7967771Z         (tmp_path / "credentials.json").write_text('"arbitrary-private-value"')
+2026-10-25T17:18:11.7968422Z         (tmp_path / "a.py").write_text("VALUE = 42\n")
+2026-10-25T17:18:11.7968887Z         (tmp_path / "tests").mkdir()
+2026-10-25T17:18:11.7969313Z         (tmp_path / "tests/test_a.py").write_text(
+2026-10-25T17:18:11.7969919Z             'from pathlib import Path\nfrom a import VALUE\ndef test_value():\n'
+2026-10-25T17:18:11.7970624Z             '    assert VALUE == 42 and not Path("credentials.json").exists()\n'
+2026-10-25T17:18:11.7971314Z             '    Path("unpublished.txt").write_text("test side effect")\n')
+2026-10-25T17:18:11.7972038Z         result = verify_edit(tmp_path, "a.py", execution=ExecutionConfig(mode="local"))
+2026-10-25T17:18:11.7972689Z >       assert result.ok, result.test_output
+2026-10-25T17:18:11.7973119Z E       AssertionError: 
+2026-10-25T17:18:11.7973465Z E       assert False
+2026-10-25T17:18:11.7974981Z E        +  where False = VerificationResult(ok=False, checks=['syntax', 'pytest'], message='source changed during check', test_output='', diagn...=None, checked_source_revision='8820f76f647dda3a6b2511a99836be52d39c5564270f821d0895d2519aab9f23', source_changed=True).ok
+2026-10-25T17:18:11.7976648Z 
+2026-10-25T17:18:11.7976898Z tests/test_execution_confidentiality.py:103: AssertionError
+2026-10-25T17:18:11.7977580Z ____________________ test_task_runner_stops_on_failed_edit _____________________
+2026-10-25T17:18:11.7978021Z 
+2026-10-25T17:18:11.7978338Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2215a72090>
+2026-10-25T17:18:11.7978913Z isolated_home = None
+2026-10-25T17:18:11.7979455Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_task_runner_stops_on_fail0')
+2026-10-25T17:18:11.7979976Z 
+2026-10-25T17:18:11.7980300Z     def test_task_runner_stops_on_failed_edit(monkeypatch, isolated_home, tmp_path):
+2026-10-25T17:18:11.7980954Z         from atomic_flow.agents import task_loop
+2026-10-25T17:18:11.7981377Z     
+2026-10-25T17:18:11.7981630Z         class R:
+2026-10-25T17:18:11.7981956Z             tool_calls = [{"tool": "edit_node",
+2026-10-25T17:18:11.7982599Z                            "result_summary": {"status": "rolled_back", "reason": "py_compile failed"}}]
+2026-10-25T17:18:11.7983221Z             ledger_id = "req_x"
+2026-10-25T17:18:11.7983563Z             cost_usd = 0.01
+2026-10-25T17:18:11.7983891Z     
+2026-10-25T17:18:11.7984155Z         class FakeOrch:
+2026-10-25T17:18:11.7984491Z             def __init__(self, *a, **kw):
+2026-10-25T17:18:11.7984870Z                 pass
+2026-10-25T17:18:11.7985158Z     
+2026-10-25T17:18:11.7985615Z             def answer(self, *a, **kw):
+2026-10-25T17:18:11.7986001Z                 return R()
+2026-10-25T17:18:11.7986308Z     
+2026-10-25T17:18:11.7986679Z         monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
+2026-10-25T17:18:11.7987177Z     
+2026-10-25T17:18:11.7987635Z         plan = Plan(steps=[PlanStep(description="bad edit", verify_with="py_compile")])
+2026-10-25T17:18:11.7988382Z         runner = TaskRunner(config=None, project=tmp_path, backend=None)
+2026-10-25T17:18:11.7989136Z         task = runner.run_plan("fail", plan)
+2026-10-25T17:18:11.7989572Z >       assert task.status == "failed"
+2026-10-25T17:18:11.7990003Z E       AssertionError: assert 'paused' == 'failed'
+2026-10-25T17:18:11.7990427Z E         
+2026-10-25T17:18:11.7990693Z E         - failed
+2026-10-25T17:18:11.7990986Z E         + paused
+2026-10-25T17:18:11.7991150Z 
+2026-10-25T17:18:11.7991304Z tests/test_task.py:104: AssertionError
+2026-10-25T17:18:11.7991845Z _____________________ test_replan_appends_steps_on_failure _____________________
+2026-10-25T17:18:11.7992266Z 
+2026-10-25T17:18:11.7992576Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2215e98290>
+2026-10-25T17:18:11.7993178Z isolated_home = None
+2026-10-25T17:18:11.7993828Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_replan_appends_steps_on_f0')
+2026-10-25T17:18:11.7994588Z 
+2026-10-25T17:18:11.7994928Z     def test_replan_appends_steps_on_failure(monkeypatch, isolated_home, tmp_path):
+2026-10-25T17:18:11.7995784Z         from atomic_flow.agents import task_loop
+2026-10-25T17:18:11.7996254Z         (tmp_path / "x.py").write_text("X = 1\n")
+2026-10-25T17:18:11.7996663Z     
+2026-10-25T17:18:11.7996906Z         class R:
+2026-10-25T17:18:11.7997199Z             def __init__(self, calls):
+2026-10-25T17:18:11.7997592Z                 self.tool_calls = calls
+2026-10-25T17:18:11.7997984Z                 self.ledger_id = "req_x"
+2026-10-25T17:18:11.7998366Z                 self.cost_usd = 0.0
+2026-10-25T17:18:11.7998720Z     
+2026-10-25T17:18:11.7998969Z         responses = [
+2026-10-25T17:18:11.7999510Z             R([{"tool": "edit_node", "result_summary": {"status": "rolled_back", "reason": "syntax"}}]),
+2026-10-25T17:18:11.8000789Z             R([{"tool": "edit_node", "result_summary": {"outcome": "success", "status": "applied", "checks": ["syntax"], "path": "x.py", "content_hash": digest((tmp_path / "x.py").read_bytes())}}]),
+2026-10-25T17:18:11.8001951Z         ]
+2026-10-25T17:18:11.8002203Z     
+2026-10-25T17:18:11.8002461Z         class FakeOrch:
+2026-10-25T17:18:11.8002788Z             def __init__(self, *a, **kw):
+2026-10-25T17:18:11.8003156Z                 pass
+2026-10-25T17:18:11.8003440Z     
+2026-10-25T17:18:11.8003708Z             def answer(self, *a, **kw):
+2026-10-25T17:18:11.8004096Z                 return responses.pop(0)
+2026-10-25T17:18:11.8004445Z     
+2026-10-25T17:18:11.8004816Z         monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
+2026-10-25T17:18:11.8005658Z         monkeypatch.setattr(task_loop, "replan_task", lambda *a, **kw: Plan(
+2026-10-25T17:18:11.8006474Z             steps=[PlanStep(description="try alternative approach", verify_with="py_compile")],
+2026-10-25T17:18:11.8007085Z         ))
+2026-10-25T17:18:11.8007329Z     
+2026-10-25T17:18:11.8007826Z         plan = Plan(steps=[PlanStep(description="initial attempt", verify_with="py_compile")])
+2026-10-25T17:18:11.8008680Z         runner = task_loop.TaskRunner(config=None, project=tmp_path, backend=None)
+2026-10-25T17:18:11.8009275Z         task = runner.run_plan("do", plan)
+2026-10-25T17:18:11.8009771Z >       assert task.status == "paused" and not task.plan_approval
+2026-10-25T17:18:11.8010272Z E       assert ('paused' == 'paused'
+2026-10-25T17:18:11.8010631Z E         
+2026-10-25T17:18:11.8011952Z E           paused and not {'schema_version': 1, 'task_id': 'task_d9479c2f6aff', 'project': '/tmp/pytest-of-runner/pytest-0/test_replan_appends_s...: '', 'steps': [{'index': 0, 'description': 'initial attempt', 'tools_needed': [], 'expected_outcome': '', ...}]}, ...})
+2026-10-25T17:18:11.8016011Z E        +  where {'schema_version': 1, 'task_id': 'task_d9479c2f6aff', 'project': '/tmp/pytest-of-runner/pytest-0/test_replan_appends_s...: '', 'steps': [{'index': 0, 'description': 'initial attempt', 'tools_needed': [], 'expected_outcome': '', ...}]}, ...} = Task(id='task_d9479c2f6aff', query='do', project='/tmp/pytest-of-runner/pytest-0/test_replan_appends_steps_on_f0', ste... "unclassified failure kind: 'unclassified'; contract change required"}, repair_budget={}, goals=[], expansion_count=0).plan_approval
+2026-10-25T17:18:11.8018722Z 
+2026-10-25T17:18:11.8018891Z tests/test_task.py:183: AssertionError
+2026-10-25T17:18:11.8019452Z _______________ test_multistep_task_publishes_all_or_none[False] _______________
+2026-10-25T17:18:11.8019913Z 
+2026-10-25T17:18:11.8020264Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_multistep_task_publishes_1')
+2026-10-25T17:18:11.8020892Z second_ok = False
+2026-10-25T17:18:11.8021078Z 
+2026-10-25T17:18:11.8021294Z     @pytest.mark.parametrize("second_ok", [True, False])
+2026-10-25T17:18:11.8021899Z     def test_multistep_task_publishes_all_or_none(tmp_path, second_ok):
+2026-10-25T17:18:11.8022462Z         root = tmp_path / "project"
+2026-10-25T17:18:11.8022829Z         root.mkdir()
+2026-10-25T17:18:11.8023127Z         for name in ("a", "b"):
+2026-10-25T17:18:11.8023846Z             (root / f"{name}.py").write_text(f"def {name}():\n    return 1\n", encoding="utf-8")
+2026-10-25T17:18:11.8024480Z         save_tree(root, build_tree(root))
+2026-10-25T17:18:11.8024881Z         backend = ScriptedBackend({
+2026-10-25T17:18:11.8025534Z             "parser": {"task_type": "modify", "focus_terms": ["return"]},
+2026-10-25T17:18:11.8026046Z             "answerer": [
+2026-10-25T17:18:11.8026616Z                 {"tool": "read_node", "args": {"node_id": "a.py::a", "zoom": 2}},
+2026-10-25T17:18:11.8027352Z                 {"tool": "edit_node", "args": {"node_id": "a.py::a", "new_source": "def a():\n    return 2"}},
+2026-10-25T17:18:11.8028003Z                 {"text": "First change ready."},
+2026-10-25T17:18:11.8028540Z                 {"tool": "read_node", "args": {"node_id": "b.py::b", "zoom": 2}},
+2026-10-25T17:18:11.8029369Z                 {"tool": "edit_node", "args": {"node_id": "b.py::b", "new_source": "def b():\n    return 2" if second_ok else "def b(:"}},
+2026-10-25T17:18:11.8030121Z                 {"text": "Second change ready."},
+2026-10-25T17:18:11.8030510Z             ],
+2026-10-25T17:18:11.8030805Z             "critic": {"verdict": "ok"},
+2026-10-25T17:18:11.8031174Z         })
+2026-10-25T17:18:11.8031444Z         approvals = []
+2026-10-25T17:18:11.8031734Z     
+2026-10-25T17:18:11.8032003Z         def approve(*args):
+2026-10-25T17:18:11.8032469Z             # Even the second step must see an unchanged original checkout.
+2026-10-25T17:18:11.8033064Z             assert "return 1" in (root / "a.py").read_text()
+2026-10-25T17:18:11.8033567Z             assert "return 1" in (root / "b.py").read_text()
+2026-10-25T17:18:11.8034026Z             approvals.append(args)
+2026-10-25T17:18:11.8034403Z             return True
+2026-10-25T17:18:11.8034702Z     
+2026-10-25T17:18:11.8034965Z         config = AtomicConfig()
+2026-10-25T17:18:11.8035526Z         config.task.max_replans = 0
+2026-10-25T17:18:11.8036105Z         task = TaskRunner(config, root, backend, approval_callback=approve).run_plan(
+2026-10-25T17:18:11.8037093Z             "update both functions", Plan(steps=[PlanStep(description=f"Update {name} function", tools_needed=["edit_node"])
+2026-10-25T17:18:11.8037909Z                                                 for name in ("a", "b")]),
+2026-10-25T17:18:11.8038337Z         )
+2026-10-25T17:18:11.8038747Z >       assert task.status == ("done" if second_ok else "failed"), task.error
+2026-10-25T17:18:11.8853719Z E       AssertionError: failure policy: reread_and_fresh_review; step 1 outcome: StepFailure: edit_node: new_source has syntax error at line 1: invalid syntax
+2026-10-25T17:18:11.8855242Z E       assert 'paused' == 'failed'
+2026-10-25T17:18:11.8856181Z E         
+2026-10-25T17:18:11.8856603Z E         - failed
+2026-10-25T17:18:11.8857041Z E         + paused
+2026-10-25T17:18:11.8857226Z 
+2026-10-25T17:18:11.8857421Z tests/test_task_changeset.py:47: AssertionError
+2026-10-25T17:18:11.8858216Z =============================== 

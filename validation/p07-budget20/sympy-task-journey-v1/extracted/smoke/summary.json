@@ -1,0 +1,116 @@
+{
+  "admitted_source_files": 1805,
+  "backend_roles": [
+    "parser",
+    "answerer",
+    "answerer",
+    "critic",
+    "host_planner",
+    "parser",
+    "answerer",
+    "answerer",
+    "answerer",
+    "answerer",
+    "critic"
+  ],
+  "benchmark_quality_claim": false,
+  "calibration_sha256": "a350ee6ce2f7b0108eb58632a57925ff5dc6be9338bb7ffa371e0aaee70af817",
+  "cases": [],
+  "changed_source_paths": [],
+  "completed_native_failure_observations": 1,
+  "completed_native_pass_observations": 1,
+  "completion": {
+    "changed_paths": [
+      {
+        "after_hash": "1142388f511a381581385ebd1b525d88e789ed89",
+        "before_hash": "ea914cd16aafe0ec93399612be4a978b19083d7b",
+        "path": "sympy/p07_probe.py"
+      }
+    ],
+    "checked_at": 1793163847.0463321,
+    "checks": [
+      {
+        "name": "completed_steps",
+        "status": "passed",
+        "superseded_by_replanning": [
+          0
+        ]
+      },
+      {
+        "name": "approved_diff_and_freshness",
+        "status": "passed"
+      },
+      {
+        "name": "final_python_syntax",
+        "scope": "Changed surviving Python files only",
+        "status": "passed"
+      },
+      {
+        "error_type": "GraphContractError",
+        "name": "workspace_integrity",
+        "status": "failed"
+      }
+    ],
+    "diagnostics": [],
+    "model_calls": 0,
+    "ready_to_publish": false,
+    "schema_version": 1,
+    "step_observations": [
+      {
+        "current": true,
+        "index": 1,
+        "legacy_missing": false,
+        "receipt": "26e10edce48d7092b4b7b83000af7d8f6aa6678e230163c07ea57048f38c1978"
+      }
+    ],
+    "tests": "not_run",
+    "workspace_manifest_sha256": "0811e9331db322830ce941d375e0ff9dda89f9228414c51b6955b15907e1fcd4"
+  },
+  "error": "Full-source public native failure/replan/repair/check/publication journey did not qualify",
+  "error_type": "ValueError",
+  "hidden_oracle": "not_run",
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626",
+  "image_id": "sha256:95d456bfbccf33f8cfa63d410bd7df2e73da60fb286d4c411d9c51fb73ffc27f",
+  "independent_requirement_success": false,
+  "internal_verify_label": "pytest compatibility floor; actual runner is sympy-native",
+  "model_calls": 0,
+  "model_transport": "scripted",
+  "native_identity": {
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "source_sha256": {
+      "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+      "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5",
+      "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"
+    },
+    "sympy_version": "1.7.dev"
+  },
+  "obligation_digest": "7f6ecb4f2596d888c01a3f3ac15a9da5a8ee84ec9eb3a25e3b40857a7fd73c12",
+  "ordinary_test_sha256": "934b9364f49aeaaef4ce0e75873d55a5dc925809b0f872fad8603eb151778a01",
+  "provider_calls": 0,
+  "provider_credentials": "not_forwarded",
+  "published_module_sha256": "585c93666fcb046b7b264d3fa73202aa2a38254ae82a4b3ba19e873c2d5a9886",
+  "raw_in_loop_receipts_retained": false,
+  "receipt_evidence": "bounded host tool summaries; raw native executor proof is separate smoke evidence",
+  "replan_count": 1,
+  "runner_source_unchanged": true,
+  "scope": "synthetic full admitted SymPy source public TaskRunner journey only",
+  "source_container_cleanup_confirmed": true,
+  "source_container_cleanup_exit": 0,
+  "source_manifest_scope": "core admitted source filter; generated/hidden files excluded",
+  "status": "not_qualified",
+  "target_setup_executed": false,
+  "task_error": "Final host checks did not pass; workspace retained, nothing published. Inspect completion_report.",
+  "task_status": "paused",
+  "taskrunner_wired": true,
+  "tested_commit": "3f034d65d7198949a0c72dfc2e9b006c146969a3",
+  "verified_success": false,
+  "version_source": "sympy/release.py",
+  "version_source_sha256": "b277ce5aba24985577c9938485d8f9cc6819d75a64a5f7ecd37e0e02b6703ba6",
+  "whole30_qualified": false
+}

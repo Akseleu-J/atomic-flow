@@ -1,0 +1,11 @@
+........................................................................ [ 82%]
+...............                                                          [100%]
+============================== warnings summary ===============================
+tests/test_rolling_plan.py::test_more_than_three_children_and_goal_rewrite_are_rejected
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\pydantic\main.py:520: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `PlanGoal` - serialized value may not be as expected [field_name='goals', input_value={'id': 'other'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+87 passed, 1 warning in 10.86s
+

@@ -1,0 +1,61 @@
+{
+  "case": "required_skip",
+  "check_passed": false,
+  "cleanup": "confirmed_by_existing_executor_return",
+  "process_exit": 5,
+  "runner_receipt": {
+    "_pytest_module": "/testbed/src/_pytest/__init__.py",
+    "argv": [
+      "-rA",
+      "testing/test_p07_self_check.py"
+    ],
+    "call_failed": 0,
+    "collected": 2,
+    "collection_complete": true,
+    "collection_errors": 0,
+    "completed": 2,
+    "exit_code": 0,
+    "failed": 0,
+    "files": [
+      "testing/test_p07_self_check.py"
+    ],
+    "finished": true,
+    "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+    "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+    "nonce": "63539ba52430405f88dd6585f9e391f2",
+    "pytest_module": "/testbed/src/pytest.py",
+    "pytest_self_identity": {
+      "pytest_entrypoint": "src/pytest.py",
+      "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+      "python_version": [
+        3,
+        9,
+        20
+      ],
+      "source_root": "src",
+      "source_sha256": {
+        "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+        "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+      },
+      "traceback": "auto"
+    },
+    "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "root": "/testbed",
+    "runner": "pytest-self",
+    "setup_failed": 0,
+    "skipped": 1,
+    "teardown_failed": 0
+  },
+  "source_after": "5e654934806d8008be655978176deeff4d4cf0312011089da1a3e98e5f3bb233",
+  "source_before": "5e654934806d8008be655978176deeff4d4cf0312011089da1a3e98e5f3bb233",
+  "spec_digest": "c2ff13a79a59db184d13547fb914d63e4ee050d7a8559f8cd8c4e30563585c33",
+  "status": "expected_pytest_self_boundary_behavior",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "7b10f8cfb00bfb068a1a2af8da520bb486240e034ba471f339428eb369cf20d6",
+  "verified_success": false
+}

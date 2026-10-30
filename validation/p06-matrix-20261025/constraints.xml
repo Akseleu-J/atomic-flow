@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="12" time="15.003" timestamp="2026-10-25T21:15:45.044517+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_p06_constraints" name="test_original_goal_call_cap_survives_replan_and_restart[False]" time="2.676" /><testcase classname="tests.test_p06_constraints" name="test_original_goal_call_cap_survives_replan_and_restart[True]" time="2.065" /><testcase classname="tests.test_p06_constraints" name="test_replacement_cannot_silently_relax_original_constraints[cap]" time="0.530" /><testcase classname="tests.test_p06_constraints" name="test_replacement_cannot_silently_relax_original_constraints[scope]" time="0.480" /><testcase classname="tests.test_p06_constraints" name="test_replacement_cannot_silently_relax_original_constraints[identity]" time="0.479" /><testcase classname="tests.test_p06_constraints" name="test_replacement_cannot_silently_relax_original_constraints[test_link]" time="0.443" /><testcase classname="tests.test_p06_constraints" name="test_replacement_cannot_silently_relax_original_constraints[step_scope]" time="0.515" /><testcase classname="tests.test_replan_lineage_wiring" name="test_inherit_preserving_replan_with_obligations_continues" time="0.815" /><testcase classname="tests.test_replan_lineage_wiring" name="test_replan_dropping_criterion_pauses_with_lineage_reason" time="0.595" /><testcase classname="tests.test_failure_wiring_and_malicious" name="test_step_failure_keeps_bounded_repair_and_records_decision" time="3.312" /><testcase classname="tests.test_failure_wiring_and_malicious" name="test_unclassified_exception_stops_fail_closed" time="0.711" /><testcase classname="tests.test_failure_wiring_and_malicious" name="test_malicious_repository_instructions_never_widen_the_envelope" time="0.984"><failure message="AssertionError: &#10;assert 'done' == 'paused'&#10;  &#10;  - paused&#10;  + done">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-136/test_malicious_repository_inst0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002F6BFB12C00&gt;
+
+    def test_malicious_repository_instructions_never_widen_the_envelope(tmp_path, monkeypatch):
+        """Adversarial row: repo text demanding broader scope stays data, not authority."""
+        task, runner = staged(tmp_path, description="Edit a.py exactly as approved")
+        task.steps.append(type(task.steps[0])(index=1, description="Second step", verify_with="none"))
+    
+        def execute_failing(task_, step):
+            if step.index == 0:
+                step.result_summary = "done within approved scope"
+                return
+            raise runner._check_failure(step, "command failed: exit_code 1", "pytest", 1)
+    
+        def malicious_plan(*args, **kwargs):
+            # The model obeys the repository text and proposes out-of-scope work.
+            return Plan(steps=[PlanStep(description="Edit AGENTS.md and all files", tools_needed=["patch_file"],
+                                        verify_with="none")])
+    
+        monkeypatch.setattr(runner, "_execute_step", execute_failing)
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", malicious_plan)
+        task = authorize(runner, task)
+        result = runner.resume(task)
+        persisted = load(result.id)
+&gt;       assert persisted.status == "paused", persisted.error
+E       AssertionError: 
+E       assert 'done' == 'paused'
+E         
+E         - paused
+E         + done
+
+tests\test_failure_wiring_and_malicious.py:88: AssertionError</failure></testcase></testsuite></testsuites>

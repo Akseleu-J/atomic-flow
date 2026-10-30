@@ -1,0 +1,20 @@
+{
+  "id": 12675262311,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY3NTI2MjMxMQ==",
+  "name": "p07-check-spec-executor-1146f073d642ca259544f95dea27ce1d0bc4bb75",
+  "size_in_bytes": 13783,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12675262311",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12675262311/zip",
+  "expired": false,
+  "digest": "sha256:09fa155d6c0ff230be4dadcf163cd33e828a69da8b931b2d4cb3667666ef86c5",
+  "created_at": "2026-10-26T18:24:36Z",
+  "updated_at": "2026-10-26T18:24:36Z",
+  "expires_at": "2026-11-09T18:24:35Z",
+  "workflow_run": {
+    "id": 40377319964,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "1146f073d642ca259544f95dea27ce1d0bc4bb75"
+  }
+}

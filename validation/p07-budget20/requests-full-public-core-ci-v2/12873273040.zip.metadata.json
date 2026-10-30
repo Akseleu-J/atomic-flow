@@ -1,0 +1,20 @@
+{
+  "id": 12873273040,
+  "node_id": "MDg6QXJ0aWZhY3QxMjg3MzI3MzA0MA==",
+  "name": "wheel-acceptance-3.11-4d3c08e3eedcc47509ba700a8b8ec9029f335b13",
+  "size_in_bytes": 1258279,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12873273040",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12873273040/zip",
+  "expired": false,
+  "digest": "sha256:8e257b2f6667c45af3ca554d2a8133f3d429da2d88c29376c2eb07ee0b5094af",
+  "created_at": "2026-10-29T04:33:18Z",
+  "updated_at": "2026-10-29T04:33:18Z",
+  "expires_at": "2026-11-12T04:33:16Z",
+  "workflow_run": {
+    "id": 40818353076,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "4d3c08e3eedcc47509ba700a8b8ec9029f335b13"
+  }
+}

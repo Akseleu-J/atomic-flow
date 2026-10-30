@@ -1,0 +1,11 @@
+/testbed/sympy/utilities/pytest.py:3: SymPyDeprecationWarning: 
+
+Import sympy.utilities.pytest has been deprecated since SymPy 1.6. Use
+Import from sympy.testing.pytest instead. See
+https://github.com/sympy/sympy/issues/18095 for more info.
+
+  SymPyDeprecationWarning(
+Traceback (most recent call last):
+  File "<string>", line 124, in <module>
+  File "<string>", line 60, in _parse_sympy_output
+ValueError: unsupported native verbose testcase shape

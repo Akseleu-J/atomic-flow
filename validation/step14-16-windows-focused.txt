@@ -1,0 +1,61 @@
+...............................s........................................ [ 19%]
+......Fs................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+............................................................s.......s... [ 98%]
+.....                                                                    [100%]
+================================== FAILURES ===================================
+_________________ test_delete_absence_proof_listing_and_tool __________________
+
+workspace = (<atomic_flow.workspace.WorkspaceRegistry object at 0x000001D323AE1D60>, WindowsPath('C:/Users/omirb/AppData/Local/Tem...st0/alpha'), WindowsPath('C:/Users/omirb/AppData/Local/Temp/af141516riskfinal01/test_delete_absence_proof_list0/beta'))
+
+    def test_delete_absence_proof_listing_and_tool(workspace):
+        registry, a, _ = workspace
+        session = registry.session()
+        assert session.list_files("alpha")["files"] == ["main.py"]
+        (a / "second.py").write_text("x=1")
+        assert session.list_files("alpha", limit=1)["truncated"]
+        ctx = ToolContext(a, {})
+        tool = WorkspaceReadTool()
+        args = WorkspaceReadArgs(root_id="alpha", path="main.py")
+        assert "error" in tool.run(args, ctx)
+        ctx.workspace_session = session
+        assert tool.run(args, ctx)["read_complete"]
+>       preview = session.preview("alpha", {"main.py": None})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_workspace_roots.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <atomic_flow.workspace.WorkspaceSession object at 0x000001D323AE2AB0>
+root_id = 'alpha', changes = {'main.py': None}
+cancel_check = <function WorkspaceSession.<lambda> at 0x000001D323798540>
+
+    def preview(self, root_id: str, changes: dict[str, str | None], *, cancel_check=lambda: None):
+        if not isinstance(changes, dict) or not 1 <= len(changes) <= 32 or len(self._previews) >= 16:
+            raise WorkspaceError("preview requires 1-32 paths and at most 16 pending previews")
+        item = self.registry._get(root_id)
+        prepared, total = {}, 0
+        for rel, text in changes.items():
+            cancel_check()
+            if rel not in item["write_paths"]:
+                raise WorkspaceError("path is outside the exact approved root write scope")
+            before, _, data, current = self._source(root_id, rel)
+            if before != item:
+                raise WorkspaceError("root grant changed")
+            key = (root_id, item["generation"], rel, current)
+            rendered = redact(data.decode("utf-8-sig")) if data is not None else ""
+            if self._reads.get(key) != [[0, len(rendered)]]:
+>               raise WorkspaceError("read the complete current root-qualified source before preview")
+E               atomic_flow.workspace.WorkspaceError: read the complete current root-qualified source before preview
+
+src\atomic_flow\workspace.py:375: WorkspaceError
+============================== warnings summary ===============================
+tests/test_run_control.py::test_api_run_stream_auth_result_version_and_root
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_workspace_roots.py::test_delete_absence_proof_listing_and_tool
+1 failed, 360 passed, 4 skipped, 1 warning in 108.05s (0:01:48)

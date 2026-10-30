@@ -1,0 +1,52 @@
+{
+  "model_calls": 0,
+  "network_calls": 0,
+  "probe_kind": "deterministic offline fault interleaving",
+  "chat_schema_accepted_content_chars": 2000000,
+  "oversized_chat_status": 500,
+  "oversized_answer_status": 422,
+  "malformed_content_part_status": 500,
+  "oversized_chat_exception": "ValidationError",
+  "oversized_chat_errors": [
+    {
+      "type": "string_too_long",
+      "loc": [
+        "query"
+      ]
+    },
+    {
+      "type": "string_too_long",
+      "loc": [
+        "retrieval_query"
+      ]
+    }
+  ],
+  "concurrent_tree_saves": [
+    {
+      "writer": 0,
+      "result": "saved"
+    },
+    {
+      "writer": 1,
+      "result": "FileNotFoundError"
+    }
+  ],
+  "saved_tree": {
+    "writer": 1
+  },
+  "task_runner_parameters": [
+    "config",
+    "project",
+    "backend",
+    "approval_callback",
+    "question_callback"
+  ],
+  "orchestrator_host_capabilities_missing_from_runner": [
+    "documentation_client",
+    "hooks",
+    "lsp_client",
+    "role_tools",
+    "tool_registry",
+    "workspace_session"
+  ]
+}

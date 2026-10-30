@@ -1,0 +1,18 @@
+ATOMIC_SYMPY_BEGIN:f52d272bdd7543e1aad795c31de12a27
+============================= test process starts ==============================
+executable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]
+architecture:       64-bit
+cache:              no
+ground types:       python 
+numpy:              None
+random seed:        77551275
+hash randomization: on (PYTHONHASHSEED=3566059906)
+
+sympy/core/tests/test_p07_native_check.py[2] 
+test_native_identity ok
+test_native_probe ok                                                        [OK]
+
+
+================== tests finished: 2 passed, in 0.00 seconds ===================
+ATOMIC_SYMPY_END:f52d272bdd7543e1aad795c31de12a27
+ATOMIC_CHECK_SPEC_RECEIPT:{"collected": 2, "collection": ["sympy/core/tests/test_p07_native_check.py::test_native_identity", "sympy/core/tests/test_p07_native_check.py::test_native_probe"], "counts": {"exceptions": 0, "failed": 0, "passed": 2, "skipped": 0, "xfailed": 0, "xpassed": 0}, "exit_code": 0, "files": ["sympy/core/tests/test_p07_native_check.py"], "finished": true, "interpreter": "/opt/miniconda3/envs/testbed/bin/python", "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9", "native_argv": ["/testbed/bin/test", "-C", "--verbose", "sympy/core/tests/test_p07_native_check.py"], "native_source_sha256": {"bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869", "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5", "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"}, "native_stdout_sha256": "aaae191d3a2b1e47efb0912e273bd11184aaa5a033fa78efa385acb7fded6b36", "nonce": "f52d272bdd7543e1aad795c31de12a27", "python_version": [3, 9, 20], "root": "/testbed", "runner": "sympy-native", "sympy_module": "/testbed/sympy/__init__.py", "sympy_version": "1.7.dev", "test_statuses": {"sympy/core/tests/test_p07_native_check.py::test_native_identity": "passed", "sympy/core/tests/test_p07_native_check.py::test_native_probe": "passed"}}

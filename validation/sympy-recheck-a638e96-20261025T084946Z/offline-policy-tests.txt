@@ -1,0 +1,19 @@
+
+=================================== ERRORS ====================================
+______________ ERROR collecting tests/test_live_pilot_policy.py _______________
+ImportError while importing test module 'C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\tests\test_live_pilot_policy.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_pilot_policy.py:11: in <module>
+    SPEC.loader.exec_module(pilot)
+tools\evaluation_live_pilot.py:21: in <module>
+    from evaluation_provenance import runtime_state, source_state
+E   ModuleNotFoundError: No module named 'evaluation_provenance'
+=========================== short test summary info ===========================
+ERROR tests/test_live_pilot_policy.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 2.24s
+

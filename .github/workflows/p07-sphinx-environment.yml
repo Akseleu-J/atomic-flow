@@ -1,0 +1,57 @@
+name: P07 historical Sphinx dependency calibration
+
+on:
+  workflow_dispatch:
+    inputs:
+      controls:
+        type: choice
+        default: benchmarks/stage4/p07-controls-v4.json
+        options: [benchmarks/stage4/p07-controls-v3.json, benchmarks/stage4/p07-controls-v4.json]
+      tasks:
+        type: choice
+        default: controls-v4
+        options: [all, controls-v4]
+
+permissions:
+  contents: read
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        task: ${{ fromJSON(inputs.tasks == 'all' && '["sphinx-doc__sphinx-8721","sphinx-doc__sphinx-8474","sphinx-doc__sphinx-8506","sphinx-doc__sphinx-8713"]' || '["sphinx-doc__sphinx-8721","sphinx-doc__sphinx-8506","sphinx-doc__sphinx-8713"]') }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install swebench==3.0.15
+      - name: Prepare and build exact offline dependency overlay
+        env:
+          TASK: ${{ matrix.task }}
+        run: |
+          mkdir -p p07-sphinx-worker
+          git rev-parse HEAD > p07-sphinx-worker/tested-commit.txt
+          python tools/p07_dependency_image.py prepare --profile benchmarks/stage4/p07-sphinx-environment-profile.json --task "$TASK" --output /tmp/p07-sphinx-context
+          cp /tmp/p07-sphinx-context/requirements.lock p07-sphinx-worker/
+          python tools/p07_dependency_image.py build --context /tmp/p07-sphinx-context --output p07-sphinx-worker/build
+      - name: Independently admit overlay and calibrate all source rows
+        env:
+          TASK: ${{ matrix.task }}
+          CONTROLS: ${{ inputs.controls }}
+        run: |
+          IMAGE=$(python -c "import json; print(json.load(open('p07-sphinx-worker/build/dependency-image.json'))['image_id'])")
+          python tools/evaluation_p07_isolated.py --task "$TASK" --manifest benchmarks/stage4/corpus-p07-v2.json --controls "$CONTROLS" --dependency-image "$IMAGE" --dependency-receipt p07-sphinx-worker/build --dependency-profile benchmarks/stage4/p07-sphinx-environment-profile.json --output p07-sphinx-worker/calibration
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-sphinx-environment-${{ matrix.task }}-${{ github.sha }}
+          path: p07-sphinx-worker/
+          retention-days: 14
+          if-no-files-found: error

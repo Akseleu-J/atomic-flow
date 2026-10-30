@@ -1,0 +1,126 @@
+{
+  "base_image": "swebench/sweb.eval.x86_64.psf_1776_requests-3362@sha256:c5dc4ba64a2d97d6cff6b82fe9c0561589df13f23df6883d05e99b630942bbd1",
+  "calibrated": false,
+  "cleanup_confirmed": true,
+  "cleanup_exit": 0,
+  "container_name": "p07-timeout-topology-f472f62516b54a63ab2e",
+  "dropped_tcp_packets": 1,
+  "external_route_exit": 2,
+  "firewall_counters": "Chain OUTPUT (policy ACCEPT 9 packets, 501 bytes)\n    pkts      bytes target     prot opt in     out     source               destination         \n       1       60 DROP       6    --  *      *       0.0.0.0/0            10.255.255.1         tcp dpt:80\n",
+  "host_netns_inode": 4026531833,
+  "image_id": "sha256:99e1429866dc72aa1cc58848ae7816ce0ccbcc3b1d77dd71c38c029926cd2c05",
+  "model_calls": 0,
+  "namespace_identity": {
+    "netns_inode": 4026532273,
+    "pid": 2844,
+    "start_ticks": "24392"
+  },
+  "probe": {
+    "blackhole": "socket.timeout",
+    "destination": [
+      "10.255.255.1",
+      80
+    ],
+    "elapsed": 0.10017975299999193,
+    "executable": "/opt/miniconda3/envs/testbed/bin/python",
+    "isolated": 1,
+    "loopback": "real_socket_pass",
+    "requested_timeout": 0.1
+  },
+  "probe_sha256": "1b85c274c9dc0deb0b4512d4fe77f94b968f40da62c9c8406262ee07c747c998",
+  "profile": "network-none plus host-owned loopback route and TCP80 silent DROP",
+  "routes_after": [
+    {
+      "dev": "lo",
+      "dst": "10.255.255.1",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "scope": "link"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.0.0.0/8",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.0.0.1",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.255.255.255",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "link",
+      "table": "local",
+      "type": "broadcast"
+    },
+    {
+      "dev": "lo",
+      "dst": "::1",
+      "flags": [],
+      "metric": 0,
+      "pref": "medium",
+      "protocol": "kernel",
+      "table": "local",
+      "type": "local"
+    }
+  ],
+  "routes_before": [
+    {
+      "dev": "lo",
+      "dst": "127.0.0.0/8",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.0.0.1",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "host",
+      "table": "local",
+      "type": "local"
+    },
+    {
+      "dev": "lo",
+      "dst": "127.255.255.255",
+      "flags": [],
+      "prefsrc": "127.0.0.1",
+      "protocol": "kernel",
+      "scope": "link",
+      "table": "local",
+      "type": "broadcast"
+    },
+    {
+      "dev": "lo",
+      "dst": "::1",
+      "flags": [],
+      "metric": 0,
+      "pref": "medium",
+      "protocol": "kernel",
+      "table": "local",
+      "type": "local"
+    }
+  ],
+  "status": "synthetic_timeout_topology_qualified",
+  "target_imports_or_tests": false,
+  "verified_success": false
+}

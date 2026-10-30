@@ -1,0 +1,18 @@
+{
+  "status": "not_qualified",
+  "run_id": 40816770477,
+  "tested_commit": "8d68fa8c37495f15187d5458bc2861b0058c5224",
+  "artifact": {
+    "id": 12873255565,
+    "bytes": 552075,
+    "sha256": "f2f7160a63426375d19457e812d21e62280a1c666f53620d81f50553502325a4"
+  },
+  "raw_hashes_verified": 790,
+  "cleanup_confirmed": true,
+  "task_status": "paused",
+  "publication": false,
+  "teardown_failed": 0,
+  "optional_outcomes": {},
+  "reason": "Exact raw pytest2.8 class instance collector aliases not yet mapped; strict receipt refused",
+  "provider_calls": 0
+}

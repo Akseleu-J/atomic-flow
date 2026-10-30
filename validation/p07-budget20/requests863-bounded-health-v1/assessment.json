@@ -1,0 +1,45 @@
+{
+  "run": 40837223989,
+  "tested_commit": "a841f55baaa50e3240b3b574fddff6f204cfe22b",
+  "artifact": 12881027072,
+  "sha256": "e44240a5fc44b3a3728e66816e53ea6fc11c1063bed731911072b2a2f5cb509c",
+  "status": "bounded_service_health_qualified",
+  "stdout_sha256": "f0278aefb94e91791ec47bc6b0829f158efd63b882e27cb24dc2b385b06cd78d",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "health_checks": {
+    "basic_auth": {
+      "authenticated": true,
+      "status": 200,
+      "user": "p07"
+    },
+    "chunked_head_redirect": "real_302_chunked_header_no_HEAD_body",
+    "chunked_request": "abc",
+    "digest": "real_response_hash_validated_wrong_password_rejected",
+    "github_cookie": {
+      "cookie": "p07_fixture=public; Path=/; HttpOnly",
+      "status": 200
+    },
+    "http": {
+      "args": {
+        "health": "p07"
+      },
+      "status": 200
+    },
+    "http11_keepalive_close": "real_persistent_connection",
+    "https": {
+      "args": {
+        "health": "p07"
+      },
+      "status": 200
+    },
+    "legacy_sslv3": "verified_chain_and_hostname",
+    "port1": "connection_refused",
+    "wrong_ca": "certificate_verification_failed",
+    "wrong_hostname": "certificate_verification_failed"
+  },
+  "external_route_exit": 2,
+  "cleanup": true,
+  "scope": "source-free service health under ordinary worker controls",
+  "provider_calls": 0,
+  "target_tests": false
+}

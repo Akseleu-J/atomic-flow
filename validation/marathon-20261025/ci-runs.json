@@ -1,0 +1,146 @@
+{
+  "runs": {
+    "workflow_runs": [
+      {
+        "id": 40212848950,
+        "name": "External interoperability and installed release",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 56,
+        "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40212848950/jobs",
+        "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40212848950/logs",
+        "workflow_id": 394926526
+      },
+      {
+        "id": 40212848955,
+        "name": "Project and container checks",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 108,
+        "jobs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40212848955/jobs",
+        "logs_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/runs/40212848955/logs",
+        "workflow_id": 388210223
+      }
+    ]
+  },
+  "job_summaries": [
+    {
+      "run_id": 40212848955,
+      "jobs": [
+        {
+          "id": 121227608736,
+          "name": "Installed wheel acceptance (3.11)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608891,
+          "name": "Real Docker acceptance",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608966,
+          "name": "Installed wheel acceptance (3.12)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608967,
+          "name": "Python 3.11",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227609028,
+          "name": "Python 3.12",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "run_id": 40212848950,
+      "jobs": [
+        {
+          "id": 121227608650,
+          "name": "Real reviewed task, notebook and recovery composition",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608801,
+          "name": "Wheel ubuntu-24.04 Python 3.12 api",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608802,
+          "name": "Wheel macos-14 Python 3.12 api",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608896,
+          "name": "Wheel ubuntu-24.04 Python 3.11 api",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608920,
+          "name": "Wheel macos-14 Python 3.11 api",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608940,
+          "name": "Wheel windows-2022 Python 3.12 api",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608946,
+          "name": "Wheel ubuntu-24.04 Python 3.11 core",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608996,
+          "name": "Wheel macos-14 Python 3.12 core",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227608997,
+          "name": "Wheel windows-2022 Python 3.12 core",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227609010,
+          "name": "Wheel windows-2022 Python 3.11 api",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227609013,
+          "name": "Wheel windows-2022 Python 3.11 core",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227609019,
+          "name": "Wheel macos-14 Python 3.11 core",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 121227609052,
+          "name": "Wheel ubuntu-24.04 Python 3.12 core",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

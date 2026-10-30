@@ -1,0 +1,21 @@
+{
+  "run_id": 40634036115,
+  "provider_calls": 0,
+  "hidden_oracle": "not_run",
+  "cases": [
+    {
+      "command": "check",
+      "artifact_id": 12792462483,
+      "zip_sha256": "198729db914a65c3dd89ee19345f13e4b161f834f083cf7c5b79137cc1cd857f",
+      "tested_commit": "0de098aaeff5a6f6294353ef78730818b68aafe0",
+      "status": "accepted_synthetic_public_journey"
+    },
+    {
+      "command": "pytest",
+      "artifact_id": 12792169663,
+      "zip_sha256": "91f652e907a9b074c49175470174e6d2dc182b24d580a7cbb7a6e2489a082cba",
+      "tested_commit": "0de098aaeff5a6f6294353ef78730818b68aafe0",
+      "status": "accepted_synthetic_public_journey"
+    }
+  ]
+}

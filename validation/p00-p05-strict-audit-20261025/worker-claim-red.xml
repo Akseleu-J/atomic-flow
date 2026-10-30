@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.975" timestamp="2026-10-25T21:54:27.211516+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_job_claim" name="test_worker_waits_for_reconcile_lease_and_rechecks_terminal_state[False]" time="0.194"><failure message="AssertionError: queued worker died on a transient observer lease: [ValueError('worker active')]&#10;assert not True">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-10/test_worker_waits_for_reconcil0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001695823B440&gt;
+interrupted_before_claim = False
+
+    @pytest.mark.parametrize("interrupted_before_claim", [False, True])
+    def test_worker_waits_for_reconcile_lease_and_rechecks_terminal_state(tmp_path, monkeypatch, interrupted_before_claim):
+        project = tmp_path / "project"
+        project.mkdir()
+        (project / "source.py").write_text("print('fixture')\n", encoding="utf-8")
+        store = JobStore(project)
+        with monkeypatch.context() as patch:
+            patch.setattr("atomic_flow.jobs.subprocess.Popen", lambda *a, **kw: None)
+            job = store.start(["source.py"], config=ExecutionConfig(mode="local"))
+        directory = store._directory(job["id"])
+        attempted, finished = threading.Event(), threading.Event()
+        errors, executions = [], []
+    
+        @contextmanager
+        def observed(path, **kwargs):
+            if path == directory / "worker.lock":
+                attempted.set()
+            with exclusive_file(path, **kwargs):
+                yield
+    
+        def execute(*args, **kwargs):
+            executions.append(1)
+            return CommandResult(0, "", "")
+    
+        def claim():
+            try:
+                job_worker.run_worker(store, job["id"])
+            except BaseException as exc:
+                errors.append(exc)
+            finally:
+                finished.set()
+    
+        monkeypatch.setattr(job_worker, "exclusive_file", observed)
+        monkeypatch.setattr(job_worker, "run_python", execute)
+        actor = threading.Thread(target=claim, daemon=True)
+        with exclusive_file(directory / "worker.lock"):
+            actor.start()
+            assert attempted.wait(5)
+            premature = finished.wait(0.2)
+            if interrupted_before_claim:
+                # A reconciler can make an aged queued request terminal while it
+                # owns the lease. The delayed worker must observe that decision.
+                with store._lease(job["id"]):
+                    state = store._read(job["id"])
+                    state.update(status="interrupted", finished_at=time.time(), updated_at=time.time(),
+                                 error="worker lease lost; execution was not replayed")
+                    _atomic(directory / "state.json", state)
+        actor.join(5)
+        assert not actor.is_alive()
+&gt;       assert not premature, f"queued worker died on a transient observer lease: {errors}"
+E       AssertionError: queued worker died on a transient observer lease: [ValueError('worker active')]
+E       assert not True
+
+tests\test_job_claim.py:64: AssertionError</failure></testcase><testcase classname="tests.test_job_claim" name="test_worker_waits_for_reconcile_lease_and_rechecks_terminal_state[True]" time="0.256"><failure message="AssertionError: queued worker died on a transient observer lease: [ValueError('worker active')]&#10;assert not True">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-10/test_worker_waits_for_reconcil1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000016958280440&gt;
+interrupted_before_claim = True
+
+    @pytest.mark.parametrize("interrupted_before_claim", [False, True])
+    def test_worker_waits_for_reconcile_lease_and_rechecks_terminal_state(tmp_path, monkeypatch, interrupted_before_claim):
+        project = tmp_path / "project"
+        project.mkdir()
+        (project / "source.py").write_text("print('fixture')\n", encoding="utf-8")
+        store = JobStore(project)
+        with monkeypatch.context() as patch:
+            patch.setattr("atomic_flow.jobs.subprocess.Popen", lambda *a, **kw: None)
+            job = store.start(["source.py"], config=ExecutionConfig(mode="local"))
+        directory = store._directory(job["id"])
+        attempted, finished = threading.Event(), threading.Event()
+        errors, executions = [], []
+    
+        @contextmanager
+        def observed(path, **kwargs):
+            if path == directory / "worker.lock":
+                attempted.set()
+            with exclusive_file(path, **kwargs):
+                yield
+    
+        def execute(*args, **kwargs):
+            executions.append(1)
+            return CommandResult(0, "", "")
+    
+        def claim():
+            try:
+                job_worker.run_worker(store, job["id"])
+            except BaseException as exc:
+                errors.append(exc)
+            finally:
+                finished.set()
+    
+        monkeypatch.setattr(job_worker, "exclusive_file", observed)
+        monkeypatch.setattr(job_worker, "run_python", execute)
+        actor = threading.Thread(target=claim, daemon=True)
+        with exclusive_file(directory / "worker.lock"):
+            actor.start()
+            assert attempted.wait(5)
+            premature = finished.wait(0.2)
+            if interrupted_before_claim:
+                # A reconciler can make an aged queued request terminal while it
+                # owns the lease. The delayed worker must observe that decision.
+                with store._lease(job["id"]):
+                    state = store._read(job["id"])
+                    state.update(status="interrupted", finished_at=time.time(), updated_at=time.time(),
+                                 error="worker lease lost; execution was not replayed")
+                    _atomic(directory / "state.json", state)
+        actor.join(5)
+        assert not actor.is_alive()
+&gt;       assert not premature, f"queued worker died on a transient observer lease: {errors}"
+E       AssertionError: queued worker died on a transient observer lease: [ValueError('worker active')]
+E       assert not True
+
+tests\test_job_claim.py:64: AssertionError</failure></testcase></testsuite></testsuites>

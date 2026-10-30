@@ -1,0 +1,33 @@
+F..........................                                              [100%]
+================================== FAILURES ===================================
+_ test_read_and_recovery_stream_long_uncommitted_tail_without_whole_file_copy _
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/atomic-session-stream-a48aa0e34df941adabcdda6625da9876/test_read_and_recovery_stream_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C41E36F470>
+
+    def test_read_and_recovery_stream_long_uncommitted_tail_without_whole_file_copy(tmp_path, monkeypatch):
+        journal = SessionJournal.create(tmp_path)
+        journal.append("tool_request", {"tool": "write"}, call_id="write.1")
+        tail = b"malformed-uncommitted:" + b"x" * (2 * MAX_EVENT_BYTES + 17)
+        with journal.path.open("ab") as handle:
+            handle.write(tail)
+        original = Path.read_bytes
+    
+        def reject_whole_journal(path):
+            if path == journal.path:
+                raise AssertionError("journal reads must stream")
+            return original(path)
+    
+        monkeypatch.setattr(Path, "read_bytes", reject_whole_journal)
+        snapshot = journal.read()
+        assert snapshot.tail_bytes == len(tail) and snapshot.pending_call_ids == ["write.1"]
+>       with pytest.raises(StateError, match="interrupted tail"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'interrupted tail'
+E         Actual message: 'session event exceeds size limit'
+
+tests\test_session_streaming.py:28: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_session_streaming.py::test_read_and_recovery_stream_long_uncommitted_tail_without_whole_file_copy
+1 failed, 26 passed, 4 deselected in 6.17s

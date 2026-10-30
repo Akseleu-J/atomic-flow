@@ -1,0 +1,17 @@
+{
+  "run": 40882353088,
+  "artifact": 12900942564,
+  "archive_sha256": "e4a2cdc752b589808e8df8aab0981d4c48a4657d06abfa957d01d555694054a6",
+  "tested_commit": "5d356c6b662200b3228874447f3acadd7b3b5b46",
+  "status": "public_execution_failed_complete_diagnostic",
+  "native_summary": "48 failed, 2439 passed, 114 skipped, 10 xfailed, 6 errors",
+  "collected": 2617,
+  "completed": 2617,
+  "stdout_truncated": false,
+  "stdout_sha256": "f40ef9cb5c872731381f3c3d6f43b522d9a9b51795edfa745245d89b100a824c",
+  "source_blobs_verified": 474,
+  "plugin_probe": [],
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

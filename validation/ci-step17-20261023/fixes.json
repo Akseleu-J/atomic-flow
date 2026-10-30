@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "tested_commit": "78f0df5c2abf18fc4b0035030a92178335134e04",
+  "scope": "Specific critic regressions fixed; not universal security, semantic grading, or production acceptance",
+  "findings": {
+    "R01": {"status": "regression_verified", "tests": ["tests/test_execution_confidentiality.py", "tests/test_unresolved_effects.py::test_dispatch_result_artifacts_and_provider_history_redact_canary"], "limits": "Credential-shaped path exclusion and recognized-secret output redaction; raw trusted host job streams have a separate contract"},
+    "R02": {"status": "regression_verified", "tests": ["tests/test_unresolved_effects.py"], "limits": "No automatic reconciliation; new independent task is not proof of resolving an old external business operation"},
+    "R03": {"status": "regression_verified", "tests": ["tests/test_execution_confidentiality.py"], "real_docker_test": "test_real_docker_checker_rejects_shadow_module_and_protects_output", "limits": "Installed checker launcher identity; hostile test/plugin interpreters still require independent grading"},
+    "R04": {"status": "regression_verified", "tests": ["tests/test_workflows.py"]},
+    "R05": {"status": "regression_verified", "tests": ["tests/test_plan_review_dependencies.py"]},
+    "R06": {"status": "regression_verified", "tests": ["tests/test_evaluation_integrity.py"], "limits": "Finite calibrated complete answer forms only; other wording needs independent review"},
+    "R07": {"status": "regression_verified", "tests": ["tests/test_evaluation_integrity.py", "tests/test_evaluation.py"], "limits": "Observed backend attempts; transport parameter-negotiation requests and provider billing are not fully observable"}
+  },
+  "open_gates": ["G01 independent live-edit evaluation", "G02 reproducible release and clean wheel acceptance", "G03 scale admission and durable capability composition"],
+  "external_model_api_calls": 0
+}

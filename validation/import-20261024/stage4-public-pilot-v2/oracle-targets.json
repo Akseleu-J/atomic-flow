@@ -1,0 +1,14 @@
+{
+  "targets": [
+    "sympy/core/tests/test_kind.py"
+  ],
+  "aliases": {
+    "test_Derivative_kind": "sympy/core/tests/test_kind.py::test_Derivative_kind",
+    "test_NumberKind": "sympy/core/tests/test_kind.py::test_NumberKind",
+    "test_Add_kind": "sympy/core/tests/test_kind.py::test_Add_kind",
+    "test_mul_kind": "sympy/core/tests/test_kind.py::test_mul_kind",
+    "test_Symbol_kind": "sympy/core/tests/test_kind.py::test_Symbol_kind",
+    "test_Integral_kind": "sympy/core/tests/test_kind.py::test_Integral_kind",
+    "test_Matrix_kind": "sympy/core/tests/test_kind.py::test_Matrix_kind"
+  }
+}

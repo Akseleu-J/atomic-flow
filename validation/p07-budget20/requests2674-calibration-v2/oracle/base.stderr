@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+  File "<p07-host>", line 1, in <module>
+  File "<p07-fixed-host-bootstrap>", line 112, in <module>
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 38, in main
+    config = _prepareconfig(args, plugins)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 117, in _prepareconfig
+    pluginmanager=pluginmanager, args=args)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 724, in __call__
+    return self._hookexec(self, self._nonwrappers + self._wrappers, kwargs)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 338, in _hookexec
+    return self._inner_hookexec(hook, methods, kwargs)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 333, in <lambda>
+    _MultiCall(methods, kwargs, hook.spec_opts).execute()
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 595, in execute
+    return _wrapped_call(hook_impl.function(*args), self.execute)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 249, in _wrapped_call
+    wrap_controller.send(call_outcome)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/helpconfig.py", line 28, in pytest_cmdline_parse
+    config = outcome.get_result()
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 279, in get_result
+    _reraise(*ex)  # noqa
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 264, in __init__
+    self.result = func()
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/vendored_packages/pluggy.py", line 596, in execute
+    res = hook_impl.function(*args)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 852, in pytest_cmdline_parse
+    self.parse(args)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 957, in parse
+    self._preparse(args)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 916, in _preparse
+    self.pluginmanager.consider_preparse(args)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 343, in consider_preparse
+    self.consider_pluginarg(opt2)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 352, in consider_pluginarg
+    self.import_plugin(arg)
+  File "/opt/p07-python27/lib/python2.7/site-packages/_pytest/config.py", line 376, in import_plugin
+    assert isinstance(modname, str)
+AssertionError

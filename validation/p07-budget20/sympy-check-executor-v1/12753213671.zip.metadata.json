@@ -1,0 +1,20 @@
+{
+  "id": 12753213671,
+  "node_id": "MDg6QXJ0aWZhY3QxMjc1MzIxMzY3MQ==",
+  "name": "p07-sympy-check-executor-b17668b8a0bd85537590f523d912a511b128d20c",
+  "size_in_bytes": 5605,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12753213671",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12753213671/zip",
+  "expired": false,
+  "digest": "sha256:313f66e1f1522a569e9dbf1d513e074ae3baa2e67c804f434b2f269b90928446",
+  "created_at": "2026-10-27T17:11:27Z",
+  "updated_at": "2026-10-27T17:11:27Z",
+  "expires_at": "2026-11-10T17:11:26Z",
+  "workflow_run": {
+    "id": 40548041491,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "b17668b8a0bd85537590f523d912a511b128d20c"
+  }
+}

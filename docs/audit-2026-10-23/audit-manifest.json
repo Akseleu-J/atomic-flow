@@ -1,0 +1,338 @@
+{
+  "schema": 1,
+  "audit_date": "2026-10-23",
+  "source_commit": "8a18fbe837b5c82597f782b6455e96b708607f36",
+  "runtime_commit": "78f0df5c2abf18fc4b0035030a92178335134e04",
+  "runtime_modified": false,
+  "model_calls": 0,
+  "verification": "offline probes, source review, official web references; no new full suite, Docker, live provider, production or native sandbox validation",
+  "artifacts": [
+    {
+      "path": "docs/audit-2026-10-23/docker-release-audit.md",
+      "bytes": 19400,
+      "sha256": "395050d2a87760d6dceec3af196ef76b06b4fc274869b4e532ff850bc7583f9e"
+    },
+    {
+      "path": "docs/audit-2026-10-23/PRODUCTION_PLAN.md",
+      "bytes": 26535,
+      "sha256": "50cd48ac770d0d112d387fc05434101b54890716588c30e480097e83f8ef2a7e"
+    },
+    {
+      "path": "docs/audit-2026-10-23/provider-probes.json",
+      "bytes": 911,
+      "sha256": "daec7b87359ce1eb045de640acf196a5eb590796863d0d728f8a1e90625cf5df"
+    },
+    {
+      "path": "docs/audit-2026-10-23/provider-routing.md",
+      "bytes": 20974,
+      "sha256": "59ed57fe4643c9704ac393274f0b47f76a9f3bbf093f86cc8069ebb381eb89d3"
+    },
+    {
+      "path": "docs/audit-2026-10-23/provider_probes.py",
+      "bytes": 2667,
+      "sha256": "17ab9d9ea95d91677fa039fa058af1cdb1d8d44e9a233ae0d7775296afa2b10b"
+    },
+    {
+      "path": "docs/audit-2026-10-23/quality-probe-workspace/.atomic_flow/tree.json",
+      "bytes": 20,
+      "sha256": "d365a6a23dbd9b090e2df49daf7eb29633ceb274add5a7d66956c42230f2c036"
+    },
+    {
+      "path": "docs/audit-2026-10-23/quality-scale-audit.md",
+      "bytes": 20291,
+      "sha256": "d9e76f5983419dc93207b6f3e9e14e727187528586da7cbd4f24fc0b375216ab"
+    },
+    {
+      "path": "docs/audit-2026-10-23/quality-scale-probes.json",
+      "bytes": 1083,
+      "sha256": "b5e89e0a9698e3493a35722986a58dd6ccb70133076607f899e8512656d8abc6"
+    },
+    {
+      "path": "docs/audit-2026-10-23/quality_scale_probes.py",
+      "bytes": 4393,
+      "sha256": "bb2be019b2942bcd14af0099a5ffbf0e5695fd44755e640f5c1920da1d84c6ee"
+    },
+    {
+      "path": "docs/audit-2026-10-23/retrieval-probe.json",
+      "bytes": 2030,
+      "sha256": "b7b153b72ad4d5c94784de0e591208354a0ca5d61d0396bd6974a3ea5d8090ed"
+    },
+    {
+      "path": "docs/audit-2026-10-23/retrieval_probe.py",
+      "bytes": 1394,
+      "sha256": "e08b2df1bd8299b18de89160ff8066c19e58774b237761fbe9492be1bb6bc0f0"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-audit.md",
+      "bytes": 17328,
+      "sha256": "399ccf8a02be0e35c55710372ffcb8d6f417628613068122d5b37efc8a43ec86"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-7h3sw16r/home/changesets/change_123ebe9afa13/journal.json",
+      "bytes": 675,
+      "sha256": "1da89d207d1bfb346df6b9ca1c1b014bc74f72ec900a6db261bebe4c3109b829"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-7h3sw16r/home/changesets/change_123ebe9afa13/workspace/sample.py",
+      "bytes": 13,
+      "sha256": "dec2bed35f8faafc64164513b368694cf276b0ff3d8821509d679213c8eb9f93"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-7h3sw16r/home/changesets/change_9502d44d9b51/journal.json",
+      "bytes": 675,
+      "sha256": "6a9c0aa94f467bb2d35537f3579f63af5ffd6ffad62cb7b3e8d8508b7c8defb8"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-7h3sw16r/home/changesets/change_9502d44d9b51/workspace/sample.py",
+      "bytes": 13,
+      "sha256": "f52fef6c6500a88b9cbf05b6d410b4d2919d87fee65836406ea4d0e6e461bd5e"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-7h3sw16r/project/sample.py",
+      "bytes": 20,
+      "sha256": "50267e74c0512acaf5d115d76c21e1dcc1f81e3b6ad74497c499658b4aaf9ea5"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/changesets/change_5b68e352dcd8/before/sample.py",
+      "bytes": 20,
+      "sha256": "50267e74c0512acaf5d115d76c21e1dcc1f81e3b6ad74497c499658b4aaf9ea5"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/changesets/change_5b68e352dcd8/journal.json",
+      "bytes": 976,
+      "sha256": "b2d9e682958865846713ae274aed3a2204b9fd14e796a453d6cf2e1dfc2b3fc4"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/changesets/change_5b68e352dcd8/workspace/sample.py",
+      "bytes": 13,
+      "sha256": "dec2bed35f8faafc64164513b368694cf276b0ff3d8821509d679213c8eb9f93"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/changesets/change_a41e13142c1f/before/sample.py",
+      "bytes": 20,
+      "sha256": "50267e74c0512acaf5d115d76c21e1dcc1f81e3b6ad74497c499658b4aaf9ea5"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/changesets/change_a41e13142c1f/journal.json",
+      "bytes": 976,
+      "sha256": "5a2a020be515ca0dfcce5db686aa8d366f8e72d6ac9e3bae8f023d910929d8a3"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/changesets/change_a41e13142c1f/workspace/sample.py",
+      "bytes": 13,
+      "sha256": "f52fef6c6500a88b9cbf05b6d410b4d2919d87fee65836406ea4d0e6e461bd5e"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_scale_20.jsonl",
+      "bytes": 4488,
+      "sha256": "b5c71e367ae72fb645fe6a008738d25053f3dbae3e91561ccbc295fee83433fb"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_scale_20.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_scale_40.jsonl",
+      "bytes": 8645,
+      "sha256": "a6cfb6166363b116eecc617612018c730f3e29c2a9b05d707f5f3d89986a4287"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_scale_40.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_scale_80.jsonl",
+      "bytes": 16955,
+      "sha256": "1feeb9f0dac02ad544ea2f9907362f0d2070e085922523ff171c5ba7f3bbbc03"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_scale_80.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_unresolved.jsonl",
+      "bytes": 1528,
+      "sha256": "2ccfbd542a9075249c0346bf5e64b5c82c0b621127af4f094217557f447187e7"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/sessions/session_audit_unresolved.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/tasks/task_aaaaaaaaaaaa.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/home/tasks/task_bbbbbbbbbbbb.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-a1e8sfba/project/sample.py",
+      "bytes": 13,
+      "sha256": "f52fef6c6500a88b9cbf05b6d410b4d2919d87fee65836406ea4d0e6e461bd5e"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/changesets/change_97724db231e8/before/sample.py",
+      "bytes": 20,
+      "sha256": "50267e74c0512acaf5d115d76c21e1dcc1f81e3b6ad74497c499658b4aaf9ea5"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/changesets/change_97724db231e8/journal.json",
+      "bytes": 976,
+      "sha256": "6fddfefdf72acf3f2cee2b2fc4cbf50087f91e7a9618941ede908024afeb4ef3"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/changesets/change_97724db231e8/workspace/sample.py",
+      "bytes": 13,
+      "sha256": "dec2bed35f8faafc64164513b368694cf276b0ff3d8821509d679213c8eb9f93"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/changesets/change_df9c1e04aa15/before/sample.py",
+      "bytes": 20,
+      "sha256": "50267e74c0512acaf5d115d76c21e1dcc1f81e3b6ad74497c499658b4aaf9ea5"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/changesets/change_df9c1e04aa15/journal.json",
+      "bytes": 976,
+      "sha256": "18283977645e532c98ad9de7f93646cfc1dc474ed59f2a36d84cf4fd25fac756"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/changesets/change_df9c1e04aa15/workspace/sample.py",
+      "bytes": 13,
+      "sha256": "f52fef6c6500a88b9cbf05b6d410b4d2919d87fee65836406ea4d0e6e461bd5e"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/tasks/task_aaaaaaaaaaaa.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/home/tasks/task_bbbbbbbbbbbb.lock",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-evidence-on8n_r98/project/sample.py",
+      "bytes": 13,
+      "sha256": "f52fef6c6500a88b9cbf05b6d410b4d2919d87fee65836406ea4d0e6e461bd5e"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime-probes.json",
+      "bytes": 1533,
+      "sha256": "7fe68fe3cbc84d3acfef5b464aad3fb26d33f2860f1459893f31ab9cd0e923ae"
+    },
+    {
+      "path": "docs/audit-2026-10-23/runtime_probes.py",
+      "bytes": 4535,
+      "sha256": "0d75b8a23d6a47286520ff2f5be8c138266eb606b8ba41f7c8c416bd8a81ee33"
+    }
+  ],
+  "critical_source_files": [
+    {
+      "path": "src/atomic_flow/agents/source.py",
+      "bytes": 2244,
+      "sha256": "d340975928e64edd36a86f1d06765c40269b33ae25c9b0d42cfc22837f923911"
+    },
+    {
+      "path": "src/atomic_flow/agents/changeset.py",
+      "bytes": 21861,
+      "sha256": "8b5f28e486e8e14dbb41877a28904c080465d89bf938d0c2218da3f81831416c"
+    },
+    {
+      "path": "src/atomic_flow/agents/control.py",
+      "bytes": 870,
+      "sha256": "2daf6c369480e671b9a0191cc24af364529cd44bf68f767bd2d370e2d83d3dd3"
+    },
+    {
+      "path": "src/atomic_flow/agents/task_loop.py",
+      "bytes": 26960,
+      "sha256": "8e6a5c3912991600144fc659190f51ce8efc96371660709e6441dd8c7026294d"
+    },
+    {
+      "path": "src/atomic_flow/agents/task_budget.py",
+      "bytes": 12569,
+      "sha256": "5f6fde564b00473b5be811d53f058e868e601c010ab69fd621b276718a3e8a7e"
+    },
+    {
+      "path": "src/atomic_flow/sessions.py",
+      "bytes": 14633,
+      "sha256": "455209bc6139c74141b5efa08e1ff964bf64f937f1665d826abcde7edda89693"
+    },
+    {
+      "path": "src/atomic_flow/tree/builder.py",
+      "bytes": 16533,
+      "sha256": "c64bd9cedf0a8676cd6263e956c2fe49d4be6ba190e7c7635af8dec6b22b8a9b"
+    },
+    {
+      "path": "src/atomic_flow/api/server.py",
+      "bytes": 15022,
+      "sha256": "e3f4fafaa2fcd65cc4d8e5bbdb213d8fc7979c97f30b4d0bac9d76838d4277ae"
+    },
+    {
+      "path": "src/atomic_flow/backends/router.py",
+      "bytes": 2671,
+      "sha256": "f92fde9aac1ef351d9ce0083b8816f6fa02c35e634671c8618bfa9c0593ef16d"
+    },
+    {
+      "path": "src/atomic_flow/backends/http.py",
+      "bytes": 5784,
+      "sha256": "6c90a36fcf827f5739fd9d87a35d99967414954cd96e7b3581c09a3eecfb5ede"
+    },
+    {
+      "path": "src/atomic_flow/backends/openai_compatible.py",
+      "bytes": 6360,
+      "sha256": "35769112435dc7beb6cd49a3956f55ae9b76b96496d757742ea3c78b9cc2682d"
+    },
+    {
+      "path": "src/atomic_flow/backends/base.py",
+      "bytes": 2940,
+      "sha256": "afc5bcb56390025276b9157fedad6fa63889cd1909543e8ec0c8814298168a95"
+    },
+    {
+      "path": "src/atomic_flow/config.py",
+      "bytes": 13725,
+      "sha256": "8fc159d29ce63e8ac27301409b4b840a023b9a28d890fbdceb7690559b94d50a"
+    },
+    {
+      "path": "src/atomic_flow/agents/execution.py",
+      "bytes": 13020,
+      "sha256": "b68fb33b87da3b968f9de201234e1ce75820dfdc60b195b0b12720cbcbf58e20"
+    },
+    {
+      "path": "src/atomic_flow/jobs.py",
+      "bytes": 23650,
+      "sha256": "42f2b7f180c66a8ac015194201b40b7723a1243f9e04c7b6a0faf7ec9d961f95"
+    },
+    {
+      "path": "src/atomic_flow/remote.py",
+      "bytes": 24391,
+      "sha256": "09d0ba256da00e43a27a4bd177b77e01b2a3590b175fcfff2ae3dabe24897648"
+    },
+    {
+      "path": "src/atomic_flow/llm/orchestrator.py",
+      "bytes": 54543,
+      "sha256": "625da0e570af395756d865c921cba4bfb01ead82c637c590c26e8105ecff55e5"
+    },
+    {
+      "path": "src/atomic_flow/llm/request_budget.py",
+      "bytes": 4719,
+      "sha256": "2e8ccaa71d908e72239c01a6522fc221db612630163216d7f1de8af53ec29d4e"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 1226,
+      "sha256": "7a92e6b48b8c5cd4b6779563e769888e38319bbd21439598c9954c3b1adf84c7"
+    },
+    {
+      "path": ".github/workflows/checks.yml",
+      "bytes": 2463,
+      "sha256": "adee1c6b669f33eb9674aac571f2588503f03e08207b26c56abb9248d729c6d9"
+    }
+  ]
+}

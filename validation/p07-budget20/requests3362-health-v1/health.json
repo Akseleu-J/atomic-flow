@@ -1,0 +1,223 @@
+{
+  "after": {
+    "diff": "",
+    "head": "e8053fb45c2c9494510cf20a2a6a878821c03ae7",
+    "status": ""
+  },
+  "before": {
+    "diff": "",
+    "head": "e8053fb45c2c9494510cf20a2a6a878821c03ae7",
+    "status": ""
+  },
+  "bootstrap_sha256": "bfc95d86f3d2fc95a7c6be3c8334e99ee4109fe3d2d05688574482e298164b29",
+  "calibrated": false,
+  "certificate_receipt_sha256": "5c05cfa08696d485228ca8ef993454f848cfff747eb7efa3b2ee64dc9cac909e",
+  "cleanup_confirmed": true,
+  "cleanup_exit": 0,
+  "image_id": "sha256:b0cb3f913c40a7379a0317d42b038ac510ff6ac6f01c4bfd88fd1091c254268e",
+  "model_calls": 0,
+  "observed": {
+    "assertion_mode": "plain_synthetic_only",
+    "collection": [
+      "test_health.py::test_legacy_apis",
+      "test_health.py::test_real_http",
+      "test_health.py::test_ca_verified_https"
+    ],
+    "entrypoints": {
+      "httpbin": "pytest_httpbin.plugin",
+      "pytest_mock": "pytest_mock"
+    },
+    "executable": "/opt/p07-python36/bin/python3.6",
+    "exit_code": 0,
+    "finished": true,
+    "fixture_tests_sha256": "ca4f6941960829b6bf2b7a93e2073a355ba1847cd81cb31f6d3117e22f3eda1e",
+    "imports": {
+      "httpbin": "/opt/p07-python36/lib/python3.6/site-packages/httpbin/__init__.py",
+      "pytest": "/opt/p07-python36/lib/python3.6/site-packages/pytest.py",
+      "pytest_httpbin.plugin": "/opt/p07-python36/lib/python3.6/site-packages/pytest_httpbin/plugin.py",
+      "pytest_mock": "/opt/p07-python36/lib/python3.6/site-packages/pytest_mock.py"
+    },
+    "plugins": [
+      [
+        "140203952151856",
+        "_pytest.config"
+      ],
+      [
+        "pytestconfig",
+        "_pytest.config"
+      ],
+      [
+        "mark",
+        "_pytest.mark"
+      ],
+      [
+        "main",
+        "_pytest.main"
+      ],
+      [
+        "terminal",
+        "_pytest.terminal"
+      ],
+      [
+        "runner",
+        "_pytest.runner"
+      ],
+      [
+        "python",
+        "_pytest.python"
+      ],
+      [
+        "pdb",
+        "_pytest.pdb"
+      ],
+      [
+        "unittest",
+        "_pytest.unittest"
+      ],
+      [
+        "capture",
+        "_pytest.capture"
+      ],
+      [
+        "skipping",
+        "_pytest.skipping"
+      ],
+      [
+        "tmpdir",
+        "_pytest.tmpdir"
+      ],
+      [
+        "monkeypatch",
+        "_pytest.monkeypatch"
+      ],
+      [
+        "recwarn",
+        "_pytest.recwarn"
+      ],
+      [
+        "pastebin",
+        "_pytest.pastebin"
+      ],
+      [
+        "helpconfig",
+        "_pytest.helpconfig"
+      ],
+      [
+        "nose",
+        "_pytest.nose"
+      ],
+      [
+        "assertion",
+        "_pytest.assertion"
+      ],
+      [
+        "genscript",
+        "_pytest.genscript"
+      ],
+      [
+        "junitxml",
+        "_pytest.junitxml"
+      ],
+      [
+        "resultlog",
+        "_pytest.resultlog"
+      ],
+      [
+        "doctest",
+        "_pytest.doctest"
+      ],
+      [
+        "cacheprovider",
+        "_pytest.cacheprovider"
+      ],
+      [
+        "140203964682592",
+        "host_health_recorder"
+      ],
+      [
+        "pytest_httpbin.plugin",
+        "pytest_httpbin.plugin"
+      ],
+      [
+        "pytest_mock",
+        "pytest_mock"
+      ],
+      [
+        "capturemanager",
+        "_pytest.capture"
+      ],
+      [
+        "session",
+        "_pytest.main"
+      ],
+      [
+        "lfplugin",
+        "_pytest.cacheprovider"
+      ]
+    ],
+    "prefix": "/opt/p07-python36",
+    "reports": [
+      {
+        "nodeid": "test_health.py::test_legacy_apis",
+        "outcome": "passed",
+        "when": "setup"
+      },
+      {
+        "nodeid": "test_health.py::test_legacy_apis",
+        "outcome": "passed",
+        "when": "call"
+      },
+      {
+        "nodeid": "test_health.py::test_legacy_apis",
+        "outcome": "passed",
+        "when": "teardown"
+      },
+      {
+        "nodeid": "test_health.py::test_real_http",
+        "outcome": "passed",
+        "when": "setup"
+      },
+      {
+        "nodeid": "test_health.py::test_real_http",
+        "outcome": "passed",
+        "when": "call"
+      },
+      {
+        "nodeid": "test_health.py::test_real_http",
+        "outcome": "passed",
+        "when": "teardown"
+      },
+      {
+        "nodeid": "test_health.py::test_ca_verified_https",
+        "outcome": "passed",
+        "when": "setup"
+      },
+      {
+        "nodeid": "test_health.py::test_ca_verified_https",
+        "outcome": "passed",
+        "when": "call"
+      },
+      {
+        "nodeid": "test_health.py::test_ca_verified_https",
+        "outcome": "passed",
+        "when": "teardown"
+      }
+    ],
+    "requests_imported": false,
+    "servers_stopped": true,
+    "session_exit": 0,
+    "target_imports": [],
+    "version_info": [
+      3,
+      6,
+      15
+    ]
+  },
+  "process_exit": 0,
+  "status": "synthetic_legacy_health_qualified",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "945561cfb28b03eb4d5b36991456b708cc07a228600fe766185359f419a0a0e2",
+  "synthetic_assertion_mode": "plain",
+  "target_setup_or_tests_executed": false,
+  "verified_success": false
+}

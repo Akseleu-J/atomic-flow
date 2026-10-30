@@ -1,0 +1,285 @@
+{
+  "schema_version": 3,
+  "kind": "prospective_requests863_python2713_service",
+  "created_date": "2026-10-27",
+  "status": "prepared_unqualified",
+  "model_visible": false,
+  "host_oracle_only": true,
+  "model_calls": 0,
+  "calibrated": false,
+  "target_execution_performed": false,
+  "source_bindings": {
+    "manifest": {
+      "path": "benchmarks/stage4/corpus-p07-v3.json",
+      "git_lf_sha256": "1f9c11ac35ebf9082f38672f5ce92f64c0692f58949a7695c8196cfefb7de920"
+    },
+    "legacy_wheel_profile": {
+      "path": "benchmarks/stage4/p07-requests863-python27-profile.json",
+      "git_lf_sha256": "a6de975e64ebdcf89e36c5b1a8b1cdc037bf64e16a4e4f64904dbb35fa4970a1"
+    },
+    "cohort_source_audit": {
+      "path": "docs/P07_REQUESTS_LEGACY_COHORTS.md",
+      "git_lf_sha256": "c385645f6779d56449bf0c10c34f9341aa9d08f24c919ae11cba305458b4d323"
+    }
+  },
+  "runtime": {
+    "implementation": "CPython",
+    "version": "2.7.13",
+    "abi": "cp27mu",
+    "os": "linux",
+    "architecture": "amd64",
+    "donor_image": "library/python@sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8",
+    "private_prefix": "/opt/p07-python27",
+    "launcher": "/opt/p07-runtime/python27",
+    "wheel_lock": "source_bindings.legacy_wheel_profile",
+    "wheel_count": 18,
+    "wheel_scope": "Exact18-wheel publisher closure for Python2.7.13, including real Gunicorn gthread and explicit futures backport",
+    "source_setup_allowed": false,
+    "accepted_environment": false
+  },
+  "certificate": {
+    "kind": "fresh_disclosed_public_benchmark_fixture",
+    "subject_common_name": "httpbin.org",
+    "subject_alternative_names": {
+      "DNS": [
+        "httpbin.org",
+        "github.com"
+      ],
+      "IP": []
+    },
+    "signature": "RSA2048/SHA256",
+    "ca": {
+      "basic_constraints": {
+        "ca": true,
+        "path_length": 0,
+        "critical": true
+      },
+      "key_usage": [
+        "keyCertSign",
+        "cRLSign"
+      ],
+      "not_before_offset_days": -1,
+      "not_after_offset_days": 30,
+      "maximum_validity_days": 31
+    },
+    "leaf": {
+      "basic_constraints": {
+        "ca": false,
+        "path_length": null,
+        "critical": true
+      },
+      "key_usage": [
+        "digitalSignature",
+        "keyEncipherment"
+      ],
+      "extended_key_usage": [
+        "serverAuth"
+      ],
+      "not_before_offset_days": -1,
+      "not_after_offset_days": 14,
+      "maximum_validity_days": 15
+    },
+    "ca_signing_key_installed": false,
+    "server_private_key_scope": "purpose-made public test fixture only",
+    "material_hashes": null,
+    "hostname_verification_required": true,
+    "chain_verification_required": true,
+    "unrelated_CA_negative_required": true,
+    "relationship_to_3362": "Separate DNS-SAN service profile; preserve 3362 CN127.0.0.1/no-SAN profile unchanged"
+  },
+  "oracle": {
+    "native_command": "pytest -rA",
+    "collection": "complete target suite; no -k/-m/file narrowing",
+    "installed_pytest_version": "2.8.7",
+    "plugin_args": [
+      "-p",
+      "no:httpbin",
+      "-p",
+      "pytest_httpbin.plugin",
+      "-p",
+      "pytest_mock"
+    ],
+    "entrypoints": {
+      "httpbin": "pytest_httpbin.plugin",
+      "pytest_mock": "pytest_mock"
+    },
+    "autoload_contract": "pytest2.8.7 has no PYTEST_DISABLE_PLUGIN_AUTOLOAD handling; explicit blocked/registered entrypoint allowlist required",
+    "environment_clear": [
+      "PYTEST_ADDOPTS",
+      "PYTEST_PLUGINS"
+    ],
+    "target_source_exposure": "Only after private pytest/entrypoint admission, add exact admitted /testbed root",
+    "source_preservation_required": true,
+    "hidden_patch_model_visible": false,
+    "resource_ceiling": {
+      "memory_bytes": 6442450944,
+      "cpus": 2,
+      "pids": 256
+    },
+    "required_outcome": "fresh complete base negative, gold all required passed, wrong negative with preserved regressions",
+    "incomplete_skip_import_timeout_truncation_source_change_cleanup_unknown": "non-success"
+  },
+  "digest_serialization": "required_id_list_sha256 is SHA256 of UTF8 compact JSON array, source order, no trailing newline; protected patch digests cover exact UTF8 manifest string bytes",
+  "tasks": [
+    {
+      "instance_id": "psf__requests-863",
+      "base_commit": "a0df2cbb10419037d11d04352b3175405ab52941",
+      "official_base_image": "swebench/sweb.eval.x86_64.psf_1776_requests-863@sha256:4dcddfdcbc2bcba96327de327f411c671e695366f4e7d09781f64c1758053b18",
+      "status": "prospective_unqualified",
+      "model_visible": false,
+      "service": {
+        "application": "httpbin==0.5.0 publisher wheel in fixed18-wheel lock",
+        "binding_host": "127.0.0.1",
+        "http_port": 80,
+        "https_port": 443,
+        "HTTPBIN_URL": "http://httpbin.org/",
+        "host_mappings": {
+          "httpbin.org": "127.0.0.1",
+          "github.com": "127.0.0.1"
+        },
+        "network_mode": "none",
+        "sysctls": {
+          "net.ipv4.ip_unprivileged_port_start": "0"
+        },
+        "cap_drop": [
+          "ALL"
+        ],
+        "cap_add": [],
+        "no_new_privileges": true,
+        "host_mounts": [],
+        "internet_route": false,
+        "port1_must_remain_closed": true,
+        "fixture_api": "HTTPBIN_URL function; own real HTTPBin process independent of object fixtures",
+        "timeout_topology": {
+          "required": false
+        },
+        "server": "gunicorn==19.9.0 gthread with futures==3.3.0, real HTTP1.1 and chunked requests",
+        "github_fixture": {
+          "scope": "Host-owned synthetic cross-domain cookie service for original github.com smoke tests; no live GitHub fidelity claim",
+          "route": "/",
+          "cookie": "p07_fixture=public; Path=/; HttpOnly",
+          "implementation": "HTTPBin WSGI response plus one explicit fixture cookie only on github.com root; never patch target APIs"
+        },
+        "wsgi_transport_compatibility": {
+          "condition": "HTTP_TRANSFER_ENCODING.lower() == 'chunked'",
+          "operation": "Set wsgi.input_terminated=True on the already-decoded Gunicorn body stream so Werkzeug0.11.4 reads its real EOF-delimited body",
+          "request_or_response_bytes_fabricated": false,
+          "target_api_modified": false
+        },
+        "host_plugin_load_order": {
+          "modules": [
+            "pytest_httpbin.plugin",
+            "pytest_mock"
+          ],
+          "phase": "before exposing target source or importing Requests",
+          "identity": "module files must remain under admitted private site-packages",
+          "reason": "target bundled six overwrites absolute sys.modules[six.moves]; host fixture modules must bind their admitted dependency before target import",
+          "target_module_registry_repaired": false
+        }
+      },
+      "oracle_obligations": {
+        "FAIL_TO_PASS": [
+          "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_HEADERS",
+          "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_postdata",
+          "tests/test_requests.py::RequestsTestSuite::test_prefetch_redirect_bug",
+          "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_data",
+          "tests/test_requests.py::RequestsTestSuite::test_allow_list_of_hooks_to_register_hook"
+        ],
+        "PASS_TO_PASS": [
+          "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_HTTP_200_OK_GET",
+          "tests/test_requests.py::RequestsTestSuite::test_BASICAUTH_TUPLE_HTTP_200_OK_GET",
+          "tests/test_requests.py::RequestsTestSuite::test_GET_no_redirect",
+          "tests/test_requests.py::RequestsTestSuite::test_HEAD_no_redirect",
+          "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET",
+          "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS",
+          "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_GET_WITH_PARAMS",
+          "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_HEAD",
+          "tests/test_requests.py::RequestsTestSuite::test_HTTP_200_OK_PUT",
+          "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_ALLOW_REDIRECT_GET",
+          "tests/test_requests.py::RequestsTestSuite::test_HTTP_302_GET",
+          "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES",
+          "tests/test_requests.py::RequestsTestSuite::test_POSTBIN_GET_POST_FILES_WITH_PARAMS",
+          "tests/test_requests.py::RequestsTestSuite::test_accept_objects_with_string_representations_as_urls",
+          "tests/test_requests.py::RequestsTestSuite::test_bytes_files",
+          "tests/test_requests.py::RequestsTestSuite::test_cached_response",
+          "tests/test_requests.py::RequestsTestSuite::test_can_have_none_in_header_values",
+          "tests/test_requests.py::RequestsTestSuite::test_connection_error",
+          "tests/test_requests.py::RequestsTestSuite::test_connection_error_with_safe_mode",
+          "tests/test_requests.py::RequestsTestSuite::test_connection_keepalive_and_close",
+          "tests/test_requests.py::RequestsTestSuite::test_danger_mode_redirects",
+          "tests/test_requests.py::RequestsTestSuite::test_decompress_gzip",
+          "tests/test_requests.py::RequestsTestSuite::test_default_status_raising",
+          "tests/test_requests.py::RequestsTestSuite::test_empty_response",
+          "tests/test_requests.py::RequestsTestSuite::test_entry_points",
+          "tests/test_requests.py::RequestsTestSuite::test_file_post_data",
+          "tests/test_requests.py::RequestsTestSuite::test_head_content",
+          "tests/test_requests.py::RequestsTestSuite::test_httpauth_recursion",
+          "tests/test_requests.py::RequestsTestSuite::test_invalid_url",
+          "tests/test_requests.py::RequestsTestSuite::test_invalid_urls_throw_requests_exception",
+          "tests/test_requests.py::RequestsTestSuite::test_iter_lines",
+          "tests/test_requests.py::RequestsTestSuite::test_max_redirects",
+          "tests/test_requests.py::RequestsTestSuite::test_multiple_hooks",
+          "tests/test_requests.py::RequestsTestSuite::test_nonurlencoded_post_data",
+          "tests/test_requests.py::RequestsTestSuite::test_nonzero_evaluation",
+          "tests/test_requests.py::RequestsTestSuite::test_params_accepts_kv_list",
+          "tests/test_requests.py::RequestsTestSuite::test_params_are_added_before_fragment",
+          "tests/test_requests.py::RequestsTestSuite::test_path_is_not_double_encoded",
+          "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files",
+          "tests/test_requests.py::RequestsTestSuite::test_post_fields_with_multiple_values_and_files_as_tuples",
+          "tests/test_requests.py::RequestsTestSuite::test_prefetch_return_response_interaction",
+          "tests/test_requests.py::RequestsTestSuite::test_redirect_history",
+          "tests/test_requests.py::RequestsTestSuite::test_relative_redirect_history",
+          "tests/test_requests.py::RequestsTestSuite::test_request_ok_set",
+          "tests/test_requests.py::RequestsTestSuite::test_response_has_unicode_url",
+          "tests/test_requests.py::RequestsTestSuite::test_response_sent",
+          "tests/test_requests.py::RequestsTestSuite::test_session_HTTP_200_OK_GET",
+          "tests/test_requests.py::RequestsTestSuite::test_session_persistent_headers",
+          "tests/test_requests.py::RequestsTestSuite::test_session_pickling",
+          "tests/test_requests.py::RequestsTestSuite::test_status_raising",
+          "tests/test_requests.py::RequestsTestSuite::test_unicode_get",
+          "tests/test_requests.py::RequestsTestSuite::test_upload_binary_data",
+          "tests/test_requests.py::RequestsTestSuite::test_urlencoded_get_query_multivalued_param",
+          "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_and_data",
+          "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_query_multivalued_and_data",
+          "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring",
+          "tests/test_requests.py::RequestsTestSuite::test_urlencoded_post_querystring_multivalued",
+          "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_port",
+          "tests/test_requests.py::RequestsTestSuite::test_useful_exception_for_invalid_scheme",
+          "tests/test_requests.py::RequestsTestSuite::test_user_agent_transfers"
+        ],
+        "required_count": 65,
+        "required_id_list_sha256": "da9cb47427eb36a74336a8edb1be75391b0f6fcc6c550091dd602109fa77937d",
+        "protected_test_patch_sha256": "f4434a5d4d12fc75e4a008efc77f14b9f711b2200d4e05a3b5cd3b04deb29bf4",
+        "gold_patch_sha256": "1fe8ef6f159643d4f5c4d06ef1ceddc6d8fa789dfcc58cd5e52eef98e43985d2"
+      },
+      "known_contract_gate": "Added protected test_allow_list_of_hooks_to_register_hook is absent from current labels; retain full observations and review prospective corpus before any acceptance"
+    }
+  ],
+  "not_admitted": [],
+  "remaining_gates": [
+    "Own-base immutable image/layer/source proof for each task",
+    "Private ABI and complete installed-wheel byte inventory per task",
+    "Fresh DNS certificate chain/hostname/wrongCA health",
+    "Real HTTP80/HTTPS443 function service and task-specific alias health",
+    "Exact native private pytest/plugins startup and collection",
+    "Same-worker timeout topology for2317",
+    "Full protected base/gold/wrong for each target",
+    "Prospective863 protected-label review without deleting prior obligations"
+  ],
+  "acceptance_claim": "None; source-free donor qualified separately, targetruntime and fulltriplepending",
+  "predecessor": {
+    "path": "benchmarks/stage4/p07-requests-function-service-profile-v2.json",
+    "git_lf_sha256": "cbeb060fc4e7272034112de1e94f6153a6f41fe92b4c1ab04ff5a2cd44dd86d1",
+    "change": "Explicit fixture CA append to original bundled requests/cacert.pem after exact base admission; Session.send direct verification otherwise bypasses CA environment"
+  },
+  "default_ca_overlay": {
+    "path": "requests/cacert.pem",
+    "operation": "append exact admitted fixture CA bytes after one separating newline",
+    "scope": "public benchmark trust material only; no Python source, assertions, selections or SSL verification flags change",
+    "original_bytes_sha256": "per own-base host receipt before append",
+    "result_bytes_sha256": "per row receipt; verify original bytes are exact prefix",
+    "fixture_ca_sha256": "admitted runtime certificate_files cacert.pem",
+    "restore_between_rows": "fresh container and git reset to exact base before each append",
+    "no_verification_disable": true
+  }
+}

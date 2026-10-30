@@ -1,0 +1,83 @@
+name: P07 independent generated candidate oracle
+
+on:
+  pull_request:
+    paths:
+      - 'validation/p07-20261026/candidates/*.patch'
+      - 'tools/evaluation_p07_source_pilot.py'
+      - 'tools/p07_source_preflight.py'
+      - '.github/workflows/p07-candidate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      has_candidates: ${{ steps.scope.outputs.value }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install .
+      - id: scope
+        run: python -c "import pathlib,os; print('value='+str(bool(list(pathlib.Path('validation/p07-20261026/candidates').glob('*.patch')))).lower(),file=open(os.environ['GITHUB_OUTPUT'],'a'))"
+      - name: Read pinned target bytes and build the actual graph without target execution
+        run: |
+          git init /tmp/sympy-mirror
+          git -C /tmp/sympy-mirror fetch --depth 1 https://github.com/sympy/sympy.git b4777fdcef467b7132c055f8ac2c9a5059e6a145
+          python tools/p07_source_preflight.py --mirror /tmp/sympy-mirror > source-preflight.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-source-preflight-${{ github.sha }}
+          path: source-preflight.json
+          if-no-files-found: error
+  candidates:
+    needs: source-preflight
+    if: needs.source-preflight.outputs.has_candidates == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install swebench==3.0.15
+      - name: Grade original model patches with no provider credentials
+        run: |
+          mkdir -p p07-candidates
+          git rev-parse HEAD > p07-candidates/tested-commit.txt
+          python -m pip freeze > p07-candidates/dependencies.txt
+          python - <<'PY'
+          import pathlib, subprocess, sys
+          sys.path.insert(0, 'tools')
+          from evaluation_stage4 import patch_paths
+          patches = sorted(pathlib.Path('validation/p07-20261026/candidates').glob('*.patch'))
+          if not patches:
+              raise SystemExit('No generated candidate inputs; oracle was not run')
+          failed = False
+          for patch in patches:
+              if patch_paths(patch.read_text()) != {'sympy/core/function.py'}:
+                  raise SystemExit('SymPy pilot candidate exceeds declared write authority')
+              result = subprocess.run([sys.executable, 'tools/evaluation_p07_isolated.py',
+                  '--task', 'sympy__sympy-21614', '--candidate', str(patch),
+                  '--output', str(pathlib.Path('p07-candidates') / patch.stem)])
+              failed |= result.returncode != 0
+          raise SystemExit(int(failed))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-generated-candidates-${{ github.sha }}
+          path: p07-candidates/
+          retention-days: 14
+          if-no-files-found: error

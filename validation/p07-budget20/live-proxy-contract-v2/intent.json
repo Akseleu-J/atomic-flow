@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "state": "frozen_not_sent",
+  "scope": "distinct single API-contract diagnostic after published byte-view fix; no task-quality claim",
+  "tested_commit": "e7c54c184ce4f1244e1c90e2cc45e04b54c6c9fa",
+  "profile": {
+    "campaign_id": "p07_live_proxy_contract_v2_20261028",
+    "model": "anthropic/claude-sonnet-5@default",
+    "framework_sha": "e7c54c184ce4f1244e1c90e2cc45e04b54c6c9fa",
+    "workflow_sha": "e7c54c184ce4f1244e1c90e2cc45e04b54c6c9fa",
+    "wire_config": {
+      "model": "anthropic/claude-sonnet-5@default",
+      "max_input_tokens": 512,
+      "max_output_tokens": 64,
+      "temperature": null,
+      "max_retries": 0
+    },
+    "total_budget_usd": "0.05",
+    "owner_caps": {
+      "akseley": "0.05"
+    },
+    "arm_budget_usd": "0.01",
+    "task_budget_usd": "0.01",
+    "reserve_per_call_usd": "0.01",
+    "max_physical_calls": 1,
+    "deadline_unix_ms": 1793209119341,
+    "allowed_arms": [
+      "protocol"
+    ],
+    "task_owners": {
+      "public_model_proxy_contract": "akseley"
+    },
+    "profile_sha256": "f868c2559f5ba3752b32bbf44bd3756b6be055f29d4e9977b5d5abdb8b135422"
+  },
+  "prior_spend": {
+    "total": "0.035771375",
+    "owners": {
+      "akseley": "0.035771375"
+    }
+  },
+  "request": {
+    "schema_version": 1,
+    "kind": "p07_model_request",
+    "call_id": "mq_d6b49f5aafd94efdaabe2e9baa053fb2",
+    "identity": {
+      "campaign_id": "p07_live_proxy_contract_v2_20261028",
+      "owner": "akseley",
+      "arm": "protocol",
+      "task_id": "public_model_proxy_contract",
+      "framework_sha": "e7c54c184ce4f1244e1c90e2cc45e04b54c6c9fa",
+      "workflow_sha": "e7c54c184ce4f1244e1c90e2cc45e04b54c6c9fa",
+      "profile_sha256": "f868c2559f5ba3752b32bbf44bd3756b6be055f29d4e9977b5d5abdb8b135422"
+    },
+    "config": {
+      "model": "anthropic/claude-sonnet-5@default",
+      "max_input_tokens": 512,
+      "max_output_tokens": 64,
+      "temperature": null,
+      "max_retries": 0
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return exactly {\"status\":\"ok\"} and no other text."
+      }
+    ],
+    "messages_sha256": "cd1d8cd0f81c30d4cd9c9b1cb1592c0ba1b3fee331608e9d51bbdbff44c21fa1",
+    "request_sha256": "7db23cbe2347e8a42ead051477547b4680fe7181e1c3d50f1f2801f3ce15e690"
+  },
+  "exact_request_sha_admission": "7db23cbe2347e8a42ead051477547b4680fe7181e1c3d50f1f2801f3ce15e690",
+  "not_a_resend_of": "mq_4f294c730ed549ef90b5dd144f1e2e20",
+  "earlier_attempt_billing_settled": true,
+  "old_broker_state_preserved": "unknown",
+  "automatic_retries": 0
+}

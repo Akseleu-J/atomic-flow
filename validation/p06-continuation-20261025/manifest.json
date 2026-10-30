@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-25",
+  "timezone": "Europe/Moscow",
+  "starting_head": "20cdd7767ad846ad42dd9d08fcd709c4d5c11b0d",
+  "branch": "experimental",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "scope": "local uncommitted package; offline/scripted verification only",
+  "live_provider_calls": 0,
+  "vault_access": false,
+  "checks": {
+    "focused": {
+      "files": [
+        "tests/test_envelope.py",
+        "tests/test_internal_replan.py",
+        "tests/test_plan_review_dependencies.py",
+        "tests/test_step_invalidation.py",
+        "tests/test_task_read_plan.py",
+        "tests/test_graph_cas_review.py",
+        "tests/test_graph_contract.py",
+        "tests/test_graph_delta.py",
+        "tests/test_graph_resolve.py",
+        "tests/test_graph_semantic.py",
+        "tests/test_graph_impact.py"
+      ],
+      "passed": 79,
+      "skipped": 0,
+      "seconds": 38.39,
+      "log": "pytest-focused.txt",
+      "exit_code": 0
+    },
+    "neighbors": {
+      "capture": "write_stdin session 79430 final tool output",
+      "exit_code": 0,
+      "passed": 85,
+      "skipped": 2,
+      "seconds": 153.81,
+      "files": [
+        "tests/test_task.py",
+        "tests/test_task_changeset.py",
+        "tests/test_task_budget.py",
+        "tests/test_cli.py",
+        "tests/test_execution.py",
+        "tests/test_completion_diagnostics.py",
+        "tests/test_task_execution.py",
+        "tests/test_composition_acceptance.py"
+      ],
+      "stdout_summary": "85 passed, 2 skipped in 153.81s (0:02:33)",
+      "not_a_raw_stdout_file": true
+    },
+    "new_cli": {
+      "files": [
+        "tests/test_replan_cli.py"
+      ],
+      "passed": 4,
+      "seconds": 1.06,
+      "log": "pytest-cli.txt",
+      "exit_code": 0
+    },
+    "total_disjoint_final_selections": {
+      "passed": 168,
+      "skipped": 2
+    },
+    "ruff": "passed",
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "source_sha256": {
+    "src/atomic_flow/agents/envelope.py": "abfa6424706af5d98223efd0965883487829faa2e4a031bf774114a87dfdfad5",
+    "src/atomic_flow/agents/plan_review.py": "81910df70ec56e35f1165905c7d5e8fcb12ac6b4aa9809fbdb63b94c076ff616",
+    "src/atomic_flow/agents/task.py": "61b90cb73672070ad48e490acc1c6961655cac531f1c007135d4bf4be13b297a",
+    "src/atomic_flow/agents/task_loop.py": "c4a6c5822db74018faac1cdd53bbc5b03f57b856228b559cce29a998ebadcf20",
+    "src/atomic_flow/cli.py": "aa512ff4a87c90fc0f0f0c0233b3dc91149d7a1e13dfe27e915d25ab91aa7dc5",
+    "src/atomic_flow/graph/store.py": "e3a9a249d898a0fffe564f7bd710c51186e4cc0ea9f01f196cd2a3181a17ac7f",
+    "src/atomic_flow/graph/delta.py": "b4b639208873cea045be014612db8177598b9f291768dcdbcff2af68d97a01df",
+    "tests/test_envelope.py": "3e119ba8861c6c8ee52365ad920c0851d771f7426925f52b1039e1eca70d36b5",
+    "tests/test_internal_replan.py": "d692e3aaab1abc3a41ac47f55529c942743413547da4e8c672d59ce579585895",
+    "tests/test_graph_cas_review.py": "e7e888341e3b3ea76c49918adea7a66ef0413a43ab337ea4e642b463b214a444",
+    "tests/test_step_invalidation.py": "b19303cb0f10d67bf628e0895a72a323af408aa0c6a6700a6bc273519749233a",
+    "tests/test_replan_cli.py": "c95eac116e3c776e89db1f612b4c1a788b648c358d0367bcddb7b02687ac76e2"
+  },
+  "tracked_runtime_diff_sha256": "ffce2992cc875add3c9d299c924521e4cd6b3efb2375bdabc695c601461d7abf",
+  "untracked_test_bytes_bound_by_source_sha256": [
+    "tests/test_internal_replan.py",
+    "tests/test_graph_cas_review.py",
+    "tests/test_replan_cli.py"
+  ],
+  "ci_scope": {
+    "source_commit": "20cdd7767ad846ad42dd9d08fcd709c4d5c11b0d",
+    "checks_run": 40159998948,
+    "external_run": 40159998952,
+    "status": "success for starting commit, not this working diff"
+  },
+  "limitations": [
+    "Initial ordinary sandbox shell processes stalled; node child spawn returned EPERM; approved local shell used.",
+    "Initial neighbor test selection included nonexistent test_state.py and ran no tests; corrected selection recorded.",
+    "Earlier overlapping development selections are excluded from totals.",
+    "Two skips remain unexecuted coverage; this is not full CI, live model quality or remote executor acceptance.",
+    "Existing dirty docs/project index and untracked tree.lock/reference/review artifacts were preserved.",
+    "No new commit or push was performed."
+  ],
+  "artifact_sha256": {
+    "pytest-focused.txt": "b1e75dbd0d302dd8babaea3a895420acd1985184b15105ecde8a84cad24b3084",
+    "pytest-cli.txt": "39706591d708400487e0bc52ebc02eb66a646219bffbe9dbb0243dc8354597b9",
+    "neighbors-result.json": "e14f2901b75620f101078f7ec13a591d15c9848e6803c96b587d368fe5144ad1",
+    "capture_evidence.py": "385fd103356665ca52fad3dafd4bbbadf870a17eb7f6b66ae754487ea3a051a6"
+  }
+}

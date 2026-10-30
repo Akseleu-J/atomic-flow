@@ -1,0 +1,96 @@
+{
+  "directory": "C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\p07-scripted-task-ledger\\3b9228dc98a295e605dd3ca525e1aff8a610b574\\p07-model-queue-task-20261028-01",
+  "branch": "codex/p07-model-queue-task-20261028-01",
+  "commit": "3b9228dc98a295e605dd3ca525e1aff8a610b574",
+  "expected": {
+    "campaign_id": "p07_public_task_queue_smoke",
+    "owner": "akseley",
+    "arm": "scripted",
+    "task_id": "public_coupled_queue_smoke",
+    "framework_sha": "3b9228dc98a295e605dd3ca525e1aff8a610b574",
+    "workflow_sha": "3b9228dc98a295e605dd3ca525e1aff8a610b574",
+    "profile_sha256": "5f4bb8503d5045838ee1e4528879bae0187c4392e66f9e8931ac833aac147e89"
+  },
+  "roles": [
+    "parser",
+    "answerer",
+    "answerer",
+    "critic",
+    "host_planner",
+    "parser",
+    "answerer",
+    "answerer",
+    "answerer",
+    "answerer",
+    "answerer",
+    "critic"
+  ],
+  "answerer_steps": 7,
+  "host_replans": 1,
+  "provider_calls": 0,
+  "model_generation": false,
+  "profile_sha256": "5f4bb8503d5045838ee1e4528879bae0187c4392e66f9e8931ac833aac147e89",
+  "script_consumed": true,
+  "last_results": [
+    {
+      "call_id": "mq_2332c0a50cda48218d3460afd09e4644",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_28fc4344551f483ebc5944ae0c6ed60f",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_41488b5027014445899fef0a8d0b6fef",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_751ba502ed53474ca0c74c0985300ccc",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_7d9f55f4947b44c28e5ef7cb20fc67b5",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_824cd9caaf8649709ae3e90a9cf15beb",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_9d9d81fef603405a99731a4f23c613b5",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_9f3dfb059e714b319ba657a4c3990aa9",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_abb85de2ba2a4b3385463d8b9e5ae517",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_b8e662550fef464c8733bd937ba8dfb4",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_e359034540f44f24aa17046960831258",
+      "state": "completed",
+      "sent": false
+    },
+    {
+      "call_id": "mq_7964ec3ef3654dca96dca74d5ad493cb",
+      "state": "completed",
+      "sent": true
+    }
+  ]
+}

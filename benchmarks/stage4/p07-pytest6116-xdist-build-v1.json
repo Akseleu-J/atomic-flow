@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "scope": "prospective xdist source and builder; no runtime admission",
+  "task_id": "pytest-dev__pytest-6116",
+  "python_version": "3.8.20",
+  "python_image": "python@sha256:1d52838af602b4b5a831beb13a0e4d073280665ea7be7f69ce2382f29c5a613f",
+  "source": {
+    "filename": "pytest-xdist-1.18.2.tar.gz",
+    "url": "https://files.pythonhosted.org/packages/e9/31/bac9fbf85fc76590cf53a6df3067fc384257d2cb193fac47c337fc1af5b0/pytest-xdist-1.18.2.tar.gz",
+    "sha256": "10468377901b80255cf192c4603a94ffe8b1f071f5c912868da5f5cb91170dae"
+  },
+  "build_wheels": [
+    {
+      "name": "setuptools",
+      "version": "57.5.0",
+      "filename": "setuptools-57.5.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/4b/b9/71687c5d2034c863db1db2e0704f5e27581ff3cb44d7f293968c5e08ceb3/setuptools-57.5.0-py3-none-any.whl",
+      "sha256": "60d78588f15b048f86e35cdab73003d8b21dd45108ee61a6693881a427f22073"
+    },
+    {
+      "name": "wheel",
+      "version": "0.37.1",
+      "filename": "wheel-0.37.1-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/27/d6/003e593296a85fd6ed616ed962795b2f87709c3eee2bca4f6d0fe55c6d00/wheel-0.37.1-py2.py3-none-any.whl",
+      "sha256": "4bdcd7d840138086126cd09254dc6195fb4fc6f01c050a1d7236f2630db1d22a"
+    },
+    {
+      "name": "setuptools-scm",
+      "version": "3.3.3",
+      "filename": "setuptools_scm-3.3.3-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/1d/70/97966deebaeeda0b81d3cd63ba9f8ec929b838871ed17476de9d8159db3e/setuptools_scm-3.3.3-py2.py3-none-any.whl",
+      "sha256": "1f11cb2eea431346d46589c2dafcafe2e7dc1c7b2c70bc4c3752d2048ad5c148"
+    }
+  ],
+  "runtime_wheels": [
+    {
+      "name": "execnet",
+      "version": "1.9.0",
+      "filename": "execnet-1.9.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/81/c0/3072ecc23f4c5e0a1af35e3a222855cfd9c80a1a105ca67be3b6172637dd/execnet-1.9.0-py2.py3-none-any.whl",
+      "sha256": "a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"
+    }
+  ],
+  "source_date_epoch": 1500000000
+}

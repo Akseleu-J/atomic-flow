@@ -1,0 +1,1 @@
+{"exit_code": 4, "regressions_passed": false, "tests": {"test_Add_kind": "error", "test_Derivative_kind": "error", "test_Integral_kind": "error", "test_Matrix_kind": "error", "test_NumberKind": "error", "test_Symbol_kind": "error", "test_mul_kind": "error"}}

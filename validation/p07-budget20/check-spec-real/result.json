@@ -1,0 +1,78 @@
+{
+  "cases": [
+    {
+      "case": "pass",
+      "check_passed": true,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "expected_check_passed": true,
+      "process_exit": 0,
+      "source_after": "b63693365df732aa1443fd0001e3b9278408b34d6bfe98ffc624523d3da09992",
+      "source_bytes_unchanged": true,
+      "source_revision": "b63693365df732aa1443fd0001e3b9278408b34d6bfe98ffc624523d3da09992",
+      "spec_digest": "b7384940b796c9443a14d8229427ae717a130e54419e0bc61d07092d8d52f19b",
+      "status": "expected_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "9d056d985138ba1c82cc711f25d53b2ffb8149fe27c7dd4cd7ad82da01bf50ef",
+      "synthetic_source_sha256": {
+        "sample.py": "aecc013c518523ca22b7e3780f87002f5cae13fabc369f2f59a1faf7058f8c76",
+        "test_example.py": "de78637a8a9e74f1d6355b7d04c686217e05249afeb3e203568938f461d102c1"
+      },
+      "verified_success": false
+    },
+    {
+      "case": "assertion_fail",
+      "check_passed": false,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "expected_check_passed": false,
+      "process_exit": 1,
+      "source_after": "1f52833743fc91cbe3ad4e11284439951764eb5a28a4a5d866aedd81d9e7f953",
+      "source_bytes_unchanged": true,
+      "source_revision": "1f52833743fc91cbe3ad4e11284439951764eb5a28a4a5d866aedd81d9e7f953",
+      "spec_digest": "6f9a8c8153a07166c375b1c8763a233b059a268de7866fabc2c65b2fd2e86d52",
+      "status": "expected_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "21cb81d1bd583ecc124b5b9ec12d42ded38d0bf8625606f476bfc04f6bdb2b3d",
+      "synthetic_source_sha256": {
+        "sample.py": "aecc013c518523ca22b7e3780f87002f5cae13fabc369f2f59a1faf7058f8c76",
+        "test_example.py": "48c6e78ea51ad3ef244c0c233736082a1492607b11ea5891058d6b79c9343e3b"
+      },
+      "verified_success": false
+    },
+    {
+      "case": "required_skip",
+      "check_passed": false,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "expected_check_passed": false,
+      "process_exit": 5,
+      "source_after": "66c4fb9fd05eefba6c91950574c721862c692ecbbacf7aae98348ec89bab7f96",
+      "source_bytes_unchanged": true,
+      "source_revision": "66c4fb9fd05eefba6c91950574c721862c692ecbbacf7aae98348ec89bab7f96",
+      "spec_digest": "5049d759898100809780dc0a3d8773c518262b9d709d533538fd3ddde65abf4f",
+      "status": "expected_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "867abaa6972c877af53c243849a09876e181ac61172a5b4353f589c0b03a8c20",
+      "synthetic_source_sha256": {
+        "sample.py": "aecc013c518523ca22b7e3780f87002f5cae13fabc369f2f59a1faf7058f8c76",
+        "test_example.py": "5176d7daa8aeefd26ad9b147cea8c4cdcdb32ab70c2e564fc0bf908b8fe6c29f"
+      },
+      "verified_success": false
+    }
+  ],
+  "historical_target_tests": false,
+  "host_source_sha256": {
+    "src/atomic_flow/agents/execution.py": "587e30fe7d96eff1e9b778223ad63a543c8f5fd207a9973bd128b4cce9a863c0",
+    "src/atomic_flow/check_execution.py": "20ff98e2659eeba4b962a06f479e2bcea711af3b61cef256c27e89aa789b4372",
+    "src/atomic_flow/check_spec.py": "14845e90ae102e00f900401f2b7aafe85808f68967cd781ddb9c5fc758445392",
+    "tools/p07_check_spec_smoke.py": "77d84c528d1c5cfe209479ad47f9de843e3c2df3532bdadcafdbddeabc11772a"
+  },
+  "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7080@sha256:3389f0d1319ca611d04a209fc30990c131e0bae9acfeb2163938c75ad23479fe",
+  "image_id": "sha256:947026ad5ca54dbbf6cc676543bf6c2299484dd9f50e746b8e027f46c44f4da4",
+  "model_calls": 0,
+  "profile_git_lf_sha256": "722003e23b71faa029f8c6f3521e3f91599a07813164937bd2dcae955c745dca",
+  "provider_credentials": "not_forwarded",
+  "scope": "standalone CheckSpec synthetic boundary only",
+  "status": "synthetic_check_spec_boundary_qualified",
+  "taskrunner_wired": false,
+  "tested_commit": "1146f073d642ca259544f95dea27ce1d0bc4bb75",
+  "verified_success": false
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "accepted_scripted_github_queue_transport_only",
+  "tested_commit": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+  "run_id": 40668983526,
+  "artifact_id": 12807267815,
+  "artifact_sha256": "1dc6b5defa46ca3441218c47ee949cbd164fb45c0a13ce65deaa2dbcd00b87dc",
+  "call_id": "mq_f67add32a615483db1e78added158960",
+  "request_sha256": "045bc67f08b59695b747a04fcae220f5b4ffd6eba53581e87af43da87ee5ecce",
+  "response_sha256": "ea5a408a5231d81b9debfc213f9c315ac7c0f9ad17ff69e581ad5631e60dfc23",
+  "identity": {
+    "campaign_id": "p07_zero_provider_queue_smoke",
+    "owner": "akseley",
+    "arm": "scripted",
+    "task_id": "public_transport_smoke",
+    "framework_sha": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+    "workflow_sha": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+    "profile_sha256": "c535e8fb5c8d01e894163067e5fdef411bb27457b4c87a4eba0413ce49fb0745"
+  },
+  "physical_provider_calls": 0,
+  "model_generation": false,
+  "full_TaskRunner": false,
+  "live_model_proxy": false,
+  "hidden_oracle": false,
+  "P07": "OPEN"
+}

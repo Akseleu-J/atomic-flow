@@ -1,0 +1,17 @@
+......F
+================================== FAILURES ===================================
+_________ test_iterative_baseline_uses_exact_read_then_verified_edit __________
+tests\test_p07_source_pilot.py:64: in test_iterative_baseline_uses_exact_read_then_verified_edit
+    patch, detail = pilot.baseline({"problem_statement": "Update value", "base_commit": "a" * 40}, work, original, backend, output)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\evaluation_p07_source_pilot.py:75: in baseline
+    + "\nPinned base: " + task["base_commit"] + "\nInitial source excerpt (not read proof):\n" + source_excerpt(original)}]
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+tools\evaluation_live_pilot.py:165: in source_excerpt
+    start = next(i for i, line in enumerate(lines) if line.startswith("class Derivative("))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+=========================== short test summary info ===========================
+FAILED tests/test_p07_source_pilot.py::test_iterative_baseline_uses_exact_read_then_verified_edit
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 6 passed in 1.92s

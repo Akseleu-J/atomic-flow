@@ -1,0 +1,20 @@
+{
+  "id": 12793222156,
+  "node_id": "MDg6QXJ0aWZhY3QxMjc5MzIyMjE1Ng==",
+  "name": "p07-sympy-task-journey-3f034d65d7198949a0c72dfc2e9b006c146969a3",
+  "size_in_bytes": 235554,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12793222156",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12793222156/zip",
+  "expired": false,
+  "digest": "sha256:745f2aafdf8fa47bad48a239d9f4165da67c24879345e27ddb3afd97dd50c41e",
+  "created_at": "2026-10-28T05:04:32Z",
+  "updated_at": "2026-10-28T05:04:32Z",
+  "expires_at": "2026-11-11T05:04:31Z",
+  "workflow_run": {
+    "id": 40635360748,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "3f034d65d7198949a0c72dfc2e9b006c146969a3"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "check_passed": true,
+  "result": {
+    "returncode": 0,
+    "stderr": "",
+    "stderr_truncated": false,
+    "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.6.15, pytest-2.8.7, py-1.4.31, pluggy-0.3.1 -- /opt/p07-python36/bin/python3.6\nrootdir: /testbed, inifile: \ncollecting ... collected 4 items\n\ntest_p07_private_fixture.py::test_legacy_apis PASSED\ntest_p07_private_fixture.py::test_real_http PASSED\ntest_p07_private_fixture.py::test_ca_verified_https PASSED\ntest_p07_private_fixture.py::test_required_production_value PASSED\n\n=========================== 4 passed in 1.01 seconds ===========================\n\nATOMIC_CHECK_SPEC_RECEIPT:{\"_pytest_module\": \"/opt/p07-python36/lib/python3.6/site-packages/_pytest/__init__.py\", \"argv\": [\"-p\", \"no:cacheprovider\", \"-p\", \"no:httpbin\", \"-p\", \"pytest_httpbin.plugin\", \"-p\", \"pytest_mock\", \"-rA\", \"-v\", \"test_p07_private_fixture.py\"], \"call_failed\": 0, \"check_spec_digest\": \"099b18b105e4b08ccff7a78168cbd77277b79ab61b7b1e9c94b21aaaea2b3cda\", \"collected\": 4, \"collection_complete\": true, \"collection_errors\": 0, \"completed\": 4, \"exit_code\": 0, \"failed\": 0, \"files\": [\"test_p07_private_fixture.py\"], \"finished\": true, \"fixture_lifecycle\": \"requires_separate_host_admission\", \"installed_inventory_sha256\": \"a8c79702279a089c556ff6033a06fd7165a7025c8503d34efd93ce8ecea64383\", \"interpreter\": \"/opt/p07-python36/bin/python3.6\", \"interpreter_resolved\": \"/opt/p07-python36/bin/python3.6\", \"launcher_sha256\": \"7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81\", \"nonce\": \"cbc4c7b64da1492c9779a604317ffa9d\", \"passed\": 4, \"private_pytest_identity_digest\": \"0dc0a695324c3728f239d327fe5c0cfcffaba76ccb26cc57493edd1aa9db7383\", \"pytest_module\": \"/opt/p07-python36/lib/python3.6/site-packages/pytest.py\", \"pytest_version\": \"2.8.7\", \"python_version\": [3, 6, 15], \"requests3362_fixture\": {\"ca_overlay\": false, \"certificate_files\": {\"/opt/p07-python36/lib/python3.6/site-packages/pytest_httpbin/certs/cacert.pem\": \"47ea37455219a8f233790b8d3ad6940c8279564a7966d3bfaaabea900ca9f41b\", \"/opt/p07-python36/lib/python3.6/site-packages/pytest_httpbin/certs/cert.pem\": \"8bbf7a4e14dcf14244e9bd69c05f2ff876ccf17e54364f764252de10cdefe8a4\"}, \"certificate_metadata_sha256\": \"29f8d4b72b4084933e5024238cfcd5388e4a11d9f4ef75c3d43a255bf46a2ad0\", \"certificate_policy\": {\"common_name\": \"127.0.0.1\", \"dns_sans\": [], \"ip_sans\": []}, \"check_spec_digest\": \"099b18b105e4b08ccff7a78168cbd77277b79ab61b7b1e9c94b21aaaea2b3cda\", \"fixture_digest\": \"fd26fe0ab9a95f13d0057b00493b036024441d9e8e2742da1e650fb9453cb58c\", \"health_assurance\": \"ordinary_declared_tests_only_no_fabricated_health\", \"httpbin_ca_bundle_observed\": true, \"key_material_binding\": \"separate_provisioning_evidence_required\", \"policy\": \"requests3362-plugin-owned-lifecycle/1\", \"runtime_digest\": \"290b737befccf70a32dd4bb372f382338533e13c9c2c1ffe32ca248393a452c2\", \"server_count\": 2, \"servers\": [{\"fixture_name\": \"httpbin\", \"host\": \"127.0.0.1\", \"port\": 46233, \"protocol\": \"http\", \"stopped\": true}, {\"fixture_name\": \"httpbin_secure\", \"host\": \"127.0.0.1\", \"port\": 40007, \"protocol\": \"https\", \"stopped\": true}], \"servers_stopped\": true, \"source_revision\": \"b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5\"}, \"requests_module\": \"/testbed/requests/__init__.py\", \"root\": \"/testbed\", \"runner\": \"pytest-private\", \"runtime_digest\": \"290b737befccf70a32dd4bb372f382338533e13c9c2c1ffe32ca248393a452c2\", \"setup_failed\": 0, \"skipped\": 0, \"source_revision\": \"b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5\", \"teardown_failed\": 0, \"xpassed\": 0}\n",
+    "stdout_truncated": false,
+    "timed_out": false
+  },
+  "runner_receipt": {
+    "_pytest_module": "/opt/p07-python36/lib/python3.6/site-packages/_pytest/__init__.py",
+    "argv": [
+      "-p",
+      "no:cacheprovider",
+      "-p",
+      "no:httpbin",
+      "-p",
+      "pytest_httpbin.plugin",
+      "-p",
+      "pytest_mock",
+      "-rA",
+      "-v",
+      "test_p07_private_fixture.py"
+    ],
+    "call_failed": 0,
+    "check_spec_digest": "099b18b105e4b08ccff7a78168cbd77277b79ab61b7b1e9c94b21aaaea2b3cda",
+    "collected": 4,
+    "collection_complete": true,
+    "collection_errors": 0,
+    "completed": 4,
+    "exit_code": 0,
+    "failed": 0,
+    "files": [
+      "test_p07_private_fixture.py"
+    ],
+    "finished": true,
+    "fixture_lifecycle": "requires_separate_host_admission",
+    "installed_inventory_sha256": "a8c79702279a089c556ff6033a06fd7165a7025c8503d34efd93ce8ecea64383",
+    "interpreter": "/opt/p07-python36/bin/python3.6",
+    "interpreter_resolved": "/opt/p07-python36/bin/python3.6",
+    "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+    "nonce": "cbc4c7b64da1492c9779a604317ffa9d",
+    "passed": 4,
+    "private_pytest_identity_digest": "0dc0a695324c3728f239d327fe5c0cfcffaba76ccb26cc57493edd1aa9db7383",
+    "pytest_module": "/opt/p07-python36/lib/python3.6/site-packages/pytest.py",
+    "pytest_version": "2.8.7",
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "requests3362_fixture": {
+      "ca_overlay": false,
+      "certificate_files": {
+        "/opt/p07-python36/lib/python3.6/site-packages/pytest_httpbin/certs/cacert.pem": "47ea37455219a8f233790b8d3ad6940c8279564a7966d3bfaaabea900ca9f41b",
+        "/opt/p07-python36/lib/python3.6/site-packages/pytest_httpbin/certs/cert.pem": "8bbf7a4e14dcf14244e9bd69c05f2ff876ccf17e54364f764252de10cdefe8a4"
+      },
+      "certificate_metadata_sha256": "29f8d4b72b4084933e5024238cfcd5388e4a11d9f4ef75c3d43a255bf46a2ad0",
+      "certificate_policy": {
+        "common_name": "127.0.0.1",
+        "dns_sans": [],
+        "ip_sans": []
+      },
+      "check_spec_digest": "099b18b105e4b08ccff7a78168cbd77277b79ab61b7b1e9c94b21aaaea2b3cda",
+      "fixture_digest": "fd26fe0ab9a95f13d0057b00493b036024441d9e8e2742da1e650fb9453cb58c",
+      "health_assurance": "ordinary_declared_tests_only_no_fabricated_health",
+      "httpbin_ca_bundle_observed": true,
+      "key_material_binding": "separate_provisioning_evidence_required",
+      "policy": "requests3362-plugin-owned-lifecycle/1",
+      "runtime_digest": "290b737befccf70a32dd4bb372f382338533e13c9c2c1ffe32ca248393a452c2",
+      "server_count": 2,
+      "servers": [
+        {
+          "fixture_name": "httpbin",
+          "host": "127.0.0.1",
+          "port": 46233,
+          "protocol": "http",
+          "stopped": true
+        },
+        {
+          "fixture_name": "httpbin_secure",
+          "host": "127.0.0.1",
+          "port": 40007,
+          "protocol": "https",
+          "stopped": true
+        }
+      ],
+      "servers_stopped": true,
+      "source_revision": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5"
+    },
+    "requests_module": "/testbed/requests/__init__.py",
+    "root": "/testbed",
+    "runner": "pytest-private",
+    "runtime_digest": "290b737befccf70a32dd4bb372f382338533e13c9c2c1ffe32ca248393a452c2",
+    "setup_failed": 0,
+    "skipped": 0,
+    "source_revision": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5",
+    "teardown_failed": 0,
+    "xpassed": 0
+  },
+  "source_after": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5",
+  "source_before": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5",
+  "spec_digest": "099b18b105e4b08ccff7a78168cbd77277b79ab61b7b1e9c94b21aaaea2b3cda",
+  "verified_success": false
+}

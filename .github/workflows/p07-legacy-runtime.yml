@@ -1,0 +1,31 @@
+name: P07 pinned legacy Python runtime qualification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Qualify immutable donor with zero target execution
+        run: |
+          mkdir -p p07-legacy-worker
+          git rev-parse HEAD > p07-legacy-worker/tested-commit.txt
+          python tools/p07_legacy_runtime_probe.py --output p07-legacy-worker/probe
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-legacy-runtime-${{ github.sha }}
+          path: p07-legacy-worker/
+          retention-days: 14
+          if-no-files-found: error

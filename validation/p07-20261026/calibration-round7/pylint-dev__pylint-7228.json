@@ -1,0 +1,168 @@
+{
+  "artifact": {
+    "id": 12638405633,
+    "name": "p07-calibration-pylint-dev__pylint-7228-2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+    "size_in_bytes": 20680,
+    "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12638405633",
+    "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12638405633/zip",
+    "expired": false,
+    "created_at": "2026-10-26T08:56:03Z",
+    "expires_at": "2026-11-09T08:56:02Z",
+    "updated_at": "2026-10-26T08:56:03Z",
+    "digest": "sha256:1ba935ecd82d16cd314f078cf6e9dfd20ed19eec1a1314dd3c30020f7d8119cf",
+    "workflow_run": {
+      "id": 40294478109,
+      "repository_id": 1373027250,
+      "head_repository_id": 1373027250,
+      "head_branch": "experimental",
+      "head_sha": "b0f87b676b1e8152c5bdfad7545ab96dde3e2a99"
+    }
+  },
+  "sha256": "1ba935ecd82d16cd314f078cf6e9dfd20ed19eec1a1314dd3c30020f7d8119cf",
+  "tested_commit": "2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+  "report": {
+    "instance_id": "pylint-dev__pylint-7228",
+    "status": "completed",
+    "calibrated": true,
+    "model_calls": 0,
+    "provider_credentials": "none",
+    "harness": "3.0.15",
+    "image_tag": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228:latest",
+    "image_digest": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088",
+    "image_id": "sha256:3f4313283113069730c2705fa9af760fd48cf4d34af3495cac19f17e3c63e824",
+    "base_commit": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+    "manifest_sha256": "77f4d869139672f1d66690303097a8eb2ec97bbbb520d4870c4ba0c8f8e9c1cf",
+    "controls_sha256": "a7894c776a279735c36a7a71cf1eef8ce94c32cb5a4a642b77b1dd369e134505",
+    "negative_control_rationale": "Raise an exception that argparse does not classify as the intended argument error.",
+    "test_command": "pytest -rA",
+    "eval_script_sha256": "814376e223a5b27e792480c37091071f13e8874cbf09e0e2453c4dd2c13e2881",
+    "rows": [
+      {
+        "label": "base",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-pylint-dev__pylint-7228-e766b2f711",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088"
+        },
+        "image_checkout_head": "6758bef9b7fc7bb2e6311fe2698939c903a6df88",
+        "base_verified": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+          "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+          "tests/config/test_config.py::test_unknown_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_short_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+          "tests/config/test_config.py::test_empty_confidence": "PASSED",
+          "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+          "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+          "tests/config/test_config.py::test_short_verbose": "PASSED",
+          "tests/config/test_config.py::test_argument_separator": "PASSED",
+          "tests/config/test_config.py::test_regex_error": "FAILED",
+          "tests/config/test_config.py::test_csv_regex_error": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [
+          "tests/config/test_config.py::test_regex_error",
+          "tests/config/test_config.py::test_csv_regex_error"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.495551464000002,
+        "log_sha256": "c76a8b0fb9677aba6f94125572bdbf8537e566fb83dfdaac376086cb2e132e70"
+      },
+      {
+        "label": "gold",
+        "patch_sha256": "8b6796ff816cae34a8ba96c465e367f321f95931a64b9dff5932f0f9ab701d1b",
+        "status": "verified_success",
+        "verified_success": true,
+        "container_name": "p07-pylint-dev__pylint-7228-8bf92ffac7",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088"
+        },
+        "image_checkout_head": "6758bef9b7fc7bb2e6311fe2698939c903a6df88",
+        "base_verified": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+          "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+          "tests/config/test_config.py::test_unknown_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_short_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+          "tests/config/test_config.py::test_empty_confidence": "PASSED",
+          "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+          "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+          "tests/config/test_config.py::test_regex_error": "PASSED",
+          "tests/config/test_config.py::test_csv_regex_error": "PASSED",
+          "tests/config/test_config.py::test_short_verbose": "PASSED",
+          "tests/config/test_config.py::test_argument_separator": "PASSED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.4127693890000046,
+        "log_sha256": "4dda6ec4eec44c805804bbadf18379b9d5de3405790c196c6613b919dfdaa1ea"
+      },
+      {
+        "label": "wrong",
+        "patch_sha256": "b0dec5a1ddcc913df67e9a1b9ee859fb9213b8dcd9c6db313b8e5a5d3f5e7163",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-pylint-dev__pylint-7228-bc1cd651f5",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7228@sha256:b3a905a9b866c0155cfd5af9ba55e19f1884b69eaf5b09ab4d82c1cce8b46088"
+        },
+        "image_checkout_head": "6758bef9b7fc7bb2e6311fe2698939c903a6df88",
+        "base_verified": "d597f252915ddcaaa15ccdfcb35670152cb83587",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+          "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+          "tests/config/test_config.py::test_unknown_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_short_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+          "tests/config/test_config.py::test_empty_confidence": "PASSED",
+          "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+          "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+          "tests/config/test_config.py::test_short_verbose": "PASSED",
+          "tests/config/test_config.py::test_argument_separator": "PASSED",
+          "tests/config/test_config.py::test_regex_error": "FAILED",
+          "tests/config/test_config.py::test_csv_regex_error": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [
+          "tests/config/test_config.py::test_regex_error",
+          "tests/config/test_config.py::test_csv_regex_error"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.2171826729999964,
+        "log_sha256": "dca60804e266dee54ef38cb3cfad269664140f0f9fc91922bcbe9d964fb13a00"
+      }
+    ]
+  }
+}

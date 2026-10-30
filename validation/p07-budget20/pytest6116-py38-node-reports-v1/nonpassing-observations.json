@@ -1,0 +1,889 @@
+{
+  "schema_version": 1,
+  "scope": "observed public nonpassing reports; not an admission policy",
+  "run": 40893566658,
+  "tested_commit": "4fe8c09675020b1b7300b5c19f14ce12e4ed3c0e",
+  "archive_sha256": "af20ec3755c405f96b35991111e5d6c810fdc7163deae217c14eb5c632c02a6e",
+  "stdout_sha256": "5f1aa8f955077409a5b00a33fdd1815d2d33b756676789799c6dbf1bbbeaa46c",
+  "collected": 2617,
+  "ordinary_skips": 115,
+  "xfailed": 10,
+  "reports": [
+    {
+      "nodeid": "testing/test_capture.py::TestStdCaptureFD::test_many",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_capture.py', 893, \"Skipped: could not run 'lsof' (FileNotFoundError(2, 'No such file or directory'))\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_capture.py::test_py36_windowsconsoleio_workaround_non_standard_streams",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('testing/test_capture.py', 1312, 'Skipped: only py3.6+ on windows')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_monkeypatch.py::test_issue1338_name_resolving",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_monkeypatch.py', 398, \"Skipped: could not import 'requests': No module named 'requests'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_setup_func_with_setup_decorator",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_setup_func_not_callable",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_tmpdir.py::test_get_user",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('testing/test_tmpdir.py', 212, 'Skipped: win only')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/code/test_excinfo.py::TestTraceback_f_g_h::test_traceback_messy_recursion",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/code/test_excinfo.py', 250, \"Skipped: could not import 'decorator': No module named 'decorator'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/code/test_excinfo.py::test_excinfo_no_python_sourcecode",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/code/test_excinfo.py', 358, \"Skipped: could not import 'jinja2': No module named 'jinja2'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_repr_nd_array[5.0-approx(5.0 \\xb1 5.0e-06)]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 85, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_repr_nd_array[value1-approx([5.0 \\xb1 5.0e-06])]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 85, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_repr_nd_array[value2-approx([[5.0 \\xb1 5.0e-06]])]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 85, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_repr_nd_array[value3-approx([[5.0 \\xb1 5.0e-06, 6.0 \\xb1 6.0e-06]])]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 85, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_repr_nd_array[value4-approx([[5.0 \\xb1 5.0e-06], [6.0 \\xb1 6.0e-06]])]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 85, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_numpy_array",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 343, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_numpy_tolerance_args",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 367, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_numpy_expecting_nan",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 391, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_numpy_expecting_inf",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 409, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_numpy_array_wrong_shape",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 423, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_numpy_array_with_scalar",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 490, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/approx.py::TestApprox::test_numpy_scalar_with_array",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/approx.py', 501, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/acceptance_test.py::TestInvocationVariants::test_noclass_discovery_if_not_testcase",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   AssertionError: assert 0 == 1\n     +  where 1 = len([<TestReport 'test_noclass_discovery_if_not_testcase.py::TestHello::test_hello' when='call' outcome='failed'>])",
+      "wasxfail": "decide: feature or bug"
+    },
+    {
+      "nodeid": "testing/test_capture.py::TestPerTestCapturing::test_capture_scope_cache",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   Failed: nomatch: '*test_func():*'\n        and: '============================= test session starts =============================='\n        and: 'platform linux -- Python 3.8.20, pytest-5.2.3.dev198+ge670ff76c.d20260815, py-1.8.0, pluggy-0.13.1'\n        and: \"hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase('/tmp/p07-hypothesis/examples')\"\n        and: 'rootdir: /tmp/pytest-of-nobody/pytest-0/test_capture_scope_cache0'\n        and: 'plugins: hypothesis-4.38.1'\n        and",
+      "wasxfail": "unimplemented feature"
+    },
+    {
+      "nodeid": "testing/test_capture.py::TestFDCapture::test_simple_many_check_open_files",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_capture.py', 893, \"Skipped: could not run 'lsof' (FileNotFoundError(2, 'No such file or directory'))\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_collection.py::TestPrunetraceback::test_collect_report_postprocessing",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   Failed: nomatch: '*ERROR collecting*'\n        and: '============================= test session starts =============================='\n        and: 'platform linux -- Python 3.8.20, pytest-5.2.3.dev198+ge670ff76c.d20260815, py-1.8.0, pluggy-0.13.1'\n        and: \"hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase('/tmp/p07-hypothesis/examples')\"\n        and: 'rootdir: /tmp/pytest-of-nobody/pytest-0/test_collect_report_postprocessing0'\n        and: 'plugins: hypothesis-4.38.",
+      "wasxfail": "other mechanism for adding to reporting needed"
+    },
+    {
+      "nodeid": "testing/test_config.py::TestParseIni::test_confcutdir",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   AssertionError: assert <ExitCode.USAGE_ERROR: 4> == 0\n     +  where <ExitCode.USAGE_ERROR: 4> = <class '_pytest.pytester.Testdir.inline_run.<locals>.reprec'>.ret",
+      "wasxfail": "probably not needed"
+    },
+    {
+      "nodeid": "testing/test_conftest.py::test_conftest_badcase",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('testing/test_conftest.py', 281, 'Skipped: only relevant for case insensitive file systems')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_doctest.py::TestLiterals::test_number_non_matches['3.1416'-'3.14']",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   AssertionError: assert 0 == 1\n     +  where 1 = len([<TestReport 'test_doc.txt::test_doc.txt' when='call' outcome='passed'>])",
+      "wasxfail": ""
+    },
+    {
+      "nodeid": "testing/test_doctest.py::test_doctest_mock_objects_dont_recurse_missbehaved[mock]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_doctest.py', 1365, \"Skipped: could not import 'mock': No module named 'mock'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_junitxml.py::test_random_report_log_xdist",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_junitxml.py', 1178, \"Skipped: could not import 'xdist': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_junitxml.py::test_runs_twice_xdist",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_junitxml.py', 1228, \"Skipped: could not import 'xdist': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_mark.py::TestKeywordSelection::test_keyword_extra_dash",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   AttributeError: type object 'reprec' has no attribute 'countoutcomes'",
+      "wasxfail": ""
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nose_setup",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nose_setup_func",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nose_setup_func_failure",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nose_setup_func_failure_2",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nose_setup_partial",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_module_level_setup",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nose_style_setup_teardown",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nose_setup_ordering",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_apiwrapper_problem_issue260",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_setup_teardown_linking_issue265",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_SkipTest_during_collection",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_SkipTest_in_test",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_istest_function_decorator",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nottest_function_decorator",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_istest_class_decorator",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_nottest_class_decorator",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_nose.py::test_skip_test_with_unicode",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_nose.py', 5, \"Skipped: could not import 'nose': No module named 'nose'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pytester.py::test_make_hook_recorder",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   _pytest.outcomes.XFailed: internal reportrecorder tests need refactoring",
+      "wasxfail": "reason: internal reportrecorder tests need refactoring"
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_passfunction",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_failfunction",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_skipfunction",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_skip_in_setup_function",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_failure_in_setup_function",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_failure_in_teardown_function",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_custom_failure_repr",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_failure_in_setup_function_ignores_custom_repr",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_systemexit_does_not_bail_out",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_exit_propagates",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::TestExecutionForked::test_suicide",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_runner.py', 424, \"Skipped: could not import 'xdist.boxed': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_runner.py::test_runtest_in_module_ordering",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   Failed: nomatch: '*2 passed*'\n        and: '============================= test session starts =============================='\n        and: 'platform linux -- Python 3.8.20, pytest-5.2.3.dev198+ge670ff76c.d20260815, py-1.8.0, pluggy-0.13.1'\n        and: \"hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase('/tmp/p07-hypothesis/examples')\"\n        and: 'rootdir: /tmp/pytest-of-nobody/pytest-0/test_runtest_in_module_ordering0'\n        and: 'plugins: hypothesis-4.38.1'\n        ",
+      "wasxfail": ""
+    },
+    {
+      "nodeid": "testing/test_terminal.py::TestTerminalFunctional::test_verbose_reporting_xdist",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_terminal.py', 706, 'Skipped: xdist plugin not installed')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_terminal.py::TestProgressOutputStyle::test_xdist_normal",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_terminal.py', 1574, \"Skipped: could not import 'xdist': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_terminal.py::TestProgressOutputStyle::test_xdist_normal_count",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_terminal.py', 1580, \"Skipped: could not import 'xdist': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_terminal.py::TestProgressOutputStyle::test_xdist_verbose",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_terminal.py', 1592, \"Skipped: could not import 'xdist': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_terminal.py::TestProgressWithTeardown::test_xdist_normal",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_terminal.py', 1688, \"Skipped: could not import 'xdist': No module named 'xdist'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_testcase_runtest_not_collected",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_exceptions_with_skips",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_error",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_testcase_skip_property",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_testfunction_skip_property",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_testcase_todo_property",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_testfunction_todo_property",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_warnings.py::test_deprecation_warning_as_error[None]",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('testing/test_warnings.py', 500, 'Skipped: This test should be enabled again before pytest 6.0 is released')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_warnings.py::test_deprecation_warning_as_error[ini]",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('testing/test_warnings.py', 500, 'Skipped: This test should be enabled again before pytest 6.0 is released')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_warnings.py::test_deprecation_warning_as_error[cmdline]",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('testing/test_warnings.py', 500, 'Skipped: This test should be enabled again before pytest 6.0 is released')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/fixtures.py::TestAutouseDiscovery::test_setup_enabled_functionnode",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   assert 2 == 0\n     +  where 0 = len([])",
+      "wasxfail": "'enabled' feature not implemented"
+    },
+    {
+      "nodeid": "testing/python/fixtures.py::test_fixture_parametrization_nparray",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/fixtures.py', 4193, \"Skipped: could not import 'numpy': No module named 'numpy'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/integration.py::TestMockDecoration::test_unittest_mock_and_pypi_mock",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/integration.py', 159, \"Skipped: could not import 'mock': No module named 'mock'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/integration.py::TestMockDecoration::test_mock",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/integration.py', 210, \"Skipped: could not import 'mock': No module named 'mock'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/integration.py::TestMockDecoration::test_mock_sorting",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/integration.py', 243, \"Skipped: could not import 'mock': No module named 'mock'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/integration.py::TestMockDecoration::test_mock_double_patch_issue473",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/python/integration.py', 267, \"Skipped: could not import 'mock': No module named 'mock'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/python/metafunc.py::TestMarkersWithParametrization::test_nested_marks",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "E   assert 0 == 3\n     +  where 0 = len([])",
+      "wasxfail": "is this important to support??"
+    },
+    {
+      "nodeid": "testing/test_parseopt.py::test_argcomplete",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/testing/test_parseopt.py', 320, 'Skipped: argcomplete not available')",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_unittest_postmortem",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_unittest_skip",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_print_captured_stdout_and_stderr",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_dont_print_empty_captured_stdout_and_stderr",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_print_captured_logs[all]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_print_captured_logs[no]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_print_captured_logs[log]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_print_captured_logs_nologging",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_interaction_exception",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_interaction_on_collection_issue181",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_interaction_on_internal_error",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_interaction_capturing_simple",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_set_trace_kwargs",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_set_trace_interception",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_and_capsys",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_with_caplog_on_pdb_invocation",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_set_trace_capturing_afterwards",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_interaction_doctest",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_doctest_set_trace_quit",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_interaction_capturing_twice",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_with_injected_do_debug",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_without_capture",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_continue_with_recursive_debug[]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_continue_with_recursive_debug[-s]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_continue_with_recursive_debug[-p no:capture]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_used_outside_test",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_used_in_generate_tests",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_enter_leave_pdb_hooks_are_called[False]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_enter_leave_pdb_hooks_are_called[True]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestPDB::test_pdb_custom_cls_with_set_trace",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestDebuggingBreakpoints::test_sys_breakpoint_interception",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestDebuggingBreakpoints::test_pdb_not_altered",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestTraceOption::test_trace_sets_breakpoint",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::TestTraceOption::test_trace_with_parametrize_handles_shared_fixtureinfo",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::test_quit_with_swallowed_SystemExit",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::test_pdb_suspends_fixture_capturing[capfd]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pdb.py::test_pdb_suspends_fixture_capturing[capsys]",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_pytester.py::test_spawn_uses_tmphome",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_terminal.py::TestTerminal::test_runtest_location_shown_before_test_starts",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_terminal.py::TestTerminal::test_report_collect_after_half_a_second",
+      "outcome": "skipped",
+      "phase": "call",
+      "reason": "('/testbed/src/_pytest/pytester.py', 1249, \"Skipped: could not import 'pexpect': No module named 'pexpect'\")",
+      "wasxfail": null
+    },
+    {
+      "nodeid": "testing/test_unittest.py::TestTrialUnittest::test_trial_pdb",
+      "outcome": "skipped",
+      "phase": "setup",
+      "reason": "('/testbed/testing/test_unittest.py', 416, \"Skipped: could not import 'twisted.trial.unittest': No module named 'twisted'\")",
+      "wasxfail": null
+    }
+  ],
+  "ordinary_acceptance": false
+}

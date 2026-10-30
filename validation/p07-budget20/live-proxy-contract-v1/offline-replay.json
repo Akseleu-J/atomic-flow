@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scope": "offline reconstruction with synthetic content, original observed usage only",
+  "actual_provider_calls": 0,
+  "decoded_result": {
+    "content": "synthetic offline replay only",
+    "tokens_in": 25,
+    "tokens_out": 11,
+    "cost_usd": "0.00016",
+    "latency_ms": 45,
+    "truncated": false,
+    "cost_source": "provider",
+    "resolved_backend": "kaggle_model_proxy",
+    "resolved_model": "anthropic/claude-sonnet-5@default",
+    "attempt_id": "mq_4f294c730ed549ef90b5dd144f1e2e20"
+  },
+  "not_original_model_content": true
+}

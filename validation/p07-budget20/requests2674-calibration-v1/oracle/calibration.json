@@ -1,0 +1,242 @@
+{
+  "base_commit": "0be38a0c37c59c4b66ce908731da15b401655113",
+  "calibrated": false,
+  "candidate_scope": "not_supported",
+  "controls_sha256": "8c5126d3fdd8e8da54593ca5c25a3355e0fdfa5cfd7b1b0295bf20662e1fbae4",
+  "dependency_profile_sha256": "aa01c11fb2de42aa64e46abcd535d1a0472e21f27398ea2a926b40fcf474d69e",
+  "harness": "3.0.15",
+  "image_id": "sha256:078f2641baf42752ca0074a4602774e16163dc9a9fbdc80e5c9d2a50ceb93cef",
+  "instance_id": "psf__requests-2674",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "model_calls": 0,
+  "native_command": "pytest -rA",
+  "provider_credentials": "none",
+  "reporting_only_flags": [
+    "-v"
+  ],
+  "required_tests": 154,
+  "rows": [
+    {
+      "abi_stdout_sha256": "89a308ab5961d6e5619abbd2ea2f04bfc0c064ae09080cbc3c2821210a8a9d61",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests-function-a0c03a67a7804b35aa50",
+      "error": "same-worker function service health failed",
+      "error_type": "ValueError",
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10029792785644531,
+        "executable": "/opt/p07-python27/bin/python2.7",
+        "ignore_environment": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "89a308ab5961d6e5619abbd2ea2f04bfc0c064ae09080cbc3c2821210a8a9d61",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests-function-d335c6df0ce3490390cb",
+      "error": "same-worker function service health failed",
+      "error_type": "ValueError",
+      "label": "gold",
+      "patch_sha256": "548962b377b03b6dc0095cc0336e26b7b9c52839e7be9383a50873ede44988c0",
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10044503211975098,
+        "executable": "/opt/p07-python27/bin/python2.7",
+        "ignore_environment": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "89a308ab5961d6e5619abbd2ea2f04bfc0c064ae09080cbc3c2821210a8a9d61",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests-function-682bba9ad7e6459ebd82",
+      "error": "same-worker function service health failed",
+      "error_type": "ValueError",
+      "label": "wrong",
+      "patch_sha256": "00865cb4f421758454ee27c9e43dd9251f1ffe128f9e047dc4612f70c6586bb4",
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10030198097229004,
+        "executable": "/opt/p07-python27/bin/python2.7",
+        "ignore_environment": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    }
+  ],
+  "runtime_receipt_sha256": "a7ddaca424e862dea21bebea9defded786a040c39f210b7e18b2ad534ab85534",
+  "service_profile_sha256": "a646d64d575e5f32fb96192aa31eedbae8f7d1bf10c3f8634b43b09d2d79233d",
+  "status": "completed"
+}

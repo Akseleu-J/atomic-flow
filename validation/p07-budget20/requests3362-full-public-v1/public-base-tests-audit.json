@@ -1,0 +1,38 @@
+{
+  "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
+  "selection": "all public tests/**/test_*.py",
+  "test_files": [
+    {
+      "path": "tests/test_hooks.py",
+      "sha256": "f941ea1f54bc53e858ba867abae488659cc80b3e0e4b7b0eb3dbe97905e402b6",
+      "sha1": "46041211b3642a17ba4b5e02a8f6169b8c5e245f"
+    },
+    {
+      "path": "tests/test_lowlevel.py",
+      "sha256": "e86bc8778495f04ff21433825228daa8c1faa541e78c01256e0696f4cca239cb",
+      "sha1": "07cc5934e0d6b93a4465e6a4a5ebc46da984cd0d"
+    },
+    {
+      "path": "tests/test_requests.py",
+      "sha256": "a6fbbc48cf42501a3a3490a1b225377a60448e309fdeb3a09e09ba6ac53d8b82",
+      "sha1": "ee10714d2785873a6b09ba9c28657d6663eb99ae"
+    },
+    {
+      "path": "tests/test_structures.py",
+      "sha256": "20655d2278ee527fcbaec2e814f600b443a3d07b1db92c4e6b82c95a099c493c",
+      "sha1": "e4fe2c60fb392693034fe76b6feea27f8205785a"
+    },
+    {
+      "path": "tests/test_testserver.py",
+      "sha256": "77deb82df1364fb3981ba3251e93df2e3200d8b2dd1feb942e7f04969f580dc1",
+      "sha1": "7b88f45e1e86dedaac1efb84555abc4b0495a904"
+    },
+    {
+      "path": "tests/test_utils.py",
+      "sha256": "7ba90e06c87309effc60be6ec09e318254006cf166d1b8bb58bf77918908d03d",
+      "sha1": "aee0cdaace1dddfda08a1e0f3242c2f0b27eb957"
+    }
+  ],
+  "compared_to": "500a0fd original unmodified test snapshot",
+  "status": "exact_public_base_test_bytes_verified"
+}

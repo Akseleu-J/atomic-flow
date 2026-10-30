@@ -1,0 +1,28 @@
+{
+  "run": 40868874514,
+  "artifact": 12894558886,
+  "archive_sha256": "87bc93f10e1bdd48ff88c595740ff3fa876f9b0a8e832c77891bf829bb095a4c",
+  "tested_commit": "7ea380d9f6b0a0c305996488046b1cabdd695c81",
+  "status": "collection_observed_not_ordinary_acceptance",
+  "base_image_id": "sha256:cebf8f9441129ee8fc2853430a94e53bbc967868fd9b2a4e6389492490d50bb3",
+  "derived_image_id": "sha256:e4bac832066ddb29e01269c778e59015fb162ec1046371209be9fed8ba3cecfd",
+  "public_git_blobs_verified": 474,
+  "wheel_files_verified": 314,
+  "installed_files": 326,
+  "collected": 2617,
+  "collected_files": 61,
+  "collection_errors": [],
+  "collection_skips": [],
+  "plugin_policy": {
+    "disabled": [
+      "typeguard"
+    ],
+    "reason": "incompatible vendored host plugin"
+  },
+  "hypothesis_storage": "/tmp/p07-hypothesis",
+  "stdout_sha256": "1a59c37889d58d1c37e63cc8d18efe4db57a9686e7ff75bcdd0fb4a072d920fc",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

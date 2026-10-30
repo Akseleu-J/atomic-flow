@@ -1,0 +1,91 @@
+{
+  "status": "verified",
+  "published_head": "995e3bb5cdc07bec4b56005c937187a1408645e6",
+  "tested_merge": "c134cb411944b5b6373f511c4983af81a8d206a1",
+  "tree": "30362281f6d2d2d851c1234cb8df3356d42d521f",
+  "runs": [
+    40224092775,
+    40224092891
+  ],
+  "reports": [
+    {
+      "artifact_id": 12611000072,
+      "archive_sha256": "7e2cdeae0e9dd92f5127cd7011352b088ce35ab0a9d0947795fc9831340845f3",
+      "name": "validation-c134cb411944b5b6373f511c4983af81a8d206a1",
+      "docker": {
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+        "gpu_requested": false,
+        "model_calls": 0,
+        "container": "PASS",
+        "tests_exit": 0,
+        "extra_tests_exit": 0,
+        "compile_exit": 0,
+        "image_id": "sha256:2a5eed8cf4f7dece7d261af17e2f7c11729f1f2807449cba0b947ea85712d31a"
+      }
+    },
+    {
+      "artifact_id": 12610407293,
+      "archive_sha256": "74f1151b01e023f00132cc76dc8d5e3fed776e356639b97e13e81b29e7cd2cf7",
+      "name": "host-tests-3.12-c134cb411944b5b6373f511c4983af81a8d206a1",
+      "cases": 1320,
+      "passed": 1306,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 279,
+      "python": "3.12.15",
+      "matrix_passed_cases": {
+        "M01": 1,
+        "M02": 8,
+        "M03": 10,
+        "M04": 15,
+        "M05": 6,
+        "M06": 6,
+        "M07": 2,
+        "M08": 14,
+        "M09": 1
+      }
+    },
+    {
+      "artifact_id": 12609753453,
+      "archive_sha256": "eb544f00b852314871e33278be23e5d603b8e8e6f182cec7c9f0793a6c0c1648",
+      "name": "host-tests-3.11-c134cb411944b5b6373f511c4983af81a8d206a1",
+      "cases": 1320,
+      "passed": 1306,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 279,
+      "python": "3.11.17",
+      "matrix_passed_cases": {
+        "M01": 1,
+        "M02": 8,
+        "M03": 10,
+        "M04": 15,
+        "M05": 6,
+        "M06": 6,
+        "M07": 2,
+        "M08": 14,
+        "M09": 1
+      }
+    },
+    {
+      "artifact_id": 12610472099,
+      "archive_sha256": "822a8d494f29fdf96ccb6b269261240fc401572d224ee528d4186468a9e3c1dd",
+      "name": "external-interoperability-c134cb411944b5b6373f511c4983af81a8d206a1",
+      "composition_scenarios": [
+        "publish",
+        "cancel",
+        "source_conflict"
+      ]
+    }
+  ],
+  "local_final_new_cases": {
+    "cases": 8,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "local_history": "Historical failed fixtures and expected-red unbound-lineage repro retained; counts from different selections are not summed.",
+  "new_provider_calls": 0,
+  "limits": "Wheel matrix job status recorded separately; its 12 archives were not downloaded. No live utility, independent review, worker deployment or production acceptance claim."
+}

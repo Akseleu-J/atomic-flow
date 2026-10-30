@@ -1,0 +1,17 @@
+ATOMIC_SYMPY_BEGIN:013091ba84dd480d9d26e391990b6791
+============================= test process starts ==============================
+executable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]
+architecture:       64-bit
+cache:              no
+ground types:       python 
+numpy:              None
+random seed:        76019182
+hash randomization: on (PYTHONHASHSEED=974209010)
+
+sympy/core/tests/test_p07_native_check.py[2] 
+test_native_identity ok
+test_native_probe synthetic required ordinary obligation s                  [OK]
+
+
+============= tests finished: 1 passed, 1 skipped, in 0.00 seconds =============
+ATOMIC_SYMPY_END:013091ba84dd480d9d26e391990b6791

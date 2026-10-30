@@ -1,0 +1,20 @@
+{
+  "id": 12644028238,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY0NDAyODIzOA==",
+  "name": "p07-calibration-sphinx-doc__sphinx-7738-71c97802544472e105035c1561fb3d9259a4e582",
+  "size_in_bytes": 22365,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12644028238",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12644028238/zip",
+  "expired": false,
+  "digest": "sha256:71d97329084d454439a6850d155fa0bf16716c99fbd54132bec55f1038f329bb",
+  "created_at": "2026-10-26T10:50:50Z",
+  "updated_at": "2026-10-26T10:50:50Z",
+  "expires_at": "2026-11-09T10:50:49Z",
+  "workflow_run": {
+    "id": 40309674235,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "71c97802544472e105035c1561fb3d9259a4e582"
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "argv": [
+    "-p",
+    "no:httpbin",
+    "-p",
+    "pytest_httpbin.plugin",
+    "-p",
+    "pytest_mock",
+    "-rA"
+  ],
+  "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
+  "calibrated": false,
+  "candidate_scope": "not_supported",
+  "certificate_receipt_sha256": "99739bc49db0b0dfc095e71cfd5c9876349daa765197100e2cbae420d9bd5f6b",
+  "controls_sha256": "04d3ade1fb573d44d364cb41ffdf4ed336ff40458bae67dedf60bc8bf10e20b2",
+  "harness": "3.0.15",
+  "health_receipt_sha256": "9ec8d0e3d883b158b6cd75df56d4729732659a71e2628a8ab3c7e1065575e463",
+  "image_id": "sha256:23829e5b99005b3f1b670c0cf43d1c3f37c4de7b2cac820839c73e035aed8aa7",
+  "instance_id": "psf__requests-3362",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "model_calls": 0,
+  "native_command": "pytest -rA",
+  "provider_credentials": "none",
+  "required_tests": 76,
+  "rows": [
+    {
+      "abi_stdout_sha256": "e56aa756eecf0ce823644307e22dec2493f8e8a13789d53f03714b59fc502f5b",
+      "bootstrap_sha256": "a32fe518ea61aa93236949cab124996caec1fcea3d4ff70c63439a568b08371e",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests3362-196e0cde4a7b417ab43f",
+      "error": "target runner identity or complete collection mismatch",
+      "error_type": "ValueError",
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "post_inventory_stdout_sha256": "2feae4cdf2bd8180e7a190ca96766640a9eae0a75ffbe8b7fac93715230da3e3",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "d1107d2b8c365599b4a6b3b3e8970096824211850935d01f95242ba423b21795",
+      "stdout_sha256": "ee3d9ede15916a17ce887786d115c75028692fdafb0239ffba63adaa8e41f214",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.1002341569999885,
+        "executable": "/opt/p07-python36/bin/python3.6",
+        "isolated": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "e56aa756eecf0ce823644307e22dec2493f8e8a13789d53f03714b59fc502f5b",
+      "bootstrap_sha256": "a32fe518ea61aa93236949cab124996caec1fcea3d4ff70c63439a568b08371e",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests3362-8df86f8a445945d1902d",
+      "error": "target runner identity or complete collection mismatch",
+      "error_type": "ValueError",
+      "label": "gold",
+      "patch_sha256": "23e64f2da841d5d49874221e915a084e9bb1def2fcd6d6a24fd8e7dce71fba8d",
+      "post_inventory_stdout_sha256": "2feae4cdf2bd8180e7a190ca96766640a9eae0a75ffbe8b7fac93715230da3e3",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "9b8517379313969079d512dab9538f2db418789fb1578c98b61d663f59547b79",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10022681499998498,
+        "executable": "/opt/p07-python36/bin/python3.6",
+        "isolated": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "e56aa756eecf0ce823644307e22dec2493f8e8a13789d53f03714b59fc502f5b",
+      "bootstrap_sha256": "a32fe518ea61aa93236949cab124996caec1fcea3d4ff70c63439a568b08371e",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests3362-79eb262a5af1460284a7",
+      "error": "target runner identity or complete collection mismatch",
+      "error_type": "ValueError",
+      "label": "wrong",
+      "patch_sha256": "9d0a89d0040b05a3ca5ddda9b252553b397612b99c35b8979f5c1f00aaac4946",
+      "post_inventory_stdout_sha256": "2feae4cdf2bd8180e7a190ca96766640a9eae0a75ffbe8b7fac93715230da3e3",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "56499663c00d288b093a6ee41d28bc69cddaef849f2f116aea7e6633dee7d354",
+      "stdout_sha256": "56bf87a4a2e73d9ec90698af28b4fa10762af6e9bed11538973a7e00985393ee",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10022718799996255,
+        "executable": "/opt/p07-python36/bin/python3.6",
+        "isolated": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    }
+  ],
+  "status": "completed"
+}

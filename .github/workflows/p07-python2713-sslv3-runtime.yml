@@ -1,0 +1,31 @@
+name: P07 Python2.7.13 SSLv3 donor qualification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Qualify immutable donor with zero target execution
+        run: |
+          mkdir -p p07-python27-worker
+          git rev-parse HEAD > p07-python27-worker/tested-commit.txt
+          python tools/p07_python27_runtime_probe.py --profile python2713-sslv3 --output p07-python27-worker/probe
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-python27-runtime-${{ github.sha }}
+          path: p07-python27-worker/
+          retention-days: 14
+          if-no-files-found: error

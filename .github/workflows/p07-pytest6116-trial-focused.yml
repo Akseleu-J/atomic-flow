@@ -1,0 +1,29 @@
+name: P07 pytest6116 eight public trial nodes diagnostic
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install . packaging==25.0
+      - name: Run isolated public trial-node diagnostic
+        run: |
+          mkdir -p p07-trial-focused
+          git rev-parse HEAD > p07-trial-focused/tested-commit.txt
+          python tools/p07_pytest6116_trial_smoke.py --focused --output p07-trial-focused/diagnostic
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-pytest6116-trial-focused-${{ github.sha }}
+          path: p07-trial-focused/
+          retention-days: 14
+          if-no-files-found: error

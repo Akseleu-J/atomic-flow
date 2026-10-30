@@ -1,0 +1,26 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_edit_node_verifies_and_records_backup __________________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-27/test_edit_node_verifies_and_re0')
+
+    def test_edit_node_verifies_and_records_backup(tmp_path):
+        stack = UndoStack(tmp_path / "edits")
+        ctx, node = make_context(tmp_path, enabled=True, stack=stack)
+        result = EditNodeTool().run(EditNodeArgs(node_id=node.node_id, new_source="def sample():\n    return 2"), ctx)
+>       assert result["status"] == "applied"
+E       AssertionError: assert 'rolled_back' == 'applied'
+E         
+E         - applied
+E         + rolled_back
+
+ctx        = ToolContext(project_root=WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-27/test_edit_node_ver...her=None, invalidated_paths=set(), effects_state=<atomic_flow.agents.effects.EffectState object at 0x00000231099B7B60>)
+node       = TreeNode(node_id='sample.py::sample', path='sample.py', symbol='sample', kind='function', start_line=1, end_line=2, pa..., calls=[], callees=[], reference_ids=[], reference_names=[], fan_in=0, fan_out=0, content_hash='', size=0, mtime_ns=0)
+result     = {'status': 'rolled_back', 'reason': 'No project tree found at C:\\Users\\omirb\\AppData\\Local\\Temp\\pytest-of-unknow...-of-unknown\\pytest-27\\test_edit_node_verifies_and_re0\\.atomic_flow\\tree.json. Run `atomic tree build` first.', ...}
+stack      = <atomic_flow.agents.undo.UndoStack object at 0x000002310987A6F0>
+tmp_path   = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-27/test_edit_node_verifies_and_re0')
+
+tests\test_edit_tools.py:35: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_edit_tools.py::test_edit_node_verifies_and_records_backup
+1 failed in 1.56s

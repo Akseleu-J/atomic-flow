@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-26T10:38:08.990Z",
+  "authorization": "user explicitly authorized participant3 for fixed portion of combined <=$20 P07 campaign",
+  "identity": {
+    "active": true,
+    "username": "umirbayulgaisha"
+  },
+  "quota": {
+    "quotaBalances": [
+      {
+        "totalQuotaAllowed": 10,
+        "refillPeriod": "DAILY"
+      },
+      {
+        "quotaUsed": 3.330001749999994,
+        "totalQuotaAllowed": 100,
+        "refillPeriod": "MONTHLY",
+        "refillTime": "2026-11-13T12:42:36.132203900Z"
+      }
+    ]
+  },
+  "model_calls": 0
+}

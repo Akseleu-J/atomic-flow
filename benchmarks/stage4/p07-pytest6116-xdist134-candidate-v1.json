@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scope": "prospective publisher-wheel analysis only; no runtime acceptance",
+  "task_id": "pytest-dev__pytest-6116",
+  "python_version": "3.8.20",
+  "optional_pexpect_profile_sha256": "82a142fdd6e1ac6c5aee6b59cef0e415fa171f66be3b6f6edc8afaf935f2072d",
+  "execnet_profile_sha256": "aca7d9c419f6a307d1fc0e77a7143803f251cb85a892650375c219739ad3de73",
+  "wheels": [
+    {
+      "name": "pytest-xdist",
+      "version": "1.34.0",
+      "filename": "pytest_xdist-1.34.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/6a/fc/30821e7799bddd56989523ee003cde488c6e6053dfd29ba07db2ba934a04/pytest_xdist-1.34.0-py2.py3-none-any.whl",
+      "sha256": "ba5d10729372d65df3ac150872f9df5d2ed004a3b0d499cc0164aafedd8c7b66"
+    },
+    {
+      "name": "pytest-forked",
+      "version": "1.0.2",
+      "filename": "pytest_forked-1.0.2-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/3f/55/ef92c340e723495dbee91d749903d2b7950b49c501943296257246d7d880/pytest_forked-1.0.2-py2.py3-none-any.whl",
+      "sha256": "5fe33fbd07d7b1302c95310803a5e5726a4ff7f19d5a542b7ce57c76fed8135f"
+    }
+  ]
+}

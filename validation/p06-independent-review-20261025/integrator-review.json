@@ -1,0 +1,10 @@
+{
+  "base": "5c8de452fa4b6e3c962c84469e2369ae3c257e3b",
+  "reviewed_source_matches": true,
+  "reviewer": "p06_closure_review",
+  "integrator_peer_review": "PASS",
+  "deadline_settlement_legacy_resume_publication": "PASS",
+  "worker_claim_lease_order": "PASS",
+  "adr": "accepted design; runtime CI pending",
+  "new_provider_calls": 0
+}

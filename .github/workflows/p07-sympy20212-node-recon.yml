@@ -1,0 +1,29 @@
+name: P07 SymPy20212 bounded native node reconnaissance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  node-recon:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install .
+      - name: Capture bounded native node observations in three isolated workers
+        run: |
+          mkdir -p p07-sympy20212-node-recon
+          git rev-parse HEAD > p07-sympy20212-node-recon/tested-commit.txt
+          python tools/p07_sympy20212_node_recon.py --output p07-sympy20212-node-recon/diagnostic
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-sympy20212-node-recon-${{ github.sha }}
+          path: p07-sympy20212-node-recon/
+          retention-days: 14
+          if-no-files-found: error

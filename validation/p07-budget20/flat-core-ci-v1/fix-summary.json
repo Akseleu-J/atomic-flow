@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "source_head_sha": "24368249867437b6629235b6cc326c599e4a1c81",
+  "scope": "general Linux CI failure diagnosis; scoped Docker baseline accepted separately",
+  "runs": [
+    40742950013,
+    40742940137
+  ],
+  "cause": "Global os mocks in topology unit fixture interfered with Linux pytest FD capture; 41 setup errors in downloaded Python3.11 JUnit.",
+  "fix": "Use module-local facades for os/platform/subprocess; add real tempfile fstat capture regression.",
+  "local_tests_after_fix": 43,
+  "P07": "OPEN"
+}

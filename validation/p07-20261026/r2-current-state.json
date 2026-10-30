@@ -1,0 +1,32 @@
+{
+  "http_status": 200,
+  "data": {
+    "runs": [
+      {
+        "taskSlug": {
+          "ownerSlug": "akseley",
+          "taskSlug": "atomic-p07-sympy-source-pair-20261026-r2",
+          "versionNumber": 1
+        },
+        "modelVersionSlug": "gemini-3.1-flash-lite-preview",
+        "id": 5497322,
+        "state": "BENCHMARK_TASK_RUN_STATE_COMPLETED",
+        "startTime": "2026-10-26T08:55:24.910990Z",
+        "endTime": "2026-10-26T08:55:38.961607Z"
+      },
+      {
+        "taskSlug": {
+          "ownerSlug": "akseley",
+          "taskSlug": "atomic-p07-sympy-source-pair-20261026-r2",
+          "versionNumber": 1
+        },
+        "modelVersionSlug": "gemini-3.8-flash",
+        "id": 5496829,
+        "state": "BENCHMARK_TASK_RUN_STATE_COMPLETED",
+        "startTime": "2026-10-26T08:42:05.776719Z",
+        "endTime": "2026-10-26T08:42:05.776829Z"
+      }
+    ],
+    "totalResults": 2
+  }
+}

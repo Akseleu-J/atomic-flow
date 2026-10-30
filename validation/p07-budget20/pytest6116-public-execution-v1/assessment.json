@@ -1,0 +1,16 @@
+{
+  "run": 40869630592,
+  "artifact": 12895187735,
+  "archive_sha256": "e356518cacb792efb3e37ffd69f3db10d252c2980ddd1d9abb5df6f231e5d895",
+  "tested_commit": "fffc1b2d4b7bc4dc749a8a0d94772631967a9051",
+  "status": "not_qualified_truncated_execution",
+  "reported_native_tail": "1442 failed, 1057 passed, 103 skipped, 9 xfailed, 6 errors",
+  "tail_marker_completed": 2617,
+  "tail_marker_collected": 2617,
+  "stdout_truncated": true,
+  "observed_nested_error": "vendored typeguard plugin loaded in nested pytest sessions",
+  "source_blobs_verified": 474,
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

@@ -1,0 +1,42 @@
+{
+  "status": "launch_intent_recorded",
+  "task": "atomic-p07-sympy-source-pair-20261026-r4",
+  "task_version": 1,
+  "owner": "owner-account-2",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "framework": "9645972b5845237f43306655e862cf318cf3b7f3",
+  "source_sha256": "3777e44be20487311498a3a5336a2a56f8100a7fee418985947db79d196bfc94",
+  "calibration_sha256": "e1d4d7d22ab3b9e7a5110bd867ae64a031c46d29a5f181f143a2d6752b4662c8",
+  "arms": [
+    "baseline",
+    "atomic"
+  ],
+  "max_calls_per_arm": 30,
+  "max_input_estimate_per_arm": 600000,
+  "max_output_per_call": 4096,
+  "deadline_seconds_per_arm": 900,
+  "max_reported_cost_per_arm": 0.4,
+  "planned_pair_cost_ceiling": 0.8,
+  "today_authorized_total_usd": 6,
+  "prior_daily_spend_usd": 0.0008,
+  "model_retries": 0,
+  "scheduling_policy": "one direct SDK scheduling call; no CLI with_retry wrapper",
+  "unknown_policy": "inspect status/quota/output before any repeat",
+  "utc": "2026-10-26T09:13:47.291Z",
+  "booked_today_usd": 0.0238046,
+  "remaining_session_ceiling_usd": 5.9761954,
+  "read_paths": [
+    "sympy/core/function.py",
+    "sympy/core/kind.py",
+    "sympy/core/basic.py",
+    "sympy/core/expr.py",
+    "sympy/matrices/expressions/matexpr.py"
+  ],
+  "write_paths": [
+    "sympy/core/function.py"
+  ],
+  "change_reason": "Only host citation-span rejection is propagated into bounded repair verdict and feedback; all validation remains strict",
+  "preflight_run": 40296369775,
+  "preflight_status": "source_workspace_ready; 0 calls; five source hashes verified",
+  "prior_attempt": "R3 completed 7 calls/$0.011585775; no candidate; host span rejection was absent from repair feedback"
+}

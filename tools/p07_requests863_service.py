@@ -1,0 +1,126 @@
+"""Host-owned real WSGI transport for the fixed historical Requests863 suite.
+
+Only source generation: execution requires separate image and isolation admission.
+"""
+from __future__ import annotations
+
+import json
+
+from p07_requests863_wire_contracts import SOURCE as WIRE_CONTRACTS
+
+CHILD = r'''from __future__ import print_function
+import os,ssl,sys
+import gunicorn,httpbin,pkg_resources
+from gunicorn.app.base import BaseApplication
+from gunicorn.workers.gthread import ThreadWorker
+from gunicorn import http
+from email.utils import formatdate
+config=CONFIG
+prefix='/opt/p07-python27/lib/python2.7/site-packages/'
+for module in (gunicorn,httpbin):
+    if not os.path.realpath(module.__file__).startswith(prefix):raise RuntimeError('foreign WSGI module')
+if gunicorn.__version__!='19.9.0' or pkg_resources.get_distribution('httpbin').version!='0.5.0':
+    raise RuntimeError('WSGI versions differ')
+if any(str(path).startswith('/testbed') for path in sys.path):raise RuntimeError('target path exposed to fixture')
+WIRE_CONTRACTS
+class FixtureThreadWorker(ThreadWorker):
+    def handle_request(self,request,connection):
+        host=dict(request.headers).get('HOST','').split(':',1)[0]
+        if request.method=='HEAD' and request.path=='/NFrx0zLG' and host=='t.co':
+            connection.sock.sendall(b'HTTP/1.1 302 Found\r\nDate: '+formatdate(usegmt=True).encode('ascii')+b'\r\nLocation: http://httpbin.org/get\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n')
+            return False
+        return ThreadWorker.handle_request(self,request,connection)
+    def enqueue_req(self,connection):
+        if connection.parser is None and self.cfg.is_ssl:
+            connection.sock.setblocking(True)
+            context=ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            context.options &= ~ssl.OP_NO_SSLv3
+            context.load_cert_chain(self.cfg.certfile,self.cfg.keyfile)
+            context.set_ciphers(self.cfg.ciphers)
+            connection.sock=context.wrap_socket(connection.sock,server_side=True,
+                do_handshake_on_connect=self.cfg.do_handshake_on_connect,
+                suppress_ragged_eofs=self.cfg.suppress_ragged_eofs)
+            connection.parser=http.RequestParser(self.cfg,connection.sock)
+        return ThreadWorker.enqueue_req(self,connection)
+class FixedApplication(BaseApplication):
+    def load_config(self):
+        for key,value in config.items():self.cfg.set(key,value)
+        self.cfg.set('worker_class','__main__.FixtureThreadWorker')
+    def load(self):return historical_application
+FixedApplication().run()
+'''.replace('WIRE_CONTRACTS', WIRE_CONTRACTS)
+
+START = r'''import os,signal,socket,subprocess,time
+function_processes=[]
+def stop_function_servers(require_complete=True):
+    failures=[]
+    for process in function_processes:
+        try:os.kill(process.pid,signal.SIGTERM)
+        except OSError:pass
+    deadline=time.time()+5
+    while any(process.poll() is None for process in function_processes) and time.time()<deadline:time.sleep(0.05)
+    for process in function_processes:
+        if process.poll() is None:
+            try:os.killpg(process.pid,signal.SIGKILL)
+            except OSError:pass
+            failures.append('forced_kill')
+        process.wait()
+        group_deadline=time.time()+2
+        while True:
+            try:os.killpg(process.pid,0)
+            except OSError as error:
+                if error.errno!=3:failures.append('group_state_unknown')
+                break
+            if time.time()>=group_deadline:
+                members=[]
+                for entry in os.listdir('/proc'):
+                    if not entry.isdigit():continue
+                    try:
+                        fields=open('/proc/'+entry+'/stat').read().rsplit(')',1)[1].split()
+                        if int(fields[2])==process.pid:
+                            members.append({'pid':int(entry),'state':fields[0],'ppid':int(fields[1])})
+                    except (IOError,ValueError,IndexError):pass
+                failures.append({'group_still_present':members})
+                break
+            time.sleep(0.05)
+    if failures or (require_complete and len(function_processes)!=2):raise RuntimeError('WSGI process cleanup unconfirmed: '+repr(failures))
+try:
+    for port in (80,443):
+        config={'bind':'127.0.0.1:'+str(port),'workers':1,'worker_class':'gthread','threads':2,
+                'keepalive':1,'timeout':10,'graceful_timeout':1,'accesslog':None,'loglevel':'warning',
+                'worker_tmp_dir':'/tmp','chdir':'/tmp'}
+        if port==443:
+            config.update(certfile='/opt/p07-function-fixture/cert.pem',keyfile='/opt/p07-function-fixture/key.pem',
+                          ssl_version=ssl.PROTOCOL_SSLv23,ciphers='AES128-SHA:AES256-SHA:ECDHE-RSA-AES128-GCM-SHA256')
+        child=CHILD_TEMPLATE.replace('CONFIG',repr(config))
+        process=subprocess.Popen(['/opt/p07-runtime/python27','-c',child],cwd='/tmp',preexec_fn=os.setsid,close_fds=True)
+        function_processes.append(process)
+        for attempt in range(60):
+            if process.poll() is not None:raise RuntimeError('WSGI master exited during startup')
+            try:
+                connection=socket.create_connection(('127.0.0.1',port),0.1)
+                connection.close()
+                break
+            except socket.error:time.sleep(0.05)
+        else:raise RuntimeError('WSGI listener startup timed out')
+except:
+    stop_function_servers(require_complete=False)
+    raise
+os.environ['HTTPBIN_URL']='http://httpbin.org/'
+os.environ['REQUESTS_CA_BUNDLE']='/opt/p07-function-fixture/cacert.pem'
+os.environ['CURL_CA_BUNDLE']='/opt/p07-function-fixture/cacert.pem'
+'''
+
+STOP = "stop_function_servers()\nprint('P07_FUNCTION_SERVERS_STOPPED=1')\nsys.stdout.flush()\n"
+
+
+def server_source(certificate_files):
+    expected = {"/opt/p07-function-fixture/" + name for name in ("cacert.pem", "cert.pem", "key.pem")}
+    if set(certificate_files) != expected:
+        raise ValueError("exact fixture certificate inventory required")
+    check = r'''import hashlib,json,os,ssl,sys
+for absolute,expected in json.loads(EXPECTED).items():
+    if os.path.islink(absolute) or os.path.realpath(absolute)!=absolute or hashlib.sha256(open(absolute,'rb').read()).hexdigest()!=expected:
+        raise RuntimeError('fixed fixture certificate bytes differ')
+'''.replace("EXPECTED", repr(json.dumps(certificate_files, sort_keys=True)))
+    return check + START.replace("CHILD_TEMPLATE", repr(CHILD))

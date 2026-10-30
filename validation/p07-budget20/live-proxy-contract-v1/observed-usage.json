@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "source": "host observer of the single original HTTP response; not a replay",
+  "call_id": "mq_4f294c730ed549ef90b5dd144f1e2e20",
+  "request_sha256": "72fa2615db3eb27352e5f11ac97e5f33f5d0c54863339959ded29be5923c2e2f",
+  "http_status": 200,
+  "model": "anthropic/claude-sonnet-5@default",
+  "usage": {
+    "completion_tokens": 11,
+    "cost": {
+      "input_tokens_cost_nanodollars": 50000,
+      "output_tokens_cost_nanodollars": 110000
+    },
+    "prompt_tokens": 25,
+    "total_backend_latency_ms": 527,
+    "total_tokens": 36
+  },
+  "source_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+  "body_retained": false
+}

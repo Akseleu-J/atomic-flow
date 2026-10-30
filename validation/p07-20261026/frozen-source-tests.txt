@@ -1,0 +1,15 @@
+...........F.......                                                      [100%]
+================================== FAILURES ===================================
+______________ test_raw_response_survives_consumer_json_failure _______________
+tests\test_p07_source_pilot.py:23: in test_raw_response_survives_consumer_json_failure
+    class Transport:
+tests\test_p07_source_pilot.py:25: in Transport
+    config = BackendConfig(type="openai_compatible", model="frozen", max_retries=0, max_output_tokens=16)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 1 validation error for BackendConfig
+E   type
+E     Input should be 'openai-compatible', 'anthropic' or 'kaggle' [type=literal_error, input_value='openai_compatible', input_type=str]
+E       For further information visit https://errors.pydantic.dev/2.14/v/literal_error
+=========================== short test summary info ===========================
+FAILED tests/test_p07_source_pilot.py::test_raw_response_survives_consumer_json_failure
+1 failed, 18 passed in 2.47s

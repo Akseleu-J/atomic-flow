@@ -1,0 +1,8 @@
+{
+  "command": [
+    "docker",
+    "cp",
+    "p07-private-source-3708a594c07641a9b21bc74a:/testbed/."
+  ],
+  "exit_code": 0
+}

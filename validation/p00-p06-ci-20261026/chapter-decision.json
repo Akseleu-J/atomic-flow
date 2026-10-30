@@ -1,0 +1,28 @@
+{
+  "status": "accepted",
+  "scope": "P00-P06 original numbered host contracts",
+  "source": {
+    "head": "a5e5a31764231683e0741cfe7c5488d5dd408251",
+    "merge": "ae892d61bafb5e2bd8a89c18034d6f59872baa10",
+    "tree": "6f6e64123d7a6db191a1899fdcd8d69538d5961c"
+  },
+  "criteria": 44,
+  "chapters": [
+    "P00",
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P06"
+  ],
+  "uncovered_skips": [],
+  "review_reports": [
+    "docs/P06_INDEPENDENT_REVIEW_2026-10-25.md",
+    "docs/P00_P06_INTEGRATION_REVIEW_2026-10-26.md",
+    "docs/P00_P06_ACCEPTANCE_AUDIT_2026-10-26.md"
+  ],
+  "storage_decision": "docs/ADR_0002_GRAPH_STORAGE.md",
+  "remaining": "P07+ and all four production gates",
+  "provider_calls": 0
+}

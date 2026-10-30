@@ -1,0 +1,13 @@
+...............................F                                         [100%]
+================================== FAILURES ===================================
+_ test_hierarchical_multifile_failure_repair_publish_without_new_plan_review __
+tests\test_p06_public_repair.py:87: in test_hierarchical_multifile_failure_repair_publish_without_new_plan_review
+    assert sorted(actual["edges"], key=lambda e: e["id"]) == sorted(expected["edges"], key=lambda e: e["id"])
+E   AssertionError: assert [{'dst': 'sym...racted', ...}] == [{'id': 'file...t', ...}, ...]
+E     
+E     At index 2 diff: {'dst': 'sym:tests/test_left.py::test_left', 'fact_status': {'extractor': 'fresh'}, 'facts': {'extractor': 'python-ast/2'}, 'facts_class': 'extracted', 'id': 'file:tests/test_left.py-contains->sym:tests/test_left.py::test_left', 'kind': 'contains', 'src': 'file:tests/test_left.py', 'status': 'active'} != {'id': 'file:tests/test_left.py-calls->sym:left.py::left', 'kind': 'calls', 'src': 'file:tests/test_left.py', 'dst': 'sym:left.py::left', 'status': 'active', 'facts': {'resolver': 'name-resolver/2'}, 'fact_status': {'resolver': 'fresh'}, 'facts_class': ...
+E     
+E     ...Full output truncated (3 lines hidden), use '-vv' to show
+=========================== short test summary info ===========================
+FAILED tests/test_p06_public_repair.py::test_hierarchical_multifile_failure_repair_publish_without_new_plan_review
+1 failed, 31 passed in 78.98s (0:01:18)

@@ -1,0 +1,63 @@
+{
+  "check_passed": true,
+  "result": {
+    "returncode": 0,
+    "stderr": "",
+    "stderr_truncated": false,
+    "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.9.20, pytest-5.2.3.dev198+ge670ff76c.d20260815, py-1.11.0, pluggy-0.13.1\nrootdir: /testbed, inifile: tox.ini\ncollected 2 items\n\ntesting/test_p07_self_check.py ..                                        [100%]\n\n==================================== PASSES ====================================\n=========================== short test summary info ============================\nPASSED testing/test_p07_self_check.py::test_identity\nPASSED testing/test_p07_self_check.py::test_probe\n============================== 2 passed in 0.04s ===============================\n\nATOMIC_CHECK_SPEC_RECEIPT:{\"_pytest_module\": \"/testbed/src/_pytest/__init__.py\", \"argv\": [\"-rA\", \"testing/test_p07_self_check.py\"], \"call_failed\": 0, \"collected\": 2, \"collection_complete\": true, \"collection_errors\": 0, \"completed\": 2, \"exit_code\": 0, \"failed\": 0, \"files\": [\"testing/test_p07_self_check.py\"], \"finished\": true, \"interpreter\": \"/opt/miniconda3/envs/testbed/bin/python\", \"interpreter_resolved\": \"/opt/miniconda3/envs/testbed/bin/python3.9\", \"nonce\": \"5cc8eade2edd4098b9c0075b16b13487\", \"pytest_module\": \"/testbed/src/pytest.py\", \"pytest_self_identity\": {\"pytest_entrypoint\": \"src/pytest.py\", \"pytest_version\": \"5.2.3.dev198+ge670ff76c.d20260815\", \"python_version\": [3, 9, 20], \"source_root\": \"src\", \"source_sha256\": {\"src/_pytest/__init__.py\": \"e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4\", \"src/pytest.py\": \"8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba\"}, \"traceback\": \"auto\"}, \"pytest_version\": \"5.2.3.dev198+ge670ff76c.d20260815\", \"python_version\": [3, 9, 20], \"root\": \"/testbed\", \"runner\": \"pytest-self\", \"setup_failed\": 0, \"skipped\": 0, \"teardown_failed\": 0}\n",
+    "stdout_truncated": false,
+    "timed_out": false
+  },
+  "runner_receipt": {
+    "_pytest_module": "/testbed/src/_pytest/__init__.py",
+    "argv": [
+      "-rA",
+      "testing/test_p07_self_check.py"
+    ],
+    "call_failed": 0,
+    "collected": 2,
+    "collection_complete": true,
+    "collection_errors": 0,
+    "completed": 2,
+    "exit_code": 0,
+    "failed": 0,
+    "files": [
+      "testing/test_p07_self_check.py"
+    ],
+    "finished": true,
+    "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+    "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+    "nonce": "5cc8eade2edd4098b9c0075b16b13487",
+    "pytest_module": "/testbed/src/pytest.py",
+    "pytest_self_identity": {
+      "pytest_entrypoint": "src/pytest.py",
+      "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+      "python_version": [
+        3,
+        9,
+        20
+      ],
+      "source_root": "src",
+      "source_sha256": {
+        "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+        "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+      },
+      "traceback": "auto"
+    },
+    "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "root": "/testbed",
+    "runner": "pytest-self",
+    "setup_failed": 0,
+    "skipped": 0,
+    "teardown_failed": 0
+  },
+  "source_after": "b279bb3cbf7504ba23b135a5125d4349280e783f1780fb18c01358a9d57de272",
+  "source_before": "b279bb3cbf7504ba23b135a5125d4349280e783f1780fb18c01358a9d57de272",
+  "spec_digest": "4faa1ab2ccf4364f465ee3f271f5590fa47a196edf88884fc7dd89f7c14f38fa",
+  "verified_success": false
+}

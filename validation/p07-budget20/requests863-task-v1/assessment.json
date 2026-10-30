@@ -1,0 +1,41 @@
+{
+  "status": "qualified_scripted_public_ordinary",
+  "run": 40841965525,
+  "tested_commit": "3feda8c33b058768f4f1c2348d8b233fdcaf8d37",
+  "artifact": 12883775725,
+  "archive_sha256": "c7a22aa2ddc8adad821a5c7aa2757b6e2d72493e272df47475be0eeeede58e5c",
+  "raw_files_verified": 982,
+  "resource_receipts_verified": 8,
+  "public_base_commit": "a0df2cbb10419037d11d04352b3175405ab52941",
+  "public_base_archive_sha256": "f800578b6f89f069a51921f064b5079d5f0b5fbb396d654bb65d14deb9a6be85",
+  "public_git_blobs_verified": 167,
+  "excluded_public_files": [
+    ".env",
+    ".travis.yml",
+    "requests/cacert.pem (separate execution resource)"
+  ],
+  "synthetic_additions": [
+    "requests/p07_function_probe.py",
+    "test_p07_function_fixture.py"
+  ],
+  "changed_paths": [
+    "requests/p07_function_probe.py"
+  ],
+  "first_check": {
+    "passed": 106,
+    "failed": 1
+  },
+  "following_four_checks": {
+    "passed": 107,
+    "failed": 0,
+    "skipped": 0
+  },
+  "replans": 1,
+  "final_receipt_sha256": "3956d810c4c4cb756ffc0cfb58049b0f55c2e342dc9e85239ca99a9aee979379",
+  "graph_sync_complete": true,
+  "zero_test_informal": "tests/informal/test_leaked_connections.py",
+  "model_calls": 0,
+  "provider_calls": 0,
+  "hidden_oracle": "not_run",
+  "verified_success": false
+}

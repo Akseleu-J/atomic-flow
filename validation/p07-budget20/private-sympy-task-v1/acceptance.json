@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "accepted_scripted_full_private_sympy_taskrunner",
+  "run_id": 40680449793,
+  "tested_commit": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+  "artifact_id": 12812244003,
+  "artifact_sha256": "f8343167a9ab4506ccf6113f7f308b41b17b75277e44bb73e63628837291522c",
+  "raw_artifact_hashes_verified": 50,
+  "admitted_source_files": 1505,
+  "python_version": "3.6.15",
+  "replan_count": 1,
+  "changed_source_paths": [
+    "sympy/p07_probe.py"
+  ],
+  "completed_negative_observations": 1,
+  "completed_positive_observations": 1,
+  "final_target_syntax_count": 1,
+  "graph_sync": {
+    "coverage_complete": false,
+    "coverage_omissions": [
+      {
+        "digest": "843a524e21ba0ceff1a4e4756108f37ad61d0e6bb42c319973dfb913bfd33576",
+        "extractor": "graph-placeholder/1",
+        "path": "sympy/integrals/rubi/rules/sine.py",
+        "policy": "project-file-projection/1",
+        "reason": "source_exceeds_extraction_byte_limit",
+        "size_bytes": 1121413
+      }
+    ],
+    "created": true,
+    "deltas": 0,
+    "failed": false,
+    "fallback": false,
+    "relocation": {}
+  },
+  "cleanup_confirmed": true,
+  "provider_calls": 0,
+  "model_generation": false,
+  "historical_issue_quality": false,
+  "raw_in_loop_receipts_retained": false,
+  "P07": "OPEN"
+}

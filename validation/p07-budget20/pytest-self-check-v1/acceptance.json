@@ -1,0 +1,11 @@
+{
+  "status": "accepted_synthetic_pytest_self_executor",
+  "tested_commit": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+  "run_id": 40668978237,
+  "artifact_id": 12807940939,
+  "zip_sha256": "6e88a65ee4b715613e6fef26c6e06196f0ed905da9bc65ec694dfeef021245b0",
+  "raw_streams_verified": 6,
+  "provider_calls": 0,
+  "taskrunner_qualified": false,
+  "whole30_qualified": false
+}

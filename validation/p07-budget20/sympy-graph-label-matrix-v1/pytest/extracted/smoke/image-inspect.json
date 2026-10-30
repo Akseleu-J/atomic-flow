@@ -1,0 +1,68 @@
+{
+  "Architecture": "amd64",
+  "Author": "",
+  "Comment": "buildkit.dockerfile.v0",
+  "Config": {
+    "AttachStderr": false,
+    "AttachStdin": false,
+    "AttachStdout": false,
+    "Cmd": [
+      "/bin/bash"
+    ],
+    "Domainname": "",
+    "Entrypoint": null,
+    "Env": [
+      "PATH=/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "TZ=Etc/UTC"
+    ],
+    "Hostname": "",
+    "Image": "",
+    "Labels": {
+      "org.opencontainers.image.version": "22.04"
+    },
+    "OnBuild": null,
+    "OpenStdin": false,
+    "StdinOnce": false,
+    "Tty": false,
+    "User": "",
+    "Volumes": null,
+    "WorkingDir": "/testbed/"
+  },
+  "Created": "2026-08-15T08:12:55.009893131Z",
+  "DockerVersion": "",
+  "GraphDriver": {
+    "Data": {
+      "LowerDir": "/var/lib/docker/overlay2/489c71398b887f5a0b3b6377a280c630544f32bcb9713ac29999efcb262ad571/diff:/var/lib/docker/overlay2/8595ce5bcbdbe3fb2103a6851167b186372fdce748ce3ec2f0648108df39520b/diff:/var/lib/docker/overlay2/b10c09e41b4972b6d83332c05b2f2dc275f673cb088650779cb47bd41069a684/diff:/var/lib/docker/overlay2/c5496ab8723ac02979ac1f7a276d1925c9e82c5cd9b649aa3ba6f04a7f3ba815/diff:/var/lib/docker/overlay2/0a746b61867deef2fdf15933104e8e4ae6bdb7148be80bc3feafaf18b1f4d7f0/diff:/var/lib/docker/overlay2/cb061203d69f3d24d021b387a818c19e14fefd72c206996b45f2525d41598420/diff:/var/lib/docker/overlay2/66bd7add2e8f8023556e2c46ced49bf7fafad544154e6ea4f041ffdb3675362d/diff:/var/lib/docker/overlay2/e30855cc831e9ec9b28d7609f6db505bde8b80bac1c214e8e46bacf24b8db59d/diff:/var/lib/docker/overlay2/bd11717b44af1a4d00a468daeb60ae0e74d86146bc35fdaf1cb4d2125ec0cbb9/diff",
+      "MergedDir": "/var/lib/docker/overlay2/e31aaec56ca4682dec56fdd514cb705f0fc8acb1ea362e2b248b3d8da3603824/merged",
+      "UpperDir": "/var/lib/docker/overlay2/e31aaec56ca4682dec56fdd514cb705f0fc8acb1ea362e2b248b3d8da3603824/diff",
+      "WorkDir": "/var/lib/docker/overlay2/e31aaec56ca4682dec56fdd514cb705f0fc8acb1ea362e2b248b3d8da3603824/work"
+    },
+    "Name": "overlay2"
+  },
+  "Id": "sha256:95d456bfbccf33f8cfa63d410bd7df2e73da60fb286d4c411d9c51fb73ffc27f",
+  "Metadata": {
+    "LastTagTime": "0001-01-01T00:00:00Z"
+  },
+  "Os": "linux",
+  "Parent": "",
+  "RepoDigests": [
+    "swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626"
+  ],
+  "RepoTags": [],
+  "RootFS": {
+    "Layers": [
+      "sha256:beb59027b96ddbf30ac9c80b527668fe7011f4f553fe83f5e59199e9a84fb5ca",
+      "sha256:8b070dae4fd6562cc7272d3392d3e5d0eb54aebbabe7992ea47407c02a7e4ab5",
+      "sha256:e41dda3ddff433b42bc5c7db367e9a89b90e42702b2204ac3748eff0661fed5d",
+      "sha256:77dfb20914dd629938c812a6dbd69d5523e3eca3798e570ceee0b09b0e9f8eeb",
+      "sha256:73f1203e53826763f5480b23ca857212005fd21f7fbfb1df5f40641c278d0802",
+      "sha256:9f91f535caf3186b2a7f093b2f8bc4e3a6605e119e563b7e49fb81415185125d",
+      "sha256:288428de913fa66f7fe9f3742bffad063ff3a3d3e45a45ce516e5db345afbba8",
+      "sha256:32828b44ca9304d306c133fd436dd87c8ab76c1126c455d9ecfbd918ece4bf8a",
+      "sha256:d226183530599cd28ae38c2bd500f9c2f4b97d0c2a6bad2bc147a39c3a4e3a8c",
+      "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+    ],
+    "Type": "layers"
+  },
+  "Size": 2773597787
+}

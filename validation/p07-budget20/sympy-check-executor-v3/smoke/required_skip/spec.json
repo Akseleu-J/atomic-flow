@@ -1,0 +1,54 @@
+{
+  "argv": [
+    "/opt/miniconda3/envs/testbed/bin/python",
+    "bin/test",
+    "-C",
+    "--verbose",
+    "sympy/core/tests/test_p07_native_check.py"
+  ],
+  "base_commit": "a106f4782a9dbe7f8fd16030f15401d977e03ae9",
+  "controls": {
+    "automatic_pull": false,
+    "cap_drop": [
+      "ALL"
+    ],
+    "network": "none",
+    "no_new_privileges": true,
+    "non_root": true,
+    "provider_environment": false,
+    "root_read_only": true
+  },
+  "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626",
+  "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+  "kind": "host_target_test_spec",
+  "resources": {
+    "cpus": 2,
+    "memory_bytes": 1073741824,
+    "output_bytes_per_stream": 16384,
+    "pids": 128,
+    "tmpfs_bytes": 134217728
+  },
+  "runner": "sympy-native",
+  "schema_version": 1,
+  "source_revision": "50ddcc15229f709381002ddfa3f4e295cef75b83657edf95221d178477f2bb69",
+  "sympy_identity": {
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "source_sha256": {
+      "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+      "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5",
+      "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"
+    },
+    "sympy_version": "1.7.dev"
+  },
+  "target_root": "/testbed",
+  "task_commit": "32d50ef04e5cf6e52578ba847787133b1b4f9551",
+  "task_id": "p07_native_synthetic_required_skip",
+  "test_paths": [
+    "sympy/core/tests/test_p07_native_check.py"
+  ],
+  "timeout_seconds": 180
+}

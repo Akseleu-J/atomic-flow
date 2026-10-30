@@ -1,0 +1,40 @@
+{
+  "status": "accepted_scoped_requests3362_regression",
+  "run_id": 40822239563,
+  "tested_commit": "06d1948ac3c239eea8f133dd8024aca228e44f26",
+  "artifact": {
+    "id": 12875535717,
+    "bytes": 733001,
+    "sha256": "ef6407799450770d254762114bf24619ce09b5998d57a6e049847e6817c5ee86"
+  },
+  "verified_raw_hashes": 810,
+  "checks": [
+    {
+      "required_passed": 349,
+      "required_failed": 1,
+      "exit": 1
+    },
+    {
+      "required_passed": 350,
+      "required_failed": 0,
+      "exit": 0
+    },
+    {
+      "required_passed": 350,
+      "required_failed": 0,
+      "exit": 0
+    },
+    {
+      "required_passed": 350,
+      "required_failed": 0,
+      "exit": 0
+    },
+    {
+      "required_passed": 350,
+      "required_failed": 0,
+      "exit": 0
+    }
+  ],
+  "source_and_publication_unchanged_except_probe": true,
+  "provider_calls": 0
+}

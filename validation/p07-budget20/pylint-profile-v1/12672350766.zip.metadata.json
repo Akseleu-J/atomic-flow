@@ -1,0 +1,20 @@
+{
+  "id": 12672350766,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY3MjM1MDc2Ng==",
+  "name": "p07-pylint-environment-pylint-dev__pylint-7114-2c938a0b4e8db8636c8f9f26fc226e6fb3b46ba3",
+  "size_in_bytes": 40721,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12672350766",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12672350766/zip",
+  "expired": false,
+  "digest": "sha256:a636d04d1ba2f250cf0284993f19a8a83e816f7d57165002e09a287cb7245d22",
+  "created_at": "2026-10-26T17:31:27Z",
+  "updated_at": "2026-10-26T17:31:27Z",
+  "expires_at": "2026-11-09T17:31:26Z",
+  "workflow_run": {
+    "id": 40369182480,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "2c938a0b4e8db8636c8f9f26fc226e6fb3b46ba3"
+  }
+}

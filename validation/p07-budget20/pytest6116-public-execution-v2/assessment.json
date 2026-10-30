@@ -1,0 +1,16 @@
+{
+  "run": 40870725655,
+  "artifact": 12896565434,
+  "archive_sha256": "f1cb697e5237e7005c5f42711c01f00fbf42e92b2a8cbbe099a040e391d05e80",
+  "tested_commit": "9d959ddaf5647006fe5bb46be934b45b5602e653",
+  "status": "not_qualified_truncated_execution",
+  "reported_native_tail": "1439 failed, 1060 passed, 103 skipped, 9 xfailed, 6 errors",
+  "tail_marker_completed": 2617,
+  "tail_marker_collected": 2617,
+  "stdout_truncated": true,
+  "observed_nested_error": "vendored typeguard plugin still loaded in nested pytest sessions despite PYTEST_ADDOPTS",
+  "source_blobs_verified": 474,
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

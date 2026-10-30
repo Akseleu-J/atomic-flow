@@ -1,0 +1,30 @@
+{
+  "cases": [],
+  "cleanup_confirmed": false,
+  "current_case": "base_fail",
+  "error": "Exactly one complete private pytest observation required",
+  "error_type": "ValueError",
+  "fixture_digest": "64bc15e4b6e62a8393f291d41d725689ccdd367b820a3929e6a4b0cfb2f4ce42",
+  "full_source_file_count": 280,
+  "full_source_revision": "7a55a0e62452d3fe3acdcf45b29a23c4b8729c0a7f28f541f2018f16bd41b949",
+  "generic_dispatch_enabled": false,
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "httpbin_version": "0.5.0",
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "private_pytest_digest": "17da362bbea5afd3eade8fc40df6ed329135046879dc84b47e18b3668c5104c4",
+  "provider_calls": 0,
+  "runtime_digest": "fb505523f8dbc13045a0a3283836eaf001c6bcc7268fb75e5c5df47ffbc968a7",
+  "scope": "synthetic full-source Requests3362 private CheckSpec fixture boundary",
+  "source_container_cleanup": {
+    "confirmed": true,
+    "container_id": "8e3feb9b138db010a813d31bef8de695ccb9c23b0545e28f08794cb1e7b1ee61",
+    "remove_exit": 0
+  },
+  "status": "not_qualified",
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "7bd3ac29e3caaf0e4f1a0fc12497a7f8cbd00a21",
+  "verified_success": false
+}

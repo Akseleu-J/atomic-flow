@@ -1,0 +1,64 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests\test_chapter_acceptance_verifier.py:2:1
+  |
+1 |   """Offline evidence auditing refuses unrelated green runs and vacuous coverage."""
+2 | / import copy
+3 | | import importlib.util
+4 | | import io
+5 | | import json
+6 | | import zipfile
+7 | | from pathlib import Path
+8 | |
+9 | | import pytest
+  | |_____________^
+help: Organize imports
+   |
+10 |
+   -
+11 | spec = importlib.util.spec_from_file_location(
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests\test_p03_semantic_topology.py:2:1
+  |
+1 |   """Semantic reuse must cover dependencies newly admitted since enrichment."""
+2 | / import pytest
+3 | |
+4 | | from atomic_flow.graph.enrichment import SemanticBudget
+5 | | from atomic_flow.graph.operations import graph_operation
+6 | | from atomic_flow.graph.schema import GraphContractError
+7 | | from atomic_flow.sdk import understand_project
+  | |______________________________________________^
+help: Organize imports
+  |
+8 |
+  -
+9 | IDENTITY = dict(extractor="ast", prompt="frozen", model="scripted", config="fixed", language="en")
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tools\verify_chapter_acceptance.py:6:1
+   |
+ 4 |   host testcase must have an actual passing outcome on an applicable CI executor.
+ 5 |   """
+ 6 | / from __future__ import annotations
+ 7 | |
+ 8 | | import argparse
+ 9 | | import hashlib
+10 | | import io
+11 | | import json
+12 | | import re
+13 | | import subprocess
+14 | | import xml.etree.ElementTree as ET
+15 | | import zipfile
+16 | | from pathlib import Path
+   | |________________________^
+help: Organize imports
+   |
+17 |
+   -
+18 | WORKFLOWS = {
+   |
+
+Found 3 errors.
+[*] 3 fixable with `--fix`.

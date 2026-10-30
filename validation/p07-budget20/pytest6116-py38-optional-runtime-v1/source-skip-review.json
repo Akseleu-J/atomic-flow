@@ -1,0 +1,58 @@
+{
+  "observation_sha256": "bfe13b99f74a19852dc29c733392955fbff24131091116df285f4c1afb2c7097",
+  "ordinary_acceptance": false,
+  "provider_calls": 0,
+  "rows": [
+    {
+      "nodeid": "testing/test_capture.py::test_py36_windowsconsoleio_workaround_non_standard_streams",
+      "observed_reason": "('testing/test_capture.py', 1312, 'Skipped: only py3.6+ on windows')",
+      "phase": "setup",
+      "public_file": "testing/test_capture.py",
+      "source_git_blob": "85b0b05aeeb1f0dc33f0ab2b19415d31062fb444",
+      "source_predicate": "not sys.platform.startswith(\"win\") and sys.version_info[:2] >= (3, 6)"
+    },
+    {
+      "nodeid": "testing/test_tmpdir.py::test_get_user",
+      "observed_reason": "('testing/test_tmpdir.py', 212, 'Skipped: win only')",
+      "phase": "setup",
+      "public_file": "testing/test_tmpdir.py",
+      "source_git_blob": "0ebed22ac45c7159647b6e12e7f4aef2a5f073d8",
+      "source_predicate": "not sys.platform.startswith(\"win\")"
+    },
+    {
+      "nodeid": "testing/test_conftest.py::test_conftest_badcase",
+      "observed_reason": "('testing/test_conftest.py', 281, 'Skipped: only relevant for case insensitive file systems')",
+      "phase": "setup",
+      "public_file": "testing/test_conftest.py",
+      "source_git_blob": "0374db0b351e2c36b335c6577ae16439267f6b42",
+      "source_predicate": "os.path.normcase(\"x\") != os.path.normcase(\"X\")"
+    },
+    {
+      "nodeid": "testing/test_warnings.py::test_deprecation_warning_as_error[None]",
+      "observed_reason": "('testing/test_warnings.py', 500, 'Skipped: This test should be enabled again before pytest 6.0 is released')",
+      "phase": "setup",
+      "public_file": "testing/test_warnings.py",
+      "source_git_blob": "c4af14dac0e5f1ebc471a435dc9d51823e40bcba",
+      "source_predicate": "pytest.mark.skip"
+    },
+    {
+      "nodeid": "testing/test_warnings.py::test_deprecation_warning_as_error[ini]",
+      "observed_reason": "('testing/test_warnings.py', 500, 'Skipped: This test should be enabled again before pytest 6.0 is released')",
+      "phase": "setup",
+      "public_file": "testing/test_warnings.py",
+      "source_git_blob": "c4af14dac0e5f1ebc471a435dc9d51823e40bcba",
+      "source_predicate": "pytest.mark.skip"
+    },
+    {
+      "nodeid": "testing/test_warnings.py::test_deprecation_warning_as_error[cmdline]",
+      "observed_reason": "('testing/test_warnings.py', 500, 'Skipped: This test should be enabled again before pytest 6.0 is released')",
+      "phase": "setup",
+      "public_file": "testing/test_warnings.py",
+      "source_git_blob": "c4af14dac0e5f1ebc471a435dc9d51823e40bcba",
+      "source_predicate": "pytest.mark.skip"
+    }
+  ],
+  "run": 40930969344,
+  "runtime_predicates_independently_verified": false,
+  "scope": "source-bound observations only; no skip admission"
+}

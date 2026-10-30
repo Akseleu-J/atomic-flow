@@ -1,0 +1,14 @@
+{
+  "run": 40933849918,
+  "artifact": 12923039096,
+  "archive_sha256": "afb9faa4df7df077407bd547f427075c2f205b1390a29afa121211c19c89d024",
+  "status": "own_process_capability_observed",
+  "package_sha256": "e4b15cf8d0b9051cf7957e7ab29a67ca7d21f42ea1b2b7dad1b52e65d02d1408",
+  "installed_binary_sha256": "be5c18d434676144516e48bc8dac0e0e5957e51cc91c4e9f40b1274431f3d864",
+  "publisher_signature_verified": false,
+  "target_tests_run": false,
+  "cleanup_confirmed": true,
+  "ordinary_acceptance": false,
+  "provider_calls": 0,
+  "tested_commit": "04c3e69109b5ee4d3d5a2c830290fa7b96edee0a"
+}

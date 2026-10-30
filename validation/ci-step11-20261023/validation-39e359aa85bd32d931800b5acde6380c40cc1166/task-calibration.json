@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "suite": "atomic-flow-historical-change-replay-v1",
+  "kind": "grader_calibration",
+  "created_at": "2026-10-22T22:06:07.198352+00:00",
+  "execution": {
+    "mode": "docker",
+    "image": "atomic-flow-checks:local",
+    "output_bytes": 16384
+  },
+  "base_commit": "7b15406a9541330b374fe1d8a5ec48ac07efbdc1",
+  "gold_commit": "0bae3ade4124e3772f20160aa3c8b0c565c497a3",
+  "manifest_sha256": "26fc6659c1347bbdaed499ddb97760ae4bfc6768cd80c1e718486ab2e6c33591",
+  "checker_sha256": "d7c03524ad3f88900aeefc2d93c306af466cc927b5bc420955b64a1028a2e4c3",
+  "wordings": 12,
+  "independent_changes": 6,
+  "calibrated": true,
+  "model_calls": 0,
+  "disclosure": "Six known historical changes in our own repository, each with RU/EN wording. Not twelve independent tasks, not a held-out multi-repository benchmark.",
+  "results": [
+    {
+      "revision": "base",
+      "check": "full_file_pages",
+      "status": "fail",
+      "returncode": 1,
+      "timed_out": false,
+      "seconds": 0.416,
+      "grader": {
+        "grader_status": "fail",
+        "error_type": "AssertionError",
+        "detail": "end of file missing"
+      },
+      "stdout_tail": "{\"grader_status\": \"fail\", \"error_type\": \"AssertionError\", \"detail\": \"end of file missing\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "base",
+      "check": "deny_priority",
+      "status": "fail",
+      "returncode": 1,
+      "timed_out": false,
+      "seconds": 0.266,
+      "grader": {
+        "grader_status": "fail",
+        "error_type": "AssertionError",
+        "detail": ""
+      },
+      "stdout_tail": "{\"grader_status\": \"fail\", \"error_type\": \"AssertionError\", \"detail\": \"\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "base",
+      "check": "corrupt_policy",
+      "status": "fail",
+      "returncode": 1,
+      "timed_out": false,
+      "seconds": 0.265,
+      "grader": {
+        "grader_status": "fail",
+        "error_type": "AssertionError",
+        "detail": ""
+      },
+      "stdout_tail": "{\"grader_status\": \"fail\", \"error_type\": \"AssertionError\", \"detail\": \"\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "base",
+      "check": "task_versions",
+      "status": "fail",
+      "returncode": 1,
+      "timed_out": false,
+      "seconds": 0.366,
+      "grader": {
+        "grader_status": "fail",
+        "error_type": "AssertionError",
+        "detail": ""
+      },
+      "stdout_tail": "{\"grader_status\": \"fail\", \"error_type\": \"AssertionError\", \"detail\": \"\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "base",
+      "check": "unique_patch",
+      "status": "fail",
+      "returncode": 1,
+      "timed_out": false,
+      "seconds": 0.416,
+      "grader": {
+        "grader_status": "fail",
+        "error_type": "ModuleNotFoundError",
+        "detail": "No module named 'atomic_flow.agents.tools.file_ops'"
+      },
+      "stdout_tail": "{\"grader_status\": \"fail\", \"error_type\": \"ModuleNotFoundError\", \"detail\": \"No module named 'atomic_flow.agents.tools.file_ops'\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "base",
+      "check": "explicit_question",
+      "status": "fail",
+      "returncode": 1,
+      "timed_out": false,
+      "seconds": 0.415,
+      "grader": {
+        "grader_status": "fail",
+        "error_type": "ModuleNotFoundError",
+        "detail": "No module named 'atomic_flow.agents.tools.ask_user'"
+      },
+      "stdout_tail": "{\"grader_status\": \"fail\", \"error_type\": \"ModuleNotFoundError\", \"detail\": \"No module named 'atomic_flow.agents.tools.ask_user'\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "gold",
+      "check": "full_file_pages",
+      "status": "pass",
+      "returncode": 0,
+      "timed_out": false,
+      "seconds": 0.467,
+      "grader": {
+        "grader_status": "pass"
+      },
+      "stdout_tail": "{\"grader_status\": \"pass\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "gold",
+      "check": "deny_priority",
+      "status": "pass",
+      "returncode": 0,
+      "timed_out": false,
+      "seconds": 0.265,
+      "grader": {
+        "grader_status": "pass"
+      },
+      "stdout_tail": "{\"grader_status\": \"pass\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "gold",
+      "check": "corrupt_policy",
+      "status": "pass",
+      "returncode": 0,
+      "timed_out": false,
+      "seconds": 0.265,
+      "grader": {
+        "grader_status": "pass"
+      },
+      "stdout_tail": "{\"grader_status\": \"pass\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "gold",
+      "check": "task_versions",
+      "status": "pass",
+      "returncode": 0,
+      "timed_out": false,
+      "seconds": 0.369,
+      "grader": {
+        "grader_status": "pass"
+      },
+      "stdout_tail": "{\"grader_status\": \"pass\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "gold",
+      "check": "unique_patch",
+      "status": "pass",
+      "returncode": 0,
+      "timed_out": false,
+      "seconds": 0.465,
+      "grader": {
+        "grader_status": "pass"
+      },
+      "stdout_tail": "{\"grader_status\": \"pass\"}\n",
+      "stderr_tail": ""
+    },
+    {
+      "revision": "gold",
+      "check": "explicit_question",
+      "status": "pass",
+      "returncode": 0,
+      "timed_out": false,
+      "seconds": 0.417,
+      "grader": {
+        "grader_status": "pass"
+      },
+      "stdout_tail": "{\"grader_status\": \"pass\"}\n",
+      "stderr_tail": ""
+    }
+  ]
+}

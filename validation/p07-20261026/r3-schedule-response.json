@@ -1,0 +1,13 @@
+{
+  "http_status": 200,
+  "data": {
+    "results": [
+      {
+        "benchmarkModelVersionId": 135,
+        "runSkippedReason": "Task version is in an invalid state to schedule runs: Validating.",
+        "benchmarkTaskVersionId": 1119638,
+        "candidateType": "BENCHMARK_CANDIDATE_TYPE_MODEL_VERSIONS"
+      }
+    ]
+  }
+}

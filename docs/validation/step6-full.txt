@@ -1,0 +1,32 @@
+............................sssss........s.........s.................... [ 34%]
+.........s..........................s................................... [ 68%]
+.........................F.........................................      [100%]
+================================== FAILURES ===================================
+________ test_task_uses_real_orchestrator_and_approval_channel[False] _________
+tests\test_task_execution.py:102: in test_task_uses_real_orchestrator_and_approval_channel
+    task = runner.run_plan("change sample", Plan(steps=[PlanStep(
+src\atomic_flow\agents\task_loop.py:72: in run_plan
+    return self.resume(task)
+           ^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:89: in resume
+    return self._resume_locked(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:138: in _resume_locked
+    result = self._resume_steps(task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:223: in _resume_steps
+    save(task)
+src\atomic_flow\agents\task.py:77: in save
+    tmp.replace(target)
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py:1376: in replace
+    os.replace(self, target)
+E   PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.analysis-history-full\\test_task_uses_real_orchestrat1\\home\\tasks\\task_09a79d423cde.json.tmp' -> 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.analysis-history-full\\test_task_uses_real_orchestrat1\\home\\tasks\\task_09a79d423cde.json'
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_task_execution.py::test_task_uses_real_orchestrator_and_approval_channel[False]
+1 failed, 201 passed, 9 skipped, 1 warning in 90.38s (0:01:30)

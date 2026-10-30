@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "status": "accepted_scripted_atomic_flat_docker_safety",
+  "run_id": 40742941290,
+  "tested_commit": "24368249867437b6629235b6cc326c599e4a1c81",
+  "arms": [
+    {
+      "arm": "atomic",
+      "status": "scripted_public_atomic_task_journey_qualified",
+      "artifact_id": 12839014205,
+      "source_sha": "24368249867437b6629235b6cc326c599e4a1c81",
+      "session_files_verified": 3,
+      "replan_count": 1,
+      "roles": [
+        "parser",
+        "answerer",
+        "answerer",
+        "critic",
+        "host_planner",
+        "parser",
+        "answerer",
+        "answerer",
+        "answerer",
+        "answerer",
+        "answerer",
+        "critic"
+      ],
+      "graph_sync": {
+        "deltas": 0,
+        "created": true,
+        "fallback": false,
+        "failed": false,
+        "relocation": {},
+        "coverage_complete": true,
+        "coverage_omissions": []
+      },
+      "shared_limits": {
+        "max_model_calls": 40,
+        "max_budget_usd": 1,
+        "max_replans": 1,
+        "max_duration_seconds": 3600,
+        "ordinary_deadline_scope": "same fixed 600-second obligation from fixture construction",
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7080@sha256:3389f0d1319ca611d04a209fc30990c131e0bae9acfeb2163938c75ad23479fe",
+        "ordinary_test_paths": [
+          "tests/test_sample.py"
+        ],
+        "check_command": "check",
+        "backend_input_cap": null,
+        "backend_output_cap": null
+      }
+    },
+    {
+      "arm": "flat",
+      "status": "scripted_public_flat_task_journey_qualified",
+      "artifact_id": 12840307845,
+      "source_sha": "24368249867437b6629235b6cc326c599e4a1c81",
+      "session_files_verified": 1,
+      "replan_count": 1,
+      "roles": [
+        "flat_turn",
+        "flat_turn",
+        "flat_turn",
+        "flat_turn",
+        "flat_turn",
+        "flat_turn"
+      ],
+      "graph_sync": {
+        "deltas": 0,
+        "created": true,
+        "fallback": false,
+        "failed": false,
+        "relocation": {},
+        "coverage_complete": true,
+        "coverage_omissions": []
+      },
+      "shared_limits": {
+        "max_model_calls": 40,
+        "max_budget_usd": 1,
+        "max_replans": 1,
+        "max_duration_seconds": 3600,
+        "ordinary_deadline_scope": "same fixed 600-second obligation from fixture construction",
+        "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-7080@sha256:3389f0d1319ca611d04a209fc30990c131e0bae9acfeb2163938c75ad23479fe",
+        "ordinary_test_paths": [
+          "tests/test_sample.py"
+        ],
+        "check_command": "check",
+        "backend_input_cap": 200000,
+        "backend_output_cap": 4096
+      }
+    }
+  ],
+  "provider_calls": 0,
+  "model_generation": false,
+  "equal_token_quality_comparison": false,
+  "hidden_oracle": false,
+  "P07": "OPEN"
+}

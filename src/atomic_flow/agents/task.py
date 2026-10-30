@@ -6,16 +6,22 @@ Writes go through tmp+replace so a crashed process never leaves a half-written t
 from __future__ import annotations
 
 import json
+import math
+import os
+import re
+import tempfile
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
 
+from atomic_flow.agents.goals import Goal, validate_goals
 from atomic_flow.config import user_dir
+from atomic_flow.state import TASK_SCHEMA_VERSION, StateError, migrate_task
 
-StepStatus = Literal["pending", "running", "done", "failed"]
-TaskStatus = Literal["running", "paused", "done", "failed"]
+StepStatus = Literal["pending", "running", "done", "failed", "blocked", "superseded", "cancelled"]
+TaskStatus = Literal["running", "paused", "done", "failed", "cancelled"]
 
 
 @dataclass
@@ -30,6 +36,16 @@ class Step:
     started_at: float | None = None
     finished_at: float | None = None
     request_id: str = ""
+    depends_on: list[int] = field(default_factory=list)
+    blocked_reason: str = ""
+    invalidated_reason: str = ""
+    parent_goal: str = ""
+    acceptance_criteria: list[str] = field(default_factory=list)
+    scope_paths: list[str] = field(default_factory=list)
+    linked_code_nodes: list[str] = field(default_factory=list)
+    linked_test_nodes: list[str] = field(default_factory=list)
+    evidence: dict = field(default_factory=dict)
+    failure: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -47,9 +63,20 @@ class Task:
     error: str = ""
     rationale: str = ""
     replan_count: int = 0
+    changeset_id: str = ""
+    plan_ready: bool = True
+    budget_events: list[dict] = field(default_factory=list)
+    schema_version: int = TASK_SCHEMA_VERSION
+    completion_report: dict = field(default_factory=dict)
+    plan_approval: dict = field(default_factory=dict)
+    graph_sync: dict = field(default_factory=dict)
+    last_failure_decision: dict = field(default_factory=dict)
+    repair_budget: dict = field(default_factory=dict)
+    goals: list[Goal] = field(default_factory=list)
+    expansion_count: int = 0
 
     @classmethod
-    def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> "Task":
+    def new(cls, query: str, project: Path, steps: list[Step], rationale: str = "") -> Task:
         return cls(
             id="task_" + uuid.uuid4().hex[:12],
             query=query,
@@ -64,22 +91,219 @@ def tasks_dir() -> Path:
 
 
 def save(task: Task) -> Path:
+    _validate_id(task.id)
+    data = asdict(_decode(asdict(task), task.id))
     directory = tasks_dir()
     directory.mkdir(parents=True, exist_ok=True)
     target = directory / f"{task.id}.json"
-    tmp = target.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(asdict(task), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    tmp.replace(target)
+    encoded = json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
+    if len(encoded.encode("utf-8")) > 16 * 1024 * 1024:
+        raise StateError("task state exceeds 16 MiB; no state was written")
+    tmp = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=directory,
+                                         prefix=target.name + ".", suffix=".tmp", delete=False) as handle:
+            tmp = Path(handle.name)
+            handle.write(encoded)
+            handle.flush()
+            os.fsync(handle.fileno())
+        tmp.replace(target)
+    finally:
+        if tmp is not None:
+            tmp.unlink(missing_ok=True)
     return target
 
 
 def load(task_id: str) -> Task:
+    _validate_id(task_id)
     path = tasks_dir() / f"{task_id}.json"
     if not path.is_file():
         raise FileNotFoundError(f"no such task: {task_id}")
-    data = json.loads(path.read_text(encoding="utf-8"))
+    if path.stat().st_size > 16 * 1024 * 1024:
+        raise StateError("task state exceeds 16 MiB; inspect its file before resuming")
+    try:
+        return _decode(json.loads(path.read_text(encoding="utf-8"), parse_constant=_invalid_constant), task_id)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise StateError(f"invalid task JSON for {task_id}; restore a known-good state before resuming") from exc
+
+
+def _invalid_constant(value: str):
+    raise StateError(f"invalid task JSON constant {value}; finite numbers are required before resuming")
+
+
+def _decode(raw: object, task_id: str) -> Task:
+    data = migrate_task(raw)
+    if data.get("id") != task_id:
+        raise StateError("task id does not match its file")
+    for name in ("id", "query", "project", "tree_fingerprint", "error", "rationale", "changeset_id"):
+        if name in data and not isinstance(data[name], str):
+            raise StateError(f"invalid task state: {name} must be text")
+    for name in ("current_index", "replan_count", "expansion_count"):
+        if name in data and (type(data[name]) is not int or data[name] < 0):
+            raise StateError(f"invalid task state: {name} must be a nonnegative integer")
+    if data.get("expansion_count", 0) > 8:
+        raise StateError("task expansion limit exceeded")
+    for name in ("created_at", "finished_at", "budget_spent"):
+        value = data.get(name)
+        if name in data and value is None and name != "finished_at":
+            raise StateError(f"invalid task state: {name} cannot be null")
+        if value is not None and (type(value) not in (int, float) or not math.isfinite(value) or value < 0):
+            raise StateError(f"invalid task state: {name} must be a finite nonnegative number")
+    if "status" in data and data["status"] not in ("running", "paused", "done", "failed", "cancelled"):
+        raise StateError("invalid task status")
+    if "plan_ready" in data and type(data["plan_ready"]) is not bool:
+        raise StateError("invalid task state: plan_ready must be boolean")
+    if "budget_events" in data and (not isinstance(data["budget_events"], list)
+                                     or any(not isinstance(e, dict) for e in data["budget_events"])):
+        raise StateError("invalid task state: budget_events must be a list of objects")
+    for name in ("completion_report", "plan_approval"):
+        if name in data and not isinstance(data[name], dict):
+            raise StateError(f"invalid task state: {name} must be an object")
+    _validate_approval(data.get("plan_approval", {}))
+    from atomic_flow.agents.repair_budget import validate_repair
+    try:
+        validate_repair(data.get("repair_budget", {}))
+    except ValueError as exc:
+        raise StateError(str(exc)) from exc
+    raw_goals = data.pop("goals", [])
+    if not isinstance(raw_goals, list) or len(raw_goals) > 128:
+        raise StateError("invalid task goals")
+    try:
+        goals = [Goal(**goal) for goal in raw_goals]
+    except (TypeError, ValueError) as exc:
+        raise StateError("invalid task goal fields") from exc
     raw_steps = data.pop("steps", [])
-    return Task(steps=[Step(**s) for s in raw_steps], **data)
+    if not isinstance(raw_steps, list) or len(raw_steps) > 128:
+        raise StateError("invalid task state: steps must be a list")
+    steps = []
+    for raw_step in raw_steps:
+        if not isinstance(raw_step, dict):
+            raise StateError("invalid task step: expected an object")
+        for name in ("description", "expected_outcome", "verify_with", "result_summary", "request_id", "blocked_reason", "invalidated_reason"):
+            if name in raw_step and not isinstance(raw_step[name], str):
+                raise StateError(f"invalid task step: {name} must be text")
+        if type(raw_step.get("index")) is not int or raw_step["index"] < 0:
+            raise StateError("invalid task step index")
+        if raw_step.get("status", "pending") not in ("pending", "running", "done", "failed", "blocked", "superseded", "cancelled"):
+            raise StateError("invalid task step status")
+        dependencies = raw_step.get("depends_on", [])
+        if not isinstance(dependencies, list) or any(type(d) is not int or d < 0 for d in dependencies):
+            raise StateError("invalid task step dependencies")
+        tools = raw_step.get("tools_needed", [])
+        if not isinstance(tools, list) or any(not isinstance(tool, str) for tool in tools):
+            raise StateError("invalid task step tools_needed")
+        for name in ("started_at", "finished_at"):
+            value = raw_step.get(name)
+            if value is not None and (type(value) not in (int, float) or not math.isfinite(value) or value < 0):
+                raise StateError(f"invalid task step: {name} must be a finite nonnegative number")
+        try:
+            steps.append(Step(**raw_step))
+        except TypeError as exc:
+            raise StateError("invalid task step fields; inspect saved state before resuming") from exc
+        from atomic_flow.agents.step_evidence import validate_receipt
+        try:
+            validate_receipt(steps[-1].evidence)
+            failure = steps[-1].failure
+            if not isinstance(failure, dict):
+                raise ValueError("step failure must be an object")
+            if failure:
+                if (set(failure) != {"kind", "evidence", "rollback_revision"}
+                        or not isinstance(failure["kind"], str) or len(failure["kind"]) > 100
+                        or not isinstance(failure["evidence"], dict)
+                        or not isinstance(failure["rollback_revision"], str)
+                        or not re.fullmatch(r"[a-f0-9]{64}", failure["rollback_revision"])):
+                    raise ValueError("invalid step failure record")
+                if failure["evidence"]:
+                    from atomic_flow.agents.failure_policy import validate_failure_evidence
+                    validate_failure_evidence(failure["evidence"])
+                    if (failure["evidence"]["step_index"] != steps[-1].index
+                            or failure["evidence"]["started_at"] != steps[-1].started_at):
+                        raise ValueError("step failure evidence attempt mismatch")
+        except ValueError as exc:
+            raise StateError(str(exc)) from exc
+    validate_dependencies(steps)
+    validate_goals(goals, steps)
+    try:
+        return Task(steps=steps, goals=goals, **data)
+    except TypeError as exc:
+        raise StateError("invalid task fields; inspect saved state before resuming") from exc
+
+
+def validate_dependencies(steps: list[Step]) -> None:
+    by_id = {s.index: s for s in steps}
+    if len(by_id) != len(steps):
+        raise StateError("duplicate task step index")
+    dependents = {s.index: [] for s in steps}
+    remaining = {}
+    for step in steps:
+        if len(set(step.depends_on)) != len(step.depends_on):
+            raise StateError("duplicate task step dependency")
+        for dependency in step.depends_on:
+            if type(dependency) is not int or dependency < 0:
+                raise StateError("invalid task step dependency index")
+            if dependency not in by_id:
+                raise StateError("missing task step dependency")
+            if dependency == step.index:
+                raise StateError("self-referencing task step dependency")
+            dependents[dependency].append(step.index)
+        remaining[step.index] = len(step.depends_on)
+    ready = [index for index, count in remaining.items() if not count]
+    visited = 0
+    while ready:
+        index = ready.pop()
+        visited += 1
+        for dependent in dependents[index]:
+            remaining[dependent] -= 1
+            if not remaining[dependent]:
+                ready.append(dependent)
+    if visited != len(steps):
+        raise StateError("cyclic task step dependencies")
+
+
+def _validate_approval(approval: dict) -> None:
+    if not approval:
+        return
+    required = {"schema_version", "task_id", "project", "plan", "source_manifest", "allowed_paths",
+                "scope_hashes", "workspace_manifest", "digest"}
+    version = approval.get("schema_version")
+    if "check_obligation" in approval:
+        from atomic_flow.check_obligation import validate_obligation_binding
+        try:
+            validate_obligation_binding(approval["check_obligation"])
+        except ValueError as exc:
+            raise StateError(str(exc)) from exc
+        required.add("check_obligation")
+    if version == 2:
+        required.add("internal_replan")
+    if set(approval) != required or type(version) is not int or version not in {1, 2}:
+        raise StateError("invalid task plan approval fields/version")
+    if version == 2:
+        from atomic_flow.agents.envelope import validate_envelope
+        try:
+            validate_envelope(approval["internal_replan"])
+        except ValueError as exc:
+            raise StateError(str(exc)) from exc
+    if (any(not isinstance(approval[key], str) for key in ("task_id", "project", "digest"))
+            or not re.fullmatch(r"[a-f0-9]{64}", approval["digest"])
+            or not isinstance(approval["plan"], dict)
+            or not isinstance(approval["allowed_paths"], list)
+            or any(not isinstance(path, str) for path in approval["allowed_paths"])):
+        raise StateError("invalid task plan approval structure")
+    for name in ("source_manifest", "scope_hashes", "workspace_manifest"):
+        manifest = approval[name]
+        if manifest is None and name == "workspace_manifest":
+            continue
+        if not isinstance(manifest, dict):
+            raise StateError("invalid task plan approval manifest")
+        for path, value in manifest.items():
+            if (not isinstance(path, str) or (value is None and name != "scope_hashes")
+                    or (value is not None and (not isinstance(value, str) or not re.fullmatch(r"[a-f0-9]{40}", value)))):
+                raise StateError("invalid task plan approval content hash")
+
+
+def _validate_id(task_id: str):
+    if not re.fullmatch(r"task_[a-f0-9]{12}", task_id):
+        raise ValueError("invalid task id")
 
 
 def list_tasks() -> list[Task]:

@@ -1,0 +1,38 @@
+name: P07 private Python3.6 SymPy CheckSpec boundary
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install . swebench==3.0.15 packaging==25.0
+      - name: Provision fixed private runtime and independently verify dependency
+        run: |
+          mkdir -p p07-private-sympy-worker
+          git rev-parse HEAD > p07-private-sympy-worker/tested-commit.txt
+          python tools/p07_legacy_transplant.py prepare --output /tmp/p07-private-transplant
+          python tools/p07_legacy_transplant.py build --context /tmp/p07-private-transplant --output p07-private-sympy-worker/transplant
+          python tools/p07_sympy13971_image.py prepare --profile benchmarks/stage4/p07-sympy13971-runtime-profile.json --transplant-receipt p07-private-sympy-worker/transplant --output /tmp/p07-private-mpmath
+          python tools/p07_sympy13971_image.py build --context /tmp/p07-private-mpmath --output p07-private-sympy-worker/runtime
+      - name: Actual target grammar and full-source private native checks
+        run: |
+          python tools/p07_private_sympy_check_smoke.py --runtime-receipt p07-private-sympy-worker/runtime --runtime-context /tmp/p07-private-mpmath --output p07-private-sympy-worker/smoke
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-private-sympy-check-${{ github.sha }}
+          path: p07-private-sympy-worker/
+          retention-days: 14
+          if-no-files-found: error

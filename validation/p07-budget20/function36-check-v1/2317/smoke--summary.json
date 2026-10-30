@@ -1,0 +1,61 @@
+{
+  "admitted_core_files": 127,
+  "ca_identity_digest": "3c5970a3330d5c6b9cd67b0b0da977582c129d1bcf84acc993731c1ffff29010",
+  "cases": [
+    {
+      "candidate_ca_absent": true,
+      "candidate_source_unchanged": true,
+      "case": "base_fail",
+      "check_passed": false,
+      "container_id": "0865d1f85392395705c4d111663615cfa179d0e4577f592ec081e063b38e845e",
+      "controller_returned_after_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 1,
+      "source_revision": "a2b30f77b2051aa244ec949d1da6745db06372854a2b8d0779cfddcb763447eb"
+    },
+    {
+      "candidate_ca_absent": true,
+      "candidate_source_unchanged": true,
+      "case": "edited_pass",
+      "check_passed": true,
+      "container_id": "c22a5e3d92b16f912a714d58bc83ec43f712e2b6ae03d40bcd2d8c4d70b73e22",
+      "controller_returned_after_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 0,
+      "source_revision": "72efdce8fc6076a822cad49da3794d30a3c25f60330870ff390da90460908cdc"
+    },
+    {
+      "candidate_ca_absent": true,
+      "candidate_source_unchanged": true,
+      "case": "required_skip",
+      "check_passed": false,
+      "container_id": "5b0fe2caf6ddbd55f4eb9a9e3883a1531353f91dfd71b154021ac5a610c62f97",
+      "controller_returned_after_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 5,
+      "source_revision": "c3c477329f168eae1d5401e3d33eda727633f587b67c633464d14d001c18fd80"
+    }
+  ],
+  "cleanup_confirmed": true,
+  "fixture_digest": "9f3f817ceea915939c726ef3bf008893bc500c790c693312a094744c37a7c3cf",
+  "generic_dispatch_enabled": false,
+  "hidden_oracle": "not_run",
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "model_calls": 0,
+  "private_pytest_digest": "541cb7052993e4bea22209f4f8141b9c5b47a9aa45b6ab65b3bdea84e000d420",
+  "provider_calls": 0,
+  "runtime_digest": "f7e38ffb6ee7f4996bae1c015d6a34448d02ff168243e4c186413af7ce69069d",
+  "scope": "synthetic full-source function36 ordinary resource boundary",
+  "source_container_cleanup": {
+    "confirmed": true,
+    "container_id": "ef7db8280deb16132d91ba43c47c55ba0b5f5433f7b08c7c495ba4b55cd9b174",
+    "remove_exit": 0
+  },
+  "status": "function36_private_resource_boundary_qualified",
+  "target_setup_executed": false,
+  "task_id": "psf__requests-2317",
+  "taskrunner_wired": false,
+  "tested_commit": "06d1948ac3c239eea8f133dd8024aca228e44f26",
+  "verified_success": false
+}

@@ -1,0 +1,10 @@
+{
+  "run": 40934644253,
+  "artifact": 12922719668,
+  "archive_sha256": "925499d614935c6a6d0125a086c639c6ab7c1271a5e3f1fef6a938946c4b886d",
+  "tested_commit": "c517aad0bedbd9031d9daf72a9356c3e37a3d4dc",
+  "status": "numpy_install_and_abi_smoke_passed",
+  "scope": "isolated focused diagnostic only",
+  "ordinary_acceptance": false,
+  "provider_calls": 0
+}

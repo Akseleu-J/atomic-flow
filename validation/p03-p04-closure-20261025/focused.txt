@@ -1,0 +1,10 @@
+..F......                                                                [100%]
+================================== FAILURES ===================================
+_ test_semantic_provider_reuses_existing_physical_budget_and_keeps_malformed_cost _
+tests\test_p03_p04_understanding.py:70: in test_semantic_provider_reuses_existing_physical_budget_and_keeps_malformed_cost
+    assert backend.calls == 1 and provider.task.budget_spent == 0.0001
+E   assert (0 == 1)
+E    +  where 0 = <test_p03_p04_understanding.test_semantic_provider_reuses_existing_physical_budget_and_keeps_malformed_cost.<locals>.Backend object at 0x00000128356B3B30>.calls
+=========================== short test summary info ===========================
+FAILED tests/test_p03_p04_understanding.py::test_semantic_provider_reuses_existing_physical_budget_and_keeps_malformed_cost
+1 failed, 8 passed in 6.17s

@@ -1,0 +1,266 @@
+{
+  "argv": [
+    "-p",
+    "no:httpbin",
+    "-p",
+    "pytest_httpbin.plugin",
+    "-p",
+    "pytest_mock",
+    "-rA",
+    "-v"
+  ],
+  "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
+  "calibrated": false,
+  "candidate_scope": "not_supported",
+  "certificate_receipt_sha256": "7f3ad279851cb8300c7c461d656f9bb1f1d7bac59c08216cbb4728be67da15d1",
+  "controls_sha256": "04d3ade1fb573d44d364cb41ffdf4ed336ff40458bae67dedf60bc8bf10e20b2",
+  "harness": "3.0.15",
+  "health_receipt_sha256": "d774bd21d14ef306b5b69e7858c4c9f4f2c5d8026b3f0f8d1abc6d9b6f9626df",
+  "image_id": "sha256:0340f2dc9b596d8f10d66f48b1150e36810abc4d4189f723e74cc6acb6f208a2",
+  "instance_id": "psf__requests-3362",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "model_calls": 0,
+  "native_command": "pytest -rA",
+  "provider_credentials": "none",
+  "reporting_only_flags": [
+    "-v"
+  ],
+  "required_tests": 76,
+  "rows": [
+    {
+      "abi_stdout_sha256": "e56aa756eecf0ce823644307e22dec2493f8e8a13789d53f03714b59fc502f5b",
+      "bootstrap_sha256": "45b748cc25248a7fc6119de32704d5ea7c510b2036d789e35585d937f7d1a6a3",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests3362-cd009e9db088432eaf83",
+      "error": "independent parser result outside sealed terminal identities",
+      "error_type": "ValueError",
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "post_inventory_stdout_sha256": "df13f5bccc449814eae56e7f57f44b81a84c92b07b90f049d730c3e34463ff93",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "416221b49e36ee8cf5ee9969c37f00e4e8c4c66cbba10c6301c965e1719c6431",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10018553000000452,
+        "executable": "/opt/p07-python36/bin/python3.6",
+        "isolated": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "e56aa756eecf0ce823644307e22dec2493f8e8a13789d53f03714b59fc502f5b",
+      "bootstrap_sha256": "45b748cc25248a7fc6119de32704d5ea7c510b2036d789e35585d937f7d1a6a3",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests3362-38613ce012294fc1907d",
+      "error": "independent parser result outside sealed terminal identities",
+      "error_type": "ValueError",
+      "label": "gold",
+      "patch_sha256": "23e64f2da841d5d49874221e915a084e9bb1def2fcd6d6a24fd8e7dce71fba8d",
+      "post_inventory_stdout_sha256": "df13f5bccc449814eae56e7f57f44b81a84c92b07b90f049d730c3e34463ff93",
+      "process_exit": 0,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e543d26351eb4227efeeedf58f22d30a5b62123354ec2c34ee9389b0cd7e9873",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10018440700000042,
+        "executable": "/opt/p07-python36/bin/python3.6",
+        "isolated": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    },
+    {
+      "abi_stdout_sha256": "e56aa756eecf0ce823644307e22dec2493f8e8a13789d53f03714b59fc502f5b",
+      "bootstrap_sha256": "45b748cc25248a7fc6119de32704d5ea7c510b2036d789e35585d937f7d1a6a3",
+      "cleanup_confirmed": true,
+      "cleanup_exit": 0,
+      "container_name": "p07-requests3362-7f5399786de3450da106",
+      "error": "independent parser result outside sealed terminal identities",
+      "error_type": "ValueError",
+      "label": "wrong",
+      "patch_sha256": "9d0a89d0040b05a3ca5ddda9b252553b397612b99c35b8979f5c1f00aaac4946",
+      "post_inventory_stdout_sha256": "df13f5bccc449814eae56e7f57f44b81a84c92b07b90f049d730c3e34463ff93",
+      "process_exit": 1,
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "10.255.255.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "scope": "link"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "status": "infrastructure_error",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e2beac8a38ff27118d7262ff324b7694d4978e27eaf573a2597ffde93170b407",
+      "topology_probe": {
+        "blackhole": "socket.timeout",
+        "destination": [
+          "10.255.255.1",
+          80
+        ],
+        "elapsed": 0.10019071700000381,
+        "executable": "/opt/p07-python36/bin/python3.6",
+        "isolated": 1,
+        "loopback": "real_socket_pass",
+        "requested_timeout": 0.1
+      },
+      "verified_success": false
+    }
+  ],
+  "status": "completed"
+}

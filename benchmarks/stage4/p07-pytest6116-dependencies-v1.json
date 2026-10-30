@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "scope": "prospective isolated pytest6116 public collection dependencies; not an accepted runtime",
+  "task_id": "pytest-dev__pytest-6116",
+  "base_commit": "e670ff76cbad80108bde9bab616b66771b8653cf",
+  "python_version": "3.9.20",
+  "base_packages": {
+    "attrs": "23.1.0"
+  },
+  "wheels": [
+    {
+      "name": "hypothesis",
+      "version": "4.38.1",
+      "filename": "hypothesis-4.38.1-py3-none-any.whl",
+      "sha256": "d66286a7a67946d843b37c5656321ea3fd318c259dc0ed9aeb6f2d4b037b876a",
+      "url": "https://files.pythonhosted.org/packages/1e/59/df7894473577bf2eb9522ca1de91b199d0565ae46e91b69f01f89fbcf675/hypothesis-4.38.1-py3-none-any.whl"
+    },
+    {
+      "name": "xmlschema",
+      "version": "1.0.18",
+      "filename": "xmlschema-1.0.18-py2.py3-none-any.whl",
+      "sha256": "4082a2053ad23ac0ac5e0d3a09b6c90d309622bcf1c720790c90277cc3a2bc50",
+      "url": "https://files.pythonhosted.org/packages/70/87/35039001a474c556e2dea5b8b714d38e6ac0cf7cccd5762f41a0cd793560/xmlschema-1.0.18-py2.py3-none-any.whl"
+    },
+    {
+      "name": "elementpath",
+      "version": "1.3.3",
+      "filename": "elementpath-1.3.3-py2.py3-none-any.whl",
+      "sha256": "4b1fc2120d69c126a2d9993ea206c214b4098ded9135318ad382ebfced537619",
+      "url": "https://files.pythonhosted.org/packages/c4/3f/f5b45bccb6e3219a2f150d21f26e9b7f5f972722dbcb45788705e5312c47/elementpath-1.3.3-py2.py3-none-any.whl"
+    }
+  ],
+  "selection_note": "Prospective, not claimed historical exactness: hypothesis 4.38.1 is within the upstream oldattrs tox constraint and satisfies setup.py minimum; xmlschema 1.0.18 plus compatible elementpath 1.3.3 is a disclosed candidate. Full worker qualification still required."
+}

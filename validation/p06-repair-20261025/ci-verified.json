@@ -1,0 +1,63 @@
+{
+  "status": "verified",
+  "published_head": "f9fd48d5bacce8b3c93bf9b15677df3f7edbc4b3",
+  "tested_merge": "a30b26b2fcfbeacc777225c434d9d4be832b86f4",
+  "tree": "9067a4044c56e04a49070fd8a2b01d3ee042627a",
+  "runs": [
+    40219160156,
+    40219160140
+  ],
+  "reports": [
+    {
+      "artifact_id": 12608696723,
+      "archive_sha256": "39aab9b60c0f2a817d6f9b81a64ca973fbd68344fa5015a331f47e68b4540dae",
+      "name": "host-tests-3.11-a30b26b2fcfbeacc777225c434d9d4be832b86f4",
+      "cases": 1294,
+      "passed": 1280,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 273,
+      "python": "3.11.17"
+    },
+    {
+      "artifact_id": 12608685955,
+      "archive_sha256": "6aa139682f3d3d178f59c03c4cc8b0417bd9b9d78804a45ab7cfc67546f29d95",
+      "name": "host-tests-3.12-a30b26b2fcfbeacc777225c434d9d4be832b86f4",
+      "cases": 1294,
+      "passed": 1280,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 273,
+      "python": "3.12.15"
+    },
+    {
+      "artifact_id": 12609111116,
+      "archive_sha256": "6e9358f81d833d52e5dc60b736459eba4cbb50d23c39c13d0206ad216e6e13c5",
+      "name": "external-interoperability-a30b26b2fcfbeacc777225c434d9d4be832b86f4",
+      "composition_scenarios": [
+        "publish",
+        "cancel",
+        "source_conflict"
+      ]
+    },
+    {
+      "artifact_id": 12609266039,
+      "archive_sha256": "0d507a23187a8a68309bfdd194ae60d5574a02bbbbcd70d675687068b7c4cb73",
+      "name": "validation-a30b26b2fcfbeacc777225c434d9d4be832b86f4",
+      "docker": {
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+        "gpu_requested": false,
+        "model_calls": 0,
+        "container": "PASS",
+        "tests_exit": 0,
+        "extra_tests_exit": 0,
+        "compile_exit": 0,
+        "image_id": "sha256:098b3d403cf644f0faf9de4bf3a21b27235adf11bbef2937c22e5962fa52e727"
+      }
+    }
+  ],
+  "local_history": "Initial runtime acceptance 226 PASS / 3 SKIP; corrected local selection interrupted by host memory exhaustion. Historical JUnit is retained and not summed.",
+  "new_provider_calls": 0,
+  "limits": "Wheel matrix job status recorded separately; its 12 archives were not downloaded. No live utility, independent review, worker deployment or production acceptance claim."
+}

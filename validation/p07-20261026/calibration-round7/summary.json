@@ -1,0 +1,498 @@
+{
+  "run_id": 40294478109,
+  "framework": "b0f87b676b1e8152c5bdfad7545ab96dde3e2a99",
+  "total": 30,
+  "checksum_verified": 30,
+  "accepted": [
+    "pylint-dev__pylint-6506",
+    "pylint-dev__pylint-7228",
+    "pytest-dev__pytest-6116",
+    "sympy__sympy-16988",
+    "sympy__sympy-20212",
+    "sympy__sympy-21614"
+  ],
+  "open": [
+    {
+      "task": "psf__requests-1963",
+      "artifact_id": 12636769974,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "psf__requests-2148",
+      "artifact_id": 12637234193,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "psf__requests-2317",
+      "artifact_id": 12638040262,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "psf__requests-2674",
+      "artifact_id": 12638070419,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "psf__requests-3362",
+      "artifact_id": 12637078492,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "psf__requests-863",
+      "artifact_id": 12637996486,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-5859",
+      "artifact_id": 12637758288,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": true
+        },
+        {
+          "label": "gold",
+          "status": "verified_success",
+          "regressions_passed": true
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-7080",
+      "artifact_id": 12638515032,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-7114",
+      "artifact_id": 12637169427,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "pylint-dev__pylint-7993",
+      "artifact_id": 12637932781,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": true
+        },
+        {
+          "label": "gold",
+          "status": "verified_success",
+          "regressions_passed": true
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-11143",
+      "artifact_id": 12637224727,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-11148",
+      "artifact_id": 12637159731,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-5227",
+      "artifact_id": 12637678027,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": true
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-7168",
+      "artifact_id": 12637134817,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "verified_success",
+          "regressions_passed": true
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": true
+        }
+      ]
+    },
+    {
+      "task": "pytest-dev__pytest-7432",
+      "artifact_id": 12637194686,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-7738",
+      "artifact_id": 12638250915,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8474",
+      "artifact_id": 12637474449,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8506",
+      "artifact_id": 12638131703,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8595",
+      "artifact_id": 12639055202,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": true
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": true
+        }
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8713",
+      "artifact_id": 12637963487,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sphinx-doc__sphinx-8721",
+      "artifact_id": 12637758888,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sympy__sympy-13971",
+      "artifact_id": 12638307625,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sympy__sympy-17139",
+      "artifact_id": 12638641674,
+      "rows": [
+        {
+          "label": "base",
+          "status": "infrastructure_error"
+        },
+        {
+          "label": "gold",
+          "status": "verified_success",
+          "regressions_passed": true
+        },
+        {
+          "label": "wrong",
+          "status": "infrastructure_error"
+        }
+      ]
+    },
+    {
+      "task": "sympy__sympy-18057",
+      "artifact_id": 12638791558,
+      "rows": [
+        {
+          "label": "base",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        },
+        {
+          "label": "gold",
+          "status": "verified_success",
+          "regressions_passed": true
+        },
+        {
+          "label": "wrong",
+          "status": "requirement_failed",
+          "regressions_passed": false
+        }
+      ]
+    }
+  ],
+  "model_calls": 0,
+  "accepted_count": 6,
+  "all_manifest_tasks_exactly_once": true,
+  "tested_commits": [
+    "2f4fdf93741e84ad21f73eaf95ba7a1037e54928"
+  ],
+  "manifest_sha256": [
+    "77f4d869139672f1d66690303097a8eb2ec97bbbb520d4870c4ba0c8f8e9c1cf"
+  ],
+  "controls_sha256": [
+    "a7894c776a279735c36a7a71cf1eef8ce94c32cb5a4a642b77b1dd369e134505"
+  ]
+}

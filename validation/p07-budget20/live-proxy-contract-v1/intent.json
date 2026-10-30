@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "state": "frozen_not_sent",
+  "scope": "one separate public API contract diagnostic; not matched quality",
+  "source_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+  "profile": {
+    "campaign_id": "p07_live_proxy_contract_v1_20261028",
+    "model": "anthropic/claude-sonnet-5@default",
+    "framework_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+    "workflow_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+    "wire_config": {
+      "model": "anthropic/claude-sonnet-5@default",
+      "max_input_tokens": 512,
+      "max_output_tokens": 64,
+      "temperature": null,
+      "max_retries": 0
+    },
+    "total_budget_usd": "0.05",
+    "owner_caps": {
+      "akseley": "0.05"
+    },
+    "arm_budget_usd": "0.01",
+    "task_budget_usd": "0.01",
+    "reserve_per_call_usd": "0.01",
+    "max_physical_calls": 1,
+    "deadline_unix_ms": 1793207792774,
+    "allowed_arms": [
+      "protocol"
+    ],
+    "task_owners": {
+      "public_model_proxy_contract": "akseley"
+    },
+    "profile_sha256": "a187218bb9643e0ee69243063bd2e2330a363b45cd0e5231928adc43f7c791e4"
+  },
+  "prior_booked_campaign_spend": {
+    "total": "0.035611375",
+    "owners": {
+      "akseley": "0.035611375"
+    }
+  },
+  "request": {
+    "schema_version": 1,
+    "kind": "p07_model_request",
+    "call_id": "mq_4f294c730ed549ef90b5dd144f1e2e20",
+    "identity": {
+      "campaign_id": "p07_live_proxy_contract_v1_20261028",
+      "owner": "akseley",
+      "arm": "protocol",
+      "task_id": "public_model_proxy_contract",
+      "framework_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+      "workflow_sha": "4c91fbb24485c9f9c5e9e06adf53f5f2fc6dc876",
+      "profile_sha256": "a187218bb9643e0ee69243063bd2e2330a363b45cd0e5231928adc43f7c791e4"
+    },
+    "config": {
+      "model": "anthropic/claude-sonnet-5@default",
+      "max_input_tokens": 512,
+      "max_output_tokens": 64,
+      "temperature": null,
+      "max_retries": 0
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return exactly {\"status\":\"ok\"} and no other text."
+      }
+    ],
+    "messages_sha256": "cd1d8cd0f81c30d4cd9c9b1cb1592c0ba1b3fee331608e9d51bbdbff44c21fa1",
+    "request_sha256": "72fa2615db3eb27352e5f11ac97e5f33f5d0c54863339959ded29be5923c2e2f"
+  },
+  "pricing_reference": {
+    "url": "https://www.anthropic.com/news/claude-sonnet-5",
+    "input_usd_per_mtok": "2",
+    "output_usd_per_mtok": "10",
+    "reference_is_kaggle_invoice": false,
+    "reservation_input_usd_per_mtok": "5",
+    "reservation_output_usd_per_mtok": "25"
+  },
+  "provider_calls": 0,
+  "automatic_retries": 0
+}

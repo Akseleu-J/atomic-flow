@@ -1,0 +1,19 @@
+{
+  "http_status": 200,
+  "data": {
+    "quotaBalances": [
+      {
+        "quotaUsed": 0.0007999999999999119,
+        "totalQuotaAllowed": 10,
+        "refillPeriod": "DAILY",
+        "refillTime": "2026-10-26T09:38:22.746852900Z"
+      },
+      {
+        "quotaUsed": 8.024414975,
+        "totalQuotaAllowed": 100,
+        "refillPeriod": "MONTHLY",
+        "refillTime": "2026-11-11T12:45:44.481855200Z"
+      }
+    ]
+  }
+}

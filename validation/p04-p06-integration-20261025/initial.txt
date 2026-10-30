@@ -1,0 +1,270 @@
+........F.......F.FFF                                                    [100%]
+================================== FAILURES ===================================
+____ test_final_pytest_failure_is_not_published_and_report_survives_reload ____
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-13/test_final_pytest_failure_is_n0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002AD93DE2960>
+
+    def test_final_pytest_failure_is_not_published_and_report_survives_reload(tmp_path, monkeypatch):
+        root = tmp_path / "project"
+        root.mkdir()
+        (root / "a.py").write_text("A = 1\n")
+    
+        class FakeOrch:
+            def __init__(self, *a, **kw):
+                pass
+    
+            def answer(self, *a, **kw):
+                return SimpleNamespace(tool_calls=[{"tool": "run_command", "args": {"command": "pytest"},
+                    "result_summary": {"outcome": "success", "exit_code": 0}}], ledger_id="req_fake", verdict="ok")
+    
+        monkeypatch.setattr("atomic_flow.agents.task_loop.Orchestrator", FakeOrch)
+        seen = []
+        def run(args, project, **kwargs):
+            seen.append(args)
+            return CommandResult(1, "final state failed", "")
+        monkeypatch.setattr("atomic_flow.agents.completion.run_python", run)
+>       task = TaskRunner(AtomicConfig(), root, None).run_plan("run checks", Plan(steps=[PlanStep(description="Run tests", verify_with="pytest")]))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_completion_diagnostics.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\task_loop.py:258: in run_plan
+    return self.resume(task)
+           ^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:365: in resume
+    return self._resume_locked(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:411: in _resume_locked
+    indexed = self._refresh_index(self.changeset.workspace, seed_root=self.project)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:464: in _refresh_index
+    return self._refresh_index_locked(root, seed_root=seed_root, recovering=recovering, changed_paths=changed_paths)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:478: in _refresh_index_locked
+    tree = build_tree(root, self.config.tree.ignore, previous=previous,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-13/test_final_pytest_failure_is_n0/home/changesets/change_6b06ebfe27e1/workspace')
+ignore = ['.git', '.venv', 'venv', 'node_modules', '__pycache__', '.atomic_flow', ...]
+previous = None, respect_gitignore = True, max_file_bytes = 1000000
+limits = ProjectLimits(max_files=10000, max_total_bytes=134217728, max_nodes=100000, max_entries=100000, max_depth=64, max_file_bytes=16777216, min_free_bytes=67108864, chunk_bytes=262144, max_workspace_path_chars=None)
+cancel_check = <function TaskRunner.resume.<locals>.check at 0x000002AD93EBA480>
+changed_paths = None
+
+    def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: dict | None = None,
+                   respect_gitignore: bool = True, max_file_bytes: int = MAX_FILE_BYTES,
+                   limits: ProjectLimits | None = None, cancel_check=None, changed_paths=None) -> dict:
+        """Index ``root``. With ``previous`` only files whose size/mtime/content changed are re-parsed."""
+        root = Path(root).expanduser().resolve()
+        limits = limits or ProjectLimits()
+        max_file_bytes = min(max_file_bytes, limits.max_file_bytes)
+        cancel_check = cancel_check or (lambda: None)
+        cancel_check()
+        generation = _generation(root)
+        if not root.is_dir():
+            raise TreeError(f"Project directory does not exist: {root}")
+        from atomic_flow.config import user_dir
+    
+        private_root = user_dir().resolve()
+        if root == private_root:
+            raise TreeError("Refusing to index atomic_flow private state as project source.")
+        skip = _Ignore(root, list(DEFAULT_IGNORE if ignore is None else ignore), respect_gitignore)
+        old = _group_by_path(previous, cancel_check)
+        per_file: dict[str, list[TreeNode]] = {}
+        parsed = reused = total_bytes = admitted_files = node_count = skipped = 0
+        for rel, path in source_files(root, skip, limits, cancel_check, private_root=private_root):
+                suffix = path.suffix.lower()
+                if suffix not in SOURCE_SUFFIXES:
+                    skipped += 1
+                    continue
+                admitted_files += 1
+                if admitted_files > limits.max_files:
+                    raise ResourceLimitError("indexed source file limit exceeded")
+                try:
+                    stat = path.stat()
+                except OSError:
+                    continue
+                if stat.st_size > max_file_bytes:
+                    if stat.st_size > limits.max_file_bytes:
+                        raise ResourceLimitError("indexed source per-file byte limit exceeded")
+                    skipped += 1
+                    continue
+                cached = old.get(rel)
+                try:
+                    with path.open("rb") as handle:
+                        chunks, size = [], 0
+                        while True:
+                            cancel_check()
+                            chunk = handle.read(min(64 * 1024, max_file_bytes + 1 - size))
+                            if not chunk:
+                                break
+                            size += len(chunk)
+                            total_bytes += len(chunk)
+                            if total_bytes > limits.max_total_bytes:
+                                raise ResourceLimitError("indexed source byte limit exceeded")
+                            chunks.append(chunk)
+                            if size > max_file_bytes:
+                                break
+                        data = b"".join(chunks)
+                    if len(data) > max_file_bytes:
+                        if len(data) > limits.max_file_bytes:
+                            raise ResourceLimitError("indexed source per-file byte limit exceeded")
+                        skipped += 1
+                        continue
+                    source = data.decode("utf-8-sig")
+                except (OSError, UnicodeError):
+                    skipped += 1
+                    continue
+                digest = hashlib.sha1(data).hexdigest()
+                if cached and cached[0].content_hash == digest:      # touched, not edited
+                    cached[0] = cached[0].model_copy(update={"mtime_ns": stat.st_mtime_ns})
+                    per_file[rel] = cached
+                    reused += 1
+                else:
+                    per_file[rel] = _index_file(rel, source, digest, stat.st_size, stat.st_mtime_ns,
+                                                suffix in PYTHON_SUFFIXES, cancel_check=cancel_check)
+                    parsed += 1
+                node_count += len(per_file[rel])
+                if node_count > limits.max_nodes:
+                    raise ResourceLimitError("indexed node limit exceeded")
+        cancel_check()
+        nodes = [n.model_copy(deep=True) for items in per_file.values() for n in items]
+        _link(nodes, cancel_check)
+        fingerprint = hashlib.sha1("\n".join(f"{n.path}:{n.content_hash}" for n in nodes if n.kind == "file").encode()).hexdigest()
+        return {"version": TREE_VERSION, "reference_format": REFERENCE_FORMAT,
+                "root": root.name, "files": len(per_file), "fingerprint": fingerprint,
+>               "policy_fingerprint": policy,
+                                      ^^^^^^
+                "_base_generation": generation,
+                "stats": {"parsed": parsed, "reused": reused, "skipped": skipped, "read_bytes": total_bytes,
+                          "read_files": admitted_files, "scanned": admitted_files, "relinked": len(per_file),
+                          "invalidated": sorted(per_file), "fallback_reason": fallback_reason or "external/trust-boundary content audit",
+                          "global_algorithms_invalidated": ["pagerank"]},
+                "nodes": [n.model_dump() for n in nodes]}
+E       NameError: name 'policy' is not defined
+
+src\atomic_flow\tree\builder.py:496: NameError
+______________ test_replan_preserves_original_absolute_deadline _______________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-13/test_replan_preserves_original0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002AD93DE1CD0>
+
+    def test_replan_preserves_original_absolute_deadline(tmp_path, monkeypatch):
+        task, runner, _backend, clock = approved(tmp_path, monkeypatch)
+        deadline = task.plan_approval["internal_replan"]["deadline_at"]
+    
+        def execute(task_, step):
+            if step.index == 0:
+                raise runner._check_failure(step, "fixture failed check", "pytest", 1)
+    
+        monkeypatch.setattr(runner, "_execute_step", execute)
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", repaired_plan)
+>       result = runner.resume(task)
+                 ^^^^^^^^^^^^^^^^^^^
+
+tests\test_p06_deadline.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\task_loop.py:365: in resume
+    return self._resume_locked(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:411: in _resume_locked
+    indexed = self._refresh_index(self.changeset.workspace, seed_root=self.project)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:464: in _refresh_index
+    return self._refresh_index_locked(root, seed_root=seed_root, recovering=recovering, changed_paths=changed_paths)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\task_loop.py:478: in _refresh_index_locked
+    tree = build_tree(root, self.config.tree.ignore, previous=previous,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-13/test_replan_preserves_original0/home/changesets/change_5072344283b0/workspace')
+ignore = ['.git', '.venv', 'venv', 'node_modules', '__pycache__', '.atomic_flow', ...]
+previous = None, respect_gitignore = True, max_file_bytes = 1000000
+limits = ProjectLimits(max_files=10000, max_total_bytes=134217728, max_nodes=100000, max_entries=100000, max_depth=64, max_file_bytes=16777216, min_free_bytes=67108864, chunk_bytes=262144, max_workspace_path_chars=None)
+cancel_check = <function TaskRunner.resume.<locals>.check at 0x000002AD94F42340>
+changed_paths = None
+
+    def build_tree(root: str | Path, ignore: list[str] | None = None, *, previous: dict | None = None,
+                   respect_gitignore: bool = True, max_file_bytes: int = MAX_FILE_BYTES,
+                   limits: ProjectLimits | None = None, cancel_check=None, changed_paths=None) -> dict:
+        """Index ``root``. With ``previous`` only files whose size/mtime/content changed are re-parsed."""
+        root = Path(root).expanduser().resolve()
+        limits = limits or ProjectLimits()
+        max_file_bytes = min(max_file_bytes, limits.max_file_bytes)
+        cancel_check = cancel_check or (lambda: None)
+        cancel_check()
+        generation = _generation(root)
+        if not root.is_dir():
+            raise TreeError(f"Project directory does not exist: {root}")
+        from atomic_flow.config import user_dir
+    
+        private_root = user_dir().resolve()
+        if root == private_root:
+            raise TreeError("Refusing to index atomic_flow private state as project source.")
+        skip = _Ignore(root, list(DEFAULT_IGNORE if ignore is None else ignore), respect_gitignore)
+        old = _group_by_path(previous, cancel_check)
+        per_file: dict[str, list[TreeNode]] = {}
+        parsed = reused = total_bytes = admitted_files = node_count = skipped = 0
+        for rel, path in source_files(root, skip, limits, cancel_check, private_root=private_root):
+                suffix = path.suffix.lower()
+                if suffix not in SOURCE_SUFFIXES:
+                    skipped += 1
+                    continue
+                admitted_files += 1
+                if admitted_files > limits.max_files:
+                    raise ResourceLimitError("indexed source file limit exceeded")
+                try:
+                    stat = path.stat()
+                except OSError:
+                    continue
+                if stat.st_size > max_file_bytes:
+                    if stat.st_size > limits.max_file_bytes:
+                        raise ResourceLimitError("indexed source per-file byte limit exceeded")
+                    skipped += 1
+                    continue
+                cached = old.get(rel)
+                try:
+                    with path.open("rb") as handle:
+                        chunks, size = [], 0
+                        while True:
+                            cancel_check()
+                            chunk = handle.read(min(64 * 1024, max_file_bytes + 1 - size))
+                            if not chunk:
+                                break
+                            size += len(chunk)
+                            total_bytes += len(chunk)
+                            if total_bytes > limits.max_total_bytes:
+                                raise ResourceLimitError("indexed source byte limit exceeded")
+                            chunks.append(chunk)
+                            if size > max_file_bytes:
+                                break
+                        data = b"".join(chunks)
+                    if len(data) > max_file_bytes:
+                        if len(data) > limits.max_file_bytes:
+                            raise ResourceLimitError("indexed source per-file byte limit exceeded")
+                        skipped += 1
+                        continue
+                    source = data.decode("utf-8-sig")
+                except (OSError, UnicodeError):
+                    skipped += 1
+                    continue
+                digest = hashlib.sha1(data).hexdigest()
+                if cached and cached[0].content_hash == digest:      # touched, not edited
+                    cached[0] = cached[0].model_copy(update={"mtime_ns": stat.st_mtime_ns})
+                    per_file[rel] = cached
+                    reused += 1
+                else:
+                    per_file[rel] = _index_file(rel, source, digest, stat.st_size, stat.st_mtime_ns,
+                                                suffix in PYTHON_SUFFIXES, cancel_check=cancel_check)
+                    parsed += 1
+                node_count += len(per_file[rel])
+                if node_count > limits.max_nodes:
+                    raise ResourceLimitError("indexed node limit exceeded")
+        cancel_check()
+        nodes = [n.model_copy(deep=True) for items in per_file.values() for n in items]
+        _link(nodes, cancel_check)
+        fingerprint = hashlib.sha1("\n".join(f"{n.path}:{n.content_hash}" for n in nodes if n.kind == "file").encode()).hexdigest()
+        return {"version": TREE_VERSION, "reference_format": REFERENCE_FORMAT,
+                "ro
+EXIT_CODE=ERR_CHILD_PROCESS_STDIO_MAXBUFFER

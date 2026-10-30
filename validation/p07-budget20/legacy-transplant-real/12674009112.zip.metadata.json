@@ -1,0 +1,20 @@
+{
+  "id": 12674009112,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY3NDAwOTExMg==",
+  "name": "p07-legacy-transplant-1146f073d642ca259544f95dea27ce1d0bc4bb75",
+  "size_in_bytes": 7539,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12674009112",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12674009112/zip",
+  "expired": false,
+  "digest": "sha256:7bbeb09b26137950d53d956261e8d220eaba7df7cad96553977e25403a627992",
+  "created_at": "2026-10-26T18:24:35Z",
+  "updated_at": "2026-10-26T18:24:35Z",
+  "expires_at": "2026-11-09T18:24:35Z",
+  "workflow_run": {
+    "id": 40377315871,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "1146f073d642ca259544f95dea27ce1d0bc4bb75"
+  }
+}

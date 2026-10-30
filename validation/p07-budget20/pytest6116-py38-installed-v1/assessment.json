@@ -1,0 +1,11 @@
+{
+  "run": 40892134352,
+  "artifact": 12904349164,
+  "archive_sha256": "709829a8711ac03020c20ae5d348eabbbaa440edbdacd24dc1f83b47021b7534",
+  "tested_commit": "e660d6bba0411bfb60a2574b94b315473bb9c739",
+  "status": "not_qualified_image_pull_failed_before_build",
+  "which_image": "unknown",
+  "container_created": false,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

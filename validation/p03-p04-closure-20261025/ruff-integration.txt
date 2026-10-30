@@ -1,0 +1,84 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> src\atomic_flow\graph\ingest.py:6:1
+   |
+ 4 |   Owned edits use the separate delta fast path. Events never grant read authority.
+ 5 |   """
+ 6 | / from __future__ import annotations
+ 7 | |
+ 8 | | import hashlib
+ 9 | | import os
+10 | | import shutil
+11 | | import subprocess
+12 | | import tempfile
+13 | | from pathlib import Path
+14 | |
+15 | | from atomic_flow.graph.delta import apply_delta, file_delta
+16 | | from atomic_flow.graph.adapter_resource import resource_kind
+17 | | from atomic_flow.graph.project import clean_build, project_files
+18 | | from atomic_flow.graph.schema import GraphContractError
+19 | | from atomic_flow.graph.store import GraphStore
+   | |______________________________________________^
+help: Organize imports
+   |
+14 |
+15 + from atomic_flow.graph.adapter_resource import resource_kind
+16 | from atomic_flow.graph.delta import apply_delta, file_delta
+   - from atomic_flow.graph.adapter_resource import resource_kind
+17 | from atomic_flow.graph.project import clean_build, project_files
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> src\atomic_flow\graph\sync.py:9:1
+   |
+ 7 |   — they are recorded in a sidecar log beside the store.
+ 8 |   """
+ 9 | / from __future__ import annotations
+10 | |
+11 | | import json
+12 | | import time
+13 | | from pathlib import Path
+14 | | from typing import Any
+15 | |
+16 | | from atomic_flow.graph.delta import apply_changes, fallback_rebuild
+17 | | from atomic_flow.graph.adapter_resource import resource_kind
+18 | | from atomic_flow.graph.adapter_ast import EXTRACTOR
+19 | | from atomic_flow.graph.adapter_resource import RESOURCE_EXTRACTOR
+20 | | from atomic_flow.graph.resolve import RESOLVER
+21 | | from atomic_flow.graph.project import clean_build, project_files, project_paths
+22 | | from atomic_flow.graph.schema import GraphContractError
+23 | | from atomic_flow.graph.store import GraphStore
+   | |______________________________________________^
+help: Organize imports
+   |
+15 |
+   - from atomic_flow.graph.delta import apply_changes, fallback_rebuild
+   - from atomic_flow.graph.adapter_resource import resource_kind
+16 | from atomic_flow.graph.adapter_ast import EXTRACTOR
+   - from atomic_flow.graph.adapter_resource import RESOURCE_EXTRACTOR
+   - from atomic_flow.graph.resolve import RESOLVER
+17 + from atomic_flow.graph.adapter_resource import RESOURCE_EXTRACTOR, resource_kind
+18 + from atomic_flow.graph.delta import apply_changes, fallback_rebuild
+19 | from atomic_flow.graph.project import clean_build, project_files, project_paths
+20 + from atomic_flow.graph.resolve import RESOLVER
+21 | from atomic_flow.graph.schema import GraphContractError
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> src\atomic_flow\llm\verification.py:3:1
+  |
+1 |   """Strict wire contract for measured identifier and source-span checks."""
+2 |
+3 | / import re
+4 | | from typing import Literal
+5 | |
+6 | | from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator, model_validator
+  | |______________________________________________________________________________________________^
+help: Organize imports
+  |
+7 |
+  -
+8 | Status = Literal["not_assessed", "passed", "failed"]
+  |
+
+Found 3 errors.
+[*] 3 fixable with `--fix`.

@@ -1,0 +1,23 @@
+{
+  "check_spec_digest": "0cfe30d1f1e30502b3ca2afe7c63fa88d78d5b0bde16520dd78d1d8de19ef374",
+  "diagnostic": null,
+  "file_sha256": "585c93666fcb046b7b264d3fa73202aa2a38254ae82a4b3ba19e873c2d5a9886",
+  "finished": true,
+  "interpreter": "/opt/p07-python36/bin/python3.6",
+  "kind": "private_syntax_observation",
+  "nonce": "1722bb99f0714a149fab9c66824805fd",
+  "outcome": "passed",
+  "path": "sympy/p07_probe.py",
+  "policy": "private-target-grammar/1",
+  "prefix": "/opt/p07-python36",
+  "python_version": [
+    3,
+    6,
+    15
+  ],
+  "request_digest": "5d18128df27f727017eb3c550e1beab92fb9ec03f4c646d50b0405071b70b692",
+  "root": "/testbed",
+  "runtime_digest": "efdccfb15db676d7a0bb598b060194d2218e0ed7c4d8f8c416fc51c06b2fe7e6",
+  "schema_version": 1,
+  "source_revision": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74"
+}

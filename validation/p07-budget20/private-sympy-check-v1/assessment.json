@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "status": "not_accepted",
+  "run_id": 40677575220,
+  "tested_commit": "9dc0cfad9e2ae41335c76c88de9da0da1bb5f596",
+  "artifact_id": 12810219772,
+  "artifact_sha256": "1229dda7f8d17386252a48a862a9f1510c3aee6ea6ce8689775b19a289a2679e",
+  "verified_raw_artifact_hashes": 76,
+  "syntax": {
+    "valid36": "passed",
+    "newer_walrus": "rejected"
+  },
+  "ordinary": {
+    "base": "failed_completed",
+    "edited": "passed_completed",
+    "required_skip": "unavailable_no_native_collection"
+  },
+  "cause": "Synthetic SKIP imported sympy.testing.pytest, absent from this historical source; copied inventory contains sympy/utilities/pytest.py. Core refused absent/partial collection; no success upgrade.",
+  "prospective_fix": "Use historical sympy.utilities.pytest skip helper; emit bounded native raw output before parsing so future unsupported output is retained.",
+  "cleanup_confirmed": true,
+  "provider_calls": 0,
+  "P07": "OPEN"
+}

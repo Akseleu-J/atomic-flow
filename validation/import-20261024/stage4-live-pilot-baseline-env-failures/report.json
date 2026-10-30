@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "instance_id": "sympy__sympy-21614",
+  "arm": "baseline",
+  "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "provider": "host_model_proxy",
+  "limits": {
+    "max_calls": 4,
+    "max_output_tokens": 2048,
+    "max_input_tokens": 60000,
+    "max_wall_seconds": 120.0,
+    "max_reported_cost_usd": 0.05
+  },
+  "status": "failed",
+  "calls": 0,
+  "tokens_in": null,
+  "tokens_out": null,
+  "cost_usd": null,
+  "cost_complete": false,
+  "human_interventions": 0,
+  "model_quality_measured": false,
+  "experiment": "exposed_public_development_pilot_not_formal_matched_comparison",
+  "money_admission": "declared_estimate_not_billing_guarantee",
+  "quota_admission": "authorized_host_responsibility",
+  "wall_enforcement": "cooperative_deadline_and_bounded_transport_not_os_hard_kill",
+  "error_type": "FileNotFoundError",
+  "request_outcome": "unknown",
+  "wall_seconds": 0.04600000008940697,
+  "known_cost_lower_bound_usd": 0
+}

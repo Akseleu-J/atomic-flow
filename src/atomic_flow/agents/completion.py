@@ -1,0 +1,144 @@
+"""Host completion gate over final workspace, independent of final model prose."""
+from __future__ import annotations
+
+import hashlib
+import json
+import time
+
+from atomic_flow.agents.diagnostics import syntax_diagnostic
+from atomic_flow.agents.execution import ExecutionUnavailable, run_python
+from atomic_flow.agents.source import confined_path, digest
+from atomic_flow.output import sanitize_output
+
+
+def assess_completion(task, changeset, config, cancel_check=lambda: None, *, check_obligation=None) -> dict:
+    report = {"schema_version": 1, "ready_to_publish": False, "checked_at": time.time(),
+              "checks": [], "diagnostics": [], "tests": "not_run", "model_calls": 0}
+    if task.goals or any(s.acceptance_criteria for s in task.steps):
+        report["declared_criteria"] = {"status": "not_assessed",
+                                       "scope": "declared checks only; no independent semantic requirement evaluator"}
+    cancel_check()
+    if check_obligation is None and (config.task.final_check == "ordinary_test"
+            or any(s.verify_with == "ordinary_test" and s.status != "superseded" for s in task.steps)):
+        report["tests"] = "unavailable"
+        report["checks"].append({"name": "ordinary_test_obligation", "status": "unavailable"})
+        return report
+    if not task.steps or task.current_index != len(task.steps) or not any(s.status == "done" for s in task.steps):
+        report["checks"].append({"name": "completed_steps", "status": "failed"})
+        return report
+    unresolved = [s.index for s in task.steps if s.status not in {"done", "superseded"}]
+    running = [s.index for s in task.steps if s.status == "running"]
+    if running or unresolved:
+        report["checks"].append({"name": "completed_steps", "status": "failed", "unresolved": unresolved})
+        return report
+    report["checks"].append({"name": "completed_steps", "status": "passed",
+                             "superseded_by_replanning": [s.index for s in task.steps if s.status == "superseded"]})
+    try:
+        if check_obligation is not None:
+            from atomic_flow.check_obligation import require_obligation_binding
+            require_obligation_binding(task.plan_approval, check_obligation)
+        changeset.check_original()
+        manifest = changeset.validate_workspace()
+        from atomic_flow.agents.step_evidence import receipt_matches
+        report["step_observations"] = [
+            {"index": step.index, "receipt": step.evidence.get("digest", ""),
+             "current": receipt_matches(step.evidence, step, manifest, task_id=task.id)[0],
+             "legacy_missing": not bool(step.evidence)} for step in task.steps if step.status == "done"]
+        if any(step.evidence and step.evidence["verification"]["outcome"] in {"failed", "unavailable"}
+               for step in task.steps if step.status == "done"):
+            report["checks"].append({"name": "step_observations", "status": "failed"})
+            return report
+        changed = sorted(p for p in manifest.keys() | changeset.state["baseline"].keys()
+                         if manifest.get(p) != changeset.state["baseline"].get(p))
+        report["changed_paths"] = [{"path": p, "before_hash": changeset.state["baseline"].get(p),
+                                    "after_hash": manifest.get(p)} for p in changed]
+        report["workspace_manifest_sha256"] = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
+        report["checks"].append({"name": "approved_diff_and_freshness", "status": "passed"})
+        for path in changed:
+            if path in manifest and path.lower().endswith(".ipynb"):
+                from atomic_flow.notebooks import NotebookDocument
+                notebook = NotebookDocument.load(changeset.workspace, path, expected_hash=manifest[path], private_workspace=True,
+                                                 tree_ignore=config.tree.ignore, respect_gitignore=config.tree.respect_gitignore)
+                if notebook.read()["missing_ids"]:
+                    raise ValueError("Changed notebook needs explicit cell ID normalization")
+                report["checks"].append({"name": "notebook_structure", "status": "passed", "path": path,
+                                         "execution": "not_run"})
+        for path in changed:
+            cancel_check()
+            if path not in manifest or not path.endswith((".py", ".pyi")):
+                continue
+            data = confined_path(changeset.workspace, path).read_bytes()
+            if digest(data) != manifest[path]:
+                raise ValueError("Workspace changed during final verification")
+            if check_obligation is not None and check_obligation.template.runtime_identity is not None:
+                from atomic_flow.check_execution import run_private_syntax
+                syntax_spec = check_obligation.derive(changeset.workspace, cancel_check=cancel_check)
+                syntax = run_private_syntax(syntax_spec, changeset.workspace, path, cancel_check=cancel_check)
+                report.setdefault("target_syntax_observations", []).append(syntax)
+                if syntax["outcome"] != "passed":
+                    report["diagnostics"].append({"path": path, **syntax["diagnostic"]})
+                continue
+            try:
+                compile(data, path, "exec", dont_inherit=True)
+            except SyntaxError as exc:
+                report["diagnostics"].append(sanitize_output(syntax_diagnostic(path, data, exc)))
+        report["checks"].append({"name": "final_python_syntax", "status": "failed" if report["diagnostics"] else "passed",
+                                 "scope": "Changed surviving Python files only"})
+        if report["diagnostics"]:
+            return report
+        impact_requires_tests = False
+        if changed:
+            from atomic_flow.graph.impact import verification_plan
+
+            # Final publication is an explicit full-content boundary. A targeted
+            # in-loop selection never replaces the final regression obligation.
+            files = {}
+            for path, expected in manifest.items():
+                cancel_check()
+                raw = confined_path(changeset.workspace, path).read_bytes()
+                if digest(raw) != expected:
+                    raise ValueError("Workspace changed during impact assessment")
+                files[path] = raw
+            report["impact_check_plan"] = verification_plan(files, changed)
+            impact_requires_tests = any(path.endswith(".py") and (
+                path.startswith("tests/") or path.rsplit("/", 1)[-1].startswith("test_")
+                or path.rsplit("/", 1)[-1].endswith("_test.py")) for path in files)
+            report["impact_check_plan"]["final_gate_applicable"] = impact_requires_tests
+            if not impact_requires_tests:
+                report["impact_check_plan"]["test_coverage"] = "not_assessed_no_test_files"
+        if check_obligation is not None:
+            from atomic_flow.check_obligation import check_observation, require_obligation_binding, run_obligation_check
+            require_obligation_binding(task.plan_approval, check_obligation)
+            spec, receipt = run_obligation_check(check_obligation, changeset.workspace, cancel_check=cancel_check)
+            report.update(check_observation(check_obligation, spec, receipt))
+            report["tests"] = "passed" if receipt.check_passed else "failed"
+            report["test_exit_code"] = receipt.result.returncode
+            report["test_timed_out"] = receipt.result.timed_out
+            report["test_output_tail"] = sanitize_output((receipt.result.stdout + receipt.result.stderr)[-3000:])
+            if not receipt.check_passed:
+                return report
+        elif (impact_requires_tests or config.task.final_check == "pytest"
+                or any(s.verify_with == "pytest" and s.status == "done" for s in task.steps)):
+            result = run_python(["-m", "pytest", "-q", "--no-header", "-x"], changeset.workspace,
+                                config=config.execution, timeout=180, cancel_check=cancel_check)
+            report["tests"] = ("unavailable" if result.returncode == 5 else
+                               "passed" if result.returncode == 0 and not result.timed_out else "failed")
+            report["test_exit_code"] = result.returncode
+            report["test_timed_out"] = result.timed_out
+            report["test_output_tail"] = sanitize_output((result.stdout + result.stderr)[-3000:])
+            if report["tests"] != "passed":
+                return report
+        cancel_check()
+        changeset.check_original()
+        if changeset.validate_workspace() != manifest:
+            raise ValueError("Workspace changed during final checks")
+    except ExecutionUnavailable:
+        report["tests"] = "unavailable"
+        report["checks"].append({"name": "final_tests", "status": "unavailable"})
+        return report
+    except (OSError, ValueError) as exc:
+        report["checks"].append({"name": "workspace_integrity", "status": "failed", "error_type": type(exc).__name__})
+        return report
+    report["ready_to_publish"] = True
+    report["limits"] = "Host gates confirm declared checks and approved bytes, not semantic fulfillment of every user requirement."
+    return report

@@ -1,0 +1,32 @@
+{
+  "status": "scripted_real_github_queue_qualified",
+  "tested_commit": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+  "provider_calls": 0,
+  "model_generation": false,
+  "scope": "real GitHub queue with scripted host broker only",
+  "identity": {
+    "campaign_id": "p07_zero_provider_queue_smoke",
+    "owner": "akseley",
+    "arm": "scripted",
+    "task_id": "public_transport_smoke",
+    "framework_sha": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+    "workflow_sha": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+    "profile_sha256": "c535e8fb5c8d01e894163067e5fdef411bb27457b4c87a4eba0413ce49fb0745"
+  },
+  "result": {
+    "content": "p07_scripted_queue_roundtrip",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cost_usd": 0.0,
+    "latency_ms": 0,
+    "truncated": false,
+    "cache_read_tokens": null,
+    "cache_write_tokens": null,
+    "cost_source": "scripted_zero_provider_calls",
+    "tool_calls": [],
+    "resolved_backend": "kaggle_model_proxy",
+    "resolved_model": "anthropic/claude-sonnet-5@default",
+    "attempt_id": "mq_f67add32a615483db1e78added158960"
+  },
+  "backend_name": "p07_github_queue:c46864a9b160b6be0b8bbe7161d924ccf061ad7230e97a78984de78270cc489e"
+}

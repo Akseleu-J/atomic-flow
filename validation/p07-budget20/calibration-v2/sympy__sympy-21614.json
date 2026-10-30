@@ -1,0 +1,157 @@
+{
+  "instance_id": "sympy__sympy-21614",
+  "status": "completed",
+  "calibrated": true,
+  "model_calls": 0,
+  "provider_credentials": "none",
+  "harness": "3.0.15",
+  "image_tag": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614:latest",
+  "image_digest": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861",
+  "image_id": "sha256:82017070db0eaee9d28e721400d4505fe83832bdcfaf4d17a9bbb3128fcb622b",
+  "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "controls_sha256": "b7f2df4bda63befd1736f55191c2fdade5ce0c9eed8ef0f7a9020bd09ac86ea0",
+  "negative_control_rationale": "Hard-code scalar kind instead of preserving the expression kind.",
+  "test_command": "PYTHONWARNINGS='ignore::UserWarning,ignore::SyntaxWarning' bin/test -C --verbose",
+  "eval_script_sha256": "a23d57faddc67f55751145a86df1019d50b31416ed06331d820996562dc4c099",
+  "rows": [
+    {
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-sympy__sympy-21614-a345840364",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"
+      },
+      "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf",
+      "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "environment_packages": "flake8 @ file:///croot/flake8_1726157165993/work\nflake8-comprehensions==3.16.0\nmccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work\nmpmath @ file:///croot/mpmath_1690848262763/work\npycodestyle @ file:///croot/pycodestyle_1726150303809/work\npyflakes @ file:///croot/pyflakes_1708962956225/work\n# Editable Git install with no remote (sympy==1.9.dev0)\n-e /testbed",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sympy/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "test_NumberKind": "PASSED",
+        "test_Add_kind": "PASSED",
+        "test_mul_kind": "PASSED",
+        "test_Symbol_kind": "PASSED",
+        "test_Integral_kind": "PASSED",
+        "test_Derivative_kind": "FAILED",
+        "test_Matrix_kind": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {
+          "sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED"
+        },
+        "discarded_nested_or_alias_observations": {
+          "sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED"
+        }
+      },
+      "regressions_passed": true,
+      "assertion_failures": [
+        "test_Derivative_kind"
+      ],
+      "cleanup_exit": 0,
+      "wall_seconds": 4.090971088000003,
+      "log_sha256": "4d779318be3a821ef1125190eaa9bb94128a8affb85883fda9f4950e0445ae1a"
+    },
+    {
+      "label": "gold",
+      "patch_sha256": "5a20f33fdb0a731064a81dc26e925e91557900bb7edbfce84463de6280e8e3cd",
+      "status": "verified_success",
+      "verified_success": true,
+      "container_name": "p07-sympy__sympy-21614-18562d6c40",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"
+      },
+      "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf",
+      "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "environment_packages": "flake8 @ file:///croot/flake8_1726157165993/work\nflake8-comprehensions==3.16.0\nmccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work\nmpmath @ file:///croot/mpmath_1690848262763/work\npycodestyle @ file:///croot/pycodestyle_1726150303809/work\npyflakes @ file:///croot/pyflakes_1708962956225/work\n# Editable Git install with no remote (sympy==1.9.dev0)\n-e /testbed",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sympy/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "test_NumberKind": "PASSED",
+        "test_Add_kind": "PASSED",
+        "test_mul_kind": "PASSED",
+        "test_Symbol_kind": "PASSED",
+        "test_Integral_kind": "PASSED",
+        "test_Derivative_kind": "PASSED",
+        "test_Matrix_kind": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "regressions_passed": true,
+      "assertion_failures": [],
+      "cleanup_exit": 0,
+      "wall_seconds": 4.107548310999988,
+      "log_sha256": "be4363e96ff42823d1d26c87ebbfe7270967c1910937eca4e97914c0a534f558"
+    },
+    {
+      "label": "wrong",
+      "patch_sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "container_name": "p07-sympy__sympy-21614-3ece4e41de",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-21614@sha256:1ecde513410482e3926c7816b74cbbbb7997ac03041b7daed6c82f5758265861"
+      },
+      "image_checkout_head": "a5096ee7b2a17bcbb1406e56ec8e83dd8076c2cf",
+      "base_verified": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "environment_packages": "flake8 @ file:///croot/flake8_1726157165993/work\nflake8-comprehensions==3.16.0\nmccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work\nmpmath @ file:///croot/mpmath_1690848262763/work\npycodestyle @ file:///croot/pycodestyle_1726150303809/work\npyflakes @ file:///croot/pyflakes_1708962956225/work\n# Editable Git install with no remote (sympy==1.9.dev0)\n-e /testbed",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sympy/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "test_NumberKind": "PASSED",
+        "test_Add_kind": "PASSED",
+        "test_mul_kind": "PASSED",
+        "test_Symbol_kind": "PASSED",
+        "test_Integral_kind": "PASSED",
+        "test_Derivative_kind": "FAILED",
+        "test_Matrix_kind": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "failure_header_aliases": {
+          "sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED"
+        },
+        "discarded_nested_or_alias_observations": {
+          "sympy/core/tests/test_kind.py:test_Derivative_kind": "FAILED"
+        }
+      },
+      "regressions_passed": true,
+      "assertion_failures": [
+        "test_Derivative_kind"
+      ],
+      "cleanup_exit": 0,
+      "wall_seconds": 3.9741256199999953,
+      "log_sha256": "0b9d44bd79dbbb63623ea318025c33f160f271de9724da7764a490ebaaad1216"
+    }
+  ]
+}

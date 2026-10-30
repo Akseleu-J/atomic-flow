@@ -1,0 +1,17 @@
+{
+  "run": 40890624670,
+  "artifact": 12905520444,
+  "archive_sha256": "abbd3bff8a99a94af9057f7f2647824d24f73af71c657a440709429a8c75210a",
+  "tested_commit": "60fb3352f84feb69e754740c268d3951cb69d901",
+  "status": "complete_diagnostic_with_unresolved_skips",
+  "python": "3.8.20",
+  "collected": 2617,
+  "completed": 2617,
+  "native_summary": "2492 passed, 115 skipped, 10 xfailed",
+  "stdout_sha256": "3530e6f2ebe99a119dbfd3e8b09cac20d939e1c2edae7014440a78aafe3a444e",
+  "source_blobs_verified": 474,
+  "matched_previous_node_ids": true,
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

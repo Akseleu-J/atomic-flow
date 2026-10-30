@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "accepted_single_live_api_contract",
+  "scope": "one public API contract diagnostic; no code task/model quality/oracle claim",
+  "tested_commit": "e7c54c184ce4f1244e1c90e2cc45e04b54c6c9fa",
+  "call_id": "mq_d6b49f5aafd94efdaabe2e9baa053fb2",
+  "outcome": {
+    "call_id": "mq_d6b49f5aafd94efdaabe2e9baa053fb2",
+    "state": "completed",
+    "sent": true
+  },
+  "outbound_physical_requests": 1,
+  "model_response_content_verified": true,
+  "result": {
+    "content": "{\"status\":\"ok\"}",
+    "tokens_in": 25,
+    "tokens_out": 11,
+    "cost_usd": "0.00016",
+    "latency_ms": 1094,
+    "truncated": false,
+    "cost_source": "provider",
+    "resolved_backend": "kaggle_model_proxy",
+    "resolved_model": "anthropic/claude-sonnet-5@default",
+    "attempt_id": "mq_d6b49f5aafd94efdaabe2e9baa053fb2"
+  },
+  "known_actual_usd": "0.00016",
+  "known_total_including_prior_usd": "0.035931375",
+  "unresolved_reserved_usd": "0",
+  "automatic_retries": 0,
+  "P07": "OPEN"
+}

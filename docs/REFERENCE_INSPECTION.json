@@ -1,0 +1,227 @@
+{
+  "review_date": "2026-10-22",
+  "atomic_flow_commit": "7b15406a9541330b374fe1d8a5ec48ac07efbdc1",
+  "reference_repository": "https://github.com/777genius/claude-code-source-code-full",
+  "reference_commit": "021277ac7bad4954e7806e5a9bfc122a533607e2",
+  "reference_commit_tree": "8121460924c7499829b11ed2166e2147945dfe44",
+  "inventory_entries": 2486,
+  "inventory_truncated": false,
+  "selected_source_files": 34,
+  "scope": "Repository-wide path inventory; six documentation pages; selected source declarations, comments and relevant sections. Not an exhaustive source audit or execution test. No source content reproduced here.",
+  "files": [
+    {
+      "path": "src/Tool.ts",
+      "sha256": "549296da32e984026258a6baa300f3c9e89c71aa7ce8b070f9c974e6e9550f58",
+      "bytes": 29518,
+      "lines": 794
+    },
+    {
+      "path": "src/QueryEngine.ts",
+      "sha256": "f4f7f08507abff6fac6a05f7c65b80a0ccdca2af95667e471d9254d9988aa7df",
+      "bytes": 46632,
+      "lines": 1297
+    },
+    {
+      "path": "src/query/tokenBudget.ts",
+      "sha256": "f9b92dddff5aac6e83526c23327e9e179dd26fbf063f26ca36b3736b3910a36f",
+      "bytes": 2321,
+      "lines": 94
+    },
+    {
+      "path": "src/services/tokenEstimation.ts",
+      "sha256": "66c24e2eca2d4665f6f0de42d1b8d585cae01a4e01654771eb2a39fc59022d3f",
+      "bytes": 16884,
+      "lines": 496
+    },
+    {
+      "path": "src/services/compact/autoCompact.ts",
+      "sha256": "903f64e00b6d47c993082d52d2d2d6895c5b0445a5161fe359d5640091344bdc",
+      "bytes": 12906,
+      "lines": 352
+    },
+    {
+      "path": "src/services/compact/sessionMemoryCompact.ts",
+      "sha256": "141b5f638f0f39b8f3517a3ec53c9110f0df365c57504b19387e4cbc72ea9ac5",
+      "bytes": 21059,
+      "lines": 631
+    },
+    {
+      "path": "src/utils/toolResultStorage.ts",
+      "sha256": "fea1b0a4189451a028ec3f4c44636b2eb88279f9147b63fe028d0c1bb23eaaad",
+      "bytes": 38385,
+      "lines": 1041
+    },
+    {
+      "path": "src/utils/fileHistory.ts",
+      "sha256": "365251e75e74e52e9cdde6d6d368b33121ea06ba21f12d8fbff3d55b3d682369",
+      "bytes": 34661,
+      "lines": 1116
+    },
+    {
+      "path": "src/utils/fileStateCache.ts",
+      "sha256": "a4add79483232725765b7216af86ad53332e208e117559ae4f64230107829fd9",
+      "bytes": 4176,
+      "lines": 143
+    },
+    {
+      "path": "src/utils/sessionStoragePortable.ts",
+      "sha256": "d665a9bf73e2cd3ead81ea84810af35aef047556796870d95871de4dca012d33",
+      "bytes": 25449,
+      "lines": 794
+    },
+    {
+      "path": "src/utils/stream.ts",
+      "sha256": "83e5c3f7a8fafcf5eda46a46de959a7eb96a876ce217f9a0f469b6cb3affff05",
+      "bytes": 1927,
+      "lines": 77
+    },
+    {
+      "path": "src/utils/messageQueueManager.ts",
+      "sha256": "d1fbf238b04f4c9ccf742fc5a161258b6eaed7bc6330cedf7e881c57cc2ba7d2",
+      "bytes": 16564,
+      "lines": 548
+    },
+    {
+      "path": "src/utils/permissions/PermissionRule.ts",
+      "sha256": "8740b89876f562caebde7846269e03478e512bfbede60e77fd9e64e1a829fa39",
+      "bytes": 1177,
+      "lines": 41
+    },
+    {
+      "path": "src/utils/permissions/permissionsLoader.ts",
+      "sha256": "894f12cfca129081c43a14fd4170b82e7d9738b402a61f5b8fce08bac5dc206a",
+      "bytes": 8744,
+      "lines": 297
+    },
+    {
+      "path": "src/utils/permissions/shadowedRuleDetection.ts",
+      "sha256": "e0676573c043fed0273643ece1c1e9da16db7376deb237e3a0d831af8e8c6260",
+      "bytes": 8051,
+      "lines": 235
+    },
+    {
+      "path": "src/services/tools/toolHooks.ts",
+      "sha256": "eba6ec3162fff92e38fdd11d3acf9daf461d4892a6e3bf21584842002b89273a",
+      "bytes": 22334,
+      "lines": 651
+    },
+    {
+      "path": "src/query/stopHooks.ts",
+      "sha256": "be391715548cfce8920727ef1019ab6c2daff09e37fedc6c56ec503c39c98f7c",
+      "bytes": 17291,
+      "lines": 474
+    },
+    {
+      "path": "src/memdir/findRelevantMemories.ts",
+      "sha256": "723a68d90f6a1d2a4a056bfa15dca2e95a01b68216870d57d3f7fdaad49669ad",
+      "bytes": 5306,
+      "lines": 142
+    },
+    {
+      "path": "src/memdir/memoryScan.ts",
+      "sha256": "00eaa7b74ff2e92230a77efd4836301ddd4623469eac8a0b68eb67f76edc5115",
+      "bytes": 3106,
+      "lines": 95
+    },
+    {
+      "path": "src/services/lsp/passiveFeedback.ts",
+      "sha256": "8d6a85462eb9310abe60d2153c479508d39bbbee693de737fd81212a6daf5f1d",
+      "bytes": 11191,
+      "lines": 329
+    },
+    {
+      "path": "src/tasks/types.ts",
+      "sha256": "9d107a91f4a79a5be0fca3a5251b5e40dd3a1c5155bf8dc48dbf4021c74c6855",
+      "bytes": 1692,
+      "lines": 47
+    },
+    {
+      "path": "src/tasks/LocalShellTask/guards.ts",
+      "sha256": "f6397437cf195ab7aac2b36b5c5256731c6690ecffe9841ac29de081e1311ed3",
+      "bytes": 1553,
+      "lines": 42
+    },
+    {
+      "path": "src/services/mcp/types.ts",
+      "sha256": "53256321070c0d2503618dd40581a7a39b2e69231b353bc7be8c5ed57ed7fe90",
+      "bytes": 6963,
+      "lines": 259
+    },
+    {
+      "path": "src/tools/ToolSearchTool/ToolSearchTool.ts",
+      "sha256": "af06047f751894157f13ea7966d1484f94aecea731f8bdaec65ec87af7d8193a",
+      "bytes": 14276,
+      "lines": 472
+    },
+    {
+      "path": "src/services/api/withRetry.ts",
+      "sha256": "325f3e39eba3f143f84dd25878e07626545e595245d2f4192cfe57d6cf98190c",
+      "bytes": 28239,
+      "lines": 823
+    },
+    {
+      "path": "src/services/api/promptCacheBreakDetection.ts",
+      "sha256": "2ecc818caf3d19af513d33a542ea9ff7591caf6dddfca69980b2a89a11086183",
+      "bytes": 26289,
+      "lines": 728
+    },
+    {
+      "path": "src/tools/GrepTool/GrepTool.ts",
+      "sha256": "cf4e791cad2b69656d0a2f236a3765ee1e03d0e59bab6635ef3f522a423b0fae",
+      "bytes": 20088,
+      "lines": 578
+    },
+    {
+      "path": "src/tools/FileEditTool/FileEditTool.ts",
+      "sha256": "4a3b50beedf981f75f40ea1b4755c907d0ff6be82164f908391108df929a7aa3",
+      "bytes": 20503,
+      "lines": 626
+    },
+    {
+      "path": "src/query.ts",
+      "sha256": "fca2a92d6923d699a5d6893e7f9373ff2c080d68ffcd83eef7eb7b7e2e8bef68",
+      "bytes": 68684,
+      "lines": 1730
+    },
+    {
+      "path": "src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx",
+      "sha256": "97376d8e18c3f1e84f3c95bde2aed3d23c020e2c01bab7d0f05829b303c393c3",
+      "bytes": 39888,
+      "lines": 266
+    },
+    {
+      "path": "src/tools/EnterWorktreeTool/EnterWorktreeTool.ts",
+      "sha256": "40015a79824b567c1be52ec34c766e899028016f23394bcd848ac7e97a4fe25e",
+      "bytes": 4365,
+      "lines": 128
+    },
+    {
+      "path": "src/entrypoints/agentSdkTypes.ts",
+      "sha256": "b27cee43d6c811dc2d67216689fd9057b28ffa2159b7dc95f67ca09438c90218",
+      "bytes": 13077,
+      "lines": 444
+    },
+    {
+      "path": "src/schemas/hooks.ts",
+      "sha256": "27ee916fc571ac3b655ca630cdd14b2182053136e4384ae95d0003a0c5c66474",
+      "bytes": 7885,
+      "lines": 223
+    },
+    {
+      "path": "src/skills/loadSkillsDir.ts",
+      "sha256": "bef7a235872cbba90612bc11763bdd7f74f95980c0fbfe4fa5d28f45c385d2f6",
+      "bytes": 34416,
+      "lines": 1087
+    }
+  ],
+  "unsuccessful_path_probes": [
+    {
+      "path": "src/tools/AskUserQuestionTool/AskUserQuestionTool.ts",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "path": "src/utils/streamingToolExecutor.ts",
+      "error": "not in tree"
+    }
+  ]
+}

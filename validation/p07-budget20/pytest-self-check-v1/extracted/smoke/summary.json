@@ -1,0 +1,238 @@
+{
+  "base_commit": "e670ff76cbad80108bde9bab616b66771b8653cf",
+  "calibration_sha256": "b98f6e53c349c6d43421c448d0aabc3aefaa84c003dac274da3a24a8c11fd8e4",
+  "cases": [
+    {
+      "case": "base_fail",
+      "check_passed": false,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "process_exit": 1,
+      "runner_receipt": {
+        "_pytest_module": "/testbed/src/_pytest/__init__.py",
+        "argv": [
+          "-rA",
+          "testing/test_p07_self_check.py"
+        ],
+        "call_failed": 1,
+        "collected": 2,
+        "collection_complete": true,
+        "collection_errors": 0,
+        "completed": 2,
+        "exit_code": 1,
+        "failed": 1,
+        "files": [
+          "testing/test_p07_self_check.py"
+        ],
+        "finished": true,
+        "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+        "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+        "nonce": "0cd95319bf0e45e0be3161100a86378d",
+        "pytest_module": "/testbed/src/pytest.py",
+        "pytest_self_identity": {
+          "pytest_entrypoint": "src/pytest.py",
+          "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+          "python_version": [
+            3,
+            9,
+            20
+          ],
+          "source_root": "src",
+          "source_sha256": {
+            "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+            "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+          },
+          "traceback": "auto"
+        },
+        "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+        "python_version": [
+          3,
+          9,
+          20
+        ],
+        "root": "/testbed",
+        "runner": "pytest-self",
+        "setup_failed": 0,
+        "skipped": 0,
+        "teardown_failed": 0
+      },
+      "source_after": "0c8b11b5ebd454b7c96a445e505b3a45b30bcd9fbbf27865718a80efd6a752cf",
+      "source_before": "0c8b11b5ebd454b7c96a445e505b3a45b30bcd9fbbf27865718a80efd6a752cf",
+      "spec_digest": "0f6d12bcd5f7640bfbe5be72003fad583257d87a51c608bdc4bf3854451028f1",
+      "status": "expected_pytest_self_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "c72f500e0660779d67a88d1140178998e937d884701eec2862e2574aed1af7ae",
+      "verified_success": false
+    },
+    {
+      "case": "edited_pass",
+      "check_passed": true,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "process_exit": 0,
+      "runner_receipt": {
+        "_pytest_module": "/testbed/src/_pytest/__init__.py",
+        "argv": [
+          "-rA",
+          "testing/test_p07_self_check.py"
+        ],
+        "call_failed": 0,
+        "collected": 2,
+        "collection_complete": true,
+        "collection_errors": 0,
+        "completed": 2,
+        "exit_code": 0,
+        "failed": 0,
+        "files": [
+          "testing/test_p07_self_check.py"
+        ],
+        "finished": true,
+        "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+        "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+        "nonce": "5cc8eade2edd4098b9c0075b16b13487",
+        "pytest_module": "/testbed/src/pytest.py",
+        "pytest_self_identity": {
+          "pytest_entrypoint": "src/pytest.py",
+          "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+          "python_version": [
+            3,
+            9,
+            20
+          ],
+          "source_root": "src",
+          "source_sha256": {
+            "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+            "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+          },
+          "traceback": "auto"
+        },
+        "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+        "python_version": [
+          3,
+          9,
+          20
+        ],
+        "root": "/testbed",
+        "runner": "pytest-self",
+        "setup_failed": 0,
+        "skipped": 0,
+        "teardown_failed": 0
+      },
+      "source_after": "b279bb3cbf7504ba23b135a5125d4349280e783f1780fb18c01358a9d57de272",
+      "source_before": "b279bb3cbf7504ba23b135a5125d4349280e783f1780fb18c01358a9d57de272",
+      "spec_digest": "4faa1ab2ccf4364f465ee3f271f5590fa47a196edf88884fc7dd89f7c14f38fa",
+      "status": "expected_pytest_self_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "8d5ccdc901890418b6bcfeac8329e8d4a2b1aa675293c83ed7ec4f6eba62157f",
+      "verified_success": false
+    },
+    {
+      "case": "required_skip",
+      "check_passed": false,
+      "cleanup": "confirmed_by_existing_executor_return",
+      "process_exit": 5,
+      "runner_receipt": {
+        "_pytest_module": "/testbed/src/_pytest/__init__.py",
+        "argv": [
+          "-rA",
+          "testing/test_p07_self_check.py"
+        ],
+        "call_failed": 0,
+        "collected": 2,
+        "collection_complete": true,
+        "collection_errors": 0,
+        "completed": 2,
+        "exit_code": 0,
+        "failed": 0,
+        "files": [
+          "testing/test_p07_self_check.py"
+        ],
+        "finished": true,
+        "interpreter": "/opt/miniconda3/envs/testbed/bin/python",
+        "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9",
+        "nonce": "63539ba52430405f88dd6585f9e391f2",
+        "pytest_module": "/testbed/src/pytest.py",
+        "pytest_self_identity": {
+          "pytest_entrypoint": "src/pytest.py",
+          "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+          "python_version": [
+            3,
+            9,
+            20
+          ],
+          "source_root": "src",
+          "source_sha256": {
+            "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+            "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+          },
+          "traceback": "auto"
+        },
+        "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+        "python_version": [
+          3,
+          9,
+          20
+        ],
+        "root": "/testbed",
+        "runner": "pytest-self",
+        "setup_failed": 0,
+        "skipped": 1,
+        "teardown_failed": 0
+      },
+      "source_after": "5e654934806d8008be655978176deeff4d4cf0312011089da1a3e98e5f3bb233",
+      "source_before": "5e654934806d8008be655978176deeff4d4cf0312011089da1a3e98e5f3bb233",
+      "spec_digest": "c2ff13a79a59db184d13547fb914d63e4ee050d7a8559f8cd8c4e30563585c33",
+      "status": "expected_pytest_self_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "7b10f8cfb00bfb068a1a2af8da520bb486240e034ba471f339428eb369cf20d6",
+      "verified_success": false
+    }
+  ],
+  "full_source_file_count": 577,
+  "full_source_revision": "d7114470de77181577acabd81f77672c77f650e9ba56193af90900b79613f54b",
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "image": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-6116@sha256:5fb21e0b90b8df4b1da5876db062a0be7f601d12bce36ac6ae5c8a72b0005be9",
+  "image_id": "sha256:cebf8f9441129ee8fc2853430a94e53bbc967868fd9b2a4e6389492490d50bb3",
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "protected_source_sha256": {
+    "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+    "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+  },
+  "provider_calls": 0,
+  "provider_credentials": "not_forwarded",
+  "provisioning_cleanup": [
+    {
+      "confirmed": true,
+      "name": "p07-pytest-probe-284b26f570d043e0bbc5cbcc",
+      "remove_exit": 0
+    },
+    {
+      "confirmed": true,
+      "name": "p07-pytest-source-631a6cc8db7b4bcd8f2c1031",
+      "remove_exit": 0
+    }
+  ],
+  "pytest_self_identity": {
+    "pytest_entrypoint": "src/pytest.py",
+    "pytest_version": "5.2.3.dev198+ge670ff76c.d20260815",
+    "python_version": [
+      3,
+      9,
+      20
+    ],
+    "source_root": "src",
+    "source_sha256": {
+      "src/_pytest/__init__.py": "e857f9bfff4264aa72d65f3b013e5c20739f300f64753b73865d86dd08d80bd4",
+      "src/pytest.py": "8d944e9f607fe391d56b472d61a3f2767e6865ca0e27cfb9e1a33096f5255aba"
+    },
+    "traceback": "auto"
+  },
+  "scope": "pytest-self CheckSpec synthetic ordinary-test boundary only",
+  "smoke_tool_sha256": "0f1028c87ef54661c189f3c1dd07f2a144db285e0be407693d640a41d1722938",
+  "source_container_cleanup_confirmed": true,
+  "status": "pytest_self_check_boundary_qualified",
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "9538c147271c6816dee736d5a9bec64c3a7ea48c",
+  "verified_success": false
+}

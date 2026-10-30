@@ -1,0 +1,31 @@
+{
+  "receipt": {
+    "check_spec_digest": "6972c9823c5959a80390e7108bf8bc9d96d24833ef28c8665733d81374e7252f",
+    "diagnostic": null,
+    "file_sha256": "88f92d58d9706e16b293aacf471dd930213780b70cbf773d31c716c3e1e84682",
+    "finished": true,
+    "interpreter": "/opt/p07-python36/bin/python3.6",
+    "kind": "private_syntax_observation",
+    "nonce": "2b6be3864d684e0bbfa8941ed52185e5",
+    "outcome": "passed",
+    "path": "sympy/p07_probe.py",
+    "policy": "private-target-grammar/1",
+    "prefix": "/opt/p07-python36",
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "request_digest": "8ad7e24849fecbd0e68540a8afb14a0612a4b79b75ee51d2d96df710f30883b2",
+    "root": "/testbed",
+    "runtime_digest": "d2b93caacdebda1b387d59f57f4b8cabec24b40671311723604935a8ec343f55",
+    "schema_version": 1,
+    "source_revision": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae"
+  },
+  "returncode": 0,
+  "source_after": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae",
+  "source_before": "e9c9f36d29f1428e7ad2ab36c7bdb1124bede91c7a16374a32da850110a220ae",
+  "stderr_truncated": false,
+  "stdout_truncated": false,
+  "timed_out": false
+}

@@ -1,0 +1,15 @@
+# P07: function36 full public TaskRunner journeys — 2026-10-29
+
+P07 remains OPEN. Tested runtime commit: `875fd01b1f3f4b4521b887688d27a82678f47df1`. [Journey CI](https://github.com/Akseleu-J/atomic-flow/actions/runs/40824311185) and [general CI](https://github.com/Akseleu-J/atomic-flow/actions/runs/40824307411) both completed SUCCESS on that exact head. This is scripted synthetic probe repair; provider calls: 0; hidden oracle: not run; verified model success: false.
+
+| Public task | Base commit | First full check | Four subsequent full checks | Artifact ID | Archive SHA256 |
+|---|---|---|---|---|---|
+| requests-1963 | `110048f9837f8441ea536804115e80b69f400277` | 121 pass, 1 synthetic fail | 122 pass each | 12875842403 | `9a8bb11480b90eccfb890a58c33d2308f6bb5ab7aaa617a1c338f5100665fdeb` |
+| requests-2148 | `fe693c492242ae532211e0c173324f09ca8cf227` | 133 pass, 1 synthetic fail | 134 pass each | 12875134258 | `0dd72027af6a42799177c2d4da085882eef780287f27de83f2e4575d0978a8d1` |
+| requests-2317 | `091991be0da19de9108dbe5e3752917fea3d7fdc` | 143 pass, 1 synthetic fail | 144 pass each | 12876291075 | `a89a72df9eea9ad2bab0df0249c8a1730fcf8baa9097f37c7ef532666f21ffc0` |
+
+Each journey has the complete public ordinary test file plus two synthetic fixture tests, one deterministic replan, and a final fresh check. Only the synthetic probe module changes. Before each journey, three separate checks confirm FAIL, edited PASS, and rejection of a required SKIP. Audited 823 raw manifest hashes per archive and eight resource receipts per task, including source stability, runner raw receipt binding, separate network namespace, matching nonce, server shutdown and container cleanup. The rejected SKIP has a raw runner receipt but no admitted host runner receipt, as intended.
+
+Independently retrieved the public upstream Git trees and verified each archive blob against its upstream Git object. Every admitted core file matches its respective base. The public `requests/cacert.pem` is excluded from the candidate and separately sourced from the immutable image as a controlled execution resource; two synthetic files are additions. Public-base archive SHA256 values: 1963 `4ff0ee4b8a5f83349708083d3ec52b00d999e9fc2fab2059cb9d47545126e5bf`, 2148 `e41eabcc007990d89236eff09f234f432590e49c69771d5ea86ac8e0cede81ac`, 2317 `c660230314a0ffd0882b36afb24df1f6d2a707886b4a121f8e069d2c4c398efa`. Local archives and machine-readable assessments are under `validation/p07-budget20/function36-task-v1/`; base audit under `validation/p07-budget20/function36-public-base-audit/`.
+
+General CI records 3267 passed and 14 skipped on each of Python 3.11 and 3.12; Windows runtime 4 passed, wheel acceptance and Docker validation passed. Six downloaded archive digests match GitHub artifact metadata. Historical model quality, paid matched evaluation and hidden grading remain unmeasured. Next: Requests2674 Python 2.7 and Requests863 SSLv3/wire, then remaining ordinary profiles and the frozen matched study gates.

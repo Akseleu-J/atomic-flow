@@ -1,0 +1,1752 @@
+{
+  "version": 2,
+  "status": "prospective_v2_wheel_closure_unqualified",
+  "kind": "Requests3362 full-suite dependency candidate v2; not a historical-exact lock or accepted runtime",
+  "created_date": "2026-10-27",
+  "model_calls": 0,
+  "target_execution": false,
+  "model_visible": false,
+  "requested_runtime": {
+    "implementation": "CPython",
+    "version_series": "3.6",
+    "abi": "cp36m",
+    "platform": "linux_x86_64",
+    "glibc_wheel_floor": "manylinux1",
+    "immutable_runtime_image": null,
+    "installed_or_probed": false
+  },
+  "pins": {
+    "httpbin": "0.5.0",
+    "Flask": "0.12.5",
+    "Werkzeug": "0.11.4",
+    "Jinja2": "2.8",
+    "MarkupSafe": "1.1.1",
+    "pytest": "2.8.7",
+    "pytest-mock": "0.11.0",
+    "pytest-httpbin": "0.2.0",
+    "decorator": "4.0.9",
+    "itsdangerous": "1.1.0",
+    "six": "1.10.0",
+    "click": "6.7",
+    "py": "1.4.31",
+    "PySocks": "1.7.1"
+  },
+  "wheels": [
+    {
+      "name": "httpbin",
+      "version": "0.5.0",
+      "filename": "httpbin-0.5.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/55/0a/387c7e8dca03cd40a0048cd20c096c1204cb4c63eafb6e21bf00dbfbe8a6/httpbin-0.5.0-py2.py3-none-any.whl",
+      "sha256": "710069973216d4bbf9ab6757f1e9a1f3be05832ce77da023adce0a98dfeecfee",
+      "primary_metadata_url": "https://pypi.org/pypi/httpbin/0.5.0/json",
+      "primary_metadata_response_sha256": "89061b951386c7d32a59ae02b0fc693df86b56f17dda1b136561854a8377a9a2",
+      "requires_dist": [
+        "Flask",
+        "MarkupSafe",
+        "decorator",
+        "itsdangerous",
+        "six"
+      ],
+      "requires_python": null,
+      "bytes": 92099,
+      "wheel_download_hash_verified": true,
+      "wheel_metadata_sha256": "cda4cc85b8df7c0dcfa8ce94ad96595029390f8bb4769c20b719ec55dcd7acc1"
+    },
+    {
+      "name": "Flask",
+      "version": "0.12.5",
+      "filename": "Flask-0.12.5-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/a4/36/756c34af4523bb0dfa77d3c83455bc4d5d01d6f03b20d8414f3e4deb8669/Flask-0.12.5-py2.py3-none-any.whl",
+      "sha256": "2c710d1d42317c802c43000daa16de9de6026146b344ab3376cbc6d18846b863",
+      "primary_metadata_url": "https://pypi.org/pypi/Flask/0.12.5/json",
+      "primary_metadata_response_sha256": "e11d31632e70376fd4ef51ae69e684fd8bbc283ad306a541a67d640a380e6c04",
+      "requires_dist": [
+        "Werkzeug (<1.0,>=0.7)",
+        "Jinja2 (>=2.4)",
+        "itsdangerous (>=0.21)",
+        "click (>=2.0)"
+      ],
+      "requires_python": null,
+      "bytes": 81748,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "Werkzeug",
+      "version": "0.11.4",
+      "filename": "Werkzeug-0.11.4-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/a8/6a/12dca42596ffa19297bd31154b489c5dd5ab3399850644894de10e7bbcae/Werkzeug-0.11.4-py2.py3-none-any.whl",
+      "sha256": "7db3cb2d4725be0680abf64a45b18229186f03ad8b9989abbe053f9357b17b37",
+      "primary_metadata_url": "https://pypi.org/pypi/Werkzeug/0.11.4/json",
+      "primary_metadata_response_sha256": "fc6669661eb77206b8fbbe96f6ad195f2a751b0bfd57b072e24b9dae34cff6b9",
+      "requires_dist": [],
+      "requires_python": null,
+      "bytes": 305196,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "Jinja2",
+      "version": "2.8",
+      "filename": "Jinja2-2.8-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/96/a1/c56bc4d99dc2663514a8481511e80eba8994133ae75eebdadfc91a5597d9/Jinja2-2.8-py2.py3-none-any.whl",
+      "sha256": "1cc03ef32b64be19e0a5b54578dd790906a34943fe9102cfdae0d4495bd536b4",
+      "primary_metadata_url": "https://pypi.org/pypi/Jinja2/2.8/json",
+      "primary_metadata_response_sha256": "776fc5320e12d8778adbf7656f0ea85084050579a044814bcdced47319357025",
+      "requires_dist": [
+        "MarkupSafe",
+        "Babel (>=0.8); extra == 'i18n'"
+      ],
+      "requires_python": null,
+      "bytes": 263888,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "1.1.1",
+      "filename": "MarkupSafe-1.1.1-cp36-cp36m-manylinux1_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/b2/5f/23e0023be6bb885d00ffbefad2942bc51a620328ee910f64abe5a8d18dd1/MarkupSafe-1.1.1-cp36-cp36m-manylinux1_x86_64.whl",
+      "sha256": "717ba8fe3ae9cc0006d7c451f0bb265ee07739daf76355d06366154ee68d221e",
+      "primary_metadata_url": "https://pypi.org/pypi/MarkupSafe/1.1.1/json",
+      "primary_metadata_response_sha256": "084b0df3f7d7c867a4ff267b5779fb1e3d5e6af3bafbc7b665a9d7be3f41aa17",
+      "requires_dist": [],
+      "requires_python": ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*",
+      "bytes": 27520,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "pytest",
+      "version": "2.8.7",
+      "filename": "pytest-2.8.7-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/b2/14/5028e88e6023a6c7621cfafe30575d7d0aa42758d9fef78a3ef4238c3716/pytest-2.8.7-py2.py3-none-any.whl",
+      "sha256": "33612ed6de42f05640fe058aafdf08899eabcb210da74aeb0b788de9695c8bb5",
+      "primary_metadata_url": "https://pypi.org/pypi/pytest/2.8.7/json",
+      "primary_metadata_response_sha256": "66dccf7b8168691545170c5be496e04136ae3e628b93f4f6f0e3cd3ebc1501c3",
+      "requires_dist": [
+        "py (>=1.4.29)",
+        "argparse; python_version==\"2.6\" or python_version==\"3.0\" or python_version==\"3.1\"",
+        "colorama; sys_platform==\"win32\""
+      ],
+      "requires_python": null,
+      "bytes": 151769,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "pytest-mock",
+      "version": "0.11.0",
+      "filename": "pytest_mock-0.11.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/82/1a/14f568457fa335563b00685afe8dcd952c927ad1dfa95c216329b62e9b15/pytest_mock-0.11.0-py2.py3-none-any.whl",
+      "sha256": "5d109071ac1c6a5a883aece92c507b4562efce86054ab39c83a9f3554688289d",
+      "primary_metadata_url": "https://pypi.org/pypi/pytest-mock/0.11.0/json",
+      "primary_metadata_response_sha256": "e48a371fc34b6427055f7a0bf3df8569b577c17b03c8a4a0383aeb15ded18ff0",
+      "requires_dist": [
+        "pytest (>=2.7)",
+        "mock; python_version==\"2.6\" or python_version==\"2.7\""
+      ],
+      "requires_python": null,
+      "bytes": 10116,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "pytest-httpbin",
+      "version": "0.2.0",
+      "filename": "pytest_httpbin-0.2.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/94/a3/1f6b2a193b9519926b71a6aaeecf90068f033fc5591c7f1f7eb9b707bf0a/pytest_httpbin-0.2.0-py2.py3-none-any.whl",
+      "sha256": "18da0fc28cc3325c582c0b6965ad1dda969564e04d4191b0fcd8c77e8356b682",
+      "primary_metadata_url": "https://pypi.org/pypi/pytest-httpbin/0.2.0/json",
+      "primary_metadata_response_sha256": "672f923813fb10dca5da0c3ac42d35a6edb28d1f9faf11c3af4d6b093fa341b5",
+      "requires_dist": [
+        "Flask",
+        "decorator",
+        "httpbin",
+        "six"
+      ],
+      "requires_python": null,
+      "bytes": 12441,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "decorator",
+      "version": "4.0.9",
+      "filename": "decorator-4.0.9-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/7d/ca/493b2377bf42d57bdd985c31975be3d2b500ad9079199cecb7633e8e2cde/decorator-4.0.9-py2.py3-none-any.whl",
+      "sha256": "f4718552326c99544a6ec602d96b7d03ef61180cf4a492c515ecb2438dd14ccc",
+      "primary_metadata_url": "https://pypi.org/pypi/decorator/4.0.9/json",
+      "primary_metadata_response_sha256": "c147b688ae810749560f86595b45c26c1be0f437bb05a31ebf00754f1c285f81",
+      "requires_dist": [],
+      "requires_python": null,
+      "bytes": 22562,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "itsdangerous",
+      "version": "1.1.0",
+      "filename": "itsdangerous-1.1.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/76/ae/44b03b253d6fade317f32c24d100b3b35c2239807046a4c953c7b89fa49e/itsdangerous-1.1.0-py2.py3-none-any.whl",
+      "sha256": "b12271b2047cb23eeb98c8b5622e2e5c5e9abd9784a153e9d8ef9cb4dd09d749",
+      "primary_metadata_url": "https://pypi.org/pypi/itsdangerous/1.1.0/json",
+      "primary_metadata_response_sha256": "dca0ee4c282901e5f28ba0c9194c544902864f324c104bbd1e0de2b86af1e007",
+      "requires_dist": [],
+      "requires_python": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+      "bytes": 16743,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "six",
+      "version": "1.10.0",
+      "filename": "six-1.10.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b44607ab535be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl",
+      "sha256": "0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1",
+      "primary_metadata_url": "https://pypi.org/pypi/six/1.10.0/json",
+      "primary_metadata_response_sha256": "8e14729eeae889c885fab6a90ce915e10d7795eb9bccaf7bedbaa1c5675a1f50",
+      "requires_dist": [],
+      "requires_python": null,
+      "bytes": 10341,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "click",
+      "version": "6.7",
+      "filename": "click-6.7-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/34/c1/8806f99713ddb993c5366c362b2f908f18269f8d792aff1abfd700775a77/click-6.7-py2.py3-none-any.whl",
+      "sha256": "29f99fc6125fbc931b758dc053b3114e55c77a6e4c6c3a2674a2dc986016381d",
+      "primary_metadata_url": "https://pypi.org/pypi/click/6.7/json",
+      "primary_metadata_response_sha256": "10888ccce8446ccae5a694a88e54e9574a4dbd6b9fa24f19a84caf8ffadde612",
+      "requires_dist": [],
+      "requires_python": null,
+      "bytes": 71175,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "py",
+      "version": "1.4.31",
+      "filename": "py-1.4.31-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/19/f2/4b71181a49a4673a12c8f5075b8744c5feb0ed9eba352dd22512d2c04d47/py-1.4.31-py2.py3-none-any.whl",
+      "sha256": "4a3e4f3000c123835ac39cab5ccc510642153bc47bc1f13e2bbb53039540ae69",
+      "primary_metadata_url": "https://pypi.org/pypi/py/1.4.31/json",
+      "primary_metadata_response_sha256": "53cb2ffa86e7d31378f04c62f020685db0e104018f9a485af595a7972a556b56",
+      "requires_dist": [],
+      "requires_python": null,
+      "bytes": 81940,
+      "wheel_download_hash_verified": true
+    },
+    {
+      "name": "PySocks",
+      "version": "1.7.1",
+      "filename": "PySocks-1.7.1-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/8d/59/b4572118e098ac8e46e399a1dd0f2d85403ce8bbaad9ec79373ed6badaf9/PySocks-1.7.1-py3-none-any.whl",
+      "sha256": "2725bd0a9925919b9b51739eea5f9e2bae91e83288108a9ad338b2e3a4435ee5",
+      "primary_metadata_url": "https://pypi.org/pypi/PySocks/1.7.1/json",
+      "primary_metadata_response_sha256": "c963fe76c7f6e8926cfe821baa12a7720a27f1aa35e70210f5d63257d3bb0da5",
+      "requires_dist": [],
+      "requires_python": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+      "bytes": 16725,
+      "wheel_download_hash_verified": true,
+      "wheel_metadata_sha256": "cdb40c8b38cf38e3f80e1122117db85d78cdad8b88c45f54194a4dd2e14307a6"
+    }
+  ],
+  "closure": {
+    "scope": "Active runtime Requires-Dist closure of14 selected wheels for CPython3.6/Linux/no extras; excludes interpreter/pip/setuptools/bootstrap and historical whole devrequirements",
+    "active_edges": [
+      {
+        "from": "httpbin",
+        "requires": "six",
+        "selected": "six==1.10.0"
+      },
+      {
+        "from": "httpbin",
+        "requires": "itsdangerous",
+        "selected": "itsdangerous==1.1.0"
+      },
+      {
+        "from": "httpbin",
+        "requires": "decorator",
+        "selected": "decorator==4.0.9"
+      },
+      {
+        "from": "httpbin",
+        "requires": "MarkupSafe",
+        "selected": "MarkupSafe==1.1.1"
+      },
+      {
+        "from": "httpbin",
+        "requires": "Flask",
+        "selected": "Flask==0.12.5"
+      },
+      {
+        "from": "Flask",
+        "requires": "Werkzeug<1.0,>=0.7",
+        "selected": "Werkzeug==0.11.4"
+      },
+      {
+        "from": "Flask",
+        "requires": "Jinja2>=2.4",
+        "selected": "Jinja2==2.8"
+      },
+      {
+        "from": "Flask",
+        "requires": "itsdangerous>=0.21",
+        "selected": "itsdangerous==1.1.0"
+      },
+      {
+        "from": "Flask",
+        "requires": "click>=2.0",
+        "selected": "click==6.7"
+      },
+      {
+        "from": "Jinja2",
+        "requires": "MarkupSafe",
+        "selected": "MarkupSafe==1.1.1"
+      },
+      {
+        "from": "pytest",
+        "requires": "py>=1.4.29",
+        "selected": "py==1.4.31"
+      },
+      {
+        "from": "pytest-mock",
+        "requires": "pytest>=2.7",
+        "selected": "pytest==2.8.7"
+      },
+      {
+        "from": "pytest-httpbin",
+        "requires": "Flask",
+        "selected": "Flask==0.12.5"
+      },
+      {
+        "from": "pytest-httpbin",
+        "requires": "decorator",
+        "selected": "decorator==4.0.9"
+      },
+      {
+        "from": "pytest-httpbin",
+        "requires": "httpbin",
+        "selected": "httpbin==0.5.0"
+      },
+      {
+        "from": "pytest-httpbin",
+        "requires": "six",
+        "selected": "six==1.10.0"
+      }
+    ],
+    "inactive_requirements": [
+      {
+        "from": "Jinja2",
+        "requirement": "Babel (>=0.8); extra == 'i18n'",
+        "reason": "i18n extra not selected"
+      },
+      {
+        "from": "pytest",
+        "requirement": "argparse; python_version==\"2.6\" or python_version==\"3.0\" or python_version==\"3.1\"",
+        "reason": "target Python3.6"
+      },
+      {
+        "from": "pytest",
+        "requirement": "colorama; sys_platform==\"win32\"",
+        "reason": "Linux target"
+      },
+      {
+        "from": "pytest-mock",
+        "requirement": "mock; python_version==\"2.6\" or python_version==\"2.7\"",
+        "reason": "target Python3.6 uses unittest.mock"
+      }
+    ],
+    "selected_wheel_count": 14,
+    "verified_total_wheel_bytes": 1164263,
+    "transitive_metadata_complete": true,
+    "runtime_compatibility_proven": false
+  },
+  "historical_exact_wheel_blockers": [
+    {
+      "name": "MarkupSafe",
+      "version": "0.23",
+      "primary_metadata_url": "https://pypi.org/pypi/MarkupSafe/0.23/json",
+      "primary_metadata_response_sha256": "2138841d5ec7866c44d9c50940923fe68039fce1ee51fa2de2cfef3a9bb796c8",
+      "wheel_count": 0,
+      "source_distributions": [
+        {
+          "filename": "MarkupSafe-0.23.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/c0/41/bae1254e0396c0cc8cf1751cb7d9afc90a602353695af5952530482c963f/MarkupSafe-0.23.tar.gz",
+          "sha256": "a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3"
+        }
+      ],
+      "action": "sdist not downloaded or executed; exact historical wheel-only reproduction unavailable"
+    },
+    {
+      "name": "itsdangerous",
+      "version": "0.24",
+      "primary_metadata_url": "https://pypi.org/pypi/itsdangerous/0.24/json",
+      "primary_metadata_response_sha256": "a563f0f63e4b43ff637b3b368b784e8a46b6e3526cd13920f214cd555165e3c0",
+      "wheel_count": 0,
+      "source_distributions": [
+        {
+          "filename": "itsdangerous-0.24.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/dc/b4/a60bcdba945c00f6d608d8975131ab3f25b22f2bcfe1dab221165194b2d4/itsdangerous-0.24.tar.gz",
+          "sha256": "cbb3fcf8d3e33df861709ecaf89d9e6629cff0a217bc2848f1b41cd30d360519"
+        }
+      ],
+      "action": "sdist not downloaded or executed; exact historical wheel-only reproduction unavailable"
+    },
+    {
+      "name": "Flask",
+      "version": "0.10.1",
+      "primary_metadata_url": "https://pypi.org/pypi/Flask/0.10.1/json",
+      "primary_metadata_response_sha256": "c06f9b00632247b535349ce1ec851bd173b736d371adad868c17c1533d2a7e22",
+      "wheel_count": 0,
+      "source_distributions": [
+        {
+          "filename": "Flask-0.10.1.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/db/9c/149ba60c47d107f85fe52564133348458f093dd5e6b57a5b60ab9ac517bb/Flask-0.10.1.tar.gz",
+          "sha256": "4c83829ff83d408b5e1d4995472265411d2c414112298f2eb4b359d9e4563373"
+        }
+      ],
+      "action": "sdist not downloaded or executed; exact historical wheel-only reproduction unavailable"
+    }
+  ],
+  "prospective_deviations": [
+    {
+      "package": "Flask",
+      "historical": "0.10.1",
+      "candidate": "0.12.5",
+      "reason": "0.10.1 has no PyPIwheel;0.12.5 wheel satisfies unbounded httpbinFlask requirement and retains Werkzeug<1/Jinja2/itsdangerous historical APIs; addedclick dependency locked; runtime unproven"
+    },
+    {
+      "package": "MarkupSafe",
+      "historical": "0.23",
+      "candidate": "1.1.1",
+      "reason": "0.23 has no PyPIwheel;1.1.1 has exactCPython3.6cp36m-manylinux1_x86_64 binary wheel, satisfies Jinja2/httpbin requirements;ABI/runtime still needs approvedimageproof"
+    },
+    {
+      "package": "itsdangerous",
+      "historical": "0.24",
+      "candidate": "1.1.0",
+      "reason": "0.24 has no PyPIwheel;1.1.0 wheel admitsPython3.6 andFlask>=0.21 requirement; preservedlegacyjson/serializerAPI source-inspected but not imported"
+    },
+    {
+      "package": "httpbin",
+      "historical": "0.4.1",
+      "candidate": "0.5.0",
+      "reason": "Actual full-suite gold failed response_headers with generator JSON serialization under Flask0.12.5. Publisher0.5.0 uses jsonify(list(headers.lists())); same five runtime dependency names alreadyclosed; plugin app export retained. Endpoint compatibility unmeasured."
+    },
+    {
+      "package": "PySocks",
+      "historical": "not in prior13-wheel candidate",
+      "candidate": "1.7.1 py3-none-any",
+      "reason": "Actual full-suite gold had8 SOCKS tests fail Missing dependencies for SOCKS support. Primary wheel supports Python3.6, no Requires-Dist, stdlib imports; no SOCKS response emulation or target mutation."
+    }
+  ],
+  "plugin": {
+    "module": "pytest_httpbin.plugin",
+    "mocker_module": "pytest_mock",
+    "autoload_policy": "remain disabled; explicit host-owned plugin admission required",
+    "bundled_certificates": {
+      "leaf": {
+        "subject_cn": "127.0.0.1",
+        "subject_alt_name": null,
+        "valid_to": "2025-06-23T18:20:35Z",
+        "sha256": "d969eccf31a3b73cfeb164fb84f595d1ef2b9849d710b30168af710a68325f7a",
+        "expired_on_audit_date": true
+      },
+      "ca": {
+        "valid_to": "2045-06-18T18:16:59Z",
+        "sha256": "237f79628140a4d988f1403eff8c54f1ee3de238e066a8a6aa2e76b8cec7caae"
+      }
+    },
+    "tls_admission": "original expiredleaf cannot be accepted; separatelyreviewfreshCN-onlypublictestcertificate withCAverificationandunchangedwarningsemantics; neververifyFalse/fakewarnings"
+  },
+  "remaining_runtime_gates": [
+    "Rebuild full14-wheel private runtime on own immutable3362officialbase; remeasure ABI/inventory/source/cleanup",
+    "Regenerate separately disclosed CN127.0.0.1/no-SAN certificate overlay on freshv2parent",
+    "Run real HTTP/CA-HTTPS/wrongCA and explicit oldpytest/plugin health under v2",
+    "Run real response-headers multi-value/cookie health for publisherHTTPBin0.5.0",
+    "Verify PySocks actualprivate module and preserved fullsuite behavior insideisolation",
+    "Retain sameworker hermetic timeoutprofile/noInternet/capsdrop",
+    "Rerun entire349-test base/gold/wrong, retain all required and ordinary outcomes, no skips/errors accepted as requirementsuccess",
+    "Use prospective reviewed negativecontrol and strict fullcollectionreceipt; previous9failureattempt unchanged",
+    "No automatic v2admission for other5Requests or function-serviceprofile boundtov1"
+  ],
+  "tasks": [
+    {
+      "instance_id": "psf__requests-863",
+      "base_commit": "a0df2cbb10419037d11d04352b3175405ab52941",
+      "task_version": "0.14",
+      "base_image_digest": "swebench/sweb.eval.x86_64.psf_1776_requests-863@sha256:4dcddfdcbc2bcba96327de327f411c671e695366f4e7d09781f64c1758053b18",
+      "observed_runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/requests/__init__.py",
+      "observed_runtime": "CPython3.9.20, not proposed3.6",
+      "candidate_profile_applies_as": "Historical source audit retained; not admitted by v2 candidate",
+      "historical_sources": [
+        {
+          "path": "requirements.txt",
+          "url": "https://raw.githubusercontent.com/psf/requests/a0df2cbb10419037d11d04352b3175405ab52941/requirements.txt",
+          "sha256": "9c38f7a86db3ba935c7dd446c24e50f8a08b98dd73936f77ceac8ef4abadf69d",
+          "relevant_lines": [
+            {
+              "line": 1,
+              "text": "nose"
+            },
+            {
+              "line": 2,
+              "text": "rudolf2"
+            }
+          ]
+        },
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/a0df2cbb10419037d11d04352b3175405ab52941/setup.py",
+          "sha256": "7126faa9b5ecd374593899c81692f5fd12b1f49c66fd71bedf6b78011d23eefb",
+          "relevant_lines": []
+        },
+        {
+          "path": "tests/test_requests.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/a0df2cbb10419037d11d04352b3175405ab52941/tests/test_requests.py",
+          "sha256": "0a642f3bef5bbdad802aa5a56e541e8c5e253e15e4947c1e04663ef0523bd538",
+          "relevant_lines": [
+            {
+              "line": 24,
+              "text": "    os.environ['HTTPBIN_URL'] = 'http://httpbin.org/'"
+            },
+            {
+              "line": 29,
+              "text": "def httpbin(*suffix):"
+            },
+            {
+              "line": 34,
+              "text": "SERVICES = (httpbin, )"
+            },
+            {
+              "line": 36,
+              "text": "_httpbin = False"
+            },
+            {
+              "line": 47,
+              "text": "        global _httpbin"
+            },
+            {
+              "line": 49,
+              "text": "        if (not 'HTTPBIN_URL' in os.environ) and not _httpbin:"
+            },
+            {
+              "line": 50,
+              "text": "            # c = envoy.connect('httpbin %s' % (PORT))"
+            },
+            {
+              "line": 52,
+              "text": "            _httpbin = True"
+            },
+            {
+              "line": 101,
+              "text": "        r = get(httpbin('get'))"
+            },
+            {
+              "line": 105,
+              "text": "        r = get(httpbin('get'))"
+            },
+            {
+              "line": 110,
+              "text": "        r = get(httpbin('redirect', '1'))"
+            },
+            {
+              "line": 114,
+              "text": "        r = get(httpbin('redirect', '1'), allow_redirects=False)"
+            },
+            {
+              "line": 120,
+              "text": "        r = get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 128,
+              "text": "        r = get(httpbin('get') + '?test=true', params={'q': 'test'}, headers=heads)"
+            },
+            {
+              "line": 135,
+              "text": "    #     requests.get(url=httpbin('get'), headers=heads)"
+            },
+            {
+              "line": 140,
+              "text": "    #                       url=httpbin('get'), headers=heads)"
+            },
+            {
+              "line": 150,
+              "text": "    #     url = httpbin('get/' + path_fully_escaped)"
+            },
+            {
+              "line": 152,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/' + path_fully_escaped))"
+            },
+            {
+              "line": 159,
+              "text": "    #     url = httpbin('get/' + path)"
+            },
+            {
+              "line": 161,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/' + path_fully_escaped))"
+            },
+            {
+              "line": 173,
+              "text": "    #     url = httpbin('get/' + path_reserved)"
+            },
+            {
+              "line": 175,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/' + path_reserved))"
+            },
+            {
+              "line": 181,
+              "text": "    #     url = httpbin('get/' + path_unreserved_escaped)"
+            },
+            {
+              "line": 183,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/' + path_unreserved))"
+            },
+            {
+              "line": 187,
+              "text": "    #     url = httpbin('get/?' + query_fully_escaped)"
+            },
+            {
+              "line": 189,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/?' + query_fully_escaped))"
+            },
+            {
+              "line": 192,
+              "text": "    #     url = httpbin('get/?' + query)"
+            },
+            {
+              "line": 194,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/?' + query_fully_escaped))"
+            },
+            {
+              "line": 198,
+              "text": "    #     url = httpbin('get/?' + query_reserved)"
+            },
+            {
+              "line": 200,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/?' + query_reserved))"
+            },
+            {
+              "line": 204,
+              "text": "    #     url = httpbin('get/?' + query_unreserved_escaped)"
+            },
+            {
+              "line": 206,
+              "text": "    #     self.assertEqual(response.url, httpbin('get/?' + query_unreserved))"
+            },
+            {
+              "line": 216,
+              "text": "        r = get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 224,
+              "text": "        r = get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 228,
+              "text": "        r = head(httpbin('get'))"
+            }
+          ]
+        }
+      ],
+      "current_test_needs": {
+        "httpbin": true,
+        "fixture_style": "HTTPBIN_URL function-based service endpoint",
+        "mocker": false,
+        "string_pytest_raises": false,
+        "cn_only_warning": false,
+        "unroutable_tarpit": false,
+        "required_test_count": 4,
+        "regression_test_count": 60
+      },
+      "calibrated": false,
+      "v2_candidate_scope": false
+    },
+    {
+      "instance_id": "psf__requests-1963",
+      "base_commit": "110048f9837f8441ea536804115e80b69f400277",
+      "task_version": "2.3",
+      "base_image_digest": "swebench/sweb.eval.x86_64.psf_1776_requests-1963@sha256:5ca751c160affa98d160831608fffe3e2c4fb61c4fb2dad2b147ef2a885088e4",
+      "observed_runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/requests/__init__.py",
+      "observed_runtime": "CPython3.9.20, not proposed3.6",
+      "candidate_profile_applies_as": "Historical source audit retained; not admitted by v2 candidate",
+      "historical_sources": [
+        {
+          "path": "requirements.txt",
+          "url": "https://raw.githubusercontent.com/psf/requests/110048f9837f8441ea536804115e80b69f400277/requirements.txt",
+          "sha256": "878c487bab1e59dc96e58d6268f03aeb70a644b1c549b11a087f7ae06e9ad57f",
+          "relevant_lines": [
+            {
+              "line": 2,
+              "text": "pytest==2.3.4"
+            },
+            {
+              "line": 3,
+              "text": "pytest-cov==1.6"
+            }
+          ]
+        },
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/110048f9837f8441ea536804115e80b69f400277/setup.py",
+          "sha256": "4264d70db4af18d3ac44519037a5855d300cd2d24318ecf838f6bb84de1546f4",
+          "relevant_lines": []
+        },
+        {
+          "path": "test_requests.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/110048f9837f8441ea536804115e80b69f400277/test_requests.py",
+          "sha256": "d2de326a548d9c5cbe86a9df3329678de75c2a532d3fd4213966071d8aaa440c",
+          "relevant_lines": [
+            {
+              "line": 13,
+              "text": "import pytest"
+            },
+            {
+              "line": 27,
+              "text": "HTTPBIN = os.environ.get('HTTPBIN_URL', 'http://httpbin.org/')"
+            },
+            {
+              "line": 32,
+              "text": "def httpbin(*suffix):"
+            },
+            {
+              "line": 61,
+              "text": "        with pytest.raises(MissingSchema):"
+            },
+            {
+              "line": 63,
+              "text": "        with pytest.raises(InvalidURL):"
+            },
+            {
+              "line": 76,
+              "text": "        get_req = requests.Request('GET', httpbin('get')).prepare()"
+            },
+            {
+              "line": 78,
+              "text": "        head_req = requests.Request('HEAD', httpbin('head')).prepare()"
+            },
+            {
+              "line": 97,
+              "text": "        parts = urlparse(httpbin('get'))"
+            },
+            {
+              "line": 107,
+              "text": "        r = requests.Request('GET', httpbin('get'))"
+            },
+            {
+              "line": 116,
+              "text": "        r = requests.get(httpbin('redirect', '1'))"
+            },
+            {
+              "line": 122,
+              "text": "    #     r = requests.post(httpbin('status', '302'), data={'some': 'data'})"
+            },
+            {
+              "line": 128,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 136,
+              "text": "        r = requests.get(httpbin('get') + '?test=true', params={'q': 'test'}, headers=heads)"
+            },
+            {
+              "line": 141,
+              "text": "        url = httpbin('cookies/set?foo=bar')"
+            },
+            {
+              "line": 147,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 148,
+              "text": "        r = s.get(httpbin('redirect/1'))  # redirects to httpbin('get')"
+            },
+            {
+              "line": 153,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 156,
+              "text": "            httpbin('response-headers'),"
+            },
+            {
+              "line": 166,
+              "text": "        s.get(httpbin('cookies/set?foo=\"bar:baz\"'))"
+            },
+            {
+              "line": 171,
+              "text": "        r = s.get(httpbin('redirect/1'), cookies={'foo': 'bar'})"
+            },
+            {
+              "line": 178,
+              "text": "        r = s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 185,
+              "text": "        s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 194,
+              "text": "        r = s.get(httpbin('cookies'))"
+            },
+            {
+              "line": 204,
+              "text": "        r = s.get(httpbin('cookies'), cookies=cj)"
+            },
+            {
+              "line": 209,
+              "text": "        resp = requests.get(httpbin('redirect/3'))"
+            },
+            {
+              "line": 218,
+              "text": "        req = requests.Request('GET', 'http://httpbin.org/get')"
+            },
+            {
+              "line": 228,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 235,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 239,
+              "text": "        r = requests.head(httpbin('get'))"
+            },
+            {
+              "line": 243,
+              "text": "        r = requests.put(httpbin('put'))"
+            },
+            {
+              "line": 248,
+              "text": "        url = httpbin('basic-auth', 'user', 'pass')"
+            },
+            {
+              "line": 264,
+              "text": "        url = httpbin('basic-auth', 'user', 'pass')"
+            },
+            {
+              "line": 292,
+              "text": "        url = httpbin('digest-auth', 'auth', 'user', 'pass')"
+            },
+            {
+              "line": 306,
+              "text": "        url = httpbin('digest-auth', 'auth', 'user', 'pass')"
+            },
+            {
+              "line": 315,
+              "text": "        url = httpbin('digest-auth', 'auth', 'user', 'pass')"
+            }
+          ]
+        }
+      ],
+      "current_test_needs": {
+        "httpbin": true,
+        "fixture_style": "HTTPBIN_URL function-based service endpoint",
+        "mocker": false,
+        "string_pytest_raises": true,
+        "cn_only_warning": false,
+        "unroutable_tarpit": false,
+        "required_test_count": 7,
+        "regression_test_count": 112
+      },
+      "calibrated": false,
+      "v2_candidate_scope": false
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "base_commit": "091991be0da19de9108dbe5e3752917fea3d7fdc",
+      "task_version": "2.4",
+      "base_image_digest": "swebench/sweb.eval.x86_64.psf_1776_requests-2317@sha256:c6b5c8846507b5e48e307decca28dbdfa4f5ef17070c1087aacde765e8c4b178",
+      "observed_runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/requests/__init__.py",
+      "observed_runtime": "CPython3.9.20, not proposed3.6",
+      "candidate_profile_applies_as": "Historical source audit retained; not admitted by v2 candidate",
+      "historical_sources": [
+        {
+          "path": "requirements.txt",
+          "url": "https://raw.githubusercontent.com/psf/requests/091991be0da19de9108dbe5e3752917fea3d7fdc/requirements.txt",
+          "sha256": "9c8e6109e5c02e74e4a4f81f5f5231a4760d1e23dd605790c961322f79362f0e",
+          "relevant_lines": [
+            {
+              "line": 2,
+              "text": "pytest==2.3.4"
+            },
+            {
+              "line": 3,
+              "text": "pytest-cov==1.6"
+            }
+          ]
+        },
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/091991be0da19de9108dbe5e3752917fea3d7fdc/setup.py",
+          "sha256": "7238dc4db3a35eda7a00e167f582b4903e5393c8b01ce84cf8e49fdf29c7da9a",
+          "relevant_lines": []
+        },
+        {
+          "path": "test_requests.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/091991be0da19de9108dbe5e3752917fea3d7fdc/test_requests.py",
+          "sha256": "e0f10cee274f0a40816209cbb01aef2d146b39ad78f38502402e95c4c0b4287a",
+          "relevant_lines": [
+            {
+              "line": 15,
+              "text": "import pytest"
+            },
+            {
+              "line": 45,
+              "text": "TARPIT = \"http://10.255.255.1\""
+            },
+            {
+              "line": 46,
+              "text": "HTTPBIN = os.environ.get('HTTPBIN_URL', 'http://httpbin.org/')"
+            },
+            {
+              "line": 51,
+              "text": "def httpbin(*suffix):"
+            },
+            {
+              "line": 80,
+              "text": "        with pytest.raises(MissingSchema):"
+            },
+            {
+              "line": 82,
+              "text": "        with pytest.raises(InvalidSchema):"
+            },
+            {
+              "line": 84,
+              "text": "        with pytest.raises(InvalidSchema):"
+            },
+            {
+              "line": 86,
+              "text": "        with pytest.raises(InvalidSchema):"
+            },
+            {
+              "line": 88,
+              "text": "        with pytest.raises(InvalidURL):"
+            },
+            {
+              "line": 101,
+              "text": "        get_req = requests.Request('GET', httpbin('get')).prepare()"
+            },
+            {
+              "line": 103,
+              "text": "        head_req = requests.Request('HEAD', httpbin('head')).prepare()"
+            },
+            {
+              "line": 122,
+              "text": "        parts = urlparse(httpbin('get'))"
+            },
+            {
+              "line": 132,
+              "text": "        r = requests.Request('GET', httpbin('get'))"
+            },
+            {
+              "line": 141,
+              "text": "        r = requests.get(httpbin('redirect', '1'))"
+            },
+            {
+              "line": 147,
+              "text": "    #     r = requests.post(httpbin('status', '302'), data={'some': 'data'})"
+            },
+            {
+              "line": 153,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 161,
+              "text": "        r = requests.get(httpbin('get') + '?test=true', params={'q': 'test'}, headers=heads)"
+            },
+            {
+              "line": 166,
+              "text": "        url = httpbin('cookies/set?foo=bar')"
+            },
+            {
+              "line": 172,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 173,
+              "text": "        r = s.get(httpbin('redirect/1'))  # redirects to httpbin('get')"
+            },
+            {
+              "line": 178,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 181,
+              "text": "            httpbin('response-headers'),"
+            },
+            {
+              "line": 191,
+              "text": "        s.get(httpbin('cookies/set?foo=\"bar:baz\"'))"
+            },
+            {
+              "line": 196,
+              "text": "        r = s.get(httpbin('redirect/1'), cookies={'foo': 'bar'})"
+            },
+            {
+              "line": 203,
+              "text": "        r = s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 210,
+              "text": "        s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 219,
+              "text": "        r = s.get(httpbin('cookies'))"
+            },
+            {
+              "line": 229,
+              "text": "        r = s.get(httpbin('cookies'), cookies=cj)"
+            },
+            {
+              "line": 234,
+              "text": "        resp = requests.get(httpbin('redirect/3'))"
+            },
+            {
+              "line": 243,
+              "text": "        resp = requests.get(httpbin('get'))"
+            },
+            {
+              "line": 245,
+              "text": "        resp = requests.get(httpbin('redirect/1'))"
+            },
+            {
+              "line": 253,
+              "text": "        req = requests.Request('GET', 'http://httpbin.org/get')"
+            },
+            {
+              "line": 263,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 270,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 274,
+              "text": "        r = requests.head(httpbin('get'))"
+            }
+          ]
+        }
+      ],
+      "current_test_needs": {
+        "httpbin": true,
+        "fixture_style": "HTTPBIN_URL function-based service endpoint",
+        "mocker": false,
+        "string_pytest_raises": true,
+        "cn_only_warning": false,
+        "unroutable_tarpit": true,
+        "required_test_count": 8,
+        "regression_test_count": 133
+      },
+      "calibrated": false,
+      "v2_candidate_scope": false
+    },
+    {
+      "instance_id": "psf__requests-2674",
+      "base_commit": "0be38a0c37c59c4b66ce908731da15b401655113",
+      "task_version": "2.7",
+      "base_image_digest": "swebench/sweb.eval.x86_64.psf_1776_requests-2674@sha256:0b80f823b65adecd8d8e26c139d636260de360e4676db18030925650dc22cca8",
+      "observed_runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/requests/__init__.py",
+      "observed_runtime": "CPython3.9.20, not proposed3.6",
+      "candidate_profile_applies_as": "Historical source audit retained; not admitted by v2 candidate",
+      "historical_sources": [
+        {
+          "path": "requirements.txt",
+          "url": "https://raw.githubusercontent.com/psf/requests/0be38a0c37c59c4b66ce908731da15b401655113/requirements.txt",
+          "sha256": "9c8e6109e5c02e74e4a4f81f5f5231a4760d1e23dd605790c961322f79362f0e",
+          "relevant_lines": [
+            {
+              "line": 2,
+              "text": "pytest==2.3.4"
+            },
+            {
+              "line": 3,
+              "text": "pytest-cov==1.6"
+            }
+          ]
+        },
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/0be38a0c37c59c4b66ce908731da15b401655113/setup.py",
+          "sha256": "c03c08c365d9dd167f1e9213401ae4bf8787a84356213aa7b5353a25d8b05036",
+          "relevant_lines": []
+        },
+        {
+          "path": "test_requests.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/0be38a0c37c59c4b66ce908731da15b401655113/test_requests.py",
+          "sha256": "c43cd34148559634c7be942dc853887a1a2fe4ce2822d101a7c70dfc1570ee07",
+          "relevant_lines": [
+            {
+              "line": 16,
+              "text": "import pytest"
+            },
+            {
+              "line": 46,
+              "text": "TARPIT = \"http://10.255.255.1\""
+            },
+            {
+              "line": 47,
+              "text": "HTTPBIN = os.environ.get('HTTPBIN_URL', 'http://httpbin.org/')"
+            },
+            {
+              "line": 52,
+              "text": "def httpbin(*suffix):"
+            },
+            {
+              "line": 81,
+              "text": "        with pytest.raises(MissingSchema):"
+            },
+            {
+              "line": 83,
+              "text": "        with pytest.raises(InvalidSchema):"
+            },
+            {
+              "line": 85,
+              "text": "        with pytest.raises(InvalidSchema):"
+            },
+            {
+              "line": 87,
+              "text": "        with pytest.raises(InvalidSchema):"
+            },
+            {
+              "line": 89,
+              "text": "        with pytest.raises(InvalidURL):"
+            },
+            {
+              "line": 102,
+              "text": "        get_req = requests.Request('GET', httpbin('get')).prepare()"
+            },
+            {
+              "line": 104,
+              "text": "        head_req = requests.Request('HEAD', httpbin('head')).prepare()"
+            },
+            {
+              "line": 111,
+              "text": "        r = requests.Request('POST', httpbin('post'), headers=headers).prepare()"
+            },
+            {
+              "line": 131,
+              "text": "        parts = urlparse(httpbin('get'))"
+            },
+            {
+              "line": 141,
+              "text": "        r = requests.Request('GET', httpbin('get'))"
+            },
+            {
+              "line": 150,
+              "text": "        r = requests.get(httpbin('redirect', '1'))"
+            },
+            {
+              "line": 156,
+              "text": "    #     r = requests.post(httpbin('status', '302'), data={'some': 'data'})"
+            },
+            {
+              "line": 162,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 170,
+              "text": "        r = requests.get(httpbin('get') + '?test=true', params={'q': 'test'}, headers=heads)"
+            },
+            {
+              "line": 175,
+              "text": "        url = httpbin('cookies/set?foo=bar')"
+            },
+            {
+              "line": 181,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 182,
+              "text": "        r = s.get(httpbin('redirect/1'))  # redirects to httpbin('get')"
+            },
+            {
+              "line": 187,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 190,
+              "text": "            httpbin('response-headers'),"
+            },
+            {
+              "line": 200,
+              "text": "        s.get(httpbin('cookies/set?foo=\"bar:baz\"'))"
+            },
+            {
+              "line": 205,
+              "text": "        r = s.get(httpbin('redirect/1'), cookies={'foo': 'bar'})"
+            },
+            {
+              "line": 212,
+              "text": "        r = s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 219,
+              "text": "        s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 228,
+              "text": "        r = s.get(httpbin('cookies'))"
+            },
+            {
+              "line": 238,
+              "text": "        r = s.get(httpbin('cookies'), cookies=cj)"
+            },
+            {
+              "line": 243,
+              "text": "        resp = requests.get(httpbin('redirect/3'))"
+            },
+            {
+              "line": 252,
+              "text": "        resp = requests.get(httpbin('get'))"
+            },
+            {
+              "line": 254,
+              "text": "        resp = requests.get(httpbin('redirect/1'))"
+            },
+            {
+              "line": 262,
+              "text": "        req = requests.Request('GET', httpbin('get'))"
+            },
+            {
+              "line": 272,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 279,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            }
+          ]
+        }
+      ],
+      "current_test_needs": {
+        "httpbin": true,
+        "fixture_style": "HTTPBIN_URL function-based service endpoint",
+        "mocker": false,
+        "string_pytest_raises": true,
+        "cn_only_warning": false,
+        "unroutable_tarpit": true,
+        "required_test_count": 12,
+        "regression_test_count": 142
+      },
+      "calibrated": false,
+      "v2_candidate_scope": false
+    },
+    {
+      "instance_id": "psf__requests-3362",
+      "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
+      "task_version": "2.10",
+      "base_image_digest": "swebench/sweb.eval.x86_64.psf_1776_requests-3362@sha256:c5dc4ba64a2d97d6cff6b82fe9c0561589df13f23df6883d05e99b630942bbd1",
+      "observed_runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/requests/__init__.py",
+      "observed_runtime": "CPython3.9.20, not proposed3.6",
+      "candidate_profile_applies_as": "Prospective14-wheel full-suite3362 environment; no execution or compatibility acceptance yet",
+      "historical_sources": [
+        {
+          "path": "requirements.txt",
+          "url": "https://raw.githubusercontent.com/psf/requests/36453b95b13079296776d11b09cab2567ea3e703/requirements.txt",
+          "sha256": "0365012e4cebaafab10f3e0c35336e6346bb4b679286b62ad8ea0d741b522e25",
+          "relevant_lines": [
+            {
+              "line": 6,
+              "text": "Flask==0.10.1"
+            },
+            {
+              "line": 7,
+              "text": "httpbin==0.4.1"
+            },
+            {
+              "line": 8,
+              "text": "itsdangerous==0.24"
+            },
+            {
+              "line": 10,
+              "text": "MarkupSafe==0.23"
+            },
+            {
+              "line": 14,
+              "text": "pytest==2.8.7"
+            },
+            {
+              "line": 15,
+              "text": "pytest-cov==2.2.1"
+            },
+            {
+              "line": 16,
+              "text": "pytest-httpbin==0.2.0"
+            },
+            {
+              "line": 17,
+              "text": "pytest-mock==0.11.0"
+            },
+            {
+              "line": 23,
+              "text": "Werkzeug==0.11.4"
+            }
+          ]
+        },
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/36453b95b13079296776d11b09cab2567ea3e703/setup.py",
+          "sha256": "f9bcd0ac4883ca0a4a5ade530ad5ce97a0b82e77b475c4b1e9a7a2cb52d24037",
+          "relevant_lines": [
+            {
+              "line": 14,
+              "text": "    user_options = [('pytest-args=', 'a', \"Arguments to pass into py.test\")]"
+            },
+            {
+              "line": 18,
+              "text": "        self.pytest_args = []"
+            },
+            {
+              "line": 26,
+              "text": "        import pytest"
+            },
+            {
+              "line": 28,
+              "text": "        errno = pytest.main(self.pytest_args)"
+            },
+            {
+              "line": 48,
+              "text": "test_requirements = ['pytest>=2.8.0', 'pytest-httpbin==0.0.7', 'pytest-cov']"
+            }
+          ]
+        },
+        {
+          "path": "tests/conftest.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/36453b95b13079296776d11b09cab2567ea3e703/tests/conftest.py",
+          "sha256": "490e783ae9673a20159da3d49f907b9ab01a63e06f28b33401f7f70be499dc9b",
+          "relevant_lines": [
+            {
+              "line": 2,
+              "text": "import pytest"
+            },
+            {
+              "line": 8,
+              "text": "    httpbin_url = value.url.rstrip('/') + '/'"
+            },
+            {
+              "line": 11,
+              "text": "        return urljoin(httpbin_url, '/'.join(suffix))"
+            },
+            {
+              "line": 16,
+              "text": "@pytest.fixture"
+            },
+            {
+              "line": 17,
+              "text": "def httpbin(httpbin):"
+            },
+            {
+              "line": 18,
+              "text": "    return prepare_url(httpbin)"
+            },
+            {
+              "line": 21,
+              "text": "@pytest.fixture"
+            },
+            {
+              "line": 22,
+              "text": "def httpbin_secure(httpbin_secure):"
+            },
+            {
+              "line": 23,
+              "text": "    return prepare_url(httpbin_secure)"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_requests.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/36453b95b13079296776d11b09cab2567ea3e703/tests/test_requests.py",
+          "sha256": "a6fbbc48cf42501a3a3490a1b225377a60448e309fdeb3a09e09ba6ac53d8b82",
+          "relevant_lines": [
+            {
+              "line": 16,
+              "text": "import pytest"
+            },
+            {
+              "line": 38,
+              "text": "TARPIT = 'http://10.255.255.1'"
+            },
+            {
+              "line": 67,
+              "text": "    @pytest.mark.parametrize("
+            },
+            {
+              "line": 76,
+              "text": "        with pytest.raises(exception):"
+            },
+            {
+              "line": 88,
+              "text": "    @pytest.mark.parametrize('method', ('GET', 'HEAD'))"
+            },
+            {
+              "line": 89,
+              "text": "    def test_no_content_length(self, httpbin, method):"
+            },
+            {
+              "line": 90,
+              "text": "        req = requests.Request(method, httpbin(method.lower())).prepare()"
+            },
+            {
+              "line": 93,
+              "text": "    def test_override_content_length(self, httpbin):"
+            },
+            {
+              "line": 97,
+              "text": "        r = requests.Request('POST', httpbin('post'), headers=headers).prepare()"
+            },
+            {
+              "line": 106,
+              "text": "    @pytest.mark.parametrize("
+            },
+            {
+              "line": 132,
+              "text": "    @pytest.mark.parametrize('scheme', ('http://', 'HTTP://', 'hTTp://', 'HttP://'))"
+            },
+            {
+              "line": 133,
+              "text": "    def test_mixed_case_scheme_acceptable(self, httpbin, scheme):"
+            },
+            {
+              "line": 136,
+              "text": "        parts = urlparse(httpbin('get'))"
+            },
+            {
+              "line": 142,
+              "text": "    def test_HTTP_200_OK_GET_ALTERNATIVE(self, httpbin):"
+            },
+            {
+              "line": 143,
+              "text": "        r = requests.Request('GET', httpbin('get'))"
+            },
+            {
+              "line": 151,
+              "text": "    def test_HTTP_302_ALLOW_REDIRECT_GET(self, httpbin):"
+            },
+            {
+              "line": 152,
+              "text": "        r = requests.get(httpbin('redirect', '1'))"
+            },
+            {
+              "line": 157,
+              "text": "    def test_HTTP_302_TOO_MANY_REDIRECTS(self, httpbin):"
+            },
+            {
+              "line": 159,
+              "text": "            requests.get(httpbin('relative-redirect', '50'))"
+            },
+            {
+              "line": 161,
+              "text": "            url = httpbin('relative-redirect', '20')"
+            },
+            {
+              "line": 166,
+              "text": "            pytest.fail('Expected redirect to raise TooManyRedirects but it did not')"
+            },
+            {
+              "line": 168,
+              "text": "    def test_HTTP_302_TOO_MANY_REDIRECTS_WITH_PARAMS(self, httpbin):"
+            },
+            {
+              "line": 172,
+              "text": "            s.get(httpbin('relative-redirect', '50'))"
+            },
+            {
+              "line": 174,
+              "text": "            url = httpbin('relative-redirect', '45')"
+            },
+            {
+              "line": 179,
+              "text": "            pytest.fail('Expected custom max number of redirects to be respected but was not')"
+            },
+            {
+              "line": 181,
+              "text": "    def test_http_301_changes_post_to_get(self, httpbin):"
+            },
+            {
+              "line": 182,
+              "text": "        r = requests.post(httpbin('status', '301'))"
+            },
+            {
+              "line": 188,
+              "text": "    def test_http_301_doesnt_change_head_to_get(self, httpbin):"
+            },
+            {
+              "line": 189,
+              "text": "        r = requests.head(httpbin('status', '301'), allow_redirects=True)"
+            },
+            {
+              "line": 196,
+              "text": "    def test_http_302_changes_post_to_get(self, httpbin):"
+            },
+            {
+              "line": 197,
+              "text": "        r = requests.post(httpbin('status', '302'))"
+            },
+            {
+              "line": 203,
+              "text": "    def test_http_302_doesnt_change_head_to_get(self, httpbin):"
+            },
+            {
+              "line": 204,
+              "text": "        r = requests.head(httpbin('status', '302'), allow_redirects=True)"
+            },
+            {
+              "line": 210,
+              "text": "    def test_http_303_changes_post_to_get(self, httpbin):"
+            },
+            {
+              "line": 211,
+              "text": "        r = requests.post(httpbin('status', '303'))"
+            }
+          ]
+        }
+      ],
+      "current_test_needs": {
+        "httpbin": true,
+        "fixture_style": "pytest-httpbin object.url fixtures",
+        "mocker": true,
+        "string_pytest_raises": true,
+        "cn_only_warning": true,
+        "unroutable_tarpit": true,
+        "required_test_count": 1,
+        "regression_test_count": 75
+      },
+      "calibrated": false,
+      "v2_candidate_scope": true
+    },
+    {
+      "instance_id": "psf__requests-2148",
+      "base_commit": "fe693c492242ae532211e0c173324f09ca8cf227",
+      "task_version": "2.3",
+      "base_image_digest": "swebench/sweb.eval.x86_64.psf_1776_requests-2148@sha256:ada704cd7cd3d1325dc7d148d3dd473fb2a0ba75a8e703aec7ae485cabc6106a",
+      "observed_runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/requests/__init__.py",
+      "observed_runtime": "CPython3.9.20, not proposed3.6",
+      "candidate_profile_applies_as": "Historical source audit retained; not admitted by v2 candidate",
+      "historical_sources": [
+        {
+          "path": "requirements.txt",
+          "url": "https://raw.githubusercontent.com/psf/requests/fe693c492242ae532211e0c173324f09ca8cf227/requirements.txt",
+          "sha256": "878c487bab1e59dc96e58d6268f03aeb70a644b1c549b11a087f7ae06e9ad57f",
+          "relevant_lines": [
+            {
+              "line": 2,
+              "text": "pytest==2.3.4"
+            },
+            {
+              "line": 3,
+              "text": "pytest-cov==1.6"
+            }
+          ]
+        },
+        {
+          "path": "setup.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/fe693c492242ae532211e0c173324f09ca8cf227/setup.py",
+          "sha256": "fdd42b0da525af52289e65d9616e66a9acdd9e6a73c1d07272705e97c7b39630",
+          "relevant_lines": []
+        },
+        {
+          "path": "test_requests.py",
+          "url": "https://raw.githubusercontent.com/psf/requests/fe693c492242ae532211e0c173324f09ca8cf227/test_requests.py",
+          "sha256": "2d831a0da26974c36aea46d17063d880603e43cc2962c957e7c2f9fd5c7a21cd",
+          "relevant_lines": [
+            {
+              "line": 15,
+              "text": "import pytest"
+            },
+            {
+              "line": 41,
+              "text": "HTTPBIN = os.environ.get('HTTPBIN_URL', 'http://httpbin.org/')"
+            },
+            {
+              "line": 46,
+              "text": "def httpbin(*suffix):"
+            },
+            {
+              "line": 75,
+              "text": "        with pytest.raises(MissingSchema):"
+            },
+            {
+              "line": 77,
+              "text": "        with pytest.raises(InvalidURL):"
+            },
+            {
+              "line": 90,
+              "text": "        get_req = requests.Request('GET', httpbin('get')).prepare()"
+            },
+            {
+              "line": 92,
+              "text": "        head_req = requests.Request('HEAD', httpbin('head')).prepare()"
+            },
+            {
+              "line": 111,
+              "text": "        parts = urlparse(httpbin('get'))"
+            },
+            {
+              "line": 121,
+              "text": "        r = requests.Request('GET', httpbin('get'))"
+            },
+            {
+              "line": 130,
+              "text": "        r = requests.get(httpbin('redirect', '1'))"
+            },
+            {
+              "line": 136,
+              "text": "    #     r = requests.post(httpbin('status', '302'), data={'some': 'data'})"
+            },
+            {
+              "line": 142,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 150,
+              "text": "        r = requests.get(httpbin('get') + '?test=true', params={'q': 'test'}, headers=heads)"
+            },
+            {
+              "line": 155,
+              "text": "        url = httpbin('cookies/set?foo=bar')"
+            },
+            {
+              "line": 161,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 162,
+              "text": "        r = s.get(httpbin('redirect/1'))  # redirects to httpbin('get')"
+            },
+            {
+              "line": 167,
+              "text": "        s.get(httpbin('cookies/set?foo=bar'))"
+            },
+            {
+              "line": 170,
+              "text": "            httpbin('response-headers'),"
+            },
+            {
+              "line": 180,
+              "text": "        s.get(httpbin('cookies/set?foo=\"bar:baz\"'))"
+            },
+            {
+              "line": 185,
+              "text": "        r = s.get(httpbin('redirect/1'), cookies={'foo': 'bar'})"
+            },
+            {
+              "line": 192,
+              "text": "        r = s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 199,
+              "text": "        s.get(httpbin('cookies'), cookies={'foo': 'baz'})"
+            },
+            {
+              "line": 208,
+              "text": "        r = s.get(httpbin('cookies'))"
+            },
+            {
+              "line": 218,
+              "text": "        r = s.get(httpbin('cookies'), cookies=cj)"
+            },
+            {
+              "line": 223,
+              "text": "        resp = requests.get(httpbin('redirect/3'))"
+            },
+            {
+              "line": 232,
+              "text": "        resp = requests.get(httpbin('get'))"
+            },
+            {
+              "line": 234,
+              "text": "        resp = requests.get(httpbin('redirect/1'))"
+            },
+            {
+              "line": 242,
+              "text": "        req = requests.Request('GET', 'http://httpbin.org/get')"
+            },
+            {
+              "line": 252,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 259,
+              "text": "        r = requests.get(httpbin('user-agent'), headers=heads)"
+            },
+            {
+              "line": 263,
+              "text": "        r = requests.head(httpbin('get'))"
+            },
+            {
+              "line": 267,
+              "text": "        r = requests.put(httpbin('put'))"
+            },
+            {
+              "line": 272,
+              "text": "        url = httpbin('basic-auth', 'user', 'pass')"
+            },
+            {
+              "line": 288,
+              "text": "        url = httpbin('basic-auth', 'user', 'pass')"
+            },
+            {
+              "line": 316,
+              "text": "        url = httpbin('digest-auth', 'auth', 'user', 'pass')"
+            }
+          ]
+        }
+      ],
+      "current_test_needs": {
+        "httpbin": true,
+        "fixture_style": "HTTPBIN_URL function-based service endpoint",
+        "mocker": false,
+        "string_pytest_raises": true,
+        "cn_only_warning": false,
+        "unroutable_tarpit": false,
+        "required_test_count": 10,
+        "regression_test_count": 118
+      },
+      "calibrated": false,
+      "v2_candidate_scope": false
+    }
+  ],
+  "scope": {
+    "admitted_task_candidates": [
+      "psf__requests-3362"
+    ],
+    "other_tasks": "Historical audit records retained only; v2 runtime/health/calibration scope does not admit any other task",
+    "model_visible": false,
+    "acceptance_claim": false
+  },
+  "supersedes_profile": {
+    "path": "benchmarks/stage4/p07-requests-legacy-profile.json",
+    "git_lf_sha256": "e107a16cadd64ab2f9d9ec416a1bafe984512fd309b49a7f7678b74fd98e399b",
+    "preserved_unchanged": true,
+    "relationship": "Separate prospective candidate; original profile/evidence remain valid only for their recorded scope"
+  },
+  "candidate_change_evidence": {
+    "workflow_run": 40453010247,
+    "runtime_commit": "5d57a0f3b4762c40be6c3441e63dfb524fe5e511",
+    "artifact_id": 12711726622,
+    "archive_sha256": "7a65e55c455da39e3e1da0d56b4b258aeb7ec9d26915b05a4802fdf5f4d4da50",
+    "audit_path": "validation/p07-budget20/requests3362-calibration-v1/audit-summary.json",
+    "old_result_accepted": false,
+    "full_suite_collected": 349,
+    "required_ids": 76,
+    "gold_native_exit": 1,
+    "gold_summary": "9 failed,337 passed,1 skipped,1 xfailed,1 xpassed",
+    "observed_dependency_failures": {
+      "missing_PySocks": 8,
+      "HTTPBin_generator_JSON": 1
+    },
+    "runtime_changes_only": true,
+    "model_calls": 0
+  },
+  "httpbin_source_review": {
+    "wheel_version": "0.5.0",
+    "core_sha256": "672b3b55ba56292e4fb30fa63bec70eb2b923b0a212afae1ac3e2347752fcf59",
+    "init_sha256": "bc1dd3503b3b1adb087091d8bed409e9e174c39f86cb6fd5e87fbf8496e641d8",
+    "fix": "response = jsonify(list(headers.lists()))",
+    "route_comparison": "All old route paths retained; redirect-to adds methods while keepingGET; extra digest-auth algorithm route added",
+    "imports_executed": false
+  },
+  "installed_inventory": {
+    "count": 238,
+    "sha256": "34a4e8aefd72dcfce63b74100b4bc449fb3d12b11845df1873b50a7b149cf702",
+    "digest_serialization": "UTF8 compact JSON object with lexically sorted file keys, no trailing newline",
+    "scope": "Wheel root modules/assets and each dist-info/METADATA; exclude directory entries, .data paths and other dist-info files rewritten bypip; no certificate overlay applied"
+  }
+}

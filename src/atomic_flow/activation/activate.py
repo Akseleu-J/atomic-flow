@@ -48,13 +48,15 @@ class SearchResult:
 class ActivationIndex:
     """Inverted index built ONCE per tree (the old code re-tokenized every node on every query)."""
 
-    def __init__(self, nodes: list[TreeNode]):
+    def __init__(self, nodes: list[TreeNode], *, previous=None):
         self.nodes = nodes
         self.pos = {n.node_id: i for i, n in enumerate(nodes)}
         names = {n.node_id: n.symbol.rsplit(".", 1)[-1].split("#")[0] for n in nodes}
         self.tf: list[Counter[str]] = []
         self.dl: list[float] = []
         self.postings: dict[str, list[tuple[int, float]]] = defaultdict(list)
+        tokenized = reused = 0
+        self._lexical_keys = {}
         for i, n in enumerate(nodes):
             tf: Counter[str] = Counter()
             fields = {
@@ -62,9 +64,20 @@ class ActivationIndex:
                 "callees": " ".join(names.get(c, "") for c in n.callees),
                 "imports": " ".join(n.imports) if n.kind == "file" else "",
             }
-            for name, text in fields.items():
-                for term in terms(text):
-                    tf[term] += FIELD_WEIGHTS[name]
+            cached = previous.pos.get(n.node_id) if previous is not None else None
+            previous_key = previous._lexical_keys.get(n.node_id) if previous is not None else None
+            lexical_key = tuple(fields.items())
+            if cached is not None and previous_key == lexical_key:
+                tf = previous.tf[cached].copy()
+                reused += 1
+            else:
+                for name, text in fields.items():
+                    for term in terms(text):
+                        tf[term] += FIELD_WEIGHTS[name]
+                tokenized += 1
+            if not hasattr(self, "_lexical_keys"):
+                self._lexical_keys = {}
+            self._lexical_keys[n.node_id] = lexical_key
             self.tf.append(tf)
             self.dl.append(sum(tf.values()))
             for term, weight in tf.items():
@@ -79,6 +92,12 @@ class ActivationIndex:
                 if callee in self.pos:
                     self.callers[self.pos[callee]].append(i)
         self.adjacency = build_adjacency(nodes)
+        self.stats = {"tokenized_nodes": tokenized, "reused_nodes": reused,
+                      "global_algorithms_invalidated": ["pagerank"] if previous is not None else []}
+
+    def updated(self, nodes: list[TreeNode]):
+        """Reuse lexical features; rebuild exact postings/adjacency and invalidate PR."""
+        return ActivationIndex(nodes, previous=self)
 
     def search(self, query: str, *, extra_terms: list[str] | None = None, limit: int = 40,
                scope: set[str] | None = None, seeds: int = 10) -> SearchResult:
@@ -328,7 +347,9 @@ def materialize(root: str | Path, candidates: list[tuple[TreeNode, float]], *, b
                 if node.kind != "file":
                     covered[node.path].append((node.start_line, last))
                 meta.append({"node_id": node.node_id, "alias": aliases.get(node.node_id), "path": node.path,
-                             "symbol": node.symbol, "score": round(score, 4), "zoom": zoom, "tokens": size})
+                             "symbol": node.symbol, "score": round(score, 4), "zoom": zoom, "tokens": size,
+                             "rendered_chars": len(body), "content_hash": hashes.get(node.path, node.content_hash),
+                             "source_complete": zoom >= 2 and last >= (len(lines) if node.kind == "file" else node.end_line)})
                 placed = True
                 break
         if not placed and used >= budget_tokens - 8:

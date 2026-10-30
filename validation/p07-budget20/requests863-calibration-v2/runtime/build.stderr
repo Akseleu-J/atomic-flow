@@ -1,0 +1,82 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.05kB 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/swebench/sweb.eval.x86_64.psf_1776_requests-863@sha256:4dcddfdcbc2bcba96327de327f411c671e695366f4e7d09781f64c1758053b18
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python@sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 1.34MB 0.0s done
+#5 DONE 0.0s
+
+#6 [donor 1/1] FROM docker.io/library/python@sha256:9d8f2f351785f0024cb4508931a33e08e4885ee88050ebfff683247846e0d8c8
+#6 DONE 0.0s
+
+#7 [stage-1  1/11] FROM docker.io/swebench/sweb.eval.x86_64.psf_1776_requests-863@sha256:4dcddfdcbc2bcba96327de327f411c671e695366f4e7d09781f64c1758053b18
+#7 DONE 0.1s
+
+#8 [stage-1  2/11] COPY --from=donor /usr/local/ /opt/p07-python27/
+#8 DONE 1.0s
+
+#9 [stage-1  3/11] COPY --from=donor /lib/x86_64-linux-gnu/ /opt/p07-donor/lib/x86_64-linux-gnu/
+#9 DONE 0.2s
+
+#10 [stage-1  4/11] COPY --from=donor /usr/lib/x86_64-linux-gnu/ /opt/p07-donor/usr/lib/x86_64-linux-gnu/
+#10 DONE 1.0s
+
+#11 [stage-1  5/11] COPY python27 /opt/p07-runtime/python27
+#11 DONE 0.1s
+
+#12 [stage-1  6/11] RUN --network=none chmod 755 /opt/p07-runtime/python27
+#12 DONE 0.0s
+
+#13 [stage-1  7/11] COPY wheels/ /opt/p07-requests-wheels/
+#13 DONE 0.0s
+
+#14 [stage-1  8/11] COPY requirements.lock /opt/p07-requests-wheels/requirements.lock
+#14 DONE 0.0s
+
+#15 [stage-1  9/11] COPY certificates/ /opt/p07-function-fixture/
+#15 DONE 0.0s
+
+#16 [stage-1 10/11] RUN --network=none chmod 755 /opt/p07-function-fixture && chmod 644 /opt/p07-function-fixture/*.pem
+#16 DONE 0.0s
+
+#17 [stage-1 11/11] RUN --network=none /opt/p07-runtime/python27 -m pip install --no-index --no-deps --no-compile --ignore-installed --require-hashes --find-links=/opt/p07-requests-wheels -r /opt/p07-requests-wheels/requirements.lock
+#17 0.220 Collecting click==6.7 (from -r /opt/p07-requests-wheels/requirements.lock (line 1))
+#17 0.230 Collecting decorator==4.0.9 (from -r /opt/p07-requests-wheels/requirements.lock (line 2))
+#17 0.232 Collecting Flask==0.12.5 (from -r /opt/p07-requests-wheels/requirements.lock (line 3))
+#17 0.238 Collecting funcsigs==1.0.2 (from -r /opt/p07-requests-wheels/requirements.lock (line 4))
+#17 0.241 Collecting futures==3.3.0 (from -r /opt/p07-requests-wheels/requirements.lock (line 5))
+#17 0.244 Collecting gunicorn==19.9.0 (from -r /opt/p07-requests-wheels/requirements.lock (line 6))
+#17 0.253 Collecting httpbin==0.5.0 (from -r /opt/p07-requests-wheels/requirements.lock (line 7))
+#17 0.258 Collecting itsdangerous==1.1.0 (from -r /opt/p07-requests-wheels/requirements.lock (line 8))
+#17 0.262 Collecting Jinja2==2.8 (from -r /opt/p07-requests-wheels/requirements.lock (line 9))
+#17 0.270 Collecting MarkupSafe==1.1.1 (from -r /opt/p07-requests-wheels/requirements.lock (line 10))
+#17 0.274 Collecting mock==3.0.5 (from -r /opt/p07-requests-wheels/requirements.lock (line 11))
+#17 0.277 Collecting py==1.4.31 (from -r /opt/p07-requests-wheels/requirements.lock (line 12))
+#17 0.284 Collecting PySocks==1.7.1 (from -r /opt/p07-requests-wheels/requirements.lock (line 13))
+#17 0.287 Collecting pytest==2.8.7 (from -r /opt/p07-requests-wheels/requirements.lock (line 14))
+#17 0.295 Collecting pytest-httpbin==0.2.0 (from -r /opt/p07-requests-wheels/requirements.lock (line 15))
+#17 0.299 Collecting pytest-mock==0.11.0 (from -r /opt/p07-requests-wheels/requirements.lock (line 16))
+#17 0.301 Collecting six==1.10.0 (from -r /opt/p07-requests-wheels/requirements.lock (line 17))
+#17 0.304 Collecting Werkzeug==0.11.4 (from -r /opt/p07-requests-wheels/requirements.lock (line 18))
+#17 0.316 Installing collected packages: click, decorator, Flask, funcsigs, futures, gunicorn, httpbin, itsdangerous, Jinja2, MarkupSafe, mock, py, PySocks, pytest, pytest-httpbin, pytest-mock, six, Werkzeug
+#17 0.484 Successfully installed Flask-0.12.5 Jinja2-2.8 MarkupSafe-1.1.1 PySocks-1.7.1 Werkzeug-0.11.4 click-6.7 decorator-4.0.9 funcsigs-1.0.2 futures-3.3.0 gunicorn-19.9.0 httpbin-0.5.0 itsdangerous-1.1.0 mock-3.0.5 py-1.4.31 pytest-2.8.7 pytest-httpbin-0.2.0 pytest-mock-0.11.0 six-1.10.0
+#17 DONE 0.7s
+
+#18 exporting to image
+#18 exporting layers
+#18 exporting layers 7.3s done
+#18 writing image sha256:f5421992443052baf68f4e37f9af626c60074d3d68934d60b217b57840748785 done
+#18 naming to docker.io/library/p07-legacy-transplant:477efd7189a5467685be5937c1ae52ce done
+#18 DONE 7.3s

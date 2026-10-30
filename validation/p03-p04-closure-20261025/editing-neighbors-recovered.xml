@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="1.716" timestamp="2026-10-26T08:20:52.053768+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_edit_tools" name="test_edit_node_requires_explicit_approval" time="0.056" /><testcase classname="tests.test_edit_tools" name="test_noop_edit_is_not_reported_as_applied" time="0.014" /><testcase classname="tests.test_edit_tools" name="test_edit_node_verifies_and_records_backup" time="0.158"><failure message="AssertionError: assert 'rolled_back' == 'applied'&#10;  &#10;  - applied&#10;  + rolled_back">tests\test_edit_tools.py:35: in test_edit_node_verifies_and_records_backup
+    assert result["status"] == "applied"
+E   AssertionError: assert 'rolled_back' == 'applied'
+E     
+E     - applied
+E     + rolled_back</failure></testcase></testsuite></testsuites>

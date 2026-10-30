@@ -1,0 +1,22 @@
+{
+  "calibration_sha256": "a350ee6ce2f7b0108eb58632a57925ff5dc6be9338bb7ffa371e0aaee70af817",
+  "cases": [],
+  "error": "No admitted literal native SymPy version found; never import target on host",
+  "error_type": "ValueError",
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-20212@sha256:10acbbc49c1905919809c0d8ca6305ee0d5e546fa541246c18fca3e222f79626",
+  "image_id": "sha256:95d456bfbccf33f8cfa63d410bd7df2e73da60fb286d4c411d9c51fb73ffc27f",
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "provider_calls": 0,
+  "provider_credentials": "not_forwarded",
+  "scope": "native CheckSpec synthetic ordinary-test boundary only",
+  "source_container_cleanup_confirmed": true,
+  "source_container_cleanup_exit": 0,
+  "status": "not_qualified",
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "b17668b8a0bd85537590f523d912a511b128d20c",
+  "verified_success": false
+}

@@ -1,0 +1,722 @@
+[
+  {
+    "task": "psf__requests-3362",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "psf__requests-1963",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sympy__sympy-17139",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pytest-dev__pytest-11143",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sphinx-doc__sphinx-7738",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sphinx-doc__sphinx-8713",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sphinx-doc__sphinx-8595",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pylint-dev__pylint-5859",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sphinx-doc__sphinx-8474",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pylint-dev__pylint-7114",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pytest-dev__pytest-7168",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sympy__sympy-18057",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pylint-dev__pylint-7228",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "psf__requests-863",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pylint-dev__pylint-7993",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pytest-dev__pytest-7432",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pytest-dev__pytest-11148",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "psf__requests-2148",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pytest-dev__pytest-6116",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sympy__sympy-20212",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sympy__sympy-21614",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pytest-dev__pytest-5227",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "psf__requests-2317",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "psf__requests-2674",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pylint-dev__pylint-7080",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sympy__sympy-13971",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "infrastructure_error",
+        "regressions": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "pylint-dev__pylint-6506",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sphinx-doc__sphinx-8506",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sphinx-doc__sphinx-8721",
+    "accepted": false,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": false,
+        "error": null
+      }
+    ]
+  },
+  {
+    "task": "sympy__sympy-16988",
+    "accepted": true,
+    "rows": [
+      {
+        "label": "base",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "gold",
+        "status": "verified_success",
+        "regressions": true,
+        "error": null
+      },
+      {
+        "label": "wrong",
+        "status": "requirement_failed",
+        "regressions": true,
+        "error": null
+      }
+    ]
+  }
+]

@@ -1,0 +1,94 @@
+{
+  "status": "not_qualified",
+  "run_id": 40817446207,
+  "tested_commit": "fa43d65d660d727d76adfa193f123864733551d5",
+  "artifact_id": 12873177467,
+  "artifact_sha256": "sha256:6391d16fc1b509411cf1e94c2267b71f5913e663bdbda2227ca053b1855138a3",
+  "verified_raw_hashes": 800,
+  "checks": [
+    {
+      "name": "journey/task-check-000/receipt.json",
+      "process_exit": 1,
+      "accepted": true,
+      "passed": false,
+      "required_passed": 349,
+      "required_failed": 1,
+      "native_exit": 1,
+      "optional": {
+        "tests/test_requests.py::TestRequests::test_auth_is_stripped_on_redirect_off_host": {
+          "category": "xfailed",
+          "raw_nodeid": "tests/test_requests.py::TestRequests::()::test_auth_is_stripped_on_redirect_off_host",
+          "when": "call"
+        },
+        "tests/test_requests.py::TestRequests::test_response_iter_lines_reentrant": {
+          "category": "xpassed",
+          "raw_nodeid": "tests/test_requests.py::TestRequests::()::test_response_iter_lines_reentrant",
+          "when": "call"
+        },
+        "tests/test_utils.py::TestSuperLen::test_io_streams[None-Test]": {
+          "category": "skipped",
+          "raw_nodeid": "tests/test_utils.py::TestSuperLen::()::test_io_streams[None-Test]",
+          "when": "setup"
+        }
+      }
+    },
+    {
+      "name": "journey/task-check-001/receipt.json",
+      "process_exit": 0,
+      "accepted": false,
+      "passed": false,
+      "required_passed": 350,
+      "required_failed": 0,
+      "native_exit": 0,
+      "optional": {
+        "tests/test_requests.py::TestRequests::test_auth_is_stripped_on_redirect_off_host": {
+          "category": "xfailed",
+          "raw_nodeid": "tests/test_requests.py::TestRequests::()::test_auth_is_stripped_on_redirect_off_host",
+          "when": "call"
+        },
+        "tests/test_requests.py::TestRequests::test_response_iter_lines_reentrant": {
+          "category": "xpassed",
+          "raw_nodeid": "tests/test_requests.py::TestRequests::()::test_response_iter_lines_reentrant",
+          "when": "call"
+        },
+        "tests/test_utils.py::TestSuperLen::test_io_streams[None-Test]": {
+          "category": "skipped",
+          "raw_nodeid": "tests/test_utils.py::TestSuperLen::()::test_io_streams[None-Test]",
+          "when": "setup"
+        }
+      }
+    },
+    {
+      "name": "journey/task-check-002/receipt.json",
+      "process_exit": 1,
+      "accepted": true,
+      "passed": false,
+      "required_passed": 349,
+      "required_failed": 1,
+      "native_exit": 1,
+      "optional": {
+        "tests/test_requests.py::TestRequests::test_auth_is_stripped_on_redirect_off_host": {
+          "category": "xfailed",
+          "raw_nodeid": "tests/test_requests.py::TestRequests::()::test_auth_is_stripped_on_redirect_off_host",
+          "when": "call"
+        },
+        "tests/test_requests.py::TestRequests::test_response_iter_lines_reentrant": {
+          "category": "xpassed",
+          "raw_nodeid": "tests/test_requests.py::TestRequests::()::test_response_iter_lines_reentrant",
+          "when": "call"
+        },
+        "tests/test_utils.py::TestSuperLen::test_io_streams[None-Test]": {
+          "category": "skipped",
+          "raw_nodeid": "tests/test_utils.py::TestSuperLen::()::test_io_streams[None-Test]",
+          "when": "setup"
+        }
+      }
+    }
+  ],
+  "task_status": "paused",
+  "replan_count": 1,
+  "changed_source_paths": [],
+  "cleanup_confirmed": true,
+  "reason": "False native-exit expectation for non-strict XPASS rejected genuine post-edit PASS; rollback preserved",
+  "provider_calls": 0
+}

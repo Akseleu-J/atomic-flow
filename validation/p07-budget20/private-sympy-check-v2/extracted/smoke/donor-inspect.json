@@ -1,0 +1,67 @@
+{
+  "Architecture": "amd64",
+  "Author": "",
+  "Comment": "",
+  "Config": {
+    "AttachStderr": false,
+    "AttachStdin": false,
+    "AttachStdout": false,
+    "Cmd": [
+      "python3"
+    ],
+    "Domainname": "",
+    "Entrypoint": null,
+    "Env": [
+      "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "LANG=C.UTF-8",
+      "GPG_KEY=0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D",
+      "PYTHON_VERSION=3.6.15",
+      "PYTHON_PIP_VERSION=21.2.4",
+      "PYTHON_SETUPTOOLS_VERSION=57.5.0",
+      "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/3cb8888cc2869620f57d5d2da64da38f516078c7/public/get-pip.py",
+      "PYTHON_GET_PIP_SHA256=c518250e91a70d7b20cceb15272209a4ded2a0c263ae5776f129e0d9b5674309"
+    ],
+    "Hostname": "",
+    "Image": "sha256:9da4cb957bd5a34666322bdd7ac329c52cc6f546bc1ae946b19e1091711a2244",
+    "Labels": null,
+    "OnBuild": null,
+    "OpenStdin": false,
+    "StdinOnce": false,
+    "Tty": false,
+    "User": "",
+    "Volumes": null,
+    "WorkingDir": ""
+  },
+  "Created": "2021-12-21T12:29:38.036669692Z",
+  "DockerVersion": "20.10.7",
+  "GraphDriver": {
+    "Data": {
+      "LowerDir": "/var/lib/docker/overlay2/4e30f679aca176623563e406a53a839f489d9b1b13b000bc78fbcdc62c8c9093/diff:/var/lib/docker/overlay2/109526ed50e663b9abf5210c7ab57d2d214ac6f79c4ab3594a5625d808e6d51b/diff:/var/lib/docker/overlay2/c130e7f925c68eedef1a6c107e514e5781061bed044137288dca4fc3332bb5dd/diff:/var/lib/docker/overlay2/1f9798468e7ee0e90528316e305d80ed2094705dce93d13401966800ffdb0e0a/diff",
+      "MergedDir": "/var/lib/docker/overlay2/4df96371d53f5b0b0abd45c562ce881c072404057ff2678f7d4aaa42230877a9/merged",
+      "UpperDir": "/var/lib/docker/overlay2/4df96371d53f5b0b0abd45c562ce881c072404057ff2678f7d4aaa42230877a9/diff",
+      "WorkDir": "/var/lib/docker/overlay2/4df96371d53f5b0b0abd45c562ce881c072404057ff2678f7d4aaa42230877a9/work"
+    },
+    "Name": "overlay2"
+  },
+  "Id": "sha256:dc468cf655a42fccd7f2bb1549e9d43d69c1e0a7dbff5457fb45de19e124ed6d",
+  "Metadata": {
+    "LastTagTime": "0001-01-01T00:00:00Z"
+  },
+  "Os": "linux",
+  "Parent": "",
+  "RepoDigests": [
+    "python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2"
+  ],
+  "RepoTags": [],
+  "RootFS": {
+    "Layers": [
+      "sha256:ad6b69b549193f81b039a1d478bc896f6e460c77c1849a4374ab95f9a3d2cea2",
+      "sha256:c42229255bc94b196a4d5aeb50642c842815cc0352baa851d1c65cbe365b384b",
+      "sha256:82baccdbb0707481406c96e8f95bbbf50c5c8b6705182a59b9b0228fbecbb96a",
+      "sha256:64978906fbf179110fdca2b0cfa439da3260951e3b3528ddd89ce36a48e690d6",
+      "sha256:e30df7d241f6e0435d003652dab5d7804dcbd5822a7deafbc337e85227bd0fcc"
+    ],
+    "Type": "layers"
+  },
+  "Size": 111818893
+}

@@ -1,0 +1,63 @@
+name: P07 historical Pylint dependency calibration
+
+on:
+  workflow_dispatch:
+    inputs:
+      controls:
+        type: choice
+        default: benchmarks/stage4/p07-controls-v5.json
+        options: [benchmarks/stage4/p07-controls-v4.json, benchmarks/stage4/p07-controls-v5.json]
+      tasks:
+        type: choice
+        default: all
+        options: [all, pylint-dev__pylint-7114]
+      pytest_launcher:
+        description: 'Native interpreter context probe, only admitted for task7114'
+        type: choice
+        default: console
+        options: [console, python-c]
+
+permissions:
+  contents: read
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        task: ${{ fromJSON(inputs.tasks == 'all' && '["pylint-dev__pylint-7080","pylint-dev__pylint-7114"]' || '["pylint-dev__pylint-7114"]') }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - run: python -m pip install swebench==3.0.15
+      - name: Build narrowly reviewed historical dependencies without target tests
+        env:
+          TASK: ${{ matrix.task }}
+        run: |
+          mkdir -p p07-pylint-worker
+          git rev-parse HEAD > p07-pylint-worker/tested-commit.txt
+          python tools/p07_dependency_image.py prepare --profile benchmarks/stage4/p07-pylint-environment-profile.json --task "$TASK" --output /tmp/p07-pylint-context
+          cp /tmp/p07-pylint-context/requirements.lock p07-pylint-worker/
+          python tools/p07_dependency_image.py build --context /tmp/p07-pylint-context --output p07-pylint-worker/build
+      - name: Independently admit dependency proof and calibrate all source rows
+        env:
+          TASK: ${{ matrix.task }}
+          PYTEST_LAUNCHER: ${{ inputs.pytest_launcher }}
+          CONTROLS: ${{ inputs.controls }}
+        run: |
+          IMAGE=$(python -c "import json; print(json.load(open('p07-pylint-worker/build/dependency-image.json'))['image_id'])")
+          python tools/evaluation_p07_isolated.py --task "$TASK" --manifest benchmarks/stage4/corpus-p07-v2.json --controls "$CONTROLS" --dependency-image "$IMAGE" --dependency-receipt p07-pylint-worker/build --dependency-profile benchmarks/stage4/p07-pylint-environment-profile.json --pytest-launcher "$PYTEST_LAUNCHER" --output p07-pylint-worker/calibration
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-pylint-environment-${{ matrix.task }}-${{ github.sha }}
+          path: p07-pylint-worker/
+          retention-days: 14
+          if-no-files-found: error

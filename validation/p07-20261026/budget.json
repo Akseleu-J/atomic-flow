@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "date": "2026-10-26",
+  "timezone": "Europe/Moscow",
+  "authorized_owner": "owner-account-2",
+  "authorized_total_usd": 6,
+  "observed_prior_daily_usd": 0.0008,
+  "new_calls": 21,
+  "new_reported_cost_usd": 0.034811375,
+  "remaining_session_ceiling_usd": 5.964388625,
+  "provider": "Kaggle Model Proxy",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "max_retries": 0,
+  "unknown_attempt_policy": "Stop physical inference admission until reconciliation; never blindly replay",
+  "price_estimate_source": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-lite/",
+  "declared_estimate_per_mtok": {
+    "input": 0.25,
+    "output": 1.5
+  },
+  "price_limit_note": "Public direct API reference, not a Kaggle billing guarantee; provider usage and quota are authoritative observations",
+  "phase": "R1/R3/R4 completed with no candidates; R2 zero-call preflight failure; no new paid repeats pending offline failure-chain reproduction",
+  "booked_today_usd": 0.035611375,
+  "attempts": [
+    {
+      "revision": "R1",
+      "run": 5496371,
+      "calls": 7,
+      "cost_usd": 0.011418825
+    },
+    {
+      "revision": "R2",
+      "run": 5497322,
+      "calls": 0,
+      "cost_usd": 0
+    },
+    {
+      "revision": "R3",
+      "run": 5497561,
+      "calls": 7,
+      "cost_usd": 0.011585775
+    },
+    {
+      "revision": "R4",
+      "run": 5497731,
+      "calls": 7,
+      "cost_usd": 0.011806775
+    }
+  ]
+}

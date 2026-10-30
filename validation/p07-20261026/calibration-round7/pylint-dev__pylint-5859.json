@@ -1,0 +1,163 @@
+{
+  "artifact": {
+    "id": 12637758288,
+    "name": "p07-calibration-pylint-dev__pylint-5859-2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+    "size_in_bytes": 19177,
+    "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12637758288",
+    "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12637758288/zip",
+    "expired": false,
+    "created_at": "2026-10-26T08:54:19Z",
+    "expires_at": "2026-11-09T08:54:18Z",
+    "updated_at": "2026-10-26T08:54:19Z",
+    "digest": "sha256:99fc074ac463c298b5cd4acf1bf91578299b0929ff7edc7cefe6c0cf5e6d7457",
+    "workflow_run": {
+      "id": 40294478109,
+      "repository_id": 1373027250,
+      "head_repository_id": 1373027250,
+      "head_branch": "experimental",
+      "head_sha": "b0f87b676b1e8152c5bdfad7545ab96dde3e2a99"
+    }
+  },
+  "sha256": "99fc074ac463c298b5cd4acf1bf91578299b0929ff7edc7cefe6c0cf5e6d7457",
+  "tested_commit": "2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+  "report": {
+    "instance_id": "pylint-dev__pylint-5859",
+    "status": "completed",
+    "calibrated": false,
+    "model_calls": 0,
+    "provider_credentials": "none",
+    "harness": "3.0.15",
+    "image_tag": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859:latest",
+    "image_digest": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf",
+    "image_id": "sha256:ca7caf3a52bd6923ae77e5fad1e6e6faa1caaf9112486638567e98aea0cd2010",
+    "base_commit": "182cc539b8154c0710fcea7e522267e42eba8899",
+    "manifest_sha256": "77f4d869139672f1d66690303097a8eb2ec97bbbb520d4870c4ba0c8f8e9c1cf",
+    "controls_sha256": "a7894c776a279735c36a7a71cf1eef8ce94c32cb5a4a642b77b1dd369e134505",
+    "negative_control_rationale": "Require a following character instead of end of input.",
+    "test_command": "pytest -rA",
+    "eval_script_sha256": "326cee04282d340e8ccc6f0bd5b4fd11c0af2b6c5f37468ebf4ec7d9d0c89d82",
+    "rows": [
+      {
+        "label": "base",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-pylint-dev__pylint-5859-56721d4e39",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf"
+        },
+        "image_checkout_head": "e60d064d597e181942a954573dc7556616eab7a5",
+        "base_verified": "182cc539b8154c0710fcea7e522267e42eba8899",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_todo_without_message": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_xxx_without_space": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_xxx_middle": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_without_space_fixme": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_absent_codetag": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_other_present_codetag": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_not_trigger": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_trigger": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_dont_trigger_on_todoist": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [
+          "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.2944681319999916,
+        "log_sha256": "7f2dcfd6325236077fd9acf0ab53adcec64236db71551be2547499aaba55424c"
+      },
+      {
+        "label": "gold",
+        "patch_sha256": "e7ec647093f251ba84dc511728af0ac5e7afafb0206bc826c343922d7afccebb",
+        "status": "verified_success",
+        "verified_success": true,
+        "container_name": "p07-pylint-dev__pylint-5859-dac8bdd193",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf"
+        },
+        "image_checkout_head": "e60d064d597e181942a954573dc7556616eab7a5",
+        "base_verified": "182cc539b8154c0710fcea7e522267e42eba8899",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_todo_without_message": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_xxx_without_space": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_xxx_middle": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_without_space_fixme": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_absent_codetag": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_other_present_codetag": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_not_trigger": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_trigger": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_dont_trigger_on_todoist": "PASSED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [],
+        "cleanup_exit": 0,
+        "wall_seconds": 2.789567452,
+        "log_sha256": "d9eea601cd65d44423246ad4f5148662b1ea22ed94120d12f9878025abb9b914"
+      },
+      {
+        "label": "wrong",
+        "patch_sha256": "2e423ec3a28abfed38021bc5f33b0f59d9b9d5e6d7feebad31d1e695696def97",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-pylint-dev__pylint-5859-31c40f58ce",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859@sha256:12412d9d1d7a06b8fa30dd0ff14ae67177fffee77d1e6ac277606fb7334837cf"
+        },
+        "image_checkout_head": "e60d064d597e181942a954573dc7556616eab7a5",
+        "base_verified": "182cc539b8154c0710fcea7e522267e42eba8899",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_xxx_middle": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_absent_codetag": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_not_trigger": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_trigger": "PASSED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_todo_without_message": "FAILED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_xxx_without_space": "FAILED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_without_space_fixme": "FAILED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag": "FAILED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_other_present_codetag": "FAILED",
+          "tests/checkers/unittest_misc.py::TestFixme::test_dont_trigger_on_todoist": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": false,
+        "assertion_failures": [
+          "tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 2.946462143000005,
+        "log_sha256": "4acc74145e42a601e4e398b31e55b44b6a24d8ca305bc4fbded1cbc14ad0ec29"
+      }
+    ]
+  }
+}

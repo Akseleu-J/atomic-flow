@@ -1,0 +1,13 @@
+..F
+================================== FAILURES ===================================
+_________________ test_edit_node_verifies_and_records_backup __________________
+tests\test_edit_tools.py:35: in test_edit_node_verifies_and_records_backup
+    assert result["status"] == "applied"
+E   AssertionError: assert 'rolled_back' == 'applied'
+E     
+E     - applied
+E     + rolled_back
+=========================== short test summary info ===========================
+FAILED tests/test_edit_tools.py::test_edit_node_verifies_and_records_backup
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 2 passed in 4.27s

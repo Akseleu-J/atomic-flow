@@ -1,0 +1,35 @@
+{
+  "candidate_and_execution_specs_equal": true,
+  "candidate_ca_present": false,
+  "candidate_core_revision": "7f68881fd32dcfaed9f8d34930e318eaaa4f247ff8811979593b37402345df2e",
+  "execution_core_revision": "7f68881fd32dcfaed9f8d34930e318eaaa4f247ff8811979593b37402345df2e",
+  "overlay": {
+    "after_manifest_sha256": "f2773f26f4087495b224b1373925233e41cfdc5a391cdd2d26b2e599dc4ba1e2",
+    "before_manifest_sha256": "df545ee3e6859030ffd8e0239c8d7bb98a78f8c58e343f76130ad17f5bfcf3bf",
+    "candidate_core_revision": "7f68881fd32dcfaed9f8d34930e318eaaa4f247ff8811979593b37402345df2e",
+    "candidate_revision": "df545ee3e6859030ffd8e0239c8d7bb98a78f8c58e343f76130ad17f5bfcf3bf",
+    "check_spec_digest": "2641df91027ad0491383763ca1a7a4fa0d04415ddfc862777f3ef712481b3706",
+    "execution_core_revision": "7f68881fd32dcfaed9f8d34930e318eaaa4f247ff8811979593b37402345df2e",
+    "execution_revision": "f2773f26f4087495b224b1373925233e41cfdc5a391cdd2d26b2e599dc4ba1e2",
+    "fixture_ca_sha256": "3149b895431f3bd1044fb7b51d56a64b47d4993669c9f189781370ffacbf90db",
+    "fixture_digest": "fa39c2505fd93feaa961809b136131964f2b536252849cf12a96a43c1504407d",
+    "hidden_mount": false,
+    "kind": "host_requests_execution_overlay",
+    "operation": "append_fixture_ca",
+    "original_ca_sha256": "6a4eeafeaf28cc7750f5f7f6ed4f84d6f08dacb8ac151412332f732647694253",
+    "path": "requests/cacert.pem",
+    "result_ca_sha256": "86fd5db01655da3edeb9643df1ed66f93b1bef4de1e7b7368b5193e8ab8e4865",
+    "runtime_digest": "f7a1f8fb890731a373734ceddf817113cd34c8f64ba12ff2fab3db8825f2493f",
+    "schema_version": 2,
+    "source_manifest_policy": "core_plus_fixed_requests_ca_sha1_v1",
+    "task_id": "psf__requests-2148"
+  },
+  "resource_container": {
+    "cleanup_confirmed": true,
+    "container_id": "6fd055641c4567389a689b487bfb658797c89644b38261d53d07c67a51cf37db",
+    "fixture_ca_sha256": "3149b895431f3bd1044fb7b51d56a64b47d4993669c9f189781370ffacbf90db",
+    "image_id": "sha256:f8f805ee1dce65b64eb8e3b48788921ab2df4b0a8aad1f4f3789cbec95f5cda0",
+    "original_ca_sha256": "6a4eeafeaf28cc7750f5f7f6ed4f84d6f08dacb8ac151412332f732647694253",
+    "started": false
+  }
+}

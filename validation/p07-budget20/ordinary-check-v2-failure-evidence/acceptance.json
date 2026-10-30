@@ -1,0 +1,23 @@
+{
+  "run_id": 40638505847,
+  "status": "accepted_synthetic_public_v2_failure_repair_publication",
+  "cases": [
+    {
+      "command": "pytest",
+      "artifact_id": 12794442507,
+      "zip_sha256": "3900f223cbd2634f16730fadf0f8a5ff4407d0cc8968713ea701cbb52e98d7bd",
+      "version": 2,
+      "actual_runner": "pytest",
+      "tested_commit": "2903ccd42855f23ecaf5dcb224a16863a710e457"
+    },
+    {
+      "command": "check",
+      "artifact_id": 12794248569,
+      "zip_sha256": "ae7a7d76f73e35b541f73ceddadb2bf8a14eac535bea06f9e2ef4b642d120694",
+      "version": 2,
+      "actual_runner": "pytest",
+      "tested_commit": "2903ccd42855f23ecaf5dcb224a16863a710e457"
+    }
+  ],
+  "provider_calls": 0
+}

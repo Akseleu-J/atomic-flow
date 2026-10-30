@@ -1,0 +1,16 @@
+{
+  "task_slug": "atomic-p07-sonnet5-pilot3-20261026-final",
+  "framework": "9645972b5845237f43306655e862cf318cf3b7f3",
+  "task_source_sha256": "9045047eba29fcdc6804d8a08fc2c5ad7a3fadfe25459d30aaf249a5657acdc9",
+  "selected": [
+    "pytest-dev__pytest-6116",
+    "pylint-dev__pylint-6506",
+    "sympy__sympy-20212"
+  ],
+  "total_budget_usd": 4.8,
+  "arm_budget_usd": 0.8,
+  "p07": "OPEN",
+  "inference_started": false,
+  "schedule_model_slug": "claude-sonnet-5-default",
+  "proxy_model_slug": "anthropic/claude-sonnet-5@default"
+}

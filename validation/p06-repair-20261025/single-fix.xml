@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="2.972" timestamp="2026-10-25T20:55:09.518299+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_task" name="test_task_runner_stops_on_failed_edit" time="2.075" /></testsuite></testsuites>

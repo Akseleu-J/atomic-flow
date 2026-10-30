@@ -27,3 +27,11 @@ class BudgetExceeded(AtomicFlowError):
 
 class TreeError(AtomicFlowError):
     pass
+
+
+class ContextLimitError(AtomicFlowError):
+    """Pinned instructions/current evidence exceed the host request limit."""
+
+
+class RepeatedToolCall(AtomicFlowError):
+    """The role repeated the same request without a source revision change."""

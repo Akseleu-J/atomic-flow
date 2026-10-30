@@ -1,0 +1,13 @@
+..................................................F..................... [ 87%]
+......s...                                                               [100%]
+================================== FAILURES ===================================
+_______________ test_multistep_task_publishes_all_or_none[True] _______________
+tests\test_task_changeset.py:45: in test_multistep_task_publishes_all_or_none
+    assert task.status == ("done" if second_ok else "failed")
+E   AssertionError: assert 'failed' == 'done'
+E
+E     - done
+E     + failed
+=========================== short test summary info ===========================
+FAILED tests/test_task_changeset.py::test_multistep_task_publishes_all_or_none[True]
+1 failed, 80 passed, 1 skipped in 37.71s

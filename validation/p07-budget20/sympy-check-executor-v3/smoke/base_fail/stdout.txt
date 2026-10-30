@@ -1,0 +1,26 @@
+ATOMIC_SYMPY_BEGIN:cb67b954771f44dc9a45f20e88d801ff
+============================= test process starts ==============================
+executable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]
+architecture:       64-bit
+cache:              no
+ground types:       python 
+numpy:              None
+random seed:        89196378
+hash randomization: on (PYTHONHASHSEED=1736952166)
+
+sympy/core/tests/test_p07_native_check.py[2] 
+test_native_identity ok
+test_native_probe F                                                       [FAIL]
+
+
+________________________________________________________________________________
+_________ sympy/core/tests/test_p07_native_check.py:test_native_probe __________
+Traceback (most recent call last):
+  File "/testbed/sympy/core/tests/test_p07_native_check.py", line 7, in test_native_probe
+    assert value == 42
+AssertionError
+
+============= tests finished: 1 passed, 1 failed, in 0.00 seconds ==============
+DO *NOT* COMMIT!
+ATOMIC_SYMPY_END:cb67b954771f44dc9a45f20e88d801ff
+ATOMIC_CHECK_SPEC_RECEIPT:{"collected": 2, "collection": ["sympy/core/tests/test_p07_native_check.py::test_native_identity", "sympy/core/tests/test_p07_native_check.py::test_native_probe"], "counts": {"exceptions": 0, "failed": 1, "passed": 1, "skipped": 0, "xfailed": 0, "xpassed": 0}, "exit_code": 1, "files": ["sympy/core/tests/test_p07_native_check.py"], "finished": true, "interpreter": "/opt/miniconda3/envs/testbed/bin/python", "interpreter_resolved": "/opt/miniconda3/envs/testbed/bin/python3.9", "native_argv": ["/testbed/bin/test", "-C", "--verbose", "sympy/core/tests/test_p07_native_check.py"], "native_source_sha256": {"bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869", "bin/test": "da4284cc210d8db5109f916248d97a8e82f725547e60c5d9a4d6c43573e3e9d5", "sympy/utilities/runtests.py": "e22c8599bd2d8c3451d044930327aeec9da780861225f23926cb1c14070bfc27"}, "native_stdout_sha256": "1f6382e9228b4091d363a1a9331696bac603256c77fb46028de5d9fcbe383eab", "nonce": "cb67b954771f44dc9a45f20e88d801ff", "python_version": [3, 9, 20], "root": "/testbed", "runner": "sympy-native", "sympy_module": "/testbed/sympy/__init__.py", "sympy_version": "1.7.dev", "test_statuses": {"sympy/core/tests/test_p07_native_check.py::test_native_identity": "passed", "sympy/core/tests/test_p07_native_check.py::test_native_probe": "failed"}}

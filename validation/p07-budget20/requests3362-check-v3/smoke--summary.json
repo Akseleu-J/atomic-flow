@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "case": "base_fail",
+      "check_passed": false,
+      "container_id": "6f1d974c517869b5ef60794f825875f203b8cd0ef3d55e6b04e216423d3812de",
+      "controller_returned_after_immutable_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 1,
+      "source_after": "968248fcd0d3863e5b2042eb5a9887bd2400dab5ad51b7fd9f30521e40c342f2",
+      "source_before": "968248fcd0d3863e5b2042eb5a9887bd2400dab5ad51b7fd9f30521e40c342f2",
+      "status": "expected_private_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "29ff84e718517fc1d80b0ad2f8116cecf334d1fb9daf659750c990012c998544"
+    },
+    {
+      "case": "edited_pass",
+      "check_passed": true,
+      "container_id": "e7b0a9706a543f7cba3cb64c4b18474de6bd5e0d354034a2a20344fa8f09c800",
+      "controller_returned_after_immutable_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 0,
+      "source_after": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5",
+      "source_before": "b8ab5291c87de32a7eb93d377922c2f2819b5df06ea9e5f2395e8bbd7ad9d9e5",
+      "status": "expected_private_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "24b6fcb64bb87c95301d3d6ca5c0583a941be012f2f5c4314a5f723442b7d09b"
+    },
+    {
+      "case": "required_skip",
+      "check_passed": false,
+      "container_id": "e1280c37adccaee02e48842c854ffd03a0ff28021b89a7253ac133253bb9dadd",
+      "controller_returned_after_immutable_cleanup": true,
+      "fixture_servers_stopped": true,
+      "process_exit": 5,
+      "source_after": "42f646b81440a6011a9c7ef53ae70ac7f2f3ac3cca3bd121a69c58d4bcd911d4",
+      "source_before": "42f646b81440a6011a9c7ef53ae70ac7f2f3ac3cca3bd121a69c58d4bcd911d4",
+      "status": "expected_private_boundary_behavior",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "c8dc818f66ac8b94d0e4fa35be0f4bbe6dcadf2e49b2715072f660b734836753"
+    }
+  ],
+  "cleanup_confirmed": true,
+  "fixture_digest": "fd26fe0ab9a95f13d0057b00493b036024441d9e8e2742da1e650fb9453cb58c",
+  "full_source_file_count": 280,
+  "full_source_revision": "7a55a0e62452d3fe3acdcf45b29a23c4b8729c0a7f28f541f2018f16bd41b949",
+  "generic_dispatch_enabled": false,
+  "historical_target_tests": false,
+  "host_target_imports": false,
+  "httpbin_version": "0.5.0",
+  "independent_requirement_success": false,
+  "model_calls": 0,
+  "private_pytest_digest": "0dc0a695324c3728f239d327fe5c0cfcffaba76ccb26cc57493edd1aa9db7383",
+  "provider_calls": 0,
+  "runtime_digest": "290b737befccf70a32dd4bb372f382338533e13c9c2c1ffe32ca248393a452c2",
+  "scope": "synthetic full-source Requests3362 private CheckSpec fixture boundary",
+  "source_container_cleanup": {
+    "confirmed": true,
+    "container_id": "d578e6819d7910c65120e9a26fa270fa497c88150da5cf927957e068c832b4c0",
+    "remove_exit": 0
+  },
+  "status": "requests3362_private_check_boundary_qualified",
+  "target_setup_executed": false,
+  "taskrunner_wired": false,
+  "tested_commit": "72bb7efa0d76f968d198d51a0caab3442fb1a846",
+  "verified_success": false
+}

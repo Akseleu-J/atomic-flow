@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "status": "accepted_synthetic_private_sympy_executor",
+  "run_id": 40678851144,
+  "tested_commit": "1c912cb2549ffd89de4fc26457fb61a2c612368f",
+  "artifact_id": 12812121013,
+  "artifact_sha256": "07e06978c62c72761cb677bbde56bf04b483b61a58efeefd71247db02d637dc7",
+  "raw_artifact_hashes_verified": 77,
+  "copied_regular_files": 1733,
+  "python_version": "3.6.15",
+  "runtime_digest": "92dd4b2e91de10005ef0ac334fae79f668c9de428762c3aa990216add42207fc",
+  "syntax": [
+    {
+      "case": "valid36",
+      "outcome": "passed"
+    },
+    {
+      "case": "walrus_rejected",
+      "outcome": "failed"
+    }
+  ],
+  "ordinary": [
+    {
+      "case": "base_fail",
+      "exit": 1,
+      "status": "expected_private_boundary_behavior"
+    },
+    {
+      "case": "edited_pass",
+      "exit": 0,
+      "status": "expected_private_boundary_behavior"
+    },
+    {
+      "case": "required_skip",
+      "exit": 5,
+      "status": "expected_private_boundary_behavior"
+    }
+  ],
+  "cleanup_confirmed": true,
+  "provider_calls": 0,
+  "model_generation": false,
+  "full_TaskRunner": false,
+  "historical_issue_quality": false,
+  "P07": "OPEN"
+}

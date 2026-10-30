@@ -1,0 +1,447 @@
+{
+  "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+  "push_checks_run": 40101171166,
+  "push_external_run": 40101171149,
+  "pr_checks_run": 40101174309,
+  "pr_external_run": 40101174300,
+  "archive_digest_verification": "GitHub-reported artifact digests retained; CLI-extracted ZIP bytes not rehashed",
+  "wheel_verification": [
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "6a534d0ce73039cbdad0944483fbcf1f8b5111cbcb7626a511e58c4b1697fb03",
+      "python": "3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]",
+      "platform": "darwin",
+      "extra": "api",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "ae213e1ba576acbc30d7666cdc4dd95cf78362c6677bf7ca48b1946a2df62964",
+      "python": "3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]",
+      "platform": "darwin",
+      "extra": "core",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "6452f947cd485ce78611aab0f32cbc327a3d7ca3338cf65fdaf892e86e11c397",
+      "python": "3.12.10 (v3.12.10:0cc81280367, Apr  8 2025, 08:46:59) [Clang 13.0.0 (clang-1300.0.29.30)]",
+      "platform": "darwin",
+      "extra": "api",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "6a534d0ce73039cbdad0944483fbcf1f8b5111cbcb7626a511e58c4b1697fb03",
+      "python": "3.12.10 (v3.12.10:0cc81280367, Apr  8 2025, 08:46:59) [Clang 13.0.0 (clang-1300.0.29.30)]",
+      "platform": "darwin",
+      "extra": "core",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "ae213e1ba576acbc30d7666cdc4dd95cf78362c6677bf7ca48b1946a2df62964",
+      "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+      "platform": "linux",
+      "extra": "api",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "ae213e1ba576acbc30d7666cdc4dd95cf78362c6677bf7ca48b1946a2df62964",
+      "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+      "platform": "linux",
+      "extra": "core",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "ae213e1ba576acbc30d7666cdc4dd95cf78362c6677bf7ca48b1946a2df62964",
+      "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+      "platform": "linux",
+      "extra": "api",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "6a534d0ce73039cbdad0944483fbcf1f8b5111cbcb7626a511e58c4b1697fb03",
+      "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+      "platform": "linux",
+      "extra": "core",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": true,
+      "crlf_only_source_differences": 0,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "2bb43fa8ef743363041cf7a11b59744be0ce7b4043f09c737c63bdd3f1d5293c",
+      "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+      "platform": "win32",
+      "extra": "api",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": false,
+      "crlf_only_source_differences": 130,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "fc8baf6d4864e33ab4d9bb67b424029a526db1d320f4087963540d4a2044423c",
+      "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+      "platform": "win32",
+      "extra": "core",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": false,
+      "crlf_only_source_differences": 130,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "e0d2e0f9aebda7de4d35de98df213c4c92fbc7624ee3f077bf9b5991f6aa1cb5",
+      "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "platform": "win32",
+      "extra": "api",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": false,
+      "crlf_only_source_differences": 130,
+      "source_inventory_verified": true
+    },
+    {
+      "wheel": "atomic_flow-0.2.0-py3-none-any.whl",
+      "sha256": "371a975fac50e3ebbfe662135af00516400826d48b639cd1588080aad0b01d87",
+      "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "platform": "win32",
+      "extra": "core",
+      "source_commit": "0dbd5938958074eae4ff73f6424f06425a525909",
+      "python_source_files": 133,
+      "exact_source_bytes": false,
+      "crlf_only_source_differences": 130,
+      "source_inventory_verified": true
+    }
+  ],
+  "external_scenarios": [
+    {
+      "name": "publish",
+      "status": "passed",
+      "scripted_calls": 14
+    },
+    {
+      "name": "cancel",
+      "status": "passed",
+      "scripted_calls": 6
+    },
+    {
+      "name": "source_conflict",
+      "status": "passed",
+      "scripted_calls": 8
+    }
+  ],
+  "retained_files": {
+    "checks/compile.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "checks/container-boundaries.txt": {
+      "sha256": "e38b7863ccfedf86f76a2ef3a2a3e95f0baac3430b65b136e9e74bcd31f894a9",
+      "bytes": 100
+    },
+    "checks/dependencies.txt": {
+      "sha256": "c1436661d063aeeb9d31f38ce3ef98be35b227d7d88caa6e540d2e2b9b2f676d",
+      "bytes": 536
+    },
+    "checks/docker-build.txt": {
+      "sha256": "646a63e826f8cdc13fff72093e3e587f173710e76b42d0fba7f1ffec97a4b640",
+      "bytes": 12879
+    },
+    "checks/docker-info.txt": {
+      "sha256": "5b19ae24145640f34f3f9c46205acbae30b234a683de08cea220ff243d0dd369",
+      "bytes": 1491
+    },
+    "checks/docker-version.txt": {
+      "sha256": "7ba4296d98811b3f6017879e4adb5452f8fe84ab8242b9bfd4fe14e394459098",
+      "bytes": 769
+    },
+    "checks/pytest-extra.txt": {
+      "sha256": "44d83ad137613939263c06a94cfab265f730215f63d49278ebe4449ac0d33999",
+      "bytes": 99
+    },
+    "checks/pytest.txt": {
+      "sha256": "6b5829a5a647bd592db2aeb08c65f656744a8a0c826a14af2adc18b7534ad81c",
+      "bytes": 1768
+    },
+    "checks/python-version.txt": {
+      "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0",
+      "bytes": 15
+    },
+    "checks/results.json": {
+      "sha256": "c7344468e4cd343ed51ebfe7baa17abdecdb5b7304780d3c3c267f30b267dac4",
+      "bytes": 355
+    },
+    "checks/task-calibration.json": {
+      "sha256": "c883a53e6c6b0a5c249050aa473c541407c6bbeea09b8cdae1cb3279e00485d3",
+      "bytes": 5529
+    },
+    "checks/tested-commit.txt": {
+      "sha256": "8da1417d277a6cc23eeff774d1bf9cf33b652dc933534598c4cd4733e478ba26",
+      "bytes": 41
+    },
+    "cpu-python312-job.txt": {
+      "sha256": "b75d40ee50f8ad10d75f5fb43e72c996dc11aeab68ba44b46cd08c8299eaf594",
+      "bytes": 32943
+    },
+    "external/node-version.txt": {
+      "sha256": "f2ec568164f99546161909b0189b57bb5be3e80f8e2ccd8a51a4aed8c4055a04",
+      "bytes": 9
+    },
+    "external/npm-package-lock.json": {
+      "sha256": "5acaece88695a0016fcdafed5a4ff86d8400d3d525a1b57993ed7cbe9cdcb816",
+      "bytes": 5601
+    },
+    "external/npm-tree.json": {
+      "sha256": "d4ccbd5d9e6fc758528cd2cedd43c064cddd6bb74e9c840bcc91d736718ed048",
+      "bytes": 3067
+    },
+    "external/python-freeze.txt": {
+      "sha256": "39575ee9ac0702ec2f2a2bfc222a34a431287cce0fe27507dd6a5535eddac728",
+      "bytes": 665
+    },
+    "external/result.json": {
+      "sha256": "f301fb188c2338b7ceba3ce5d9cda3f8b720aa3ce9cd8acf52dc26ce00b2cd1a",
+      "bytes": 6279
+    },
+    "external/tested-commit.txt": {
+      "sha256": "8da1417d277a6cc23eeff774d1bf9cf33b652dc933534598c4cd4733e478ba26",
+      "bytes": 41
+    },
+    "release/installed-macos-14-3.11-api/install-report.json": {
+      "sha256": "db39f310c2c6dbb06b43597ec4fe14658b711e6d3020844a0267d356ab695697",
+      "bytes": 367074
+    },
+    "release/installed-macos-14-3.11-api/installed-freeze.txt": {
+      "sha256": "d8b6e854226cad5c6629450370ff95d33aab6fb809bc5f9a8f669feff9176c77",
+      "bytes": 645
+    },
+    "release/installed-macos-14-3.11-api/manifest.json": {
+      "sha256": "50703a431e6c5b1c8c66fcdb313d75f166fc8d821fb94fb3c7aafdb89d6715a8",
+      "bytes": 338
+    },
+    "release/installed-macos-14-3.11-api/smoke.txt": {
+      "sha256": "36271fd5ddd5e6db85385a0f8a3eeae9e9cfbead39164f41bd9f7dbc4e0bca33",
+      "bytes": 609
+    },
+    "release/installed-macos-14-3.11-core/install-report.json": {
+      "sha256": "78cbf1a2634a3b2317b8076b222be0709191904d05ecdbd93674346e6328dfe5",
+      "bytes": 197621
+    },
+    "release/installed-macos-14-3.11-core/installed-freeze.txt": {
+      "sha256": "5cc95872587eb71fe9bd17507cbce674eb00e227e56b43480bbd413a117c9984",
+      "bytes": 360
+    },
+    "release/installed-macos-14-3.11-core/manifest.json": {
+      "sha256": "b2a77ee565816567f0dffdf471ecacec037e7490b85b4cc54cdcfce38371059e",
+      "bytes": 339
+    },
+    "release/installed-macos-14-3.11-core/smoke.txt": {
+      "sha256": "145ac00ae79badb05c0e86963caaccdce482f047d119da2129ce9e46f7a8446e",
+      "bytes": 305
+    },
+    "release/installed-macos-14-3.12-api/install-report.json": {
+      "sha256": "a5c8c2f44f2ed9e93323ff82b11a09cf3b542f3f83f65f5e863b54c2d8ee8f84",
+      "bytes": 369235
+    },
+    "release/installed-macos-14-3.12-api/installed-freeze.txt": {
+      "sha256": "5f5bc9c87d87005c18f88acbe2797704722b4745a300959659ef4fc5ed93483f",
+      "bytes": 628
+    },
+    "release/installed-macos-14-3.12-api/manifest.json": {
+      "sha256": "3d991a0f8f651d41913a76821af3c89e00f3269bade6f44170836df1dcfb8eb9",
+      "bytes": 341
+    },
+    "release/installed-macos-14-3.12-api/smoke.txt": {
+      "sha256": "0ea8f236af59063e1cbfbfb2dae2b73aa5bd5acdddd823e47779ad5868ff6665",
+      "bytes": 609
+    },
+    "release/installed-macos-14-3.12-core/install-report.json": {
+      "sha256": "81be4024b1fc8bbbaeef9bbda2cc36b76cca85870315bd4533cd36b984161d63",
+      "bytes": 198270
+    },
+    "release/installed-macos-14-3.12-core/installed-freeze.txt": {
+      "sha256": "c8bdbf69ee7074c81efb1725558da7be41b743c7d760a91fba4bfd0959d989cd",
+      "bytes": 343
+    },
+    "release/installed-macos-14-3.12-core/manifest.json": {
+      "sha256": "4d5e7e51b7b231bae3b2d772701c711667337bf527190fd77cd01dce78f48a07",
+      "bytes": 342
+    },
+    "release/installed-macos-14-3.12-core/smoke.txt": {
+      "sha256": "7e4ab43776bd345892beb9ca9386db33ebf922a7b3eabf0704346a553a68b0db",
+      "bytes": 305
+    },
+    "release/installed-ubuntu-24.04-3.11-api/install-report.json": {
+      "sha256": "bbdb71fc82fcb0e5eb6ad09d58db90138b758967411a56cc7fbe8ee96813ea10",
+      "bytes": 367242
+    },
+    "release/installed-ubuntu-24.04-3.11-api/installed-freeze.txt": {
+      "sha256": "38cd429bde1570f2546ed2308b3794b0601cd928c1f5bad1088c12ae886d630f",
+      "bytes": 644
+    },
+    "release/installed-ubuntu-24.04-3.11-api/manifest.json": {
+      "sha256": "76775ce358f8c642030def7a8085b05a4b2d088a4f446639c8bd11e8259e17ab",
+      "bytes": 301
+    },
+    "release/installed-ubuntu-24.04-3.11-api/smoke.txt": {
+      "sha256": "d7e591e3078811e7e3673d0c50ddad311099b7237251f8717f381b88441ffcd0",
+      "bytes": 505
+    },
+    "release/installed-ubuntu-24.04-3.11-core/install-report.json": {
+      "sha256": "f78edcc89172c043ee6e853e12034b319537bb9210a7387f89cbaa92c94f2ecc",
+      "bytes": 197636
+    },
+    "release/installed-ubuntu-24.04-3.11-core/installed-freeze.txt": {
+      "sha256": "6e890dc89ecc15cf3179be08b4ed9c9955b1eadc652b1ebcc757ffcd95b0d399",
+      "bytes": 359
+    },
+    "release/installed-ubuntu-24.04-3.11-core/manifest.json": {
+      "sha256": "7b96e50fbfef0d20d9af996133eba14cf545f3e582c6f82a44a5fc20b7c7c7fe",
+      "bytes": 302
+    },
+    "release/installed-ubuntu-24.04-3.11-core/smoke.txt": {
+      "sha256": "15fed862d97d35098b848bc873fc8400ef8c2b60b5928e428e384d9102c6552d",
+      "bytes": 253
+    },
+    "release/installed-ubuntu-24.04-3.12-api/install-report.json": {
+      "sha256": "342de81c9373b0949a6c3e74422f17d8e1ed61957211b5a64c2bea3607f07a37",
+      "bytes": 369400
+    },
+    "release/installed-ubuntu-24.04-3.12-api/installed-freeze.txt": {
+      "sha256": "4dd5b83128e8a6131affd12a3301dbf23054b264b0ab86d024ae1c470c9e8cf3",
+      "bytes": 627
+    },
+    "release/installed-ubuntu-24.04-3.12-api/manifest.json": {
+      "sha256": "4b9572576c5db247d378fb64206d6092a2e4f7d004ea71813ceb918abdeb806d",
+      "bytes": 301
+    },
+    "release/installed-ubuntu-24.04-3.12-api/smoke.txt": {
+      "sha256": "b99bb8e821c40ff2f79dbb9cef15131bc482df38af15a346c88987e5b9dbce46",
+      "bytes": 505
+    },
+    "release/installed-ubuntu-24.04-3.12-core/install-report.json": {
+      "sha256": "fd35310c46d5dbc9905a6cc397f333a32a2233a7fb8ceed22a99fb339f2b7bd6",
+      "bytes": 198283
+    },
+    "release/installed-ubuntu-24.04-3.12-core/installed-freeze.txt": {
+      "sha256": "a727eea18676ef5c6a2cf84c386c5e46516e97ba658f919b10a329ddd48ec143",
+      "bytes": 342
+    },
+    "release/installed-ubuntu-24.04-3.12-core/manifest.json": {
+      "sha256": "454f2bb5692260b5d976cdd39f890f4195ed27366169d4c12611063bf081553d",
+      "bytes": 302
+    },
+    "release/installed-ubuntu-24.04-3.12-core/smoke.txt": {
+      "sha256": "96c8e21eb18bfea7cb3ef8266737e17bc1d357f6474855e68527b8d62c114b0b",
+      "bytes": 253
+    },
+    "release/installed-windows-2022-3.11-api/install-report.json": {
+      "sha256": "e517baa0945f5f81911cb2d418fcada99eb89fdb1df93646c81308e1cdece002",
+      "bytes": 363516
+    },
+    "release/installed-windows-2022-3.11-api/installed-freeze.txt": {
+      "sha256": "7d42ae06c45f53e54ef7f167acdca34d68a6c765632b369ea0873114dd9d5e0f",
+      "bytes": 643
+    },
+    "release/installed-windows-2022-3.11-api/manifest.json": {
+      "sha256": "9cfd42de1869567ad4fec500eb0a2481f2588e0e78716710b45e86d3bc4a4c67",
+      "bytes": 338
+    },
+    "release/installed-windows-2022-3.11-api/smoke.txt": {
+      "sha256": "c617bd1fcca0c702c331eeda6a00780d9d949bf48660af0449e9b527f335c8f3",
+      "bytes": 559
+    },
+    "release/installed-windows-2022-3.11-core/install-report.json": {
+      "sha256": "4536e1becbe0804631709df0680eb9c3d82cee4ca6e830e1357a8268bf46ce7a",
+      "bytes": 198529
+    },
+    "release/installed-windows-2022-3.11-core/installed-freeze.txt": {
+      "sha256": "68b424e347b78086f297f3be4253660aec1dfa70598f24c81ca6de67f7eb1d1c",
+      "bytes": 357
+    },
+    "release/installed-windows-2022-3.11-core/manifest.json": {
+      "sha256": "df4d2cf31074f44c4a59730a08d79845fc5b5556469e3e2efe6ba8ab7c87f730",
+      "bytes": 339
+    },
+    "release/installed-windows-2022-3.11-core/smoke.txt": {
+      "sha256": "691fa6edbe61622dfcce49832ae51b25027ad7221f344055fee4cbf71f37012d",
+      "bytes": 284
+    },
+    "release/installed-windows-2022-3.12-api/install-report.json": {
+      "sha256": "26869aac65a649d8f6fd5a911e9b7fdc0058010d58be22159fdb4e3cc99ec685",
+      "bytes": 365682
+    },
+    "release/installed-windows-2022-3.12-api/installed-freeze.txt": {
+      "sha256": "be95867e8750e970e2da8b6d5afb516065536f64c6ee9dfc8edd175ccb318b64",
+      "bytes": 625
+    },
+    "release/installed-windows-2022-3.12-api/manifest.json": {
+      "sha256": "3497937d74edc67ba603e8c0393a68d3a15f1b71facb87cfa09e22f90b157eaf",
+      "bytes": 340
+    },
+    "release/installed-windows-2022-3.12-api/smoke.txt": {
+      "sha256": "67b191d6b72c152fa915d438d9d03eb2aa525bdc989ff2f3718ca0aef5e5367c",
+      "bytes": 559
+    },
+    "release/installed-windows-2022-3.12-core/install-report.json": {
+      "sha256": "12907441d50016e87650b002a324e00f19a4f872deabbe6deb3940401dbffc89",
+      "bytes": 199215
+    },
+    "release/installed-windows-2022-3.12-core/installed-freeze.txt": {
+      "sha256": "1b8ca1a160bb723b3e64c4b0e81402fb2861ecadccde1244ffa8aeb0e6bf29ad",
+      "bytes": 339
+    },
+    "release/installed-windows-2022-3.12-core/manifest.json": {
+      "sha256": "e64587ee61bb5803d86e76b5448f04cbe44065a7ae57c9c566075f4491a45d00",
+      "bytes": 341
+    },
+    "release/installed-windows-2022-3.12-core/smoke.txt": {
+      "sha256": "6543ffeb50dd46d8df0e32cc443918ba4f96bf50466ab06b0cce46b8a855053f",
+      "bytes": 284
+    },
+    "workflows.json": {
+      "sha256": "98a6fb95e2b320497ede56f41f87390aab85ba089a42e5a1d41ef7d6cc9dcf0b",
+      "bytes": 54914
+    }
+  },
+  "production_acceptance": false,
+  "new_provider_calls": 0
+}

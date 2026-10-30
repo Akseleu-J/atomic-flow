@@ -1,0 +1,49 @@
+{
+  "runtime": "5d57a0f3b4762c40be6c3441e63dfb524fe5e511",
+  "run": 40453010247,
+  "artifact": 12711726622,
+  "archive_sha256": "7a65e55c455da39e3e1da0d56b4b258aeb7ec9d26915b05a4802fdf5f4d4da50",
+  "accepted": false,
+  "model_calls": 0,
+  "rows": [
+    {
+      "label": "base",
+      "raw_collection": 349,
+      "canonical_collection": 349,
+      "required": 76,
+      "required_missing_after_canonicalization": [],
+      "native_exit": 1,
+      "stdout_sha256": "ee3d9ede15916a17ce887786d115c75028692fdafb0239ffba63adaa8e41f214",
+      "stderr_sha256": "d1107d2b8c365599b4a6b3b3e8970096824211850935d01f95242ba423b21795",
+      "cleanup_confirmed": true,
+      "protected_requirement_outcome": "failed",
+      "summary": "=== 10 failed, 336 passed, 1 skipped, 1 xfailed, 1 xpassed in 81.56 seconds ===="
+    },
+    {
+      "label": "gold",
+      "raw_collection": 349,
+      "canonical_collection": 349,
+      "required": 76,
+      "required_missing_after_canonicalization": [],
+      "native_exit": 1,
+      "stdout_sha256": "9b8517379313969079d512dab9538f2db418789fb1578c98b61d663f59547b79",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cleanup_confirmed": true,
+      "protected_requirement_outcome": "passed",
+      "summary": "==== 9 failed, 337 passed, 1 skipped, 1 xfailed, 1 xpassed in 81.54 seconds ===="
+    },
+    {
+      "label": "wrong",
+      "raw_collection": 349,
+      "canonical_collection": 349,
+      "required": 76,
+      "required_missing_after_canonicalization": [],
+      "native_exit": 1,
+      "stdout_sha256": "56bf87a4a2e73d9ec90698af28b4fa10762af6e9bed11538973a7e00985393ee",
+      "stderr_sha256": "56499663c00d288b093a6ee41d28bc69cddaef849f2f116aea7e6633dee7d354",
+      "cleanup_confirmed": true,
+      "protected_requirement_outcome": "failed",
+      "summary": "=== 10 failed, 336 passed, 1 skipped, 1 xfailed, 1 xpassed in 81.53 seconds ===="
+    }
+  ]
+}

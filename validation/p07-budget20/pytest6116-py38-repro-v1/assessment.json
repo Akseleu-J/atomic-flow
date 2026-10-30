@@ -1,0 +1,14 @@
+{
+  "run": 40888913341,
+  "artifact": 12902724745,
+  "archive_sha256": "be2dcbb33f0dc2ce9678e6c6618a18f5de84dd9abacbc088691f2c93e9d8d8d5",
+  "tested_commit": "fb8b1ad1a8d206a19a3e0a4798d6f0600a8a9d43",
+  "scope": "three public tests only",
+  "python": "3.8.20",
+  "collected": 3,
+  "passed": 3,
+  "source_blobs_verified": 474,
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

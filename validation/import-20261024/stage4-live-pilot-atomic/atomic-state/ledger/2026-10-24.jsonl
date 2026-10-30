@@ -1,0 +1,2 @@
+{"ts": "2026-10-24T09:09:09.340743+00:00", "task_id": "task_74780dc9d463", "call_id": "call_3fc32bc55b41484fba28c957fdc8586d", "backend": "host_model_proxy", "model": "google/gemini-3.1-flash-lite-preview", "reserved_usd": 0.0012389, "status": "in_flight", "cost_usd": null}
+{"ts": "2026-10-24T09:09:11.470186+00:00", "task_id": "task_74780dc9d463", "call_id": "call_3fc32bc55b41484fba28c957fdc8586d", "backend": "host_model_proxy", "model": "google/gemini-3.1-flash-lite-preview", "cost_usd": 0.00040375, "tokens_in": 547, "tokens_out": 178, "status": "completed"}

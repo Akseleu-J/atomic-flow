@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "kind": "p07_model_response",
+  "call_id": "mq_4f294c730ed549ef90b5dd144f1e2e20",
+  "request_sha256": "72fa2615db3eb27352e5f11ac97e5f33f5d0c54863339959ded29be5923c2e2f",
+  "identity_sha256": "f1095f70476e9a65ff096ab6136130f250b7b18ade789b16cb4544576c7075e6",
+  "state": "unknown",
+  "result": null,
+  "error_code": "physical_or_accounting_outcome_unknown",
+  "response_sha256": "854a95fe66ee891868fb2799918eefc91fe86cd17e91806c6d876c43e2bbd843"
+}

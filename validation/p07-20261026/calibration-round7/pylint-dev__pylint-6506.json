@@ -1,0 +1,156 @@
+{
+  "artifact": {
+    "id": 12638017960,
+    "name": "p07-calibration-pylint-dev__pylint-6506-2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+    "size_in_bytes": 17031,
+    "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12638017960",
+    "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12638017960/zip",
+    "expired": false,
+    "created_at": "2026-10-26T08:54:59Z",
+    "expires_at": "2026-11-09T08:54:58Z",
+    "updated_at": "2026-10-26T08:54:59Z",
+    "digest": "sha256:8794fa0f2a3728965b56ad77628115e055e04ddb89431ee67d1bd1c8a354e2a1",
+    "workflow_run": {
+      "id": 40294478109,
+      "repository_id": 1373027250,
+      "head_repository_id": 1373027250,
+      "head_branch": "experimental",
+      "head_sha": "b0f87b676b1e8152c5bdfad7545ab96dde3e2a99"
+    }
+  },
+  "sha256": "8794fa0f2a3728965b56ad77628115e055e04ddb89431ee67d1bd1c8a354e2a1",
+  "tested_commit": "2f4fdf93741e84ad21f73eaf95ba7a1037e54928",
+  "report": {
+    "instance_id": "pylint-dev__pylint-6506",
+    "status": "completed",
+    "calibrated": true,
+    "model_calls": 0,
+    "provider_credentials": "none",
+    "harness": "3.0.15",
+    "image_tag": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-6506:latest",
+    "image_digest": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-6506@sha256:f2304d2a6461bc098bc872efc4474b34b54eec72f5a87bacc0509a88ba52fb2d",
+    "image_id": "sha256:f36fa34ed8366cd0a4cab240305841b939db316bbbe5c632dc0c85c8a550954a",
+    "base_commit": "0a4204fd7555cfedd43f43017c94d24ef48244a5",
+    "manifest_sha256": "77f4d869139672f1d66690303097a8eb2ec97bbbb520d4870c4ba0c8f8e9c1cf",
+    "controls_sha256": "a7894c776a279735c36a7a71cf1eef8ce94c32cb5a4a642b77b1dd369e134505",
+    "negative_control_rationale": "Use argparse but emit the wrong required diagnostic.",
+    "test_command": "pytest -rA",
+    "eval_script_sha256": "25284478b7ebe30e60cda7448075a4e4d57368e671b82f4c6f98e50c416701dc",
+    "rows": [
+      {
+        "label": "base",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-pylint-dev__pylint-6506-2175b51fa2",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-6506@sha256:f2304d2a6461bc098bc872efc4474b34b54eec72f5a87bacc0509a88ba52fb2d"
+        },
+        "image_checkout_head": "8416895fe7b9fe9b8fbc56d4536da9915ae0ae08",
+        "base_verified": "0a4204fd7555cfedd43f43017c94d24ef48244a5",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+          "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+          "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+          "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+          "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+          "tests/config/test_config.py::test_short_verbose": "PASSED",
+          "tests/config/test_config.py::test_unknown_option_name": "FAILED",
+          "tests/config/test_config.py::test_unknown_short_option_name": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [
+          "tests/config/test_config.py::test_unknown_option_name",
+          "tests/config/test_config.py::test_unknown_short_option_name"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.2219618529999963,
+        "log_sha256": "d48b27554a3eda1da5e6b5e5c00c432b49fce89c62361d195f7405fbc624c4f8"
+      },
+      {
+        "label": "gold",
+        "patch_sha256": "d998b15278fc2bfaddeeb5d44319201298246247a7ed18c76203e9d27d12b12a",
+        "status": "verified_success",
+        "verified_success": true,
+        "container_name": "p07-pylint-dev__pylint-6506-8be502b5ab",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-6506@sha256:f2304d2a6461bc098bc872efc4474b34b54eec72f5a87bacc0509a88ba52fb2d"
+        },
+        "image_checkout_head": "8416895fe7b9fe9b8fbc56d4536da9915ae0ae08",
+        "base_verified": "0a4204fd7555cfedd43f43017c94d24ef48244a5",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+          "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+          "tests/config/test_config.py::test_unknown_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_short_option_name": "PASSED",
+          "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+          "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+          "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+          "tests/config/test_config.py::test_short_verbose": "PASSED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.2231034310000126,
+        "log_sha256": "913188cb450af3fa849ccc3f5400c4b45b2d86ac57dbd7a5b41e0472781bc145"
+      },
+      {
+        "label": "wrong",
+        "patch_sha256": "020d71b4ef2636cf5d7475575cd07c9530b7f2f2048b490dbdfcff511cbe5ab9",
+        "status": "requirement_failed",
+        "verified_success": false,
+        "container_name": "p07-pylint-dev__pylint-6506-2fdbbfb125",
+        "isolation": {
+          "network": "none",
+          "caps": "ALL dropped",
+          "host_mounts": [],
+          "memory_bytes": 6442450944,
+          "pids": 256,
+          "no_new_privileges": true,
+          "image": "swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-6506@sha256:f2304d2a6461bc098bc872efc4474b34b54eec72f5a87bacc0509a88ba52fb2d"
+        },
+        "image_checkout_head": "8416895fe7b9fe9b8fbc56d4536da9915ae0ae08",
+        "base_verified": "0a4204fd7555cfedd43f43017c94d24ef48244a5",
+        "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]",
+        "process_exit": 0,
+        "tests": {
+          "tests/config/test_config.py::test_can_read_toml_env_variable": "PASSED",
+          "tests/config/test_config.py::test_unknown_message_id": "PASSED",
+          "tests/config/test_config.py::test_unknown_confidence": "PASSED",
+          "tests/config/test_config.py::test_unknown_yes_no": "PASSED",
+          "tests/config/test_config.py::test_unknown_py_version": "PASSED",
+          "tests/config/test_config.py::test_short_verbose": "PASSED",
+          "tests/config/test_config.py::test_unknown_option_name": "FAILED",
+          "tests/config/test_config.py::test_unknown_short_option_name": "FAILED"
+        },
+        "parser_diagnostics": {},
+        "regressions_passed": true,
+        "assertion_failures": [
+          "tests/config/test_config.py::test_unknown_option_name",
+          "tests/config/test_config.py::test_unknown_short_option_name"
+        ],
+        "cleanup_exit": 0,
+        "wall_seconds": 3.3579126189999897,
+        "log_sha256": "4b3e206dc17bf12c1e791908195713b30e368a232679b34e511358ce0fda9681"
+      }
+    ]
+  }
+}

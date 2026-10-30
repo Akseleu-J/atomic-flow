@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="6.172" timestamp="2026-10-25T21:29:12.893871+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_checker_bytecode" name="test_pytest_checks_current_source_despite_valid_timestamp_bytecode[1-2-0]" time="4.391"><failure message="AssertionError: F                                                                        [100%]&#13;&#10;  ================================== FAILURES ===================================&#13;&#10;  _________________________________ test_value __________________________________&#13;&#10;  &#13;&#10;      def test_value():&#13;&#10;  &gt;       assert VALUE == 2&#13;&#10;  E       assert 1 == 2&#13;&#10;  &#13;&#10;  test_value.py:3: AssertionError&#13;&#10;  =========================== short test summary info ===========================&#13;&#10;  FAILED test_value.py::test_value - assert 1 == 2&#13;&#10;  1 failed in 0.50s&#13;&#10;  &#10;assert 1 == 0&#10; +  where 1 = CommandResult(returncode=1, stdout='F                                                                        [100%]\r\... - assert 1 == 2\r\n1 failed in 0.50s\r\n', stderr='', timed_out=False, stdout_truncated=False, stderr_truncated=False).returncode">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-141/test_pytest_checks_current_sou0')
+cached = 1, current = 2, expected_exit = 0
+
+    @pytest.mark.parametrize("cached,current,expected_exit", [(1, 2, 0), (2, 1, 1)])
+    def test_pytest_checks_current_source_despite_valid_timestamp_bytecode(tmp_path, cached, current, expected_exit):
+        source = tmp_path / "value.py"
+        source.write_text(f"VALUE = {cached}\n", encoding="utf-8")
+        before = source.stat()
+        cache = py_compile.compile(str(source), doraise=True, invalidation_mode=py_compile.PycInvalidationMode.TIMESTAMP)
+        from pathlib import Path
+        cache_bytes = Path(cache).read_bytes()
+        source.write_text(f"VALUE = {current}\n", encoding="utf-8")
+        os.utime(source, ns=(before.st_atime_ns, before.st_mtime_ns))
+        (tmp_path / "test_value.py").write_text("from value import VALUE\ndef test_value():\n    assert VALUE == 2\n", encoding="utf-8")
+        result = run_python(["-m", "pytest", "-q", "test_value.py"], tmp_path, config=ExecutionConfig(mode="local"))
+&gt;       assert result.returncode == expected_exit, result.stdout + result.stderr
+E       AssertionError: F                                                                        [100%]
+E         ================================== FAILURES ===================================
+E         _________________________________ test_value __________________________________
+E         
+E             def test_value():
+E         &gt;       assert VALUE == 2
+E         E       assert 1 == 2
+E         
+E         test_value.py:3: AssertionError
+E         =========================== short test summary info ===========================
+E         FAILED test_value.py::test_value - assert 1 == 2
+E         1 failed in 0.50s
+E         
+E       assert 1 == 0
+E        +  where 1 = CommandResult(returncode=1, stdout='F                                                                        [100%]\r\... - assert 1 == 2\r\n1 failed in 0.50s\r\n', stderr='', timed_out=False, stdout_truncated=False, stderr_truncated=False).returncode
+
+tests\test_checker_bytecode.py:23: AssertionError</failure></testcase><testcase classname="tests.test_checker_bytecode" name="test_pytest_checks_current_source_despite_valid_timestamp_bytecode[2-1-1]" time="1.174"><failure message="AssertionError: .                                                                        [100%]&#13;&#10;  1 passed in 0.03s&#13;&#10;  &#10;assert 0 == 1&#10; +  where 0 = CommandResult(returncode=0, stdout='.                                                                        [100%]\r\n1 passed in 0.03s\r\n', stderr='', timed_out=False, stdout_truncated=False, stderr_truncated=False).returncode">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-141/test_pytest_checks_current_sou1')
+cached = 2, current = 1, expected_exit = 1
+
+    @pytest.mark.parametrize("cached,current,expected_exit", [(1, 2, 0), (2, 1, 1)])
+    def test_pytest_checks_current_source_despite_valid_timestamp_bytecode(tmp_path, cached, current, expected_exit):
+        source = tmp_path / "value.py"
+        source.write_text(f"VALUE = {cached}\n", encoding="utf-8")
+        before = source.stat()
+        cache = py_compile.compile(str(source), doraise=True, invalidation_mode=py_compile.PycInvalidationMode.TIMESTAMP)
+        from pathlib import Path
+        cache_bytes = Path(cache).read_bytes()
+        source.write_text(f"VALUE = {current}\n", encoding="utf-8")
+        os.utime(source, ns=(before.st_atime_ns, before.st_mtime_ns))
+        (tmp_path / "test_value.py").write_text("from value import VALUE\ndef test_value():\n    assert VALUE == 2\n", encoding="utf-8")
+        result = run_python(["-m", "pytest", "-q", "test_value.py"], tmp_path, config=ExecutionConfig(mode="local"))
+&gt;       assert result.returncode == expected_exit, result.stdout + result.stderr
+E       AssertionError: .                                                                        [100%]
+E         1 passed in 0.03s
+E         
+E       assert 0 == 1
+E        +  where 0 = CommandResult(returncode=0, stdout='.                                                                        [100%]\r\n1 passed in 0.03s\r\n', stderr='', timed_out=False, stdout_truncated=False, stderr_truncated=False).returncode
+
+tests\test_checker_bytecode.py:23: AssertionError</failure></testcase></testsuite></testsuites>

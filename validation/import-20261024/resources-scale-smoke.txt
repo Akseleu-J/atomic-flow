@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "model_calls": 0,
+  "synthetic": true,
+  "journal_quadratic_work_fixed": false,
+  "cases": [
+    {
+      "label": "small",
+      "files": 16,
+      "source_bytes": 65632,
+      "snapshot_seconds": 4.50977380014956,
+      "snapshot_tracemalloc_peak_bytes": 338804,
+      "cancel_check_calls": 198,
+      "rss_after_bytes": 26882048,
+      "journal_appends": 16,
+      "journal_bytes": 4607,
+      "journal_append_median_seconds": 0.03359270002692938,
+      "journal_append_max_seconds": 0.09706300008110702,
+      "read_calls": 32,
+      "read_bytes": 37117
+    },
+    {
+      "label": "medium",
+      "files": 64,
+      "source_bytes": 262528,
+      "snapshot_seconds": 12.15466900006868,
+      "snapshot_tracemalloc_peak_bytes": 346457,
+      "cancel_check_calls": 778,
+      "rss_after_bytes": 18243584,
+      "journal_appends": 64,
+      "journal_bytes": 17611,
+      "journal_append_median_seconds": 0.03627959999721497,
+      "journal_append_max_seconds": 0.3754122999962419,
+      "read_calls": 128,
+      "read_bytes": 564262
+    },
+    {
+      "label": "large",
+      "files": 256,
+      "source_bytes": 1050112,
+      "snapshot_seconds": 73.25452920002863,
+      "snapshot_tracemalloc_peak_bytes": 423436,
+      "cancel_check_calls": 3106,
+      "rss_after_bytes": 6148096,
+      "journal_appends": 256,
+      "journal_bytes": 69661,
+      "journal_append_median_seconds": 0.11123329994734377,
+      "journal_append_max_seconds": 1.3315250999294221,
+      "read_calls": 512,
+      "read_bytes": 8903950
+    }
+  ]
+}

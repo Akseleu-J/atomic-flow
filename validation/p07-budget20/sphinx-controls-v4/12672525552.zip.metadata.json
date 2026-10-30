@@ -1,0 +1,20 @@
+{
+  "id": 12672525552,
+  "node_id": "MDg6QXJ0aWZhY3QxMjY3MjUyNTU1Mg==",
+  "name": "p07-sphinx-environment-sphinx-doc__sphinx-8713-2c938a0b4e8db8636c8f9f26fc226e6fb3b46ba3",
+  "size_in_bytes": 29916,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12672525552",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12672525552/zip",
+  "expired": false,
+  "digest": "sha256:a9cca4aa3b30ceb8d718914ebb811b608bf41f2f5729a840b6a80923f06b5924",
+  "created_at": "2026-10-26T17:31:46Z",
+  "updated_at": "2026-10-26T17:31:46Z",
+  "expires_at": "2026-11-09T17:31:45Z",
+  "workflow_run": {
+    "id": 40369178231,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "2c938a0b4e8db8636c8f9f26fc226e6fb3b46ba3"
+  }
+}

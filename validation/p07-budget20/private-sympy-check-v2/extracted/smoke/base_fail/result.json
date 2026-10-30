@@ -1,0 +1,11 @@
+{
+  "case": "base_fail",
+  "check_passed": false,
+  "process_exit": 1,
+  "source_after": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+  "source_before": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+  "status": "expected_private_boundary_behavior",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "541d8dc9d1b6e4f13d8ea80a821b5b4b787ccc47ccde3c248052a84e8904b8d3",
+  "verified_success": false
+}

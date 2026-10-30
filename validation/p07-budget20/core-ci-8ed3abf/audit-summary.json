@@ -1,0 +1,20 @@
+{
+  "runtime": "8ed3abf2b9a5cd50798be6a487b1c55baf589a7d",
+  "tested_pr_commit": "e2b40a52cf85dea5752ad9ec619d514e390b75e9",
+  "tree": "a69038f7b1407a8e7f5155e10800c99ed6402bb7",
+  "tree_equality_verified": true,
+  "source_normalized_hashes_verified": 335,
+  "python311": {
+    "passed": 2043,
+    "skipped": 14,
+    "failed": 0
+  },
+  "python312": {
+    "passed": 2043,
+    "skipped": 14,
+    "failed": 0
+  },
+  "windows_passed": 4,
+  "model_calls": 0,
+  "real_docker_passed": 26
+}

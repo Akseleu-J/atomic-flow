@@ -1,0 +1,153 @@
+name: P07 isolated corpus calibration
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/p07-calibration.yml'
+      - 'tools/evaluation_p07_isolated.py'
+      - 'benchmarks/stage4/p07-controls.json'
+      - 'benchmarks/stage4/p07-controls-v2.json'
+      - 'benchmarks/stage4/p07-controls-v3.json'
+      - 'benchmarks/stage4/corpus-p07-v2.json'
+      - 'benchmarks/stage4/p07-manifest-migrations.json'
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: 'Comma-separated exact corpus IDs, or all; SymPy canary always runs first'
+        required: true
+        default: all
+        type: string
+      parallel:
+        description: 'Independent Linux workers; each container retains its resource limits'
+        required: true
+        default: '3'
+        type: choice
+        options: ['1', '3', '6']
+      controls:
+        description: 'Versioned prospective negative controls; old results remain unchanged'
+        required: true
+        default: 'benchmarks/stage4/p07-controls.json'
+        type: choice
+        options: ['benchmarks/stage4/p07-controls.json', 'benchmarks/stage4/p07-controls-v2.json', 'benchmarks/stage4/p07-controls-v3.json']
+      manifest:
+        description: 'Versioned task labels; select v2 only after metadata migration review'
+        required: true
+        default: 'benchmarks/stage4/corpus.json'
+        type: choice
+        options: ['benchmarks/stage4/corpus.json', 'benchmarks/stage4/corpus-p07-v2.json']
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    runs-on: ubuntu-24.04
+    outputs:
+      tasks: ${{ steps.tasks.outputs.value }}
+      should_run: ${{ steps.scope.outputs.value }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Admit calibration only when its inputs changed
+        id: scope
+        env:
+          BEFORE: ${{ github.event.before || github.event.pull_request.base.sha }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import os, subprocess
+          before = os.environ.get('BEFORE', '')
+          admitted = {'tools/evaluation_p07_isolated.py', 'benchmarks/stage4/p07-controls.json', 'benchmarks/stage4/p07-controls-v2.json', 'benchmarks/stage4/p07-controls-v3.json', 'benchmarks/stage4/corpus-p07-v2.json', 'benchmarks/stage4/p07-manifest-migrations.json', '.github/workflows/p07-calibration.yml', 'tools/evaluation_stage4.py'}
+          if os.environ['EVENT'] == 'workflow_dispatch' or not before:
+              changed = admitted
+          else:
+              subprocess.run(['git', 'fetch', '--no-tags', 'origin', before], check=True)
+              changed = set(subprocess.check_output(['git', 'diff', '--name-only', before, 'HEAD']).decode().splitlines())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print('value=' + str(bool(changed & admitted)).lower(), file=output)
+          PY
+      - id: tasks
+        env:
+          REQUESTED_TASKS: ${{ inputs.tasks || 'sympy__sympy-21614' }}
+        run: |
+          python - <<'PY'
+          import json, os
+          known = [t['instance_id'] for t in json.load(open('benchmarks/stage4/corpus.json'))['tasks']]
+          request = os.environ['REQUESTED_TASKS']
+          selected = known if request == 'all' else [value.strip() for value in request.split(',')]
+          if not selected or any(value not in known for value in selected) or len(set(selected)) != len(selected):
+              raise SystemExit('Requested tasks must be unique, exact declared corpus IDs')
+          selected = [value for value in selected if value != 'sympy__sympy-21614']
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print('value=' + json.dumps(selected), file=output)
+          PY
+
+  canary:
+    needs: matrix
+    if: needs.matrix.outputs.should_run == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [sympy__sympy-21614]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Install pinned official evaluator (no model credentials)
+        run: python -m pip install swebench==3.0.15
+      - name: Record worker identity
+        run: |
+          mkdir -p p07-worker
+          git rev-parse HEAD > p07-worker/tested-commit.txt
+          python -m pip freeze > p07-worker/dependencies.txt
+          docker version > p07-worker/docker-version.txt
+      - name: Base assertion FAIL, gold PASS, wrong assertion FAIL
+        run: python tools/evaluation_p07_isolated.py --task '${{ matrix.task }}' --manifest '${{ inputs.manifest || 'benchmarks/stage4/corpus.json' }}' --controls '${{ inputs.controls || 'benchmarks/stage4/p07-controls.json' }}' --output 'p07-worker/result' --timeout 240
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-calibration-${{ matrix.task }}-${{ github.sha }}
+          path: p07-worker/
+          retention-days: 14
+          if-no-files-found: error
+
+  calibrate:
+    needs: [matrix, canary]
+    if: needs.matrix.outputs.tasks != '[]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJSON(inputs.parallel || '3') }}
+      matrix:
+        task: ${{ fromJSON(needs.matrix.outputs.tasks) }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Install pinned official evaluator (no model credentials)
+        run: python -m pip install swebench==3.0.15
+      - name: Record worker identity
+        run: |
+          mkdir -p p07-worker
+          git rev-parse HEAD > p07-worker/tested-commit.txt
+          python -m pip freeze > p07-worker/dependencies.txt
+          docker version > p07-worker/docker-version.txt
+      - name: Base assertion FAIL, gold PASS, wrong assertion FAIL
+        run: python tools/evaluation_p07_isolated.py --task '${{ matrix.task }}' --manifest '${{ inputs.manifest || 'benchmarks/stage4/corpus.json' }}' --controls '${{ inputs.controls || 'benchmarks/stage4/p07-controls.json' }}' --output 'p07-worker/result' --timeout 240
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p07-calibration-${{ matrix.task }}-${{ github.sha }}
+          path: p07-worker/
+          retention-days: 14
+          if-no-files-found: error

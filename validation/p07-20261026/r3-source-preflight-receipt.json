@@ -1,0 +1,31 @@
+{
+  "artifact": {
+    "id": 12637794437,
+    "name": "p07-source-preflight-0b924b06f5d2b5786fc285144540d292aaa6354a",
+    "size_in_bytes": 41453,
+    "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12637794437",
+    "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12637794437/zip",
+    "expired": false,
+    "created_at": "2026-10-26T09:01:27Z",
+    "expires_at": "2027-01-24T09:01:10Z",
+    "updated_at": "2026-10-26T09:01:27Z",
+    "digest": "sha256:0df7932aa47e3031c2c623e373a729f39b13dcda73e082e9566873dd3289da3c",
+    "workflow_run": {
+      "id": 40296369775,
+      "repository_id": 1373027250,
+      "head_repository_id": 1373027250,
+      "head_branch": "experimental",
+      "head_sha": "013caf01cf148eaa5915d153ec0d1d85ea36c9c8"
+    }
+  },
+  "sha256": "0df7932aa47e3031c2c623e373a729f39b13dcda73e082e9566873dd3289da3c",
+  "status": "source_workspace_ready",
+  "files": {
+    "sympy/core/basic.py": "9396be3c9fdeda370c99e056a34c9abb4ebca3e1572ab0e7ca59f77be539e610",
+    "sympy/core/expr.py": "ed1466879dd1213b31fcc62e758a6660d525f6974528a11703733850e0924d1a",
+    "sympy/core/function.py": "2cad2e22c4d8ba8a0b41c34afc4f84468315cf4152f061a290b3a05e2d630657",
+    "sympy/core/kind.py": "d301d8dddf363fcf4338986b9d55e9c00dc75d7e12c06c60ba55a2478fa1e1c4",
+    "sympy/matrices/expressions/matexpr.py": "806e2e4d7e889b105f502c654efba789564b5f24b64640c21b8f6bc006066ba9"
+  },
+  "model_calls": 0
+}

@@ -1,0 +1,72 @@
+................F........................s......ss............F......... [ 63%]
+.........................................                                [100%]
+================================== FAILURES ===================================
+________ test_task_uses_real_orchestrator_and_approval_channel[False] _________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-4/test_task_uses_real_orchestrat1')
+approved = False
+
+    @pytest.mark.parametrize("approved", [True, False])
+    def test_task_uses_real_orchestrator_and_approval_channel(tmp_path, approved):
+        project = tmp_path / "project"
+        project.mkdir()
+        source = project / "sample.py"
+        source.write_text('def sample():\n    """Return sample value."""\n    return 1\n', encoding="utf-8")
+        save_tree(project, build_tree(project))
+        backend = ScriptedBackend({
+            "parser": {"task_type": "modify", "focus_terms": ["sample"]},
+            "answerer": [
+                {"tool": "read_node", "args": {"node_id": "sample.py::sample", "zoom": 2}},
+                {"tool": "edit_node", "args": {"node_id": "sample.py::sample", "new_source": "def sample():\n    return 2"}},
+                {"text": "Changed sample.", "confidence": "low"},
+            ],
+            "critic": {"verdict": "ok", "citation_coverage": 1},
+        })
+        config = AtomicConfig()
+        config.task.max_replans = 0
+        approvals = []
+        runner = TaskRunner(config, project, backend,
+                            approval_callback=lambda *args: approvals.append(args) or approved)
+        task = runner.run_plan("change sample", Plan(steps=[PlanStep(
+            description="Change sample return value", tools_needed=["edit_node"], verify_with="py_compile",
+        )]))
+        assert approvals and approvals[0][0] == "edit_node"
+>       assert task.status == ("done" if approved else "failed")
+E       AssertionError: assert 'paused' == 'failed'
+E         
+E         - failed
+E         + paused
+
+tests\test_task_execution.py:106: AssertionError
+____________ test_capability_factory_must_return_task_capabilities ____________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-4/test_capability_factory_must_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002AA02E9F440>
+
+    def test_capability_factory_must_return_task_capabilities(tmp_path, monkeypatch):
+        from atomic_flow.llm.orchestrator import Orchestrator as Real
+    
+        constructed = []
+    
+        class Recording(Real):
+            def __init__(self, *args, **kwargs):
+                constructed.append(kwargs)
+                super().__init__(*args, **kwargs)
+    
+        monkeypatch.setattr("atomic_flow.agents.task_loop.Orchestrator", Recording)
+        backend = ScriptedBackend({"parser": {}, "answerer": [{"text": PLAN}]})
+        _, task = run_probe_task(tmp_path, factory=lambda ctx: {"tool_registry": "not-a-capabilities"},
+                                 backend=backend, max_replans=0)
+>       assert task.status == "failed" and "TaskCapabilities" in task.error
+E       AssertionError: assert ('paused' == 'failed'
+E         
+E         - failed
+E         + paused)
+
+tests\test_capability_composition.py:130: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_task_execution.py::test_task_uses_real_orchestrator_and_approval_channel[False]
+FAILED tests/test_capability_composition.py::test_capability_factory_must_return_task_capabilities
+2 failed, 108 passed, 3 skipped in 87.17s (0:01:27)
+
+EXIT_CODE=1

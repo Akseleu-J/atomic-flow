@@ -1,0 +1,25 @@
+..........F....................................                          [100%]
+================================== FAILURES ===================================
+______________ test_clean_tree_is_noop_and_non_git_root_refused _______________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-unknown/pytest-15/test_clean_tree_is_noop_and_no0')
+
+    def test_clean_tree_is_noop_and_non_git_root_refused(tmp_path):
+        root = repo(tmp_path)
+        sync_project_graph(root, {})
+        store = GraphStore(root / ".atomic_flow" / "graph.json")
+>       assert ingest_git_changes(store, root) == {"deltas": 0, "unchanged": True}
+E       AssertionError: assert {'deltas': 0,...iles': 2, ...} == {'deltas': 0,...hanged': True}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Left contains 4 more items:
+E         {'audit_parsed_files': 0,
+E          'parsed_files': 0,
+E          'reason': 'external source reconciliation',
+E          'scanned_files': 2}
+E         Use -v to get more diff
+
+tests\test_graph_ingest.py:67: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_graph_ingest.py::test_clean_tree_is_noop_and_non_git_root_refused
+1 failed, 46 passed in 65.53s (0:01:05)

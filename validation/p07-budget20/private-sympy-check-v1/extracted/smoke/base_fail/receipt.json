@@ -1,0 +1,76 @@
+{
+  "check_passed": false,
+  "result": {
+    "returncode": 1,
+    "stderr": "",
+    "stderr_truncated": false,
+    "stdout": "ATOMIC_SYMPY_BEGIN:44b5027dd8c94487ad81e364b14f0e51\n============================= test process starts ==============================\nexecutable:         /opt/p07-python36/bin/python3.6  (3.6.15-final-0) [CPython]\narchitecture:       64-bit\ncache:              yes\nground types:       python \nnumpy:              None\nrandom seed:        5596680\nhash randomization: off\n\nsympy/core/tests/test_p07_native_check.py[2] \ntest_native_identity ok\ntest_native_probe F                                                       [FAIL]\n\n\n________________________________________________________________________________\n_________ sympy/core/tests/test_p07_native_check.py:test_native_probe __________\n  File \"/testbed/sympy/core/tests/test_p07_native_check.py\", line 7, in test_native_probe\n    assert value == 42\nAssertionError\n\n============= tests finished: 1 passed, 1 failed, in 0.00 seconds ==============\nDO *NOT* COMMIT!\nATOMIC_SYMPY_END:44b5027dd8c94487ad81e364b14f0e51\nATOMIC_CHECK_SPEC_RECEIPT:{\"check_spec_digest\": \"3c51a015b7dd2550e9a115f6b324eebac906f1f00ed4c5084eb58e12d5d847d8\", \"collected\": 2, \"collection\": [\"sympy/core/tests/test_p07_native_check.py::test_native_identity\", \"sympy/core/tests/test_p07_native_check.py::test_native_probe\"], \"counts\": {\"exceptions\": 0, \"failed\": 1, \"passed\": 1, \"skipped\": 0, \"xfailed\": 0, \"xpassed\": 0}, \"dependency_inventory_sha256\": \"ca2164da16c614f2c78b17152e71dd15f67a536381de99996220fb135cc5a168\", \"dependency_inventory_verification\": \"required_separately_by_host_admission\", \"exit_code\": 1, \"files\": [\"sympy/core/tests/test_p07_native_check.py\"], \"finished\": true, \"interpreter\": \"/opt/p07-python36/bin/python3.6\", \"interpreter_resolved\": \"/opt/p07-python36/bin/python3.6\", \"launcher_sha256\": \"7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81\", \"mpmath_module\": \"/opt/p07-python36/lib/python3.6/site-packages/mpmath/__init__.py\", \"mpmath_module_sha256\": \"46cd24a875e8dd00fb47c6a5cf28fd06878d4dfe7562446b8d23ca69ca65b413\", \"mpmath_version\": \"1.2.1\", \"native_argv\": [\"/testbed/bin/test\", \"-C\", \"--verbose\", \"sympy/core/tests/test_p07_native_check.py\"], \"native_source_sha256\": {\"bin/get_sympy.py\": \"3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869\", \"bin/test\": \"973e3cf784388b8e7821e4962da8eeb4b615447cd652af920452b322bd63588c\", \"sympy/utilities/runtests.py\": \"f3ebc3f4677d84d64b7e52ea5129522b2b5233fd2937fe5857fbe8244dfcf95c\"}, \"native_stdout_sha256\": \"31b06e8b7ebef9256f3f911de75765e46ceb8f4d6dc8222956b0349d89179f40\", \"nonce\": \"44b5027dd8c94487ad81e364b14f0e51\", \"python_version\": [3, 6, 15], \"root\": \"/testbed\", \"runner\": \"sympy-native\", \"runtime_digest\": \"d2b93caacdebda1b387d59f57f4b8cabec24b40671311723604935a8ec343f55\", \"source_revision\": \"21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74\", \"sympy_module\": \"/testbed/sympy/__init__.py\", \"sympy_version\": \"1.1.2.dev\", \"test_statuses\": {\"sympy/core/tests/test_p07_native_check.py::test_native_identity\": \"passed\", \"sympy/core/tests/test_p07_native_check.py::test_native_probe\": \"failed\"}, \"warning_policy\": [\"ignore::UserWarning\", \"ignore::SyntaxWarning\"]}\n",
+    "stdout_truncated": false,
+    "timed_out": false
+  },
+  "runner_receipt": {
+    "check_spec_digest": "3c51a015b7dd2550e9a115f6b324eebac906f1f00ed4c5084eb58e12d5d847d8",
+    "collected": 2,
+    "collection": [
+      "sympy/core/tests/test_p07_native_check.py::test_native_identity",
+      "sympy/core/tests/test_p07_native_check.py::test_native_probe"
+    ],
+    "counts": {
+      "exceptions": 0,
+      "failed": 1,
+      "passed": 1,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0
+    },
+    "dependency_inventory_sha256": "ca2164da16c614f2c78b17152e71dd15f67a536381de99996220fb135cc5a168",
+    "dependency_inventory_verification": "required_separately_by_host_admission",
+    "exit_code": 1,
+    "files": [
+      "sympy/core/tests/test_p07_native_check.py"
+    ],
+    "finished": true,
+    "interpreter": "/opt/p07-python36/bin/python3.6",
+    "interpreter_resolved": "/opt/p07-python36/bin/python3.6",
+    "launcher_sha256": "7a7d1df825c85051aebf2c5d183de24d86e6e7f8727e96564c68065b52bd8e81",
+    "mpmath_module": "/opt/p07-python36/lib/python3.6/site-packages/mpmath/__init__.py",
+    "mpmath_module_sha256": "46cd24a875e8dd00fb47c6a5cf28fd06878d4dfe7562446b8d23ca69ca65b413",
+    "mpmath_version": "1.2.1",
+    "native_argv": [
+      "/testbed/bin/test",
+      "-C",
+      "--verbose",
+      "sympy/core/tests/test_p07_native_check.py"
+    ],
+    "native_source_sha256": {
+      "bin/get_sympy.py": "3cae7463d72dd553101977101015a862c4ce2b93f17c7ae9712f0fd2ca287869",
+      "bin/test": "973e3cf784388b8e7821e4962da8eeb4b615447cd652af920452b322bd63588c",
+      "sympy/utilities/runtests.py": "f3ebc3f4677d84d64b7e52ea5129522b2b5233fd2937fe5857fbe8244dfcf95c"
+    },
+    "native_stdout_sha256": "31b06e8b7ebef9256f3f911de75765e46ceb8f4d6dc8222956b0349d89179f40",
+    "nonce": "44b5027dd8c94487ad81e364b14f0e51",
+    "python_version": [
+      3,
+      6,
+      15
+    ],
+    "root": "/testbed",
+    "runner": "sympy-native",
+    "runtime_digest": "d2b93caacdebda1b387d59f57f4b8cabec24b40671311723604935a8ec343f55",
+    "source_revision": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+    "sympy_module": "/testbed/sympy/__init__.py",
+    "sympy_version": "1.1.2.dev",
+    "test_statuses": {
+      "sympy/core/tests/test_p07_native_check.py::test_native_identity": "passed",
+      "sympy/core/tests/test_p07_native_check.py::test_native_probe": "failed"
+    },
+    "warning_policy": [
+      "ignore::UserWarning",
+      "ignore::SyntaxWarning"
+    ]
+  },
+  "source_after": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+  "source_before": "21f7ac8247e422b7db37690feeb7ca941985ac6ee1b9ba40e6632e8509720d74",
+  "spec_digest": "3c51a015b7dd2550e9a115f6b324eebac906f1f00ed4c5084eb58e12d5d847d8",
+  "verified_success": false
+}

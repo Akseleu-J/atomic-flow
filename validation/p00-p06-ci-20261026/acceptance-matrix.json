@@ -1,0 +1,848 @@
+{
+  "schema": "p00-p06-original-criteria/1",
+  "original_source": "docs/PRODUCTION_ROADMAP.md P00-P06 numbered criteria",
+  "status": "pending exact-source CI audit; mapping is not a passing grade",
+  "scope": "Python/headless host contracts; actual union covers platform skips; P07 semantic quality and four production blocks remain separate",
+  "rows": [
+    {
+      "id": "P00.1",
+      "criterion": "frozen identities and offline zero-call contract",
+      "cases": [
+        {
+          "classname": "tests.test_p00_contracts",
+          "test": "test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+        }
+      ]
+    },
+    {
+      "id": "P00.2",
+      "criterion": "complete static test inventory and W1-W9 mapping",
+      "cases": [
+        {
+          "classname": "tests.test_p00_contracts",
+          "test": "test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+        }
+      ]
+    },
+    {
+      "id": "P00.3",
+      "criterion": "baseline measurements retain historical bytes and isolated future I/O",
+      "cases": [
+        {
+          "classname": "tests.test_p00_contracts",
+          "test": "test_baseline_cache_measurement_never_replaces_existing_project_tree"
+        }
+      ]
+    },
+    {
+      "id": "P00.4",
+      "criterion": "versioned acceptance/evidence contract and read-only inventory",
+      "cases": [
+        {
+          "classname": "tests.test_p00_contracts",
+          "test": "test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+        }
+      ]
+    },
+    {
+      "id": "P00.5",
+      "criterion": "preregistered comparison and explicit no-paid-run budget",
+      "cases": [
+        {
+          "classname": "tests.test_p00_contracts",
+          "test": "test_p00_inventory_preserves_historical_evidence_and_declares_measurement_limits"
+        }
+      ]
+    },
+    {
+      "id": "P01.1",
+      "criterion": "all selected UA kinds and explicit parser/unsupported omission",
+      "cases": [
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_resource_kinds_parse_failures_and_legacy_omissions_are_explicit"
+        },
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_graph_review_reports_unresolved_dependencies_instead_of_complete_claim"
+        }
+      ]
+    },
+    {
+      "id": "P01.2",
+      "criterion": "source digest/span/provenance/freshness strictness",
+      "cases": [
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_graph_source_provenance_and_freshness_are_strict"
+        }
+      ]
+    },
+    {
+      "id": "P01.3",
+      "criterion": "duplicate symbols canonical identity and project/root namespace",
+      "cases": [
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_root_principal_policy_namespaces_reject_cross_project_reads"
+        },
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_legacy_roundtrip_preserves_supported_records_duplicate_symbols_and_omissions"
+        },
+        {
+          "classname": "tests.test_p02_relocation",
+          "test": "test_explicit_edited_move_maps_ids_and_bad_hint_cannot_commit"
+        },
+        {
+          "classname": "tests.test_p02_relocation",
+          "test": "test_duplicate_content_does_not_guess_rename_identity"
+        },
+        {
+          "classname": "tests.test_p02_owned_moves",
+          "test": "test_public_move_then_edit_preserves_graph_identity_mapping"
+        }
+      ]
+    },
+    {
+      "id": "P01.4",
+      "criterion": "CAS transaction/read port/legacy export migration",
+      "cases": [
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_store_snapshots_do_not_grant_mutable_handles_and_detect_same_generation_tamper"
+        },
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_store_strict_document_decode_never_silently_collapses_records"
+        },
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_legacy_roundtrip_preserves_supported_records_duplicate_symbols_and_omissions"
+        },
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_duplicate_transaction_ids_do_not_silently_replace_records"
+        },
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_graph_read_port_feeds_existing_tree_search_without_read_authority"
+        }
+      ]
+    },
+    {
+      "id": "P01.5",
+      "criterion": "independent adapter decision pinned reference and attribution",
+      "cases": [
+        {
+          "classname": "tests.test_graph_contract",
+          "test": "test_adapter_extracts_symbols_imports_and_calls_with_stable_identity"
+        }
+      ],
+      "artifacts": [
+        "docs/P01_GRAPH_COMPATIBILITY.md",
+        "docs/UNDERSTAND_ANYTHING_REFERENCE_2026-10-24.md"
+      ]
+    },
+    {
+      "id": "P02.1",
+      "criterion": "Content/generation-bound deltas including explicit or ambiguity-preserving move identity",
+      "cases": [
+        {
+          "classname": "tests.test_graph_delta",
+          "test": "test_delta_refuses_moved_source_and_records_instrumentation"
+        },
+        {
+          "classname": "tests.test_graph_cas_review",
+          "test": "test_planned_delta_generation_cannot_follow_unrelated_commit"
+        },
+        {
+          "classname": "tests.test_p02_relocation",
+          "test": "test_explicit_edited_move_maps_ids_and_bad_hint_cannot_commit"
+        },
+        {
+          "classname": "tests.test_p02_relocation",
+          "test": "test_duplicate_content_does_not_guess_rename_identity"
+        },
+        {
+          "classname": "tests.test_p02_owned_moves",
+          "test": "test_public_move_then_edit_preserves_graph_identity_mapping"
+        },
+        {
+          "classname": "tests.test_p02_owned_moves",
+          "test": "test_only_verified_moves_compose_across_steps"
+        }
+      ]
+    },
+    {
+      "id": "P02.2",
+      "criterion": "Git staged/unstaged/untracked NUL paths and non-Git/watch reconciliation",
+      "cases": [
+        {
+          "classname": "tests.test_graph_ingest",
+          "test": "test_modified_and_untracked_files_ingest_to_parity"
+        },
+        {
+          "classname": "tests.test_graph_ingest",
+          "test": "test_nested_untracked_rename_and_committed_drift"
+        },
+        {
+          "classname": "tests.test_p02_closure",
+          "test": "test_non_git_watch_and_dropped_events_reconcile_to_parity"
+        }
+      ]
+    },
+    {
+      "id": "P02.3",
+      "criterion": "Ordinary owned private-body edit reads and parses only changed file",
+      "cases": [
+        {
+          "classname": "tests.test_p02_closure",
+          "test": "test_owned_private_body_edit_reads_parses_relinks_only_changed_file"
+        },
+        {
+          "classname": "tests.test_graph_delta",
+          "test": "test_body_edit_parses_only_the_changed_file"
+        }
+      ]
+    },
+    {
+      "id": "P02.4",
+      "criterion": "Reverse definitions/import/export indexes update unresolved consumers",
+      "cases": [
+        {
+          "classname": "tests.test_graph_cas_review",
+          "test": "test_added_module_resolves_old_unresolved_consumer_without_reparse"
+        },
+        {
+          "classname": "tests.test_graph_delta",
+          "test": "test_reverse_index_reports_name_level_blast_radius"
+        },
+        {
+          "classname": "tests.test_p02_resource_closure",
+          "test": "test_export_visibility_invalidates_transitive_consumers"
+        }
+      ]
+    },
+    {
+      "id": "P02.5",
+      "criterion": "Affected relink reaches fixed point; ambiguous/wildcard/shadowed bindings never guessed",
+      "cases": [
+        {
+          "classname": "tests.test_p02_closure",
+          "test": "test_fixedpoint_reexports_alias_relative_star_and_new_target"
+        },
+        {
+          "classname": "tests.test_p02_closure",
+          "test": "test_wildcard_ambiguity_dynamic_exports_nested_names_are_not_guessed"
+        },
+        {
+          "classname": "tests.test_p02_resource_closure",
+          "test": "test_shadowed_imports_never_invent_provider_call_edges"
+        },
+        {
+          "classname": "tests.test_p02_resource_closure",
+          "test": "test_private_body_edit_retains_incoming_calls_without_consumer_relink"
+        }
+      ]
+    },
+    {
+      "id": "P02.6",
+      "criterion": "Delta fan-in/out and retrieval refresh reuse unchanged lexical features and invalidate global algorithms",
+      "cases": [
+        {
+          "classname": "tests.test_p02_closure",
+          "test": "test_activation_updates_reuse_unchanged_tokens"
+        },
+        {
+          "classname": "tests.test_context_pack_cache",
+          "test": "test_same_size_body_edit_reparses_only_changed_file_and_rollback_restores_revision"
+        }
+      ]
+    },
+    {
+      "id": "P02.7",
+      "criterion": "Atomic source/generation CAS and cancelled private overlay preserve old snapshot",
+      "cases": [
+        {
+          "classname": "tests.test_graph_cas_review",
+          "test": "test_cooperating_processes_cannot_both_commit_same_generation"
+        },
+        {
+          "classname": "tests.test_p02_closure",
+          "test": "test_multifile_overlay_cancel_never_exposes_partial_snapshot"
+        },
+        {
+          "classname": "tests.test_p02_resource_closure",
+          "test": "test_public_sync_cancellation_after_private_delta_keeps_persisted_snapshot"
+        },
+        {
+          "classname": "tests.test_p02_sync_snapshot",
+          "test": "test_fallback_source_drift_preserves_previous_graph_snapshot"
+        }
+      ]
+    },
+    {
+      "id": "P02.8",
+      "criterion": "Verified staged overlay and published-source graph parity",
+      "cases": [
+        {
+          "classname": "tests.test_p06_journey",
+          "test": "test_publication_hot_path_delta_syncs_graph_to_parity"
+        },
+        {
+          "classname": "tests.test_p06_journey",
+          "test": "test_graph_sync_crash_never_flips_completed_publication"
+        },
+        {
+          "classname": "tests.test_p02_resource_closure",
+          "test": "test_mixed_resources_live_sync_initial_and_owned_edit"
+        },
+        {
+          "classname": "tests.test_p02_sync_snapshot",
+          "test": "test_initial_graph_source_drift_reconciles_instead_of_accepting_stale_snapshot"
+        }
+      ]
+    },
+    {
+      "id": "P02.9",
+      "criterion": "Missing/corrupt/config/parser/resolver/ignore/external drift fallback is reasoned",
+      "cases": [
+        {
+          "classname": "tests.test_graph_delta",
+          "test": "test_fallback_rebuild_requires_reason_and_restores_parity"
+        },
+        {
+          "classname": "tests.test_p02_version_drift",
+          "test": "test_changed_extractor_or_resolver_forces_reasoned_rebuild"
+        },
+        {
+          "classname": "tests.test_graph_ingest",
+          "test": "test_nested_untracked_rename_and_committed_drift"
+        },
+        {
+          "classname": "tests.test_p02_closure",
+          "test": "test_non_git_watch_and_dropped_events_reconcile_to_parity"
+        },
+        {
+          "classname": "tests.test_watching",
+          "test": "test_ignore_policy_change_invalidates_previously_visible_file"
+        }
+      ]
+    },
+    {
+      "id": "P03.1",
+      "criterion": "Admitted semantic pipeline uses shared durable physical budget and cancellation",
+      "cases": [
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_semantic_provider_reuses_existing_physical_budget_and_keeps_malformed_cost"
+        },
+        {
+          "classname": "tests.test_graph_enrichment",
+          "test": "test_sdk_uses_admission_and_reports_unsupported_omissions"
+        },
+        {
+          "classname": "tests.test_graph_enrichment",
+          "test": "test_cached_evidence_is_revalidated_and_cancel_does_not_publish"
+        }
+      ]
+    },
+    {
+      "id": "P03.2",
+      "criterion": "Source-bound summaries/tags/layers/entrypoints/tours/domain flows",
+      "cases": [
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_resolved_dependency_change_invalidates_consumer_and_narrative_fragments"
+        },
+        {
+          "classname": "tests.test_graph_semantic",
+          "test": "test_layers_group_by_top_package_deterministically"
+        },
+        {
+          "classname": "tests.test_graph_semantic",
+          "test": "test_entry_points_use_name_level_mentions_only"
+        },
+        {
+          "classname": "tests.test_graph_semantic",
+          "test": "test_tour_orders_entries_first_and_binds_digests"
+        }
+      ]
+    },
+    {
+      "id": "P03.3",
+      "criterion": "Separate bytes/body/API/docs/reference hashes invalidate relevant explanations",
+      "cases": [
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_hashes_distinguish_body_api_docs_and_comments"
+        },
+        {
+          "classname": "tests.test_graph_enrichment",
+          "test": "test_repeat_reuses_cache_body_and_document_edits_invalidate_locally"
+        }
+      ]
+    },
+    {
+      "id": "P03.4",
+      "criterion": "Only invalid semantic/dependent narrative cache keys regenerate; failure publishes no mixed revisions",
+      "cases": [
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_resolved_dependency_change_invalidates_consumer_and_narrative_fragments"
+        },
+        {
+          "classname": "tests.test_graph_enrichment",
+          "test": "test_failure_never_publishes_partial_cache_and_budget_is_not_refunded"
+        },
+        {
+          "classname": "tests.test_graph_enrichment",
+          "test": "test_sdk_source_drift_refuses_cache_publication"
+        }
+      ]
+    },
+    {
+      "id": "P03.5",
+      "criterion": "Cache key isolates source dependencies, versions, language and project scope",
+      "cases": [
+        {
+          "classname": "tests.test_graph_enrichment",
+          "test": "test_every_identity_field_invalidates"
+        },
+        {
+          "classname": "tests.test_graph_enrichment",
+          "test": "test_scope_dependencies_and_new_files_invalidate"
+        },
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_cached_semantic_output_cannot_cross_root_or_survive_source_drift"
+        }
+      ]
+    },
+    {
+      "id": "P03.6",
+      "criterion": "Six current-source operations in SDK/CLI/MCP retain read and citation boundaries",
+      "cases": [
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_six_operations_are_current_source_bound_and_report_unsupported"
+        },
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_cli_and_mcp_expose_graph_operations_without_constructing_provider"
+        },
+        {
+          "classname": "tests.test_p04_span_visibility",
+          "test": "test_partial_node_page_cannot_verify_unshown_source_lines"
+        }
+      ]
+    },
+    {
+      "id": "P03.7",
+      "criterion": "Surviving symbols and omissions/unresolved/dangling validity stay explicit",
+      "cases": [
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_resolved_dependency_change_invalidates_consumer_and_narrative_fragments"
+        },
+        {
+          "classname": "tests.test_p01_contract",
+          "test": "test_graph_review_reports_unresolved_dependencies_instead_of_complete_claim"
+        },
+        {
+          "classname": "tests.test_graph_contract",
+          "test": "test_store_refuses_dangling_edges_and_forged_identity"
+        }
+      ],
+      "artifacts": [
+        "validation/p03-p04-closure-20261025/own-walkthrough.json",
+        "validation/p03-p04-closure-20261025/sympy-walkthrough.json"
+      ]
+    },
+    {
+      "id": "P04.1",
+      "criterion": "Goal/current-source/dependency/tests context has reasons, caps and omissions",
+      "cases": [
+        {
+          "classname": "tests.test_task_read_plan",
+          "test": "test_step_query_includes_read_plan_with_reasons"
+        },
+        {
+          "classname": "tests.test_graph_impact",
+          "test": "test_pack_respects_byte_cap_and_marks_truncation"
+        },
+        {
+          "classname": "tests.test_graph_impact",
+          "test": "test_pack_orders_goals_first_with_reasons_and_blast_radius"
+        }
+      ]
+    },
+    {
+      "id": "P04.2",
+      "criterion": "Continuation/truncation/current read proof prevents incomplete old-text and stale edits",
+      "cases": [
+        {
+          "classname": "tests.test_file_operations",
+          "test": "test_patch_is_unique_hash_bound_verified_and_undoable"
+        },
+        {
+          "classname": "tests.test_file_operations",
+          "test": "test_stale_patch_and_disabled_mutations_leave_bytes_alone"
+        },
+        {
+          "classname": "tests.test_p04_span_visibility",
+          "test": "test_partial_node_page_cannot_verify_unshown_source_lines"
+        },
+        {
+          "classname": "tests.test_read_plan_live_cache",
+          "test": "test_live_read_plan_reuses_ast_and_refreshes_same_stat_edit_and_rollback"
+        },
+        {
+          "classname": "tests.test_runtime_discovery",
+          "test": "test_line_reads_accumulate_actual_file_coverage_and_reject_stale_hash"
+        },
+        {
+          "classname": "tests.test_first12_integration",
+          "test": "test_patch_requires_actual_read_then_can_be_undone"
+        }
+      ]
+    },
+    {
+      "id": "P04.3",
+      "criterion": "Version-bound range/symbol edits require fresh exact span and preserve preconditions",
+      "cases": [
+        {
+          "classname": "tests.test_file_operations",
+          "test": "test_version_bound_range_patch_and_line_shift_refusal"
+        },
+        {
+          "classname": "tests.test_file_operations",
+          "test": "test_range_patch_requires_exact_span_and_paired_coordinates"
+        },
+        {
+          "classname": "tests.test_edit_tools",
+          "test": "test_edit_node_verifies_and_records_backup"
+        }
+      ]
+    },
+    {
+      "id": "P04.4",
+      "criterion": "Diff-impact-target recommendations keep runtime coverage and unknowns explicit",
+      "cases": [
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_six_operations_are_current_source_bound_and_report_unsupported"
+        },
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_unknown_impact_and_noncode_inputs_expand_checks_without_parsing_binary"
+        }
+      ]
+    },
+    {
+      "id": "P04.5",
+      "criterion": "Targeted-loop success cannot replace required final regression; zero identifiers and span checks are measured",
+      "cases": [
+        {
+          "classname": "tests.test_p04_final_impact",
+          "test": "test_existing_tests_force_full_final_gate_after_syntax_only_edit"
+        },
+        {
+          "classname": "tests.test_completion_diagnostics",
+          "test": "test_final_pytest_failure_is_not_published_and_report_survives_reload"
+        },
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_empty_identifier_denominator_never_reports_success"
+        },
+        {
+          "classname": "tests.test_p03_p04_understanding",
+          "test": "test_explicit_citation_lines_require_complete_current_source_and_exact_span"
+        },
+        {
+          "classname": "tests.test_verification_contract",
+          "test": "test_no_checks_are_not_assessed_and_wire_roundtrips"
+        }
+      ]
+    },
+    {
+      "id": "P05.1",
+      "criterion": "Existing DAG stable IDs/goal criteria/scope/caps/evidence survive roundtrip and reviewed changes",
+      "cases": [
+        {
+          "classname": "tests.test_goal_hierarchy",
+          "test": "test_roundtrip_preserves_stable_goal_ids_and_ancestor_requirements"
+        },
+        {
+          "classname": "tests.test_goal_hierarchy",
+          "test": "test_goal_and_step_requirement_changes_stale_approval"
+        },
+        {
+          "classname": "tests.test_p05_acceptance",
+          "test": "test_goal_call_cap_shared_across_steps_and_resume"
+        },
+        {
+          "classname": "tests.test_p05_acceptance",
+          "test": "test_goal_usd_caps_independent_of_global_enforcement"
+        }
+      ]
+    },
+    {
+      "id": "P05.2",
+      "criterion": "Derived states and legacy migration never grant authority or replay terminal work",
+      "cases": [
+        {
+          "classname": "tests.test_goal_hierarchy",
+          "test": "test_legacy_canonical_plan_is_byte_compatible_and_migration_grants_nothing"
+        },
+        {
+          "classname": "tests.test_task_frontier",
+          "test": "test_running_requires_reconciliation_superseded_does_not_satisfy_dependency"
+        },
+        {
+          "classname": "tests.test_p05_acceptance",
+          "test": "test_cancelled_task_is_terminal_without_replay"
+        }
+      ]
+    },
+    {
+      "id": "P05.3",
+      "criterion": "Bounded subgoal decomposition rejects cycles/invalid dependencies/overflows",
+      "cases": [
+        {
+          "classname": "tests.test_goal_hierarchy",
+          "test": "test_invalid_decomposition_is_rejected"
+        },
+        {
+          "classname": "tests.test_rolling_plan",
+          "test": "test_unvalidated_plan_cannot_smuggle_cycles_missing_or_self_edges"
+        },
+        {
+          "classname": "tests.test_rolling_plan",
+          "test": "test_history_and_expansion_count_limits_include_superseded_steps"
+        },
+        {
+          "classname": "tests.test_rolling_plan",
+          "test": "test_more_than_three_children_and_goal_rewrite_are_rejected"
+        }
+      ]
+    },
+    {
+      "id": "P05.4",
+      "criterion": "Rolling1–3 frontier is derived from evidence and explicit reviewed expansion",
+      "cases": [
+        {
+          "classname": "tests.test_task_frontier",
+          "test": "test_frontier_drains_independent_work_and_links_existing_ledgers"
+        },
+        {
+          "classname": "tests.test_task_frontier",
+          "test": "test_horizon_and_context_stay_bounded_with_valid_json"
+        },
+        {
+          "classname": "tests.test_p05_acceptance",
+          "test": "test_expand_public_api_preserves_goals_requires_new_review"
+        }
+      ]
+    },
+    {
+      "id": "P05.5",
+      "criterion": "Planner sees source/graph identity, known failures/effects, remaining budgets and criteria",
+      "cases": [
+        {
+          "classname": "tests.test_p05_initial_context",
+          "test": "test_initial_plan_receives_current_revision_budget_and_empty_effect_history"
+        },
+        {
+          "classname": "tests.test_goal_hierarchy",
+          "test": "test_requirements_reach_step_context_without_claiming_semantic_acceptance"
+        },
+        {
+          "classname": "tests.test_goal_hierarchy",
+          "test": "test_completed_goal_criteria_remain_observations_in_replan_context"
+        }
+      ]
+    },
+    {
+      "id": "P05.6",
+      "criterion": "Explicit premise invalidation cascades without automatic completed/external-effect replay",
+      "cases": [
+        {
+          "classname": "tests.test_step_invalidation",
+          "test": "test_invalidation_cascades_to_dependents_and_records_reason"
+        },
+        {
+          "classname": "tests.test_step_invalidation",
+          "test": "test_invalidation_spares_independent_done_steps"
+        },
+        {
+          "classname": "tests.test_p05_acceptance",
+          "test": "test_done_step_receipt_survives_resume_and_stale_premise_never_replays"
+        },
+        {
+          "classname": "tests.test_step_evidence",
+          "test": "test_exact_receipt_roundtrip_and_legacy_is_not_replay_authority"
+        }
+      ]
+    },
+    {
+      "id": "P06.1",
+      "criterion": "Default exact-plan approval plus separately reviewed opt-in envelope bounds authority/budget/deadline",
+      "cases": [
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_internal_replan_is_explicit_and_bound_to_review_digest"
+        },
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_legacy_approval_still_pauses_before_replanned_execution"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_deadline_is_bound_to_review_digest_and_task_creation"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_legacy_envelope_requires_review_without_minting_deadline"
+        }
+      ]
+    },
+    {
+      "id": "P06.2",
+      "criterion": "In-scope replan preserves original requirements/runtime/envelope; widening pauses",
+      "cases": [
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_authorized_repair_continues_in_same_resume_and_preserves_scope"
+        },
+        {
+          "classname": "tests.test_replan_lineage_wiring",
+          "test": "test_replan_dropping_criterion_pauses_with_lineage_reason"
+        },
+        {
+          "classname": "tests.test_p06_constraints",
+          "test": "test_replacement_cannot_silently_relax_original_constraints"
+        },
+        {
+          "classname": "tests.test_p06_constraints",
+          "test": "test_opted_in_runtime_drift_pauses_before_any_call_or_effect"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_replan_preserves_original_absolute_deadline"
+        }
+      ]
+    },
+    {
+      "id": "P06.3",
+      "criterion": "Public observe→repair→verify→publish→graph loop progresses on host evidence",
+      "cases": [
+        {
+          "classname": "tests.test_p06_public_repair",
+          "test": "test_hierarchical_multifile_failure_repair_publish_without_new_plan_review"
+        },
+        {
+          "classname": "tests.test_p06_journey",
+          "test": "test_publication_hot_path_delta_syncs_graph_to_parity"
+        },
+        {
+          "classname": "tests.test_checker_bytecode",
+          "test": "test_pytest_checks_current_source_despite_valid_timestamp_bytecode"
+        }
+      ]
+    },
+    {
+      "id": "P06.4",
+      "criterion": "Typed failure table routes bounded repair or reconciliation/review; unknowns fail closed",
+      "cases": [
+        {
+          "classname": "tests.test_failure_policy",
+          "test": "test_matrix_kinds_map_to_mandated_actions"
+        },
+        {
+          "classname": "tests.test_failure_wiring_and_malicious",
+          "test": "test_step_failure_keeps_bounded_repair_and_records_decision"
+        },
+        {
+          "classname": "tests.test_failure_wiring_and_malicious",
+          "test": "test_unclassified_exception_stops_fail_closed"
+        },
+        {
+          "classname": "tests.test_unresolved_effects",
+          "test": "test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval"
+        }
+      ]
+    },
+    {
+      "id": "P06.5",
+      "criterion": "No-progress/retry/budget/deadline stops preserve original requirements and known or uncertain costs",
+      "cases": [
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_repeated_failure_pauses_before_global_replan_cap"
+        },
+        {
+          "classname": "tests.test_repair_budget",
+          "test": "test_cap_admits_first_call_blocks_next_before_send_and_survives_restart"
+        },
+        {
+          "classname": "tests.test_p06_constraints",
+          "test": "test_original_goal_cap_survives_replan_and_restart"
+        },
+        {
+          "classname": "tests.test_task_budget",
+          "test": "test_uncertain_charge_is_held_and_not_replayed"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_known_response_keeps_cost_and_blocks_next_call"
+        },
+        {
+          "classname": "tests.test_p06_deadline",
+          "test": "test_expiry_after_final_check_blocks_publication"
+        }
+      ]
+    },
+    {
+      "id": "P06.6",
+      "criterion": "Host allowlist and operation grants cannot be expanded by repository/model text",
+      "cases": [
+        {
+          "classname": "tests.test_failure_wiring_and_malicious",
+          "test": "test_malicious_repository_instructions_never_widen_the_envelope"
+        },
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_opt_in_enforces_effective_tool_allowlist_in_orchestrator"
+        },
+        {
+          "classname": "tests.test_internal_replan",
+          "test": "test_real_dispatcher_denies_undeclared_execution_before_tool_implementation"
+        }
+      ]
+    },
+    {
+      "id": "P06.7",
+      "criterion": "One writer and durable crash/resume authority/effect reservations; specialists do not create fresh budgets",
+      "cases": [
+        {
+          "classname": "tests.test_graph_cas_review",
+          "test": "test_cooperating_processes_cannot_both_commit_same_generation"
+        },
+        {
+          "classname": "tests.test_task_budget",
+          "test": "test_process_interruption_preserves_call_reservation"
+        },
+        {
+          "classname": "tests.test_task_budget",
+          "test": "test_daily_reservation_excludes_competing_processes"
+        },
+        {
+          "classname": "tests.test_unresolved_effects",
+          "test": "test_task_uncertainty_blocks_independent_work_replan_resume_and_new_approval"
+        }
+      ]
+    }
+  ]
+}

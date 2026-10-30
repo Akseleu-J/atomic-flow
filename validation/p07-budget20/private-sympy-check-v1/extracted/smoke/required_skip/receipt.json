@@ -1,0 +1,16 @@
+{
+  "check_passed": false,
+  "result": {
+    "returncode": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 173, in <module>\n  File \"<string>\", line 66, in _parse_sympy_output\nValueError: native collection is empty, partial or unclosed\n",
+    "stderr_truncated": false,
+    "stdout": "",
+    "stdout_truncated": false,
+    "timed_out": false
+  },
+  "runner_receipt": null,
+  "source_after": "0bb8bb4f1ad93d1c01b2a0c0400293d63b1c0c0842bd102b6a04fff517f0421b",
+  "source_before": "0bb8bb4f1ad93d1c01b2a0c0400293d63b1c0c0842bd102b6a04fff517f0421b",
+  "spec_digest": "f0d370824c292c955e0c35f47124ec629644e511d41320ce61d2df6af9cdafdb",
+  "verified_success": false
+}

@@ -1,0 +1,20 @@
+{
+  "id": 12810995505,
+  "node_id": "MDg6QXJ0aWZhY3QxMjgxMDk5NTUwNQ==",
+  "name": "p07-scripted-queued-task-3b9228dc98a295e605dd3ca525e1aff8a610b574",
+  "size_in_bytes": 56803,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12810995505",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12810995505/zip",
+  "expired": false,
+  "digest": "sha256:5c04205b64d146a3f4316912c59415fb875307efe3295db311a5958865e5767f",
+  "created_at": "2026-10-28T10:52:52Z",
+  "updated_at": "2026-10-28T10:52:52Z",
+  "expires_at": "2026-11-11T10:52:51Z",
+  "workflow_run": {
+    "id": 40674589781,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "3b9228dc98a295e605dd3ca525e1aff8a610b574"
+  }
+}

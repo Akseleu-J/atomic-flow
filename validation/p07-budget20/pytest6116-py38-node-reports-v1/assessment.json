@@ -1,0 +1,20 @@
+{
+  "run": 40893566658,
+  "artifact": 12905113601,
+  "archive_sha256": "af20ec3755c405f96b35991111e5d6c810fdc7163deae217c14eb5c632c02a6e",
+  "tested_commit": "4fe8c09675020b1b7300b5c19f14ce12e4ed3c0e",
+  "status": "complete_diagnostic_with_per_node_skip_records",
+  "stdout_sha256": "5f1aa8f955077409a5b00a33fdd1815d2d33b756676789799c6dbf1bbbeaa46c",
+  "collected": 2617,
+  "completed": 2617,
+  "ordinary_skips": 115,
+  "xfailed": 10,
+  "passed": 2492,
+  "installed_publisher_files_verified": 504,
+  "installed_inventory_matches_previous": true,
+  "node_ids_match_previous": true,
+  "source_blobs_verified": 474,
+  "cleanup": true,
+  "provider_calls": 0,
+  "ordinary_acceptance": false
+}

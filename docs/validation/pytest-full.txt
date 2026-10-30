@@ -1,0 +1,26 @@
+
+=================================== ERRORS ====================================
+_____________________ ERROR collecting tests/test_task.py _____________________
+ImportError while importing test module 'C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\tests\test_task.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_task.py:9: in <module>
+    from atomic_flow.agents.task import Task, Step, list_tasks, load, save
+E   ModuleNotFoundError: No module named 'atomic_flow.agents.task'
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.pytest_cache\v\cache\nodeids: [WinError 5] �������� � �������: 'C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\pytest-cache-files-cmt0stdj'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:423
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\_pytest\cacheprovider.py:423: PytestCacheWarning: could not create cache path C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.pytest_cache\v\cache\lastfailed: [WinError 5] �������� � �������: 'C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\pytest-cache-files-lw33j502'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/test_task.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+2 warnings, 1 error in 0.73s

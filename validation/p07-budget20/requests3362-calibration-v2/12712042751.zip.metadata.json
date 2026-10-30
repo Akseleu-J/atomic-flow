@@ -1,0 +1,20 @@
+{
+  "id": 12712042751,
+  "node_id": "MDg6QXJ0aWZhY3QxMjcxMjA0Mjc1MQ==",
+  "name": "p07-requests3362-calibration-82b42f085fd7a3edc443cf1db8ea995bf2d580b6",
+  "size_in_bytes": 224351,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12712042751",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12712042751/zip",
+  "expired": false,
+  "digest": "sha256:016ea7b8c740488b9ab95c4712e2d482401cebf161ced2f5ef1642dc4ee3b10d",
+  "created_at": "2026-10-27T05:19:30Z",
+  "updated_at": "2026-10-27T05:19:30Z",
+  "expires_at": "2026-11-10T05:19:29Z",
+  "workflow_run": {
+    "id": 40454290733,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "82b42f085fd7a3edc443cf1db8ea995bf2d580b6"
+  }
+}

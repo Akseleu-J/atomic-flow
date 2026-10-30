@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="1" tests="35" time="102.921" timestamp="2026-10-25T20:52:45.203644+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_task" name="test_task_runner_stops_on_failed_edit" time="3.674"><failure message="AssertionError: assert 'failed' == 'paused'&#10;  &#10;  - paused&#10;  + failed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000206F3A31130&gt;
+isolated_home = None
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-133/test_task_runner_stops_on_fail0')
+
+    def test_task_runner_stops_on_failed_edit(monkeypatch, isolated_home, tmp_path):
+        from atomic_flow.agents import task_loop
+    
+        class R:
+            tool_calls = [{"tool": "edit_node",
+                           "result_summary": {"status": "rolled_back", "reason": "py_compile failed"}}]
+            ledger_id = "req_x"
+            cost_usd = 0.01
+    
+        class FakeOrch:
+            def __init__(self, *a, **kw):
+                pass
+    
+            def answer(self, *a, **kw):
+                return R()
+    
+        monkeypatch.setattr(task_loop, "Orchestrator", FakeOrch)
+    
+        plan = Plan(steps=[PlanStep(description="bad edit", verify_with="py_compile")])
+        runner = TaskRunner(config=None, project=tmp_path, backend=None)
+        task = runner.run_plan("fail", plan)
+&gt;       assert task.status == "paused"
+E       AssertionError: assert 'failed' == 'paused'
+E         
+E         - paused
+E         + failed
+
+tests\test_task.py:104: AssertionError</failure></testcase><testcase classname="tests.test_execution_confidentiality" name="test_execution_snapshot_excludes_private_inputs_but_keeps_build_artifacts" time="1.937" /><testcase classname="tests.test_execution_confidentiality" name="test_command_output_and_diagnostics_redact_recognized_canaries" time="0.575" /><testcase classname="tests.test_execution_confidentiality" name="test_run_python_redacts_stdout_and_stderr" time="1.096"><failure message="AssertionError: assert 3221225773 == 0&#10; +  where 3221225773 = CommandResult(returncode=3221225773, stdout='', stderr='', timed_out=False, stdout_truncated=False, stderr_truncated=False).returncode">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-133/test_run_python_redacts_stdout0')
+
+    def test_run_python_redacts_stdout_and_stderr(tmp_path):
+        result = run_python(["-c", f"import sys; print({CANARY!r}); print({CANARY!r}, file=sys.stderr)"],
+                            tmp_path, config=ExecutionConfig(mode="local"))
+&gt;       assert result.returncode == 0
+E       AssertionError: assert 3221225773 == 0
+E        +  where 3221225773 = CommandResult(returncode=3221225773, stdout='', stderr='', timed_out=False, stdout_truncated=False, stderr_truncated=False).returncode
+
+tests\test_execution_confidentiality.py:76: AssertionError</failure></testcase><testcase classname="tests.test_execution_confidentiality" name="test_model_check_uses_snapshot_without_private_file_even_outside_taskrunner" time="15.542" /><testcase classname="tests.test_execution_confidentiality" name="test_direct_edit_matching_checks_also_exclude_private_inputs" time="4.617"><failure message="AssertionError: &#10;assert False&#10; +  where False = VerificationResult(ok=False, checks=['syntax', 'pytest'], message=&quot;pytest FAIL on ['tests/test_a.py']&quot;, test_output=''...5773, checked_source_revision='b41ce59aaa7830265d734860bd66c3a83179e0f471677a55a072fe11d698ca62', source_changed=False).ok">tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/pytest-of-omirb/pytest-133/test_direct_edit_matching_chec0')
+
+    def test_direct_edit_matching_checks_also_exclude_private_inputs(tmp_path):
+        (tmp_path / "credentials.json").write_text('"arbitrary-private-value"')
+        (tmp_path / "a.py").write_text("VALUE = 42\n")
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests/test_a.py").write_text(
+            'from pathlib import Path\nfrom a import VALUE\ndef test_value():\n'
+            '    assert VALUE == 42 and not Path("credentials.json").exists()\n'
+            '    Path("unpublished.txt").write_text("test side effect")\n')
+        result = verify_edit(tmp_path, "a.py", execution=ExecutionConfig(mode="local"))
+&gt;       assert result.ok, result.test_output
+E       AssertionError: 
+E       assert False
+E        +  where False = VerificationResult(ok=False, checks=['syntax', 'pytest'], message="pytest FAIL on ['tests/test_a.py']", test_output=''...5773, checked_source_revision='b41ce59aaa7830265d734860bd66c3a83179e0f471677a55a072fe11d698ca62', source_changed=False).ok
+
+tests\test_execution_confidentiality.py:103: AssertionError</failure></testcase><testcase classname="tests.test_execution_confidentiality" name="test_final_report_redacts_even_an_injected_executor_result" time="0.351" /><testcase classname="tests.test_execution_confidentiality" name="test_installed_checker_cannot_be_replaced_by_project_module[pytest-arguments0]" time="0.536" /><testcase classname="tests.test_execution_confidentiality" name="test_installed_checker_cannot_be_replaced_by_project_module[ruff-arguments1]" time="0.241" /><testcase classname="tests.test_execution_confidentiality" name="test_installed_checker_cannot_be_replaced_by_project_module[mypy-arguments2]" time="17.844" /><testcase classname="tests.test_execution_confidentiality" name="test_installed_pytest_preserves_project_imports" time="5.889" /><testcase classname="tests.test_execution_confidentiality" name="test_trusted_checker_preserves_selected_matching_tests" time="4.704" /><testcase classname="tests.test_execution_confidentiality" name="test_final_pytest_gate_rejects_shadowing_and_zero_collection" time="9.963" /><testcase classname="tests.test_execution_confidentiality" name="test_docker_quality_launch_uses_isolated_installed_checker" time="0.053" /><testcase classname="tests.test_execution_confidentiality" name="test_real_docker_checker_rejects_shadow_module_and_protects_output" time="0.016"><skipped type="pytest.skip" message="requires explicit real Docker integration run">C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\tests\test_execution_confidentiality.py:166: requires explicit real Docker integration run</skipped></testcase><testcase classname="tests.test_repair_budget" name="test_cap_admits_first_call_blocks_next_before_send_and_survives_restart" time="1.980" /><testcase classname="tests.test_repair_budget" name="test_reported_overspend_is_persisted_and_blocks_all_continuation" time="0.293" /><testcase classname="tests.test_repair_budget" name="test_unknown_usage_keeps_hold_and_never_refreshes_repair" time="0.538" /><testcase classname="tests.test_repair_budget" name="test_malformed_repair_state_cannot_be_saved[cap_usd-nan]" time="0.104" /><testcase classname="tests.test_repair_budget" name="test_malformed_repair_state_cannot_be_saved[start_event--1]" time="0.149" /><testcase classname="tests.test_repair_budget" name="test_malformed_repair_state_cannot_be_saved[version-True]" time="0.085" /><testcase classname="tests.test_repair_budget" name="test_repair_cap_applies_even_with_global_task_budget_guard_disabled" time="0.882" /><testcase classname="tests.test_repair_budget" name="test_untyped_message_and_model_critique_do_not_authorize_repair" time="1.794" /><testcase classname="tests.test_repair_budget" name="test_planner_and_repair_share_ceiling_without_reset_after_resume" time="1.803" /><testcase classname="tests.test_repair_budget" name="test_stale_check_receipt_and_collection_errors_refuse_auto_repair" time="1.024" /><testcase classname="tests.test_repair_budget" name="test_host_tool_summary_preserves_typed_check_outcome[payload0-deterministic_test_failure]" time="0.900" /><testcase classname="tests.test_repair_budget" name="test_host_tool_summary_preserves_typed_check_outcome[payload1-check_unavailable]" time="1.049" /><testcase classname="tests.test_repair_budget" name="test_host_tool_summary_preserves_typed_check_outcome[payload2-check_unavailable]" time="1.440" /><testcase classname="tests.test_repair_budget" name="test_host_tool_summary_preserves_typed_check_outcome[payload3-check_timeout]" time="4.085" /><testcase classname="tests.test_repair_budget" name="test_host_tool_summary_preserves_typed_check_outcome[payload4-check_unavailable]" time="2.212" /><testcase classname="tests.test_repair_budget" name="test_host_tool_summary_preserves_typed_check_outcome[payload5-deterministic_test_failure]" time="2.092" /><testcase classname="tests.test_repair_budget" name="test_host_tool_summary_preserves_typed_check_outcome[payload6-check_timeout]" time="0.755" /><testcase classname="tests.test_repair_budget" name="test_later_mutation_invalidates_earlier_failed_check" time="1.541" /><testcase classname="tests.test_repair_budget" name="test_execution_snapshot_mutation_is_reported_as_source_conflict" time="0.549" /><testcase classname="tests.test_repair_budget" name="test_native_calls_share_same_repair_cap" time="0.205" /></testsuite></testsuites>

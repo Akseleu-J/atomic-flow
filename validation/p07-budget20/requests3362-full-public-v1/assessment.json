@@ -1,0 +1,34 @@
+{
+  "status": "not_qualified",
+  "run_id": 40815490220,
+  "tested_commit": "16463c42ba3fdc148ec219b2b27eeadaf934042a",
+  "artifact": {
+    "id": 12871404715,
+    "bytes": 570216,
+    "sha256": "3fbdad164ee0b358e9b07eddbafaec6f79262502b52865f5f87b42864e8efcff"
+  },
+  "raw_hashes_verified": 790,
+  "public_base_test_files_verified": 6,
+  "ordinary_test_paths": [
+    "test_p07_private_fixture.py",
+    "tests/test_hooks.py",
+    "tests/test_lowlevel.py",
+    "tests/test_requests.py",
+    "tests/test_structures.py",
+    "tests/test_testserver.py",
+    "tests/test_utils.py"
+  ],
+  "task_status": "paused",
+  "task_error": "failure policy: pause_user_decision; step 0 outcome: StepFailure: host obligation failure is incomplete, unavailable or stale",
+  "cleanup_confirmed": true,
+  "counts": {
+    "collected": 353,
+    "completed": 353,
+    "passed": 349,
+    "call_failed": 2,
+    "skipped": 3,
+    "teardown_failed": 115
+  },
+  "limits": "Declared historical expected outcomes and wrapped HTTPBin fixture lifecycle not yet supported; no publication",
+  "provider_calls": 0
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "attempt": 1,
+    "status": "response",
+    "cost_usd": 0.0003885,
+    "tokens_in": 546,
+    "tokens_out": 168,
+    "estimated_input_tokens": 2161,
+    "request_sha256": "8c9298ec46c21d637ecd9a4a86782f7d0297a0940189f99a9979c04b6b56032c",
+    "request_outcome": "completed",
+    "truncated": false,
+    "cost_source": "provider",
+    "response_sha256": "243f84c6171b824d4f915f99d805dc2447c85443b6b975de8e0b51ec9e34b748",
+    "wall_seconds": 1.6399999998975545
+  },
+  {
+    "attempt": 2,
+    "status": "response",
+    "cost_usd": 0.00019875,
+    "tokens_in": 495,
+    "tokens_out": 50,
+    "estimated_input_tokens": 1856,
+    "request_sha256": "460f3f9c57bad448d7381fe9efffcafc2bde944f94684df99e998b696c9c4bca",
+    "request_outcome": "completed",
+    "truncated": false,
+    "cost_source": "provider",
+    "response_sha256": "2961e483cdb99fb168311e65b29b8aca3ba2ced86f575c0b72e7f52da03c2e98",
+    "wall_seconds": 1.2190000000409782
+  },
+  {
+    "attempt": 3,
+    "status": "response",
+    "cost_usd": 0.0041385,
+    "tokens_in": 16374,
+    "tokens_out": 30,
+    "estimated_input_tokens": 37036,
+    "request_sha256": "3b4c58817428671d7328fc0471302a307a841fe10e5d41db80283d8862dfd208",
+    "request_outcome": "completed",
+    "truncated": false,
+    "cost_source": "provider",
+    "response_sha256": "46a34d03b518001d99f216d9386d8962ddbedd5de676d3e15474a4891ee8604d",
+    "wall_seconds": 1.827999999979511
+  }
+]

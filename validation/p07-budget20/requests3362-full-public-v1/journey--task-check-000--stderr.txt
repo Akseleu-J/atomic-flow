@@ -1,0 +1,51 @@
+----------------------------------------
+Traceback (most recent call last):
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 138, in run
+    self.finish_response()
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 180, in finish_response
+    self.write(data)
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 279, in write
+    self._write(data)
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 453, in _write
+    result = self.stdout.write(data)
+  File "/opt/p07-python36/lib/python3.6/socketserver.py", line 803, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 141, in run
+    self.handle_error()
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 368, in handle_error
+    self.finish_response()
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 180, in finish_response
+    self.write(data)
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 274, in write
+    self.send_headers()
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 331, in send_headers
+    if not self.origin_server or self.client_is_modern():
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 344, in client_is_modern
+    return self.environ['SERVER_PROTOCOL'].upper() != 'HTTP/0.9'
+TypeError: 'NoneType' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/p07-python36/lib/python3.6/socketserver.py", line 320, in _handle_request_noblock
+    self.process_request(request, client_address)
+  File "/opt/p07-python36/lib/python3.6/socketserver.py", line 351, in process_request
+    self.finish_request(request, client_address)
+  File "/opt/p07-python36/lib/python3.6/socketserver.py", line 364, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/opt/p07-python36/lib/python3.6/socketserver.py", line 724, in __init__
+    self.handle()
+  File "/opt/p07-python36/lib/python3.6/site-packages/pytest_httpbin/serve.py", line 43, in handle
+    handler.run(self.server.get_app())
+  File "/opt/p07-python36/lib/python3.6/wsgiref/handlers.py", line 144, in run
+    self.close()
+  File "/opt/p07-python36/lib/python3.6/site-packages/pytest_httpbin/serve.py", line 24, in close
+    self.status.split(' ', 1)[0], self.bytes_sent
+AttributeError: 'NoneType' object has no attribute 'split'
+----------------------------------------
+----------------------------------------

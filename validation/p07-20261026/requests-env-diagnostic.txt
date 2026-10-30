@@ -1,0 +1,65 @@
+[{"label": "base", "status": "requirement_failed", "error": null, "tests": 185, "sample": [["tests/test_requests.py::TestRequests::test_entry_points", "PASSED"], ["tests/test_requests.py::TestRequests::test_invalid_url[MissingSchema-hiwpefhipowhefopw]", "PASSED"], ["tests/test_requests.py::TestRequests::test_invalid_url[InvalidSchema-localhost:3128]", "PASSED"]]}, {"label": "gold", "status": "requirement_failed", "error": null, "tests": 185, "sample": [["tests/test_requests.py::TestRequests::test_entry_points", "PASSED"], ["tests/test_requests.py::TestRequests::test_invalid_url[MissingSchema-hiwpefhipowhefopw]", "PASSED"], ["tests/test_requests.py::TestRequests::test_invalid_url[InvalidSchema-localhost:3128]", "PASSED"]]}, {"label": "wrong", "status": "requirement_failed", "error": null, "tests": 185, "sample": [["tests/test_requests.py::TestRequests::test_entry_points", "PASSED"], ["tests/test_requests.py::TestRequests::test_invalid_url[MissingSchema-hiwpefhipowhefopw]", "PASSED"], ["tests/test_requests.py::TestRequests::test_invalid_url[InvalidSchema-localhost:3128]", "PASSED"]]}]
+
+ERROR tests/test_requests.py::TestRequests::test_unicode_header_name
+ERROR tests/test_requests.py::TestRequests::test_pyopenssl_redirect
+ERROR tests/test_requests.py::TestRequests::test_https_warnings
+ERROR tests/test_requests.py::TestRequests::test_urlencoded_get_query_multivalued_param
+ERROR tests/test_requests.py::TestRequests::test_different_encodings_dont_break_post
+ERROR tests/test_requests.py::TestRequests::test_unicode_multipart_post[data0]
+ERROR tests/test_requests.py::TestRequests::test_unicode_multipart_post[data1]
+ERROR tests/test_requests.py::TestRequests::test_unicode_multipart_post[data2]
+ERROR tests/test_requests.py::TestRequests::test_unicode_multipart_post[data3]
+ERROR tests/test_requests.py::TestRequests::test_unicode_multipart_post_fieldnames
+ERROR tests/test_requests.py::TestRequests::test_unicode_method_name
+ERROR tests/test_requests.py::TestRequests::test_unicode_method_name_with_request_object
+ERROR tests/test_requests.py::TestRequests::test_custom_content_type
+ERROR tests/test_requests.py::TestRequests::test_hook_receives_request_arguments
+ERROR tests/test_requests.py::TestRequests::test_session_hooks_are_used_with_no_request_hooks
+ERROR tests/test_requests.py::TestRequests::test_session_hooks_are_overridden_by_request_hooks
+ERROR tests/test_requests.py::TestRequests::test_prepared_request_hook
+ERROR tests/test_requests.py::TestRequests::test_prepared_from_session
+ERROR tests/test_requests.py::TestRequests::test_time_elapsed_blank
+ERROR tests/test_requests.py::TestRequests::test_request_and_response_are_pickleable
+ERROR tests/test_requests.py::TestRequests::test_cannot_send_unprepared_requests
+ERROR tests/test_requests.py::TestRequests::test_session_pickling
+ERROR tests/test_requests.py::TestRequests::test_fixes_1329
+ERROR tests/test_requests.py::TestRequests::test_uppercase_scheme_redirect
+ERROR tests/test_requests.py::TestRequests::test_header_remove_is_case_insensitive
+ERROR tests/test_requests.py::TestRequests::test_params_are_merged_case_sensitive
+ERROR tests/test_requests.py::TestRequests::test_header_keys_are_native
+ERROR tests/test_requests.py::TestRequests::test_can_send_objects_with_files[foo0]
+ERROR tests/test_requests.py::TestRequests::test_can_send_objects_with_files[foo1]
+ERROR tests/test_requests.py::TestRequests::test_can_send_objects_with_files[files2]
+ERROR tests/test_requests.py::TestRequests::test_can_send_file_object_with_non_string_filename
+ERROR tests/test_requests.py::TestRequests::test_autoset_header_values_are_native
+ERROR tests/test_requests.py::TestRequests::test_auth_is_stripped_on_redirect_off_host
+ERROR tests/test_requests.py::TestRequests::test_auth_is_retained_for_redirect_on_host
+ERROR tests/test_requests.py::TestRequests::test_manual_redirect_with_partial_body_read
+ERROR tests/test_requests.py::TestRequests::test_redirect_with_wrong_gzipped_header
+ERROR tests/test_requests.py::TestRequests::test_requests_history_is_saved
+ERROR tests/test_requests.py::TestRequests::test_json_param_post_content_type_works
+ERROR tests/test_requests.py::TestRequests::test_json_param_post_should_not_override_data_param
+ERROR tests/test_requests.py::TestRequests::test_response_iter_lines
+ERROR tests/test_requests.py::TestRequests::test_unconsumed_session_response_closes_connection
+ERROR tests/test_requests.py::TestRequests::test_session_close_proxy_clear
+ERROR tests/test_requests.py::TestRequests::test_response_json_when_content_is_None
+ERROR tests/test_requests.py::TestTimeout::test_stream_timeout
+ERROR tests/test_requests.py::TestTimeout::test_invalid_timeout[timeout0-(connect, read)]
+ERROR tests/test_requests.py::TestTimeout::test_invalid_timeout[foo-must be an int or float]
+ERROR tests/test_requests.py::TestTimeout::test_none_timeout
+ERROR tests/test_requests.py::TestTimeout::test_read_timeout
+ERROR tests/test_requests.py::TestTimeout::test_encoded_methods
+ERROR tests/test_requests.py::test_requests_are_updated_each_time
+ERROR tests/test_requests.py::test_urllib3_retries
+ERROR tests/test_requests.py::test_urllib3_pool_connection_closed
+FAILED tests/test_requests.py::TestTimeout::test_connect_timeout - requests.e...
+FAILED tests/test_requests.py::TestTimeout::test_total_timeout_connect - requ...
+======= 2 failed, 74 passed, 1 xfailed, 22 warnings, 108 errors in 0.39s =======
++ p07_test_exit=1
++ printf '\nP07_TEST_EXIT=%s\n' 1
+
+P07_TEST_EXIT=1
++ : '>>>>> End Test Output'
++ git checkout 36453b95b13079296776d11b09cab2567ea3e703 tests/test_requests.py
+Updated 1 path from 5602c48a
+

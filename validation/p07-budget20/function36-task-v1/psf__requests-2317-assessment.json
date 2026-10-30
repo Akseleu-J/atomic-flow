@@ -1,0 +1,78 @@
+{
+  "id": "psf__requests-2317",
+  "manifest_count": 823,
+  "manifest_errors": [],
+  "public_differences": [
+    {
+      "path": "requests/cacert.pem",
+      "candidate": null,
+      "public": "e626b115e2bac921ae73161c0f93489325d76d71"
+    }
+  ],
+  "additional": [
+    "requests/p07_function_probe.py",
+    "test_p07_function_fixture.py"
+  ],
+  "changed": [
+    "requests/p07_function_probe.py"
+  ],
+  "checks": [
+    {
+      "name": "journey/task-check-000/receipt.json",
+      "passed": false,
+      "exit": 1,
+      "summary": "===================== 1 failed, 143 passed in 2.76 seconds =====================\n"
+    },
+    {
+      "name": "journey/task-check-001/receipt.json",
+      "passed": true,
+      "exit": 0,
+      "summary": "========================== 144 passed in 2.80 seconds ==========================\n"
+    },
+    {
+      "name": "journey/task-check-002/receipt.json",
+      "passed": true,
+      "exit": 0,
+      "summary": "========================== 144 passed in 2.81 seconds ==========================\n"
+    },
+    {
+      "name": "journey/task-check-003/receipt.json",
+      "passed": true,
+      "exit": 0,
+      "summary": "========================== 144 passed in 2.83 seconds ==========================\n"
+    },
+    {
+      "name": "journey/task-check-004/receipt.json",
+      "passed": true,
+      "exit": 0,
+      "summary": "========================== 144 passed in 2.76 seconds ==========================\n"
+    }
+  ],
+  "completion_pass": true,
+  "completion_tests": "passed",
+  "cleanup": true,
+  "archive": 12876291075,
+  "sha256": "sha256:a89a72df9eea9ad2bab0df0249c8a1730fcf8baa9097f37c7ef532666f21ffc0",
+  "base_commit": "091991be0da19de9108dbe5e3752917fea3d7fdc",
+  "public_base_archive_sha256": "c660230314a0ffd0882b36afb24df1f6d2a707886b4a121f8e069d2c4c398efa",
+  "raw_resource_receipts_verified": 8,
+  "synthetic_cases": [
+    {
+      "case": "base_fail",
+      "passed": false
+    },
+    {
+      "case": "edited_pass",
+      "passed": true
+    },
+    {
+      "case": "required_skip",
+      "passed": false
+    }
+  ],
+  "model_calls": 0,
+  "provider_calls": 0,
+  "hidden_oracle": "not_run",
+  "verified_success": false,
+  "scope": "complete public function36 ordinary inventory plus synthetic probe repair"
+}

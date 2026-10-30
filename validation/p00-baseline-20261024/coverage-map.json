@@ -1,0 +1,34 @@
+{
+  "schema": "p00-coverage-map/1",
+  "generated_utc": "2026-10-24T16:55:00Z",
+  "head": "2342dc2c7e86911b76bf91b437a8306356cdabc1",
+  "method": "rg -c 'def test_' inventory over tests/*.py (89 files) with area classification; W mapping cross-checked against docs/PRODUCTION_PLAN.md W1-W9 exit criteria and module names used by those suites. Function-level spot checks were done for representative entries only; per-file counts are exact.",
+  "areas": {
+    "source-integrity": ["test_changeset.py", "test_index_commit.py", "test_write_serialization.py", "test_source_freshness.py", "test_worktree_workspace.py", "test_snapshot_resources.py", "test_resume_index_resources.py", "test_evidence_refresh.py", "test_dialogue_rewind.py"],
+    "safety": ["test_policy.py", "test_tool_contract_policy.py", "test_scoped_credentials.py", "test_execution_confidentiality.py", "test_instructions_reads.py"],
+    "spending": ["test_task_budget.py", "test_ledger_day_identity.py", "test_provider_contracts.py", "test_anthropic_usage.py", "test_request_budget.py", "test_routed_accounting.py", "test_routing.py", "test_routing_import_review.py", "test_context_usage_batch.py"],
+    "recovery": ["test_host_reconciliation.py", "test_reconcile.py", "test_reconcile_import_regressions.py", "test_session_streaming.py", "test_sessions_migrations.py", "test_unresolved_effects.py", "test_run_control.py"],
+    "task-completion": ["test_task.py", "test_task_changeset.py", "test_task_execution.py", "test_planner.py", "test_plan_review_dependencies.py", "test_completion_diagnostics.py", "test_first12_integration.py", "test_composition_acceptance.py", "test_capability_composition.py"],
+    "integrations": ["test_lsp.py", "test_lsp_staged_admission.py", "test_mcp_integration.py", "test_ide_bridge.py", "test_notebooks.py", "test_watching.py", "test_extensions.py", "test_workflows.py", "test_hooks.py", "test_integrations_runtime.py", "test_documentation.py"],
+    "execution": ["test_execution.py", "test_execution_profiles.py", "test_jobs.py", "test_job_cli.py", "test_remote_execution.py", "test_container_integration.py", "test_run_command.py", "test_tool_execution.py", "test_workers.py"],
+    "api-sdk-cli": ["test_api_admission.py", "test_config_backends_api.py", "test_cli.py", "test_phase0.py", "test_package12_surfaces.py", "test_native_transport.py", "test_runtime_discovery.py", "test_tool_discovery.py"],
+    "evaluation-harness": ["test_evaluation.py", "test_evaluation_integrity.py", "test_evaluation_provenance.py", "test_stage4_harness.py", "test_pilot_evidence_audit.py", "test_benchmark.py"],
+    "graph-index": ["test_text_and_tree.py", "test_pagerank.py", "test_activation.py", "test_orchestrator.py", "test_history.py", "test_memory_summaries.py", "test_questions_results.py", "test_advisory_integration.py", "test_file_operations.py", "test_edit_tools.py", "test_workspace_roots.py", "test_project_integration.py"]
+  },
+  "w_coverage": [
+    {"w": "W1", "title": "write correctness (leases, index CAS, API admission, usage fixes)", "evidence": ["test_write_serialization.py", "test_index_commit.py", "test_api_admission.py", "test_anthropic_usage.py", "test_provider_contracts.py"], "gap": false},
+    {"w": "W2", "title": "recovery (typed states, host reconciliation)", "evidence": ["test_host_reconciliation.py", "test_reconcile.py", "test_reconcile_import_regressions.py", "test_unresolved_effects.py"], "gap": false},
+    {"w": "W3", "title": "routing (attempt coordinator, quota, free_only/capped_paid)", "evidence": ["test_routing.py", "test_routed_accounting.py", "test_routing_import_review.py"], "gap": false},
+    {"w": "W4", "title": "Docker-free execution boundaries", "evidence": ["test_execution_profiles.py", "test_execution.py", "test_remote_execution.py"], "gap": false, "note": "native sandbox absence is a documented boundary, not a gap in regressions"},
+    {"w": "W5", "title": "release foundation (installed wheel)", "evidence": ["CI workflow integrations-release.yml wheel matrix (not a pytest file)", "tools/release_acceptance.py"], "gap": false},
+    {"w": "W6", "title": "composition (TaskRunner capabilities, real LSP/MCP journeys)", "evidence": ["test_capability_composition.py", "test_composition_acceptance.py", "test_lsp_staged_admission.py", "CI job 'Real pylsp and MCP staged task'"], "gap": true, "note": "full plan->edit->checker->publish journey with LSP+MCP in one scripted host test is partial; CI covers staged real-tool scenarios"},
+    {"w": "W7", "title": "scale/operations measurements", "evidence": ["test_snapshot_resources.py", "tools/resource_scale_smoke.py (synthetic)"], "gap": true, "note": "no published p95/RSS/soak numbers on pinned repos; quadratic journal append marked not fixed"},
+    {"w": "W8", "title": "usefulness proof (Stage 4)", "evidence": ["test_stage4_harness.py", "test_evaluation_integrity.py", "validation/import-20261024/stage4-*"], "gap": true, "note": "1/30 cases calibrated and piloted (negative result recorded); 29 cases and matched comparison open"},
+    {"w": "W9", "title": "release candidate", "evidence": [], "gap": true, "note": "not started; depends on W1-W8"}
+  ],
+  "notes": [
+    "Counts derive from rg inventory; 85 test files, 786 test functions total at this HEAD.",
+    "A file may serve several areas; classification is by dominant subsystem under test.",
+    "Subagent-based audit was unavailable (infrastructure errors); this map was produced by the coordinating session with the same method."
+  ]
+}

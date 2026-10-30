@@ -1,0 +1,636 @@
+{
+  "instance_id": "sympy__sympy-17139",
+  "status": "completed",
+  "calibrated": true,
+  "model_calls": 0,
+  "provider_credentials": "none",
+  "harness": "3.0.15",
+  "image_tag": "swebench/sweb.eval.x86_64.sympy_1776_sympy-17139:latest",
+  "image_digest": "swebench/sweb.eval.x86_64.sympy_1776_sympy-17139@sha256:9a8111742e0548816d920a27ba259ebde7647f4e46e7522c61647990dd35713c",
+  "image_id": "sha256:05bd322eebbc03124d5701f89047cf0c91c6905c87506c581cd40d8540bb9a48",
+  "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+  "manifest_sha256": "ac32cd32aa0305821b440b9de277f0b3e3d5c1c55c9b485091f96b19773713dd",
+  "controls_sha256": "7aafd710738986f8676cd4ff187bc41a8e2816d6f0fa7b3ca3757cc7cc807725",
+  "negative_control_rationale": "Guard only unknown exponent realness and forget explicitly nonreal exponents; preserve behavior for real exponents.",
+  "test_command": "PYTHONWARNINGS='ignore::UserWarning,ignore::SyntaxWarning' bin/test -C --verbose",
+  "eval_script_sha256": "43eaffd5fd0eadea04e6fa7727f2551db19c9f382c5a7f53ccce552a1cf3601c",
+  "rows": [
+    {
+      "label": "base",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "requirement_exception_failed",
+      "verified_success": false,
+      "container_name": "p07-sympy__sympy-17139-5a9208be41",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-17139@sha256:9a8111742e0548816d920a27ba259ebde7647f4e46e7522c61647990dd35713c"
+      },
+      "image_checkout_head": "50b9e9886441ef3c17eeea2fe20458c298c62b99",
+      "base_verified": "1d3327b8e90a186df6972991963a5ae87053259d",
+      "environment_packages": "flake8 @ file:///croot/flake8_1726157165993/work\nflake8-comprehensions==3.15.0\nmccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work\nmpmath @ file:///croot/mpmath_1690848262763/work\npycodestyle @ file:///croot/pycodestyle_1726150303809/work\npyflakes @ file:///croot/pyflakes_1708962956225/work\n# Editable Git install with no remote (sympy==1.5.dev0)\n-e /testbed",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sympy/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "test_TR1": "PASSED",
+        "test_TR2": "PASSED",
+        "test_TR2i": "PASSED",
+        "test_TR3": "PASSED",
+        "test__TR56": "ERROR",
+        "test_TR5": "PASSED",
+        "test_TR6": "PASSED",
+        "test_TR7": "PASSED",
+        "test_TR8": "PASSED",
+        "test_TR9": "PASSED",
+        "test_TR10": "PASSED",
+        "test_TR10i": "PASSED",
+        "test_TR11": "PASSED",
+        "test_TR12": "PASSED",
+        "test_TR13": "PASSED",
+        "test_L": "PASSED",
+        "test_fu": "PASSED",
+        "test_objective": "PASSED",
+        "test_process_common_addends": "PASSED",
+        "test_trig_split": "PASSED",
+        "test_TRmorrie": "PASSED",
+        "test_TRpower": "PASSED",
+        "test_hyper_as_trig": "PASSED",
+        "test_TR12i": "PASSED",
+        "test_TR14": "PASSED",
+        "test_TR15_16_17": "PASSED",
+        "test_as_f_sign_1": "PASSED",
+        "test_issue_7263": "PASSED",
+        "test_simplify_expr": "PASSED",
+        "test_issue_3557": "PASSED",
+        "test_simplify_other": "PASSED",
+        "test_simplify_complex": "PASSED",
+        "test_simplify_ratio": "PASSED",
+        "test_simplify_measure": "PASSED",
+        "test_simplify_rational": "PASSED",
+        "test_simplify_issue_1308": "PASSED",
+        "test_issue_5652": "PASSED",
+        "test_simplify_fail1": "PASSED",
+        "test_nthroot": "PASSED",
+        "test_nthroot1": "PASSED",
+        "test_separatevars": "PASSED",
+        "test_separatevars_advanced_factor": "PASSED",
+        "test_hypersimp": "PASSED",
+        "test_nsimplify": "PASSED",
+        "test_issue_9448": "PASSED",
+        "test_extract_minus_sign": "PASSED",
+        "test_diff": "PASSED",
+        "test_logcombine_1": "PASSED",
+        "test_logcombine_complex_coeff": "PASSED",
+        "test_issue_5950": "PASSED",
+        "test_posify": "PASSED",
+        "test_issue_4194": "PASSED",
+        "test_as_content_primitive": "PASSED",
+        "test_signsimp": "PASSED",
+        "test_besselsimp": "PASSED",
+        "test_Piecewise": "PASSED",
+        "test_polymorphism": "PASSED",
+        "test_issue_from_PR1599": "PASSED",
+        "test_issue_6811": "PASSED",
+        "test_issue_6920": "PASSED",
+        "test_issue_7001": "PASSED",
+        "test_inequality_no_auto_simplify": "PASSED",
+        "test_issue_9398": "PASSED",
+        "test_issue_9324_simplify": "PASSED",
+        "test_issue_13474": "PASSED",
+        "test_simplify_function_inverse": "PASSED",
+        "test_clear_coefficients": "PASSED",
+        "test_nc_simplify": "PASSED",
+        "test_issue_15965": "PASSED",
+        "test_issue_17137": "ERROR",
+        "test_issue_7971": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "native_status_normalized": true,
+        "failure_header_aliases": {
+          "sympy/simplify/tests/test_fu.py:test__TR56": "FAILED",
+          "sympy/simplify/tests/test_simplify.py:test_issue_17137": "FAILED"
+        },
+        "header_status_mismatches": {
+          "sympy/simplify/tests/test_fu.py:test__TR56": {
+            "header": "FAILED",
+            "test": "ERROR"
+          },
+          "sympy/simplify/tests/test_simplify.py:test_issue_17137": {
+            "header": "FAILED",
+            "test": "ERROR"
+          }
+        },
+        "discarded_nested_or_alias_observations": {
+          "sympy/simplify/tests/test_fu.py:test__TR56": "FAILED",
+          "sympy/simplify/tests/test_simplify.py:test_issue_17137": "FAILED"
+        }
+      },
+      "test_body_exception_receipts": {
+        "test__TR56": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test__TR56",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_fu.py",
+            "line": 80,
+            "function": "test__TR56"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 524,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 504,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "9d9ef907bf9db070404874591777161eb1db774f53bd9b665c1297566b48778f",
+          "traceback_sha256": "0f100ce73adddf1ff439ca85af99ba79a74e5b69f6c1af265a8e5a1f03362d42"
+        },
+        "test_issue_17137": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test_issue_17137",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_simplify.py",
+            "line": 815,
+            "function": "test_issue_17137"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 566,
+              "function": "TR6"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 524,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 504,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "9d9ef907bf9db070404874591777161eb1db774f53bd9b665c1297566b48778f",
+          "traceback_sha256": "157495abf446f927703c90daf9f51303c39108cf2fdb1762627313f41219936f"
+        }
+      },
+      "regressions_passed": true,
+      "assertion_failures": [],
+      "requirement_exception_failures": [
+        "test__TR56",
+        "test_issue_17137"
+      ],
+      "requirement_exception_evidence": {
+        "test__TR56": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test__TR56",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_fu.py",
+            "line": 80,
+            "function": "test__TR56"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 524,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 504,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "9d9ef907bf9db070404874591777161eb1db774f53bd9b665c1297566b48778f",
+          "traceback_sha256": "0f100ce73adddf1ff439ca85af99ba79a74e5b69f6c1af265a8e5a1f03362d42"
+        },
+        "test_issue_17137": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test_issue_17137",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_simplify.py",
+            "line": 815,
+            "function": "test_issue_17137"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 566,
+              "function": "TR6"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 524,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 504,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "9d9ef907bf9db070404874591777161eb1db774f53bd9b665c1297566b48778f",
+          "traceback_sha256": "157495abf446f927703c90daf9f51303c39108cf2fdb1762627313f41219936f"
+        }
+      },
+      "cleanup_exit": 0,
+      "wall_seconds": 117.42796070300002,
+      "log_sha256": "6aa39012b39e02ef0d92dbe14de722f0adc53a91a95323b3747c2ddbb11e8a9e"
+    },
+    {
+      "label": "gold",
+      "patch_sha256": "8d075ec2ca5d69a25b188b01bcc94733358cd360ebb782e6626edc89bc563e5e",
+      "status": "verified_success",
+      "verified_success": true,
+      "container_name": "p07-sympy__sympy-17139-edcc888762",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-17139@sha256:9a8111742e0548816d920a27ba259ebde7647f4e46e7522c61647990dd35713c"
+      },
+      "image_checkout_head": "50b9e9886441ef3c17eeea2fe20458c298c62b99",
+      "base_verified": "1d3327b8e90a186df6972991963a5ae87053259d",
+      "environment_packages": "flake8 @ file:///croot/flake8_1726157165993/work\nflake8-comprehensions==3.15.0\nmccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work\nmpmath @ file:///croot/mpmath_1690848262763/work\npycodestyle @ file:///croot/pycodestyle_1726150303809/work\npyflakes @ file:///croot/pyflakes_1708962956225/work\n# Editable Git install with no remote (sympy==1.5.dev0)\n-e /testbed",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sympy/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "test_TR1": "PASSED",
+        "test_TR2": "PASSED",
+        "test_TR2i": "PASSED",
+        "test_TR3": "PASSED",
+        "test__TR56": "PASSED",
+        "test_TR5": "PASSED",
+        "test_TR6": "PASSED",
+        "test_TR7": "PASSED",
+        "test_TR8": "PASSED",
+        "test_TR9": "PASSED",
+        "test_TR10": "PASSED",
+        "test_TR10i": "PASSED",
+        "test_TR11": "PASSED",
+        "test_TR12": "PASSED",
+        "test_TR13": "PASSED",
+        "test_L": "PASSED",
+        "test_fu": "PASSED",
+        "test_objective": "PASSED",
+        "test_process_common_addends": "PASSED",
+        "test_trig_split": "PASSED",
+        "test_TRmorrie": "PASSED",
+        "test_TRpower": "PASSED",
+        "test_hyper_as_trig": "PASSED",
+        "test_TR12i": "PASSED",
+        "test_TR14": "PASSED",
+        "test_TR15_16_17": "PASSED",
+        "test_as_f_sign_1": "PASSED",
+        "test_issue_7263": "PASSED",
+        "test_simplify_expr": "PASSED",
+        "test_issue_3557": "PASSED",
+        "test_simplify_other": "PASSED",
+        "test_simplify_complex": "PASSED",
+        "test_simplify_ratio": "PASSED",
+        "test_simplify_measure": "PASSED",
+        "test_simplify_rational": "PASSED",
+        "test_simplify_issue_1308": "PASSED",
+        "test_issue_5652": "PASSED",
+        "test_simplify_fail1": "PASSED",
+        "test_nthroot": "PASSED",
+        "test_nthroot1": "PASSED",
+        "test_separatevars": "PASSED",
+        "test_separatevars_advanced_factor": "PASSED",
+        "test_hypersimp": "PASSED",
+        "test_nsimplify": "PASSED",
+        "test_issue_9448": "PASSED",
+        "test_extract_minus_sign": "PASSED",
+        "test_diff": "PASSED",
+        "test_logcombine_1": "PASSED",
+        "test_logcombine_complex_coeff": "PASSED",
+        "test_issue_5950": "PASSED",
+        "test_posify": "PASSED",
+        "test_issue_4194": "PASSED",
+        "test_as_content_primitive": "PASSED",
+        "test_signsimp": "PASSED",
+        "test_besselsimp": "PASSED",
+        "test_Piecewise": "PASSED",
+        "test_polymorphism": "PASSED",
+        "test_issue_from_PR1599": "PASSED",
+        "test_issue_6811": "PASSED",
+        "test_issue_6920": "PASSED",
+        "test_issue_7001": "PASSED",
+        "test_inequality_no_auto_simplify": "PASSED",
+        "test_issue_9398": "PASSED",
+        "test_issue_9324_simplify": "PASSED",
+        "test_issue_13474": "PASSED",
+        "test_simplify_function_inverse": "PASSED",
+        "test_clear_coefficients": "PASSED",
+        "test_nc_simplify": "PASSED",
+        "test_issue_15965": "PASSED",
+        "test_issue_17137": "PASSED",
+        "test_issue_7971": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "native_status_normalized": true,
+        "failure_header_aliases": {},
+        "header_status_mismatches": {},
+        "discarded_nested_or_alias_observations": {}
+      },
+      "test_body_exception_receipts": {},
+      "regressions_passed": true,
+      "assertion_failures": [],
+      "requirement_exception_failures": [],
+      "requirement_exception_evidence": {},
+      "cleanup_exit": 0,
+      "wall_seconds": 117.305791833,
+      "log_sha256": "8903ff15bdc7089c8db58dbe2d17ada40d6b5053545200dc9d4689122405a559"
+    },
+    {
+      "label": "wrong",
+      "patch_sha256": "73e84aeeb06a961008fa3eeed48bd5073e510476aba9657849ba899e01156a84",
+      "status": "requirement_exception_failed",
+      "verified_success": false,
+      "container_name": "p07-sympy__sympy-17139-3c1b28440d",
+      "isolation": {
+        "network": "none",
+        "caps": "ALL dropped",
+        "host_mounts": [],
+        "memory_bytes": 6442450944,
+        "pids": 256,
+        "no_new_privileges": true,
+        "image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-17139@sha256:9a8111742e0548816d920a27ba259ebde7647f4e46e7522c61647990dd35713c"
+      },
+      "image_checkout_head": "50b9e9886441ef3c17eeea2fe20458c298c62b99",
+      "base_verified": "1d3327b8e90a186df6972991963a5ae87053259d",
+      "environment_packages": "flake8 @ file:///croot/flake8_1726157165993/work\nflake8-comprehensions==3.15.0\nmccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work\nmpmath @ file:///croot/mpmath_1690848262763/work\npycodestyle @ file:///croot/pycodestyle_1726150303809/work\npyflakes @ file:///croot/pyflakes_1708962956225/work\n# Editable Git install with no remote (sympy==1.5.dev0)\n-e /testbed",
+      "runner_identity": "3.9.20 (main, Oct  3 2024, 07:27:41) \n[GCC 11.2.0]\n/testbed/sympy/__init__.py",
+      "process_exit": 0,
+      "tests": {
+        "test_TR1": "PASSED",
+        "test_TR2": "PASSED",
+        "test_TR2i": "PASSED",
+        "test_TR3": "PASSED",
+        "test__TR56": "ERROR",
+        "test_TR5": "PASSED",
+        "test_TR6": "PASSED",
+        "test_TR7": "PASSED",
+        "test_TR8": "PASSED",
+        "test_TR9": "PASSED",
+        "test_TR10": "PASSED",
+        "test_TR10i": "PASSED",
+        "test_TR11": "PASSED",
+        "test_TR12": "PASSED",
+        "test_TR13": "PASSED",
+        "test_L": "PASSED",
+        "test_fu": "PASSED",
+        "test_objective": "PASSED",
+        "test_process_common_addends": "PASSED",
+        "test_trig_split": "PASSED",
+        "test_TRmorrie": "PASSED",
+        "test_TRpower": "PASSED",
+        "test_hyper_as_trig": "PASSED",
+        "test_TR12i": "PASSED",
+        "test_TR14": "PASSED",
+        "test_TR15_16_17": "PASSED",
+        "test_as_f_sign_1": "PASSED",
+        "test_issue_7263": "PASSED",
+        "test_simplify_expr": "PASSED",
+        "test_issue_3557": "PASSED",
+        "test_simplify_other": "PASSED",
+        "test_simplify_complex": "PASSED",
+        "test_simplify_ratio": "PASSED",
+        "test_simplify_measure": "PASSED",
+        "test_simplify_rational": "PASSED",
+        "test_simplify_issue_1308": "PASSED",
+        "test_issue_5652": "PASSED",
+        "test_simplify_fail1": "PASSED",
+        "test_nthroot": "PASSED",
+        "test_nthroot1": "PASSED",
+        "test_separatevars": "PASSED",
+        "test_separatevars_advanced_factor": "PASSED",
+        "test_hypersimp": "PASSED",
+        "test_nsimplify": "PASSED",
+        "test_issue_9448": "PASSED",
+        "test_extract_minus_sign": "PASSED",
+        "test_diff": "PASSED",
+        "test_logcombine_1": "PASSED",
+        "test_logcombine_complex_coeff": "PASSED",
+        "test_issue_5950": "PASSED",
+        "test_posify": "PASSED",
+        "test_issue_4194": "PASSED",
+        "test_as_content_primitive": "PASSED",
+        "test_signsimp": "PASSED",
+        "test_besselsimp": "PASSED",
+        "test_Piecewise": "PASSED",
+        "test_polymorphism": "PASSED",
+        "test_issue_from_PR1599": "PASSED",
+        "test_issue_6811": "PASSED",
+        "test_issue_6920": "PASSED",
+        "test_issue_7001": "PASSED",
+        "test_inequality_no_auto_simplify": "PASSED",
+        "test_issue_9398": "PASSED",
+        "test_issue_9324_simplify": "PASSED",
+        "test_issue_13474": "PASSED",
+        "test_simplify_function_inverse": "PASSED",
+        "test_clear_coefficients": "PASSED",
+        "test_nc_simplify": "PASSED",
+        "test_issue_15965": "PASSED",
+        "test_issue_17137": "ERROR",
+        "test_issue_7971": "PASSED"
+      },
+      "parser_diagnostics": {
+        "scope": "complete_test_output",
+        "ansi_removed": false,
+        "verbose_status_normalized": false,
+        "native_status_normalized": true,
+        "failure_header_aliases": {
+          "sympy/simplify/tests/test_fu.py:test__TR56": "FAILED",
+          "sympy/simplify/tests/test_simplify.py:test_issue_17137": "FAILED"
+        },
+        "header_status_mismatches": {
+          "sympy/simplify/tests/test_fu.py:test__TR56": {
+            "header": "FAILED",
+            "test": "ERROR"
+          },
+          "sympy/simplify/tests/test_simplify.py:test_issue_17137": {
+            "header": "FAILED",
+            "test": "ERROR"
+          }
+        },
+        "discarded_nested_or_alias_observations": {
+          "sympy/simplify/tests/test_fu.py:test__TR56": "FAILED",
+          "sympy/simplify/tests/test_simplify.py:test_issue_17137": "FAILED"
+        }
+      },
+      "test_body_exception_receipts": {
+        "test__TR56": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test__TR56",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_fu.py",
+            "line": 80,
+            "function": "test__TR56"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 526,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 506,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "5dee1bb37aed5d9d47cdba276fe63ccfc44f94c443611a4622b5cf8b87f830e3",
+          "traceback_sha256": "fbc4ef10ffe68a1074b34ba5da94d5d4f98f54f1d2ccd0546baab42c2cd89d3b"
+        },
+        "test_issue_17137": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test_issue_17137",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_simplify.py",
+            "line": 815,
+            "function": "test_issue_17137"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 568,
+              "function": "TR6"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 526,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 506,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "5dee1bb37aed5d9d47cdba276fe63ccfc44f94c443611a4622b5cf8b87f830e3",
+          "traceback_sha256": "0029d4116768987314dddb915c6cf33afbcbb3f40dbd70fe7e0f22e0aba5c4c2"
+        }
+      },
+      "regressions_passed": true,
+      "assertion_failures": [],
+      "requirement_exception_failures": [
+        "test__TR56",
+        "test_issue_17137"
+      ],
+      "requirement_exception_evidence": {
+        "test__TR56": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test__TR56",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_fu.py",
+            "line": 80,
+            "function": "test__TR56"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 526,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 506,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "5dee1bb37aed5d9d47cdba276fe63ccfc44f94c443611a4622b5cf8b87f830e3",
+          "traceback_sha256": "fbc4ef10ffe68a1074b34ba5da94d5d4f98f54f1d2ccd0546baab42c2cd89d3b"
+        },
+        "test_issue_17137": {
+          "kind": "requirement_test_body_exception",
+          "test_id": "test_issue_17137",
+          "observed_status": "ERROR",
+          "exception_type": "TypeError",
+          "base_commit": "1d3327b8e90a186df6972991963a5ae87053259d",
+          "test_frame": {
+            "path": "sympy/simplify/tests/test_simplify.py",
+            "line": 815,
+            "function": "test_issue_17137"
+          },
+          "native_runner_completed": true,
+          "test_exit": 1,
+          "production_frames": [
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 568,
+              "function": "TR6"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 526,
+              "function": "_TR56"
+            },
+            {
+              "path": "sympy/simplify/fu.py",
+              "line": 506,
+              "function": "_f"
+            }
+          ],
+          "raw_body_sha256": "5dee1bb37aed5d9d47cdba276fe63ccfc44f94c443611a4622b5cf8b87f830e3",
+          "traceback_sha256": "0029d4116768987314dddb915c6cf33afbcbb3f40dbd70fe7e0f22e0aba5c4c2"
+        }
+      },
+      "cleanup_exit": 0,
+      "wall_seconds": 117.15734449200005,
+      "log_sha256": "1be2ed477656a834289de89724ea41d1779d860db14ea8e863e2e745e18010f7"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "command": [
+    "docker",
+    "image",
+    "inspect"
+  ],
+  "exit_code": 0
+}

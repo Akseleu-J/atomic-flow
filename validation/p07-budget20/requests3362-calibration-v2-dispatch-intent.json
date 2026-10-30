@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-10-27T05:15:32.878Z",
+  "head": "82b42f085fd7a3edc443cf1db8ea995bf2d580b6",
+  "workflow": "p07-requests3362-calibration.yml",
+  "ref": "experimental",
+  "profile": "p07-requests-legacy-profile-v2.json",
+  "model_calls": 0
+}

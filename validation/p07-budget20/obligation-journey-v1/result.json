@@ -1,0 +1,22 @@
+{
+  "status": "not_qualified",
+  "provider_calls": 0,
+  "model_transport": "scripted",
+  "independent_requirement_success": false,
+  "hidden_oracle": "not_run",
+  "task_status": "paused",
+  "task_error": "internal replan requires fresh review: step 1: tools outside approved envelope: ['edit_node']; step 1: introduces a mutating tool the plan never had",
+  "replan_count": 1,
+  "completion": {},
+  "backend_roles": [
+    "parser",
+    "answerer",
+    "answerer",
+    "critic",
+    "host_planner"
+  ],
+  "final_source": "def sample():\n    return 1\n",
+  "obligation_digest": "b13b2efd7cde833fff202d95956d8c162fda80542c748942e090debe56e76865",
+  "error_type": "ValueError",
+  "error": "public source-bound failure/repair/publication journey did not qualify"
+}

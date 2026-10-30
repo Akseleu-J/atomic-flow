@@ -1,0 +1,31 @@
+{
+  "tested_commit": "4d3c08e3eedcc47509ba700a8b8ec9029f335b13",
+  "run_id": 40818355491,
+  "status": "strict_required_skip_refusal_preserved",
+  "cases": [
+    {
+      "case": "base_fail",
+      "process_exit": 1,
+      "check_passed": false,
+      "required_skips": 0,
+      "source_unchanged": true,
+      "fixture_shutdown": true
+    },
+    {
+      "case": "edited_pass",
+      "process_exit": 0,
+      "check_passed": true,
+      "required_skips": 0,
+      "source_unchanged": true,
+      "fixture_shutdown": true
+    },
+    {
+      "case": "required_skip",
+      "process_exit": 5,
+      "check_passed": false,
+      "required_skips": 1,
+      "source_unchanged": true,
+      "fixture_shutdown": true
+    }
+  ]
+}

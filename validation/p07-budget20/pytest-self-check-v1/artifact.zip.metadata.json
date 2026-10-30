@@ -1,0 +1,20 @@
+{
+  "id": 12807940939,
+  "node_id": "MDg6QXJ0aWZhY3QxMjgwNzk0MDkzOQ==",
+  "name": "p07-pytest-self-check-9538c147271c6816dee736d5a9bec64c3a7ea48c",
+  "size_in_bytes": 36122,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12807940939",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/12807940939/zip",
+  "expired": false,
+  "digest": "sha256:6e88a65ee4b715613e6fef26c6e06196f0ed905da9bc65ec694dfeef021245b0",
+  "created_at": "2026-10-28T10:03:41Z",
+  "updated_at": "2026-10-28T10:03:41Z",
+  "expires_at": "2026-11-11T10:03:40Z",
+  "workflow_run": {
+    "id": 40668978237,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "9538c147271c6816dee736d5a9bec64c3a7ea48c"
+  }
+}

@@ -1,0 +1,87 @@
+...F.................................................................... [ 66%]
+....................................                                     [100%]
+================================== FAILURES ===================================
+________ test_goal_and_step_requirement_changes_stale_approval[parent] ________
+
+tmp_path = WindowsPath('C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-hierarchy-acceptance-20261025/test_goal_and_step_requirement2')
+change = 'parent'
+
+    @pytest.mark.parametrize("change", ["goal_criterion", "step_criterion", "parent"])
+    def test_goal_and_step_requirement_changes_stale_approval(tmp_path, change):
+        task, runner = staged(tmp_path)
+        review = runner.review(task, allowed_paths=["a.py"])
+        task = runner.approve(task, review["digest"], allowed_paths=["a.py"])
+        if change == "goal_criterion":
+            task.goals[0].acceptance_criteria = ["Different requirement"]
+        elif change == "step_criterion":
+            task.steps[0].acceptance_criteria = ["Different step requirement"]
+        else:
+            task.steps[0].parent_goal = "p0:root"
+        with pytest.raises(ChangeSetConflict, match="stale"):
+>           require_approval(task, tmp_path)
+
+tests\test_goal_hierarchy.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\plan_review.py:90: in require_approval
+    or approval.get("plan") != canonical_plan(task)):
+                               ^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\agents\plan_review.py:17: in canonical_plan
+    validate_goals(task.goals, task.steps)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goals = [Goal(id='p0:root', description='Overall objective', parent_id='', acceptance_criteria=['Report source facts']), Goal(...spect', description='Inspect current source', parent_id='p0:root', acceptance_criteria=['Identify the current value'])]
+steps = [Step(index=0, description='Inspect a.py source', tools_needed=['read_file'], expected_outcome='', verify_with='none',...'', depends_on=[], blocked_reason='', invalidated_reason='', parent_goal='p0:root', acceptance_criteria=['Cite a.py'])]
+
+    def validate_goals(goals, steps):
+        """Historical plans share a bounded task-local namespace, max depth four."""
+        if len(goals) > 128:
+            raise StateError("task goal history exceeds 128 nodes")
+        by_id = {}
+        generations = {}
+        for goal in goals:
+            if (not isinstance(goal.id, str) or not re.fullmatch(r"p[0-9]+:[A-Za-z][A-Za-z0-9_-]{0,31}", goal.id)
+                    or len(goal.id) > 64 or goal.id in by_id):
+                raise StateError("invalid or duplicate task goal id")
+            if (not isinstance(goal.description, str) or not goal.description.strip() or not 5 <= len(goal.description) <= 500
+                    or not isinstance(goal.parent_id, str)):
+                raise StateError("invalid task goal description/parent")
+            validate_criteria(goal.acceptance_criteria)
+            if not goal.acceptance_criteria:
+                raise StateError("goal requires acceptance criteria")
+            generation = goal.id.split(":", 1)[0]
+            generations[generation] = generations.get(generation, 0) + 1
+            if generations[generation] > 32:
+                raise StateError("plan goal count exceeds 32 nodes")
+            by_id[goal.id] = goal
+        for goal in goals:
+            seen = set()
+            current = goal.id
+            while current:
+                if current in seen:
+                    raise StateError("cyclic task goal hierarchy")
+                if current not in by_id:
+                    raise StateError("missing task parent goal")
+                seen.add(current)
+                if len(seen) > 4:
+                    raise StateError("task goal hierarchy exceeds depth 4")
+                parent = by_id[current].parent_id
+                if parent and parent.split(":", 1)[0] != goal.id.split(":", 1)[0]:
+                    raise StateError("goal parent crosses plan generation")
+                current = parent
+        covered = set()
+        for step in steps:
+            validate_criteria(step.acceptance_criteria)
+            if not isinstance(step.parent_goal, str) or (step.parent_goal and step.parent_goal not in by_id):
+                raise StateError("missing or invalid step parent goal")
+            current = step.parent_goal
+            while current:
+                covered.add(current)
+                current = by_id[current].parent_id
+        if set(by_id) - covered:
+>           raise StateError("every goal needs an executable descendant step")
+E           atomic_flow.state.StateError: every goal needs an executable descendant step
+
+src\atomic_flow\agents\goals.py:71: StateError
+=========================== short test summary info ===========================
+FAILED tests/test_goal_hierarchy.py::test_goal_and_step_requirement_changes_stale_approval[parent]
+1 failed, 107 passed in 49.70s
