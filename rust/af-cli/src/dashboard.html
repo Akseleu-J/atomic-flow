@@ -2,127 +2,318 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>af — dashboard v0.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>af — atomic-flow</title>
 <style>
-  :root { color-scheme: dark; }
+  :root {
+    color-scheme: dark;
+    --bg: #0f0f10;
+    --panel: #161618;
+    --panel2: #1b1b1e;
+    --border: #26262b;
+    --border2: #303036;
+    --text: #d4d4d8;
+    --muted: #7c7c85;
+    --faint: #55555c;
+    --accent: #8878f0;
+    --accent2: #6a5ae0;
+    --ok: #4ecf8d;
+    --warn: #e0c98a;
+    --err: #e07a7a;
+    --radius: 8px;
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 14px/1.45 ui-monospace, Consolas, monospace; background: #101418; color: #d7dde3; }
-  header { padding: 14px 20px; border-bottom: 1px solid #232a31; display: flex; gap: 16px; align-items: baseline; }
-  header h1 { font-size: 16px; margin: 0; color: #7fd087; }
-  header .ver { color: #5a6773; }
-  main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 20px; max-width: 1200px; margin: 0 auto; }
-  section { border: 1px solid #232a31; border-radius: 6px; padding: 12px 14px; background: #151b21; }
-  section h2 { font-size: 13px; margin: 0 0 10px; color: #9ab3c7; text-transform: uppercase; letter-spacing: .06em; }
-  label { display: block; margin: 8px 0 2px; color: #7d8b97; font-size: 12px; }
-  input, textarea { width: 100%; background: #0c1013; color: #d7dde3; border: 1px solid #2b343c; border-radius: 4px; padding: 6px 8px; font: inherit; }
-  textarea { min-height: 64px; resize: vertical; }
-  button { margin: 10px 6px 0 0; background: #1d4d2b; color: #b8f0c2; border: 1px solid #2f7a42; border-radius: 4px; padding: 6px 14px; font: inherit; cursor: pointer; }
-  button.secondary { background: #1a2733; color: #9ab3c7; border-color: #2b343c; }
-  button:disabled { opacity: .5; cursor: default; }
-  pre { background: #0a0d10; border: 1px solid #1d242b; border-radius: 4px; padding: 10px; max-height: 320px; overflow: auto; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
-  .ok { color: #7fd087; } .err { color: #e08a8a; } .hold { color: #e0c98a; }
-  .row { display: flex; gap: 8px; } .row > * { flex: 1; }
-  #deltas { color: #c9d7e3; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; display: flex; height: 100vh; overflow: hidden;
+    font: 13px/1.5 "Inter", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text);
+  }
+
+  /* ── sidebar ─────────────────────────────────────────── */
+  nav {
+    width: 208px; min-width: 208px; border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; background: #0c0c0d;
+  }
+  .logo { padding: 16px 16px 12px; display: flex; align-items: center; gap: 8px; }
+  .logo .mark {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: grid; place-items: center; font-weight: 700; font-size: 12px; color: #fff;
+  }
+  .logo .name { font-weight: 600; letter-spacing: .01em; }
+  .logo .tag { font-size: 10px; color: var(--faint); }
+  .nav-items { flex: 1; padding: 4px 8px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 7px 10px; margin: 1px 0;
+    border-radius: 6px; cursor: pointer; color: var(--muted); user-select: none;
+  }
+  .nav-item:hover { background: var(--panel); color: var(--text); }
+  .nav-item.active { background: #201f2b; color: #cfc9ff; }
+  .nav-item .ico { width: 16px; text-align: center; opacity: .8; }
+  .nav-footer { padding: 12px 16px; border-top: 1px solid var(--border); font-size: 11px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+  .dot.ok { background: var(--ok); box-shadow: 0 0 6px rgba(78,207,141,.5); }
+  .dot.err { background: var(--err); }
+  .dot.wait { background: var(--warn); }
+
+  /* ── main ────────────────────────────────────────────── */
+  main { flex: 1; overflow: auto; padding: 24px 28px; }
+  .view { display: none; max-width: 860px; }
+  .view.active { display: block; }
+  h2 { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 20px 0 8px; }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; }
+  label { display: block; margin: 10px 0 3px; color: var(--muted); font-size: 12px; }
+  input, textarea, select {
+    width: 100%; background: #0c0c0d; color: var(--text); border: 1px solid var(--border2);
+    border-radius: 6px; padding: 7px 10px; font: inherit; outline: none;
+  }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  textarea { min-height: 72px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+  button {
+    margin-top: 10px; background: var(--accent2); color: #fff; border: none; border-radius: 6px;
+    padding: 7px 16px; font: inherit; font-weight: 500; cursor: pointer;
+  }
+  button:hover { background: var(--accent); }
+  button.ghost { background: transparent; border: 1px solid var(--border2); color: var(--text); font-weight: 400; }
+  button:disabled { opacity: .45; cursor: default; }
+  .row { display: flex; gap: 10px; } .row > * { flex: 1; }
+  pre {
+    background: #0a0a0b; border: 1px solid var(--border); border-radius: 6px;
+    padding: 12px; max-height: 360px; overflow: auto; white-space: pre-wrap;
+    word-break: break-all; font: 11.5px/1.55 ui-monospace, Consolas, monospace; color: #b8b8bf;
+  }
+  .ok { color: var(--ok); } .err { color: var(--err); } .warn { color: var(--warn); }
   .hidden { display: none; }
+
+  /* ── overview cards ──────────────────────────────────── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+  .stat .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 6px 10px; border-bottom: 1px solid #1c1c20; }
+  .layer-entry { color: var(--accent); } .layer-test { color: var(--warn); }
+  .layer-doc { color: #7ab8e0; } .layer-config { color: #c9a0e0; } .layer-core { color: var(--ok); }
+  .chk { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid #1c1c20; align-items: baseline; }
+  .chk:last-child { border-bottom: none; }
+  .chk .name { min-width: 140px; font-weight: 500; }
 </style>
 </head>
 <body>
-<header>
-  <h1>af dashboard</h1>
-  <span class="ver" id="ver">v0.1 · kernel: checking…</span>
-  <span id="health" class="hold">health: ?</span>
-</header>
-<main>
-  <section>
-    <h2>chat stream (live)</h2>
-    <label>base_url <span style="color:#5a6773">(scripted://local = zero-spend smoke)</span></label>
-    <input id="baseUrl" value="scripted://local">
-    <label>api_key_env <span style="color:#5a6773">(env var NAME; the key itself never leaves the server)</span></label>
-    <input id="apiKeyEnv" value="MODEL_PROXY_API_KEY">
-    <label>model</label>
-    <input id="model" value="google/gemini-3.1-flash-lite-preview">
-    <label>prompt</label>
-    <textarea id="prompt">Reply with exactly one line: DASHBOARD-OK</textarea>
-    <button id="sendBtn" onclick="sendChat()">stream ▶</button>
-    <div id="deltas"></div>
-    <pre id="chatOut">idle</pre>
-  </section>
+<nav>
+  <div class="logo">
+    <div class="mark">af</div>
+    <div><div class="name">atomic-flow</div><div class="tag" id="ver">kernel…</div></div>
+  </div>
+  <div class="nav-items">
+    <div class="nav-item active" data-view="overview"><span class="ico">◈</span> Overview</div>
+    <div class="nav-item" data-view="chat"><span class="ico">✦</span> Chat</div>
+    <div class="nav-item" data-view="graph"><span class="ico">⌘</span> Graph</div>
+    <div class="nav-item" data-view="journey"><span class="ico">✎</span> Journey</div>
+    <div class="nav-item" data-view="sessions"><span class="ico">≡</span> Sessions</div>
+    <div class="nav-item" data-view="jobs"><span class="ico">⟐</span> Jobs</div>
+    <div class="nav-item" data-view="doctor"><span class="ico">✚</span> Doctor</div>
+  </div>
+  <div class="nav-footer"><span class="dot wait" id="healthDot"></span><span id="healthText">connecting…</span></div>
+</nav>
 
-  <section>
-    <h2>sessions</h2>
-    <button class="secondary" onclick="listSessions()">list</button>
-    <div class="row">
-      <input id="newSessionId" placeholder="new session id (blank = random)">
-      <button class="secondary" onclick="createSession()">create</button>
+<main>
+  <!-- ── overview ─────────────────────────────────────── -->
+  <div class="view active" id="view-overview">
+    <h2>Overview</h2>
+    <div class="sub">Kernel state at a glance. All authority checks live in the kernel; this is read-only.</div>
+    <div class="cards">
+      <div class="stat"><div class="k">version</div><div class="v" id="ovVersion">…</div></div>
+      <div class="stat"><div class="k">sessions</div><div class="v" id="ovSessions">…</div></div>
+      <div class="stat"><div class="k">unresolved holds</div><div class="v" id="ovHolds">…</div></div>
+      <div class="stat"><div class="k">doctor</div><div class="v" id="ovDoctor">…</div></div>
     </div>
-    <div class="row">
-      <input id="readSessionId" placeholder="session id to read">
-      <button class="secondary" onclick="readSession()">read</button>
+    <h3>environment (doctor)</h3>
+    <div class="card"><div id="ovDoctorChecks">run Doctor for details</div></div>
+    <h3>sessions (latest 200)</h3>
+    <div class="card"><table id="ovSessionTable"><thead><tr><th>session</th><th>created</th><th>project</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- ── chat ─────────────────────────────────────────── -->
+  <div class="view" id="view-chat">
+    <h2>Chat</h2>
+    <div class="sub">Live streaming through the kernel backend plane. Deltas appear as they arrive; the final event carries settled usage.</div>
+    <div class="card">
+      <label>base_url — <span style="color:var(--accent)">scripted://local</span> = zero-spend smoke</label>
+      <input id="baseUrl" value="scripted://local">
+      <label>api_key_env — env var NAME; the key itself never leaves the server</label>
+      <input id="apiKeyEnv" value="MODEL_PROXY_API_KEY">
+      <label>model</label>
+      <input id="model" value="google/gemini-3.1-flash-lite-preview">
+      <label>prompt</label>
+      <textarea id="prompt">Reply with exactly one line: DASHBOARD-OK</textarea>
+      <button id="sendBtn" onclick="sendChat()">Stream ▶</button>
+      <div id="deltas" style="margin-top:10px; min-height:20px; font-family:ui-monospace,monospace;"></div>
+    </div>
+    <pre id="chatOut">idle</pre>
+  </div>
+
+  <!-- ── graph ────────────────────────────────────────── -->
+  <div class="view" id="view-graph">
+    <h2>Graph</h2>
+    <div class="sub">Structural graph over a granted root: per-file layers (deterministic, P03 slice) and symbols.</div>
+    <div class="card">
+      <label>root_id — grant first via <b>af sandbox grant --root-id …</b></label>
+      <div class="row">
+        <input id="graphRootId" value="main">
+        <button class="ghost" style="flex:0" onclick="buildGraph()">Build ▶</button>
+        <button class="ghost" style="flex:0" onclick="readGraph()">Read layers</button>
+      </div>
+      <pre id="graphBuildOut" style="margin-top:10px">idle</pre>
+    </div>
+    <div class="card"><table id="graphTable"><thead><tr><th>file</th><th>layer</th><th>symbols</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- ── journey ──────────────────────────────────────── -->
+  <div class="view" id="view-journey">
+    <h2>Edit journey</h2>
+    <div class="sub">read → apply → check → host final gate. The check cannot be skipped; unverified changes are never committed.</div>
+    <div class="card">
+      <label>root_id / file</label>
+      <div class="row">
+        <input id="journeyRootId" value="main">
+        <input id="journeyFile" value="src/lib.py">
+      </div>
+      <label>replacement (exact reviewed text)</label>
+      <textarea id="journeyReplacement">def helper():
+    return 2  # edited via dashboard</textarea>
+      <label>goal</label>
+      <input id="journeyGoal" value="dashboard edit">
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="journeyApproved" style="width:auto"> host-approved — explicit operator decision</label>
+      <button onclick="runJourney()">Run journey ▶</button>
+    </div>
+    <pre id="journeyOut">idle</pre>
+  </div>
+
+  <!-- ── sessions ─────────────────────────────────────── -->
+  <div class="view" id="view-sessions">
+    <h2>Sessions</h2>
+    <div class="sub">Append-only journals with redaction and unknown-outcome holds.</div>
+    <div class="card">
+      <div class="row">
+        <input id="newSessionId" placeholder="new session id (blank = random)">
+        <button class="ghost" style="flex:0" onclick="createSession()">Create</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input id="readSessionId" placeholder="session id to read">
+        <button class="ghost" style="flex:0" onclick="readSession()">Read</button>
+      </div>
     </div>
     <pre id="sessionOut">idle</pre>
+  </div>
 
-    <h2 style="margin-top:16px">jobs</h2>
-    <div class="row">
-      <input id="jobStore" placeholder="store path (absolute)">
-      <button class="secondary" onclick="readJobs()">status</button>
+  <!-- ── jobs ─────────────────────────────────────────── -->
+  <div class="view" id="view-jobs">
+    <h2>Jobs</h2>
+    <div class="sub">Durable job records with unknown-outcome holds.</div>
+    <div class="card">
+      <label>store path</label>
+      <div class="row">
+        <input id="jobStore" placeholder="absolute path to the job store">
+        <button class="ghost" style="flex:0" onclick="readJobs()">Status</button>
+      </div>
     </div>
     <pre id="jobsOut">idle</pre>
+  </div>
 
-    <h2 style="margin-top:16px">doctor</h2>
-    <button class="secondary" onclick="runDoctor()">run checks</button>
-    <pre id="doctorOut">idle</pre>
-  </section>
-
-  <section>
-    <h2>graph</h2>
-    <label>root_id (must be granted via af sandbox grant)</label>
-    <input id="graphRootId" value="main">
-    <button class="secondary" onclick="buildGraph()">build ▶</button>
-    <pre id="graphBuildOut">idle</pre>
-    <button class="secondary" onclick="readGraph()">read layers</button>
-    <pre id="graphOut">idle</pre>
-
-    <h2 style="margin-top:16px">edit journey</h2>
-    <label>root_id / file</label>
-    <div class="row">
-      <input id="journeyRootId" value="main">
-      <input id="journeyFile" value="src/lib.py">
-    </div>
-    <label>replacement (exact, reviewed — host gate enforces checks)</label>
-    <textarea id="journeyReplacement">def helper():
-    return 2  # edited via dashboard</textarea>
-    <label>goal</label>
-    <input id="journeyGoal" value="dashboard edit">
-    <label><input type="checkbox" id="journeyApproved" style="width:auto"> host-approved (explicit operator decision)</label>
-    <button onclick="runJourney()">run journey ▶</button>
-    <pre id="journeyOut">idle</pre>
-  </section>
+  <!-- ── doctor ───────────────────────────────────────── -->
+  <div class="view" id="view-doctor">
+    <h2>Doctor</h2>
+    <div class="sub">Read-only environment checks. One failure never hides the rest.</div>
+    <div class="card"><div id="doctorChecks">idle</div></div>
+  </div>
 </main>
+
 <script>
 const $ = (id) => document.getElementById(id);
-const put = (id, text, cls) => { const el = $(id); el.textContent = text; el.className = cls || ""; };
-const show = (id, value) => { $(id).textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2); };
+const show = (id, value, cls) => {
+  const el = $(id);
+  el.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+  el.className = cls || "";
+};
+
+/* ── navigation ── */
+document.querySelectorAll(".nav-item").forEach((item) => {
+  item.onclick = () => {
+    document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+    document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+    item.classList.add("active");
+    $("view-" + item.dataset.view).classList.add("active");
+  };
+});
 
 async function api(path, init) {
   const response = await fetch(path, { ...init, headers: { "Content-Type": "application/json", ...init?.headers } });
   const text = await response.text();
   let body = text;
-  try { body = JSON.parse(text); } catch { /* non-JSON error page */ }
+  try { body = JSON.parse(text); } catch {}
   if (!response.ok) throw new Error(`HTTP ${response.status}: ${text.slice(0, 300)}`);
   return body;
 }
 
-async function checkHealth() {
+/* ── health / overview ── */
+async function refreshHealth() {
   try {
-    await api("/health");
-    $("health").textContent = "health: OK";
-    $("health").className = "ok";
-  } catch (e) {
-    $("health").textContent = "health: DOWN";
-    $("health").className = "err";
+    const health = await api("/health");
+    $("healthDot").className = "dot ok";
+    $("healthText").textContent = "serving";
+    $("ovVersion").textContent = health.version;
+    $("ver").textContent = "v" + health.version;
+  } catch {
+    $("healthDot").className = "dot err";
+    $("healthText").textContent = "down";
   }
 }
 
+async function refreshOverview() {
+  try {
+    const listing = await api("/v1/sessions");
+    $("ovSessions").textContent = (listing.sessions || []).length;
+    const tbody = $("ovSessionTable").querySelector("tbody");
+    tbody.innerHTML = "";
+    for (const s of (listing.sessions || []).slice(0, 12)) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${s.session_id ?? "?"}</td><td>${new Date(s.created_at * 1000).toLocaleString()}</td><td>${s.project ?? ""}</td>`;
+      tbody.appendChild(row);
+    }
+  } catch { $("ovSessions").textContent = "—"; }
+  try {
+    const doctor = await api("/v1/doctor");
+    const failed = (doctor.checks || []).filter((c) => !c.ok);
+    $("ovDoctor").textContent = failed.length === 0 ? "all ok" : failed.length + " warn";
+    $("ovDoctor").style.color = failed.length === 0 ? "var(--ok)" : "var(--warn)";
+    renderDoctor(doctor, "ovDoctorChecks");
+  } catch { $("ovDoctor").textContent = "—"; }
+}
+
+function renderDoctor(doctor, targetId) {
+  const el = $(targetId);
+  el.innerHTML = "";
+  for (const check of doctor.checks || []) {
+    const row = document.createElement("div");
+    row.className = "chk";
+    row.innerHTML = `<span class="${check.ok ? "ok" : "warn"}">${check.ok ? "●" : "○"}</span>` +
+      `<span class="name">${check.name}</span><span style="color:var(--muted)">${JSON.stringify(check.detail)}</span>`;
+    el.appendChild(row);
+  }
+}
+
+async function runDoctor() {
+  try { renderDoctor(await api("/v1/doctor"), "doctorChecks"); }
+  catch (e) { show("doctorChecks", String(e), "err"); }
+}
+
+/* ── chat streaming ── */
 async function sendChat() {
   $("sendBtn").disabled = true;
   $("deltas").textContent = "";
@@ -144,8 +335,7 @@ async function sendChat() {
     if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = "";
-    let finalEvent = null;
+    let buffer = "", finalEvent = null;
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -163,7 +353,7 @@ async function sendChat() {
       }
     }
     show("chatOut", finalEvent ?? "stream ended without final event", finalEvent?.error ? "err" : "ok");
-    if (finalEvent && !finalEvent.error) put("deltas", ` [${deltas} deltas]`, "ok");
+    if (finalEvent && !finalEvent.error) $("deltas").innerHTML += `<span style="color:var(--muted)">[${deltas} deltas]</span>`;
   } catch (e) {
     show("chatOut", String(e), "err");
   } finally {
@@ -171,37 +361,7 @@ async function sendChat() {
   }
 }
 
-async function createSession() {
-  try {
-    show("sessionOut", await api("/v1/sessions", {
-      method: "POST",
-      body: JSON.stringify({ id: $("newSessionId").value || null }),
-    }));
-  } catch (e) { show("sessionOut", String(e), "err"); }
-}
-
-async function readSession() {
-  try {
-    show("sessionOut", await api(`/v1/sessions/${encodeURIComponent($("readSessionId").value)}`));
-  } catch (e) { show("sessionOut", String(e), "err"); }
-}
-
-async function readJobs() {
-  try {
-    show("jobsOut", await api(`/v1/jobs?store=${encodeURIComponent($("jobStore").value)}`));
-  } catch (e) { show("jobsOut", String(e), "err"); }
-}
-
-async function listSessions() {
-  try { show("sessionOut", await api("/v1/sessions")); }
-  catch (e) { show("sessionOut", String(e), "err"); }
-}
-
-async function runDoctor() {
-  try { show("doctorOut", await api("/v1/doctor")); }
-  catch (e) { show("doctorOut", String(e), "err"); }
-}
-
+/* ── graph ── */
 async function buildGraph() {
   try {
     show("graphBuildOut", await api("/v1/graph/build", {
@@ -212,10 +372,19 @@ async function buildGraph() {
 }
 
 async function readGraph() {
-  try { show("graphOut", await api(`/v1/graph/${encodeURIComponent($("graphRootId").value)}`)); }
-  catch (e) { show("graphOut", String(e), "err"); }
+  try {
+    const graph = await api(`/v1/graph/${encodeURIComponent($("graphRootId").value)}`);
+    const tbody = $("graphTable").querySelector("tbody");
+    tbody.innerHTML = "";
+    for (const file of graph.files || []) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${file.path}</td><td class="layer-${file.layer}">${file.layer}</td><td>${(file.symbols || []).join(", ") || "—"}</td>`;
+      tbody.appendChild(row);
+    }
+  } catch (e) { show("graphOut", String(e), "err"); }
 }
 
+/* ── journey ── */
 async function runJourney() {
   if (!$("journeyApproved").checked) {
     show("journeyOut", "host-approved checkbox is required (explicit operator decision)", "err");
@@ -240,19 +409,34 @@ async function runJourney() {
   } catch (e) { show("journeyOut", String(e), "err"); }
 }
 
-async function checkHealth() {
+/* ── sessions / jobs ── */
+async function createSession() {
   try {
-    const health = await api("/health");
-    $("health").textContent = "health: OK";
-    $("health").className = "ok";
-    $("ver").textContent = `v${health.version} · kernel: ${health.kernel}`;
-  } catch (e) {
-    $("health").textContent = "health: DOWN";
-    $("health").className = "err";
-  }
+    show("sessionOut", await api("/v1/sessions", {
+      method: "POST",
+      body: JSON.stringify({ id: $("newSessionId").value || null }),
+    }));
+  } catch (e) { show("sessionOut", String(e), "err"); }
 }
 
-const version = fetch("/health").then(checkHealth).catch(checkHealth);
+async function readSession() {
+  try {
+    show("sessionOut", await api(`/v1/sessions/${encodeURIComponent($("readSessionId").value)}`));
+  } catch (e) { show("sessionOut", String(e), "err"); }
+}
+
+async function listSessions() {
+  try { show("sessionOut", await api("/v1/sessions")); }
+  catch (e) { show("sessionOut", String(e), "err"); }
+}
+
+async function readJobs() {
+  try { show("jobsOut", await api(`/v1/jobs?store=${encodeURIComponent($("jobStore").value)}`)); }
+  catch (e) { show("jobsOut", String(e), "err"); }
+}
+
+/* ── boot ── */
+refreshHealth().then(refreshOverview);
 </script>
 </body>
 </html>

@@ -700,6 +700,6 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let bytes = response.into_body().collect().await.unwrap().to_bytes();
         let html = String::from_utf8(bytes.to_vec()).unwrap();
-        assert!(html.contains("af dashboard"));
+        assert!(html.contains("atomic-flow") && html.contains("nav-item"), "dashboard markup present");
     }
 }
