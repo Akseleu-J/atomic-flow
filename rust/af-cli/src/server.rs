@@ -51,6 +51,7 @@ fn build_router(token: Option<String>) -> Router {
         .route("/", get(root_redirect))
         .route("/health", get(health))
         .route("/dashboard", get(dashboard))
+        .route("/v1/doctor", get(doctor_ep))
         .route("/v1/sessions", get(list_sessions_ep).post(create_session))
         .route("/v1/sessions/{id}/events", post(append_event))
         .route("/v1/sessions/{id}", get(read_session))
@@ -189,11 +190,28 @@ fn auth_denied(state: &ServerState, headers: &HeaderMap) -> Option<StatusCode> {
     }
 }
 
-async fn health(State(state): State<ServerState>, headers: HeaderMap) -> StatusCode {
+async fn health(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+) -> Result<Json<Value>, StatusCode> {
     if auth_denied(&state, &headers).is_some() {
-        return StatusCode::UNAUTHORIZED;
+        return Err(StatusCode::UNAUTHORIZED);
     }
-    StatusCode::OK
+    Ok(Json(json!({
+        "ok": true,
+        "version": env!("CARGO_PKG_VERSION"),
+        "kernel": "atomic-flow-rust",
+    })))
+}
+
+async fn doctor_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+) -> Result<Json<Value>, StatusCode> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    Ok(Json(crate::doctor::run_checks()))
 }
 
 #[derive(serde::Deserialize)]

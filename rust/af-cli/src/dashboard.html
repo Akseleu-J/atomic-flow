@@ -50,6 +50,7 @@
 
   <section>
     <h2>sessions</h2>
+    <button class="secondary" onclick="listSessions()">list</button>
     <div class="row">
       <input id="newSessionId" placeholder="new session id (blank = random)">
       <button class="secondary" onclick="createSession()">create</button>
@@ -66,6 +67,35 @@
       <button class="secondary" onclick="readJobs()">status</button>
     </div>
     <pre id="jobsOut">idle</pre>
+
+    <h2 style="margin-top:16px">doctor</h2>
+    <button class="secondary" onclick="runDoctor()">run checks</button>
+    <pre id="doctorOut">idle</pre>
+  </section>
+
+  <section>
+    <h2>graph</h2>
+    <label>root_id (must be granted via af sandbox grant)</label>
+    <input id="graphRootId" value="main">
+    <button class="secondary" onclick="buildGraph()">build ▶</button>
+    <pre id="graphBuildOut">idle</pre>
+    <button class="secondary" onclick="readGraph()">read layers</button>
+    <pre id="graphOut">idle</pre>
+
+    <h2 style="margin-top:16px">edit journey</h2>
+    <label>root_id / file</label>
+    <div class="row">
+      <input id="journeyRootId" value="main">
+      <input id="journeyFile" value="src/lib.py">
+    </div>
+    <label>replacement (exact, reviewed — host gate enforces checks)</label>
+    <textarea id="journeyReplacement">def helper():
+    return 2  # edited via dashboard</textarea>
+    <label>goal</label>
+    <input id="journeyGoal" value="dashboard edit">
+    <label><input type="checkbox" id="journeyApproved" style="width:auto"> host-approved (explicit operator decision)</label>
+    <button onclick="runJourney()">run journey ▶</button>
+    <pre id="journeyOut">idle</pre>
   </section>
 </main>
 <script>
@@ -160,6 +190,66 @@ async function readJobs() {
   try {
     show("jobsOut", await api(`/v1/jobs?store=${encodeURIComponent($("jobStore").value)}`));
   } catch (e) { show("jobsOut", String(e), "err"); }
+}
+
+async function listSessions() {
+  try { show("sessionOut", await api("/v1/sessions")); }
+  catch (e) { show("sessionOut", String(e), "err"); }
+}
+
+async function runDoctor() {
+  try { show("doctorOut", await api("/v1/doctor")); }
+  catch (e) { show("doctorOut", String(e), "err"); }
+}
+
+async function buildGraph() {
+  try {
+    show("graphBuildOut", await api("/v1/graph/build", {
+      method: "POST",
+      body: JSON.stringify({ root_id: $("graphRootId").value }),
+    }));
+  } catch (e) { show("graphBuildOut", String(e), "err"); }
+}
+
+async function readGraph() {
+  try { show("graphOut", await api(`/v1/graph/${encodeURIComponent($("graphRootId").value)}`)); }
+  catch (e) { show("graphOut", String(e), "err"); }
+}
+
+async function runJourney() {
+  if (!$("journeyApproved").checked) {
+    show("journeyOut", "host-approved checkbox is required (explicit operator decision)", "err");
+    return;
+  }
+  try {
+    show("journeyOut", await api("/v1/edit-journeys", {
+      method: "POST",
+      body: JSON.stringify({
+        backend: {
+          base_url: $("baseUrl").value,
+          api_key_env: $("apiKeyEnv").value,
+          model: $("model").value,
+        },
+        root_id: $("journeyRootId").value,
+        file: $("journeyFile").value,
+        replacement: $("journeyReplacement").value,
+        goal: $("journeyGoal").value,
+        host_approved: true,
+      }),
+    }));
+  } catch (e) { show("journeyOut", String(e), "err"); }
+}
+
+async function checkHealth() {
+  try {
+    const health = await api("/health");
+    $("health").textContent = "health: OK";
+    $("health").className = "ok";
+    $("ver").textContent = `v${health.version} · kernel: ${health.kernel}`;
+  } catch (e) {
+    $("health").textContent = "health: DOWN";
+    $("health").className = "err";
+  }
 }
 
 const version = fetch("/health").then(checkHealth).catch(checkHealth);

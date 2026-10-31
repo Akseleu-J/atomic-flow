@@ -4,6 +4,7 @@
 //! the explicit `--host-approved` flag: the human running the CLI is the host.
 
 mod dashboard;
+mod doctor;
 mod server;
 
 use clap::{Parser, Subcommand};
@@ -33,6 +34,8 @@ enum Command {
     },
     /// MCP stdio server: line-delimited JSON-RPC over stdin/stdout.
     Mcp,
+    /// Environment checks for the self-host kernel (read-only).
+    Doctor,
     /// Structural graph operations (roadmap P01/P02 core).
     Graph {
         #[command(subcommand)]
@@ -281,6 +284,9 @@ fn run(command: Command) -> Result<String, String> {
     match command {
         Command::Serve { .. } => unreachable!("serve is handled in main"),
         Command::Mcp => unreachable!("mcp is handled in main"),
+        Command::Doctor => {
+            Ok(serde_json::to_string_pretty(&doctor::run_checks()).map_err(|e| e.to_string())?)
+        }
         Command::SelfTest => self_test(),
         Command::Agent { command } => match command {
             AgentCommand::Journey {
