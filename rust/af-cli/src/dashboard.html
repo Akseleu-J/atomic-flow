@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>af — dashboard v0.1</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 ui-monospace, Consolas, monospace; background: #101418; color: #d7dde3; }
+  header { padding: 14px 20px; border-bottom: 1px solid #232a31; display: flex; gap: 16px; align-items: baseline; }
+  header h1 { font-size: 16px; margin: 0; color: #7fd087; }
+  header .ver { color: #5a6773; }
+  main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 20px; max-width: 1200px; margin: 0 auto; }
+  section { border: 1px solid #232a31; border-radius: 6px; padding: 12px 14px; background: #151b21; }
+  section h2 { font-size: 13px; margin: 0 0 10px; color: #9ab3c7; text-transform: uppercase; letter-spacing: .06em; }
+  label { display: block; margin: 8px 0 2px; color: #7d8b97; font-size: 12px; }
+  input, textarea { width: 100%; background: #0c1013; color: #d7dde3; border: 1px solid #2b343c; border-radius: 4px; padding: 6px 8px; font: inherit; }
+  textarea { min-height: 64px; resize: vertical; }
+  button { margin: 10px 6px 0 0; background: #1d4d2b; color: #b8f0c2; border: 1px solid #2f7a42; border-radius: 4px; padding: 6px 14px; font: inherit; cursor: pointer; }
+  button.secondary { background: #1a2733; color: #9ab3c7; border-color: #2b343c; }
+  button:disabled { opacity: .5; cursor: default; }
+  pre { background: #0a0d10; border: 1px solid #1d242b; border-radius: 4px; padding: 10px; max-height: 320px; overflow: auto; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
+  .ok { color: #7fd087; } .err { color: #e08a8a; } .hold { color: #e0c98a; }
+  .row { display: flex; gap: 8px; } .row > * { flex: 1; }
+  #deltas { color: #c9d7e3; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>af dashboard</h1>
+  <span class="ver" id="ver">v0.1 · kernel: checking…</span>
+  <span id="health" class="hold">health: ?</span>
+</header>
+<main>
+  <section>
+    <h2>chat stream (live)</h2>
+    <label>base_url <span style="color:#5a6773">(scripted://local = zero-spend smoke)</span></label>
+    <input id="baseUrl" value="scripted://local">
+    <label>api_key_env <span style="color:#5a6773">(env var NAME; the key itself never leaves the server)</span></label>
+    <input id="apiKeyEnv" value="MODEL_PROXY_API_KEY">
+    <label>model</label>
+    <input id="model" value="google/gemini-3.1-flash-lite-preview">
+    <label>prompt</label>
+    <textarea id="prompt">Reply with exactly one line: DASHBOARD-OK</textarea>
+    <button id="sendBtn" onclick="sendChat()">stream ▶</button>
+    <div id="deltas"></div>
+    <pre id="chatOut">idle</pre>
+  </section>
+
+  <section>
+    <h2>sessions</h2>
+    <div class="row">
+      <input id="newSessionId" placeholder="new session id (blank = random)">
+      <button class="secondary" onclick="createSession()">create</button>
+    </div>
+    <div class="row">
+      <input id="readSessionId" placeholder="session id to read">
+      <button class="secondary" onclick="readSession()">read</button>
+    </div>
+    <pre id="sessionOut">idle</pre>
+
+    <h2 style="margin-top:16px">jobs</h2>
+    <div class="row">
+      <input id="jobStore" placeholder="store path (absolute)">
+      <button class="secondary" onclick="readJobs()">status</button>
+    </div>
+    <pre id="jobsOut">idle</pre>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const put = (id, text, cls) => { const el = $(id); el.textContent = text; el.className = cls || ""; };
+const show = (id, value) => { $(id).textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2); };
+
+async function api(path, init) {
+  const response = await fetch(path, { ...init, headers: { "Content-Type": "application/json", ...init?.headers } });
+  const text = await response.text();
+  let body = text;
+  try { body = JSON.parse(text); } catch { /* non-JSON error page */ }
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${text.slice(0, 300)}`);
+  return body;
+}
+
+async function checkHealth() {
+  try {
+    await api("/health");
+    $("health").textContent = "health: OK";
+    $("health").className = "ok";
+  } catch (e) {
+    $("health").textContent = "health: DOWN";
+    $("health").className = "err";
+  }
+}
+
+async function sendChat() {
+  $("sendBtn").disabled = true;
+  $("deltas").textContent = "";
+  show("chatOut", "streaming…");
+  let deltas = 0;
+  try {
+    const response = await fetch("/v1/chat/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        backend: {
+          base_url: $("baseUrl").value,
+          api_key_env: $("apiKeyEnv").value,
+          model: $("model").value,
+        },
+        prompt: $("prompt").value,
+      }),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let finalEvent = null;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let boundary;
+      while ((boundary = buffer.indexOf("\n\n")) >= 0) {
+        const block = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        const dataLine = block.split("\n").find((l) => l.startsWith("data: "));
+        if (!dataLine) continue;
+        const payload = JSON.parse(dataLine.slice(6));
+        if (payload.type === "delta") { deltas += 1; $("deltas").textContent += payload.text; }
+        else if (payload.type === "final") finalEvent = payload;
+        else if (payload.type === "error") finalEvent = { error: payload.error };
+      }
+    }
+    show("chatOut", finalEvent ?? "stream ended without final event", finalEvent?.error ? "err" : "ok");
+    if (finalEvent && !finalEvent.error) put("deltas", ` [${deltas} deltas]`, "ok");
+  } catch (e) {
+    show("chatOut", String(e), "err");
+  } finally {
+    $("sendBtn").disabled = false;
+  }
+}
+
+async function createSession() {
+  try {
+    show("sessionOut", await api("/v1/sessions", {
+      method: "POST",
+      body: JSON.stringify({ id: $("newSessionId").value || null }),
+    }));
+  } catch (e) { show("sessionOut", String(e), "err"); }
+}
+
+async function readSession() {
+  try {
+    show("sessionOut", await api(`/v1/sessions/${encodeURIComponent($("readSessionId").value)}`));
+  } catch (e) { show("sessionOut", String(e), "err"); }
+}
+
+async function readJobs() {
+  try {
+    show("jobsOut", await api(`/v1/jobs?store=${encodeURIComponent($("jobStore").value)}`));
+  } catch (e) { show("jobsOut", String(e), "err"); }
+}
+
+const version = fetch("/health").then(checkHealth).catch(checkHealth);
+</script>
+</body>
+</html>

@@ -5,10 +5,16 @@
 use axum::{
     extract::{Path as AxPath, Query, State},
     http::{HeaderMap, StatusCode},
+    response::{
+        sse::{Event, KeepAlive, Sse},
+        IntoResponse,
+    },
     routing::{get, post},
     Json, Router,
 };
 use serde_json::{json, Value};
+use std::convert::Infallible;
+use tokio_stream::wrappers::UnboundedReceiverStream;
 
 /// Constant-time equality over byte strings (no early exit on mismatch).
 fn ct_eq(a: &[u8], b: &[u8]) -> bool {
@@ -43,12 +49,24 @@ fn build_router(token: Option<String>) -> Router {
     let state = ServerState { token };
     Router::new()
         .route("/health", get(health))
+        .route("/dashboard", get(dashboard))
         .route("/v1/sessions", post(create_session))
         .route("/v1/sessions/{id}/events", post(append_event))
         .route("/v1/sessions/{id}", get(read_session))
         .route("/v1/edit-journeys", post(edit_journey))
+        .route("/v1/chat/stream", post(chat_stream_sse))
         .route("/v1/jobs", get(job_status))
         .with_state(state)
+}
+
+async fn dashboard(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+) -> Result<axum::response::Html<&'static str>, StatusCode> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    Ok(axum::response::Html(crate::dashboard::DASHBOARD_HTML))
 }
 
 fn auth_denied(state: &ServerState, headers: &HeaderMap) -> Option<StatusCode> {
@@ -234,6 +252,92 @@ struct JobsQuery {
 
 use std::path::PathBuf;
 
+/// Core streaming engine: runs one backend call on a blocking thread, pushing
+/// delta events and the final event (settled usage or hold) into the channel.
+/// Used by the SSE endpoint and directly testable with the scripted backend.
+fn spawn_chat_stream(
+    backend: Box<dyn af_llm::ChatBackend>,
+    model: String,
+    prompt: String,
+) -> tokio::sync::mpsc::UnboundedReceiver<Result<Value, String>> {
+    let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
+    std::thread::spawn(move || {
+        let mut request =
+            af_llm::ChatRequest::new(&model, vec![af_llm::ChatMessage::new("user", &prompt)]);
+        request.max_output_tokens = Some(256);
+        let outcome = backend.chat_stream(&request, &af_llm::Cancel::new(), &mut |delta| {
+            let _ = tx.send(Ok(json!({"type": "delta", "text": delta})));
+        });
+        let final_event = match outcome {
+            af_llm::BackendOutcome::Completed(result) => json!({
+                "type": "final", "ok": true,
+                "content": result.content,
+                "tokens_in": result.usage.tokens_in, "tokens_out": result.usage.tokens_out,
+                "cost_usd": result.usage.cost_usd, "truncated": result.truncated,
+            }),
+            af_llm::BackendOutcome::Refused { sent, reason } => json!({
+                "type": "error", "refused": sent, "error": reason,
+            }),
+            af_llm::BackendOutcome::Unknown { sent, detail } => json!({
+                "type": "error", "unknown": true, "sent": sent, "error": detail,
+            }),
+        };
+        let _ = tx.send(Ok(final_event));
+    });
+    rx
+}
+
+fn backend_from_config(base_url: &str, api_key_env: &str) -> Box<dyn af_llm::ChatBackend> {
+    // scripted://local = zero-spend smoke path (dashboard testing without a
+    // provider); everything else is the OpenAI-compatible transport.
+    if base_url == "scripted://local" {
+        Box::new(af_llm::ScriptedBackend::echo())
+    } else {
+        Box::new(af_llm::OpenAiBackend::new("openai", base_url, api_key_env))
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct ChatStreamBody {
+    backend: BackendConfig,
+    prompt: String,
+}
+
+async fn chat_stream_sse(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+    Json(body): Json<ChatStreamBody>,
+) -> Result<axum::response::Response, StatusCode> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    let backend = backend_from_config(&body.backend.base_url, &body.backend.api_key_env);
+    let mut rx = spawn_chat_stream(backend, body.backend.model.clone(), body.prompt);
+    let (event_tx, event_rx) =
+        tokio::sync::mpsc::unbounded_channel::<Result<Event, std::convert::Infallible>>();
+    tokio::spawn(async move {
+        while let Some(item) = rx.recv().await {
+            let event = match item {
+                Ok(value) => Event::default().json_data(value).unwrap_or_else(|error| {
+                    Event::default()
+                        .event("error")
+                        .data(format!("{{\"error\": \"serialize failed: {error}\"}}"))
+                }),
+                Err(error) => Event::default()
+                    .event("error")
+                    .data(format!("{{\"error\": \"{error}\"}}")),
+            };
+            if event_tx.send(Ok(event)).is_err() {
+                break;
+            }
+        }
+    });
+    let stream = UnboundedReceiverStream::new(event_rx);
+    Ok(Sse::new(stream)
+        .keep_alive(KeepAlive::default())
+        .into_response())
+}
+
 async fn job_status(
     State(state): State<ServerState>,
     headers: HeaderMap,
@@ -412,5 +516,60 @@ mod tests {
         assert!(bind_allowed("0.0.0.0:8787", &None).is_err());
         assert!(bind_allowed("0.0.0.0:8787", &Some("t".into())).is_ok());
         assert!(bind_allowed("192.168.0.2:8787", &None).is_err());
+    }
+
+    #[tokio::test]
+    async fn sse_stream_via_scripted_backend() {
+        let app = build_router(None);
+        let response = app
+            .oneshot(
+                axum::http::Request::builder()
+                    .method("POST")
+                    .uri("/v1/chat/stream")
+                    .header("Content-Type", "application/json")
+                    .body(Body::from(
+                        json!({
+                            "backend": {"base_url": "scripted://local", "api_key_env": "", "model": "scripted"},
+                            "prompt": "ping"
+                        })
+                        .to_string(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        assert!(response
+            .headers()
+            .get("Content-Type")
+            .is_some_and(|value| value.to_str().unwrap().starts_with("text/event-stream")));
+        let bytes = response.into_body().collect().await.unwrap().to_bytes();
+        let body = String::from_utf8(bytes.to_vec()).unwrap();
+        assert!(
+            body.contains("\"type\":\"final\""),
+            "final event present: {body}"
+        );
+        assert!(
+            body.contains("scripted-echo"),
+            "settled content in final: {body}"
+        );
+    }
+
+    #[tokio::test]
+    async fn dashboard_is_served() {
+        let app = build_router(None);
+        let response = app
+            .oneshot(
+                axum::http::Request::builder()
+                    .uri("/dashboard")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        let bytes = response.into_body().collect().await.unwrap().to_bytes();
+        let html = String::from_utf8(bytes.to_vec()).unwrap();
+        assert!(html.contains("af dashboard"));
     }
 }

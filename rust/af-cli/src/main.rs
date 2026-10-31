@@ -3,6 +3,7 @@
 //! thin; all authority checks live in the crates. Sandbox mutations require
 //! the explicit `--host-approved` flag: the human running the CLI is the host.
 
+mod dashboard;
 mod server;
 
 use clap::{Parser, Subcommand};
@@ -781,8 +782,7 @@ fn backend_call_stream(
     model: String,
     prompt: String,
 ) -> Result<String, String> {
-    let backend =
-        af_llm::OpenAiBackend::new("openai", &base_url, &api_key_env);
+    let backend = af_llm::OpenAiBackend::new("openai", &base_url, &api_key_env);
     let mut request =
         af_llm::ChatRequest::new(&model, vec![af_llm::ChatMessage::new("user", &prompt)]);
     request.max_output_tokens = Some(256);
@@ -803,9 +803,9 @@ fn backend_call_stream(
             "truncated": result.truncated,
         })
         .to_string()),
-        af_llm::BackendOutcome::Refused { sent, reason } => Err(format!(
-            "REFUSED (sent={sent}): {reason}"
-        )),
+        af_llm::BackendOutcome::Refused { sent, reason } => {
+            Err(format!("REFUSED (sent={sent}): {reason}"))
+        }
         af_llm::BackendOutcome::Unknown { sent, detail } => Err(format!(
             "HOLD (sent={sent}): {detail} (unknown outcomes are never retried)"
         )),
