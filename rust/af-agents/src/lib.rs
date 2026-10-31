@@ -12,6 +12,7 @@ pub mod check_spec;
 pub mod constraints;
 pub mod failure_evidence;
 pub mod repair;
+pub mod task_dag;
 
 use serde_json::{json, Value};
 use std::collections::BTreeSet;

@@ -48,15 +48,22 @@ fn authorized(state: &ServerState, headers: &HeaderMap) -> bool {
 fn build_router(token: Option<String>) -> Router {
     let state = ServerState { token };
     Router::new()
+        .route("/", get(root_redirect))
         .route("/health", get(health))
         .route("/dashboard", get(dashboard))
-        .route("/v1/sessions", post(create_session))
+        .route("/v1/sessions", get(list_sessions_ep).post(create_session))
         .route("/v1/sessions/{id}/events", post(append_event))
         .route("/v1/sessions/{id}", get(read_session))
         .route("/v1/edit-journeys", post(edit_journey))
         .route("/v1/chat/stream", post(chat_stream_sse))
         .route("/v1/jobs", get(job_status))
+        .route("/v1/graph/build", post(graph_build_ep))
+        .route("/v1/graph/{root_id}", get(graph_read_ep))
         .with_state(state)
+}
+
+async fn root_redirect() -> axum::response::Response {
+    axum::response::Redirect::temporary("/dashboard").into_response()
 }
 
 async fn dashboard(
@@ -67,6 +74,111 @@ async fn dashboard(
         return Err(StatusCode::UNAUTHORIZED);
     }
     Ok(axum::response::Html(crate::dashboard::DASHBOARD_HTML))
+}
+
+async fn list_sessions_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+) -> Result<Json<Value>, StatusCode> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    let sessions = af_journal::list_sessions(200).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json(json!({"ok": true, "sessions": sessions})))
+}
+
+/// Build (or rebuild) the structural graph for a granted root and persist it
+/// under the server's graph store; returns the summary.
+#[derive(serde::Deserialize)]
+struct GraphBuildBody {
+    root_id: String,
+}
+
+async fn graph_build_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+    Json(body): Json<GraphBuildBody>,
+) -> Result<Json<Value>, StatusCode> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    let registry = af_sandbox::SandboxRegistry::new("default")
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let root_item = registry
+        .get(&body.root_id)
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+    let root = PathBuf::from(root_item["path"].as_str().unwrap_or_default());
+    let files = af_graph::project::collect_source_files(&root).map_err(|e| {
+        eprintln!("af serve graph build: {e}");
+        StatusCode::BAD_REQUEST
+    })?;
+    let build = af_graph::project::clean_build(&files).map_err(|e| {
+        eprintln!("af serve graph build: {e}");
+        StatusCode::BAD_REQUEST
+    })?;
+    let store_dir = af_sandbox::user_dir().join("graphs");
+    std::fs::create_dir_all(&store_dir).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let document = json!({
+        "schema_version": 1, "generation": 1,
+        "nodes": build["nodes"], "edges": build["edges"],
+    });
+    let store_path = store_dir.join(format!("{}.json", body.root_id));
+    std::fs::write(&store_path, af_graph::canonical::canonical_bytes(&document))
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json(json!({
+        "ok": true, "root_id": body.root_id,
+        "files": build["parsed_files"],
+        "nodes": build["nodes"].as_array().map(|n| n.len()).unwrap_or(0),
+        "edges": build["edges"].as_array().map(|e| e.len()).unwrap_or(0),
+        "unresolved": build["unresolved"].as_array().map(|u| u.len()).unwrap_or(0),
+        "store": store_path.to_string_lossy(),
+    })))
+}
+
+/// Read a stored graph: per-file layer assignment (deterministic P03 slice)
+/// plus node/edge summary and unresolved list.
+async fn graph_read_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+    AxPath(root_id): AxPath<String>,
+) -> Result<Json<Value>, StatusCode> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    let store_path = af_sandbox::user_dir()
+        .join("graphs")
+        .join(format!("{root_id}.json"));
+    let text = std::fs::read_to_string(&store_path).map_err(|_| StatusCode::NOT_FOUND)?;
+    let document: Value =
+        serde_json::from_str(&text).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let files: Vec<Value> = document["nodes"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|node| node["kind"] == json!("file"))
+        .collect();
+    let files: Vec<Value> = files
+        .iter()
+        .map(|node| {
+            let path = node["path"].as_str().unwrap_or_default();
+            json!({
+                "path": path,
+                "layer": af_graph::semantic::layer_for(path),
+                "symbols": document["nodes"].as_array().cloned().unwrap_or_default()
+                    .iter()
+                    .filter(|n| n["path"].as_str() == Some(path) && n["kind"] != json!("file"))
+                    .map(|n| n["symbol"].as_str().unwrap_or_default().to_string())
+                    .collect::<Vec<_>>(),
+            })
+        })
+        .collect();
+    Ok(Json(json!({
+        "ok": true, "root_id": root_id,
+        "files": files,
+        "nodes": document["nodes"].as_array().map(|n| n.len()).unwrap_or(0),
+        "edges": document["edges"].as_array().map(|e| e.len()).unwrap_or(0),
+    })))
 }
 
 fn auth_denied(state: &ServerState, headers: &HeaderMap) -> Option<StatusCode> {

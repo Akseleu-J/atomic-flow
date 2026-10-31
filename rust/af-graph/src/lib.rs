@@ -12,6 +12,7 @@ pub mod project;
 pub mod relocation;
 pub mod resolve;
 pub mod schema;
+pub mod semantic;
 pub mod store;
 
 pub use schema::{edge_id, file_id, symbol_id, GraphContractError, GRAPH_SCHEMA_VERSION};
