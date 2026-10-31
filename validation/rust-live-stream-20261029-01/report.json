@@ -1,0 +1,71 @@
+{
+  "run_id": "rust-live-stream-20261029-01",
+  "kind": "LIVE_API_RESPONSE (streaming transport smoke of the Rust backend)",
+  "credential_label": "Kaggle3_TOKEN",
+  "owner_authorized": true,
+  "authorized_by": "owner granted Kaggle3_TOKEN and asked to run GitHub/Kaggle items (29.10.2026)",
+  "utc_start": "2026-10-31T06:11:03.058401+00:00",
+  "caps": {
+    "max_physical_calls": 1,
+    "max_output_tokens": 256,
+    "timeout_seconds": 600,
+    "max_retries": 0,
+    "min_quota_reserve": 1,
+    "prompt_transfer": "no repository content; synthetic one-line prompt only"
+  },
+  "physical_attempts": [
+    {
+      "attempt": 1,
+      "command": [
+        "C:\\Users\\omirb\\.zcode\\workspace\\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\\atomic-flow-dev\\rust\\target\\release\\af.exe",
+        "backend",
+        "call-stream",
+        "--base-url",
+        "https://mp-staging.kaggle.net/models/openapi",
+        "--api-key-env",
+        "MODEL_PROXY_API_KEY",
+        "--model",
+        "google/gemini-3.1-flash-lite-preview",
+        "--prompt",
+        "Reply with exactly one line: RUST-STREAM-OK"
+      ],
+      "note": "deltas stream to stdout live; MODEL_PROXY_API_KEY is child-env only",
+      "exit_code": 0,
+      "stdout_tail": "\n{\"content_chars\":14,\"deltas\":0,\"ok\":true,\"tokens_in\":13,\"tokens_out\":6,\"truncated\":false}\n",
+      "stderr_tail": "",
+      "outcome": "success"
+    }
+  ],
+  "model_calls": 1,
+  "prior_runs": [
+    "rust-live-20261026-01 (405 precursors resolved: quota delta 0, /openapi suffix)"
+  ],
+  "quota_before": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 0.0,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 3.3300140000000056,
+      "allowed": 100
+    }
+  ],
+  "model_choice": "account 3 has no LLM_DEFAULT; using the owner-approved pilot model (see rust-live-20261026-01)",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "status": "LIVE_API_RESPONSE",
+  "quota_after": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 1.224999999926979e-05,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 3.330026250000003,
+      "allowed": 100
+    }
+  ],
+  "utc_end": "2026-10-31T06:11:14.612555+00:00"
+}
