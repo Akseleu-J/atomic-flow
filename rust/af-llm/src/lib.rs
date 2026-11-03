@@ -635,7 +635,11 @@ impl OpenAiBackend {
             let Some(chunk) = parse_sse_line(&String::from_utf8_lossy(&line)) else {
                 continue;
             };
+            let before = content.len();
             accumulate_chunk(&mut content, &chunk);
+            if content.len() > before {
+                on_delta(&content[before..]);
+            }
             partial_tool_calls.absorb(&chunk);
             if let Some(reason) = chunk
                 .pointer("/choices/0/finish_reason")

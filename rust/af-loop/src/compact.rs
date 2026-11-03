@@ -7,7 +7,6 @@
 //! Compaction never invents content — omitted is omitted.
 
 use af_llm::ChatMessage;
-use serde_json::json;
 
 /// Serialized size of the transcript (the bytes a provider would roughly see).
 pub fn serialized_bytes(messages: &[ChatMessage]) -> usize {

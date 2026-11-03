@@ -13,7 +13,6 @@ use axum::{
     Json, Router,
 };
 use serde_json::{json, Value};
-use std::convert::Infallible;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 
 /// Constant-time equality over byte strings (no early exit on mismatch).
@@ -337,17 +336,23 @@ async fn edit_journey(
         .map_err(|_| StatusCode::CONFLICT)?;
     let toolset =
         crate::edit_toolset_for(&registry, &body.root_id).map_err(|_| StatusCode::BAD_REQUEST)?;
+    // The journey's target file and replacement are part of the task the
+    // model executes — not silently dropped client fields.
+    let task = format!(
+        "{}\nTarget file: {}\nDesired replacement content:\n{}",
+        body.goal, body.file, body.replacement
+    );
     let outcome = af_loop::edit::run_edit_task(
         &router,
         &toolset,
         Some(&mut journal),
         &body.backend.model,
-        &body.goal,
+        &task,
         true,
         af_loop::LoopLimits::default(),
         None,
     )
-    .map_err(|error| StatusCode::BAD_REQUEST)?;
+    .map_err(|_| StatusCode::BAD_REQUEST)?;
     let (ok, verified, refusal) = match &outcome {
         af_loop::edit::EditOutcome::Completed {
             content,
@@ -362,7 +367,7 @@ async fn edit_journey(
         af_loop::edit::EditOutcome::CheckFailed { check, git, .. } => (
             false,
             false,
-            json!({"git": git, "reason": "final gate failed"}),
+            json!({"git": git, "reason": "final gate failed", "check": check}),
         ),
         af_loop::edit::EditOutcome::Interrupted { loop_outcome, .. } => {
             (false, false, json!({"reason": format!("{loop_outcome:?}")}))

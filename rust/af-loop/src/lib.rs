@@ -117,7 +117,7 @@ impl<'a> TurnLoop<'a> {
     pub fn run(
         &mut self,
         model: &str,
-        mut messages: Vec<ChatMessage>,
+        messages: Vec<ChatMessage>,
         cancel: &Cancel,
     ) -> LoopResult<LoopOutcome> {
         self.run_inner(model, messages, cancel, None)
@@ -128,7 +128,7 @@ impl<'a> TurnLoop<'a> {
     pub fn run_streaming(
         &mut self,
         model: &str,
-        mut messages: Vec<ChatMessage>,
+        messages: Vec<ChatMessage>,
         cancel: &Cancel,
         on_delta: &mut dyn FnMut(&str),
     ) -> LoopResult<LoopOutcome> {

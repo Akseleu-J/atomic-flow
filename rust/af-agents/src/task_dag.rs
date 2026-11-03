@@ -160,7 +160,7 @@ impl TaskDag {
             .iter()
             .map(|(id, step)| (id.clone(), step.state))
             .collect();
-        for (id, step) in self.steps.iter_mut() {
+        for (_id, step) in self.steps.iter_mut() {
             if step.state != "pending" {
                 continue;
             }
@@ -180,7 +180,6 @@ impl TaskDag {
                 step.transition("ready", "all dependencies succeeded");
             }
         }
-        let _ = id_marker();
     }
 
     /// The frontier: steps ready for execution right now, in id order.
@@ -281,8 +280,6 @@ impl TaskDag {
         })
     }
 }
-
-fn id_marker() -> () {}
 
 #[cfg(test)]
 mod tests {

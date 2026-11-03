@@ -9,7 +9,7 @@
 use super::mcp;
 use af_llm::ToolSpec;
 use serde_json::{json, Value};
-use std::io::{BufRead, Write};
+use std::io::Write;
 
 /// One kernel tool exposed over MCP: spec + sync executor.
 pub struct McpTool<'a> {
