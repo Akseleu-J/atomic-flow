@@ -20,6 +20,7 @@ af-agent.workspace = true
 af-loop.workspace = true
 af-program.workspace = true
 af-entropy.workspace = true
+af-budget.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
 clap = { version = "4", features = ["derive"] }

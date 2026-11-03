@@ -189,8 +189,8 @@ impl SandboxRegistry {
             ));
         }
         ensure_no_links(raw)?;
-        let canonical =
-            std::fs::canonicalize(raw).map_err(|_| SandboxError("root is unavailable".into()))?;
+        let canonical = std::fs::canonicalize(raw)
+            .map_err(|error| SandboxError(format!("root is unavailable: {error}")))?;
         if !canonical.is_dir() {
             return Err(SandboxError("root must be a directory".into()));
         }

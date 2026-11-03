@@ -9,7 +9,7 @@ use axum::{
         sse::{Event, KeepAlive, Sse},
         IntoResponse,
     },
-    routing::{get, post},
+    routing::{delete, get, post},
     Json, Router,
 };
 use serde_json::{json, Value};
@@ -57,6 +57,9 @@ fn build_router(token: Option<String>) -> Router {
         .route("/v1/edit-journeys", post(edit_journey))
         .route("/v1/chat/stream", post(chat_stream_sse))
         .route("/v1/jobs", get(job_status))
+        .route("/v1/roots", get(list_roots_ep).post(grant_root_ep))
+        .route("/v1/roots/{root_id}", delete(revoke_root_ep))
+        .route("/v1/budget", get(budget_snapshot).post(budget_create))
         .route("/v1/graph/build", post(graph_build_ep))
         .route("/v1/graph/{root_id}", get(graph_read_ep))
         .with_state(state)
@@ -85,6 +88,154 @@ async fn list_sessions_ep(
     }
     let sessions = af_journal::list_sessions(200).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(json!({"ok": true, "sessions": sessions})))
+}
+
+/// Error response that carries the reason (the dashboard surfaces it verbatim).
+fn api_error(status: StatusCode, message: impl std::fmt::Display) -> (StatusCode, Json<Value>) {
+    (
+        status,
+        Json(json!({"ok": false, "error": message.to_string()})),
+    )
+}
+
+/// Grant a sandbox root so graph build / journeys can operate on it. This is
+/// a host-level mutation: it requires the explicit `host_approved` flag.
+#[derive(serde::Deserialize)]
+struct GrantRootBody {
+    root_id: String,
+    path: String,
+    host_approved: bool,
+}
+
+async fn grant_root_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+    Json(body): Json<GrantRootBody>,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(api_error(StatusCode::UNAUTHORIZED, "unauthorized"));
+    }
+    if !body.host_approved {
+        return Err(api_error(
+            StatusCode::FORBIDDEN,
+            "регистрация root требует host_approved — явного решения оператора",
+        ));
+    }
+    let registry = af_sandbox::SandboxRegistry::new("default")
+        .map_err(|e| api_error(StatusCode::INTERNAL_SERVER_ERROR, e.0))?;
+    let item = registry
+        .grant(&body.root_id, std::path::Path::new(&body.path), &[], true)
+        .map_err(|e| api_error(StatusCode::BAD_REQUEST, e.0))?;
+    Ok(Json(json!({"ok": true, "root": item})))
+}
+
+async fn list_roots_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(api_error(StatusCode::UNAUTHORIZED, "unauthorized"));
+    }
+    let registry = af_sandbox::SandboxRegistry::new("default")
+        .map_err(|e| api_error(StatusCode::INTERNAL_SERVER_ERROR, e.0))?;
+    let roots = registry
+        .list_roots()
+        .map_err(|e| api_error(StatusCode::INTERNAL_SERVER_ERROR, e.0))?;
+    Ok(Json(json!({"ok": true, "roots": roots})))
+}
+
+/// Revoke a granted root (host-approved mutation).
+#[derive(serde::Deserialize)]
+struct RevokeRootBody {
+    #[serde(default)]
+    host_approved: bool,
+}
+
+async fn revoke_root_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+    AxPath(root_id): AxPath<String>,
+    body: Option<Json<RevokeRootBody>>,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(api_error(StatusCode::UNAUTHORIZED, "unauthorized"));
+    }
+    let approved = body.map(|Json(b)| b.host_approved).unwrap_or(false);
+    if !approved {
+        return Err(api_error(
+            StatusCode::FORBIDDEN,
+            "отзыв root требует host_approved",
+        ));
+    }
+    let registry = af_sandbox::SandboxRegistry::new("default")
+        .map_err(|e| api_error(StatusCode::INTERNAL_SERVER_ERROR, e.0))?;
+    let result = registry
+        .revoke(&root_id, true)
+        .map_err(|e| api_error(StatusCode::BAD_REQUEST, e.0))?;
+    Ok(Json(json!({"ok": true, "revoke": result})))
+}
+
+/// Durable budget ledger (af-budget authority). One fixed owner/ledger per
+/// installation; the dashboard reads it for the live budget line.
+fn budget_ledger_path() -> std::path::PathBuf {
+    af_sandbox::user_dir().join("budget").join("ledger.jsonl")
+}
+const BUDGET_OWNER: &str = "dashboard";
+
+async fn budget_snapshot(State(state): State<ServerState>, headers: HeaderMap) -> Json<Value> {
+    if auth_denied(&state, &headers).is_some() {
+        return Json(json!({"state": "unauthorized"}));
+    }
+    let path = budget_ledger_path();
+    if !path.exists() {
+        return Json(json!({"state": "missing"}));
+    }
+    let Ok(ledger) = af_budget::Ledger::open(&path, BUDGET_OWNER) else {
+        return Json(json!({"state": "unreadable"}));
+    };
+    match ledger.snapshot() {
+        Ok(snap) => Json(json!({
+            "state": if snap.send_checkpoint || snap.has_hold() { "hold" } else { "ok" },
+            "committed_usd": snap.committed().map(|m| m.usd_string()).unwrap_or_else(|_| "unknown".into()),
+            "cap_usd": snap.cap.usd_string(),
+            "calls": snap.calls.len(),
+            "send_hold": snap.send_checkpoint,
+        })),
+        Err(_) => Json(json!({"state": "unreadable"})),
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct BudgetCreateBody {
+    cap_usd: String,
+    #[serde(default)]
+    host_approved: bool,
+}
+
+async fn budget_create(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+    Json(body): Json<BudgetCreateBody>,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(api_error(StatusCode::UNAUTHORIZED, "unauthorized"));
+    }
+    if !body.host_approved {
+        return Err(api_error(
+            StatusCode::FORBIDDEN,
+            "создание бюджета требует host_approved",
+        ));
+    }
+    let cap = af_budget::Money::from_usd_str(&body.cap_usd)
+        .map_err(|e| api_error(StatusCode::BAD_REQUEST, e.0))?;
+    let path = budget_ledger_path();
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)
+            .map_err(|_| api_error(StatusCode::INTERNAL_SERVER_ERROR, "budget dir unavailable"))?;
+    }
+    af_budget::Ledger::create(&path, BUDGET_OWNER, cap, 256)
+        .map_err(|e| api_error(StatusCode::CONFLICT, e.0))?;
+    Ok(Json(json!({"ok": true, "cap_usd": cap.usd_string()})))
 }
 
 /// Build (or rebuild) the structural graph for a granted root and persist it
