@@ -59,6 +59,7 @@ fn build_router(token: Option<String>) -> Router {
         .route("/v1/jobs", get(job_status))
         .route("/v1/roots", get(list_roots_ep).post(grant_root_ep))
         .route("/v1/roots/{root_id}", delete(revoke_root_ep))
+        .route("/v1/pick-folder", post(pick_folder_ep))
         .route("/v1/budget", get(budget_snapshot).post(budget_create))
         .route("/v1/graph/build", post(graph_build_ep))
         .route("/v1/graph/{root_id}", get(graph_read_ep))
@@ -173,6 +174,39 @@ async fn revoke_root_ep(
         .revoke(&root_id, true)
         .map_err(|e| api_error(StatusCode::BAD_REQUEST, e.0))?;
     Ok(Json(json!({"ok": true, "revoke": result})))
+}
+
+/// Open the native OS folder picker (Explorer-style IFileOpenDialog) on the
+/// host machine. The server shares the operator's interactive session, so the
+/// dialog appears on their desktop; the choice never leaves the machine.
+/// A cancelled dialog is reported as `cancelled`, not an error.
+async fn pick_folder_ep(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
+    if auth_denied(&state, &headers).is_some() {
+        return Err(api_error(StatusCode::UNAUTHORIZED, "unauthorized"));
+    }
+    let picked = tokio::task::spawn_blocking(|| {
+        rfd::FileDialog::new()
+            .set_title("Выберите папку проекта для Atomic Flow")
+            .pick_folder()
+    })
+    .await
+    .map_err(|e| {
+        api_error(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("dialog task failed: {e}"),
+        )
+    })?;
+    match picked {
+        Some(path) => Ok(Json(json!({
+            "ok": true, "cancelled": false,
+            "path": path.to_string_lossy(),
+            "name": path.file_name().map(|n| n.to_string_lossy()).unwrap_or_default(),
+        }))),
+        None => Ok(Json(json!({"ok": true, "cancelled": true}))),
+    }
 }
 
 /// Durable budget ledger (af-budget authority). One fixed owner/ledger per

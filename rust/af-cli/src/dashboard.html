@@ -757,11 +757,15 @@
 
         <div class="card" id="card-roots">
           <div class="c-title"><svg class="i"><use href="#i-folder"/></svg> Корень проекта и граф</div>
-          <div class="c-sub">Root регистрируется в sandbox-реестре (host-approved), затем по нему собирается структурный граф.</div>
+          <div class="c-sub">Выберите папку в проводнике — root регистрируется в sandbox-реестре (host-approved), затем по нему собирается структурный граф.</div>
+          <div class="frow">
+            <div class="a-btn primary" id="pickBtn" onclick="pickFolder()"><svg class="i"><use href="#i-folder"/></svg> Выбрать папку…</div>
+          </div>
           <div class="frow">
             <div class="fcol" style="flex:2"><label>путь к проекту</label><input id="cfgRootPath" placeholder="C:\projects\my-app"></div>
-            <div class="fcol" style="flex:1"><label>root_id</label><input id="cfgRootId" placeholder="main"></div>
+            <div class="fcol" style="flex:1"><label>root_id</label><input id="cfgRootId" list="rootIds" placeholder="main"></div>
           </div>
+          <datalist id="rootIds"></datalist>
           <div class="frow">
             <div class="a-btn primary" onclick="grantRoot()"><svg class="i"><use href="#i-plus"/></svg> Зарегистрировать root</div>
             <div class="a-btn" onclick="buildGraph()"><svg class="i"><use href="#i-layers"/></svg> Собрать граф</div>
@@ -775,12 +779,13 @@
           <div class="c-sub">Управляемый цикл: план → правка через sandbox → финальная проверка ядром. Правка публикуется только при host-approved и пройденной проверке.</div>
           <div class="frow">
             <div class="fcol" style="flex:2"><label>цель правки</label><input id="cfgGoal" placeholder="исправь X в модуле Y"></div>
-            <div class="fcol" style="flex:1"><label>root_id</label><input id="cfgJourneyRoot" placeholder="main"></div>
+            <div class="fcol" style="flex:1"><label>root_id</label><input id="cfgJourneyRoot" list="rootIds" placeholder="main"></div>
           </div>
           <div class="frow">
-            <div class="fcol" style="flex:1"><label>файл</label><input id="cfgFile" placeholder="src/main.py"></div>
+            <div class="fcol" style="flex:1"><label>файл (из собранного графа)</label><input id="cfgFile" list="rootFiles" placeholder="src/main.py"></div>
             <div class="fcol" style="flex:2"><label>желаемое содержимое / замена</label><input id="cfgReplacement" placeholder="новое содержимое файла"></div>
           </div>
+          <datalist id="rootFiles"></datalist>
           <label class="check-row"><input type="checkbox" id="cfgApproved"> host-approved: я оператор и одобряю мутацию файлов</label>
           <div class="frow">
             <div class="a-btn primary" onclick="runJourney()"><svg class="i"><use href="#i-play"/></svg> Запустить journey</div>
@@ -1004,6 +1009,28 @@ async function createBudget() {
 }
 
 /* ═════════ roots & graph ═════════ */
+function suggestRootId(path, name) {
+  const base = String(name || path.split(/[\\/]/).filter(Boolean).pop() || "main").trim();
+  let id = base.replace(/[^a-zA-Z0-9_.-]/g, "-");
+  if (!/^[a-zA-Z]/.test(id)) id = "p" + id;
+  return id.slice(0, 48) || "main";
+}
+
+async function pickFolder() {
+  const btn = $("pickBtn");
+  btn.disabled = true;
+  $("rootStatus").textContent = "открываю проводник…";
+  try {
+    const r = await api("/v1/pick-folder", { method: "POST" });
+    if (r.cancelled) { $("rootStatus").textContent = "выбор отменён"; return; }
+    $("cfgRootPath").value = r.path;
+    $("cfgRootId").value = suggestRootId(r.path || "", r.name || "");
+    $("rootStatus").textContent = "папка выбрана — зарегистрируйте root";
+    $("cfgRootId").focus();
+  } catch (e) { $("rootStatus").textContent = "ошибка: " + e.message; }
+  finally { btn.disabled = false; }
+}
+
 async function grantRoot() {
   const rootId = $("cfgRootId").value.trim() || "main";
   const path = $("cfgRootPath").value.trim();
@@ -1022,6 +1049,8 @@ async function renderRoots() {
   try {
     const r = await api("/v1/roots");
     const el = $("rootsList");
+    $("rootIds").innerHTML = (r.roots || [])
+      .map((root) => `<option value="${esc(root.root_id ?? "")}">`).join("");
     if (!(r.roots || []).length) { el.innerHTML = '<div class="pt-sub">корней пока нет</div>'; return; }
     el.innerHTML = r.roots.map((root) =>
       `<div class="src-row"><svg class="i"><use href="#i-folder"/></svg>` +
@@ -1079,6 +1108,7 @@ function renderTree(graph) {
   tree.innerHTML = "";
   const files = graph.files || [];
   $("ceNodeCount").textContent = (graph.nodes ?? files.length) + " узлов";
+  $("rootFiles").innerHTML = files.map((f) => `<option value="${esc(f.path)}">`).join("");
   for (const file of files) {
     const row = document.createElement("div");
     row.className = "trow";
