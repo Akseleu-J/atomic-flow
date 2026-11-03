@@ -358,6 +358,113 @@ pub struct SessionJournal {
 }
 
 impl SessionJournal {
+    fn effect_path(&self) -> PathBuf {
+        self.path.with_extension("effect-hold.json")
+    }
+
+    /// Refuse continuation while a durable effect checkpoint or unresolved
+    /// request exists. Reading state never grants permission to replay it.
+    pub fn require_effects_clear(&mut self) -> JournalResult<()> {
+        if self.effect_path().exists() {
+            return err(
+                "durable effect hold exists; explicit host reconciliation required, never replay",
+            );
+        }
+        let snapshot = self.read()?;
+        if snapshot.incomplete_tail || !snapshot.unresolved_call_ids().is_empty() {
+            return err("unresolved journal observations block new effects; never replay");
+        }
+        Ok(())
+    }
+
+    /// Persist a separate fail-closed checkpoint before a physical send/tool
+    /// effect. It survives a terminal append failure even when the full terminal
+    /// line happened to reach the journal before fsync failed.
+    pub fn begin_effect(
+        &mut self,
+        kind: &str,
+        call_id: &str,
+        payload: &Value,
+    ) -> JournalResult<()> {
+        if !matches!(kind, "model_request" | "tool_request") || !valid_call_id(call_id) {
+            return err("invalid host effect checkpoint");
+        }
+        self.require_effects_clear()?;
+        let hold = self.effect_path();
+        let _lease = Self::lease(&hold)?;
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&hold)
+            .map_err(|_| {
+                JournalError("effect hold creation failed; effect not authorized".into())
+            })?;
+        let bytes =
+            serde_json::to_vec(&json!({"schema_version": 1, "kind": kind, "call_id": call_id}))
+                .map_err(|_| JournalError("effect hold encoding failed".into()))?;
+        file.write_all(&bytes)
+            .and_then(|_| file.sync_all())
+            .map_err(|_| {
+                JournalError("effect hold persistence failed; effect not authorized".into())
+            })?;
+        sync_parent(&hold)?;
+        self.append(kind, payload, Some(call_id), None, None)?;
+        Ok(())
+    }
+
+    /// Complete only the matching host effect. A failed write retains the
+    /// checkpoint and stops the caller; it never authorizes a new effect.
+    pub fn finish_effect(
+        &mut self,
+        event: &str,
+        call_id: &str,
+        payload: &Value,
+        outcome: &str,
+    ) -> JournalResult<()> {
+        let hold = self.effect_path();
+        let _lease = Self::lease(&hold)?;
+        let metadata = std::fs::symlink_metadata(&hold)
+            .map_err(|_| JournalError("effect hold is unavailable".into()))?;
+        if !metadata.is_file() || metadata.file_type().is_symlink() {
+            return err("effect hold must be an owned regular file");
+        }
+        let mut raw = Vec::new();
+        std::fs::File::open(&hold)
+            .map_err(|_| JournalError("effect hold is unavailable".into()))?
+            .take(1025)
+            .read_to_end(&mut raw)
+            .map_err(|_| JournalError("effect hold read failed".into()))?;
+        if raw.len() > 1024 {
+            return err("effect hold exceeds bound");
+        }
+        let saved: Value = serde_json::from_slice(&raw)
+            .map_err(|_| JournalError("effect hold is corrupt".into()))?;
+        let kind = saved.get("kind").and_then(Value::as_str);
+        let valid = match kind {
+            Some("model_request") => matches!(event, "model_response" | "model_failed"),
+            Some("tool_request") => matches!(event, "tool_result" | "tool_effect_unknown"),
+            _ => false,
+        };
+        if !valid
+            || saved.get("call_id").and_then(Value::as_str) != Some(call_id)
+            || saved.get("schema_version") != Some(&json!(1))
+            || saved.as_object().is_none_or(|fields| fields.len() != 3)
+        {
+            return err("effect checkpoint identity differs");
+        }
+        self.append(event, payload, Some(call_id), Some(outcome), None)?;
+        // Unknown effect/charge always keeps the separate durable checkpoint.
+        if outcome == "unknown" {
+            return Ok(());
+        }
+        if !self.read()?.unresolved_call_ids().is_empty() {
+            return err("terminal observation does not resolve the effect; durable hold retained");
+        }
+        std::fs::remove_file(&hold)
+            .map_err(|_| JournalError("effect hold cleanup failed; no continuation".into()))?;
+        sync_parent(&hold)
+    }
+
     fn new(session_id: &str) -> JournalResult<SessionJournal> {
         if !valid_session_id(session_id) {
             return err("invalid session id: use 1-64 letters, digits, underscore or hyphen");
@@ -837,6 +944,21 @@ impl SessionJournal {
     }
 }
 
+fn sync_parent(path: &std::path::Path) -> JournalResult<()> {
+    #[cfg(unix)]
+    {
+        std::fs::File::open(
+            path.parent()
+                .ok_or_else(|| JournalError("missing journal parent".into()))?,
+        )
+        .and_then(|file| file.sync_all())
+        .map_err(|_| JournalError("journal directory sync failed".into()))?;
+    }
+    #[cfg(not(unix))]
+    let _ = path; // std has no portable directory-flush primitive on Windows.
+    Ok(())
+}
+
 /// Recent sessions with creation metadata; invalid sessions are reported, not
 /// silently skipped.
 pub fn list_sessions(limit: usize) -> JournalResult<Vec<Value>> {
@@ -939,6 +1061,79 @@ mod tests {
             assert_eq!(snapshot.events.len(), 2);
             assert!(snapshot.pending_call_ids().is_empty());
             assert!(snapshot.unresolved_call_ids().is_empty());
+        });
+    }
+
+    #[test]
+    fn durable_effect_checkpoint_prevents_replay_until_successful_terminal_ack() {
+        let home = temp_home();
+        with_env(&home, || {
+            let mut journal = make_journal(&home, "checkpoint");
+            journal
+                .begin_effect("tool_request", "call1", &json!({"name":"write"}))
+                .unwrap();
+            assert!(journal.effect_path().exists());
+            assert!(journal.require_effects_clear().is_err());
+            assert!(journal
+                .begin_effect("tool_request", "call2", &json!({}))
+                .is_err());
+            assert!(journal
+                .finish_effect("tool_result", "other_call", &json!({}), "success")
+                .is_err());
+            journal
+                .finish_effect("tool_result", "call1", &json!({"ok":true}), "success")
+                .unwrap();
+            assert!(!journal.effect_path().exists());
+            journal.require_effects_clear().unwrap();
+        });
+    }
+
+    #[test]
+    fn failed_terminal_append_keeps_independent_checkpoint_even_if_log_was_written() {
+        let home = temp_home();
+        with_env(&home, || {
+            let mut journal = make_journal(&home, "terminalfail");
+            journal
+                .begin_effect("tool_request", "call1", &json!({"name":"write"}))
+                .unwrap();
+            let oversized = json!({"body": "x".repeat(MAX_EVENT_BYTES)});
+            assert!(journal
+                .finish_effect("tool_result", "call1", &oversized, "success")
+                .is_err());
+            assert!(journal.effect_path().exists());
+            // Model a complete terminal line visible after an uncertain fsync.
+            // The checkpoint independently preserves the lack of host ACK.
+            journal
+                .append(
+                    "tool_result",
+                    &json!({"ok":true}),
+                    Some("call1"),
+                    Some("success"),
+                    None,
+                )
+                .unwrap();
+            assert!(journal.read().unwrap().unresolved_call_ids().is_empty());
+            let mut reopened = SessionJournal::open("terminalfail").unwrap();
+            assert!(reopened.require_effects_clear().is_err());
+        });
+    }
+
+    #[test]
+    fn unknown_outcome_never_clears_durable_checkpoint() {
+        let home = temp_home();
+        with_env(&home, || {
+            let mut journal = make_journal(&home, "unknowncheckpoint");
+            journal
+                .begin_effect("model_request", "call1", &json!({"turn":0}))
+                .unwrap();
+            journal
+                .finish_effect("model_failed", "call1", &json!({}), "unknown")
+                .unwrap();
+            assert!(journal.effect_path().exists());
+            assert!(SessionJournal::open("unknowncheckpoint")
+                .unwrap()
+                .require_effects_clear()
+                .is_err());
         });
     }
 

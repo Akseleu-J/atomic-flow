@@ -68,6 +68,11 @@ pub fn clean_build(
         if node["kind"].as_str() != Some("file") {
             continue;
         }
+        // The existing resolver is Python-specific. Rust syntax imports must
+        // never silently acquire Python module/call-resolution authority.
+        if node.pointer("/facts/language").and_then(Value::as_str) == Some("rust") {
+            continue;
+        }
         let (inferred, items) = infer_file_edges(node, &modules, &by_file_exports);
         edges.extend(inferred);
         let path = node["path"].as_str().unwrap_or_default();
@@ -117,7 +122,9 @@ pub const DEFAULT_IGNORE: [&str; 13] = [
 
 /// Extensions adapted by the structural graph: Python sources and UA
 /// resources (config/document/pipeline).
-pub const GRAPH_SUFFIXES: [&str; 7] = [".py", ".pyi", ".toml", ".json", ".yaml", ".yml", ".md"];
+pub const GRAPH_SUFFIXES: [&str; 8] = [
+    ".py", ".pyi", ".rs", ".toml", ".json", ".yaml", ".yml", ".md",
+];
 
 /// Bounded source collection for a clean build: regular files only, ignore
 /// patterns and hidden entries skipped like the sandbox scan, byte cap per
@@ -139,6 +146,9 @@ pub fn collect_source_files(root: &std::path::Path) -> Result<BTreeMap<String, V
                 return Err("graph scan entry limit exceeded".into());
             }
             let name = entry.file_name().to_string_lossy().to_string();
+            if name.contains('\\') {
+                return Err("literal backslash filename is not a POSIX graph path".into());
+            }
             if name.starts_with('.') && name != ".github" {
                 continue;
             }
@@ -198,6 +208,32 @@ fn project_glob(pattern: &str, name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rust_collection_keeps_nested_platform_paths_and_explicit_language_scope() {
+        let root = std::env::temp_dir().join(format!("af-native-graph-{}", af_entropy::token()));
+        std::fs::create_dir_all(root.join("nested")).unwrap();
+        std::fs::write(root.join("nested").join("lib.rs"), b"pub fn refund() {}\n").unwrap();
+        let files = collect_source_files(&root).unwrap();
+        assert!(files.contains_key("nested/lib.rs"));
+        let graph = clean_build(&files).unwrap();
+        assert_eq!(graph["nodes"][0]["facts"]["language"], json!("rust"));
+        assert_eq!(
+            graph["nodes"][0]["facts"]["semantic_status"],
+            json!("not_assessed")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn literal_backslash_cannot_alias_a_nested_posix_path() {
+        let root = std::env::temp_dir().join(format!("af-native-path-{}", af_entropy::token()));
+        std::fs::create_dir_all(&root).unwrap();
+        std::fs::write(root.join("nested\\lib.rs"), b"fn x() {}\n").unwrap();
+        assert!(collect_source_files(&root).is_err());
+        std::fs::remove_dir_all(root).unwrap();
+    }
 
     fn files() -> BTreeMap<String, Vec<u8>> {
         BTreeMap::from([

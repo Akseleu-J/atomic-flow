@@ -1,0 +1,90 @@
+{
+  "source": "Python reference atomic_flow.graph.adapter_ast.adapt_file, current checkout; full parity not claimed",
+  "path": "src/policy.py",
+  "utf8": "def refund(amount):\n    return amount\n",
+  "reference": {
+    "nodes": [
+      {
+        "id": "file:src/policy.py",
+        "kind": "file",
+        "path": "src/policy.py",
+        "source": {
+          "digest": "20c438014b18a3a71a69bfe008c568647968fb50c3a348a25b15d801c2accd92",
+          "algorithm": "sha256"
+        },
+        "facts": {
+          "extractor": "python-ast/3",
+          "parse_ok": true,
+          "imports": [],
+          "raw_calls": [],
+          "import_bindings": [],
+          "call_targets": [],
+          "top_level_names": [
+            "refund"
+          ],
+          "assigned_names": [],
+          "shadowed_call_names": [
+            "amount"
+          ],
+          "module_exports": null,
+          "dynamic_exports": false
+        },
+        "fact_status": {
+          "extractor": "fresh",
+          "parse_ok": "fresh",
+          "imports": "fresh",
+          "raw_calls": "fresh",
+          "import_bindings": "fresh",
+          "call_targets": "fresh",
+          "top_level_names": "fresh",
+          "assigned_names": "fresh",
+          "shadowed_call_names": "fresh",
+          "module_exports": "fresh",
+          "dynamic_exports": "fresh"
+        },
+        "facts_class": "extracted"
+      },
+      {
+        "id": "sym:src/policy.py::refund",
+        "kind": "function",
+        "path": "src/policy.py",
+        "symbol": "refund",
+        "source": {
+          "digest": "20c438014b18a3a71a69bfe008c568647968fb50c3a348a25b15d801c2accd92",
+          "algorithm": "sha256"
+        },
+        "start_line": 1,
+        "end_line": 2,
+        "facts": {
+          "extractor": "python-ast/3",
+          "start_line": 1,
+          "end_line": 2,
+          "signature": "def refund(amount)"
+        },
+        "fact_status": {
+          "extractor": "fresh",
+          "start_line": "fresh",
+          "end_line": "fresh",
+          "signature": "fresh"
+        },
+        "facts_class": "extracted"
+      }
+    ],
+    "edges": [
+      {
+        "id": "file:src/policy.py-contains->sym:src/policy.py::refund",
+        "kind": "contains",
+        "src": "file:src/policy.py",
+        "dst": "sym:src/policy.py::refund",
+        "status": "active",
+        "facts": {
+          "extractor": "python-ast/3"
+        },
+        "fact_status": {
+          "extractor": "fresh"
+        },
+        "facts_class": "extracted"
+      }
+    ]
+  }
+}

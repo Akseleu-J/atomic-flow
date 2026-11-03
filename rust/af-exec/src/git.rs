@@ -34,19 +34,28 @@ impl CommandRunner for ProcessRunner {
         cwd: &Path,
         extra_env: &[(&str, &str)],
     ) -> Result<(i32, String, String), String> {
-        use std::process::Command;
-        let mut command = Command::new(&argv[0]);
-        command.args(&argv[1..]).current_dir(cwd);
-        for (key, value) in extra_env {
-            command.env(key, value);
+        // Generic inherited authentication is not an operation-scoped grant.
+        // Publication requires a separately accepted broker; never pass the
+        // parent environment or arbitrary extra variables to a Git child.
+        if !extra_env.is_empty() || argv.get(1).is_some_and(|v| v == "push") {
+            return Err("Git credential broker is not admitted; publication refused".into());
         }
-        let output = command
-            .output()
-            .map_err(|error| format!("command spawn failed: {error}"))?;
+        let result = crate::process::run(argv, cwd, std::time::Duration::from_secs(30), |_| Ok(()))
+            .map_err(|e| e.0)?;
+        if !result.cleanup_confirmed
+            || result.timed_out
+            || result.stdout_truncated
+            || result.stderr_truncated
+            || result.error.is_some()
+        {
+            return Err(
+                "Git process result incomplete or cleanup uncertain; do not retry effects".into(),
+            );
+        }
         Ok((
-            output.status.code().unwrap_or(-1),
-            String::from_utf8_lossy(&output.stdout).to_string(),
-            String::from_utf8_lossy(&output.stderr).to_string(),
+            result.exit_code.unwrap_or(-1),
+            String::from_utf8_lossy(&result.stdout).to_string(),
+            String::from_utf8_lossy(&result.stderr).to_string(),
         ))
     }
 }
@@ -287,5 +296,21 @@ mod tests {
         assert!(message.starts_with("af: bump helper"));
         assert!(message.contains("files: src/lib.py"));
         assert!(message.contains("checks: verified"));
+    }
+
+    #[test]
+    fn real_runner_refuses_implicit_credentials_without_spawning_git() {
+        let runner = ProcessRunner;
+        let cwd = std::env::temp_dir();
+        assert!(runner
+            .run(&["git".into(), "push".into()], &cwd, &[])
+            .is_err());
+        assert!(runner
+            .run(
+                &["git".into(), "status".into()],
+                &cwd,
+                &[("GH_TOKEN", "synthetic")]
+            )
+            .is_err());
     }
 }

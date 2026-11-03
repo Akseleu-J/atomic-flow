@@ -34,7 +34,9 @@ pub fn admit_rel(root: &Path, rel: &str) -> SandboxResult<PathBuf> {
             return Err(SandboxError("path traversal is not admitted".into()));
         }
     }
-    let joined = root.join(rel.replace('/', "\\"));
+    let joined = rel
+        .split('/')
+        .fold(root.to_path_buf(), |path, component| path.join(component));
     ensure_no_links(&joined)?;
     ensure_no_links(root)?;
     Ok(joined)
@@ -48,7 +50,10 @@ mod tests {
     fn admits_plain_relative_paths() {
         let base = std::env::temp_dir().join(format!("af-adm-{}", af_entropy::token()));
         std::fs::create_dir_all(&base).unwrap();
-        assert!(admit_rel(&base, "pkg/mod.py").is_ok());
+        assert_eq!(
+            admit_rel(&base, "pkg/mod.py").unwrap(),
+            base.join("pkg").join("mod.py")
+        );
         assert!(admit_rel(&base, "docs/readme.md").is_ok());
         assert!(admit_rel(&base, "../secret").is_err());
         assert!(admit_rel(&base, "/abs").is_err());
@@ -57,5 +62,18 @@ mod tests {
         assert!(admit_rel(&base, "C:evil").is_err());
         assert!(admit_rel(&base, "").is_err());
         let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn nested_directory_link_cannot_escape_on_posix() {
+        let base = std::env::temp_dir().join(format!("af-adm-links-{}", af_entropy::token()));
+        let root = base.join("root");
+        let outside = base.join("outside");
+        std::fs::create_dir_all(&root).unwrap();
+        std::fs::create_dir_all(&outside).unwrap();
+        std::os::unix::fs::symlink(&outside, root.join("pkg")).unwrap();
+        assert!(admit_rel(&root, "pkg/secret.rs").is_err());
+        std::fs::remove_dir_all(&base).unwrap();
     }
 }

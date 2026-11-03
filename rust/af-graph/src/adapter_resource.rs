@@ -30,6 +30,9 @@ pub fn resource_kind(path: &str) -> Option<&'static str> {
 /// Dispatch: Python sources go to the AST adapter, resources to the metadata
 /// adapter. Unsupported paths are refused — never silently file-noded.
 pub fn adapt_source(path: &str, source: &[u8]) -> Result<Value, GraphContractError> {
+    if path.ends_with(".rs") {
+        return crate::adapter_rust::adapt_file(path, source);
+    }
     if path.ends_with(".py") || path.ends_with(".pyi") {
         return Ok(adapter_ast::adapt_file(path, source));
     }

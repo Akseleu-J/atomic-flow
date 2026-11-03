@@ -12,3 +12,5 @@ sha2.workspace = true
 af-entropy.workspace = true
 rustpython-parser = "0.4"
 rustpython-ast = { version = "0.4", features = ["visitor"] }
+syn = { version = "=2.0.119", features = ["full"] }
+proc-macro2 = { version = "=1.0.107", features = ["span-locations"] }

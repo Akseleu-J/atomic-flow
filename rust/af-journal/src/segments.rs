@@ -1,9 +1,9 @@
 //! P09 kernel contract: segmented session store with a checkpoint chain.
-//! Appends validate only the current segment; every older segment is pinned
-//! by a sha256 checkpoint recorded at rotation, so historical tampering is
-//! detected by the chain — without rehashing the whole history on every
-//! append. This replaces the linear-per-append rehash of the single-file
-//! journal while keeping integrity and crash recovery.
+//! Experimental storage, not authority for live model/tool effects. Rotation
+//! records prior-segment digests; explicit verify_chain() checks them. Appends
+//! do not authenticate all prior bytes, and readers do not reconcile effects.
+//! SessionJournal remains the active durable-effect journal. Destructive
+//! retention is refused until archival anchors and crash recovery are defined.
 
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -116,8 +116,8 @@ impl SegmentStore {
     }
 
     /// Append one event line (compact JSON); rotates when the cap is reached.
-    /// O(1): only this append's bytes are validated, history is pinned by the
-    /// checkpoint chain.
+    /// This experimental writer does not validate historical checkpoints on
+    /// append. Call verify_chain explicitly; this is not an effect journal.
     pub fn append(&mut self, event: &Value) -> SegmentResult<usize> {
         let mut line = serde_json::to_string(event).map_err(|e| SegmentError(format!("{e}")))?;
         line.push('\n');
@@ -215,32 +215,30 @@ impl SegmentStore {
         Ok((events, incomplete_tail))
     }
 
-    /// Retention: remove segments older than `keep` most recent ones; the
-    /// chain digest of the oldest remaining segment is returned for archives.
+    /// Non-destructive retention preflight. Prefix deletion previously made
+    /// read()/verify_chain() start at a missing segment and hide the retained
+    /// suffix. Until archived bytes have an authenticated durable manifest and
+    /// an anchored reader, pruning is explicitly unavailable.
     pub fn retain(&mut self, keep: usize) -> SegmentResult<Value> {
-        let mut total = 0usize;
-        while Path::new(&Self::segment_path(&self.dir, total)).exists() {
-            total += 1;
+        if keep == 0 {
+            return err("retention must preserve at least one segment");
         }
-        let mut removed = 0usize;
-        while total > keep {
-            std::fs::remove_file(Self::segment_path(&self.dir, removed))
-                .map_err(|error| SegmentError(format!("retention remove failed: {error}")))?;
-            removed += 1;
-            total -= 1;
+        let (_, incomplete) = self.read()?;
+        if incomplete {
+            return err("interrupted segment tail blocks retention; preserve all bytes");
         }
-        // Re-index: rebuild checkpoint pins after removal is refused —
-        // removal must be an explicit archival operation with the digest.
-        Ok(json!({
-            "removed_segments": removed,
-            "remaining": total,
-            "archive_digest": if total > 0 {
-                Value::String(sha256_hex(&std::fs::read(Self::segment_path(&self.dir, removed))
-                    .map_err(|error| SegmentError(format!("{error}")))?))
-            } else {
-                Value::Null
-            },
-        }))
+        let chain = self.verify_chain()?;
+        if chain["ok"] != json!(true) {
+            return err("segment integrity failure blocks retention");
+        }
+        let total = chain["segments_checked"].as_u64().unwrap_or(0) as usize;
+        if total > keep {
+            return err("destructive retention unavailable: anchored archival manifest and crash recovery required; no bytes removed");
+        }
+        Ok(
+            json!({"removed_segments": 0, "remaining": total, "archive_digest": Value::Null,
+                  "limits": "non-destructive preflight only; not effect reconciliation or archival acceptance"}),
+        )
     }
 }
 
@@ -335,20 +333,54 @@ mod tests {
     }
 
     #[test]
-    fn retention_reports_archive_digest() {
+    fn retention_refusal_preserves_actual_readable_history_and_chain() {
         let dir = temp_dir();
         let mut store = SegmentStore::open(&dir, "retain", 200).unwrap();
-        // Padded events guarantee several segments at this cap.
         for index in 0..8 {
+            store.append(&json!({"seq": index, "kind": "model_request", "call_id": format!("pending{index}"), "pad": "x".repeat(60)})).unwrap();
+        }
+        let before = store.read().unwrap();
+        let chain = store.verify_chain().unwrap();
+        assert!(store.retain(1).is_err());
+        assert_eq!(store.read().unwrap(), before);
+        assert_eq!(store.verify_chain().unwrap(), chain);
+        let mut reopened = SegmentStore::open(&dir, "retain", 200).unwrap();
+        assert_eq!(reopened.read().unwrap().0.len(), 8);
+        assert!(reopened.retain(100).is_ok());
+        assert_eq!(reopened.read().unwrap(), before);
+        assert_eq!(reopened.verify_chain().unwrap()["ok"], json!(true));
+    }
+
+    #[test]
+    fn corrupt_or_interrupted_history_blocks_retention_without_removing_bytes() {
+        let dir = temp_dir();
+        let mut store = SegmentStore::open(&dir, "retentioncrash", 200).unwrap();
+        for index in 0..4 {
             store
-                .append(&json!({"seq": index, "pad": "x".repeat(60)}))
+                .append(&json!({"seq":index,"pad":"x".repeat(100)}))
                 .unwrap();
         }
-        let report = store.retain(1).unwrap();
-        assert!(report["removed_segments"].as_u64().unwrap() >= 1);
-        assert!(report["archive_digest"]
-            .as_str()
-            .is_some_and(|digest| digest.len() == 64));
-        let _ = std::fs::remove_dir_all(&dir);
+        let current = SegmentStore::segment_path(&store.dir, store.current);
+        let old = SegmentStore::segment_path(&store.dir, 0);
+        let old_bytes = std::fs::read(&old).unwrap();
+        let current_bytes = std::fs::read(&current).unwrap();
+        std::fs::OpenOptions::new()
+            .append(true)
+            .open(&current)
+            .unwrap()
+            .write_all(b"{\"partial\":")
+            .unwrap();
+        let interrupted = std::fs::read(&current).unwrap();
+        assert!(store.retain(1).is_err());
+        assert_eq!(std::fs::read(&current).unwrap(), interrupted);
+        assert_eq!(std::fs::read(&old).unwrap(), old_bytes);
+        std::fs::write(&current, &current_bytes).unwrap();
+        let mut corrupt = old_bytes.clone();
+        corrupt[0] = b'[';
+        std::fs::write(&old, &corrupt).unwrap();
+        assert!(store.retain(1).is_err());
+        assert_eq!(std::fs::read(&old).unwrap(), corrupt);
+        assert_eq!(std::fs::read(&current).unwrap(), current_bytes);
+        assert_eq!(store.verify_chain().unwrap()["ok"], json!(false));
     }
 }

@@ -1,9 +1,7 @@
 //! P10/B2B kernel contract: the SandboxDriver abstraction. One trait, four
-//! implementations — local-trusted (lifetime only, explicitly NOT isolation),
-//! Docker containers, gVisor, and Firecracker microVMs. Each driver builds
-//! the exact non-shell argv for its runtime and refuses honestly when its
-//! binary or platform is unavailable; the driver kind is recorded with every
-//! job so the isolation boundary is always visible in evidence.
+//! accepted lifecycles: local-trusted and Linux Docker. gVisor/Firecracker
+//! builders remain unavailable until their control/cleanup boundaries pass
+//! acceptance. Building argv alone grants no execution or verification.
 
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
@@ -105,6 +103,9 @@ impl SandboxDriver for LocalTrustedDriver {
 pub struct DockerDriver;
 
 impl SandboxDriver for DockerDriver {
+    fn available(&self) -> bool {
+        cfg!(target_os = "linux") && which("docker")
+    }
     fn kind(&self) -> DriverKind {
         DriverKind::Docker
     }
@@ -114,7 +115,18 @@ impl SandboxDriver for DockerDriver {
     }
 
     fn command(&self, job: &SandboxJob) -> Vec<String> {
-        let mut command = vec!["docker".into(), "run".into(), "--rm".into()];
+        let mut command = vec![
+            "docker".into(),
+            "run".into(),
+            "--rm".into(),
+            "--init".into(),
+            "--pull=never".into(),
+            "--user=65534:65534".into(),
+            "--memory=1073741824".into(),
+            "--cpus=2".into(),
+            "--pids-limit=128".into(),
+            "--tmpfs=/tmp:rw,noexec,nosuid,size=134217728,mode=1777".into(),
+        ];
         if job.network_none {
             command.push("--network".into());
             command.push("none".into());
@@ -138,6 +150,9 @@ impl SandboxDriver for DockerDriver {
 pub struct GvisorDriver;
 
 impl SandboxDriver for GvisorDriver {
+    fn available(&self) -> bool {
+        false
+    } // builder only, no accepted lifecycle
     fn kind(&self) -> DriverKind {
         DriverKind::Gvisor
     }
@@ -178,8 +193,7 @@ impl SandboxDriver for FirecrackerDriver {
     }
 
     fn available(&self) -> bool {
-        // Linux-only runtime plus the binary.
-        cfg!(target_os = "linux") && which(self.probe().binary)
+        false // no accepted immutable-ID execution/cleanup implementation
     }
 
     fn command(&self, job: &SandboxJob) -> Vec<String> {
@@ -350,10 +364,11 @@ mod tests {
         let store = std::env::temp_dir().join(format!("af-docker-acc-{}", af_entropy::token()));
         let runner = JobRunner::open(&store).unwrap();
         let spec = JobSpec {
-            argv: vec!["/bin/echo".into(), "sandbox-live".into()],
+            argv: vec!["/bin/sh".into(), "-c".into(),
+                "test \"$(id -u)\" = 65534 && test ! -e /host && ! touch /write-refused && touch /tmp/allowed && echo sandbox-live".into()],
             cwd: std::env::temp_dir(),
             timeout_secs: 120,
-            image: Some("alpine:3.19".into()),
+            image: Some(std::env::var("AF_EXEC_TEST_IMAGE").expect("pre-provision AF_EXEC_TEST_IMAGE with immutable sha256 image; this test never pulls")),
             sandbox_workdir: Some("/workspace".into()),
             job_id: af_entropy::token(),
         };
@@ -368,6 +383,10 @@ mod tests {
             .contains("shared kernel"));
         let jobs = runner.jobs().unwrap();
         assert_eq!(jobs[&spec.job_id]["status"], json!("succeeded"));
+        assert_eq!(status["cleanup_confirmed"], json!(true));
+        assert_eq!(status["verification"], json!("not_assessed"));
+        assert_eq!(jobs[&spec.job_id]["sandbox"], status["sandbox"]);
+        assert!(status["sandbox"]["container_id"].as_str().unwrap().len() == 64);
         let _ = std::fs::remove_dir_all(&store);
     }
 }

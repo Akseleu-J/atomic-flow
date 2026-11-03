@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "profile": "rust-typescript-v1",
+  "platform": "linux/amd64",
+  "images": {
+    "rust": "rust@sha256:bf7d87666c4da6eace19e06d21bc4859c6e2a5c97a21ac273b0e082112753cf0",
+    "python": "python@sha256:de63c5645b0def520dd5d6acaa0144ba4994ba99ec21de45e77910375fc17665",
+    "node": "node@sha256:745403dc46b5ab4c998502b07a12cbf020cf2c30645427a68ec0718f02d647de"
+  },
+  "versions": {"rustc": "1.85.1", "cargo": "1.85.1", "python": "3.11.11", "node": "v22.14.0", "typescript": "Version 5.8.3"},
+  "typescript": {
+    "version": "5.8.3",
+    "tarball": "https://registry.npmjs.org/typescript/-/typescript-5.8.3.tgz",
+    "integrity": "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==",
+    "shasum": "92f8a3e5e3cf497356f4178c34cd65a7f5e8440e"
+  },
+  "limits": "Pinned dependency-free engineering pilot, not general toolchain support or model quality"
+}

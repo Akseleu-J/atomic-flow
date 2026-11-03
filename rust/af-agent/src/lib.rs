@@ -65,19 +65,27 @@ impl Journey<'_> {
         }
     }
 
-    fn record(&mut self, event_type: &str, payload: Value) {
-        let _ = self.journal.append(event_type, &payload, None, None, None);
+    fn record(&mut self, event_type: &str, payload: Value) -> AgentResult<()> {
+        self.journal
+            .append(event_type, &payload, None, None, None)
+            .map(|_| ())
+            .map_err(|_| {
+                AgentError("journal persistence failed; stop and reconcile; never replay".into())
+            })
     }
 
     /// One bounded journey. Every phase is journaled; any refusal stops the
     /// journey with evidence, never with a silent fallback.
     pub fn run(&mut self, plan: &JourneyPlan) -> AgentResult<JourneyReport> {
+        self.journal.require_effects_clear().map_err(|_| {
+            AgentError("unresolved journal effects block journey; never replay".into())
+        })?;
         let mut steps: Vec<Value> = Vec::new();
 
         self.record(
             "user_input",
             json!({"goal": plan.goal, "file": plan.file, "root_id": plan.root_id}),
-        );
+        )?;
 
         // --- observe ---------------------------------------------------------
         let mut session =
@@ -88,7 +96,7 @@ impl Journey<'_> {
         if page["read_complete"] != json!(true) {
             let refusal = "journey requires the complete current source; increase the read window"
                 .to_string();
-            self.record("failed", json!({"phase": "observe", "refusal": refusal}));
+            self.record("failed", json!({"phase": "observe", "refusal": refusal}))?;
             return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
         }
         let before_hash = page["content_hash"]
@@ -109,23 +117,23 @@ impl Journey<'_> {
         self.record(
             "tool_result",
             json!({"phase": "observe", "content_hash": before_hash, "symbols": symbol_count}),
-        );
+        )?;
 
         // --- exact reviewed plan --------------------------------------------
         let Some(replacement) = &plan.replacement else {
             let refusal =
                 "journey needs an exact reviewed replacement; no model text is trusted".to_string();
-            self.record("failed", json!({"phase": "plan", "refusal": refusal}));
+            self.record("failed", json!({"phase": "plan", "refusal": refusal}))?;
             return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
         };
         if replacement == &before_source {
             let refusal = "replacement equals the current source; nothing to apply".to_string();
-            self.record("failed", json!({"phase": "plan", "refusal": refusal}));
+            self.record("failed", json!({"phase": "plan", "refusal": refusal}))?;
             return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
         }
         if self.limits.max_edits == 0 {
             let refusal = "journey edit budget is zero".to_string();
-            self.record("failed", json!({"phase": "plan", "refusal": refusal}));
+            self.record("failed", json!({"phase": "plan", "refusal": refusal}))?;
             return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
         }
         steps.push(json!({"phase": "plan", "ok": true, "replacement_bytes": replacement.len()}));
@@ -137,7 +145,7 @@ impl Journey<'_> {
             Ok(preview) => preview,
             Err(error) => {
                 let refusal = format!("preview refused: {}", error.0);
-                self.record("failed", json!({"phase": "act", "refusal": refusal}));
+                self.record("failed", json!({"phase": "act", "refusal": refusal}))?;
                 return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
             }
         };
@@ -145,12 +153,33 @@ impl Journey<'_> {
             .as_str()
             .unwrap_or_default()
             .to_string();
+        let effect_id = af_entropy::token();
+        self.journal
+            .begin_effect(
+                "tool_request",
+                &effect_id,
+                &json!({"phase": "act", "file": plan.file}),
+            )
+            .map_err(|_| AgentError("mutation checkpoint failed; no effect authorized".into()))?;
         let applied = match session.apply(&token, true) {
             Ok(applied) => applied,
             Err(error) => {
                 let refusal = format!("apply refused: {}", error.0);
-                self.record("failed", json!({"phase": "act", "refusal": refusal}));
-                return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
+                self.journal
+                    .finish_effect(
+                        "tool_effect_unknown",
+                        &effect_id,
+                        &json!({"phase": "act", "refusal": refusal}),
+                        "unknown",
+                    )
+                    .map_err(|_| {
+                        AgentError(
+                            "mutation result checkpoint failed; durable hold retained".into(),
+                        )
+                    })?;
+                return Err(AgentError(
+                    "mutation outcome requires reconciliation; never replay".into(),
+                ));
             }
         };
         steps.push(json!({
@@ -158,7 +187,16 @@ impl Journey<'_> {
             "changeset_id": applied["changeset_id"],
             "status": applied["status"],
         }));
-        self.record("tool_result", json!({"phase": "act", "changeset": applied}));
+        self.journal
+            .finish_effect(
+                "tool_result",
+                &effect_id,
+                &json!({"phase": "act", "changeset": applied}),
+                "success",
+            )
+            .map_err(|_| {
+                AgentError("mutation completion persistence failed; durable hold retained".into())
+            })?;
 
         // --- verify -----------------------------------------------------------
         let after = session
@@ -181,7 +219,7 @@ impl Journey<'_> {
         self.record(
             if verified { "completed" } else { "failed" },
             json!({"phase": "verify", "verified": verified, "after_hash": after_hash}),
-        );
+        )?;
         Ok(make_report(
             verified,
             &plan.goal,
@@ -299,6 +337,32 @@ mod tests {
         assert!(kinds.contains(&"user_input"));
         assert!(kinds.contains(&"completed"));
         assert_eq!(snapshot.unresolved_call_ids().len(), 0);
+    }
+
+    #[test]
+    fn journal_failure_before_apply_preserves_original_source() {
+        let (pair, registry) = setup();
+        let mut journal = journal(&pair.home);
+        // A real interrupted durable record must stop before a write effect.
+        use std::io::Write;
+        std::fs::OpenOptions::new()
+            .append(true)
+            .open(&journal.path)
+            .unwrap()
+            .write_all(b"{\"interrupted\":")
+            .unwrap();
+        let mut journey = Journey::new(&registry, &mut journal, JourneyLimits::default());
+        let plan = JourneyPlan {
+            root_id: "main".into(),
+            file: "src/lib.py".into(),
+            replacement: Some("def helper():\n    return 2\n".into()),
+            goal: "do not mutate".into(),
+        };
+        assert!(journey.run(&plan).is_err());
+        assert_eq!(
+            std::fs::read(pair.root.join("src/lib.py")).unwrap(),
+            b"def helper():\n    return 1\n"
+        );
     }
 
     #[test]

@@ -29,6 +29,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "af-budget"
+version = "0.1.0"
+dependencies = [
+ "af-entropy",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "af-cli"
 version = "0.1.0"
 dependencies = [
@@ -80,10 +90,12 @@ name = "af-graph"
 version = "0.1.0"
 dependencies = [
  "af-entropy",
+ "proc-macro2",
  "rustpython-ast",
  "rustpython-parser",
  "serde_json",
  "sha2",
+ "syn 2.0.119",
  "thiserror",
 ]
 

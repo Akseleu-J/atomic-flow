@@ -5,6 +5,7 @@ members = [
     "af-graph",
     "af-sandbox",
     "af-journal",
+    "af-budget",
     "af-agents",
     "af-exec",
     "af-llm",
@@ -32,6 +33,7 @@ af-entropy = { path = "af-entropy" }
 af-graph = { path = "af-graph" }
 af-sandbox = { path = "af-sandbox" }
 af-journal = { path = "af-journal" }
+af-budget = { path = "af-budget" }
 af-agents = { path = "af-agents" }
 af-exec = { path = "af-exec" }
 af-llm = { path = "af-llm" }

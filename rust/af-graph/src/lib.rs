@@ -5,6 +5,7 @@
 
 pub mod adapter_ast;
 pub mod adapter_resource;
+pub mod adapter_rust;
 pub mod canonical;
 pub mod delta;
 pub mod identity;
@@ -13,6 +14,7 @@ pub mod relocation;
 pub mod resolve;
 pub mod schema;
 pub mod semantic;
+pub mod source_analysis;
 pub mod store;
 
 pub use schema::{edge_id, file_id, symbol_id, GraphContractError, GRAPH_SCHEMA_VERSION};

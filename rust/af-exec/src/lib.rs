@@ -3,23 +3,25 @@
 //! are fsynced status records written before and after the observable effect:
 //! a host crash between them leaves the outcome `unknown`, and the runner
 //! refuses new submissions until the host explicitly reconciles every unknown.
-//! Killing a timed-out child is a witnessed outcome (we did it), so it is a
-//! plain failure — unknown is reserved for outcomes the host cannot testify
-//! about. Process-tree isolation (Job Objects / cgroups) lands with the full
-//! worker image; this slice is the durable accounting core.
+//! Deadline/overflow are known failures only with witnessed owned cleanup.
+//! Windows uses suspended spawn plus a Job Object; Unix uses a dedicated
+//! process group. Trusted host execution is not filesystem/network isolation.
+//! Docker has its own immutable-ID inspect/cleanup lifecycle. Exit zero never
+//! constitutes independent test verification.
 
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+mod docker;
 pub mod driver;
 pub mod git;
+mod process;
 pub mod queue;
 
 pub const STATUS_SCHEMA_VERSION: i64 = 1;
-const OUTPUT_CAP_BYTES: u64 = 1_000_000;
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -44,6 +46,9 @@ fn is_hex32(value: &str) -> bool {
 
 /// Does the OS still have a live process with this pid?
 fn process_alive(pid: u32) -> bool {
+    if pid == 0 {
+        return false;
+    }
     #[cfg(windows)]
     {
         if pid == 0 {
@@ -162,7 +167,10 @@ impl JobRunner {
             return err("invalid job id");
         }
         let path = self.status_path(&job_id);
-        let temp = self.root.join("jobs").join(format!("{job_id}.tmp"));
+        let temp = self
+            .root
+            .join("jobs")
+            .join(format!("{job_id}.{}.tmp", af_entropy::token()));
         {
             let mut file = std::fs::OpenOptions::new()
                 .write(true)
@@ -177,15 +185,26 @@ impl JobRunner {
             .and_then(|_| file.sync_all())
             .map_err(|error| ExecError(format!("job status fsync failed: {error}")))?;
         }
-        std::fs::rename(&temp, &path)
-            .map_err(|error| ExecError(format!("job status replace failed: {error}")))?;
+        std::fs::rename(&temp, &path).map_err(|_| ExecError("job status replace failed".into()))?;
+        #[cfg(unix)]
+        std::fs::File::open(self.root.join("jobs"))
+            .and_then(|f| f.sync_all())
+            .map_err(|_| ExecError("job status directory fsync failed".into()))?;
         Ok(())
     }
 
     /// Mark the intent durably before any observable effect.
     pub fn submit(&self, spec: &JobSpec) -> ExecResult<Value> {
-        if !is_hex32(&spec.job_id) {
-            return err("invalid job id");
+        if !is_hex32(&spec.job_id)
+            || spec.argv.is_empty()
+            || spec.argv[0].is_empty()
+            || spec.argv.iter().any(|v| v.contains('\0'))
+            || !spec.cwd.is_absolute()
+            || !spec.cwd.is_dir()
+            || spec.timeout_secs == 0
+            || spec.timeout_secs > 3600
+        {
+            return err("invalid job identity, argv, cwd or timeout");
         }
         if self.status_path(&spec.job_id).exists() {
             return err("duplicate job id");
@@ -208,139 +227,109 @@ impl JobRunner {
         Ok(status)
     }
 
-    /// Run the job to a terminal, witnessed state. The `running` record with
-    /// the pid is fsynced before spawn effects become observable.
+    /// Trusted host process execution with owned lifetime and bounded drains.
+    /// A successful command is diagnostic execution, never test verification.
     pub fn run(&self, spec: &JobSpec) -> ExecResult<Value> {
-        let submitted = self.submit(spec)?;
-        let mut status = submitted.as_object().cloned().unwrap_or_default();
-        status.insert("status".into(), json!("running"));
-        status.insert("started_at".into(), json!(now_unix()));
-        let stdout_path = self.root.join("jobs").join(format!("{}.out", spec.job_id));
-        let stderr_path = self.root.join("jobs").join(format!("{}.err", spec.job_id));
-        let stdout = std::fs::File::create(&stdout_path)
-            .map_err(|error| ExecError(format!("job output create failed: {error}")))?;
-        let stderr = std::fs::File::create(&stderr_path)
-            .map_err(|error| ExecError(format!("job output create failed: {error}")))?;
-        self.write_status(&Value::Object(status.clone()))?;
-        let mut command = std::process::Command::new(&spec.argv[0]);
-        command
-            .args(&spec.argv[1..])
-            .current_dir(&spec.cwd)
-            .stdout(std::process::Stdio::from(stdout))
-            .stderr(std::process::Stdio::from(stderr))
-            .stdin(std::process::Stdio::null());
-        // Prefer an explicit env reset to the parent's environment minimalism:
-        // environment policy is a later boundary, but secrets must not leak
-        // into job records, so nothing from env is persisted.
-        let spawn = command.spawn();
-        let mut child = match spawn {
-            Ok(child) => child,
-            Err(error) => {
-                status.insert("status".into(), json!("failed"));
-                status.insert("reason".into(), json!(format!("spawn failed: {error}")));
-                status.insert("finished_at".into(), json!(now_unix()));
-                let value = Value::Object(status.clone());
-                self.write_status(&value)?;
-                return Ok(value);
-            }
-        };
-        let pid = child.id();
-        status.insert("pid".into(), json!(pid));
-        self.write_status(&Value::Object(status.clone()))?;
-        let deadline = Instant::now() + Duration::from_secs(spec.timeout_secs);
-        let outcome = loop {
-            match child.try_wait() {
-                Ok(Some(exit)) => break Ok(exit),
-                Ok(None) => {
-                    if Instant::now() >= deadline {
-                        // Kill is a witnessed intervention, not an unknown.
-                        let _ = child.kill();
-                        let exit = child.wait();
-                        break match exit {
-                            Ok(exit) => Ok(exit),
-                            Err(error) => Err(format!("kill wait failed: {error}")),
-                        };
-                    }
-                    std::thread::sleep(Duration::from_millis(25));
-                }
-                Err(error) => break Err(format!("wait failed: {error}")),
-            }
-        };
-        let finished_at = now_unix();
-        let mut final_status = match outcome {
-            Ok(exit) => {
-                status.insert("status".into(), json!("failed"));
-                status.insert("exit_code".into(), json!(exit.code()));
-                if exit.code() == Some(0) {
-                    status.insert("status".into(), json!("succeeded"));
-                }
-                status
-            }
-            Err(reason) => {
-                status.insert("status".into(), json!("failed"));
-                status.insert("reason".into(), json!(reason));
-                status
-            }
-        };
-        let timed_out = final_status
-            .get("reason")
-            .and_then(Value::as_str)
-            .is_some_and(|reason| reason.starts_with("kill wait failed"))
-            .then_some(true)
-            .unwrap_or(false);
-        if timed_out {
-            final_status.insert("reason".into(), json!("timeout"));
-        }
-        final_status.insert("finished_at".into(), json!(finished_at));
-        let value = Value::Object(final_status);
-        self.write_status(&value)?;
-        self.truncate_output(&stdout_path)?;
-        self.truncate_output(&stderr_path)?;
-        Ok(value)
+        self.run_recorded(spec, None)
     }
 
-    /// Run the job inside a sandbox boundary: the driver rewrites argv into
-    /// its runtime command, and the returned status carries the isolation
-    /// evidence (driver kind, network/read-only posture). Requires the spec
-    /// to carry an image; local-trusted drivers may pass it through.
+    fn run_recorded(&self, spec: &JobSpec, sandbox: Option<Value>) -> ExecResult<Value> {
+        let mut status = self.submit(spec)?;
+        status["status"] = json!("running");
+        status["started_at"] = json!(now_unix());
+        status["verification"] = json!("not_assessed");
+        status["isolation"] =
+            json!("trusted host; owned lifetime only, NO filesystem or network isolation");
+        if let Some(evidence) = sandbox {
+            status["sandbox"] = evidence;
+        }
+        self.write_status(&status)?;
+        let outcome = process::run(
+            &spec.argv,
+            &spec.cwd,
+            Duration::from_secs(spec.timeout_secs),
+            |pid| {
+                status["pid"] = json!(pid);
+                self.write_status(&status)
+            },
+        );
+        match outcome {
+            Ok(result) => {
+                status["exit_code"] = json!(result.exit_code);
+                status["timed_out"] = json!(result.timed_out);
+                status["stdout_truncated"] = json!(result.stdout_truncated);
+                status["stderr_truncated"] = json!(result.stderr_truncated);
+                status["cleanup_confirmed"] = json!(result.cleanup_confirmed);
+                status["reason"] = json!(result.error);
+                let complete = result.cleanup_confirmed && result.error.is_none();
+                status["status"] = json!(if !complete {
+                    "unknown"
+                } else if result.exit_code == Some(0)
+                    && !result.timed_out
+                    && !result.stdout_truncated
+                    && !result.stderr_truncated
+                {
+                    "succeeded"
+                } else {
+                    "failed"
+                });
+                status["reconcile_required"] = json!(!complete);
+                // Output files are bounded by the drain, never post-hoc truncation.
+                for (suffix, bytes) in [("out", result.stdout), ("err", result.stderr)] {
+                    let path = self
+                        .root
+                        .join("jobs")
+                        .join(format!("{}.{}", spec.job_id, suffix));
+                    let mut file = std::fs::OpenOptions::new()
+                        .write(true)
+                        .create_new(true)
+                        .open(path)
+                        .map_err(|_| {
+                            ExecError(
+                                "owned output persistence failed; running checkpoint retained"
+                                    .into(),
+                            )
+                        })?;
+                    file.write_all(&bytes)
+                        .and_then(|_| file.sync_all())
+                        .map_err(|_| {
+                            ExecError(
+                                "owned output fsync failed; running checkpoint retained".into(),
+                            )
+                        })?;
+                }
+            }
+            Err(error) => {
+                // Spawn may have occurred: persist a hold rather than guessing zero effects.
+                let never_spawned = error.0 == "host process spawn failed";
+                status["status"] = json!(if never_spawned { "failed" } else { "unknown" });
+                status["reconcile_required"] = json!(!never_spawned);
+                status["cleanup_confirmed"] = json!(never_spawned);
+                status["reason"] = json!(error.0);
+            }
+        }
+        status["finished_at"] = json!(now_unix());
+        self.write_status(&status)?;
+        Ok(status)
+    }
+
+    /// Only accepted host lifecycle implementations execute sandbox jobs.
     pub fn run_with_driver(
         &self,
         spec: &JobSpec,
         driver: &dyn driver::SandboxDriver,
     ) -> ExecResult<Value> {
-        let Some(image) = spec.image.clone() else {
-            return err("sandboxed run requires spec.image");
-        };
-        let sandbox_job = driver::SandboxJob {
-            image_or_kernel: image,
-            argv: spec.argv.clone(),
-            workdir_in_sandbox: spec
-                .sandbox_workdir
-                .clone()
-                .unwrap_or_else(|| "/workspace".into()),
-            timeout_secs: spec.timeout_secs,
-            network_none: true,
-            root_read_only: true,
-        };
-        let mut sandboxed = spec.clone();
-        sandboxed.argv = driver.command(&sandbox_job);
-        let mut status = self.run(&sandboxed)?;
-        status["sandbox"] = driver::run_evidence(driver, &sandbox_job, &status);
-        Ok(status)
-    }
-
-    fn truncate_output(&self, path: &Path) -> ExecResult<()> {
-        let metadata = std::fs::metadata(path)
-            .map_err(|error| ExecError(format!("output stat failed: {error}")))?;
-        if metadata.len() > OUTPUT_CAP_BYTES {
-            let file = std::fs::OpenOptions::new()
-                .write(true)
-                .open(path)
-                .map_err(|error| ExecError(format!("output open failed: {error}")))?;
-            file.set_len(OUTPUT_CAP_BYTES)
-                .map_err(|error| ExecError(format!("output truncate failed: {error}")))?;
+        match driver.kind() {
+            driver::DriverKind::LocalTrusted => {
+                let mut status = self.run(spec)?;
+                status["sandbox"] = json!({"driver":"local-trusted", "isolation":"NO filesystem or network isolation",
+                    "cleanup_confirmed":status["cleanup_confirmed"], "verification":"not_assessed"});
+                self.write_status(&status)?;
+                Ok(status)
+            }
+            driver::DriverKind::Docker => self.run_docker(spec),
+            _ => err("sandbox lifecycle has no accepted inspect/cleanup implementation; execution refused"),
         }
-        Ok(())
     }
 
     /// All job ids with their current persisted status.
@@ -369,16 +358,13 @@ impl JobRunner {
         Ok(result)
     }
 
-    /// Jobs recorded as running whose process is provably gone: the host died
-    /// without witnessing the outcome.
+    /// Persisted running or unknown jobs hold admission. A reusable PID cannot
+    /// establish that a previous effect is complete, even if it is alive.
     pub fn unresolved_unknown_ids(&self) -> ExecResult<Vec<String>> {
         let mut unknown = Vec::new();
         for (job_id, status) in self.jobs()? {
             if status["status"] == json!("running") {
-                let pid = status.get("pid").and_then(Value::as_u64).unwrap_or(0) as u32;
-                if !process_alive(pid) {
-                    unknown.push(job_id.clone());
-                }
+                unknown.push(job_id.clone());
             }
             if status["status"] == json!("unknown") {
                 unknown.push(job_id);
@@ -493,6 +479,8 @@ mod tests {
         let spec = JobSpec::new(argv, root.clone(), 1).unwrap();
         let status = runner.run(&spec).unwrap();
         assert_eq!(status["status"], json!("failed"));
+        assert_eq!(status["timed_out"], json!(true));
+        assert_eq!(status["cleanup_confirmed"], json!(true));
         assert!(runner.unresolved_unknown_ids().unwrap().is_empty());
         let _ = std::fs::remove_dir_all(&root);
     }
@@ -540,7 +528,7 @@ mod tests {
     }
 
     #[test]
-    fn alive_running_job_is_not_unknown() {
+    fn alive_running_job_holds_admission_without_guessing_completion() {
         let root = temp_root();
         let runner = JobRunner::open(&root).unwrap();
         let job_id = af_entropy::token();
@@ -555,7 +543,12 @@ mod tests {
         std::fs::write(&path, serde_json::to_vec_pretty(&record).unwrap()).unwrap();
         let error = runner.mark_unknown(&job_id).unwrap_err();
         assert!(error.0.contains("still alive"));
-        assert!(runner.unresolved_unknown_ids().unwrap().is_empty());
+        assert_eq!(
+            runner.unresolved_unknown_ids().unwrap(),
+            vec![job_id.clone()]
+        );
+        let (_, next) = echo_job(&root, 0);
+        assert!(runner.submit(&next).is_err());
         let _ = std::fs::remove_dir_all(&root);
     }
 

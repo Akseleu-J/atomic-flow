@@ -88,7 +88,11 @@ pub fn paired_report(tasks: &[PairedTask]) -> Value {
             (&task.atomic, &mut known_costs.1),
         ] {
             match arm.cost_usd {
-                Some(cost) => *slot += cost,
+                Some(cost) if cost.is_finite() && cost >= 0.0 && (*slot + cost).is_finite() => {
+                    *slot += cost
+                }
+                Some(_) => unknown_cost_tasks
+                    .push(format!("{}:{}:invalid_or_overflow", task.task_id, arm.arm)),
                 None => unknown_cost_tasks.push(format!("{}:{}", task.task_id, arm.arm)),
             }
         }
@@ -97,14 +101,14 @@ pub fn paired_report(tasks: &[PairedTask]) -> Value {
         .iter()
         .filter(|task| {
             matches!(task.atomic.verdict, Verdict::Passed { .. })
-                && !matches!(task.baseline.verdict, Verdict::Passed { .. })
+                && matches!(task.baseline.verdict, Verdict::Failed { .. })
         })
         .count();
     let baseline_wins = tasks
         .iter()
         .filter(|task| {
             matches!(task.baseline.verdict, Verdict::Passed { .. })
-                && !matches!(task.atomic.verdict, Verdict::Passed { .. })
+                && matches!(task.atomic.verdict, Verdict::Failed { .. })
         })
         .count();
     json!({
@@ -117,6 +121,8 @@ pub fn paired_report(tasks: &[PairedTask]) -> Value {
             "n_tasks": tasks.len(),
             "atomic_only_pass": atomic_wins,
             "baseline_only_pass": baseline_wins,
+            "unassessed_pairs": tasks.iter().filter(|task| matches!(task.atomic.verdict, Verdict::NotAssessed { .. })
+                || matches!(task.baseline.verdict, Verdict::NotAssessed { .. })).map(|task| task.task_id.clone()).collect::<Vec<_>>(),
             "known_cost_usd": {"baseline": known_costs.0, "atomic": known_costs.1},
             "unknown_cost_arms": unknown_cost_tasks,
             "claim": "exploratory; no superiority claim without a frozen hypothesis and a fresh holdout",
@@ -230,5 +236,71 @@ mod tests {
             .as_str()
             .unwrap()
             .contains("exploratory"));
+    }
+
+    #[test]
+    fn unassessed_arm_never_counts_as_an_opponents_win() {
+        let arm = |name: &str, verdict| PairedArm {
+            arm: name.into(),
+            verdict,
+            cost_usd: None,
+            wall_seconds: None,
+            interventions: 0,
+        };
+        let tasks = [
+            PairedTask {
+                task_id: "baseline-missing".into(),
+                baseline: arm(
+                    "baseline",
+                    Verdict::NotAssessed {
+                        omissions: vec!["no oracle".into()],
+                    },
+                ),
+                atomic: arm("atomic", passed()),
+            },
+            PairedTask {
+                task_id: "atomic-missing".into(),
+                baseline: arm("baseline", passed()),
+                atomic: arm(
+                    "atomic",
+                    Verdict::NotAssessed {
+                        omissions: vec!["runner unavailable".into()],
+                    },
+                ),
+            },
+        ];
+        let report = paired_report(&tasks);
+        assert_eq!(report["summary"]["atomic_only_pass"], json!(0));
+        assert_eq!(report["summary"]["baseline_only_pass"], json!(0));
+        assert_eq!(
+            report["summary"]["unassessed_pairs"],
+            json!(["baseline-missing", "atomic-missing"])
+        );
+    }
+
+    #[test]
+    fn invalid_cost_is_explicitly_unknown_and_never_reduces_known_spend() {
+        for cost in [f64::NAN, f64::INFINITY, -0.1] {
+            let arm = |name: &str| PairedArm {
+                arm: name.into(),
+                verdict: failed("test"),
+                cost_usd: Some(cost),
+                wall_seconds: None,
+                interventions: 0,
+            };
+            let report = paired_report(&[PairedTask {
+                task_id: "invalid".into(),
+                baseline: arm("baseline"),
+                atomic: arm("atomic"),
+            }]);
+            assert_eq!(
+                report["summary"]["unknown_cost_arms"]
+                    .as_array()
+                    .unwrap()
+                    .len(),
+                2
+            );
+            assert_eq!(report["summary"]["known_cost_usd"]["baseline"], json!(0.0));
+        }
     }
 }

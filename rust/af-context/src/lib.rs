@@ -8,6 +8,100 @@
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
+/// Build a context projection only from a matching source-analysis/1 envelope.
+/// Root/revision/hash binding is integrity context, never proof of correctness.
+pub fn source_bound_context_pack(
+    analysis: &Value,
+    query: &str,
+    byte_budget: usize,
+) -> Result<Value, String> {
+    if analysis["schema"] != json!(af_graph::source_analysis::SCHEMA)
+        || analysis["verification"] != json!("not_assessed")
+    {
+        return Err("source-analysis/1 envelope required".into());
+    }
+    let root = analysis["root_id"]
+        .as_str()
+        .ok_or("root identity required")?;
+    let revision = analysis["source_revision"]
+        .as_str()
+        .ok_or("source revision required")?;
+    if root.is_empty()
+        || revision.len() != 64
+        || !revision
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    {
+        return Err("exact root/revision binding required".into());
+    }
+    let mut sources = BTreeMap::new();
+    for source in analysis["sources"]
+        .as_array()
+        .ok_or("source inventory required")?
+    {
+        let path = source["path"].as_str().ok_or("source path required")?;
+        af_graph::source_analysis::validate_path(path).map_err(|e| e.0)?;
+        let hash = source["sha256"].as_str().ok_or("source hash required")?;
+        if hash.len() != 64
+            || !hash
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+            || sources.insert(path.to_string(), hash.to_string()).is_some()
+        {
+            return Err("duplicate or invalid source hash".into());
+        }
+    }
+    let mut identities = BTreeSet::new();
+    for node in analysis["nodes"].as_array().ok_or("nodes required")? {
+        af_graph::schema::validate_node(node).map_err(|e| e.0)?;
+        if node["source"]["algorithm"] != json!("sha256")
+            || node["path"]
+                .as_str()
+                .and_then(|p| sources.get(p))
+                .map(String::as_str)
+                != node["source"]["digest"].as_str()
+        {
+            return Err("context node source binding differs".into());
+        }
+        if !identities.insert(
+            node["id"]
+                .as_str()
+                .ok_or("node identity required")?
+                .to_string(),
+        ) {
+            return Err("duplicate node identity".into());
+        }
+    }
+    for edge in analysis["edges"].as_array().ok_or("edges required")? {
+        af_graph::schema::validate_edge(edge).map_err(|e| e.0)?;
+        if !identities.contains(edge["src"].as_str().ok_or("edge source required")?)
+            || !identities.contains(edge["dst"].as_str().ok_or("edge target required")?)
+        {
+            return Err("context edge endpoint is outside source-bound inventory".into());
+        }
+    }
+    let mut pack = context_pack(&ContextIndex::build(analysis), query, byte_budget, None);
+    for item in pack["items"]
+        .as_array_mut()
+        .ok_or("context items required")?
+    {
+        let hash = item["path"]
+            .as_str()
+            .and_then(|p| sources.get(p))
+            .ok_or("context source missing")?
+            .clone();
+        item["source_sha256"] = json!(hash);
+    }
+    pack["root_id"] = json!(root);
+    pack["source_revision"] = json!(revision);
+    pack["verification"] = json!("not_assessed");
+    pack["omissions"] = analysis["omissions"].clone();
+    pack["byte_budget_scope"] = json!(
+        "selection entries before source-binding metadata; not token or complete response cap"
+    );
+    Ok(pack)
+}
+
 const STOP_WORDS: [&str; 18] = [
     "the", "a", "an", "of", "for", "and", "to", "in", "is", "are", "on", "at", "by", "with",
     "this", "that", "from", "as",
@@ -418,6 +512,17 @@ pub fn context_pack(
 mod tests {
     use super::*;
     use serde_json::json;
+    #[test]
+    fn bound_pack_keeps_root_revision_and_refuses_stale_hashes() {
+        let files = BTreeMap::from([("lib.rs".into(), b"pub fn refund() {}\n".to_vec())]);
+        let mut analysis =
+            af_graph::source_analysis::analyze("main", &"a".repeat(64), &files).unwrap();
+        let pack = source_bound_context_pack(&analysis, "refund", 10000).unwrap();
+        assert_eq!(pack["verification"], json!("not_assessed"));
+        assert_eq!(pack["source_revision"], json!("a".repeat(64)));
+        analysis["nodes"][0]["source"]["digest"] = json!("b".repeat(64));
+        assert!(source_bound_context_pack(&analysis, "refund", 10000).is_err());
+    }
 
     fn document() -> Value {
         json!({

@@ -93,10 +93,24 @@ impl<'a> TurnLoop<'a> {
         payload: Value,
         call_id: Option<&str>,
         outcome: Option<&str>,
-    ) {
+    ) -> LoopResult<()> {
         if let Some(journal) = self.journal.as_deref_mut() {
-            let _ = journal.append(event_type, &payload, call_id, outcome, None);
+            let result = match (event_type, call_id, outcome) {
+                ("model_request" | "tool_request", Some(id), _) => {
+                    journal.begin_effect(event_type, id, &payload)
+                }
+                (
+                    "model_response" | "model_failed" | "tool_result" | "tool_effect_unknown",
+                    Some(id),
+                    Some(outcome),
+                ) => journal.finish_effect(event_type, id, &payload, outcome),
+                _ => journal
+                    .append(event_type, &payload, call_id, outcome, None)
+                    .map(|_| ()),
+            };
+            result.map_err(|_| LoopError("journal persistence failed; stop effects and reconcile pending checkpoints; never replay".into()))?;
         }
+        Ok(())
     }
 
     fn tool_specs(&self) -> Vec<ToolSpec> {
@@ -142,6 +156,11 @@ impl<'a> TurnLoop<'a> {
         cancel: &Cancel,
         mut on_delta: Option<&mut dyn FnMut(&str)>,
     ) -> LoopResult<LoopOutcome> {
+        if let Some(journal) = self.journal.as_deref_mut() {
+            journal.require_effects_clear().map_err(|_| {
+                LoopError("unresolved journal effects block continuation; never replay".into())
+            })?;
+        }
         let mut turns = 0usize;
         let mut tool_calls_used = 0usize;
         loop {
@@ -168,7 +187,7 @@ impl<'a> TurnLoop<'a> {
                 json!({"turn": turns, "tools": self.tool_specs().len()}),
                 Some(&call_id),
                 None,
-            );
+            )?;
             let route = match on_delta.as_deref_mut() {
                 Some(on_delta) => self.router.route_streaming(&request, cancel, on_delta),
                 None => self.router.route(&request, cancel),
@@ -187,7 +206,7 @@ impl<'a> TurnLoop<'a> {
                         }),
                         Some(&call_id),
                         Some("success"),
-                    );
+                    )?;
                     turns += 1;
                     if result.tool_calls.is_empty() {
                         return Ok(LoopOutcome::Final {
@@ -221,7 +240,7 @@ impl<'a> TurnLoop<'a> {
                             json!({"name": call.name, "arguments": call.arguments}),
                             Some(&tool_call_id),
                             None,
-                        );
+                        )?;
                         let result_value = self.execute_tool(call);
                         tool_calls_used += 1;
                         self.record(
@@ -229,7 +248,7 @@ impl<'a> TurnLoop<'a> {
                             json!({"name": call.name, "result": result_value}),
                             Some(&tool_call_id),
                             Some("success"),
-                        );
+                        )?;
                         messages.push(ChatMessage::tool_result(
                             &call.id,
                             &result_value.to_string(),
@@ -243,7 +262,7 @@ impl<'a> TurnLoop<'a> {
                         json!({"detail": detail}),
                         Some(&call_id),
                         Some("unknown"),
-                    );
+                    )?;
                     return Ok(LoopOutcome::Hold { backend, detail });
                 }
                 RouteOutcome::Exhausted { refusals } => {
@@ -252,7 +271,7 @@ impl<'a> TurnLoop<'a> {
                         json!({"refusals": refusals}),
                         Some(&call_id),
                         Some("refused"),
-                    );
+                    )?;
                     return Ok(LoopOutcome::BudgetExhausted {
                         reason: format!("route exhausted before inference: {refusals:?}"),
                         turns,
@@ -397,6 +416,66 @@ mod tests {
         let snapshot = journal.read().unwrap();
         assert!(snapshot.pending_call_ids().is_empty());
         assert!(snapshot.unresolved_call_ids().is_empty());
+    }
+
+    #[test]
+    fn tool_effect_completion_write_failure_stops_followups_and_retains_hold() {
+        use std::sync::{
+            atomic::{AtomicUsize, Ordering},
+            Arc,
+        };
+        struct LargeResultTool(Arc<AtomicUsize>);
+        impl KernelTool for LargeResultTool {
+            fn spec(&self) -> ToolSpec {
+                ToolSpec {
+                    name: "large".into(),
+                    description: String::new(),
+                    parameters: json!({"type":"object"}),
+                }
+            }
+            fn execute(&self, _: &Value) -> Value {
+                self.0.fetch_add(1, Ordering::SeqCst);
+                json!({"body": "x".repeat(af_journal::MAX_EVENT_BYTES)})
+            }
+        }
+        let count = Arc::new(AtomicUsize::new(0));
+        let tools: Vec<Box<dyn KernelTool>> = vec![Box::new(LargeResultTool(count.clone()))];
+        let router = Router::new(vec![Box::new(ScriptedBackend::new(
+            "scripted",
+            vec![
+                completed(
+                    "",
+                    vec![call("one", "large", "{}"), call("two", "large", "{}")],
+                ),
+                completed("must not reach model again", vec![]),
+            ],
+        ))]);
+        let (_home, mut journal) = temp_journal();
+        let outcome = TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default())
+            .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new());
+        assert!(outcome.is_err());
+        assert_eq!(count.load(Ordering::SeqCst), 1);
+        assert!(journal.require_effects_clear().is_err());
+        assert!(journal.path.with_extension("effect-hold.json").exists());
+    }
+
+    #[test]
+    fn interrupted_journal_prevents_even_first_effect() {
+        use std::io::Write;
+        let router = Router::new(vec![Box::new(ScriptedBackend::echo())]);
+        let (_home, mut journal) = temp_journal();
+        std::fs::OpenOptions::new()
+            .append(true)
+            .open(&journal.path)
+            .unwrap()
+            .write_all(b"{\"tail\":")
+            .unwrap();
+        let tools = Vec::new();
+        assert!(
+            TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default())
+                .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new())
+                .is_err()
+        );
     }
 
     #[test]
