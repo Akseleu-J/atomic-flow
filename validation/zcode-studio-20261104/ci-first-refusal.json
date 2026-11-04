@@ -1,0 +1,8 @@
+{
+  "run_id": 41841153725,
+  "commit": "a98d4a206702a1e5c606d772a09b656e53a2092b",
+  "stage": "Set up job",
+  "application_tests_executed": false,
+  "reason": "Unable to resolve actions/setup-node@6044e13b5db4789a24ef6e0b3ec1826e84042607",
+  "correction": "official setup-node v4 upstream ref49933ea5288caeca8642d1e84afbd3f7d6820020 verified"
+}

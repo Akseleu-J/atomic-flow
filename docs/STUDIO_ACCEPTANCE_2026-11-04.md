@@ -109,3 +109,10 @@ Computer Use stopped because it could not determine Chrome's current URL safely.
 No browser protection was bypassed. Full native Linux Docker acceptance, full
 capability cutover, independent answer grading and real-provider quality are
 separate gates. Historical research pairs/holdout/ablations remain unfinished.
+
+First remote CI41841153725 on a98d4a2 stopped before build: the pre-existing
+zcode workflow's setup-node pin could not be resolved. The Studio workflow
+now uses official setup-node v4 commit49933ea5288caeca8642d1e84afbd3f7d6820020,
+verified through the upstream Git ref. This setup refusal is retained separately
+from application test outcomes. The inventory generator now writes explicit LF
+to keep its one-line JSON free of Windows CR whitespace issues.
