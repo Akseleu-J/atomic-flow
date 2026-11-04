@@ -797,3 +797,20 @@ Bundled runtime: `C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dep
 
 Предыдущие локальные воспоминания использованы только как подсказка для validation-first проверки;
 описание архитектуры и все текущие выводы сверены с новым GitHub-клоном. Глобальная память не менялась.
+
+
+## Production continuation — 4 November 2026
+
+The active Rust/TypeScript development checkout is the zcode branch
+`codex/studio-safe-zcode-20261104`. Continue from
+[PRODUCTION_STATUS_2026-11-04.md](PRODUCTION_STATUS_2026-11-04.md) for all
+P00–P14 and E00–E08 chapter gates. The earlier Python-only production wording
+is superseded by the owner's Rust kernel / TypeScript adapters direction;
+Python remains a reference/lab/compatibility surface until measured parity.
+
+The next native increment adds a strict data-only `af-evidence` contract,
+request-bound API reports, and explicit host CLI publication recovery. Neither
+well-formed JSON nor a byte restoration is a requirement-check verdict. Read
+[PRODUCTION_INCREMENT_2026-11-04.md](PRODUCTION_INCREMENT_2026-11-04.md) for
+validation and remaining limits. Original P07 research/paid UNKNOWN evidence
+is preserved; recovery does not reconcile model, budget or job UNKNOWNs.

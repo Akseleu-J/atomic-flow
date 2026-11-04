@@ -4,6 +4,7 @@
 //! publication. Source/config/model content never creates grants.
 
 pub mod admission;
+pub mod recovery;
 pub mod redact;
 pub mod registry;
 pub mod session;

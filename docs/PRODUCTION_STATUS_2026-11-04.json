@@ -1,0 +1,944 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-11-04",
+  "reviewed_head": "8eff6f25beafb712c89aa1749a039c11f44ec3ae",
+  "registry_kind": "planning_and_evidence_inventory_not_runtime_authorization",
+  "decision": "not_ready",
+  "provider_calls_this_pass": 0,
+  "authority_scope": {
+    "target": "Rust owns runtime authority; TypeScript owns UI/client/language adapters; Python remains reference/oracle/lab/compatibility.",
+    "precedence": "Latest owner Rust/TS reconstruction instruction supersedes historical Python-only product scope. Chapter numbers and unmet safety/evidence obligations survive.",
+    "cutover": "One mutable task/session has one named authority owner. Migration does not inherit approval/read proof or clear paid UNKNOWN holds.",
+    "current_surface": "Accepted native Studio engineering increment. Apply/task publication UI disabled pending admitted requirement checker and review/publication contract.",
+    "language_policy": "No new languages/services for variety; require a demonstrated capability need.",
+    "unsupported_profiles": [
+      "corporate_ready",
+      "distributed",
+      "hostile_multi_tenant"
+    ]
+  },
+  "status_semantics": {
+    "chapter_production_status": "open until complete scoped production obligations have accepted source-bound evidence",
+    "native_implementation_status": "partial_candidate describes inspected code, not accepted parity/cutover",
+    "engineering_status": "accepted_in_scope applies only to named engineering evidence and authority",
+    "reference_scope": "Historical Python acceptance retains original source/runtime; never implies native acceptance"
+  },
+  "evidence": {
+    "native-studio-ci": {
+      "kind": "retained_ci_audit",
+      "tested_commit": "7279e237358e96ed32583aca3f2931697937731c",
+      "run_id": 41842587975,
+      "paths": [
+        "validation/zcode-studio-20261104/ci-7279e23/audit-linux.json",
+        "validation/zcode-studio-20261104/ci-7279e23/audit-windows.json",
+        "docs/STUDIO_ACCEPTANCE_2026-11-04.md"
+      ],
+      "linux": {
+        "pass": 292,
+        "ignored": 1,
+        "http_smoke": "passed",
+        "ui_tests": 8,
+        "archive_sha256": "8f5f838d5bb424894235893c6ff19805c19b86b3aab38d2c0fe53bba2f63575b"
+      },
+      "windows": {
+        "pass": 290,
+        "ignored": 1,
+        "http_smoke": "passed",
+        "ui_tests": 8,
+        "archive_sha256": "5626732c8324cbd805722c73f71ea4d47f9014340bfa809a504c63e6648e1eaf"
+      },
+      "ignored_scope": "real Docker acceptance",
+      "source_hashes_each": 84,
+      "provider_calls": 0,
+      "review": "Retained audits read; both archive digests rechecked here. Raw 84-source audits were not repeated.",
+      "excludes": [
+        "browser visual QA",
+        "strict Clippy",
+        "native real Docker isolation",
+        "full capability cutover",
+        "behavioral requirement acceptance",
+        "live quality"
+      ]
+    },
+    "p07-engineering": {
+      "kind": "retained_accepted_engineering",
+      "tested_commit_prefix": "f76a59e",
+      "native_check_run_id": 41655855886,
+      "general_ci_run_id": 41655869867,
+      "artifact_id": 13239936458,
+      "archive_sha256": "fbb8c466f62eb844ff13a1cb0dbc4940535087ae3094a03d4bbc4839b05a2cb4",
+      "path": "docs/P07_POLYGLOT_TASKRUNNER_2026-11-03.md",
+      "source_hashes": 135,
+      "completed_cleaned_checks": 6,
+      "provider_calls": 0,
+      "runtime_authority": "Python TaskRunner with native Rust/TypeScript target checks",
+      "scope": "FAIL -> one bounded replan -> repair -> fresh complete PASS -> two-file publication",
+      "review": "Retained acceptance document reviewed; archive not re-audited here.",
+      "excludes": [
+        "live generation",
+        "independent semantic oracle quality",
+        "paired utility",
+        "holdout",
+        "ablations",
+        "native Rust TaskRunner cutover"
+      ]
+    },
+    "reference-p05": {
+      "kind": "historical_python_functional_core",
+      "tested_commit": "91d22e2d1ed3e4d415bbb72076503cc4c6bf2fe3",
+      "path": "validation/p05-ci-20261025/verified.json",
+      "source_document": "docs/PROJECT_CONTEXT.md",
+      "status": "accepted_in_historical_scope",
+      "review": "Retained source documents; not re-executed/raw-audited here."
+    },
+    "reference-p00-p06": {
+      "kind": "historical_python_scoped_engineering",
+      "tested_commit_prefix": "395b8ac",
+      "path": "docs/P00_P06_MARATHON_2026-10-25.md",
+      "status": "scoped_code_acceptance_only",
+      "review": "Retained source context; not re-executed here."
+    }
+  },
+  "chapters": [
+    {
+      "id": "P00",
+      "title": "Frozen baseline and acceptance contracts",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [],
+      "implementation_paths": [
+        "rust/af-program/src/rc.rs"
+      ],
+      "observed": "Scoped registry helper and source-bound native audit exist; this inventory is not acceptance.",
+      "evidence_refs": [
+        "native-studio-ci",
+        "reference-p00-p06"
+      ],
+      "gaps": [
+        "Freeze Rust/TS capability/authority inventory and config/model/provider/environment/workload/reviewer per decision.",
+        "Measure latency/RSS/disk/full cost baseline before performance or utility claims."
+      ],
+      "next_package": "N01"
+    },
+    {
+      "id": "P01",
+      "title": "Graph schema, adapters and migration",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P00"
+      ],
+      "implementation_paths": [
+        "rust/af-graph/src/schema.rs",
+        "rust/af-graph/src/store.rs",
+        "rust/af-graph/src/identity.rs",
+        "rust/af-graph/tests/python_reference.rs"
+      ],
+      "observed": "Schema/store/canonical identity and reference fixtures exist.",
+      "evidence_refs": [
+        "native-studio-ci",
+        "reference-p00-p06"
+      ],
+      "gaps": [
+        "Supported capability mapping, canonical/malformed-state migration fixtures, OS locking/crash validation and individual cutover receipts.",
+        "Provenance and unsupported kinds per adapter; Rust syntax is not semantic coverage."
+      ],
+      "next_package": "N04"
+    },
+    {
+      "id": "P02",
+      "title": "Delta structural updates",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P01"
+      ],
+      "implementation_paths": [
+        "rust/af-graph/src/delta.rs",
+        "rust/af-graph/src/resolve.rs",
+        "rust/af-graph/src/relocation.rs",
+        "rust/af-graph/src/project.rs"
+      ],
+      "observed": "File delta/relocation/resolver/store code exists.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Accept source-owned overlay, external Git/watch reconciliation and clean-build parity across rename/delete/alias/unresolved consumers.",
+        "Expose read/parse/relink/reuse counters and fallback reasons; keep trust-boundary content audits."
+      ],
+      "next_package": "N04"
+    },
+    {
+      "id": "P03",
+      "title": "Incremental semantic graph and UA operations",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P02"
+      ],
+      "implementation_paths": [
+        "rust/af-graph/src/semantic.rs",
+        "rust/af-graph/src/source_analysis.rs"
+      ],
+      "observed": "semantic.rs supplies deterministic path layers/counts/summaries, not LLM semantic enrichment.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Revision-bound enrichment, dependency invalidation, architecture/tours/flows and public CLI/SDK/MCP operations.",
+        "Budget/cancel/privacy/cache conformance and independent semantic quality acceptance."
+      ],
+      "next_package": "N05"
+    },
+    {
+      "id": "P04",
+      "title": "Evidence-aware context and editing",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P03",
+        "E01",
+        "E02"
+      ],
+      "implementation_paths": [
+        "rust/af-context/src/lib.rs",
+        "rust/af-loop/src/edit.rs",
+        "rust/af-sandbox/src/session.rs"
+      ],
+      "observed": "Source-bound context, scoped CAS edits and diagnostics exist; generic exit zero stays not_assessed.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Admitted host requirement checker and complete fresh final receipt are missing from Studio edit path.",
+        "Trace requirements to spans/omissions/impact/independent obligations; reject stale/forged/incomplete/zero-test/required-skip evidence."
+      ],
+      "next_package": "N03"
+    },
+    {
+      "id": "P05",
+      "title": "Hierarchical DAG and rolling planning",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P04"
+      ],
+      "implementation_paths": [
+        "rust/af-agents/src/task_dag.rs",
+        "rust/af-agents/src/repair.rs",
+        "rust/af-loop/src/schedule.rs"
+      ],
+      "observed": "DAG frontier, step invalidation and bounded repair exist.",
+      "reference_scope": "Python P05 functional core accepted on 91d22e2d1ed3e4d415bbb72076503cc4c6bf2fe3; not native cutover or full production acceptance.",
+      "evidence_refs": [
+        "native-studio-ci",
+        "reference-p05"
+      ],
+      "gaps": [
+        "Native hierarchy/criteria approval/revision receipts/rolling expansion parity and cutover.",
+        "No transfer of Python approval/read proof or equation of step success with requirement acceptance."
+      ],
+      "next_package": "N06"
+    },
+    {
+      "id": "P06",
+      "title": "Bounded autonomous execution and replan",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P05",
+        "E03",
+        "E04",
+        "E06"
+      ],
+      "implementation_paths": [
+        "rust/af-agent/src/lib.rs",
+        "rust/af-loop/src/lib.rs",
+        "rust/af-loop/src/edit.rs",
+        "rust/af-agents/src/failure_evidence.rs"
+      ],
+      "observed": "Loops bind scope/cancel/effects uncertainty; local journey integrity cannot verify requirements.",
+      "evidence_refs": [
+        "native-studio-ci",
+        "p07-engineering"
+      ],
+      "gaps": [
+        "Native public TaskRunner with host policy/durable budget/lineage/one repair/fresh final publication.",
+        "Negative/cancel/unknown/disk-error semantics with one owner; P07 Python TaskRunner pilot is not native parity."
+      ],
+      "next_package": "N06"
+    },
+    {
+      "id": "P07",
+      "title": "Engineering autonomy and separate measured utility",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "engineering_status": "accepted_in_scope",
+      "research_status": "open",
+      "prerequisites": [
+        "P06",
+        "E01",
+        "P10:isolation_for_untrusted_execution"
+      ],
+      "implementation_paths": [
+        "docs/P07_POLYGLOT_TASKRUNNER_2026-11-03.md",
+        "rust/af-program/src/eval.rs"
+      ],
+      "observed": "Bounded mixed Rust/TS engineering pilot accepted on f76a59e through actual Python TaskRunner, six completed/cleaned checks and publication.",
+      "evidence_refs": [
+        "p07-engineering",
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Research pairs, remaining calibration/ordinary gaps, replacement holdout and ablations remain OPEN; paid UNKNOWN holds unchanged.",
+        "Engineering acceptance permits reconstruction without repeating every old P07 investigation; no model generation, semantic-oracle or utility claim."
+      ],
+      "next_package": "N06"
+    },
+    {
+      "id": "P08",
+      "title": "End-to-end performance and efficiency",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P07:quality_for_efficiency_claim"
+      ],
+      "implementation_paths": [
+        "rust/af-program/src/perf.rs"
+      ],
+      "observed": "Sample statistics and scratch two-file delta/clean helper exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Pinned real repos, cold/warm phase timings, adequate repeated N/dispersion, RSS/disk/cancel and full cost.",
+        "parity_checks increments after warm_delta_ms without canonical clean/delta comparison; counter is not parity oracle.",
+        "No speedup/quality-preserving efficiency claim from helper or unit PASS."
+      ],
+      "next_package": "N07"
+    },
+    {
+      "id": "P09",
+      "title": "Long sessions, recovery and operations",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P08:full_chapter_order"
+      ],
+      "implementation_paths": [
+        "rust/af-journal/src/lib.rs",
+        "rust/af-journal/src/segments.rs",
+        "rust/af-sandbox/src/session.rs",
+        "rust/af-sandbox/src/registry.rs"
+      ],
+      "observed": "Journal/segments and durable intent/backups/root uncertainty hold exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Complete publication recovery/reconcile receipt, backup integrity and crash/error/conflict matrix without replay.",
+        "Actual journal integration/migration, legacy IDs/day/holds, long-session scaling/soak, backup restore and supported OS/process matrix.",
+        "Hardening may proceed now; does not imply chapter acceptance or power-loss durability."
+      ],
+      "next_package": "N02"
+    },
+    {
+      "id": "P10",
+      "title": "Isolated worker and live routes",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P09:full_gate",
+        "P07:isolation_prerequisite"
+      ],
+      "implementation_paths": [
+        "rust/af-exec/src/docker.rs",
+        "rust/af-exec/src/driver.rs",
+        "rust/af-cli/src/trusted_provider.rs",
+        "rust/af-llm/src/lib.rs"
+      ],
+      "observed": "Docker profile/host provider transport exist. Historical P07 image has its own accepted Linux Docker scope.",
+      "evidence_refs": [
+        "native-studio-ci",
+        "p07-engineering"
+      ],
+      "gaps": [
+        "Studio native CI ignores real Docker. Native worker needs separate consumer, pinned image/inspection/bounds/cancel/cleanup/disconnected-submit reconciliation.",
+        "Authorized bounded live route actual cost/refusal/unknown acceptance; current provider_calls=0.",
+        "P07 Python-owned native-check isolation does not accept separate af-exec deployment."
+      ],
+      "next_package": "N08"
+    },
+    {
+      "id": "P11",
+      "title": "Reproducible native release and consumer",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P10"
+      ],
+      "implementation_paths": [
+        "rust/Cargo.lock",
+        "rust/af-program/src/release.rs",
+        "rust/af-py/Cargo.toml",
+        "ts/af-language-typescript/package-lock.json"
+      ],
+      "observed": "Locks, artifact-hash/consumer comparisons and upgrade-record helpers exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Immutable native builds/dependency hashes/SBOM/licenses/provenance and installed CLI/API/SDK consumer outside checkout.",
+        "Supported migrations/recovery/rollback; af-py excluded from kernel workspace and needs independent acceptance.",
+        "Synthetic artifact unit tests are not independent release/consumer acceptance."
+      ],
+      "next_package": "N09"
+    },
+    {
+      "id": "P12",
+      "title": "Single-owner production RC and beta",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P00-P11"
+      ],
+      "implementation_paths": [
+        "rust/af-program/src/rc.rs",
+        "docs/PRODUCTION_PLAN.md"
+      ],
+      "observed": "RcRegistry models scoped records/not_ready; no actual production decision established.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Rust/TS target replaces old Python-only product wording; historical evidence remains scoped to its runtime.",
+        "Evidence-bound W1-W9 and chapter decisions, independent review, accepted operation envelope, beta stop thresholds and owner decision.",
+        "Empty/partial synthetic RC registry never establishes production acceptance."
+      ],
+      "next_package": "N10"
+    },
+    {
+      "id": "P13",
+      "title": "Studio, language and integration parity",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P12:full_chapter_order"
+      ],
+      "implementation_paths": [
+        "rust/af-cli/src/dashboard.html",
+        "rust/af-cli/src/server.rs",
+        "rust/af-cli/src/studio_data.rs",
+        "ts/af-client/src/index.ts",
+        "ts/af-language-typescript/src/index.ts"
+      ],
+      "observed": "Served Studio graph/source/chat/history/snapshot/provider/budget surfaces and TS sidecar/client exist; no ts/af-studio React app.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Visual QA incomplete; apply/check/publication UI disabled pending host checker/review contract.",
+        "TS client runtime validation/current host-provider API/tasks/evidence/SSE replay/dedup/cancel integration.",
+        "Rust macro/cfg/type/call and full TS project semantics, installed mixed-stack journeys and IDE/browser boundaries remain partial."
+      ],
+      "next_package": "N03"
+    },
+    {
+      "id": "P14",
+      "title": "Measured differentiation",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P13",
+        "P07:research",
+        "P08"
+      ],
+      "implementation_paths": [
+        "docs/COMPETITIVE_ACCEPTANCE.md",
+        "rust/af-program/src/eval.rs"
+      ],
+      "observed": "Positioning hypothesis and paired-result machinery exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Requirement/diff/impact/check/publication report and independent user-value assessment.",
+        "Frozen matched comparisons/new holdout with independent grades/full cost; no superiority from CI or engineering pilot."
+      ],
+      "next_package": "N12"
+    },
+    {
+      "id": "E00",
+      "title": "Core ports and modularity",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P00",
+        "P01"
+      ],
+      "implementation_paths": [
+        "rust/Cargo.toml",
+        "rust/af-program/src/lib.rs",
+        "rust/af-cli/src/server.rs",
+        "ts/af-client/src/index.ts"
+      ],
+      "observed": "Crates separate graph/context/journal/budget/LLM/execution/sandbox; shared claims contract is next work.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Versioned bounded identity/evidence/result/application ports, malformed vectors, dependency/cycle inventory and compatibility policy.",
+        "CLI/API service composition and installed slim-core SDK/API same journey acceptance."
+      ],
+      "next_package": "N01"
+    },
+    {
+      "id": "E01",
+      "title": "Honest evidence and verification",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P00",
+        "E00"
+      ],
+      "implementation_paths": [
+        "rust/af-program/src/eval.rs",
+        "rust/af-agent/src/lib.rs",
+        "rust/af-loop/src/edit.rs",
+        "rust/af-context/src/lib.rs"
+      ],
+      "observed": "Unchecked requirements/context stay not_assessed. Model events cannot create authoritative success.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Shared typed claim/citation/VerificationReport with source revision/span/quote digest, component denominators/omissions and real consumers.",
+        "Independent requirement receipt admission; wrong logic/irrelevant citation/partial source/no tests must not verify."
+      ],
+      "next_package": "N01"
+    },
+    {
+      "id": "E02",
+      "title": "Retrieval completeness and uncertainty",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "E01"
+      ],
+      "implementation_paths": [
+        "rust/af-context/src/lib.rs",
+        "rust/af-graph/src/source_analysis.rs",
+        "rust/af-graph/src/adapter_rust.rs",
+        "ts/af-language-typescript/src/index.ts"
+      ],
+      "observed": "Lexical/graph context and omission-bearing envelope exist; Rust syntax-only omissions explicit.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Pinned RU/EN/no-answer/dynamic/alias/config/follow-up corpus and resolved/candidate/unresolved/unsupported coverage.",
+        "Task completeness/revoked-scope/cache and ablation acceptance; dense adapter optional only after measured utility/privacy cost."
+      ],
+      "next_package": "N05"
+    },
+    {
+      "id": "E03",
+      "title": "Principal and resource authorization",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "E00",
+        "P01",
+        "P06"
+      ],
+      "implementation_paths": [
+        "rust/af-program/src/corporate.rs",
+        "rust/af-program/src/governance.rs",
+        "rust/af-sandbox/src/registry.rs",
+        "rust/af-cli/src/http_safety.rs"
+      ],
+      "observed": "Root grants/HTTP token/Origin/Host controls plus PrincipalScope namespace and RBAC helpers exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Namespace strings/RBAC helper are not authenticated ACL. Trusted principal/IdP expiry/revoke and resource enforcement across all API/SDK/data paths.",
+        "Two-principal confused deputy/denied listing/mid-task revoke acceptance and deployment transport contract."
+      ],
+      "next_package": "N11"
+    },
+    {
+      "id": "E04",
+      "title": "Durable tasks, admission and scheduling",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "E00",
+        "P05",
+        "P06",
+        "P09"
+      ],
+      "implementation_paths": [
+        "rust/af-exec/src/queue.rs",
+        "rust/af-exec/src/lib.rs",
+        "rust/af-journal/src/lib.rs",
+        "rust/af-cli/src/server.rs"
+      ],
+      "observed": "AdmissionQueue models bounded entries/fences in memory; jobs/journal/bounded stream exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Queue is not restart-safe task admission despite Durable submission comment. Authenticated request-digest idempotency, reserve/outbox/queue reconciliation and durable task/attempt repository.",
+        "Duplicate submit/restart/lease loss/worker unknown, cursor gaps/fairness/quota/cancel latency acceptance."
+      ],
+      "next_package": "N02"
+    },
+    {
+      "id": "E05",
+      "title": "Data governance and project isolation",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "E00",
+        "E03",
+        "P01"
+      ],
+      "implementation_paths": [
+        "rust/af-program/src/corporate.rs",
+        "rust/af-sandbox/src/redact.rs",
+        "rust/af-cli/src/trusted_provider.rs",
+        "rust/af-graph/src/source_analysis.rs"
+      ],
+      "observed": "SHA256 source identity/redaction/root grants/host provider configuration and egress matrix helper exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Enforce data policy before every enrichment/provider/worker/plugin effect; matrix unit test alone is not enforcement.",
+        "Data ownership/regions, secret TTL/revoke, retention/export/delete, backup/canary and cross-project cache tests.",
+        "Distributed encryption/key custody/server store unsupported; no shared SQLite/WAL on sync/network volume."
+      ],
+      "next_package": "N11"
+    },
+    {
+      "id": "E06",
+      "title": "Provider, extension and central budget contracts",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "E00",
+        "P06",
+        "E03"
+      ],
+      "implementation_paths": [
+        "rust/af-budget/src/lib.rs",
+        "rust/af-llm/src/lib.rs",
+        "rust/af-cli/src/trusted_provider.rs",
+        "rust/af-program/src/corporate.rs",
+        "rust/af-program/src/mcp.rs"
+      ],
+      "observed": "Durable local reservation/send/settle/HOLD ledger and typed provider outcomes; scripted conformance/no-replay helpers.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Corporate hierarchical atomic server accounting and original owner/day conformance are not accepted by local ledger CI.",
+        "Versioned provider/extension grants/revoke and malformed price/unknown cost/cancel conformance plus bounded authorized live adapter acceptance.",
+        "Reservation estimate is not billing cap; model/admin text cannot erase unknown hold."
+      ],
+      "next_package": "N08"
+    },
+    {
+      "id": "E07",
+      "title": "Operations, release security and scale",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "E03",
+        "E04",
+        "E05",
+        "E06"
+      ],
+      "implementation_paths": [
+        "rust/af-program/src/governance.rs",
+        "rust/af-program/src/perf.rs",
+        "rust/af-program/src/release.rs",
+        "rust/af-journal/src/segments.rs"
+      ],
+      "observed": "In-memory audit/OTel-shaped records, measurement and artifact helpers exist.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Actual bounded metrics/export, supported workload/SLO/RPO/RTO, alerts/runbooks and restore drill.",
+        "OS/process/worker fault matrix, adequate scale/soak, fuzz/property, dependency security/SBOM and independent review.",
+        "Dev signing/hash chains are not host attestation, external human pentest or compliance."
+      ],
+      "next_package": "N07"
+    },
+    {
+      "id": "E08",
+      "title": "Headless corporate-core release",
+      "chapter_production_status": "open",
+      "native_implementation_status": "partial_candidate",
+      "prerequisites": [
+        "P00-P12",
+        "E00-E07"
+      ],
+      "implementation_paths": [
+        "rust/af-program/src/corporate.rs",
+        "docs/ENTERPRISE_CORE_PLAN.md"
+      ],
+      "observed": "PrincipalAcceptance emits distinct namespace record and explicitly leaves other corporate gates separate.",
+      "evidence_refs": [
+        "native-studio-ci"
+      ],
+      "gaps": [
+        "Installed independent SDK/API consumer, real IdP/secret/model/worker, two principals/several repos and complete edit/check/publication journey.",
+        "ACL/queue/quota/cancel/revoke/restart/restore and policy-bound utility/performance, signed owner decision.",
+        "Corporate/distributed/hostile multi-tenant unsupported; UI neither prerequisite nor substitute."
+      ],
+      "next_package": "N11"
+    }
+  ],
+  "next_packages": [
+    {
+      "id": "N01",
+      "title": "Freeze native claims and evidence contracts",
+      "chapters": [
+        "P00",
+        "E00",
+        "E01"
+      ],
+      "depends_on": [],
+      "exit": "Shared bounded VerificationReport/Claim/Citation identities, not_assessed/omissions, compatibility/malformed vectors and claims audit; contract package does not admit behavioral success."
+    },
+    {
+      "id": "N02",
+      "title": "Publication recovery and durable task boundary",
+      "chapters": [
+        "P09",
+        "E04"
+      ],
+      "depends_on": [
+        "N01"
+      ],
+      "exit": "Exact before-byte backups/intent/root-hold recovery with error/conflict/crash fixtures; persistent authenticated idempotency/reserve/outbox/task boundary. Scope slices; no fabricated cross-store atomicity."
+    },
+    {
+      "id": "N03",
+      "title": "Requirement checker and review/apply contract",
+      "chapters": [
+        "P04",
+        "P13",
+        "E01"
+      ],
+      "depends_on": [
+        "N01",
+        "N02"
+      ],
+      "exit": "Host checker rejects forged/stale/incomplete/zero-test/required-skip receipt; exact reviewed source/replacements; UI apply only after fresh final and recoverable publication."
+    },
+    {
+      "id": "N04",
+      "title": "Graph delta and language adapter cutovers",
+      "chapters": [
+        "P01",
+        "P02",
+        "E02"
+      ],
+      "depends_on": [
+        "N01"
+      ],
+      "exit": "Reference/native canonical fixtures, source-bound mixed language analysis, honest omissions, delta-clean equality, conflict/cancel/migration cutover receipts."
+    },
+    {
+      "id": "N05",
+      "title": "Semantic understanding and complete context",
+      "chapters": [
+        "P03",
+        "P04",
+        "E02"
+      ],
+      "depends_on": [
+        "N03",
+        "N04"
+      ],
+      "exit": "Dependency/revision-bound enrichment/tours/impact, scoped caches, explicit completeness and pinned negative/no-answer evidence."
+    },
+    {
+      "id": "N06",
+      "title": "Native TaskRunner vertical slice",
+      "chapters": [
+        "P05",
+        "P06",
+        "P07"
+      ],
+      "depends_on": [
+        "N02",
+        "N03",
+        "N05"
+      ],
+      "exit": "Public native understand/plan/edit/complete FAIL/one repair/fresh checks/publication/recovery, mixed Rust/TS, shared budget/cancel/lineage and negatives. Retain accepted Python TaskRunner pilot; no endless old P07 campaign as reconstruction blocker."
+    },
+    {
+      "id": "N07",
+      "title": "Actual operating envelope and fault acceptance",
+      "chapters": [
+        "P08",
+        "P09",
+        "E07"
+      ],
+      "depends_on": [
+        "N06"
+      ],
+      "exit": "Pinned repeated phase/RSS/disk/cancel and soak/fault reports, real parity oracle, OS/process matrix and integrity-preserving journal migration. Efficiency claim waits for quality."
+    },
+    {
+      "id": "N08",
+      "title": "Native worker and authorized provider routes",
+      "chapters": [
+        "P10",
+        "E06"
+      ],
+      "depends_on": [
+        "N02",
+        "N03"
+      ],
+      "exit": "Separate-client Linux worker identity/resource/network/cleanup/reconcile evidence plus separately approved-budget route conformance. Isolation precedes all untrusted candidate execution."
+    },
+    {
+      "id": "N09",
+      "title": "Reproducible artifacts and installed consumers",
+      "chapters": [
+        "P11",
+        "E00",
+        "E07"
+      ],
+      "depends_on": [
+        "N06",
+        "N07",
+        "N08"
+      ],
+      "exit": "Locks/transitive hashes/SBOM/licenses/provenance, installed CLI/API/SDK consumer outside checkout and migration/rollback/restore evidence."
+    },
+    {
+      "id": "N10",
+      "title": "Scope-bound single-owner RC decision",
+      "chapters": [
+        "P12"
+      ],
+      "depends_on": [
+        "N09"
+      ],
+      "exit": "W1-W9/required cutover evidence, independent review, bounded beta observation/stop thresholds and owner acceptance."
+    },
+    {
+      "id": "N11",
+      "title": "Corporate headless profile",
+      "chapters": [
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08"
+      ],
+      "depends_on": [
+        "N01",
+        "N02",
+        "N08",
+        "N09",
+        "N10"
+      ],
+      "exit": "Trusted principal/resource enforcement/revoke, durable fairness/quota/server accounting/data boundaries, independent two-principal installed consumer and signed decision. Design can begin earlier; readiness unsupported."
+    },
+    {
+      "id": "N12",
+      "title": "Separately authorized utility and holdout",
+      "chapters": [
+        "P07",
+        "P14"
+      ],
+      "depends_on": [
+        "N06",
+        "N08"
+      ],
+      "exit": "Calibrated pairs/replacement holdout/ablations under frozen caps with independent grades and full cost/failure/UNKNOWN; live routes require explicit run budget. Engineering tests imply no superiority."
+    }
+  ],
+  "cross_cutting_open_gates": {
+    "quality": [
+      "P00",
+      "P04",
+      "P07",
+      "E01",
+      "E02"
+    ],
+    "scale": [
+      "P08",
+      "P09",
+      "E04",
+      "E07"
+    ],
+    "release": [
+      "P11",
+      "E00",
+      "E06",
+      "E07",
+      "E08"
+    ],
+    "production_acceptance": [
+      "P09",
+      "P10",
+      "P11",
+      "P12",
+      "E03",
+      "E05",
+      "E07",
+      "E08"
+    ]
+  },
+  "review_limits": [
+    "Read-only Rust/TS and retained evidence audit; no heavy tests, provider calls, commit or push.",
+    "Native source diff from tested 7279e23 to reviewed HEAD was empty for rust/, ts/ and workflows at audit start. Concurrent changes require separate fresh evidence.",
+    "Concurrent new claims/recovery packages are not accepted by this snapshot; update only from reviewed implementation and source-bound evidence."
+  ],
+  "in_progress_increment": {
+    "scope": [
+      "P00",
+      "E00",
+      "E01",
+      "P09",
+      "E04",
+      "P12"
+    ],
+    "implementation_paths": [
+      "rust/af-evidence/src/lib.rs",
+      "rust/af-sandbox/src/recovery.rs",
+      "rust/af-cli/src/server.rs",
+      "rust/af-cli/src/main.rs",
+      "rust/af-program/src/rc.rs",
+      "ts/af-client/src/index.ts"
+    ],
+    "report": "docs/PRODUCTION_INCREMENT_2026-11-04.md",
+    "status": "candidate_pending_fresh_source_bound_validation",
+    "chapter_status_changed": false,
+    "remaining": [
+      "No native independent behavioral checker adapter",
+      "No complete retrieval omissions inventory",
+      "No durable API idempotency/outbox task acceptance",
+      "No full corporate identity/resource isolation or release acceptance"
+    ]
+  }
+}

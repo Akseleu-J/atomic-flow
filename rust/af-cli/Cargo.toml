@@ -10,6 +10,7 @@ name = "af"
 path = "src/main.rs"
 
 [dependencies]
+af-evidence.workspace = true
 af-graph.workspace = true
 af-sandbox.workspace = true
 af-journal.workspace = true

@@ -1,0 +1,180 @@
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+   Compiling af-evidence v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-evidence)
+   Compiling af-program v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-program)
+   Compiling af-loop v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-loop)
+   Compiling af-agent v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-agent)
+   Compiling af-cli v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 50s
+     Running unittests src\main.rs (target\debug\deps\af-755f7ba9deae9253.exe)
+
+running 23 tests
+test server::evidence_adapter_tests::delivered_context_is_bound_without_inventing_requirement_success ... ok
+test server::http_safety::tests::authenticated_remote_ip_still_requires_its_exact_origin_and_port ... ok
+test server::http_safety::tests::only_exact_local_authority_and_same_origin_are_admitted ... ok
+test server::studio_data::tests::credential_hidden_and_generated_paths_are_not_browser_sources ... ok
+test server::studio_data::tests::history_pages_are_bounded_and_do_not_make_replay_authority ... ok
+test server::tests::bind_policy_requires_token_off_loopback ... ok
+test server::tests::body_and_prompt_limits_refuse_before_backend_work ... ok
+test server::tests::browser_cannot_choose_credential_env_or_provider_destination ... ok
+test server::tests::browser_cannot_forge_kernel_terminal_history ... ok
+test server::tests::dashboard_is_served ... ok
+test server::tests::disconnected_stream_cancels_the_actual_worker_and_releases_capacity ... ok
+test server::tests::graph_and_job_queries_never_grant_arbitrary_host_paths ... ok
+test server::tests::health_is_open_loopback_style_without_token ... ok
+test server::tests::hostile_origin_is_denied_even_with_an_operator_bearer ... ok
+test server::tests::oversized_terminal_content_is_never_reported_as_a_complete_answer ... ok
+test server::tests::session_endpoints_roundtrip ... ok
+test server::tests::settled_chat_is_durable_and_an_existing_unknown_is_never_replayed ... ok
+test server::tests::sse_stream_via_scripted_backend ... ok
+test server::tests::static_authentication_ui_has_nonce_csp_but_api_remains_private ... ok
+test server::tests::token_is_enforced_with_constant_time_path ... ok
+test trusted_provider::tests::cancelled_and_wrong_model_calls_never_create_a_send ... ok
+test trusted_provider::tests::host_configuration_rejects_credential_urls_and_plaintext_remote_transport ... ok
+test trusted_provider::tests::provider_send_is_durably_settled_and_missing_cost_latches_hold ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.26s
+
+     Running unittests src\lib.rs (target\debug\deps\af_evidence-eb2f18a2b23ac41f.exe)
+
+running 13 tests
+test tests::confused_checker_scope_outputs_do_not_mint_receipts ... ok
+test tests::duplicate_omission_claim_and_requirement_ids_are_rejected ... ok
+test tests::empty_is_not_assessed_never_perfect ... ok
+test tests::exact_quote_checks_delivery_and_fresh_source ... ok
+test tests::forged_passed_wire_is_data_only_and_cannot_complete ... ok
+test tests::frozen_vectors_match_exporter_and_validator ... ok
+test tests::integer_bounds_and_overflow_are_rejected ... ok
+test tests::known_names_wrong_logic_and_irrelevant_quotes_have_no_entailment ... ok
+test tests::malformed_wire_rejected_directly_not_via_value ... ok
+test tests::mixed_completion_snapshots_and_tasks_fail_closed ... ok
+test tests::no_adapter_zero_checks_syntax_model_or_generic_exit_cannot_complete ... ok
+test tests::omissions_cannot_be_hidden_as_complete_delivery ... ok
+test tests::receipts_are_current_requirement_runtime_and_inventory_bound ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src\lib.rs (target\debug\deps\af_program-45c17f13a967fca6.exe)
+
+running 29 tests
+test corporate::tests::egress_matrix_is_deny_by_default ... ok
+test corporate::tests::principal_namespaces_are_distinct_and_validated ... ok
+test corporate::tests::scripted_backend_passes_conformance_and_hold_contract ... ok
+test eval::tests::calibration_requires_the_exact_triple ... ok
+test eval::tests::invalid_cost_is_explicitly_unknown_and_never_reduces_known_spend ... ok
+test eval::tests::paired_report_keeps_unknown_costs_unknown ... ok
+test eval::tests::unassessed_arm_never_counts_as_an_opponents_win ... ok
+test governance::tests::audit_chain_detects_any_tamper ... ok
+test governance::tests::dev_signing_verifies_and_refuses_weak_keys ... ok
+test governance::tests::rbac_is_deny_by_default_and_monotonic ... ok
+test governance::tests::span_export_counts_children ... ok
+test mcp::tests::error_response_shape ... ok
+test mcp::tests::handshake_and_tools_list ... ok
+test mcp::tests::malformed_requests_are_refused ... ok
+test mcp::tests::tools_call_validates_and_wraps ... ok
+test mcp_stdio::tests::empty_lines_are_skipped_not_dispatched ... ok
+test mcp_stdio::tests::stdio_loop_serves_the_full_handshake ... ok
+test mcp_stdio::tests::tool_failure_is_iserror_content_not_a_crash ... ok
+test mcp_stdio::tests::unknown_method_and_bad_line_survive_the_loop ... ok
+test perf::tests::both_workloads_measure_and_report ... ok
+test perf::tests::sample_stats_report_dispersion_honestly ... ok
+test publication::tests::full_publication_manifest_builds_with_digest ... ok
+test publication::tests::impact_radius_names_mentioning_files ... ok
+test publication::tests::missing_sections_are_named_never_filled ... ok
+test rc::tests::decision_refuses_until_required_chapters_accept_in_scope ... ok
+test rc::tests::empty_optional_duplicate_and_forged_registry_cannot_admit_rc ... ok
+test rc::tests::unknown_chapters_and_empty_scopes_refuse ... ok
+test release::tests::manifest_hashes_and_verifies_consumer_artifacts ... ok
+test release::tests::manifest_requires_artifacts_and_records_rollback_semantics ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.05s
+
+     Running unittests src\lib.rs (target\debug\deps\af_sandbox-8822bc28c013ea61.exe)
+
+running 26 tests
+test admission::tests::admits_plain_relative_paths ... ok
+test recovery::tests::approval_digest_conflict_and_corrupt_backup_fail_closed ... ok
+test recovery::tests::duplicate_json_keys_including_nested_escaped_keys_are_refused ... ok
+test recovery::tests::intent_schema_foreign_grant_and_manifest_edits_refuse ... ok
+test recovery::tests::kill_at_postwrite_boundary_restores_without_replay ... ok
+test recovery::tests::kill_at_prewrite_boundary_restores_without_replay ... ok
+test recovery::tests::malformed_intents_and_oversize_backups_are_refused ... ok
+test recovery::tests::overlapping_grants_and_other_workspaces_cannot_bypass_hold ... ok
+test recovery::tests::owned_child ... ok
+test recovery::tests::recovery_restores_bytes_and_preserves_original_intent ... ok
+test redact::tests::masks_known_token_shapes ... ok
+test redact::tests::masks_literal_key_value_assignments ... ok
+test redact::tests::masks_private_keys_preserving_line_count ... ok
+test session::tests::apply_refuses_when_source_changed_after_preview ... ok
+test session::tests::apply_requires_approval_and_publishes ... ok
+test session::tests::broken_python_replacement_refused ... ok
+test session::tests::failed_intent_storage_prevents_all_source_writes ... ok
+test session::tests::list_files_is_bounded_and_suffix_filtered ... ok
+test session::tests::partial_publication_restores_bytes_and_keeps_cross_session_hold ... ok
+test session::tests::preview_outside_write_scope_refused ... ok
+test session::tests::publication_hold_blocks_another_session_and_preserves_backups ... ok
+test session::tests::read_requires_and_records_proofs ... ok
+test session::tests::secrets_are_redacted_in_reads ... ok
+test session::tests::successful_publication_retains_durable_intent_and_exact_before_bytes ... ok
+test tests::glob_matches_ignore_patterns ... ok
+test tests::identifiers_follow_the_contract ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.28s
+
+   Doc-tests af_evidence
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests af_program
+error[E0786]: found invalid metadata files for crate `af_llm`
+ --> af-program\src\corporate.rs:6:5
+  |
+6 | use af_llm::{BackendOutcome, ChatBackend, ChatRequest, RouteOutcome, Router};
+  |     ^^^^^^
+  |
+  = note: failed to mmap file '\\?\C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libaf_llm-26507f68e13005a0.rlib': Файл подкачки слишком мал для завершения операции. (os error 1455)
+
+error[E0786]: found invalid metadata files for crate `serde_json`
+ --> af-program\src\corporate.rs:7:5
+  |
+7 | use serde_json::{json, Value};
+  |     ^^^^^^^^^^
+  |
+  = note: failed to mmap file '\\?\C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libserde_json-5b8598bf8cdcd01c.rlib': Файл подкачки слишком мал для завершения операции. (os error 1455)
+
+error[E0786]: found invalid metadata files for crate `sha2`
+ --> af-program\src\governance.rs:7:5
+  |
+7 | use sha2::{Digest, Sha256};
+  |     ^^^^
+  |
+  = note: failed to mmap file '\\?\C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libsha2-e7bc80b89712111e.rlib': Файл подкачки слишком мал для завершения операции. (os error 1455)
+
+error[E0462]: found staticlib `std` instead of rlib or dylib
+ --> af-program\src\governance.rs:8:5
+  |
+8 | use std::collections::BTreeMap;
+  |     ^^^
+  |
+  = note: the following crate versions were found:
+          crate `std`: C:\Users\omirb\.rustup\toolchains\stable-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\libstd-f903e3d16df36da5.dll.a
+  = help: please recompile that crate using --crate-type lib
+
+error[E0786]: found invalid metadata files for crate `af_graph`
+ --> af-program\src\perf.rs:5:5
+  |
+5 | use af_graph::{delta, project, GraphStore};
+  |     ^^^^^^^^
+  |
+  = note: failed to mmap file '\\?\C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libaf_graph-b4f1eb51f2574829.rlib': Файл подкачки слишком мал для завершения операции. (os error 1455)
+
+error: aborting due to 5 previous errors
+
+Some errors have detailed explanations: E0462, E0786.
+For more information about an error, try `rustc --explain E0462`.
+error: doctest failed, to rerun pass `-p af-program --doc`
+
+Caused by:
+  process didn't exit successfully: `C:\Users\omirb\.rustup\toolchains\stable-x86_64-pc-windows-gnu\bin\rustdoc.exe --edition=2021 --crate-type lib --color auto --crate-name af_program --test af-program\src\lib.rs --test-run-directory C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-program -L native=C:\Users\omirb\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_gnu-0.52.6\lib -L native=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\build\ring-7fcc89ce022c3497\out --test-args --test-threads=1 --extern af_agents=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libaf_agents-eea3965138b60704.rlib --extern af_entropy=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libaf_entropy-eb6b016170ea739e.rlib --extern af_graph=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libaf_graph-b4f1eb51f2574829.rlib --extern af_llm=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libaf_llm-26507f68e13005a0.rlib --extern af_program=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libaf_program-7b9d62f67600d1a4.rlib --extern serde_json=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libserde_json-5b8598bf8cdcd01c.rlib --extern sha2=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libsha2-e7bc80b89712111e.rlib --extern thiserror=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps\libthiserror-62b108d033544e2e.rlib -L dependency=C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\target\debug\deps -C embed-bitcode=no --check-cfg cfg(docsrs,test) --check-cfg "cfg(feature, values())" --error-format human` (exit code: 1)
+note: test exited abnormally; to see the full output pass --no-capture to the harness.

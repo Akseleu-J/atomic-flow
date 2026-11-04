@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import shutil
 import subprocess
 import tempfile
 import time
@@ -63,6 +64,11 @@ def run():
             else:
                 raise RuntimeError("owned server failed to become ready")
             request("/health", authorized=False, expected=401)
+            request("/v1/capabilities", authorized=False, expected=401)
+            capabilities = json.loads(request("/v1/capabilities")[0])
+            assert capabilities["verification_schema_version"] == 1
+            assert capabilities["requirement_checker"] == "unavailable"
+            assert capabilities["verification_report_authorizes_execution"] is False
             html, headers = request("/dashboard", authorized=False)
             policy = headers["Content-Security-Policy"]
             assert "script-src 'nonce-" in policy and b"innerHTML" not in html and b"onclick=" not in html
@@ -87,6 +93,12 @@ def run():
             final = next(e for e in events if e.get("type") == "final")
             assert final["content"] == "scripted-echo" and final["verification"] == "not_assessed"
             assert final["sources"][0]["sha256"] == source["sha256"]
+            report = final["verification_report"]
+            assert report["schema_version"] == 1 and report["requirements"]["checked"] == 0
+            assert report["requirements"]["status"] == "not_assessed"
+            assert report["evidence_coverage"]["delivered_complete"] == 0
+            assert final["coverage_scope"] == "selected_request_excerpts"
+            assert len(report["binding"]["inventory_sha256"]) == 64
             history = json.loads(request(f"/v1/sessions/{session}/history?after=0&limit=100")[0])
             assert history["events"][-1]["payload"]["content"] == "scripted-echo"
             assert history["effect_admission_clear"] and not history["unresolved_call_ids"]
@@ -100,6 +112,24 @@ def run():
             budget = json.loads(request("/v1/budget")[0])
             assert budget["cap_usd"] == "1.5" and budget["enforced"] and budget["available_usd"] == "1.5"
             results.append("immutable journal snapshot exact SHA256 and durable budget projection")
+            # A separate consumer resolves only an installed dist/package copy.
+            package = directory / "consumer/node_modules/@atomic-flow/af-client"
+            package.mkdir(parents=True)
+            sdk = ROOT / "ts/af-client"
+            shutil.copytree(sdk / "dist", package / "dist")
+            shutil.copyfile(sdk / "package.json", package / "package.json")
+            consumer = directory / "consumer/consumer.mjs"
+            shutil.copyfile(ROOT / "validation/production-20261104/sdk-native-consumer.mjs", consumer)
+            node = os.environ.get("AF_NODE_BINARY") or shutil.which("node")
+            if not node:
+                raise RuntimeError("Node runtime required for installed SDK acceptance")
+            consumer_env = dict(env, AF_CLIENT_BASE=BASE)
+            output = subprocess.run([node, str(consumer)], cwd=consumer.parent, env=consumer_env,
+                capture_output=True, text=True, timeout=30)
+            assert output.returncode == 0, output.stderr[:2000]
+            consumer_result = json.loads(output.stdout)
+            assert consumer_result["ok"] and consumer_result["provider_calls"] == 0
+            results.append("installed SDK copy outside checkout against actual native API")
         finally:
             process.terminate()
             process.wait(timeout=10)

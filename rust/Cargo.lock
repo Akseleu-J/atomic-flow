@@ -46,6 +46,7 @@ dependencies = [
  "af-agents",
  "af-budget",
  "af-entropy",
+ "af-evidence",
  "af-exec",
  "af-graph",
  "af-journal",
@@ -77,6 +78,16 @@ dependencies = [
 [[package]]
 name = "af-entropy"
 version = "0.1.0"
+
+[[package]]
+name = "af-evidence"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
 
 [[package]]
 name = "af-exec"

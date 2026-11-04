@@ -833,6 +833,10 @@ dialog { background:var(--panel);color:var(--text);border:1px solid var(--border
             <label class="check-row" style="align-self:flex-end"><input type="checkbox" id="cfgBudgetApproved"> host-approved</label>
             <div class="a-btn primary" style="align-self:flex-end" data-action="createBudget"><svg class="i"><use href="#i-plus"/></svg> Создать</div>
           </div>
+          <div class="frow">
+            <div class="fcol" style="flex:1"><label>резерв на вызов, USD (напр. 0.01) — Ask-запрос резервирует сумму; HOLD или переполнение капы отменяет отправку до контакта с провайдером</label><input id="cfgReserve" placeholder="0.01" autocomplete="off"></div>
+            <span class="pt-sub" id="reserveStatus" style="align-self:center"></span>
+          </div>
           <div id="budgetCard" class="pt-sub"></div>
         </div>
       </div>
@@ -1022,6 +1026,7 @@ function sessionLabel() { $("sbSession").textContent = "Сессия: " + (state
 async function refreshBudget() { try { const b = await api("/v1/budget"); const text = b.state === "hold" ? "HOLD · нужна сверка" : b.state === "ok" ? "$" + safeString(b.committed_usd, 32) + " / $" + safeString(b.cap_usd, 32) : b.state === "missing" ? "не задан" : "недоступен"; $("sbBudget").textContent = "Бюджет: " + text; $("rmBudgetText").textContent = text; return b; } catch { $("sbBudget").textContent = "Бюджет: недоступен"; return null; } }
 async function refreshBudgetCard() { const b = await refreshBudget(); const target = $("budgetCard"); if (!b) { target.textContent = "Не удалось прочитать бюджет."; return; } target.textContent = b.state === "missing" ? "Лимит ещё не создан. Задайте сумму для книги бюджета." : b.state === "hold" ? "Есть незавершённая отправка или неизвестная стоимость. Новая отправка требует сверки." : b.state === "ok" ? "Учтено $" + b.committed_usd + " из $" + b.cap_usd + ". Вызовов: " + safeCount(b.calls) + "." : "Книга бюджета недоступна."; target.append(node("p", "", b.enforced === true ? "Лимит проверяется сервером перед отправкой." : "Доступность внешних запросов зависит от подключённого провайдера и его правил учёта.")); }
 async function createBudget() { if (!$("cfgBudgetApproved").checked) { $("budgetCard").textContent = "Подтвердите создание книги бюджета."; return; } try { await api("/v1/budget", { method: "POST", body: JSON.stringify({ cap_usd: $("cfgCap").value.trim(), host_approved: true }) }); await refreshBudgetCard(); } catch (e) { $("budgetCard").textContent = e.message; } }
+function saveReserve() { const raw = $("cfgReserve").value.trim(); if (!raw) { localStorage.removeItem("af.reserve"); $("reserveStatus").textContent = "Резерв отключён — вызовы без бюджетной брони."; return; } if (!/^(0|[1-9][0-9]*)(\.[0-9]{1,9})?$/.test(raw)) { $("reserveStatus").textContent = "Формат: число ≥ 0, до 9 знаков после точки."; return; } localStorage.setItem("af.reserve", raw); $("reserveStatus").textContent = "Резерв сохранён — действует со следующего запроса."; }
 async function selectRoot(rootId) { if (state.rootId !== rootId) { invalidateContext(true); state.sessionId = null; state.lastGraph = null; state.rootId = rootId; remember("af.rootId.v2", rootId); sessionLabel(); } updateProject(); await readGraph(); }
 function suggestRootId(path, name) { const base = String(name || path.split(/[\\/]/).filter(Boolean).pop() || "main"); return ("p-" + base.replace(/[^a-zA-Z0-9_.-]/g, "-")).slice(0, 48); }
 async function pickFolder() { const b = $("pickBtn"); b.disabled = true; $("rootStatus").textContent = "Выберите папку в системном диалоге…"; try { const r = await api("/v1/pick-folder", { method: "POST" }); if (r.cancelled) { $("rootStatus").textContent = "Выбор отменён"; return; } $("cfgRootPath").value = safeString(r.path, 4096); $("cfgRootId").value = suggestRootId(r.path || "", r.name || ""); $("rootStatus").textContent = "Папка выбрана. Зарегистрируйте её для доступа к файлам."; } catch (e) { $("rootStatus").textContent = e.message; } finally { b.disabled = false; } }
@@ -1059,10 +1064,11 @@ async function copyText(text) { try { await navigator.clipboard.writeText(text);
 function autoGrow() { const n = $("composerText"); n.style.height = "auto"; n.style.height = Math.min(n.scrollHeight, 160) + "px"; }
 async function sendComposer() {
   const prompt = $("composerText").value.trim(); if (!prompt || state.busy) return; if (prompt.length > 32768) { setBanner("error", "Сократите запрос до 32 768 символов."); return; }
-  resetEvidence(); $("composerText").value = ""; autoGrow(); addMessage("user", prompt); $("ceQuery").textContent = prompt; const epoch = state.epoch, controller = new AbortController(); state.active = controller; setBusy(true); const answer = addMessage("assistant", "", "Получение ответа…"); const timeout = setTimeout(() => controller.abort(), 120000);
+  resetEvidence(); $("composerText").value = ""; autoGrow(); addMessage("user", prompt); $("ceQuery").textContent = prompt; const epoch = state.epoch, controller = new AbortController(); state.active = controller; setBusy(true); const answer = addMessage("assistant", "", "Получение ответа…"); const timeout = setTimeout(() => controller.abort(), 600000);
   try {
     if (!state.sessionId) await createSession(); if (epoch !== state.epoch) return;
-    const response = await fetch("/v1/chat/stream", { method: "POST", redirect: "error", credentials: "same-origin", signal: controller.signal, headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify({ backend: state.backend, prompt, session_id: state.sessionId, root_id: state.rootId || null }) });
+    const reserve = localStorage.getItem("af.reserve") || "";
+    const response = await fetch("/v1/chat/stream", { method: "POST", redirect: "error", credentials: "same-origin", signal: controller.signal, headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify({ backend: state.backend, prompt, session_id: state.sessionId, root_id: state.rootId || null, ...(reserve ? { reserve_usd: reserve } : {}) }) });
     if (response.status === 401) { openAuth(); throw new Error("Требуется вход. Запрос автоматически не повторяется."); }
     if (!response.ok) { const text = await readBounded(response, 16384); let reason; try { reason = JSON.parse(text).error; } catch {} throw new Error(reason || "Запрос отклонён: HTTP " + response.status); }
     if (!(response.headers.get("Content-Type") || "").includes("text/event-stream")) throw new Error("Вместо потока получен другой тип ответа");
@@ -1116,7 +1122,7 @@ $("composerText").addEventListener("keydown", e => { if (e.key === "Enter" && !e
 $("composerText").addEventListener("input", autoGrow); $("fileFilter").addEventListener("input", renderTree); $("cfgProvider").addEventListener("change", updateModels);
 $("dialogView").setAttribute("role", "log"); $("dialogView").setAttribute("aria-label", "Сообщения диалога"); $("vBannerText").setAttribute("aria-live", "polite"); $("composerText").setAttribute("aria-label", "Запрос к модели");
 initResize("explorerPanel", "--explorer-w", 220, 420, false); initResize("verificationPanel", "--verify-w", 260, 420, true); if (safeRead("af.compact", false)) document.body.classList.add("compact"); if (safeRead("af.hide-explorer", false)) document.body.classList.add("hide-explorer"); if (safeRead("af.hide-verification", false)) document.body.classList.add("hide-verification");
-(async () => { resetEvidence(); updateProject(); sessionLabel(); setClock(); setInterval(setClock, 30000); await refreshHealth(); await refreshProviders(); await renderRoots(); await readGraph(); await refreshBudget(); })();
+(async () => { resetEvidence(); updateProject(); sessionLabel(); setClock(); setInterval(setClock, 30000); $("cfgReserve").value = localStorage.getItem("af.reserve") || ""; $("cfgReserve").addEventListener("change", saveReserve); await refreshHealth(); await refreshProviders(); await renderRoots(); await readGraph(); await refreshBudget(); })();
 </script>
 </body>
 </html>

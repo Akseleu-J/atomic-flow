@@ -127,6 +127,24 @@ enum SandboxCommand {
     },
     /// List granted roots.
     List,
+    /// Inspect interrupted publication without changing files or clearing holds.
+    InspectRecovery {
+        #[arg(long)]
+        root_id: String,
+        #[arg(long)]
+        changeset_id: String,
+    },
+    /// Restore an inspected publication. Never repeats model or tool calls.
+    RecoverPublication {
+        #[arg(long)]
+        root_id: String,
+        #[arg(long)]
+        changeset_id: String,
+        #[arg(long)]
+        preview_digest: String,
+        #[arg(long)]
+        host_approved: bool,
+    },
     /// Read a bounded, redacted page of root-qualified source.
     Read {
         #[arg(long)]
@@ -334,6 +352,28 @@ fn run(command: Command) -> Result<String, String> {
                 host_approved,
             } => sandbox_grant(root_id, path, write, host_approved),
             SandboxCommand::List => sandbox_list(),
+            SandboxCommand::InspectRecovery {
+                root_id,
+                changeset_id,
+            } => {
+                let registry = af_sandbox::SandboxRegistry::new("default").map_err(|e| e.0)?;
+                let preview = registry
+                    .inspect_recovery(&root_id, &changeset_id)
+                    .map_err(|e| e.0)?;
+                serde_json::to_string(&preview).map_err(|e| e.to_string())
+            }
+            SandboxCommand::RecoverPublication {
+                root_id,
+                changeset_id,
+                preview_digest,
+                host_approved,
+            } => {
+                let registry = af_sandbox::SandboxRegistry::new("default").map_err(|e| e.0)?;
+                let result = registry
+                    .recover(&root_id, &changeset_id, &preview_digest, host_approved)
+                    .map_err(|e| e.0)?;
+                serde_json::to_string(&result).map_err(|e| e.to_string())
+            }
             SandboxCommand::Read {
                 root_id,
                 path,

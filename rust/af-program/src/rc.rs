@@ -59,10 +59,31 @@ impl RcRegistry {
     /// The decision names every open remainder instead of hiding it.
     pub fn rc_decision(&self) -> Value {
         let mut missing: Vec<Value> = Vec::new();
+        // This is a declaration registry, not an evidence verifier. An empty
+        // or ambiguous registry must never accidentally admit a release.
+        if !self.chapters.iter().any(|chapter| chapter.required_for_rc) {
+            missing.push(json!({"chapter": null, "remainder": "no required chapters configured"}));
+        }
+        let mut ids = std::collections::BTreeSet::new();
+        for chapter in &self.chapters {
+            if chapter.id.trim().is_empty() || !ids.insert(&chapter.id) {
+                missing.push(json!({"chapter": chapter.id, "remainder": "empty or duplicate chapter identity"}));
+            }
+        }
         for chapter in &self.chapters {
             if chapter.required_for_rc {
                 match &chapter.status {
-                    ChapterStatus::Accepted { .. } => {}
+                    ChapterStatus::Accepted {
+                        scope,
+                        manifest_sha256,
+                    } => {
+                        if scope.trim().is_empty()
+                            || manifest_sha256.len() != 64
+                            || !manifest_sha256.bytes().all(|b| b.is_ascii_hexdigit())
+                        {
+                            missing.push(json!({"chapter": chapter.id, "remainder": "invalid acceptance declaration"}));
+                        }
+                    }
                     ChapterStatus::Open { remainder } => {
                         missing.push(json!({"chapter": chapter.id, "remainder": remainder}));
                     }
@@ -85,7 +106,9 @@ impl RcRegistry {
                     }),
                 },
             })).collect::<Vec<_>>(),
-            "note": "this is the single-owner Python-RC gate; corporate acceptance additionally requires E00-E08",
+            "evidence_audited": false,
+            "production_authorized": false,
+            "note": "declared scoped statuses only; artifact verification and the complete P00-P14/E00-E08 production profile remain separate host gates",
         })
     }
 }
@@ -146,6 +169,30 @@ mod tests {
             .collect();
         assert_eq!(open.len(), 1);
         assert_eq!(open[0]["id"], json!("P13"));
+    }
+
+    #[test]
+    fn empty_optional_duplicate_and_forged_registry_cannot_admit_rc() {
+        assert_eq!(RcRegistry::new().rc_decision()["decision"], "not_ready");
+        let mut r = RcRegistry::new();
+        r.push(Chapter {
+            id: "P00".into(),
+            required_for_rc: false,
+            status: ChapterStatus::Accepted {
+                scope: "demo".into(),
+                manifest_sha256: "a".repeat(64),
+            },
+        });
+        assert_eq!(r.rc_decision()["decision"], "not_ready");
+        r.chapters[0].required_for_rc = true;
+        r.chapters[0].status = ChapterStatus::Accepted {
+            scope: "".into(),
+            manifest_sha256: "forged".into(),
+        };
+        assert_eq!(r.rc_decision()["decision"], "not_ready");
+        r.accept("P00", "scope", &"a".repeat(64)).unwrap();
+        r.push(r.chapters[0].clone());
+        assert_eq!(r.rc_decision()["decision"], "not_ready");
     }
 
     #[test]

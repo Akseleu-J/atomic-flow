@@ -45,7 +45,18 @@ jobs:
           git rev-parse HEAD > validation/studio-ci/commit.txt
           rustc --version --verbose > validation/studio-ci/rustc.txt
           cargo --version > validation/studio-ci/cargo.txt
-          python -c "import pathlib,hashlib,json; r=pathlib.Path('.'); fs=[p for p in (r/'rust').rglob('*') if p.is_file() and ('target' not in p.parts) and (p.suffix in ('.rs','.html','.toml') or p.name=='Cargo.lock')]; pathlib.Path('validation/studio-ci/source.json').write_text(json.dumps({p.as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in fs},sort_keys=True))"
+          python validation/production-20261104/capture_source.py validation/studio-ci/source.json
+      - name: Validate complete production planning registry
+        shell: bash
+        run: python validation/production-20261104/check_registry.py
+      - name: TypeScript client contract and package
+        shell: bash
+        working-directory: ts/af-client
+        run: |
+          set -o pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm test 2>&1 | tee ../../validation/studio-ci/sdk-tests.txt
+          npm pack --ignore-scripts --pack-destination ../../validation/studio-ci
       - name: Native kernel regressions
         shell: bash
         working-directory: rust

@@ -506,7 +506,7 @@ impl SandboxRegistry {
             .ok_or_else(|| SandboxError("root access is not granted".into()))
     }
 
-    fn effect_path(&self, root: &Path) -> PathBuf {
+    pub(crate) fn effect_path(&self, root: &Path) -> PathBuf {
         let key = root.to_string_lossy().to_string();
         #[cfg(windows)]
         let key = key.to_lowercase();
@@ -522,7 +522,10 @@ impl SandboxRegistry {
             .map_err(|_| SandboxError("root effect store is unavailable".into()))?;
         ensure_no_links(&path)?;
         Lease::acquire(
-            &path.with_extension("lock"),
+            &path
+                .parent()
+                .expect("effect parent")
+                .join("publication.lock"),
             true,
             "another publication owns this root",
         )
@@ -532,10 +535,25 @@ impl SandboxRegistry {
     pub(crate) fn require_path_effects_clear(&self, root: &Path) -> SandboxResult<()> {
         let path = self.effect_path(root);
         ensure_no_links(&path)?;
-        match std::fs::symlink_metadata(path) {
-            Err(error) if error.kind()==std::io::ErrorKind::NotFound => Ok(()),
-            _ => Err(SandboxError("root publication has an unresolved durable hold; inspect and reconcile, never replay".into())),
+        let directory = path.parent().expect("effect parent");
+        if !directory.exists() {
+            return Ok(());
         }
+        for (index, entry) in std::fs::read_dir(directory)
+            .map_err(|_| SandboxError("publication hold store unavailable".into()))?
+            .enumerate()
+        {
+            if index > 1024 {
+                return Err(SandboxError("publication hold scan limit".into()));
+            }
+            let entry =
+                entry.map_err(|_| SandboxError("publication hold entry unavailable".into()))?;
+            ensure_no_links(&entry.path())?;
+            if entry.path().extension().and_then(|x| x.to_str()) == Some("json") {
+                return Err(SandboxError("publication has an unresolved durable hold; inspect and reconcile, never replay".into()));
+            }
+        }
+        Ok(())
     }
 
     /// Shared across sessions, root IDs and workspaces in the same state home.
@@ -587,7 +605,12 @@ impl SandboxRegistry {
         }
         std::fs::remove_file(&path)
             .map_err(|_| SandboxError("root publication hold removal failed".into()))?;
-        sync_parent(&path)
+        if let Err(error) = sync_parent(&path) {
+            // Restore the conservative marker when removal acknowledgement fails.
+            let _ = persist_new(&path, &bytes);
+            return Err(error);
+        }
+        Ok(())
     }
 }
 

@@ -1,17 +1,19 @@
 {
   "name": "@atomic-flow/af-client",
   "version": "0.1.0",
-  "description": "TypeScript client for the atomic-flow self-host API (af serve): sessions, edit journeys, jobs — typed, zero-dependency",
+  "description": "Bounded validated client for the native single-owner atomic-flow API",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "README.md"],
+  "engines": { "node": ">=22" },
   "scripts": {
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "npm run build && node --test tests/*.test.mjs"
   },
   "devDependencies": {
-    "typescript": "^5.6.0",
-    "vitest": "^2.1.0",
-    "@types/node": "^22.0.0"
+    "typescript": "5.8.3"
   }
 }

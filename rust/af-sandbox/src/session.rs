@@ -535,7 +535,7 @@ impl<'a> SandboxSession<'a> {
             originals.insert(rel.clone(), original);
         }
         let intent = json!({"schema_version":1,"changeset_id":changeset_id,"workspace_id":self.registry.id,
-            "root_id":root_id,"status":"prepared","baseline":preview.manifest,"files":backups,
+            "root_id":root_id,"grant":item,"status":"prepared","baseline":preview.manifest,"files":backups,
             "cross_root_atomic":false});
         let raw = serde_json::to_vec(&intent)
             .map_err(|_| SandboxError("intent encoding failed".into()))?;
@@ -545,6 +545,8 @@ impl<'a> SandboxSession<'a> {
         )?;
         self.registry
             .begin_root_effect(&root, &changeset_id, &sha256_hex(&raw))?;
+        #[cfg(test)]
+        crate::recovery::test_boundary("prewrite");
         let mut applied = Vec::<String>::new();
         let result = (|| -> SandboxResult<()> {
             for (rel, change) in &preview.changes {
@@ -577,6 +579,8 @@ impl<'a> SandboxSession<'a> {
                         }
                     }
                 }
+                #[cfg(test)]
+                crate::recovery::test_boundary("postwrite");
                 let actual = if path.exists() {
                     Some(
                         std::fs::read(&path)

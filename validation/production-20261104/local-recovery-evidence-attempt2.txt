@@ -1,0 +1,25 @@
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+error: only metadata stub found for `rlib` dependency `core` please provide path to the corresponding .rmeta file with full metadata
+  --> af-sandbox\src\lib.rs:15:17
+   |
+15 | #[derive(Debug, thiserror::Error)]
+   |                 ^^^^^^^^^^^^^^^^
+   |
+   = note: this error originates in the derive macro `thiserror::Error` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `SandboxError` doesn't implement `std::fmt::Display`
+  --> af-sandbox\src\lib.rs:17:12
+   |
+17 | pub struct SandboxError(pub String);
+   |            ^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `std::fmt::Display` is not implemented for `SandboxError`
+  --> af-sandbox\src\lib.rs:17:1
+   |
+17 | pub struct SandboxError(pub String);
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `std::error::Error`
+  --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library\core\src\error.rs:59:0
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `af-sandbox` (lib test) due to 2 previous errors

@@ -491,7 +491,9 @@ impl ChatBackend for OpenAiBackend {
             .post(&format!("{}/chat/completions", self.base_url))
             .set("Authorization", &format!("Bearer {api_key}"))
             .set("Content-Type", "application/json")
-            .timeout(std::time::Duration::from_secs(120))
+            // Total deadline is generous: long model generations are normal,
+            // a cut-off mid-generation would surface as an unknown outcome.
+            .timeout(std::time::Duration::from_secs(600))
             .send_json(self.payload(request));
         let latency_ms = Some(started.elapsed().as_millis() as u64);
         match response {
@@ -616,7 +618,9 @@ impl OpenAiBackend {
             .post(&format!("{}/chat/completions", self.base_url))
             .set("Authorization", &format!("Bearer {api_key}"))
             .set("Content-Type", "application/json")
-            .timeout(std::time::Duration::from_secs(120))
+            // Same generous total deadline as the non-streaming path: an
+            // aborted stream would surface as an unknown charge.
+            .timeout(std::time::Duration::from_secs(600))
             .send_json(self.stream_payload(request));
         let latency_ms = Some(started.elapsed().as_millis() as u64);
         let mut reader = match response {

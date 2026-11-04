@@ -76,6 +76,7 @@ fn build_router_for(token: Option<String>, port: u16) -> Router {
         .route("/health", get(health))
         .route("/dashboard", get(dashboard))
         .route("/v1/doctor", get(doctor_ep))
+        .route("/v1/capabilities", get(capabilities))
         .route("/v1/sessions", get(list_sessions_ep).post(create_session))
         .route("/v1/sessions/{id}/events", post(append_event))
         .route("/v1/sessions/{id}", get(read_session))
@@ -95,6 +96,43 @@ fn build_router_for(token: Option<String>, port: u16) -> Router {
             http_safety::guard,
         ))
         .with_state(state)
+}
+
+/// Data-only protocol capabilities. No source or execution authority is exposed.
+async fn capabilities(
+    State(state): State<ServerState>,
+    headers: HeaderMap,
+) -> Result<Json<Value>, StatusCode> {
+    if let Some(error) = auth_denied(&state, &headers) {
+        return Err(error);
+    }
+    Ok(Json(
+        json!({"schema_version": 1, "verification_schema_version": af_evidence::VERSION,
+        "authority": "single_owner", "requirement_checker": "unavailable",
+        "verification_report_authorizes_execution": false,
+        "publication_recovery": "host_cli_preview_digest",
+        "unknown_replay": false}),
+    ))
+}
+
+/// Bind a report to the exact delivered request, not to a claimed Git revision.
+/// Coverage describes the selected excerpts only; it is not project coverage.
+fn request_report(
+    prompt: &str,
+    sources: &[Value],
+    session: &str,
+) -> af_evidence::VerificationReport {
+    let inventory = serde_json::to_vec(&(prompt, sources)).expect("bounded request is JSON");
+    let binding = af_evidence::SourceBinding {
+        workspace_id: format!("session:{session}"),
+        source_revision: "delivered-request-snapshot-v1".into(),
+        inventory_sha256: af_evidence::sha256(&inventory),
+        runtime_id: concat!("af-cli/", env!("CARGO_PKG_VERSION")).into(),
+    };
+    let mut report = af_evidence::VerificationReport::not_assessed(binding).expect("host binding");
+    report.evidence_coverage.requested = sources.len() as u64;
+    report.evidence_coverage.delivered_partial = sources.len() as u64;
+    report
 }
 
 async fn root_redirect() -> axum::response::Response {
@@ -760,6 +798,8 @@ use std::path::PathBuf;
 /// Core streaming engine: runs one backend call on a blocking thread, pushing
 /// delta events and the final event (settled usage or hold) into the channel.
 /// Used by the SSE endpoint and directly testable with the scripted backend.
+/// `budget` is the optional af-budget authority: reserve → durable send
+/// checkpoint → settle/unknown/not_sent around the single provider call.
 fn spawn_chat_stream(
     backend: Box<dyn af_llm::ChatBackend>,
     model: String,
@@ -768,12 +808,38 @@ fn spawn_chat_stream(
     mut journal: Option<af_journal::SessionJournal>,
     call_id: String,
     permit: tokio::sync::OwnedSemaphorePermit,
+    budget: Option<(af_budget::Ledger, af_budget::Money)>,
 ) -> (tokio::sync::mpsc::Receiver<Value>, af_llm::Cancel) {
     let (tx, rx) = tokio::sync::mpsc::channel(32);
     let cancel = af_llm::Cancel::new();
     let worker_cancel = cancel.clone();
     std::thread::spawn(move || {
         let _permit = permit;
+        let mut budget = budget;
+        let task_id = journal
+            .as_ref()
+            .map(|journal| journal.session_id.clone())
+            .unwrap_or_else(|| "serve".to_string());
+        if let Some((ledger, amount)) = budget.as_mut() {
+            if let Err(error) = ledger.reserve(&call_id, &task_id, *amount) {
+                let _ = tx.blocking_send(json!({"type": "error", "unknown": false,
+                    "error": format!("budget reserve refused; nothing was sent ({})", error.0)}));
+                return;
+            }
+            if let Err(error) = ledger.begin_send(&call_id, &task_id) {
+                let _ = tx.blocking_send(json!({"type": "error", "unknown": true,
+                    "error": format!("budget send checkpoint failed; treat the outcome as unknown ({})", error.0)}));
+                return;
+            }
+        }
+        let verification_report = request_report(
+            &prompt,
+            &sources,
+            journal
+                .as_ref()
+                .map(|j| j.session_id.as_str())
+                .unwrap_or("unbound"),
+        );
         let mut request =
             af_llm::ChatRequest::new(&model, vec![af_llm::ChatMessage::new("user", &prompt)]);
         request.host_attempt = journal.as_ref().map(|journal| af_llm::HostAttempt {
@@ -820,12 +886,12 @@ fn spawn_chat_stream(
                 };
                 let payload = json!({"content": content, "cost_usd": result.usage.cost_usd,
                     "tokens_in": result.usage.tokens_in, "tokens_out": result.usage.tokens_out,
-                    "truncated": result.truncated || !bounded, "verification": "not_assessed", "sources": sources});
+                    "truncated": result.truncated || !bounded, "verification": "not_assessed", "verification_report": verification_report, "coverage_scope": "selected_request_excerpts", "sources": sources});
                 (
                     json!({"type": if bounded && valid_cost {"final"} else {"error"}, "ok": bounded && valid_cost,
                     "content": content, "tokens_in": result.usage.tokens_in, "tokens_out": result.usage.tokens_out,
                     "cost_usd": result.usage.cost_usd, "truncated": result.truncated || !bounded,
-                    "verification": "not_assessed", "sources": sources, "unknown": !valid_cost,
+                    "verification": "not_assessed", "verification_report": verification_report, "coverage_scope": "selected_request_excerpts", "sources": sources, "unknown": !valid_cost,
                     "error": if !bounded {"stream output limit exceeded"} else if !valid_cost {"usage is unresolved"} else {""}}),
                     "model_response",
                     payload,
@@ -856,6 +922,23 @@ fn spawn_chat_stream(
                     "error": "durable result recording failed; inspect session before continuing"});
             }
         }
+        // Budget settlement mirrors the terminal outcome. Without a tariff
+        // table the settled actual is the reserved commitment itself —
+        // conservative, never cheaper than evidence.
+        if let Some((mut ledger, amount)) = budget {
+            let settlement = match outcome {
+                "success" => ledger.settle(&call_id, &task_id, amount).map(|_| "settled"),
+                "unknown" => ledger.mark_unknown(&call_id, &task_id).map(|_| "unknown"),
+                "not_sent" => ledger
+                    .release_not_sent(&call_id, &task_id)
+                    .map(|_| "released"),
+                _ => Ok(()).map(|_: ()| "noop"),
+            };
+            if let Err(error) = settlement {
+                final_event = json!({"type": "error", "unknown": true,
+                    "error": format!("budget settlement failed; durable hold retained ({})", error.0)});
+            }
+        }
         let _ = tx.blocking_send(final_event);
     });
     (rx, cancel)
@@ -881,6 +964,11 @@ struct ChatStreamBody {
     prompt: String,
     session_id: Option<String>,
     root_id: Option<String>,
+    /// Operator-set per-call reservation against the af-budget ledger. When
+    /// present the call is refused before any provider contact if the
+    /// reservation does not fit under the cap or a hold exists.
+    #[serde(default)]
+    reserve_usd: Option<String>,
 }
 
 struct CancellableSse {
@@ -966,6 +1054,24 @@ async fn chat_stream_sse(
     } else {
         None
     };
+    // Operator-requested budget enforcement: the ledger must already exist
+    // (Settings → Бюджет). A missing ledger is a conflict, not a silent
+    // unaccounted send.
+    let budget = match body.reserve_usd.as_deref() {
+        Some(amount_text) => {
+            let ledger_path = budget_ledger_path();
+            if !ledger_path.exists() {
+                return Err(StatusCode::CONFLICT);
+            }
+            let amount =
+                af_budget::Money::from_usd_str(amount_text).map_err(|_| StatusCode::BAD_REQUEST)?;
+            match af_budget::Ledger::open(&ledger_path, BUDGET_OWNER) {
+                Ok(ledger) => Some((ledger, amount)),
+                Err(_) => return Err(StatusCode::CONFLICT),
+            }
+        }
+        None => None,
+    };
     let (rx, cancel) = spawn_chat_stream(
         backend,
         body.backend.model,
@@ -974,6 +1080,7 @@ async fn chat_stream_sse(
         journal,
         call_id,
         permit,
+        budget,
     );
     let stream = CancellableSse {
         inner: ReceiverStream::new(rx),
@@ -1046,6 +1153,11 @@ mod tests {
     use http_body_util::BodyExt;
     use tower::ServiceExt;
 
+    /// ATOMIC_FLOW_HOME is process-wide: every test that redirects it must
+    /// hold this lock for its whole body, or a concurrently running test
+    /// reads/writes another test's state home (observed as a 404 mid-test).
+    static HOME_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
     #[tokio::test]
     async fn health_is_open_loopback_style_without_token() {
         let app = build_router(None);
@@ -1106,8 +1218,7 @@ mod tests {
 
     #[tokio::test]
     async fn session_endpoints_roundtrip() {
-        static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        let _home_guard = HOME_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         let home = std::env::temp_dir().join(format!("af-serve-{}", af_entropy::token()));
         std::fs::create_dir_all(&home).unwrap();
         let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
@@ -1171,7 +1282,7 @@ mod tests {
             Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
             None => std::env::remove_var("ATOMIC_FLOW_HOME"),
         }
-        drop(guard);
+        drop(_home_guard);
         let _ = std::fs::remove_dir_all(&home);
     }
 
@@ -1414,12 +1525,116 @@ mod tests {
             None,
             "bounded-output".into(),
             semaphore.clone().try_acquire_owned().unwrap(),
+            None,
         );
         let terminal = receiver.recv().await.unwrap();
         assert_eq!(terminal["type"], json!("error"));
         assert_eq!(terminal["ok"], json!(false));
         assert_eq!(terminal["truncated"], json!(true));
         assert_eq!(terminal["content"], json!(""));
+    }
+
+    #[tokio::test]
+    async fn budget_gates_the_stream_and_settles_by_outcome() {
+        fn temp_ledger(name: &str) -> (std::path::PathBuf, af_budget::Ledger) {
+            let dir = std::env::temp_dir()
+                .join(format!("af-serve-budget-{}-{name}", af_entropy::token()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let path = dir.join("ledger.jsonl");
+            af_budget::Ledger::create(&path, BUDGET_OWNER, af_budget::Money(10), 8).unwrap();
+            let ledger = af_budget::Ledger::open(&path, BUDGET_OWNER).unwrap();
+            (path, ledger)
+        }
+
+        fn scripted(outcome: af_llm::BackendOutcome) -> Box<dyn af_llm::ChatBackend> {
+            Box::new(af_llm::ScriptedBackend::new(
+                "budget-scripted",
+                vec![outcome],
+            ))
+        }
+
+        fn completed() -> af_llm::BackendOutcome {
+            af_llm::BackendOutcome::Completed(af_llm::ChatResult {
+                content: "ok".into(),
+                truncated: false,
+                tool_calls: vec![],
+                usage: af_llm::Usage {
+                    tokens_in: Some(3),
+                    tokens_out: Some(4),
+                    cost_usd: Some(0.0),
+                    latency_ms: Some(1),
+                },
+            })
+        }
+
+        // Settled success: reserved amount is charged, no hold, one more
+        // reservation still fits under the cap.
+        let (path, ledger) = temp_ledger("settled");
+        let (mut receiver, _) = spawn_chat_stream(
+            scripted(completed()),
+            "scripted".into(),
+            "test".into(),
+            vec![],
+            None,
+            "call-ok".into(),
+            Arc::new(tokio::sync::Semaphore::new(1))
+                .try_acquire_owned()
+                .unwrap(),
+            Some((ledger, af_budget::Money(4))),
+        );
+        let terminal = receiver.recv().await.unwrap();
+        assert_eq!(terminal["type"], json!("final"));
+        let ledger = af_budget::Ledger::open(&path, BUDGET_OWNER).unwrap();
+        let snapshot = ledger.snapshot().unwrap();
+        assert_eq!(snapshot.committed().unwrap(), af_budget::Money(4));
+        assert!(!snapshot.has_hold());
+
+        // Unknown outcome: the call keeps its durable hold and blocks every
+        // further reservation — fail-closed.
+        let (path, ledger) = temp_ledger("unknown");
+        let (mut receiver, _) = spawn_chat_stream(
+            scripted(af_llm::BackendOutcome::Unknown {
+                sent: true,
+                detail: "scripted unresolved".into(),
+            }),
+            "scripted".into(),
+            "test".into(),
+            vec![],
+            None,
+            "call-unknown".into(),
+            Arc::new(tokio::sync::Semaphore::new(1))
+                .try_acquire_owned()
+                .unwrap(),
+            Some((ledger, af_budget::Money(3))),
+        );
+        let terminal = receiver.recv().await.unwrap();
+        assert_eq!(terminal["type"], json!("error"));
+        assert_eq!(terminal["unknown"], json!(true));
+        let mut ledger = af_budget::Ledger::open(&path, BUDGET_OWNER).unwrap();
+        assert!(ledger.snapshot().unwrap().has_hold());
+        assert!(ledger.reserve("next", "task", af_budget::Money(1)).is_err());
+
+        // Reserve over the cap: the provider is never contacted.
+        let (_, ledger) = temp_ledger("over-cap");
+        let (mut receiver, _) = spawn_chat_stream(
+            scripted(completed()),
+            "scripted".into(),
+            "test".into(),
+            vec![],
+            None,
+            "call-over-cap".into(),
+            Arc::new(tokio::sync::Semaphore::new(1))
+                .try_acquire_owned()
+                .unwrap(),
+            Some((ledger, af_budget::Money(11))),
+        );
+        let terminal = receiver.recv().await.unwrap();
+        assert_eq!(terminal["type"], json!("error"));
+        assert_eq!(terminal["unknown"], json!(false));
+        assert!(terminal["error"]
+            .as_str()
+            .unwrap()
+            .contains("budget reserve refused"));
     }
 
     #[tokio::test]
@@ -1456,6 +1671,7 @@ mod tests {
             None,
             "cancel-test".into(),
             semaphore.clone().try_acquire_owned().unwrap(),
+            None,
         );
         drop(CancellableSse {
             inner: ReceiverStream::new(rx),
@@ -1471,6 +1687,7 @@ mod tests {
 
     #[tokio::test]
     async fn settled_chat_is_durable_and_an_existing_unknown_is_never_replayed() {
+        let _home_guard = HOME_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         struct IsolatedHome {
             path: PathBuf,
             previous: Option<std::ffi::OsString>,
@@ -1562,5 +1779,29 @@ mod tests {
         assert_eq!(projection["unknown_cost_present"], json!(true));
         assert_eq!(projection["available_usd"], Value::Null);
         assert_eq!(projection["spent_usd_known"], json!("2"));
+    }
+}
+
+#[cfg(test)]
+mod evidence_adapter_tests {
+    #[test]
+    fn delivered_context_is_bound_without_inventing_requirement_success() {
+        let sources =
+            vec![serde_json::json!({"root_id":"r", "path":"a.rs", "sha256":"a".repeat(64)})];
+        let report = super::request_report("delivered body", &sources, "test");
+        let parsed =
+            af_evidence::parse_report(&af_evidence::report_json(&report).unwrap()).unwrap();
+        assert_eq!(parsed.requirements.checked, 0);
+        assert_eq!(
+            parsed.requirements.status,
+            af_evidence::Assessment::NotAssessed
+        );
+        assert_eq!(parsed.evidence_coverage.delivered_complete, 0);
+        assert_ne!(
+            report.binding.inventory_sha256,
+            super::request_report("changed body", &sources, "test")
+                .binding
+                .inventory_sha256
+        );
     }
 }
