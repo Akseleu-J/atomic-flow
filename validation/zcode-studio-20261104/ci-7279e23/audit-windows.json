@@ -1,0 +1,13 @@
+{
+  "run_id": 41842587975,
+  "tested_commit": "7279e237358e96ed32583aca3f2931697937731c",
+  "platform": "windows-2022",
+  "status": "native_accepted",
+  "exact_git_blob_sha256_matches": 84,
+  "unit_pass": 290,
+  "unit_ignored": 1,
+  "http_smoke": "passed",
+  "ui_tests": 8,
+  "provider_calls": 0,
+  "archive_sha256": "5626732c8324cbd805722c73f71ea4d47f9014340bfa809a504c63e6648e1eaf"
+}

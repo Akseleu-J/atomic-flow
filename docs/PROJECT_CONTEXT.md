@@ -7,7 +7,11 @@
 Generic exit-zero больше не означает Verified. Перед source write сохраняются
 intent/backups; неопределённая публикация оставляет cross-session root hold.
 Локально 104 целевых Rust PASS, 8 JS PASS и native HTTP smoke PASS, provider_calls=0.
-Browser visual QA заблокирована URL guard инструмента, внешний CI ещё требуется.
+Browser visual QA заблокирована URL guard инструмента. NativeCI41842587975
+на7279e23 SUCCESS: Linux292PASS/1IGNORED, Windows290PASS/1IGNORED, HTTPsmoke и8JS
+на каждой платформе; оба ZIP скачаны, по84sourcehashes совпали с Git blobs.
+ОбщийCI41842587866 иinteroperability41842588641 SUCCESS. Background startup
+заблокирован automatic permission review; бинарник/ручной запуск — в инструкции.
 Полная реконструкция и production acceptance не объявлены завершёнными.
 
 P07 engineering exit принят отдельно на `f76a59e`: native Rust/TS TaskRunner

@@ -18,7 +18,10 @@ base09d06c5, ветка `codex/studio-safe-zcode-20261104`.
 8JS PASS, actual native HTTP smoke PASS. UI поддерживает реальные project/source,
 history, journal snapshot и host-only providers/budget. Generic checks не дают
 Verified; поддерживаемый task/publication UI ещё требует admitted check contract.
-Browser visual QA заблокирована URL guard; fresh native CI проверяется отдельно.
+Browser visual QA заблокирована URL guard. Native CI41842587975 на7279e23
+SUCCESS в Linux/Windows (292/290PASS, по1IGNORED Docker; по84Git-bytehashes
+сверены), реальные HTTPsmoke и8JS tests на каждой платформе PASS. Background
+startup заблокирован permission review; ручной запуск описан в Studio checkpoint.
 Нижние записи описывают исторический ход и не заменяют этот checkpoint.
 
 Новое поручение владельца, 3 ноября: сначала ограниченный инженерный выход

@@ -1,5 +1,23 @@
 # Atomic Flow Studio — working native surface and safety boundaries
 
+**Native acceptance current: CI41842587975 SUCCESS on7279e23 (both platforms).**
+Linux292PASS/1IGNORED; Windows290PASS/1IGNORED. Each platform also passed the
+real native HTTP lifecycle smoke and8UI protocol/rendering tests. Both archives
+were downloaded and each of84source hashes matched exact Git blobs after LF
+was made an explicit checkout policy. The ignored test is real Docker acceptance,
+not a passed isolation test. provider_calls=0.
+
+- Linux artifact13329652887 SHA2568f5f838d5bb424894235893c6ff19805c19b86b3aab38d2c0fe53bba2f63575b.
+- Windows artifact13330156903 SHA2565626732c8324cbd805722c73f71ea4d47f9014340bfa809a504c63e6648e1eaf.
+- General CI41842587866 and external interoperability41842588641 also SUCCESS.
+
+The final follow-up commits only evidence/docs/inventory for this accepted
+runtime; they do not change its Rust, HTML or toolchain source. Browser visual
+QA and strict Clippy remain separate unaccepted checks as explained below.
+Persistent background startup was rejected by automatic permission review
+without a specific reason; no alternative launch was attempted. The native
+binary itself was started, exercised and cleaned up by the accepted smoke.
+
 The 4 November work continues the updated zcode checkout from `09d06c5`.
 It preserves the Rust/TypeScript reconstruction and improves the existing
 native Studio surface. This is a functional engineering increment, not full
