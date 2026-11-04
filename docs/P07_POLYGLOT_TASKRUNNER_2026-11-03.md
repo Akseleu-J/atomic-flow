@@ -1,5 +1,16 @@
 # P07: bounded engineering exit and native pilot
 
+**Current status, 4 November: engineering exit ACCEPTED on f76a59e.**
+Native CI41655855886 SUCCESS; downloaded artifact13239936458 SHA256
+fbb8c466f62eb844ff13a1cb0dbc4940535087ae3094a03d4bbc4839b05a2cb4.
+All135rawhashes, six complete FAIL/PASS native receipts, source/final bindings,
+two-file publication journal, supported graph projection and six cleanups were
+independently rechecked. General CI41655869867 SUCCESS, source-equal485hashes
+per Python3.11/3.12 suite (3594PASS/26SKIP each). Research quality remains open.
+Implementation notes below retain the original preparation and rejected attempts;
+their then-pending status is historical. Current Studio work is documented in
+[the 4 November acceptance](STUDIO_ACCEPTANCE_2026-11-04.md).
+
 Owner instruction, 3 November: finish necessary TaskRunner/P07 engineering,
 then reconstruct on suitable languages. The pilot is Rust + TypeScript.
 Historical paired research is retained as unfinished research, rather than

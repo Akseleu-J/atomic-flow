@@ -116,3 +116,18 @@ now uses official setup-node v4 commit49933ea5288caeca8642d1e84afbd3f7d6820020,
 verified through the upstream Git ref. This setup refusal is retained separately
 from application test outcomes. The inventory generator now writes explicit LF
 to keep its one-line JSON free of Windows CR whitespace issues.
+
+CI41841470828 then compiled on Linux but refused the native picker dependency:
+`wayland-client.pc` was missing. Artifact13328159865 SHA256
+46affecc1bfa82e2032020c7871a6a98c89fd7cb43f431bdff47e5603e6dcc8c was downloaded;
+84 Rust/source/config hashes matched653163f. No application test outcome is
+claimed for that Linux attempt. The workflow now provisions `libwayland-dev`
+and `pkg-config`; the Windows job was still running when this was recorded.
+
+Windows job126613871213 subsequently completed SUCCESS on653163f: full workspace
+290PASS/1IGNORED, native HTTP smoke PASS, 8 UI tests PASS. Downloaded artifact
+13330160802 SHA256448547bac18e2cbe4c107337c678c765ac9c6c01f638965a56f3db01d06c9764
+was audited. One source hash matched the exact Git blob; the other83 matched
+the exact Git blob after the recorded Windows LF→CRLF checkout conversion.
+This is explicit content equivalence with newline differences, not84 identical
+Git-byte hashes. `rust/** text eol=lf` now standardizes future checkouts.

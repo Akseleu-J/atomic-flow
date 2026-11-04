@@ -1,5 +1,26 @@
 # Продолжение P07 — 29 октября 2026
 
+## Актуальный checkpoint — 4 ноября
+
+Необходимая инженерная граница **P07-E / Rust+TypeScript TaskRunner принята**
+на `f76a59e`: CI41655855886, artifact13239936458 SHA256
+`fbb8c466f62eb844ff13a1cb0dbc4940535087ae3094a03d4bbc4839b05a2cb4`.
+Независимо перепроверены135rawhashes, шесть complete native checks,
+FAIL → один replan → двухфайловый repair → fresh PASS → publication,
+cleanup шести owned containers и supported graph projection.
+Общий CI41655869867 SUCCESS; source-equal Python3.11/3.12 по3594PASS/26SKIP,
+по485sourcehashes. Это scripted engineering acceptance, provider_calls=0.
+Исследовательские пары/holdout/ablations и прежние paid UNKNOWN НЕ закрыты.
+
+Текущая разработка по поручению владельца ведётся в обновлённом **zcode**,
+base09d06c5, ветка `codex/studio-safe-zcode-20261104`.
+[Studio checkpoint](STUDIO_ACCEPTANCE_2026-11-04.md): локально104RustPASS,
+8JS PASS, actual native HTTP smoke PASS. UI поддерживает реальные project/source,
+history, journal snapshot и host-only providers/budget. Generic checks не дают
+Verified; поддерживаемый task/publication UI ещё требует admitted check contract.
+Browser visual QA заблокирована URL guard; fresh native CI проверяется отдельно.
+Нижние записи описывают исторический ход и не заменяют этот checkpoint.
+
 Новое поручение владельца, 3 ноября: сначала ограниченный инженерный выход
 TaskRunner с Rust + TypeScript пилотом, затем реконструкция по модулям.
 Контракт и текущий gate: [polyglot TaskRunner](P07_POLYGLOT_TASKRUNNER_2026-11-03.md).

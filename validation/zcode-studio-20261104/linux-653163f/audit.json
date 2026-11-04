@@ -1,0 +1,10 @@
+{
+  "run_id": 41841470828,
+  "artifact_id": 13328159865,
+  "tested_commit": "653163f43f266e3a8b2196cb89790595aa18b857",
+  "verified_source_hashes": 84,
+  "status": "build_dependency_refusal",
+  "reason": "rfd requires wayland-client pkg-config metadata on Linux; libwayland-dev missing",
+  "application_tests_executed": false,
+  "archive_sha256": "46affecc1bfa82e2032020c7871a6a98c89fd7cb43f431bdff47e5603e6dcc8c"
+}
