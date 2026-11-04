@@ -26,6 +26,16 @@ pub trait KernelTool {
     /// Execute with parsed arguments; errors are returned to the model as a
     /// tool result with an "error" field — never as a loop crash.
     fn execute(&self, arguments: &Value) -> Value;
+    /// Host-owned uncertainty latch, never read from model/tool JSON. Once an
+    /// effect may have occurred without a witnessed outcome, stop the loop.
+    fn effects_unknown(&self) -> bool {
+        false
+    }
+    /// Mutable/executable host tools opt into durable effect checkpointing.
+    /// A consumer cannot bypass the edit entry point by using TurnLoop itself.
+    fn requires_durable_journal(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -118,9 +128,10 @@ impl<'a> TurnLoop<'a> {
     }
 
     fn execute_tool(&self, call: &ToolCall) -> Value {
-        let arguments: Value = serde_json::from_str(&call.arguments).unwrap_or_else(
-            |error| json!({"error": format!("arguments are not valid JSON: {error}")}),
-        );
+        let arguments: Value = match serde_json::from_str(&call.arguments) {
+            Ok(arguments @ Value::Object(_)) => arguments,
+            _ => return json!({"error": "tool arguments must be a JSON object"}),
+        };
         let Some(tool) = self.tools.iter().find(|tool| tool.spec().name == call.name) else {
             return json!({"error": format!("unknown tool {}", call.name)});
         };
@@ -156,10 +167,27 @@ impl<'a> TurnLoop<'a> {
         cancel: &Cancel,
         mut on_delta: Option<&mut dyn FnMut(&str)>,
     ) -> LoopResult<LoopOutcome> {
+        if self.journal.is_none()
+            && self
+                .tools
+                .iter()
+                .any(|tool| tool.requires_durable_journal())
+        {
+            return Err(LoopError(
+                "effectful tools require a durable journal before model or tool effects".into(),
+            ));
+        }
         if let Some(journal) = self.journal.as_deref_mut() {
             journal.require_effects_clear().map_err(|_| {
                 LoopError("unresolved journal effects block continuation; never replay".into())
             })?;
+        }
+        if self.tools.iter().any(|tool| tool.effects_unknown()) {
+            return Ok(LoopOutcome::Hold {
+                backend: "host-tool".into(),
+                detail: "an earlier tool effect is unknown; reconcile before another model send"
+                    .into(),
+            });
         }
         let mut turns = 0usize;
         let mut tool_calls_used = 0usize;
@@ -182,6 +210,10 @@ impl<'a> TurnLoop<'a> {
             let mut request = ChatRequest::new(model, messages.clone());
             request.tools = Some(self.tool_specs());
             let call_id = af_entropy::token();
+            request.host_attempt = self.journal.as_ref().map(|journal| af_llm::HostAttempt {
+                session_id: journal.session_id.clone(),
+                call_id: call_id.clone(),
+            });
             self.record(
                 "model_request",
                 json!({"turn": turns, "tools": self.tool_specs().len()}),
@@ -243,6 +275,19 @@ impl<'a> TurnLoop<'a> {
                         )?;
                         let result_value = self.execute_tool(call);
                         tool_calls_used += 1;
+                        if self.tools.iter().any(|tool| tool.effects_unknown()) {
+                            self.record(
+                                "tool_effect_unknown",
+                                json!({"name": call.name, "reason": "host tool effect requires reconciliation"}),
+                                Some(&tool_call_id),
+                                Some("unknown"),
+                            )?;
+                            return Ok(LoopOutcome::Hold {
+                                backend: "host-tool".into(),
+                                detail: "tool effect is unknown; stop and reconcile, never replay"
+                                    .into(),
+                            });
+                        }
                         self.record(
                             "tool_result",
                             json!({"name": call.name, "result": result_value}),
@@ -457,6 +502,107 @@ mod tests {
         assert_eq!(count.load(Ordering::SeqCst), 1);
         assert!(journal.require_effects_clear().is_err());
         assert!(journal.path.with_extension("effect-hold.json").exists());
+    }
+
+    #[test]
+    fn host_unknown_tool_effect_stops_same_turn_and_preserves_durable_hold() {
+        use std::sync::{
+            atomic::{AtomicUsize, Ordering},
+            Arc,
+        };
+        struct UnknownTool(Arc<AtomicUsize>);
+        impl KernelTool for UnknownTool {
+            fn spec(&self) -> ToolSpec {
+                ToolSpec {
+                    name: "mutate".into(),
+                    description: String::new(),
+                    parameters: json!({"type":"object"}),
+                }
+            }
+            fn execute(&self, _: &Value) -> Value {
+                self.0.fetch_add(1, Ordering::SeqCst);
+                // This apparent success JSON cannot clear the host latch.
+                json!({"ok":true})
+            }
+            fn effects_unknown(&self) -> bool {
+                self.0.load(Ordering::SeqCst) > 0
+            }
+        }
+        let count = Arc::new(AtomicUsize::new(0));
+        let tools: Vec<Box<dyn KernelTool>> = vec![Box::new(UnknownTool(count.clone()))];
+        let router = Router::new(vec![Box::new(ScriptedBackend::new(
+            "scripted",
+            vec![
+                completed(
+                    "",
+                    vec![
+                        call("first", "mutate", "{}"),
+                        call("must-not-run", "mutate", "{}"),
+                    ],
+                ),
+                completed("must not send again", vec![]),
+            ],
+        ))]);
+        let (_home, mut journal) = temp_journal();
+        let result = TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default())
+            .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new())
+            .unwrap();
+        assert!(matches!(result, LoopOutcome::Hold { .. }));
+        assert_eq!(count.load(Ordering::SeqCst), 1);
+        assert!(journal.require_effects_clear().is_err());
+        let snapshot = journal.read().unwrap();
+        assert_eq!(
+            snapshot
+                .events
+                .iter()
+                .filter(|e| e["event_type"] == json!("model_request"))
+                .count(),
+            1
+        );
+        assert_eq!(
+            snapshot
+                .events
+                .iter()
+                .filter(|e| e["event_type"] == json!("tool_effect_unknown"))
+                .count(),
+            1
+        );
+        assert!(journal.path.with_extension("effect-hold.json").exists());
+    }
+
+    #[test]
+    fn invalid_model_arguments_never_execute_the_host_tool() {
+        let tools: Vec<Box<dyn KernelTool>> = vec![Box::new(CountingTool::new("probe"))];
+        let router = Router::new(vec![Box::new(ScriptedBackend::new(
+            "scripted",
+            vec![
+                completed(
+                    "",
+                    vec![
+                        call("bad-json", "probe", "{"),
+                        call("bad-shape", "probe", "[]"),
+                    ],
+                ),
+                completed("done", vec![]),
+            ],
+        ))]);
+        let (_home, mut journal) = temp_journal();
+        let result = TurnLoop::new(&router, &tools, Some(&mut journal), LoopLimits::default())
+            .run("m", vec![ChatMessage::new("user", "go")], &Cancel::new())
+            .unwrap();
+        assert!(matches!(result, LoopOutcome::Final { .. }));
+        let snapshot = journal.read().unwrap();
+        assert!(snapshot
+            .events
+            .iter()
+            .filter(|e| e["event_type"] == json!("tool_result"))
+            .all(|e| e.pointer("/payload/result/error").is_some()));
+        // Full malformed arguments were rejected before execute; the only
+        // results contain the parser's refusal, not CountingTool's run count.
+        assert!(snapshot
+            .events
+            .iter()
+            .all(|e| e.pointer("/payload/result/runs").is_none()));
     }
 
     #[test]

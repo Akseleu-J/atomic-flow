@@ -1,13 +1,15 @@
 //! The edit loop (Tier 0 closer): kernel tools wired for code editing —
 //! context pack (repo map), full-proof reads, sandbox CAS edits, a check
 //! command whose failures feed back to the model (the Aider auto-test loop),
-//! and a host final gate the model cannot skip. Edit budget is the in-loop
+//! and a host diagnostic gate the model cannot skip. Diagnostic success is
+//! never requirement verification. Edit budget is the in-loop
 //! ceiling; the durable per-task ceiling lives in af-agents::repair.
 
 use crate::{KernelTool, LoopLimits, LoopOutcome, TurnLoop};
 use af_llm::{Cancel, ChatMessage, Router};
 use serde_json::{json, Value};
 use std::cell::RefCell;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
 /// Kernel tools for one editing task inside a sandboxed root.
@@ -21,6 +23,9 @@ pub struct EditToolset<'a> {
     pub max_edits: usize,
     edits_used: RefCell<usize>,
     changed: RefCell<Vec<String>>,
+    write_scope: BTreeSet<String>,
+    reviewed_replacements: BTreeMap<String, String>,
+    effects_unknown: RefCell<bool>,
 }
 
 impl<'a> EditToolset<'a> {
@@ -33,6 +38,18 @@ impl<'a> EditToolset<'a> {
         check_cwd: PathBuf,
         max_edits: usize,
     ) -> Result<Self, String> {
+        let root = registry.get(root_id).map_err(|error| error.0)?;
+        registry
+            .require_root_effects_clear(root_id)
+            .map_err(|error| error.0)?;
+        let granted = root["path"]
+            .as_str()
+            .ok_or("granted root path is unavailable")?;
+        if std::fs::canonicalize(granted).map_err(|_| "granted root is unavailable")?
+            != std::fs::canonicalize(&check_cwd).map_err(|_| "check workspace is unavailable")?
+        {
+            return Err("check workspace must equal the granted task root".into());
+        }
         Ok(EditToolset {
             session: RefCell::new(af_sandbox::SandboxSession::new(registry).map_err(|e| e.0)?),
             runner: RefCell::new(runner),
@@ -43,7 +60,98 @@ impl<'a> EditToolset<'a> {
             max_edits,
             edits_used: RefCell::new(0),
             changed: RefCell::new(Vec::new()),
+            write_scope: BTreeSet::new(),
+            reviewed_replacements: BTreeMap::new(),
+            effects_unknown: RefCell::new(false),
         })
+    }
+
+    /// Bind exact reviewed host paths before a model runs. Prompts, tool input
+    /// and a broad root grant cannot expand this scope. An unbound toolset is
+    /// read-only even when its root grant permits writes.
+    pub fn with_write_scope(mut self, paths: &[String]) -> Result<Self, String> {
+        if !self.write_scope.is_empty() || paths.is_empty() || paths.len() > 128 {
+            return Err("a bounded nonempty reviewed write scope is required".into());
+        }
+        for path in paths {
+            if path.len() > 512 || !self.write_scope.insert(path.clone()) {
+                return Err("write scope paths must be bounded and unique".into());
+            }
+            af_sandbox::admission::admit_rel(&self.check_cwd, path).map_err(|error| error.0)?;
+        }
+        Ok(self)
+    }
+
+    /// For an endpoint that accepts an exact reviewed replacement, bind those
+    /// bytes independently of the model prompt. It cannot substitute a different
+    /// edit while staying inside the path scope.
+    pub fn with_reviewed_replacement(
+        mut self,
+        path: &str,
+        replacement: &str,
+    ) -> Result<Self, String> {
+        if !self.write_scope.contains(path)
+            || self.reviewed_replacements.contains_key(path)
+            || replacement.len() > 1_000_000
+            || self
+                .reviewed_replacements
+                .values()
+                .map(String::len)
+                .sum::<usize>()
+                + replacement.len()
+                > 1_000_000
+        {
+            return Err(
+                "reviewed replacement requires a unique scoped path and bounded exact bytes".into(),
+            );
+        }
+        self.reviewed_replacements
+            .insert(path.to_string(), replacement.to_string());
+        Ok(self)
+    }
+
+    fn diagnostic_check(&self) -> Result<Value, String> {
+        let before = af_sandbox::manifest(&self.check_cwd).map_err(|error| error.0)?;
+        if self.check_argv.is_empty() {
+            let revision =
+                af_sandbox::sha256_hex(&af_graph::canonical::canonical_bytes(&json!(before)));
+            return Ok(json!({"status":"not_configured", "diagnostic_passed":false,
+                "verification":"not_assessed", "execution_started":false,
+                "source_before":revision,"source_after":revision,"source_changed":false,
+                "requirement_check":{"status":"not_assessed","reason":"no diagnostic or requirement checker is configured"}}));
+        }
+        let spec = af_exec::JobSpec::new(self.check_argv.clone(), self.check_cwd.clone(), 120)
+            .map_err(|error| error.0)?;
+        let mut status = self.runner.borrow().run(&spec).map_err(|_| {
+            *self.effects_unknown.borrow_mut() = true;
+            "diagnostic execution outcome requires reconciliation; never replay".to_string()
+        })?;
+        if status["status"] == json!("unknown") || status["cleanup_confirmed"] != json!(true) {
+            *self.effects_unknown.borrow_mut() = true;
+        }
+        let after = af_sandbox::manifest(&self.check_cwd).map_err(|_| {
+            *self.effects_unknown.borrow_mut() = true;
+            "source audit unavailable after diagnostic execution; stop and reconcile".to_string()
+        })?;
+        status["source_before"] = json!(af_sandbox::sha256_hex(
+            &af_graph::canonical::canonical_bytes(&json!(before))
+        ));
+        status["source_after"] = json!(af_sandbox::sha256_hex(
+            &af_graph::canonical::canonical_bytes(&json!(after))
+        ));
+        status["source_changed"] = json!(before != after);
+        status["diagnostic_passed"] = json!(
+            status["status"] == json!("succeeded")
+                && status["exit_code"] == json!(0)
+                && status["cleanup_confirmed"] == json!(true)
+                && status["timed_out"] == json!(false)
+                && status["stdout_truncated"] == json!(false)
+                && status["stderr_truncated"] == json!(false)
+                && before == after
+        );
+        status["verification"] = json!("not_assessed");
+        status["requirement_check"] = json!({"status":"not_assessed", "reason":"no host-bound completed requirement checker was supplied"});
+        Ok(status)
     }
 
     pub fn edits_used(&self) -> usize {
@@ -66,6 +174,9 @@ impl KernelTool for EditToolset<'_> {
     }
 
     fn execute(&self, arguments: &Value) -> Value {
+        if *self.effects_unknown.borrow() {
+            return json!({"error": "an earlier effect is unknown; stop and reconcile, never replay"});
+        }
         let op = arguments
             .get("op")
             .and_then(Value::as_str)
@@ -99,6 +210,16 @@ impl KernelTool for EditToolset<'_> {
                 ) else {
                     return json!({"error": "apply_edit requires path and replacement"});
                 };
+                if !self.write_scope.contains(path) {
+                    return json!({"error": "path is outside the exact host-reviewed write scope"});
+                }
+                if self
+                    .reviewed_replacements
+                    .get(path)
+                    .is_some_and(|expected| expected != replacement)
+                {
+                    return json!({"error":"replacement differs from the exact host-reviewed bytes"});
+                }
                 if *self.edits_used.borrow() >= self.max_edits {
                     return json!({"error": format!("edit budget exhausted ({} of {} used); repair via one precise edit or stop", self.edits_used.borrow(), self.max_edits)});
                 }
@@ -118,27 +239,25 @@ impl KernelTool for EditToolset<'_> {
                         self.changed.borrow_mut().push(path.to_string());
                         report
                     }
-                    Err(error) => json!({"error": error.0}),
+                    Err(_) => {
+                        *self.effects_unknown.borrow_mut() = true;
+                        json!({"error": "apply outcome is unknown; stop and reconcile, never replay"})
+                    }
                 }
             }
-            "run_check" => {
-                let spec = match af_exec::JobSpec::new(
-                    self.check_argv.clone(),
-                    self.check_cwd.clone(),
-                    120,
-                ) {
-                    Ok(spec) => spec,
-                    Err(error) => return json!({"error": error.0}),
-                };
-                match self.runner.borrow().run(&spec) {
-                    Ok(status) => json!({
-                        "check": {"status": status["status"], "exit_code": status["exit_code"]},
-                    }),
-                    Err(error) => json!({"error": error.0}),
-                }
-            }
+            "run_check" => match self.diagnostic_check() {
+                Ok(status) => json!({"check": status}),
+                Err(error) => json!({"error": error}),
+            },
             other => json!({"error": format!("unknown op {other}")}),
         }
+    }
+
+    fn effects_unknown(&self) -> bool {
+        *self.effects_unknown.borrow()
+    }
+    fn requires_durable_journal(&self) -> bool {
+        true
     }
 }
 
@@ -151,6 +270,14 @@ pub enum EditOutcome {
         edits: usize,
         check: Value,
         /// Auto-commit record: committed head, skip reason or honest error.
+        git: Value,
+    },
+    /// Answer or source change completed, but no admitted completed requirement
+    /// check was provided. Generic exit-zero is diagnostic, never Verified.
+    Unverified {
+        content: String,
+        edits: usize,
+        check: Value,
         git: Value,
     },
     /// The model finished, but the final gate failed: not a success, ever.
@@ -170,8 +297,8 @@ pub enum EditOutcome {
 /// Run one guided editing task: TurnLoop over the edit toolset, then the
 /// host final gate. `host_approved` is an explicit operator decision bound
 /// to this task (sandbox apply authority), never inferred from model text.
-/// `git` is an optional GitWorkflow; when supplied and the check verifies,
-/// exactly one auto-commit records the change on the task branch.
+/// `git` is retained for compatibility. Without a bound completed requirement
+/// checker this path never auto-commits, even when a diagnostic exits zero.
 pub fn run_edit_task(
     router: &Router,
     toolset: &EditToolset,
@@ -185,8 +312,10 @@ pub fn run_edit_task(
     if !host_approved {
         return Err("edit tasks require explicit host approval for sandbox apply".into());
     }
+    let journal =
+        journal.ok_or("edit tasks require a durable journal before model or mutation effects")?;
     let tools: Vec<Box<dyn KernelTool + '_>> = vec![Box::new(RefCellTool(toolset))];
-    let mut loop_ = TurnLoop::new(router, &tools, journal, limits);
+    let mut loop_ = TurnLoop::new(router, &tools, Some(&mut *journal), limits);
     let outcome = loop_
         .run(
             model,
@@ -201,46 +330,85 @@ pub fn run_edit_task(
             &Cancel::new(),
         )
         .map_err(|error| error.0)?;
+    drop(loop_);
     let edits = toolset.edits_used();
     match outcome {
         LoopOutcome::Final { content, .. } => {
             if edits == 0 {
-                return Ok(EditOutcome::Completed {
+                return Ok(EditOutcome::Unverified {
                     content,
                     edits: 0,
-                    check: json!({"skipped": true, "reason": "no edits were applied"}),
+                    check: json!({"skipped": true, "verification":"not_assessed", "reason": "no edits were applied; no requirement check ran"}),
                     git: json!({"skipped": true, "reason": "no edits were applied"}),
                 });
             }
-            // Host final gate: the check runs again, model-invisible.
-            let spec =
-                af_exec::JobSpec::new(toolset.check_argv.clone(), toolset.check_cwd.clone(), 120)
-                    .map_err(|e| e.0)?;
-            let check = toolset.runner.borrow().run(&spec).map_err(|e| e.0)?;
-            let verified = check["status"] == json!("succeeded");
-            // Git-native workflow: one auto-commit per verified change set,
-            // only when the caller supplied a workflow bound to a repo root.
-            // A commit failure is recorded honestly; it never flips the
-            // check verdict, and unverified changes are never committed.
-            let git_record = if verified {
-                match git {
-                    Some(workflow) => {
-                        let changed = toolset.changed_paths();
-                        let changed_refs: Vec<&str> = changed.iter().map(String::as_str).collect();
-                        match workflow
-                            .auto_commit(&changed_refs, &format!("af: {task} (check verified)"))
-                        {
-                            Ok(head) => json!({"committed": true, "head": head}),
-                            Err(error) => json!({"committed": false, "error": error.0}),
-                        }
-                    }
-                    None => json!({"skipped": true, "reason": "no git workflow supplied"}),
+            // This trusted arbitrary command is diagnostic. Persist its effect
+            // boundary, audit source freshness and preserve its actual outcome;
+            // it cannot substitute for a completed requirement check receipt.
+            let check_id = af_entropy::token();
+            journal
+                .begin_effect(
+                    "tool_request",
+                    &check_id,
+                    &json!({"name":"final_diagnostic_check", "verification":"not_assessed"}),
+                )
+                .map_err(|_| "final diagnostic checkpoint failed; execution was not authorized")?;
+            let check = match toolset.diagnostic_check() {
+                Ok(check) => check,
+                Err(error) => {
+                    journal
+                        .finish_effect(
+                            "tool_effect_unknown",
+                            &check_id,
+                            &json!({"reason":"final diagnostic outcome requires reconciliation"}),
+                            "unknown",
+                        )
+                        .map_err(|_| {
+                            "final diagnostic outcome could not be persisted; durable hold retained"
+                        })?;
+                    return Err(error);
                 }
-            } else {
-                json!({"committed": false, "reason": "checks did not pass; unverified changes are never committed"})
             };
-            if verified {
-                Ok(EditOutcome::Completed {
+            if toolset.effects_unknown() {
+                journal
+                    .finish_effect(
+                        "tool_effect_unknown",
+                        &check_id,
+                        &json!({"check":check}),
+                        "unknown",
+                    )
+                    .map_err(|_| {
+                        "diagnostic completion persistence failed; durable hold retained"
+                    })?;
+                return Ok(EditOutcome::Interrupted {
+                    edits,
+                    loop_outcome: LoopOutcome::Hold {
+                        backend: "host-check".into(),
+                        detail: "diagnostic outcome is unknown; reconcile before continuation"
+                            .into(),
+                    },
+                });
+            }
+            let diagnostic_passed = check["diagnostic_passed"] == json!(true);
+            let not_configured = check["status"] == json!("not_configured");
+            journal
+                .finish_effect(
+                    "tool_result",
+                    &check_id,
+                    &json!({"check":check}),
+                    if diagnostic_passed {
+                        "success"
+                    } else {
+                        "error"
+                    },
+                )
+                .map_err(|_| {
+                    "final diagnostic completion persistence failed; durable hold retained"
+                })?;
+            let git_record = json!({"committed":false, "workflow_supplied":git.is_some(),
+                "reason":"no completed requirement checker; diagnostic exit-zero cannot authorize auto-commit"});
+            if diagnostic_passed || not_configured {
+                Ok(EditOutcome::Unverified {
                     content,
                     edits,
                     check,
@@ -267,6 +435,12 @@ pub fn run_edit_task(
 struct RefCellTool<'a, 'b>(&'a EditToolset<'b>);
 
 impl KernelTool for RefCellTool<'_, '_> {
+    fn effects_unknown(&self) -> bool {
+        self.0.effects_unknown()
+    }
+    fn requires_durable_journal(&self) -> bool {
+        true
+    }
     fn spec(&self) -> af_llm::ToolSpec {
         af_llm::ToolSpec {
             name: "edit_task".into(),
@@ -368,7 +542,7 @@ mod tests {
         (Temp { home, root, store }, registry)
     }
 
-    fn toolset<'a>(
+    fn unbound_toolset<'a>(
         temp: &'a Temp,
         registry: &'a af_sandbox::SandboxRegistry,
         check_exit: i32,
@@ -394,8 +568,36 @@ mod tests {
         .unwrap()
     }
 
+    fn toolset<'a>(
+        temp: &'a Temp,
+        registry: &'a af_sandbox::SandboxRegistry,
+        check_exit: i32,
+        max_edits: usize,
+    ) -> EditToolset<'a> {
+        unbound_toolset(temp, registry, check_exit, max_edits)
+            .with_write_scope(&["lib.py".into()])
+            .unwrap()
+    }
+
+    fn edit_journal(temp: &Temp) -> af_journal::SessionJournal {
+        let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
+        std::env::set_var("ATOMIC_FLOW_HOME", &temp.home);
+        let project = temp.home.join("proj");
+        std::fs::create_dir_all(&project).unwrap();
+        let result = af_journal::SessionJournal::create(
+            &project,
+            Some(&format!("edit{}", af_entropy::token())),
+            None,
+        );
+        match previous {
+            Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
+            None => std::env::remove_var("ATOMIC_FLOW_HOME"),
+        }
+        result.unwrap()
+    }
+
     #[test]
-    fn guided_edit_read_apply_check_final() {
+    fn zero_exit_with_no_tests_does_not_verify_or_commit_an_edit() {
         let (temp, registry) = setup();
         let toolset = toolset(&temp, &registry, 0, 4);
         let backend = ScriptedBackend::new(
@@ -438,7 +640,7 @@ mod tests {
         )
         .unwrap();
         match outcome {
-            EditOutcome::Completed {
+            EditOutcome::Unverified {
                 content,
                 edits,
                 check,
@@ -447,28 +649,24 @@ mod tests {
                 assert_eq!(content, "helper now returns 2");
                 assert_eq!(edits, 1);
                 assert_eq!(check["status"], json!("succeeded"));
+                assert_eq!(check["verification"], json!("not_assessed"));
+                assert_eq!(check["diagnostic_passed"], json!(true));
                 assert_eq!(
-                    git["skipped"],
-                    json!(true),
-                    "no workflow supplied: honest skip"
+                    git["committed"],
+                    json!(false),
+                    "exit-zero is not a completed requirement receipt"
                 );
             }
-            other => panic!("expected completed, got {other:?}"),
+            other => panic!("expected changed but unverified, got {other:?}"),
         }
         let on_disk = std::fs::read_to_string(temp.root.join("lib.py")).unwrap();
         assert!(on_disk.contains("return 2"));
     }
 
     #[test]
-    fn failing_check_feeds_back_and_repair_succeeds() {
-        // check exits 1 while the helper is "broken"; after the repair edit
-        // the toolset's check passes (argv is re-read per call? no — the
-        // fixture uses a marker file: check fails while marker absent).
+    fn edited_source_remains_unverified_without_a_requirement_checker() {
         let (temp, registry) = setup();
-        let marker = temp.root.join("marker.tmp");
         let toolset = toolset(&temp, &registry, 0, 4);
-        // First check must fail: run_check reports exit code of a probe job —
-        // model then applies the real edit; final gate re-runs check (pass).
         let backend = ScriptedBackend::new(
             "scripted",
             vec![
@@ -487,10 +685,11 @@ mod tests {
             ],
         );
         let router = Router::new(vec![Box::new(backend)]);
+        let mut journal = edit_journal(&temp);
         let outcome = run_edit_task(
             &router,
             &toolset,
-            None,
+            Some(&mut journal),
             "m",
             "repair helper",
             true,
@@ -498,8 +697,7 @@ mod tests {
             None,
         )
         .unwrap();
-        assert!(matches!(outcome, EditOutcome::Completed { edits: 1, .. }));
-        let _ = std::fs::remove_file(&marker);
+        assert!(matches!(outcome, EditOutcome::Unverified { edits: 1, .. }));
     }
 
     #[test]
@@ -531,10 +729,11 @@ mod tests {
             ],
         );
         let router = Router::new(vec![Box::new(backend)]);
+        let mut journal = edit_journal(&temp);
         let outcome = run_edit_task(
             &router,
             &toolset,
-            None,
+            Some(&mut journal),
             "m",
             "two edits",
             true,
@@ -543,8 +742,8 @@ mod tests {
         )
         .unwrap();
         match outcome {
-            EditOutcome::Completed { edits, .. } => assert_eq!(edits, 1),
-            other => panic!("expected completed with one edit, got {other:?}"),
+            EditOutcome::Unverified { edits, .. } => assert_eq!(edits, 1),
+            other => panic!("expected one unverified edit, got {other:?}"),
         }
         let on_disk = std::fs::read_to_string(temp.root.join("lib.py")).unwrap();
         assert!(on_disk.contains("return 2"));
@@ -573,10 +772,11 @@ mod tests {
             ],
         );
         let router = Router::new(vec![Box::new(backend)]);
+        let mut journal = edit_journal(&temp);
         let outcome = run_edit_task(
             &router,
             &toolset,
-            None,
+            Some(&mut journal),
             "m",
             "optimistic",
             true,
@@ -611,5 +811,194 @@ mod tests {
         )
         .unwrap_err();
         assert!(error.contains("explicit host approval"));
+    }
+
+    #[test]
+    fn no_edits_is_answer_only_not_verified() {
+        let (temp, registry) = setup();
+        let toolset = toolset(&temp, &registry, 0, 4);
+        let router = Router::new(vec![Box::new(ScriptedBackend::echo())]);
+        let mut journal = edit_journal(&temp);
+        let result = run_edit_task(
+            &router,
+            &toolset,
+            Some(&mut journal),
+            "m",
+            "answer",
+            true,
+            LoopLimits::default(),
+            None,
+        )
+        .unwrap();
+        match result {
+            EditOutcome::Unverified { edits, check, .. } => {
+                assert_eq!(edits, 0);
+                assert_eq!(check["skipped"], json!(true));
+                assert_eq!(check["verification"], json!("not_assessed"));
+            }
+            other => panic!("answer-only must not verify an edit: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn missing_durable_journal_refuses_before_any_edit() {
+        let (temp, registry) = setup();
+        let toolset = toolset(&temp, &registry, 0, 4);
+        let router = Router::new(vec![Box::new(ScriptedBackend::new(
+            "scripted",
+            vec![
+                completed(
+                    "",
+                    vec![call("read", r#"{"op":"read_file","path":"lib.py"}"#)],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "edit",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"x = 9\n"}"#,
+                    )],
+                ),
+            ],
+        ))]);
+        let before = std::fs::read(temp.root.join("lib.py")).unwrap();
+        let error = run_edit_task(
+            &router,
+            &toolset,
+            None,
+            "m",
+            "edit",
+            true,
+            LoopLimits::default(),
+            None,
+        )
+        .unwrap_err();
+        assert!(error.contains("durable journal"));
+        assert_eq!(toolset.edits_used(), 0);
+        assert_eq!(std::fs::read(temp.root.join("lib.py")).unwrap(), before);
+    }
+
+    #[test]
+    fn exact_scope_cannot_be_widened_by_model_arguments_or_a_root_grant() {
+        let (temp, registry) = setup();
+        std::fs::write(temp.root.join("other.py"), b"VALUE = 1\n").unwrap();
+        registry
+            .grant(
+                "main",
+                &temp.root,
+                &["lib.py".into(), "other.py".into()],
+                true,
+            )
+            .unwrap();
+        let toolset = toolset(&temp, &registry, 0, 4);
+        assert_eq!(
+            toolset.execute(&json!({"op":"read_file","path":"other.py"}))["read_complete"],
+            json!(true)
+        );
+        let refused = toolset.execute(
+            &json!({"op":"apply_edit","path":"other.py", "replacement":"VALUE = 2\n",
+            "scope_paths":["other.py"],"host_approved":true}),
+        );
+        assert!(refused["error"]
+            .as_str()
+            .unwrap()
+            .contains("exact host-reviewed"));
+        assert_eq!(
+            std::fs::read(temp.root.join("other.py")).unwrap(),
+            b"VALUE = 1\n"
+        );
+        assert_eq!(toolset.edits_used(), 0);
+    }
+
+    #[test]
+    fn an_unbound_toolset_is_read_only_even_with_a_write_grant() {
+        let (temp, registry) = setup();
+        let toolset = unbound_toolset(&temp, &registry, 0, 4);
+        toolset.execute(&json!({"op":"read_file","path":"lib.py"}));
+        let result =
+            toolset.execute(&json!({"op":"apply_edit","path":"lib.py","replacement":"x = 9\n"}));
+        assert!(result["error"].is_string());
+        assert_eq!(toolset.edits_used(), 0);
+        assert!(std::fs::read_to_string(temp.root.join("lib.py"))
+            .unwrap()
+            .contains("return 1"));
+    }
+
+    #[test]
+    fn stale_read_proof_never_overwrites_the_newer_source() {
+        let (temp, registry) = setup();
+        let toolset = toolset(&temp, &registry, 0, 4);
+        toolset.execute(&json!({"op":"read_file","path":"lib.py"}));
+        std::fs::write(temp.root.join("lib.py"), b"EXTERNAL = 7\n").unwrap();
+        let result =
+            toolset.execute(&json!({"op":"apply_edit","path":"lib.py","replacement":"x = 9\n"}));
+        assert!(result["error"].is_string());
+        assert_eq!(toolset.edits_used(), 0);
+        assert!(!toolset.effects_unknown());
+        assert_eq!(
+            std::fs::read(temp.root.join("lib.py")).unwrap(),
+            b"EXTERNAL = 7\n"
+        );
+    }
+
+    #[test]
+    fn check_workspace_must_match_the_granted_root() {
+        let (temp, registry) = setup();
+        let runner = af_exec::JobRunner::open(&temp.home.join("jobs")).unwrap();
+        let result = EditToolset::new(
+            &registry,
+            "main",
+            runner,
+            json!({"nodes":[],"edges":[]}),
+            vec!["unused".into()],
+            temp.home.clone(),
+            4,
+        );
+        assert!(result.err().unwrap().contains("must equal the granted"));
+    }
+
+    #[test]
+    fn zero_exit_source_mutation_invalidates_the_diagnostic_source_binding() {
+        let (temp, registry) = setup();
+        let mut toolset = toolset(&temp, &registry, 0, 4);
+        #[cfg(windows)]
+        {
+            toolset.check_argv = vec![
+                "cmd".into(),
+                "/C".into(),
+                "echo EXTERNAL = 3 > lib.py".into(),
+            ];
+        }
+        #[cfg(not(windows))]
+        {
+            toolset.check_argv = vec![
+                "sh".into(),
+                "-c".into(),
+                "printf 'EXTERNAL = 3\\n' > lib.py".into(),
+            ];
+        }
+        let check = toolset.diagnostic_check().unwrap();
+        assert_eq!(check["exit_code"], json!(0));
+        assert_eq!(check["source_changed"], json!(true));
+        assert_eq!(check["diagnostic_passed"], json!(false));
+        assert_eq!(check["verification"], json!("not_assessed"));
+    }
+
+    #[test]
+    fn model_cannot_replace_different_bytes_than_the_reviewed_http_change() {
+        let (temp, registry) = setup();
+        let toolset = toolset(&temp, &registry, 0, 4)
+            .with_reviewed_replacement("lib.py", "REVIEWED = 2\n")
+            .unwrap();
+        toolset.execute(&json!({"op":"read_file","path":"lib.py"}));
+        let refused = toolset.execute(&json!({"op":"apply_edit","path":"lib.py",
+            "replacement":"UNREVIEWED = 3\n","host_approved":true}));
+        assert!(refused["error"]
+            .as_str()
+            .unwrap()
+            .contains("exact host-reviewed bytes"));
+        assert_eq!(toolset.edits_used(), 0);
+        assert!(std::fs::read_to_string(temp.root.join("lib.py"))
+            .unwrap()
+            .contains("return 1"));
     }
 }

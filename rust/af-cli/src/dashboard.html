@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atomic Flow Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     color-scheme: dark;
@@ -491,6 +489,49 @@
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   ::-webkit-scrollbar-track { background: transparent; }
+
+/* Studio refinement: calm surfaces, clearer hierarchy, adaptable workspace. */
+:root { --explorer-w:286px; --verify-w:306px; --rail-w:68px; --toolbar-h:56px; --muted:#9692A1; --faint:#777382; }
+body { font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+button,input,textarea { font:inherit; } button { color:inherit; } button:not(:disabled),[role=button] { cursor:pointer; }
+button { background:none;border:0; } button:disabled,[aria-disabled=true] { opacity:.45;cursor:not-allowed; }
+:focus-visible { outline:2px solid var(--lavender);outline-offset:3px; }
+.toolbar { gap:16px; padding:0 18px; } .logo .name { letter-spacing:-.025em;font-size:14px; } .logo .atom-badge { background:var(--elev);box-shadow:none;color:#B29ACB; }
+.win-controls { display:none; } .tool-tab { padding:6px 10px; } .search-hint { white-space:nowrap; }
+.body { gap:0; } .rail { border-right:1px solid var(--border);padding:12px 7px 8px; } .rail-item { border-radius:8px;margin-bottom:6px;min-height:52px;font-size:10px; }
+.rail-item.active { background:#211C2D;box-shadow:inset 2px 0 var(--lavender); } .rail-meta { display:none; }
+.explorer { position:relative;min-width:0;flex:0 0 var(--explorer-w); } .panel-head { min-height:55px;padding:14px 16px; } .panel-head .title { font-size:12px;letter-spacing:.015em; }
+.panel-head .count { padding:1px 6px;color:var(--text2);background:var(--surf);font-size:10px; }
+.panel-tabs { padding:0 10px; } .ptab { flex:1;padding:9px 2px;text-align:center;font-size:11px; }
+.explorer-filter { padding:12px 12px 4px; } .explorer-filter input { width:100%;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);padding:0 10px;font-size:11px; }
+.panel-body { padding:8px; } .query-card { margin:12px 4px 2px;padding:13px;border-color:var(--border);background:var(--bg2); }
+.tree details { border-left:1px solid var(--border);margin:2px 0 2px 9px; } .tree details > summary { list-style:none;padding:6px 8px;display:flex;gap:7px;cursor:pointer;align-items:center;color:var(--text2);font-size:11px; }
+.tree details > summary::before { content:'›';color:var(--muted);width:9px; } .tree details[open] > summary::before { transform:rotate(90deg); } .tree details > summary svg { color:var(--lavender);width:14px;height:14px; }
+.tree .trow { width:100%;padding:7px 8px;gap:8px;text-align:left;font-size:11px;line-height:1.4; } .tree .trow .name { text-overflow:ellipsis; } .tree .layer-chip { font-size:9px;padding:0 5px;color:var(--text2);background:var(--bg2);border-color:var(--border); }
+.workspace { min-width:320px;flex:1;background:linear-gradient(180deg,#0D0E12 0%,#090A0D 32%); } .ws-tabs { min-height:48px;gap:0;align-items:center;padding:0 16px;border-bottom:1px solid var(--border); }
+.agent-tab { border:0!important;background:none!important;padding:0 2px;font-size:12px; } .workspace-caption { color:var(--muted);font-size:10px;margin-left:14px; } .workspace-tools { margin-left:auto;display:flex;gap:8px; } .workspace-tools button { color:var(--text2);font-size:10px;padding:5px 7px;border:1px solid var(--border);border-radius:5px; }
+.dialog { padding:24px clamp(18px,3vw,52px); } .empty { text-align:left;max-width:600px;margin:auto;padding:clamp(32px,8vh,100px) 8px 32px; }
+.empty .eic { width:42px;height:42px;margin:0 0 22px;background:var(--elev);border:1px solid var(--border2);box-shadow:none;color:var(--lavender);border-radius:12px; }
+.welcome-kicker { font-size:9px;letter-spacing:.16em;color:var(--lavender);margin-bottom:14px;font-weight:600; } .empty .et { font-size:clamp(25px,2.6vw,36px);font-weight:550;letter-spacing:-.045em;line-height:1.22;color:var(--text); }
+.empty .es { max-width:420px;margin:16px 0 0;font-size:12px;color:var(--text2);line-height:1.75; } .empty .quick-actions { justify-content:flex-start;gap:8px;margin-top:25px;flex-wrap:wrap; } .empty .btn-link { padding:9px 11px;border:1px solid var(--border2);border-radius:7px;background:var(--panel);font-size:11px; }
+.msg { gap:13px;margin-bottom:24px; } .m-avatar { width:30px;height:30px;border-radius:9px;min-width:30px;box-shadow:none; } .m-head { font-size:11px; } .m-time { font-size:10px;color:var(--muted); } .m-text { font-size:13px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere; } .m-bubble { background:none;border:0;padding:12px 0 0; } .user .m-bubble { background:var(--elev);border:1px solid var(--border);padding:13px 16px;border-radius:10px; } .claim-chips { display:flex;gap:6px;flex-wrap:wrap;margin-top:13px; } .chip { border:1px solid var(--border);padding:3px 8px;border-radius:6px;font-size:10px; }
+.composer-wrap { padding:14px clamp(18px,3vw,52px) 22px;background:transparent; } .composer { border-radius:12px;border-color:var(--border2);background:#121319;box-shadow:0 8px 30px #0003; } .mode-row { padding:9px 12px 0;gap:5px; } .mode-chip { border-radius:5px;font-size:10px;padding:4px 9px; } .mode-note { font-size:10px; } .input-row { padding:10px 14px;gap:10px; } .input-row textarea { font-size:13px;line-height:1.6;min-height:40px; } .composer-foot { font-size:9px;gap:16px;padding:0 15px 9px;color:var(--muted); }
+.send-btn { width:32px;height:32px;border-radius:7px;background:linear-gradient(140deg,#635178,#49365F);box-shadow:inset 0 1px #ffffff12; } .stop-btn { font-size:11px;color:var(--warn);padding:6px 9px;border:1px solid #DDA64C55;border-radius:6px; }
+.verify { position:relative;flex:0 0 var(--verify-w);width:var(--verify-w);min-width:0;border-left:1px solid var(--border);background:var(--panel);overflow:auto; } .v-head { min-height:55px;padding:14px;gap:7px; } .v-head .title { font-size:12px; } .v-head .vic { color:var(--lavender); } .v-badge { font-size:9px;white-space:nowrap; } .v-banner { margin:12px 12px 18px;padding:12px;font-size:11px;line-height:1.7;background:var(--bg2);border:1px solid var(--border);color:var(--text2); } .v-banner.pending { border-color:var(--border);background:var(--bg2);color:var(--text2); } .v-banner.error { border-color:#D65C6255;color:var(--err); }
+.v-section { padding:0 14px 20px; } .vs-title { text-transform:none;font-size:11px;letter-spacing:0;margin-bottom:12px; } .v-item { gap:9px;align-items:flex-start;font-size:11px;line-height:1.6;padding:8px 0;color:var(--text2); } .v-item .vic { color:var(--muted); } .changes-head { border-top:1px solid var(--border);padding-top:18px; } .changes-head .ct { font-size:11px; } .v-actions { padding:12px 14px;gap:7px; } .v-btn { width:100%;min-height:33px;font-size:11px;border-radius:6px; } .stepper { margin-top:auto;border-top:1px solid var(--border);padding:16px 14px; } .st-title { font-size:10px; } .st-track { opacity:.65; } .statusbar { gap:18px;padding:0 16px;font-size:10px; } .statusbar .mono { font-size:10px; }
+.page { padding:24px; } .page-head { flex-wrap:wrap;gap:10px; } .pt-title { font-size:19px;letter-spacing:-.03em; } .pt-sub { line-height:1.65;font-size:11px; } .card { padding:18px;border:1px solid var(--border);border-radius:10px;background:var(--panel); } .frow { flex-wrap:wrap; } .fcol { min-width:160px; } .a-btn { min-height:32px;font-size:11px; } .tbl td,.tbl th { font-size:11px; } .tbl td { max-width:220px;overflow-wrap:anywhere; }
+.layout-handle { position:absolute;top:0;bottom:0;width:5px;z-index:3;cursor:col-resize;touch-action:none; } .explorer .layout-handle { right:-3px; } .verify .layout-handle { left:-3px; } .layout-handle:hover,.layout-handle:focus-visible { background:var(--accent); }
+body.hide-explorer .explorer,body.hide-verification .verify { display:none; } body.compact .trow { padding-top:4px;padding-bottom:4px; }
+dialog { background:var(--panel);color:var(--text);border:1px solid var(--border2);border-radius:12px;padding:0;box-shadow:0 24px 90px #0009;max-width:92vw;width:650px; } dialog::backdrop { background:#0009; } .modal-head { padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px; } .modal-head button { margin-left:auto;padding:4px 8px;color:var(--text2); } .modal-body { padding:20px;max-height:70vh;overflow:auto; } .modal-body input { width:100%;padding:10px;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:6px; } .source-code { white-space:pre;overflow:auto;font:11px/1.8 ui-monospace,Consolas,monospace;max-height:55vh;padding:14px;background:var(--bg2);border-radius:7px; } .source-meta { font:10px/1.7 ui-monospace,Consolas,monospace;color:var(--text2);overflow-wrap:anywhere;margin-bottom:12px; } .command-list { display:flex;flex-direction:column;gap:5px; } .command-list button { text-align:left;padding:11px;border-radius:7px;color:var(--text2); } .command-list button:hover { background:var(--hover);color:var(--text); }
+.history-event { padding:12px 0;border-bottom:1px solid var(--border); } .history-event summary { color:var(--text2);cursor:pointer;font-size:11px; } .history-event pre { white-space:pre-wrap;font:10px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--text2); } .message-tools { display:flex;gap:10px;margin-top:10px; } .message-tools button { font-size:10px;color:var(--muted); }
+@media(max-width:1180px){ :root { --explorer-w:248px;--verify-w:276px; } .logo .name{font-size:12px}.toolbar{gap:10px}.tool-tab{font-size:11px;padding:5px 7px}.provider-chip{max-width:180px;font-size:10px}.workspace-caption{display:none}.rail-footer .avatar{display:none}.dialog{padding:22px}.composer-wrap{padding:12px 22px 18px} }
+@media(max-width:980px){ .verify{display:none}body.show-verification .verify{display:flex;position:absolute;right:0;top:56px;bottom:30px;z-index:10;box-shadow:-15px 0 40px #0008;width:300px}.tool-tabs [data-nav=analytics]{display:none}.workspace-tools{gap:4px} }
+@media(max-width:760px){ :root{--rail-w:56px}.explorer{display:none}body.show-explorer .explorer{display:flex;position:absolute;left:56px;top:56px;bottom:30px;z-index:10;box-shadow:15px 0 40px #0008;width:270px;flex-basis:270px}.toolbar{padding:0 12px}.logo .name{display:none}.logo .ver{display:none}.provider-chip{max-width:115px}.tool-tabs{display:none}.proj-select .path{max-width:125px}.workspace{min-width:0}.dialog{padding:18px 15px}.composer-wrap{padding:10px 12px 12px}.workspace-tools button{font-size:9px}.ws-tabs{padding:0 12px}.rail-item{font-size:8px}.statusbar{gap:12px}.statusbar #sbProject,.statusbar #sbClock{display:none}.mode-note{display:none}.empty .et{font-size:29px}.page{padding:16px}.fcol{min-width:100%}.quick-actions{display:flex;flex-direction:column;align-items:flex-start!important} }
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+.fcol select { width:100%;min-height:35px;padding:7px 9px;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:6px;font:12px inherit; }
+.tree .trow > svg { color:var(--lavender);flex-shrink:0; }
+.source-meta { white-space:pre-wrap; }
 </style>
 </head>
 <body>
@@ -541,43 +582,39 @@
     <span class="name">Atomic Flow Studio</span>
     <span class="ver" id="tbVersion">v0.1.0</span>
   </div>
-  <div class="proj-select" onclick="switchView('settings')" title="Проект и корни">
+  <div class="proj-select" data-action="switchView" data-value="settings" title="Проект и корни">
     <span class="ic"><svg class="i" width="13" height="13"><use href="#i-box"/></svg></span>
     <span class="path" id="tbProject">project/</span>
     <span class="ic"><svg class="i" width="10" height="10"><use href="#i-chev-d"/></svg></span>
   </div>
   <div class="tool-tabs">
-    <div class="tool-tab active" data-nav="dialog" onclick="switchView('dialog')"><span>Диалог</span><span class="badge" id="tabDialogCount">0</span></div>
-    <div class="tool-tab" data-nav="tasks" onclick="switchView('tasks')"><span>Задачи</span><span class="badge" id="tabTasksCount">0</span></div>
-    <div class="tool-tab" data-nav="analytics" onclick="switchView('analytics')"><span>Аналитика</span></div>
-    <div class="tool-tab" data-nav="settings" onclick="switchView('settings')"><span>Настройки</span></div>
+    <div class="tool-tab active" data-nav="dialog" data-action="switchView" data-value="dialog"><span>Диалог</span><span class="badge" id="tabDialogCount">0</span></div>
+    <div class="tool-tab" data-nav="tasks" data-action="switchView" data-value="tasks"><span>Сессии</span><span class="badge" id="tabTasksCount">0</span></div>
+    <div class="tool-tab" data-nav="analytics" data-action="switchView" data-value="analytics"><span>Аналитика</span></div>
+    <div class="tool-tab" data-nav="settings" data-action="switchView" data-value="settings"><span>Настройки</span></div>
   </div>
   <div style="flex:1"></div>
-  <div class="provider-chip" onclick="switchView('settings')" title="Backend и провайдер — Настройки">
+  <div class="provider-chip" data-action="switchView" data-value="settings" title="Backend и провайдер — Настройки">
     <span class="p-dot" id="providerDot"></span>
     <span id="providerText">Provider: подключение…</span>
   </div>
-  <div class="search-hint" onclick="focusComposer()" title="Фокус на композер"><span class="kbd">Ctrl+K</span> Поиск</div>
-  <div class="win-controls" aria-hidden="true" title="оформление оболочки">
-    <div class="win-btn"><svg class="i" width="11" height="11"><use href="#i-minus"/></svg></div>
-    <div class="win-btn"><svg class="i" width="10" height="10"><use href="#i-square"/></svg></div>
-    <div class="win-btn close"><svg class="i" width="11" height="11"><use href="#i-x"/></svg></div>
-  </div>
+  <button class="search-hint" data-action="openPalette" title="Команды (Ctrl+K)"><span class="kbd">Ctrl+K</span> Команды</button>
+
 </div>
 
 <div class="body">
   <!-- ═══ Global Navigation rail ═══ -->
   <div class="rail">
-    <div class="rail-item active" data-view="dialog" onclick="switchView('dialog')"><svg class="i ric"><use href="#i-home"/></svg>Home</div>
-    <div class="rail-item" data-view="tasks" onclick="switchView('tasks')"><svg class="i ric"><use href="#i-tasks"/></svg>Tasks<span class="rbadge hidden" id="railTaskBadge">0</span></div>
-    <div class="rail-item" data-view="workspaces" onclick="switchView('workspaces')"><svg class="i ric"><use href="#i-folder"/></svg>Roots</div>
-    <div class="rail-item" data-view="history" onclick="switchView('history')"><svg class="i ric"><use href="#i-history"/></svg>History</div>
-    <div class="rail-item" data-view="analytics" onclick="switchView('analytics')"><svg class="i ric"><use href="#i-analytics"/></svg>Аналитика</div>
-    <div class="rail-item" data-view="index" onclick="switchView('index')"><svg class="i ric"><use href="#i-index"/></svg>Index</div>
-    <div class="rail-item" data-view="settings" onclick="switchView('settings')"><svg class="i ric"><use href="#i-sliders"/></svg>Settings</div>
+    <div class="rail-item active" data-view="dialog" data-action="switchView" data-value="dialog"><svg class="i ric"><use href="#i-home"/></svg>Диалог</div>
+    <div class="rail-item" data-view="tasks" data-action="switchView" data-value="tasks"><svg class="i ric"><use href="#i-tasks"/></svg>Сессии<span class="rbadge hidden" id="railTaskBadge">0</span></div>
+    <div class="rail-item" data-view="workspaces" data-action="switchView" data-value="workspaces"><svg class="i ric"><use href="#i-folder"/></svg>Проекты</div>
+    <div class="rail-item" data-view="history" data-action="switchView" data-value="history"><svg class="i ric"><use href="#i-history"/></svg>История</div>
+    <div class="rail-item" data-view="analytics" data-action="switchView" data-value="analytics"><svg class="i ric"><use href="#i-analytics"/></svg>Аналитика</div>
+    <div class="rail-item" data-view="index" data-action="switchView" data-value="index"><svg class="i ric"><use href="#i-index"/></svg>Индекс</div>
+    <div class="rail-item" data-view="settings" data-action="switchView" data-value="settings"><svg class="i ric"><use href="#i-sliders"/></svg>Настройки</div>
     <div class="rail-spacer"></div>
     <div class="rail-footer">
-      <div class="rail-item" onclick="switchView('analytics')" title="Диагностика ядра"><svg class="i ric"><use href="#i-plus"/></svg>Doctor</div>
+      <div class="rail-item" data-action="switchView" data-value="analytics" title="Диагностика ядра"><svg class="i ric"><use href="#i-plus"/></svg>Doctor</div>
       <div class="rail-meta">
         <div class="rm" id="rmProject" title="Активный root"><span class="idle-dot" id="rmProjectDot"></span><span id="rmProjectText">root: —</span></div>
         <div class="rm" id="rmGit" title="git"><svg class="i"><use href="#i-git"/></svg><span id="rmGitText">git: —</span></div>
@@ -596,17 +633,17 @@
       <span class="count" id="ceNodeCount">0 узлов</span>
     </div>
     <div class="panel-tabs">
-      <div class="ptab active" data-ctab="files" onclick="switchCTab('files')">Files</div>
-      <div class="ptab" data-ctab="context" onclick="switchCTab('context')">Context</div>
-      <div class="ptab" data-ctab="sources" onclick="switchCTab('sources')">Sources</div>
-      <div class="ptab" data-ctab="cgraph" onclick="switchCTab('cgraph')">Graph</div>
+      <div class="ptab active" data-ctab="files" data-action="switchCTab" data-value="files">Files</div>
+      <div class="ptab" data-ctab="context" data-action="switchCTab" data-value="context">Context</div>
+      <div class="ptab" data-ctab="sources" data-action="switchCTab" data-value="sources">Sources</div>
+      <div class="ptab" data-ctab="cgraph" data-action="switchCTab" data-value="cgraph">Graph</div>
     </div>
-    <div class="panel-body">
+    <div class="explorer-filter"><input id="fileFilter" type="search" placeholder="Найти файл…" aria-label="Найти файл в графе" autocomplete="off"></div><div class="panel-body">
       <div class="ctab-view view" id="ctab-files">
         <div class="tree" id="ceTree">
           <div class="panel-empty" id="ceTreeEmpty">
             Граф ещё не собран.<br>Зарегистрируйте root и нажмите «Собрать граф».
-            <div class="btn-link" onclick="gotoRootSetup()"><svg class="i"><use href="#i-folder"/></svg> Настроить root</div>
+            <div class="btn-link" data-action="gotoRootSetup"><svg class="i"><use href="#i-folder"/></svg> Настроить root</div>
           </div>
         </div>
         <div class="query-card">
@@ -615,7 +652,7 @@
         </div>
       </div>
       <div class="ctab-view hidden" id="ctab-context">
-        <div class="panel-empty">Узлы, порядок и причины включения в контекст запроса.<br><br><b>Ожидает backend-эндпоинта</b> (context pack из af-context готов в ядре — HTTP-обвязка следующая).</div>
+        <div class="panel-empty">Файлы графа можно просматривать. Автоматическое включение в запрос пока не подключено; модель не получает проект целиком.</div>
       </div>
       <div class="ctab-view hidden" id="ctab-sources">
         <div id="sourcesList"><div class="panel-empty">Источники ответа: цитаты и диапазоны строк появятся после ответа с проверкой.</div></div>
@@ -628,43 +665,38 @@
 
   <!-- ═══ Agent Workspace ═══ -->
   <div class="workspace">
-    <div class="ws-tabs">
-      <div class="agent-tab active"><span class="tdot"></span> Main Agent</div>
-      <div class="agent-tab" title="P13 writable specialists — следующие фазы"><span>Research Agent</span></div>
-      <div class="agent-tab" title="P13 writable specialists — следующие фазы"><span>Code Agent</span></div>
-      <div class="agent-tab" title="P13 writable specialists — следующие фазы"><span>Review Agent</span></div>
-    </div>
+    <div class="ws-tabs"><div class="agent-tab active"><span class="tdot"></span> Рабочая сессия</div><span class="workspace-caption" id="workspaceCaption">Локальная среда · Ask</span><div class="workspace-tools"><button data-action="toggleExplorer" title="Показать / скрыть контекст">Контекст</button><button data-action="toggleVerification" title="Показать / скрыть проверки">Проверки</button></div></div>
 
     <!-- ── Диалог ── -->
     <div class="view" id="view-dialog">
       <div class="dialog" id="dialogView">
         <div class="empty" id="dialogEmpty">
           <div class="eic"><svg class="i"><use href="#i-atom"/></svg></div>
-          <div class="et">Atomic Flow готов</div>
-          <div class="es">Задайте вопрос — ответ пойдёт через ядро со стримингом, бюджетом и журналом. Или начните со сборки графа проекта.</div>
+          <div class="welcome-kicker">CONTEXT → EVIDENCE → VERIFICATION</div><div class="et">Сначала контекст.<br>Затем уверенные решения.</div>
+          <div class="es">Подключите проект, изучите его структуру и начните диалог. Источники, проверки и изменения всегда показаны отдельно.</div>
           <div class="quick-actions">
-            <div class="btn-link" onclick="gotoRootSetup()"><svg class="i"><use href="#i-layers"/></svg> Собрать граф</div>
-            <div class="btn-link" onclick="showDemo()"><svg class="i"><use href="#i-play"/></svg> Демо-сценарий</div>
-            <div class="btn-link" onclick="switchView('settings')"><svg class="i"><use href="#i-sliders"/></svg> Backend</div>
+            <div class="btn-link" data-action="gotoRootSetup"><svg class="i"><use href="#i-layers"/></svg> Собрать граф</div>
+            <div class="btn-link" data-action="newTask"><svg class="i"><use href="#i-plus"/></svg> Новая сессия</div>
+            <div class="btn-link" data-action="switchView" data-value="settings"><svg class="i"><use href="#i-sliders"/></svg> Backend</div>
           </div>
         </div>
       </div>
       <div class="composer-wrap">
         <div class="composer">
           <div class="mode-row">
-            <div class="mode-chip active" data-mode="ask" onclick="switchMode('ask')">Ask</div>
-            <div class="mode-chip" data-mode="edit" onclick="switchMode('edit')">Edit</div>
-            <div class="mode-chip" data-mode="task" onclick="switchMode('task')">Task</div>
-            <span class="mode-note" id="modeNote">спрос через backend</span>
+            <div class="mode-chip active" data-mode="ask" data-action="switchMode" data-value="ask">Ask</div>
+            <div class="mode-chip" data-mode="edit" data-action="switchMode" data-value="edit">Edit</div>
+            <button class="mode-chip" disabled title="Планирование и запуск задач появятся после подключения TaskRunner API">Task · скоро</button>
+            <span class="mode-note" id="modeNote">Диалог без изменения файлов</span>
           </div>
           <div class="input-row">
             <span class="bolt"><svg class="i"><use href="#i-bolt"/></svg></span>
             <textarea id="composerText" rows="1" placeholder="Задайте следующий вопрос..."></textarea>
-            <button class="attach-btn" title="Вложения — следующие фазы"><svg class="i"><use href="#i-clip"/></svg></button>
-            <button class="send-btn" onclick="sendComposer()" title="Отправить (Enter)"><svg class="i"><use href="#i-send"/></svg></button>
+            <button class="attach-btn" disabled title="Вложения пока не поддерживаются"><svg class="i"><use href="#i-clip"/></svg></button>
+            <button class="stop-btn hidden" id="stopBtn" data-action="stopStream" title="Остановить (Esc)">Стоп</button><button class="send-btn" id="sendBtn" data-action="sendComposer" title="Отправить (Enter)"><svg class="i"><use href="#i-send"/></svg></button>
           </div>
           <div class="composer-foot">
-            <span>↑↓ Навигация</span><span>Enter — отправить</span><span>Ctrl+K — фокус</span>
+            <span>Enter — отправить · Shift+Enter — новая строка</span><span>Esc — остановить</span>
           </div>
         </div>
       </div>
@@ -675,15 +707,15 @@
       <div class="page">
         <div class="page-head">
           <span class="pt-ic"><svg class="i"><use href="#i-tasks"/></svg></span>
-          <span class="pt-title">Задачи</span>
-          <span class="pt-sub">сессии журнала ядра — каждая задача это сессия с append-only историей</span>
+          <span class="pt-title">Сессии</span>
+          <span class="pt-sub">Сохранённая история диалога и состояние незавершённых операций</span>
           <span style="flex:1"></span>
-          <div class="btn-link" onclick="newTask()"><svg class="i"><use href="#i-plus"/></svg> Новая задача</div>
-          <div class="btn-link" onclick="refreshTasks()"><svg class="i"><use href="#i-rotate"/></svg> Обновить</div>
+          <div class="btn-link" data-action="newTask"><svg class="i"><use href="#i-plus"/></svg> Новая сессия</div>
+          <div class="btn-link" data-action="refreshTasks"><svg class="i"><use href="#i-rotate"/></svg> Обновить</div>
         </div>
         <div class="card">
           <table class="tbl" id="tasksTable">
-            <thead><tr><th>Сессия</th><th>События</th><th>Статус</th><th></th></tr></thead>
+            <thead><tr><th>Сессия</th><th>Проект</th><th>Состояние</th><th></th></tr></thead>
             <tbody id="tasksBody"><tr><td colspan="4" style="color:var(--muted)">загрузка…</td></tr></tbody>
           </table>
         </div>
@@ -698,9 +730,9 @@
           <span class="pt-title">История сессии</span>
           <span class="pt-sub" id="histSession">—</span>
           <span style="flex:1"></span>
-          <div class="btn-link" onclick="refreshHistory()"><svg class="i"><use href="#i-rotate"/></svg> Обновить</div>
+          <div class="btn-link" data-action="refreshHistory"><svg class="i"><use href="#i-rotate"/></svg> Обновить</div>
         </div>
-        <div id="historyBody"><div class="panel-empty">Откройте задачу во вкладке «Задачи» или задайте вопрос в диалоге.</div></div>
+        <div id="historyBody"><div class="panel-empty">Выберите сессию, чтобы просмотреть реальные события её журнала.</div></div>
       </div>
     </div>
 
@@ -712,7 +744,7 @@
           <span class="pt-title">Аналитика и диагностика</span>
           <span class="pt-sub">живое состояние ядра</span>
           <span style="flex:1"></span>
-          <div class="btn-link" onclick="refreshAnalytics()"><svg class="i"><use href="#i-rotate"/></svg> Обновить</div>
+          <div class="btn-link" data-action="refreshAnalytics"><svg class="i"><use href="#i-rotate"/></svg> Обновить</div>
         </div>
         <div id="analyticsBody"><div class="panel-empty">загрузка…</div></div>
       </div>
@@ -726,7 +758,7 @@
           <span class="pt-title">Индекс графа</span>
           <span class="pt-sub" id="indexSub">root: —</span>
           <span style="flex:1"></span>
-          <div class="btn-link" onclick="buildGraph()"><svg class="i"><use href="#i-rotate"/></svg> Пересобрать</div>
+          <div class="btn-link" data-action="buildGraph"><svg class="i"><use href="#i-rotate"/></svg> Пересобрать</div>
         </div>
         <div id="indexBody"><div class="panel-empty">Граф не собран — вкладка Files в Context Explorer.</div></div>
       </div>
@@ -743,14 +775,14 @@
 
         <div class="card" id="card-backend">
           <div class="c-title"><svg class="i"><use href="#i-bolt"/></svg> Backend модели</div>
-          <div class="c-sub">Используется композером (Ask) и journey. Ключ читается из переменной окружения — сам ключ сюда не вводится и не хранится.</div>
+          <div class="c-sub">Выберите подключённого провайдера. Ключи и адреса подключений настраиваются на сервере и не передаются в браузер.</div>
           <div class="frow">
-            <div class="fcol"><label>base_url</label><input id="cfgBaseUrl" placeholder="https://…/v1"></div>
-            <div class="fcol"><label>модель</label><input id="cfgModel" placeholder="google/gemini-…"></div>
-            <div class="fcol"><label>имя env-переменной с ключом</label><input id="cfgKeyEnv" placeholder="MODEL_PROXY_API_KEY"></div>
+            <div class="fcol"><label for="cfgProvider">Провайдер</label><select id="cfgProvider"><option value="scripted">Локальный тест</option></select></div>
+            <div class="fcol"><label for="cfgModel">Модель</label><select id="cfgModel"><option value="scripted">scripted</option></select></div>
           </div>
           <div class="frow">
-            <div class="a-btn primary" onclick="saveBackend()"><svg class="i"><use href="#i-check"/></svg> Сохранить</div>
+            <div class="a-btn primary" data-action="saveBackend"><svg class="i"><use href="#i-check"/></svg> Сохранить</div>
+            <button class="a-btn" data-action="openAuth">Войти с токеном</button>
             <span class="pt-sub" id="backendStatus" style="align-self:center"></span>
           </div>
         </div>
@@ -759,7 +791,7 @@
           <div class="c-title"><svg class="i"><use href="#i-folder"/></svg> Корень проекта и граф</div>
           <div class="c-sub">Выберите папку в проводнике — root регистрируется в sandbox-реестре (host-approved), затем по нему собирается структурный граф.</div>
           <div class="frow">
-            <div class="a-btn primary" id="pickBtn" onclick="pickFolder()"><svg class="i"><use href="#i-folder"/></svg> Выбрать папку…</div>
+            <div class="a-btn primary" id="pickBtn" data-action="pickFolder"><svg class="i"><use href="#i-folder"/></svg> Выбрать папку…</div>
           </div>
           <div class="frow">
             <div class="fcol" style="flex:2"><label>путь к проекту</label><input id="cfgRootPath" placeholder="C:\projects\my-app"></div>
@@ -767,8 +799,8 @@
           </div>
           <datalist id="rootIds"></datalist>
           <div class="frow">
-            <div class="a-btn primary" onclick="grantRoot()"><svg class="i"><use href="#i-plus"/></svg> Зарегистрировать root</div>
-            <div class="a-btn" onclick="buildGraph()"><svg class="i"><use href="#i-layers"/></svg> Собрать граф</div>
+            <div class="a-btn primary" data-action="grantRoot"><svg class="i"><use href="#i-plus"/></svg> Зарегистрировать root</div>
+            <div class="a-btn" data-action="buildGraph"><svg class="i"><use href="#i-layers"/></svg> Собрать граф</div>
             <span class="pt-sub" id="rootStatus" style="align-self:center"></span>
           </div>
           <div id="rootsList"></div>
@@ -776,7 +808,7 @@
 
         <div class="card" id="card-journey">
           <div class="c-title"><svg class="i"><use href="#i-code"/></svg> Edit journey (правка кода)</div>
-          <div class="c-sub">Управляемый цикл: план → правка через sandbox → финальная проверка ядром. Правка публикуется только при host-approved и пройденной проверке.</div>
+          <div class="c-sub">Запуск изменения временно недоступен: требуется подключённый контракт проверки и безопасной публикации. Форму можно подготовить без изменения файлов.</div>
           <div class="frow">
             <div class="fcol" style="flex:2"><label>цель правки</label><input id="cfgGoal" placeholder="исправь X в модуле Y"></div>
             <div class="fcol" style="flex:1"><label>root_id</label><input id="cfgJourneyRoot" list="rootIds" placeholder="main"></div>
@@ -788,7 +820,7 @@
           <datalist id="rootFiles"></datalist>
           <label class="check-row"><input type="checkbox" id="cfgApproved"> host-approved: я оператор и одобряю мутацию файлов</label>
           <div class="frow">
-            <div class="a-btn primary" onclick="runJourney()"><svg class="i"><use href="#i-play"/></svg> Запустить journey</div>
+            <button class="a-btn primary" disabled title="Нет подключённого безопасного контракта публикации" data-action="runJourney"><svg class="i"><use href="#i-play"/></svg> Запустить изменение</button>
             <span class="pt-sub" id="journeyStatus" style="align-self:center"></span>
           </div>
         </div>
@@ -799,7 +831,7 @@
           <div class="frow">
             <div class="fcol" style="flex:1"><label>кап, USD (например 1.00)</label><input id="cfgCap" placeholder="1.00"></div>
             <label class="check-row" style="align-self:flex-end"><input type="checkbox" id="cfgBudgetApproved"> host-approved</label>
-            <div class="a-btn primary" style="align-self:flex-end" onclick="createBudget()"><svg class="i"><use href="#i-plus"/></svg> Создать</div>
+            <div class="a-btn primary" style="align-self:flex-end" data-action="createBudget"><svg class="i"><use href="#i-plus"/></svg> Создать</div>
           </div>
           <div id="budgetCard" class="pt-sub"></div>
         </div>
@@ -808,42 +840,37 @@
   </div>
 
   <!-- ═══ Verification Summary ═══ -->
-  <div class="panel verify">
+  <div class="panel verify" id="verificationPanel">
     <div class="v-head">
       <span class="vic"><svg class="i"><use href="#i-shield"/></svg></span>
-      <span class="title">Verification Summary</span>
-      <span class="v-badge pending" id="vBadge">ожидание</span>
+      <span class="title">Проверки и доказательства</span>
+      <span class="v-badge pending" id="vBadge">не оценено</span>
     </div>
     <div class="v-banner pending" id="vBanner">
       <svg class="i"><use href="#i-info"/></svg>
-      <span id="vBannerText">Запустите запрос или journey — сводка проверок появится здесь.</span>
+      <span id="vBannerText">Подтверждённые факты появятся здесь вместе с источником и областью проверки.</span>
     </div>
     <div class="v-section">
-      <div class="vs-title"><span>Проверка фактов</span><span class="pill" id="vFactsCount">0/0</span></div>
+      <div class="vs-title"><span>Проверки ответа</span><span class="pill" id="vFactsCount">—</span></div>
       <div id="vFacts"><div class="panel-empty" style="padding:6px 0">нет данных</div></div>
     </div>
     <div class="changes-head">
       <span class="ct">Изменения в проекте</span>
-      <span class="draft-chip" id="vDraftChip">draft</span>
+      <span class="draft-chip" id="vDraftChip">нет правок</span>
     </div>
     <div id="vChanges"><div class="panel-empty" style="padding:6px 14px">нет изменений</div></div>
-    <div class="v-actions">
-      <div class="v-btn primary" onclick="applyLastJourney()"><svg class="i"><use href="#i-check"/></svg> Применить правку</div>
-      <div class="v-btn" onclick="openJourney()"><svg class="i"><use href="#i-play"/></svg> Отправить в task</div>
-      <div class="v-btn" onclick="snapshotSession()"><svg class="i"><use href="#i-camera"/></svg> Создать снапшот</div>
-      <div class="v-btn" onclick="showDiff()"><svg class="i"><use href="#i-code"/></svg> Показать diff</div>
-    </div>
+    <div class="v-actions"><button class="v-btn" data-action="showDiff" id="diffBtn" disabled><svg class="i"><use href="#i-code"/></svg> Посмотреть изменения</button><button class="v-btn" data-action="snapshotSession" id="snapshotBtn" disabled><svg class="i"><use href="#i-camera"/></svg> Снимок журнала</button></div>
     <div class="stepper">
       <div class="st-title">
-        <span>Активная задача <span class="tchip" id="stChip">#—</span></span>
-        <span class="recover" onclick="recoverNote()" title="Восстановление из журнала"><svg class="i"><use href="#i-rotate"/></svg>Recover</span>
+        <span>Текущая сессия <span class="tchip" id="stChip">#—</span></span>
+        <span class="recover" data-action="refreshHistory" title="Просмотреть журнал и незавершённые операции"><svg class="i"><use href="#i-rotate"/></svg>Журнал</span>
       </div>
       <div class="st-track">
-        <div class="st-node done" id="stDraft"><div class="ball"><svg class="i"><use href="#i-check"/></svg></div><div class="lbl">draft</div></div>
+        <div class="st-node" id="stDraft"><div class="ball"><svg class="i"><use href="#i-check"/></svg></div><div class="lbl">черновик</div></div>
         <div class="st-line" id="stLine1"></div>
-        <div class="st-node" id="stVerified"><div class="ball"><svg class="i"><use href="#i-check"/></svg></div><div class="lbl">verified</div></div>
+        <div class="st-node" id="stVerified"><div class="ball"><svg class="i"><use href="#i-check"/></svg></div><div class="lbl">проверено</div></div>
         <div class="st-line" id="stLine2"></div>
-        <div class="st-node" id="stPublished"><div class="ball"><svg class="i"><use href="#i-check"/></svg></div><div class="lbl">published</div></div>
+        <div class="st-node" id="stPublished"><div class="ball"><svg class="i"><use href="#i-check"/></svg></div><div class="lbl">опубликовано</div></div>
       </div>
     </div>
   </div>
@@ -853,727 +880,243 @@
 <div class="statusbar">
   <div class="seg"><span class="dot" id="sbState"></span><span id="sbStateText">Подключение…</span></div>
   <div class="seg"><span class="ic"><svg class="i"><use href="#i-box"/></svg></span><span id="sbProject">Проект: —</span></div>
-  <div class="seg"><span class="ic"><svg class="i"><use href="#i-tasks"/></svg></span><span id="sbSession">Задача: —</span></div>
+  <div class="seg"><span class="ic"><svg class="i"><use href="#i-tasks"/></svg></span><span id="sbSession">Сессия: —</span></div>
   <div class="seg"><span class="ic"><svg class="i"><use href="#i-db"/></svg></span><span id="sbBudget">Бюджет: —</span></div>
   <div class="sp"></div>
   <div class="seg mono" id="sbClock">—</div>
 </div>
 
 <script>
-/* ═════════ state ═════════ */
-const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const state = {
-  rootId: localStorage.getItem("af.rootId") || "main",
-  sessionId: null,
-  lastJourney: null,
-  lastGraph: null,
-  lastSources: [],
-  backend: JSON.parse(localStorage.getItem("af.backend") || "null"),
-  mode: "ask",
-  online: false,
-};
+"use strict";
+/* TESTABLE_STUDIO_CORE_BEGIN */
+const StudioCore = (() => {
+  const LIMITS = Object.freeze({ frame: 65536, output: 262144, wire: 2097152 });
+  function outcome(event) {
+    if (!event || typeof event !== "object") return "unknown";
+    if (event.unknown === true || event.hold === true) return "hold";
+    if (event.type === "error") return event.sent === false || event.refused !== undefined ? "refused" : "unknown";
+    if (event.type !== "final" || event.ok !== true) return "unknown";
+    return event.truncated === true ? "partial" : "received";
+  }
+  function verification(report) {
+    const checks = Array.isArray(report?.checks) ? report.checks : [];
+    // An aggregate flag never invents independent checks or publication.
+    const rows = checks.filter(c => c && typeof c.name === "string" &&
+      ["passed", "failed", "not_assessed"].includes(c.status) && typeof c.scope === "string" &&
+      (c.status !== "passed" || /^[a-f0-9]{64}$/.test(c.evidence_sha256 || "")));
+    return { rows, verified: report?.verified === true && rows.length > 0 && rows.length === checks.length && rows.every(c => c.status === "passed"),
+      published: report?.publication?.status === "published" && typeof report.publication.receipt_id === "string" };
+  }
+  async function consumeSSE(body, onFrame) {
+    if (!body || typeof body.getReader !== "function") throw new Error("Поток ответа недоступен");
+    const reader = body.getReader(), decoder = new TextDecoder("utf-8", { fatal: true });
+    let buffer = "", terminal = null, wire = 0, output = 0;
+    function block(raw) {
+      const data = raw.split("\n").filter(line => line.startsWith("data:")).map(line => line.slice(5).replace(/^ /, "")).join("\n");
+      if (!data) return;
+      if (data.length > LIMITS.frame) throw new Error("Превышен предел события потока");
+      const value = JSON.parse(data);
+      if (!value || typeof value !== "object" || !["delta", "final", "error"].includes(value.type)) throw new Error("Неизвестное событие потока");
+      if (terminal) throw new Error("Получены данные после завершения потока");
+      if (value.type === "delta") {
+        if (typeof value.text !== "string") throw new Error("Некорректный фрагмент ответа");
+        output += value.text.length;
+        if (output > LIMITS.output) throw new Error("Превышен предел ответа");
+      } else {
+        if (value.content !== undefined && (typeof value.content !== "string" || value.content.length > LIMITS.output)) throw new Error("Некорректный итог ответа");
+        if (value.type === "final" && typeof value.ok !== "boolean") throw new Error("Нет статуса завершения");
+        terminal = value;
+      }
+      onFrame(value);
+    }
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        wire += value.byteLength;
+        if (wire > LIMITS.wire) throw new Error("Превышен предел передачи");
+        buffer += decoder.decode(value, { stream: true });
+        buffer = buffer.replace(/\r\n/g, "\n");
+        let index;
+        while ((index = buffer.indexOf("\n\n")) >= 0) { block(buffer.slice(0, index)); buffer = buffer.slice(index + 2); }
+        if (buffer.length > LIMITS.frame) throw new Error("Незавершённое событие превышает предел");
+      }
+      buffer += decoder.decode();
+      if (buffer.trim()) throw new Error("Поток оборвался посреди события");
+      if (!terminal) throw new Error("Нет подтверждённого завершения потока");
+      return terminal;
+    } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+  }
+  return Object.freeze({ LIMITS, outcome, verification, consumeSSE });
+})();
+/* TESTABLE_STUDIO_CORE_END */
 
-/* ═════════ navigation ═════════ */
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+function node(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = String(text); return n; }
+function icon(name) { const n = document.createElementNS(NS, "svg"), u = document.createElementNS(NS, "use"); n.setAttribute("class", "i"); n.setAttribute("width", "14"); n.setAttribute("height", "14"); n.setAttribute("aria-hidden", "true"); u.setAttribute("href", "#i-" + name); n.append(u); return n; }
+function button(label, click, cls = "btn-link", glyph) { const b = node("button", cls, label); b.type = "button"; if (glyph) b.prepend(icon(glyph)); b.addEventListener("click", click); return b; }
+function empty(target, text, action) { const n = node("div", "panel-empty", text); if (action) n.append(node("br"), action); target.replaceChildren(n); }
+function safeRead(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
+function remember(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
+function safeString(value, max = 512) { return typeof value === "string" ? value.slice(0, max) : "—"; }
+function safeCount(value) { return Number.isSafeInteger(value) && value >= 0 ? value : "—"; }
+const state = { rootId: safeRead("af.rootId.v2", null), sessionId: null, lastJourney: null, lastGraph: null,
+  token: "", online: false, active: null, epoch: 0, mode: "ask", busy: false, selectedFile: null, lastSources: [],
+  backend: { provider_id: "scripted", base_url: "", api_key_env: "", model: "scripted" } };
+try { localStorage.removeItem("af.backend"); } catch {}
 const VIEWS = ["dialog", "tasks", "history", "analytics", "index", "settings"];
+function authHeaders() { return state.token ? { Authorization: "Bearer " + state.token } : {}; }
+async function readBounded(response, max = 1048576) {
+  if (!response.body) return "";
+  const reader = response.body.getReader(), decoder = new TextDecoder(); let result = "", count = 0;
+  try { while (true) { const { done, value } = await reader.read(); if (done) break; count += value.byteLength; if (count > max) throw new Error("Ответ превышает допустимый размер"); result += decoder.decode(value, { stream: true }); } return result + decoder.decode(); }
+  finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+}
+async function api(path, init = {}) {
+  let response;
+  try { response = await fetch(path, { ...init, redirect: "error", credentials: "same-origin", headers: { "Content-Type": "application/json", ...authHeaders(), ...init.headers } }); }
+  catch { throw new Error(init.method && init.method !== "GET" ? "Связь прервана. Результат операции неизвестен; автоматического повтора нет." : "Нет связи с ядром"); }
+  const raw = await readBounded(response); let result;
+  if (response.status === 401) { openAuth(); throw new Error("Нужен токен сервера. Введите его и повторите действие вручную."); }
+  try { result = raw ? JSON.parse(raw) : {}; } catch { throw new Error("Ядро вернуло некорректный ответ"); }
+  if (!response.ok) throw new Error(typeof result?.error === "string" ? result.error.slice(0, 400) : "Запрос отклонён: HTTP " + response.status);
+  if (!result || typeof result !== "object") throw new Error("Некорректный формат ответа");
+  return result;
+}
 function switchView(view) {
-  if (view === "workspaces" || view === "home") view = view === "home" ? "dialog" : "settings";
-  for (const v of VIEWS) $("view-" + v).classList.toggle("hidden", v !== view);
-  document.querySelectorAll(".rail-item[data-view]").forEach((item) => {
-    item.classList.toggle("active", item.dataset.view === view || (view === "settings" && item.dataset.view === "workspaces"));
-  });
-  document.querySelectorAll(".tool-tab").forEach((t) => {
-    t.classList.toggle("active", t.dataset.nav === view || (view === "settings" && t.dataset.nav === "settings"));
-  });
-  if (view === "tasks") refreshTasks();
-  if (view === "history") refreshHistory();
-  if (view === "analytics") refreshAnalytics();
-  if (view === "index") refreshIndex();
+  if (view === "home") view = "dialog"; if (view === "workspaces") view = "settings";
+  if (!VIEWS.includes(view)) return;
+  VIEWS.forEach(v => $("view-" + v).classList.toggle("hidden", v !== view));
+  document.querySelectorAll(".rail-item[data-view]").forEach(n => { const active = n.dataset.view === view; n.classList.toggle("active", active); n.setAttribute("aria-current", active ? "page" : "false"); });
+  document.querySelectorAll(".tool-tab").forEach(n => n.classList.toggle("active", n.dataset.nav === view));
+  if (view === "tasks") refreshTasks(); if (view === "history") refreshHistory(); if (view === "analytics") refreshAnalytics(); if (view === "index") refreshIndex();
   if (view === "settings") { renderRoots(); refreshBudgetCard(); loadBackendForm(); }
 }
-function switchCTab(tab) {
-  document.querySelectorAll(".ptab").forEach((t) => t.classList.toggle("active", t.dataset.ctab === tab));
-  ["files", "context", "sources", "cgraph"].forEach((t) =>
-    $("ctab-" + t).classList.toggle("hidden", t !== tab));
-  $("ctab-files").classList.toggle("hidden", tab !== "files");
-}
-function switchMode(mode) {
-  state.mode = mode;
-  document.querySelectorAll(".mode-chip").forEach((c) => c.classList.toggle("active", c.dataset.mode === mode));
-  $("modeNote").textContent = mode === "ask" ? "спрос через backend"
-    : mode === "edit" ? "правка через journey (Настройки)" : "регистрация задачи в журнале";
-  if (mode === "edit") {
-    $("cfgGoal").value = $("composerText").value.trim() || $("cfgGoal").value;
-    switchView("settings");
-    $("card-journey").scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
+function switchCTab(tab) { if (!["files", "context", "sources", "cgraph"].includes(tab)) return; document.querySelectorAll(".ptab").forEach(n => { n.classList.toggle("active", n.dataset.ctab === tab); n.setAttribute("aria-selected", String(n.dataset.ctab === tab)); }); ["files", "context", "sources", "cgraph"].forEach(t => $("ctab-" + t).classList.toggle("hidden", t !== tab)); }
+function switchMode(mode) { if (mode === "edit") { openJourney(); return; } state.mode = "ask"; }
 function focusComposer() { switchView("dialog"); $("composerText").focus(); }
-function gotoRootSetup() {
-  switchView("settings");
-  $("card-roots").scrollIntoView({ behavior: "smooth", block: "start" });
-  $("cfgRootPath").focus();
+function gotoRootSetup() { switchView("settings"); $("card-roots").scrollIntoView({ block: "start" }); $("cfgRootPath").focus(); }
+function openJourney() { switchView("settings"); $("card-journey").scrollIntoView({ block: "start" }); }
+function setBanner(kind, text) { $("vBanner").className = "v-banner" + (kind === "error" ? " error" : " pending"); $("vBannerText").textContent = text; }
+function setBusy(value) { state.busy = value; $("sendBtn").disabled = value; $("stopBtn").classList.toggle("hidden", !value || !state.active); $("composerText").readOnly = value; $("sbState").className = "dot" + (value ? " busy" : !state.online ? " err" : ""); $("sbStateText").textContent = value ? "Выполняется" : state.online ? "Готово" : "Нет связи"; sessionLabel(); }
+function resetEvidence() {
+  state.lastJourney = null; state.lastSources = []; $("vBadge").textContent = "не оценено"; $("vBadge").className = "v-badge pending";
+  setBanner("pending", "Ответ и проверка — разные результаты. Подтверждения появятся вместе с источником и областью проверки.");
+  $("vFactsCount").textContent = "—"; $("vFacts").replaceChildren();
+  for (const text of ["Утверждения: проверка не выполнялась", "Источники ответа: пока не предоставлены", "Изменения: отсутствуют"]) { const item = node("div", "v-item partial"); item.append(icon("info"), node("span", "", text)); $("vFacts").append(item); }
+  empty($("vChanges"), "Изменений нет"); $("vDraftChip").textContent = "нет правок"; $("diffBtn").disabled = true;
+  ["stDraft", "stVerified", "stPublished"].forEach(id => $(id).className = "st-node"); ["stLine1", "stLine2"].forEach(id => $(id).className = "st-line");
+  empty($("sourcesList"), "Ответ пока не содержит проверенных ссылок на источники.");
 }
-function openJourney() { switchView("settings"); $("card-journey").scrollIntoView({ behavior: "smooth", block: "start" }); }
-function showDiff() {
-  if (!state.lastJourney) { setBanner("pending", "Diff появится после journey — правки ещё не было."); return; }
-  addMessage("assistant",
-    "Diff правки: " + esc(JSON.stringify(state.lastJourney.edits ?? [], null, 1)) +
-    "\nИтог: " + (state.lastJourney.verified ? "проверка пройдена" : "проверка НЕ пройдена"));
-  switchView("dialog");
-}
-
-/* ═════════ api ═════════ */
-async function api(path, init) {
-  const response = await fetch(path, { ...init, headers: { "Content-Type": "application/json", ...init?.headers } });
-  const text = await response.text();
-  let body = text;
-  try { body = JSON.parse(text); } catch {}
-  if (!response.ok) throw new Error((body && body.error) ? body.error : `HTTP ${response.status}`);
-  return body;
-}
-
-/* ═════════ health / status ═════════ */
+function stopStream() { if (!state.active) return; state.active.abort(); }
+function invalidateContext(clearMessages = false) { const active = state.active; state.active = null; active?.abort(); state.epoch++; resetEvidence(); state.selectedFile = null; setBusy(false); if (clearMessages) { $("dialogView").querySelectorAll(".msg").forEach(n => n.remove()); $("dialogEmpty")?.classList.remove("hidden"); $("tabDialogCount").textContent = "0"; } }
 async function refreshHealth() {
-  try {
-    const health = await api("/health");
-    state.online = true;
-    $("tbVersion").textContent = "v" + health.version;
-    $("providerDot").className = "p-dot ok";
-    $("providerText").textContent = state.backend?.model
-      ? "Provider: " + state.backend.model
-      : "Provider: kernel готов (backend не настроен)";
-    $("sbState").className = "dot";
-    $("sbStateText").textContent = "Готово";
-    $("rmOnlineDot").className = "ok-dot";
-    $("rmOnlineText").textContent = "online";
-  } catch {
-    state.online = false;
-    $("providerDot").className = "p-dot err";
-    $("providerText").textContent = "Provider: offline";
-    $("sbState").className = "dot err";
-    $("sbStateText").textContent = "Нет связи";
-    $("rmOnlineDot").className = "idle-dot";
-    $("rmOnlineText").textContent = "offline";
-  }
+  try { const h = await api("/health"); state.online = true; $("tbVersion").textContent = "v" + safeString(h.version, 24); $("providerDot").className = "p-dot ok"; $("providerText").textContent = "Локальный тестовый провайдер"; $("rmOnlineText").textContent = "online"; }
+  catch { state.online = false; $("providerDot").className = "p-dot err"; $("providerText").textContent = "Нет связи / нужен вход"; $("rmOnlineText").textContent = "offline"; }
+  if (!state.busy) setBusy(false);
 }
-
-function setClock() {
-  const now = new Date();
-  const hhmm = now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-  const date = now.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
-  $("sbClock").textContent = hhmm + "  " + date;
-}
-setInterval(setClock, 1000); setClock();
-
-function setBusy(busy) {
-  $("sbState").className = "dot" + (busy ? " busy" : "");
-  $("sbStateText").textContent = busy ? "Running" : (state.online ? "Готово" : "Нет связи");
-}
-function setBanner(kind, text) {
-  $("vBanner").className = "v-banner" + (kind === "pending" ? " pending" : "");
-  $("vBannerText").textContent = text;
-}
-
-/* ═════════ budget (af-budget) ═════════ */
-async function refreshBudget() {
-  try {
-    const b = await api("/v1/budget");
-    let text;
-    if (b.state === "ok") text = `$${b.committed_usd} / $${b.cap_usd}`;
-    else if (b.state === "hold") text = `HOLD $${b.committed_usd ?? "?"} / $${b.cap_usd ?? "?"}`;
-    else if (b.state === "missing") text = "не настроен";
-    else text = "недоступен";
-    $("sbBudget").textContent = "Бюджет: " + text;
-    $("rmBudgetText").textContent = text;
-  } catch { $("sbBudget").textContent = "Бюджет: —"; }
-  refreshBudgetCard();
-}
-async function refreshBudgetCard() {
-  try {
-    const b = await api("/v1/budget");
-    const el = $("budgetCard");
-    if (b.state === "ok") el.innerHTML = `Состояние: <span style="color:var(--ok)">активен</span> · израсходовано $${esc(b.committed_usd)} из $${esc(b.cap_usd)} · вызовов: ${b.calls}`;
-    else if (b.state === "hold") el.innerHTML = `Состояние: <span style="color:var(--warn)">HOLD</span> (send-checkpoint) · $${esc(b.committed_usd ?? "?")} / $${esc(b.cap_usd ?? "?")} · вызовов: ${b.calls ?? "—"}`;
-    else if (b.state === "missing") el.textContent = "Книга не создана — задайте кап и создайте.";
-    else el.textContent = "Книга существует, но недоступна для чтения (fail-closed).";
-  } catch {}
-}
-async function createBudget() {
-  if (!$("cfgBudgetApproved").checked) { $("budgetCard").innerHTML = '<span style="color:var(--warn)">Требуется host-approved.</span>'; return; }
-  try {
-    const r = await api("/v1/budget", { method: "POST", body: JSON.stringify({ cap_usd: $("cfgCap").value.trim(), host_approved: true }) });
-    $("budgetCard").innerHTML = `<span style="color:var(--ok)">Книга создана, кап $${esc(r.cap_usd)}.</span>`;
-    refreshBudget();
-  } catch (e) { $("budgetCard").innerHTML = `<span style="color:var(--err)">${esc(e.message)}</span>`; }
-}
-
-/* ═════════ roots & graph ═════════ */
-function suggestRootId(path, name) {
-  const base = String(name || path.split(/[\\/]/).filter(Boolean).pop() || "main").trim();
-  let id = base.replace(/[^a-zA-Z0-9_.-]/g, "-");
-  if (!/^[a-zA-Z]/.test(id)) id = "p" + id;
-  return id.slice(0, 48) || "main";
-}
-
-async function pickFolder() {
-  const btn = $("pickBtn");
-  btn.disabled = true;
-  $("rootStatus").textContent = "открываю проводник…";
-  try {
-    const r = await api("/v1/pick-folder", { method: "POST" });
-    if (r.cancelled) { $("rootStatus").textContent = "выбор отменён"; return; }
-    $("cfgRootPath").value = r.path;
-    $("cfgRootId").value = suggestRootId(r.path || "", r.name || "");
-    $("rootStatus").textContent = "папка выбрана — зарегистрируйте root";
-    $("cfgRootId").focus();
-  } catch (e) { $("rootStatus").textContent = "ошибка: " + e.message; }
-  finally { btn.disabled = false; }
-}
-
-async function grantRoot() {
-  const rootId = $("cfgRootId").value.trim() || "main";
-  const path = $("cfgRootPath").value.trim();
-  $("rootStatus").textContent = "регистрация…";
-  try {
-    await api("/v1/roots", { method: "POST", body: JSON.stringify({ root_id: rootId, path, host_approved: true }) });
-    state.rootId = rootId;
-    localStorage.setItem("af.rootId", rootId);
-    $("rootStatus").textContent = `root «${rootId}» зарегистрирован`;
-    await renderRoots();
-    await buildGraph();
-  } catch (e) { $("rootStatus").textContent = "ошибка: " + e.message; }
-}
-
+function setClock() { $("sbClock").textContent = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }); }
+function updateProject() { const name = state.rootId || "Не выбран"; $("tbProject").textContent = name; $("sbProject").textContent = "Проект: " + name; $("rmProjectText").textContent = name; $("cfgRootId").value = state.rootId || ""; $("cfgJourneyRoot").value = state.rootId || ""; }
+function sessionLabel() { $("sbSession").textContent = "Сессия: " + (state.sessionId ? state.sessionId.slice(0, 12) : "—"); $("stChip").textContent = state.sessionId ? "#" + state.sessionId.slice(0, 9) : "#—"; $("snapshotBtn").disabled = !state.sessionId || state.busy; }
+async function refreshBudget() { try { const b = await api("/v1/budget"); const text = b.state === "hold" ? "HOLD · нужна сверка" : b.state === "ok" ? "$" + safeString(b.committed_usd, 32) + " / $" + safeString(b.cap_usd, 32) : b.state === "missing" ? "не задан" : "недоступен"; $("sbBudget").textContent = "Бюджет: " + text; $("rmBudgetText").textContent = text; return b; } catch { $("sbBudget").textContent = "Бюджет: недоступен"; return null; } }
+async function refreshBudgetCard() { const b = await refreshBudget(); const target = $("budgetCard"); if (!b) { target.textContent = "Не удалось прочитать бюджет."; return; } target.textContent = b.state === "missing" ? "Лимит ещё не создан. Задайте сумму для книги бюджета." : b.state === "hold" ? "Есть незавершённая отправка или неизвестная стоимость. Новая отправка требует сверки." : b.state === "ok" ? "Учтено $" + b.committed_usd + " из $" + b.cap_usd + ". Вызовов: " + safeCount(b.calls) + "." : "Книга бюджета недоступна."; target.append(node("p", "", b.enforced === true ? "Лимит проверяется сервером перед отправкой." : "Доступность внешних запросов зависит от подключённого провайдера и его правил учёта.")); }
+async function createBudget() { if (!$("cfgBudgetApproved").checked) { $("budgetCard").textContent = "Подтвердите создание книги бюджета."; return; } try { await api("/v1/budget", { method: "POST", body: JSON.stringify({ cap_usd: $("cfgCap").value.trim(), host_approved: true }) }); await refreshBudgetCard(); } catch (e) { $("budgetCard").textContent = e.message; } }
+async function selectRoot(rootId) { if (state.rootId !== rootId) { invalidateContext(true); state.sessionId = null; state.lastGraph = null; state.rootId = rootId; remember("af.rootId.v2", rootId); sessionLabel(); } updateProject(); await readGraph(); }
+function suggestRootId(path, name) { const base = String(name || path.split(/[\\/]/).filter(Boolean).pop() || "main"); return ("p-" + base.replace(/[^a-zA-Z0-9_.-]/g, "-")).slice(0, 48); }
+async function pickFolder() { const b = $("pickBtn"); b.disabled = true; $("rootStatus").textContent = "Выберите папку в системном диалоге…"; try { const r = await api("/v1/pick-folder", { method: "POST" }); if (r.cancelled) { $("rootStatus").textContent = "Выбор отменён"; return; } $("cfgRootPath").value = safeString(r.path, 4096); $("cfgRootId").value = suggestRootId(r.path || "", r.name || ""); $("rootStatus").textContent = "Папка выбрана. Зарегистрируйте её для доступа к файлам."; } catch (e) { $("rootStatus").textContent = e.message; } finally { b.disabled = false; } }
+async function grantRoot() { const rootId = $("cfgRootId").value.trim(), path = $("cfgRootPath").value.trim(); if (!rootId || !path) { $("rootStatus").textContent = "Укажите папку и идентификатор проекта."; return; } try { await api("/v1/roots", { method: "POST", body: JSON.stringify({ root_id: rootId, path, host_approved: true }) }); await selectRoot(rootId); $("rootStatus").textContent = "Проект зарегистрирован. Можно собрать граф."; await renderRoots(); } catch (e) { $("rootStatus").textContent = e.message; } }
 async function renderRoots() {
-  try {
-    const r = await api("/v1/roots");
-    const el = $("rootsList");
-    $("rootIds").innerHTML = (r.roots || [])
-      .map((root) => `<option value="${esc(root.root_id ?? "")}">`).join("");
-    if (!(r.roots || []).length) { el.innerHTML = '<div class="pt-sub">корней пока нет</div>'; return; }
-    el.innerHTML = r.roots.map((root) =>
-      `<div class="src-row"><svg class="i"><use href="#i-folder"/></svg>` +
-      `<span class="p">${esc(root.root_id ?? "?")}</span>` +
-      `<span class="ln" style="flex:1;overflow:hidden;text-overflow:ellipsis">${esc(root.path ?? "")}</span>` +
-      `<span class="btn-link" data-revoke="${esc(root.root_id ?? "")}" title="Отозвать root">отозвать</span></div>`).join("");
-    el.querySelectorAll("[data-revoke]").forEach((btn) => {
-      btn.onclick = () => revokeRoot(btn.dataset.revoke);
-    });
-  } catch {}
+  try { const r = await api("/v1/roots"), roots = Array.isArray(r.roots) ? r.roots.slice(0, 200) : []; $("rootsList").replaceChildren(); $("rootIds").replaceChildren();
+    for (const root of roots) { if (typeof root.root_id !== "string") continue; const option = node("option"); option.value = root.root_id; $("rootIds").append(option); const row = node("div", "src-row"); row.append(icon("folder"), button(root.root_id, () => selectRoot(root.root_id), "btn-link"), node("span", "ln", safeString(root.path, 4096)), button("Отозвать", () => revokeRoot(root.root_id))); $("rootsList").append(row); }
+    if (!roots.length) empty($("rootsList"), "Подключённых проектов пока нет.");
+    if (state.rootId && !roots.some(r => r.root_id === state.rootId)) { await selectRoot(null); }
+  } catch (e) { empty($("rootsList"), e.message); }
 }
-
-async function revokeRoot(rootId) {
-  if (!rootId) return;
-  try {
-    await api(`/v1/roots/${encodeURIComponent(rootId)}`, {
-      method: "DELETE",
-      body: JSON.stringify({ host_approved: true }),
-    });
-    $("rootStatus").textContent = `root «${rootId}» отозван`;
-    await renderRoots();
-  } catch (e) { $("rootStatus").textContent = "ошибка: " + e.message; }
-}
-
-async function buildGraph() {
-  setBusy(true);
-  try {
-    const report = await api("/v1/graph/build", { method: "POST", body: JSON.stringify({ root_id: state.rootId }) });
-    $("sbProject").textContent = "Проект: " + state.rootId;
-    $("rmProjectDot").className = "ok-dot";
-    $("rmProjectText").textContent = "root: " + state.rootId;
-    $("tbProject").textContent = state.rootId + "/";
-    await readGraph();
-    addMessage("assistant", `Граф собран: ${report.files} файлов, ${report.nodes} узлов, ${report.edges} рёбер, unresolved: ${report.unresolved}. Дерево — в Context Explorer.`);
-  } catch (e) {
-    setBanner("pending", "Сборка графа: " + e.message);
-    if (String(e.message).includes("not granted")) gotoRootSetup();
-  } finally { setBusy(false); }
-}
-
-async function readGraph() {
-  try {
-    const graph = await api(`/v1/graph/${encodeURIComponent(state.rootId)}`);
-    state.lastGraph = graph;
-    renderTree(graph);
-  } catch {
-    $("ceNodeCount").textContent = "0 узлов";
-    $("ceTree").innerHTML = `<div class="panel-empty" id="ceTreeEmpty">Граф не собран.<div class="btn-link" onclick="buildGraph()"><svg class="i"><use href="#i-layers"/></svg> Собрать граф</div></div>`;
+async function revokeRoot(rootId) { try { await api("/v1/roots/" + encodeURIComponent(rootId), { method: "DELETE", body: JSON.stringify({ host_approved: true }) }); if (state.rootId === rootId) await selectRoot(null); $("rootStatus").textContent = "Доступ к проекту отозван."; await renderRoots(); } catch (e) { $("rootStatus").textContent = e.message; } }
+async function buildGraph() { if (!state.rootId) { gotoRootSetup(); return; } if (state.busy) return; setBusy(true); const root = state.rootId, epoch = state.epoch; try { const r = await api("/v1/graph/build", { method: "POST", body: JSON.stringify({ root_id: root }) }); if (epoch !== state.epoch) return; await readGraph(); setBanner("pending", "Индекс обновлён: " + safeCount(r.files) + " файлов. Это структурный анализ, а не проверка утверждений."); } catch (e) { if (epoch === state.epoch) setBanner("error", e.message); } finally { if (epoch === state.epoch) setBusy(false); } }
+async function readGraph() { const root = state.rootId, epoch = state.epoch; if (!root) { state.lastGraph = null; empty($("ceTree"), "Подключите проект для просмотра файлов.", button("Выбрать проект", gotoRootSetup)); $("ceNodeCount").textContent = "0 файлов"; return; } try { const r = await api("/v1/graph/" + encodeURIComponent(root)); if (epoch !== state.epoch || state.rootId !== root) return; state.lastGraph = r; renderTree(); } catch { if (epoch !== state.epoch) return; state.lastGraph = null; $("ceNodeCount").textContent = "нет индекса"; empty($("ceTree"), "Проект подключён. Соберите его граф.", button("Собрать граф", buildGraph)); } }
+function renderTree() {
+  const graph = state.lastGraph; if (!graph) return; const all = Array.isArray(graph.files) ? graph.files.slice(0, 5000) : [], filter = $("fileFilter").value.toLocaleLowerCase();
+  const files = all.filter(f => typeof f.path === "string" && f.path.toLocaleLowerCase().includes(filter)); const tree = $("ceTree"); tree.replaceChildren();
+  $("ceNodeCount").textContent = all.length + " файлов"; $("rootFiles").replaceChildren(); const folders = new Map([["", tree]]);
+  for (const file of files) { const parts = file.path.split("/"); let current = "", parent = tree; for (const part of parts.slice(0, -1)) { current += part + "/"; if (!folders.has(current)) { const details = node("details"); details.open = Boolean(filter) || current.split("/").length < 3; const summary = node("summary"); summary.append(icon("folder"), node("span", "", part)); details.append(summary); parent.append(details); folders.set(current, details); } parent = folders.get(current); }
+    const row = button("", () => showFileDetail(file), "trow"); row.title = file.path; row.dataset.path = file.path; row.append(icon("doc"), node("span", "name", parts.at(-1))); if (Array.isArray(file.symbols) && file.symbols.length) row.append(node("span", "layer-chip", file.symbols.length)); parent.append(row); const option = node("option"); option.value = file.path; $("rootFiles").append(option);
   }
+  if (!files.length) empty(tree, filter ? "Совпадений не найдено." : "В индексе нет поддерживаемых файлов.");
+  const summary = node("div", "node-detail"); summary.append(node("div", "nd-title", "Структурный граф"), node("p", "", "Узлы: " + safeCount(graph.nodes) + " · связи: " + safeCount(graph.edges)), node("p", "pt-sub", "Граф показывает структуру исходников. Участие файла в конкретном ответе подтверждается отдельно.")); $("cgraphBody").replaceChildren(summary);
+  const unresolved = Array.isArray(graph.unresolved) ? graph.unresolved : []; summary.append(node("p", "pt-sub", "Неразрешённые ссылки: " + unresolved.length));
+  const index = $("indexBody"); index.replaceChildren(); for (const file of all) index.append(button(file.path, () => showFileDetail(file), "doc-row")); $("indexSub").textContent = "Проект: " + state.rootId + " · " + all.length + " файлов";
 }
-
-const LAYER_LABEL = { entry: "entry", test: "test", doc: "doc", config: "config", core: "core" };
-function renderTree(graph) {
-  const tree = $("ceTree");
-  tree.innerHTML = "";
-  const files = graph.files || [];
-  $("ceNodeCount").textContent = (graph.nodes ?? files.length) + " узлов";
-  $("rootFiles").innerHTML = files.map((f) => `<option value="${esc(f.path)}">`).join("");
-  for (const file of files) {
-    const row = document.createElement("div");
-    row.className = "trow";
-    row.onclick = () => showFileDetail(file);
-    const layer = LAYER_LABEL[file.layer] ? file.layer : "core";
-    row.innerHTML = `<span class="chev"><svg class="i"><use href="#i-chev-r"/></svg></span>` +
-      `<span class="fic"><svg class="i"><use href="#i-doc"/></svg></span>` +
-      `<span class="name">${esc(file.path)}</span>` +
-      `<span class="layer-chip ${layer}">${esc(layer)}</span>`;
-    tree.appendChild(row);
-    for (const symbol of file.symbols || []) {
-      const sub = document.createElement("div");
-      sub.className = "trow";
-      sub.style.paddingLeft = "30px";
-      sub.innerHTML = `<span class="fic"><svg class="i"><use href="#i-code"/></svg></span>` +
-        `<span class="name sym">${esc(symbol)}</span>`;
-      tree.appendChild(sub);
-    }
-  }
-  if (!files.length) {
-    tree.innerHTML = `<div class="panel-empty">Граф пуст — файлов с кодом не найдено в root.</div>`;
-  }
-  const edges = graph.edges ?? "?";
-  const unresolved = graph.unresolved ?? [];
-  $("cgraphBody").innerHTML =
-    `<div class="kv-grid" style="margin-bottom:10px">` +
-    `<div class="kv"><div class="k">узлы</div><div class="v">${graph.nodes ?? "—"}</div></div>` +
-    `<div class="kv"><div class="k">рёбра</div><div class="v">${edges}</div></div>` +
-    `<div class="kv"><div class="k">unresolved</div><div class="v ${unresolved.length ? "warn" : "ok"}">${unresolved.length}</div></div></div>` +
-    (unresolved.length
-      ? unresolved.map((u) => `<div class="src-row"><svg class="i"><use href="#i-alert"/></svg><span class="p" style="color:var(--warn)">${esc(u.symbol ?? u.path ?? JSON.stringify(u))}</span></div>`).join("")
-      : `<div class="panel-empty">Все ссылки разрешены.</div>`);
-  const index = $("indexBody");
-  index.innerHTML = files.map((file) => {
-    const layer = LAYER_LABEL[file.layer] ? file.layer : "core";
-    return `<div class="doc-row"><svg class="i"><use href="#i-doc"/></svg>` +
-      `<span class="mono" style="font-size:11.5px">${esc(file.path)}</span>` +
-      `<span class="layer-chip ${layer}">${esc(layer)}</span>` +
-      `<span style="color:var(--muted);font-size:11px">${(file.symbols || []).length} симв.</span></div>`;
-  }).join("") || '<div class="panel-empty">пусто</div>';
-  $("indexSub").textContent = "root: " + state.rootId;
+function refreshIndex() { if (state.lastGraph) renderTree(); else empty($("indexBody"), "Соберите граф проекта для просмотра индекса.", button("Настроить проект", gotoRootSetup)); }
+function showFileDetail(file) { state.selectedFile = file; $("ceTree").querySelectorAll("[data-path]").forEach(n => n.classList.toggle("active", n.dataset.path === file.path)); const detail = node("div", "node-detail"); detail.append(node("div", "nd-title", file.path), node("p", "pt-sub", "Символов: " + (Array.isArray(file.symbols) ? file.symbols.length : 0)), node("p", "pt-sub", "Статус: индексирован. Использование в ответе не подтверждено."), button("Просмотреть источник", () => openSource(file.path), "btn-link", "code")); if (Array.isArray(file.symbols)) for (const name of file.symbols.slice(0, 80)) detail.append(node("div", "mono pt-sub", safeString(name))); const context = $("ctab-context"); context.replaceChildren(detail); switchCTab("context"); }
+async function openSource(path, expectedHash) { const root = state.rootId, epoch = state.epoch; try { const r = await api("/v1/roots/" + encodeURIComponent(root) + "/file?path=" + encodeURIComponent(path)); if (state.epoch !== epoch) return; if (r.path !== path || r.root_id !== root || !Array.isArray(r.lines) || !/^[a-f0-9]{64}$/.test(r.sha256 || "")) throw new Error("Источник не привязан к выбранному файлу"); const modal = makeModal("sourceDialog", path); const changed = expectedHash && expectedHash !== r.sha256; if (changed) modal.body.append(node("p", "pt-sub warn", "Файл изменился после запроса. Показана текущая версия; прежний фрагмент по ней не подтверждается.")); const meta = node("div", "source-meta", "Проект: " + root + "\nТекущий SHA256: " + r.sha256 + (expectedHash ? "\nSHA256 контекста запроса: " + expectedHash : "") + (r.truncated ? "\nПоказан ограниченный фрагмент" : "")); const pre = node("pre", "source-code", r.lines.map((line, i) => String((r.start_line || 1) + i).padStart(4, " ") + "  " + String(line)).join("\n")); modal.body.append(meta, pre, button("Копировать ссылку с хешем", () => copyText(root + "/" + path + "#sha256=" + r.sha256))); modal.dialog.showModal(); } catch (e) { setBanner("error", "Источник: " + e.message); } }
+function renderSources(sources) { state.lastSources = Array.isArray(sources) ? sources.filter(s => s && s.root_id === state.rootId && typeof s.path === "string" && /^[a-f0-9]{64}$/.test(s.sha256 || "") && s.kind === "request_context").slice(0, 100) : []; const target = $("sourcesList"); target.replaceChildren(); if (!state.lastSources.length) { empty(target, "Источник с привязкой к запросу не предоставлен."); return; } target.append(node("div", "panel-empty", "Контекст запроса. Передача файла модели не означает проверку утверждений ответа.")); for (const source of state.lastSources) { const row = button("", () => openSource(source.path, source.sha256), "src-row"); row.append(icon("doc"), node("span", "p", source.path), node("span", "ln", "L" + safeCount(source.start_line) + "–" + safeCount(source.end_line))); target.append(row); } const count = $("vFacts").firstElementChild?.nextElementSibling; if (count) count.lastElementChild.textContent = "Контекст запроса: " + state.lastSources.length + " файлов · утверждения не оценены"; }
+function addMessage(role, text, status) {
+  $("dialogEmpty")?.classList.add("hidden"); const message = node("div", "msg " + (role === "user" ? "user" : "assistant")); const avatar = node("div", "m-avatar" + (role === "user" ? " user" : "")); avatar.append(icon(role === "user" ? "user" : "atom")); const body = node("div", "m-body"), head = node("div", "m-head"); head.append(node("span", "m-name", role === "user" ? "Вы" : "Atomic Flow"), node("span", "m-time", new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }))); const bubble = node("div", "m-bubble"), content = node("div", "m-text", text), chips = node("div", "claim-chips"); if (status) chips.append(node("span", "chip partial", status)); bubble.append(content, chips); body.append(head, bubble); message.append(avatar, body); $("dialogView").append(message); const tools = node("div", "message-tools"); tools.append(button("Копировать", () => copyText(content.textContent))); bubble.append(tools); $("tabDialogCount").textContent = $("dialogView").querySelectorAll(".msg").length; $("dialogView").scrollTop = $("dialogView").scrollHeight; return { message, content, chips };
 }
-
-function showFileDetail(file) {
-  const detail = document.createElement("div");
-  detail.className = "node-detail";
-  const layer = LAYER_LABEL[file.layer] ? file.layer : "core";
-  detail.innerHTML = `<div class="nd-title">${esc(file.path)}</div>` +
-    `<div class="nd-row"><span>Слой</span><span class="v">${esc(layer)}</span></div>` +
-    `<div class="nd-row"><span>Символов</span><span class="v">${(file.symbols || []).length}</span></div>` +
-    `<div class="nd-row"><span>Статус</span><span class="v">deterministic</span></div>`;
-  const tree = $("ceTree");
-  tree.querySelectorAll(".node-detail").forEach((n) => n.remove());
-  tree.insertBefore(detail, tree.firstChild);
-}
-
-function refreshIndex() {
-  if (state.lastGraph) renderTree(state.lastGraph);
-  else $("indexBody").innerHTML = '<div class="panel-empty">Граф не собран.</div>';
-}
-
-/* ═════════ dialog / chat ═════════ */
-function addMessage(role, text, extraHtml, badgeKind) {
-  $("dialogEmpty")?.classList.add("hidden");
-  const message = document.createElement("div");
-  message.className = "msg " + role;
-  const avatar = role === "user"
-    ? `<div class="m-avatar user"><svg class="i"><use href="#i-user"/></svg></div>`
-    : `<div class="m-avatar"><svg class="i"><use href="#i-atom"/></svg></div>`;
-  const name = role === "user" ? "Вы" : "Atomic Flow";
-  const time = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-  const badge = badgeKind === "verified"
-    ? `<span class="verify-badge ok"><svg class="i" width="11" height="11"><use href="#i-check-circle"/></svg> Ответ с проверкой</span>`
-    : badgeKind === "demo"
-      ? `<span class="verify-badge demo">демо-данные</span>` : "";
-  message.innerHTML = `${avatar}<div class="m-body"><div class="m-head">` +
-    `<span class="m-name">${name}</span>${badge}<span class="m-time">${time}</span></div>` +
-    `<div class="m-bubble"><div class="m-text">${text}</div>${extraHtml ?? ""}</div></div>`;
-  $("dialogView").appendChild(message);
-  $("dialogView").scrollTop = $("dialogView").scrollHeight;
-  $("tabDialogCount").textContent = document.querySelectorAll(".msg").length;
-  return message;
-}
-
-function quoteBlock(text, source, lines) {
-  return `<div class="quote">«${esc(text)}»` +
-    `<div class="src" onclick="switchCTab('sources')"><svg class="i"><use href="#i-link"/></svg>` +
-    `${esc(source)}<span class="sep">·</span><span>${esc(lines)}</span></div></div>`;
-}
-
+async function copyText(text) { try { await navigator.clipboard.writeText(text); } catch { setBanner("pending", "Копирование недоступно в этом браузере. Текст можно выделить вручную."); } }
+function autoGrow() { const n = $("composerText"); n.style.height = "auto"; n.style.height = Math.min(n.scrollHeight, 160) + "px"; }
 async function sendComposer() {
-  const prompt = $("composerText").value.trim();
-  if (!prompt) return;
-  $("composerText").value = ""; autoGrow();
-  addMessage("user", esc(prompt));
-  $("ceQuery").textContent = prompt;
-  setBusy(true);
+  const prompt = $("composerText").value.trim(); if (!prompt || state.busy) return; if (prompt.length > 32768) { setBanner("error", "Сократите запрос до 32 768 символов."); return; }
+  resetEvidence(); $("composerText").value = ""; autoGrow(); addMessage("user", prompt); $("ceQuery").textContent = prompt; const epoch = state.epoch, controller = new AbortController(); state.active = controller; setBusy(true); const answer = addMessage("assistant", "", "Получение ответа…"); const timeout = setTimeout(() => controller.abort(), 120000);
   try {
-    if (state.mode === "task") {
-      if (!state.sessionId) await createSession();
-      await api(`/v1/sessions/${state.sessionId}/events`, {
-        method: "POST",
-        body: JSON.stringify({ event_type: "user_input", payload: { kind: "task", text: prompt } }),
-      });
-      addMessage("assistant", "Задача зарегистрирована в журнале сессии (P05 DAG-ядро в кернеле). История — во вкладке History.");
-      setBusy(false);
-      return;
-    }
-    if (state.mode === "edit") {
-      $("cfgGoal").value = prompt;
-      addMessage("assistant", "Режим Edit: цель скопирована в форму journey. Проверьте файл и replacement в Настройках и запустите.");
-      openJourney();
-      setBusy(false);
-      return;
-    }
-    // Ask: streaming chat через ядро
-    const messageEl = addMessage("assistant", "");
-    const bodyEl = messageEl.querySelector(".m-bubble");
-    bodyEl.innerHTML = `<div class="m-text" id="streamText" style="white-space:pre-wrap"></div>` +
-      `<div style="margin-top:6px"><span class="chip partial">⏳ запрос к модели…</span></div>`;
-    const streamText = bodyEl.querySelector("#streamText");
-    const backend = state.backend ||
-      { base_url: "scripted://local", api_key_env: "MODEL_PROXY_API_KEY", model: "kernel-scripted" };
-    if (!state.sessionId) await createSession();
-    const response = await fetch("/v1/chat/stream", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ backend, prompt }),
-    });
-    if (!response.ok) {
-      const detail = await response.text();
-      throw new Error(`HTTP ${response.status}: ${detail.slice(0, 300)}`);
-    }
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "", finalEvent = null;
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      let boundary;
-      while ((boundary = buffer.indexOf("\n\n")) >= 0) {
-        const block = buffer.slice(0, boundary);
-        buffer = buffer.slice(boundary + 2);
-        const dataLine = block.split("\n").find((l) => l.startsWith("data: "));
-        if (!dataLine) continue;
-        const payload = JSON.parse(dataLine.slice(6));
-        if (payload.type === "delta") streamText.textContent += payload.text;
-        else if (payload.type === "final") finalEvent = payload;
-        else if (payload.type === "error") finalEvent = { error: payload.error };
-      }
-    }
-    const tokens = `tokens ${finalEvent?.tokens_in ?? "?"}/${finalEvent?.tokens_out ?? "?"}`;
-    bodyEl.innerHTML = `<div class="m-text" style="white-space:pre-wrap">${esc(streamText.textContent || "(пустой ответ)")}</div>` +
-      `<div class="claim-chips">` +
-      (finalEvent?.error
-        ? `<span class="chip unsupported">? unsupported — ${esc(finalEvent.error)}</span>`
-        : `<span class="chip ok">✓ kernel-ответ</span>`) +
-      `<span class="chip partial">⚠ ${esc(tokens)}</span></div>`;
-    $("sbSession").textContent = "Задача: " + shortId(state.sessionId);
+    if (!state.sessionId) await createSession(); if (epoch !== state.epoch) return;
+    const response = await fetch("/v1/chat/stream", { method: "POST", redirect: "error", credentials: "same-origin", signal: controller.signal, headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify({ backend: state.backend, prompt, session_id: state.sessionId, root_id: state.rootId || null }) });
+    if (response.status === 401) { openAuth(); throw new Error("Требуется вход. Запрос автоматически не повторяется."); }
+    if (!response.ok) { const text = await readBounded(response, 16384); let reason; try { reason = JSON.parse(text).error; } catch {} throw new Error(reason || "Запрос отклонён: HTTP " + response.status); }
+    if (!(response.headers.get("Content-Type") || "").includes("text/event-stream")) throw new Error("Вместо потока получен другой тип ответа");
+    const final = await StudioCore.consumeSSE(response.body, event => { if (epoch !== state.epoch) return; if (event.type === "delta") { answer.content.textContent += event.text; $("dialogView").scrollTop = $("dialogView").scrollHeight; } });
+    if (epoch !== state.epoch) return; const outcome = StudioCore.outcome(final);
+    if (typeof final.content === "string" && outcome === "received") answer.content.textContent = final.content; renderSources(final.sources);
+    const label = { received: "Ответ получен · утверждения не проверены", partial: "Неполный ответ · лимит вывода", refused: "Отправка отклонена", hold: "HOLD · требуется сверка", unknown: "Исход не подтверждён" }[outcome]; answer.chips.replaceChildren(node("span", "chip partial", label));
+    if (final.error) answer.chips.append(node("span", "chip partial", safeString(final.error, 400)));
+    if (Number.isSafeInteger(final.tokens_in) && Number.isSafeInteger(final.tokens_out)) answer.chips.append(node("span", "chip", "Токены: " + final.tokens_in + " / " + final.tokens_out));
+    if (!answer.content.textContent) answer.content.textContent = outcome === "refused" || outcome === "hold" ? "Ответ модели не получен." : "Пустой ответ.";
+    if (["hold", "unknown"].includes(outcome)) setBanner("error", "Есть неопределённость отправки или учёта. Проверьте журнал; автоматического повтора нет.");
   } catch (e) {
-    addMessage("assistant",
-      `<span class="err-text">HOLD: ${esc(e.message)}</span>` +
-      `<div class="note-text">unknown outcome — не ретраится автоматически (контракт ядра). Проверьте backend в Настройках.</div>`);
-  } finally { setBusy(false); }
+    if (epoch !== state.epoch) return; const text = e.name === "AbortError" ? "Поток остановлен. Итог отправки проверьте в журнале." : "Завершение не подтверждено: " + e.message;
+    answer.chips.replaceChildren(node("span", "chip partial", text)); if (!answer.content.textContent) answer.content.textContent = "Ответ не получен."; setBanner("error", text + " Запрос не повторяется автоматически.");
+  } finally { clearTimeout(timeout); if (state.active === controller) { state.active = null; setBusy(false); refreshBudget(); sessionLabel(); } }
 }
-
-function shortId(id) { return id ? String(id).slice(0, 12) + "…" : "—"; }
-
-function autoGrow() {
-  const el = $("composerText");
-  el.style.height = "auto";
-  el.style.height = Math.min(el.scrollHeight, 160) + "px";
-}
-
-function showDemo() {
-  addMessage("user", esc("Объясни правила возврата средств для подписки."));
-  addMessage("assistant",
-    "Демо-диалог показывает целевой вид панели с цитатами-источниками (spec v2.1). Реальные ответы идут через ядро с журналом и бюджетом.",
-    quoteBlock("Возврат средств осуществляется в течение 14 дней с момента оплаты, при условии, что подписка не была активирована.", "docs/refund-policy.md", "строка 12-14 · демо") +
-    quoteBlock("В случае технических сбоев мы рассматриваем возврат индивидуально.", "docs/refund-policy.md", "строка 20-22 · демо") +
-    `<div class="related-chip" onclick="switchCTab('sources')"><svg class="i" width="12" height="12"><use href="#i-link"/></svg> Показать связанные файлы (2)</div>`,
-    "demo");
-  state.lastSources = [
-    { path: "docs/refund-policy.md", lines: "строка 12-14", demo: true },
-    { path: "docs/refund-policy.md", lines: "строка 20-22", demo: true },
-  ];
-  renderSources();
-  switchCTab("sources");
-}
-
-function renderSources() {
-  const el = $("sourcesList");
-  if (!state.lastSources.length) {
-    el.innerHTML = '<div class="panel-empty">Источники появятся после ответа с цитатами (evidence-контракт — следующая HTTP-обвязка).</div>';
-    return;
-  }
-  el.innerHTML = state.lastSources.map((s) =>
-    `<div class="src-row"><svg class="i"><use href="#i-doc"/></svg>` +
-    `<span class="p">${esc(s.path)}</span><span class="ln">${esc(s.lines)}${s.demo ? " · демо" : ""}</span></div>`).join("");
-}
-
-/* ═════════ sessions / tasks / history ═════════ */
-async function createSession() {
-  const session = await api("/v1/sessions", { method: "POST", body: JSON.stringify({ id: null }) });
-  state.sessionId = session.session_id;
-  $("sbSession").textContent = "Задача: " + shortId(state.sessionId);
-  $("stChip").textContent = "#" + shortId(state.sessionId);
-  return session;
-}
-
-async function newTask() {
-  try {
-    await createSession();
-    addMessage("assistant", "Новая задача-сессия создана: " + shortId(state.sessionId));
-    switchView("dialog");
-    refreshTasks();
-  } catch (e) { addMessage("assistant", "Ошибка создания задачи: " + esc(e.message)); }
-}
-
-async function refreshTasks() {
-  const body = $("tasksBody");
-  try {
-    const listing = await api("/v1/sessions");
-    const sessions = listing.sessions || [];
-    $("tabTasksCount").textContent = sessions.length;
-    $("railTaskBadge").textContent = sessions.length;
-    $("railTaskBadge").classList.toggle("hidden", !sessions.length);
-    if (!sessions.length) {
-      body.innerHTML = `<tr><td colspan="4" style="color:var(--muted)">задач ещё нет — задайте вопрос или создайте новую</td></tr>`;
-      return;
-    }
-    body.innerHTML = sessions.map((s) => {
-      const id = s.session_id ?? s.id ?? "?";
-      return `<tr><td class="mono">${esc(id)}</td>` +
-        `<td class="mono">${esc(s.project ?? "—")}</td>` +
-        `<td>${s.events != null ? esc(s.events) + " событий" : "—"}</td>` +
-        `<td style="text-align:right"><span class="btn-link" data-open="${esc(id)}">Открыть</span></td></tr>`;
-    }).join("");
-    body.querySelectorAll("[data-open]").forEach((btn) => {
-      btn.onclick = () => openSession(btn.dataset.open);
-    });
-  } catch (e) {
-    body.innerHTML = `<tr><td colspan="4" style="color:var(--err)">${esc(e.message)}</td></tr>`;
-  }
-}
-
-async function openSession(id) {
-  state.sessionId = id;
-  $("sbSession").textContent = "Задача: " + shortId(id);
-  $("stChip").textContent = "#" + shortId(id);
-  switchView("dialog");
-  addMessage("assistant", "Открыта сессия " + esc(shortId(id)) + " — новые события пишутся в её журнал.");
-}
-
+async function createSession() { const result = await api("/v1/sessions", { method: "POST", body: JSON.stringify({ id: null, root_id: state.rootId || null }) }); if (typeof result.session_id !== "string") throw new Error("Нет идентификатора сессии"); state.sessionId = result.session_id; sessionLabel(); return result; }
+async function newTask() { if (state.busy) stopStream(); invalidateContext(true); state.sessionId = null; sessionLabel(); try { await createSession(); switchView("dialog"); focusComposer(); refreshTasks(); } catch (e) { setBanner("error", e.message); } }
+async function refreshTasks() { try { const data = await api("/v1/sessions"), sessions = Array.isArray(data.sessions) ? data.sessions.slice(0, 200) : []; $("tabTasksCount").textContent = sessions.length; $("railTaskBadge").textContent = sessions.length; $("railTaskBadge").classList.toggle("hidden", !sessions.length); const body = $("tasksBody"); body.replaceChildren(); if (!sessions.length) { const tr = node("tr"), td = node("td", "pt-sub", "Сессий пока нет. Создайте новую, чтобы начать диалог."); td.colSpan = 4; tr.append(td); body.append(tr); } for (const session of sessions) { const id = typeof session.session_id === "string" ? session.session_id : null; if (!id) continue; const tr = node("tr"); tr.append(node("td", "mono", id), node("td", "", safeString(session.project, 160)), node("td", "", session.error ? "Нужна проверка журнала" : "Сохранена")); const td = node("td"); td.append(button("Открыть", () => openSession(id))); tr.append(td); body.append(tr); } } catch (e) { const tr = node("tr"), td = node("td", "pt-sub", e.message); td.colSpan = 4; tr.append(td); $("tasksBody").replaceChildren(tr); } }
+async function openSession(id) { invalidateContext(true); state.sessionId = id; sessionLabel(); switchView("history"); }
+function historyEvent(event) { const details = node("details", "history-event"), summary = node("summary"); summary.textContent = "#" + safeCount(event.seq ?? event.sequence) + " · " + safeString(event.event_type, 80) + (event.outcome ? " · " + safeString(event.outcome, 30) : ""); details.append(summary, node("pre", "", JSON.stringify(event.payload ?? {}, null, 2).slice(0, 16384))); return details; }
 async function refreshHistory() {
-  const body = $("historyBody");
-  if (!state.sessionId) {
-    body.innerHTML = '<div class="panel-empty">Нет открытой сессии. Откройте задачу во вкладке «Задачи».</div>';
-    $("histSession").textContent = "—";
-    return;
-  }
-  try {
-    const j = await api(`/v1/sessions/${encodeURIComponent(state.sessionId)}`);
-    $("histSession").textContent = state.sessionId;
-    const pending = j.pending_call_ids || [], unresolved = j.unresolved_call_ids || [];
-    body.innerHTML =
-      `<div class="kv-grid">` +
-      `<div class="kv"><div class="k">событий в журнале</div><div class="v">${j.events ?? "—"}</div></div>` +
-      `<div class="kv"><div class="k">незавершённый хвост</div><div class="v ${j.incomplete_tail ? "warn" : "ok"}">${j.incomplete_tail ? "есть" : "нет"}</div></div>` +
-      `<div class="kv"><div class="k">pending вызовы</div><div class="v">${pending.length}</div></div>` +
-      `<div class="kv"><div class="k">unresolved (HOLD)</div><div class="v ${unresolved.length ? "err" : "ok"}">${unresolved.length}</div></div>` +
-      `</div>` +
-      `<div class="card" style="margin-top:14px"><div class="c-title"><svg class="i"><use href="#i-shield"/></svg> Контракт fail-closed</div>` +
-      `<div class="doc-row ok"><svg class="i"><use href="#i-check"/></svg><span>Все эффекты сессии записаны append-only с цепочкой хешей; при обрыве хвост восстанавливается без доверия к последней записи.</span></div>` +
-      (unresolved.length
-        ? `<div class="doc-row err"><svg class="i"><use href="#i-alert"/></svg><span>Есть unresolved вызовы — HOLD не снимается автоматически, ручная сверка обязательна.</span></div>`
-        : `<div class="doc-row ok"><svg class="i"><use href="#i-check"/></svg><span>Unresolved вызовов нет — счётчики расходов сходятся.</span></div>`) +
-      `</div>`;
-  } catch (e) {
-    body.innerHTML = `<div class="panel-empty" style="color:var(--err)">${esc(e.message)}</div>`;
-  }
+  if (!state.sessionId) { $("histSession").textContent = "—"; empty($("historyBody"), "Выберите сохранённую сессию.", button("Открыть сессии", () => switchView("tasks"))); return; }
+  const id = state.sessionId, epoch = state.epoch; $("histSession").textContent = id;
+  try { const result = await api("/v1/sessions/" + encodeURIComponent(id) + "/history?after=0&limit=100"); if (id !== state.sessionId || epoch !== state.epoch) return; const body = $("historyBody"); body.replaceChildren(); const pending = Array.isArray(result.pending_call_ids) ? result.pending_call_ids : [], holds = Array.isArray(result.unresolved_call_ids) ? result.unresolved_call_ids : [];
+    const card = node("div", "card"); card.append(node("div", "c-title", "Состояние журнала"), node("p", "pt-sub", "Событий: " + safeCount(result.total_events) + " · ожидают завершения: " + pending.length + " · неизвестный исход: " + holds.length), node("p", "pt-sub", result.incomplete_tail ? "Незавершённый хвост. До проверки журнала новые действия могут быть недоступны." : "Хвост журнала завершён. Это не подтверждение корректности ответов или сверки расходов.")); body.append(card);
+    for (const event of Array.isArray(result.events) ? result.events : []) body.append(historyEvent(event));
+    if (result.next_cursor !== null && result.next_cursor !== undefined && result.next_cursor < result.total_events) { let cursor = result.next_cursor; const more = button("Ещё события", async () => { more.disabled = true; try { const r = await api("/v1/sessions/" + encodeURIComponent(id) + "/history?after=" + cursor + "&limit=100"); if (id !== state.sessionId || epoch !== state.epoch) return; for (const e of r.events || []) body.insertBefore(historyEvent(e), more); cursor = r.next_cursor; more.hidden = cursor == null || cursor >= r.total_events; } catch (e) { setBanner("error", e.message); } finally { more.disabled = false; } }); body.append(more); }
+  } catch (e) { if (epoch === state.epoch) empty($("historyBody"), e.message); }
 }
-
-/* ═════════ analytics / doctor ═════════ */
-async function refreshAnalytics() {
-  const body = $("analyticsBody");
-  body.innerHTML = '<div class="panel-empty">загрузка…</div>';
-  const parts = [];
-  try {
-    const doctor = await api("/v1/doctor");
-    const checks = doctor.checks || [];
-    parts.push(`<div class="card"><div class="c-title"><svg class="i"><use href="#i-plus"/></svg> Doctor</div>` +
-      `<div class="c-sub">${checks.filter((c) => c.ok).length} из ${checks.length} проверок зелёные</div>` +
-      checks.map((c) => {
-        const detail = typeof c.detail === "string" ? c.detail : c.detail ? JSON.stringify(c.detail) : "";
-        const cls = c.ok ? "ok" : "warn";
-        const icn = c.ok ? "i-check" : "i-alert";
-        return `<div class="doc-row ${cls}"><svg class="i"><use href="#${icn}"/></svg>` +
-          `<span>${esc(c.name)} <span class="d">— ${esc(detail)}</span></span></div>`;
-      }).join("") + `</div>`);
-    if (checks.some((c) => c.name === "git" && !c.ok)) {
-      $("rmGitText").textContent = "git: вне PATH";
-    } else if (checks.some((c) => c.name === "git" && c.ok)) {
-      $("rmGitText").textContent = "git: ✓";
-    }
-  } catch (e) {
-    parts.push(`<div class="card"><div class="c-title">Doctor</div><div class="pt-sub" style="color:var(--err)">${esc(e.message)}</div></div>`);
-  }
-  const g = state.lastGraph;
-  parts.push(`<div class="card"><div class="c-title"><svg class="i"><use href="#i-layers"/></svg> Граф</div>` +
-    (g ? `<div class="kv-grid">` +
-      `<div class="kv"><div class="k">файлов</div><div class="v">${(g.files || []).length}</div></div>` +
-      `<div class="kv"><div class="k">узлов</div><div class="v">${g.nodes ?? "—"}</div></div>` +
-      `<div class="kv"><div class="k">unresolved</div><div class="v">${(g.unresolved || []).length}</div></div></div>`
-      : `<div class="pt-sub">граф не собран</div>`) + `</div>`);
-  parts.push(`<div class="card"><div class="c-title"><svg class="i"><use href="#i-analytics"/></svg> Retrieval-бенчмарки</div>` +
-    `<div class="pt-sub">Recall@K / MRR — ожидают backend-эндпоинта (контракт готов в af-program, eval.rs).</div></div>`);
-  body.innerHTML = parts.join("");
-}
-
-/* ═════════ settings forms ═════════ */
-function loadBackendForm() {
-  if (state.backend) {
-    $("cfgBaseUrl").value = state.backend.base_url || "";
-    $("cfgModel").value = state.backend.model || "";
-    $("cfgKeyEnv").value = state.backend.api_key_env || "";
-  }
-  $("cfgRootId").value = state.rootId;
-  $("cfgJourneyRoot").value = state.rootId;
-}
-function saveBackend() {
-  const base_url = $("cfgBaseUrl").value.trim();
-  const model = $("cfgModel").value.trim();
-  const api_key_env = $("cfgKeyEnv").value.trim();
-  if (!base_url || !model) { $("backendStatus").textContent = "base_url и модель обязательны"; return; }
-  state.backend = { base_url, api_key_env, model };
-  localStorage.setItem("af.backend", JSON.stringify(state.backend));
-  $("backendStatus").textContent = "сохранено — используется при следующем запросе";
-  refreshHealth();
-}
-
-/* ═════════ journey / verification ═════════ */
-async function runJourney() {
-  if (!$("cfgApproved").checked) {
-    setBanner("pending", "Требуется host-approved — явное решение оператора.");
-    $("vBadge").textContent = "требуется approve";
-    $("vBadge").className = "v-badge pending";
-    return;
-  }
-  $("journeyStatus").textContent = "выполняется…";
-  setBusy(true);
-  try {
-    if (!state.sessionId) await createSession();
-    const report = await api("/v1/edit-journeys", {
-      method: "POST",
-      body: JSON.stringify({
-        backend: state.backend || { base_url: "scripted://local", api_key_env: "", model: "kernel-scripted" },
-        root_id: $("cfgJourneyRoot").value.trim() || state.rootId,
-        file: $("cfgFile").value.trim(),
-        replacement: $("cfgReplacement").value,
-        goal: $("cfgGoal").value.trim(),
-        host_approved: true,
-      }),
-    });
-    state.lastJourney = report;
-    renderVerification(report);
-    $("journeyStatus").textContent = report.verified ? "проверка пройдена" : "проверка не пройдена";
-    addMessage("assistant", report.verified
-      ? "Journey завершён: финальная проверка пройдена, правка в стейджинге ядра."
-      : "Journey завершён, но финальная проверка НЕ пройдена — правка не публикуется.");
-  } catch (e) {
-    setBanner("pending", "Ошибка journey: " + e.message);
-    $("journeyStatus").textContent = "ошибка: " + e.message;
-  } finally { setBusy(false); }
-}
-
-function renderVerification(report) {
-  $("vBadge").textContent = report.verified ? "Пройдена" : "Не пройдена";
-  $("vBadge").className = "v-badge" + (report.verified ? "" : " pending");
-  setBanner(report.verified ? "ok" : "pending",
-    report.verified ? "Финальный gate пройден ядром" : "Финальная проверка не пройдена — правка не опубликована");
-  const facts = $("vFacts");
-  const items = [
-    { name: "content hash (CAS)", ok: report.verified },
-    { name: "syntax / compile check", ok: report.verified },
-    { name: "host final gate", ok: report.ok },
-  ];
-  const passed = items.filter((i) => i.ok).length;
-  $("vFactsCount").textContent = `${passed}/${items.length}`;
-  facts.innerHTML = items.map((item) =>
-    `<div class="v-item ${item.ok ? "" : "partial"}">` +
-    `<span class="vic"><svg class="i"><use href="#${item.ok ? "i-check-circle" : "i-alert"}"/></svg></span>` +
-    `<span>${esc(item.name)}</span></div>`).join("");
-  const edits = report.edits || [];
-  const changes = $("vChanges");
-  changes.innerHTML = edits.length
-    ? edits.map((edit) => {
-        const path = typeof edit === "string" ? edit : (edit.file ?? edit.path ?? "?");
-        return `<div class="change-row"><span class="fic"><svg class="i"><use href="#i-doc"/></svg></span>` +
-          `<span class="path">${esc(path)}</span><span class="add">M</span></div>`;
-      }).join("")
-    : `<div class="panel-empty" style="padding:6px 14px">правок не зафиксировано</div>`;
-  if (report.verified) {
-    $("stVerified").className = "st-node done";
-    $("stLine1").className = "st-line done";
-    $("stLine2").className = "st-line done";
-    $("stPublished").className = "st-node done";
-  } else {
-    $("stVerified").className = "st-node current";
-    $("stLine1").className = "st-line";
-    $("stLine2").className = "st-line";
-    $("stPublished").className = "st-node";
-  }
-  $("vDraftChip").textContent = report.verified ? "verified" : "draft";
-}
-
-function applyLastJourney() {
-  if (!state.lastJourney) { setBanner("pending", "Нет завершённого journey."); return; }
-  setBanner(state.lastJourney.verified ? "ok" : "pending", state.lastJourney.verified
-    ? "Правка применена ядром (sandbox apply с CAS-стейджингом), событие в журнале."
-    : "Правка не применялась: проверка не пройдена.");
-}
-
-function snapshotSession() {
-  if (!state.sessionId) { setBanner("pending", "Нет открытой сессии."); return; }
-  api(`/v1/sessions/${state.sessionId}/events`, {
-    method: "POST",
-    body: JSON.stringify({ event_type: "snapshot_created", payload: { via: "dashboard" } }),
-  }).then(() => {
-    $("vDraftChip").textContent = "snapshot";
-    setBanner("ok", "Снапшот записан в журнал сессии.");
-  }).catch((e) => setBanner("pending", "Снапшот: " + e.message));
-}
-
-function recoverNote() {
-  setBanner("pending", "Recovery: журнал append-only с восстановлением хвоста (recover_tail) — HOLD не снимается автоматически.");
-}
-
-/* ═════════ boot ═════════ */
-(async () => {
-  await refreshHealth();
-  $("rmProjectText").textContent = "root: " + state.rootId;
-  $("tbProject").textContent = state.rootId + "/";
-  $("cfgRootId").value = state.rootId;
-  $("cfgJourneyRoot").value = state.rootId;
-  refreshBudget();
-  renderSources();
-  try { await readGraph(); } catch {}
-  try {
-    const listing = await api("/v1/sessions");
-    const count = (listing.sessions || []).length;
-    $("tabTasksCount").textContent = count;
-    $("railTaskBadge").textContent = count;
-    $("railTaskBadge").classList.toggle("hidden", !count);
-  } catch {}
-})();
-document.addEventListener("keydown", (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") sendComposer();
-  if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "К")) { e.preventDefault(); focusComposer(); }
-});
-$("composerText").addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendComposer(); }
-});
-$("composerText").addEventListener("input", autoGrow);
+async function snapshotSession() { if (!state.sessionId || state.busy) return; const id = state.sessionId; $("snapshotBtn").disabled = true; try { const r = await api("/v1/sessions/" + encodeURIComponent(id) + "/snapshot", { method: "POST" }); if (r.scope !== "session_journal" || !/^[a-f0-9]{64}$/.test(r.sha256 || "")) throw new Error("Нет корректной квитанции снимка журнала"); const modal = makeModal("snapshotDialog", "Снимок журнала создан"); modal.body.append(node("p", "pt-sub", "Сохранён журнал сессии. Это не резервная копия исходников и не разрешение повторить незавершённые операции."), node("pre", "source-meta", "Сессия: " + safeString(r.session_id) + "\nСнимок: " + safeString(r.snapshot_id) + "\nSHA256: " + r.sha256 + "\nСобытий: " + safeCount(r.events))); modal.dialog.showModal(); } catch (e) { setBanner("error", e.message); } finally { sessionLabel(); } }
+async function refreshAnalytics() { const body = $("analyticsBody"); empty(body, "Читаю состояние ядра…"); try { const data = await api("/v1/doctor"); body.replaceChildren(); const checks = Array.isArray(data.checks) ? data.checks : []; const card = node("div", "card"); card.append(node("div", "c-title", "Диагностика среды"), node("p", "pt-sub", "Доступность компонентов. Результат не подтверждает качество модели или безопасность всего проекта.")); for (const c of checks) { const row = node("div", "doc-row " + (c.ok === true ? "ok" : "warn")); row.append(icon(c.ok === true ? "check" : "alert"), node("span", "", safeString(c.name, 80) + " — " + (typeof c.detail === "string" ? c.detail : JSON.stringify(c.detail ?? {})).slice(0, 600))); card.append(row); } body.append(card); } catch (e) { empty(body, e.message); } }
+function loadBackendForm() { const provider = $("cfgProvider"); if (provider && !provider.options.length) { const option = node("option", "", "Локальный тестовый провайдер"); option.value = "scripted"; provider.append(option); } refreshProviders(); }
+async function refreshProviders() { try { const result = await api("/v1/providers"); const providers = Array.isArray(result.providers) ? result.providers.filter(p => p && typeof p.id === "string" && Array.isArray(p.models)).slice(0, 50) : []; state.providers = providers; const selected = state.backend.provider_id || "scripted", select = $("cfgProvider"); select.replaceChildren(); for (const p of providers) { const option = node("option", "", safeString(p.label, 120)); option.value = p.id; option.disabled = p.available !== true; select.append(option); } if (providers.some(p => p.id === selected && p.available === true)) select.value = selected; else if (select.options.length) select.selectedIndex = 0; updateModels(); $("backendStatus").textContent = providers.some(p => p.id !== "scripted" && p.available === true) ? "Выберите провайдера и модель для этой вкладки." : "Внешний провайдер пока не подключён. Доступен локальный тест соединения."; } catch (e) { $("backendStatus").textContent = e.message; } }
+function updateModels() { const provider = state.providers?.find(p => p.id === $("cfgProvider").value), select = $("cfgModel"); select.replaceChildren(); for (const name of provider?.models || ["scripted"]) { if (typeof name !== "string") continue; const option = node("option", "", name); option.value = name; select.append(option); } if ([...select.options].some(o => o.value === state.backend.model)) select.value = state.backend.model; }
+function saveBackend() { const id = $("cfgProvider").value, model = $("cfgModel").value, provider = state.providers?.find(p => p.id === id && p.available === true); if (!provider || !provider.models.includes(model)) { $("backendStatus").textContent = "Выберите доступного провайдера и модель."; return; } invalidateContext(); state.backend = { provider_id: id, base_url: "", api_key_env: "", model }; $("providerText").textContent = safeString(provider.label, 120) + " · " + model; $("backendStatus").textContent = "Выбор сохранён в памяти этой вкладки."; }
+function runJourney() { setBanner("pending", "Для изменения нужен подключённый контракт проверки и публикации. Сейчас доступны просмотр проекта и диалог."); }
+function renderVerification(report) { const v = StudioCore.verification(report); $("vBadge").textContent = v.verified ? "пакет проверен" : "не оценено"; $("vFactsCount").textContent = v.rows.filter(r => r.status === "passed").length + "/" + v.rows.length; $("vFacts").replaceChildren(); for (const c of v.rows) { const row = node("div", "v-item"); row.append(icon(c.status === "passed" ? "check" : "info"), node("span", "", c.name + " · " + c.status + "\nОбласть: " + c.scope)); $("vFacts").append(row); } $("stPublished").className = "st-node" + (v.published ? " done" : ""); }
+function showDiff() { if (!state.lastJourney?.diff) return; const modal = makeModal("diffDialog", "Изменения"); modal.body.append(node("pre", "source-code", String(state.lastJourney.diff).slice(0, 262144))); modal.dialog.showModal(); }
+function makeModal(id, title) { const old = $(id); if (old) { if (old.open) old.close(); old.remove(); } const dialog = node("dialog"); dialog.id = id; const head = node("div", "modal-head"), heading = node("strong", "", title); heading.id = id + "Title"; dialog.setAttribute("aria-labelledby", heading.id); head.append(heading, button("Закрыть", () => dialog.close())); const body = node("div", "modal-body"); dialog.append(head, body); document.body.append(dialog); return { dialog, body }; }
+function openAuth() { if ($("authDialog")?.open) return; const modal = makeModal("authDialog", "Подключение к серверу"); const label = node("label", "pt-sub", "Токен сервера"), input = node("input"); input.type = "password"; input.autocomplete = "off"; input.spellcheck = false; input.setAttribute("aria-label", "Токен сервера"); label.append(input); modal.body.append(node("p", "pt-sub", "Токен хранится только в памяти вкладки и передаётся в заголовке авторизации. После перезагрузки войдите снова."), label, button("Подключить", async () => { state.token = input.value.trim(); input.value = ""; modal.dialog.close(); await refreshHealth(); refreshProviders(); refreshTasks(); renderRoots(); refreshBudget(); })); modal.dialog.addEventListener("close", () => { input.value = ""; }); modal.dialog.showModal(); input.focus(); }
+function openPalette() { const modal = makeModal("commandDialog", "Команды"), input = node("input"), list = node("div", "command-list"); input.type = "search"; input.placeholder = "Найти команду…"; input.setAttribute("aria-label", "Найти команду"); const commands = [["Новая сессия", newTask], ["Подключить проект", gotoRootSetup], ["Собрать граф проекта", buildGraph], ["Открыть сессии", () => switchView("tasks")], ["История текущей сессии", () => switchView("history")], ["Диагностика ядра", () => switchView("analytics")], ["Настройки провайдера", () => switchView("settings")], ["Показать / скрыть контекст", toggleExplorer], ["Показать / скрыть проверки", toggleVerification], ["Компактная плотность", () => { document.body.classList.toggle("compact"); remember("af.compact", document.body.classList.contains("compact")); }], ["Войти с токеном сервера", openAuth]]; for (const [label, action] of commands) list.append(button(label, () => { modal.dialog.close(); action(); })); input.addEventListener("input", () => list.querySelectorAll("button").forEach(b => b.hidden = !b.textContent.toLocaleLowerCase().includes(input.value.toLocaleLowerCase()))); modal.body.append(input, list); modal.dialog.showModal(); input.focus(); }
+function toggleExplorer() { document.body.classList.toggle(innerWidth <= 760 ? "show-explorer" : "hide-explorer"); if (innerWidth > 760) remember("af.hide-explorer", document.body.classList.contains("hide-explorer")); }
+function toggleVerification() { document.body.classList.toggle(innerWidth <= 980 ? "show-verification" : "hide-verification"); if (innerWidth > 980) remember("af.hide-verification", document.body.classList.contains("hide-verification")); }
+function initResize(id, property, min, max, reverse) { const panel = $(id), handle = node("div", "layout-handle"); handle.tabIndex = 0; handle.setAttribute("role", "separator"); handle.setAttribute("aria-orientation", "vertical"); handle.setAttribute("aria-label", id === "explorerPanel" ? "Ширина панели контекста" : "Ширина панели проверок"); const saved = safeRead("af.layout." + property, null); if (typeof saved === "number" && saved >= min && saved <= max) document.documentElement.style.setProperty(property, saved + "px"); function set(value) { const width = Math.max(min, Math.min(max, value)); document.documentElement.style.setProperty(property, width + "px"); handle.setAttribute("aria-valuenow", String(width)); remember("af.layout." + property, width); } handle.addEventListener("pointerdown", event => { const start = event.clientX, width = panel.getBoundingClientRect().width; handle.setPointerCapture(event.pointerId); const move = e => set(width + (e.clientX - start) * (reverse ? -1 : 1)); const end = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", end); }; handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", end); }); handle.addEventListener("keydown", e => { if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); set(panel.getBoundingClientRect().width + (e.key === "ArrowRight" ? 16 : -16) * (reverse ? -1 : 1)); } }); panel.append(handle); }
+const ACTIONS = { switchView, switchCTab, switchMode, focusComposer, gotoRootSetup, openJourney, openPalette, openAuth, toggleExplorer, toggleVerification, pickFolder, grantRoot, buildGraph, refreshTasks, refreshHistory, refreshAnalytics, newTask, sendComposer, stopStream, saveBackend, createBudget, snapshotSession, showDiff, runJourney };
+document.addEventListener("click", e => { const target = e.target.closest("[data-action]"); if (!target || target.disabled || target.getAttribute("aria-disabled") === "true") return; const action = ACTIONS[target.dataset.action]; if (action) action(target.dataset.value); });
+document.querySelectorAll("div[data-action],span[data-action]").forEach(n => { n.tabIndex = 0; n.setAttribute("role", "button"); n.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); n.click(); } }); });
+document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); openPalette(); } if (e.key === "Escape" && state.active && !document.querySelector("dialog[open]")) stopStream(); });
+$("composerText").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendComposer(); } });
+$("composerText").addEventListener("input", autoGrow); $("fileFilter").addEventListener("input", renderTree); $("cfgProvider").addEventListener("change", updateModels);
+$("dialogView").setAttribute("role", "log"); $("dialogView").setAttribute("aria-label", "Сообщения диалога"); $("vBannerText").setAttribute("aria-live", "polite"); $("composerText").setAttribute("aria-label", "Запрос к модели");
+initResize("explorerPanel", "--explorer-w", 220, 420, false); initResize("verificationPanel", "--verify-w", 260, 420, true); if (safeRead("af.compact", false)) document.body.classList.add("compact"); if (safeRead("af.hide-explorer", false)) document.body.classList.add("hide-explorer"); if (safeRead("af.hide-verification", false)) document.body.classList.add("hide-verification");
+(async () => { resetEvidence(); updateProject(); sessionLabel(); setClock(); setInterval(setClock, 30000); await refreshHealth(); await refreshProviders(); await renderRoots(); await readGraph(); await refreshBudget(); })();
 </script>
 </body>
 </html>

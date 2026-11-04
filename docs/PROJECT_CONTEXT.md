@@ -1,5 +1,20 @@
 # atomic-flow — рабочая карта проекта
 
+4 ноября, текущая работа в обновлённом zcode checkout (base `09d06c5`):
+[Studio acceptance](STUDIO_ACCEPTANCE_2026-11-04.md). Переработаны три зоны UI,
+подключены реальная история/исходники/снимок журнала, host-only provider config
+и durable budget admission; защита HTTP Origin/Host и bounded/cancellable SSE.
+Generic exit-zero больше не означает Verified. Перед source write сохраняются
+intent/backups; неопределённая публикация оставляет cross-session root hold.
+Локально 104 целевых Rust PASS, 8 JS PASS и native HTTP smoke PASS, provider_calls=0.
+Browser visual QA заблокирована URL guard инструмента, внешний CI ещё требуется.
+Полная реконструкция и production acceptance не объявлены завершёнными.
+
+P07 engineering exit принят отдельно на `f76a59e`: native Rust/TS TaskRunner
+CI41655855886, artifact13239936458, 135 raw hashes, FAIL→one replan→repair→fresh
+PASS→publication, шесть completed/cleaned checks; общий CI41655869867 SUCCESS.
+Research pairs/holdout/ablations и прежние UNKNOWN остаются незавершёнными.
+
 Обновлено 25 октября 2026 после сверки ночных пакетов и локального продолжения.
 Работать из этого репозитория `atomic-flow/`; внешний родитель — другой Git root.
 Ветка `experimental`, draft [PR №2](https://github.com/Akseleu-J/atomic-flow/pull/2),

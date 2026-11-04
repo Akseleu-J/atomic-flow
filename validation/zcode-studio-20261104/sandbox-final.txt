@@ -1,0 +1,31 @@
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.05s
+     Running unittests src\lib.rs (target\debug\deps\af_sandbox-629df21e265d5f27.exe)
+
+running 17 tests
+test admission::tests::admits_plain_relative_paths ... ok
+test redact::tests::masks_known_token_shapes ... ok
+test redact::tests::masks_literal_key_value_assignments ... ok
+test redact::tests::masks_private_keys_preserving_line_count ... ok
+test session::tests::apply_refuses_when_source_changed_after_preview ... ok
+test session::tests::apply_requires_approval_and_publishes ... ok
+test session::tests::broken_python_replacement_refused ... ok
+test session::tests::failed_intent_storage_prevents_all_source_writes ... ok
+test session::tests::list_files_is_bounded_and_suffix_filtered ... ok
+test session::tests::partial_publication_restores_bytes_and_keeps_cross_session_hold ... ok
+test session::tests::preview_outside_write_scope_refused ... ok
+test session::tests::publication_hold_blocks_another_session_and_preserves_backups ... ok
+test session::tests::read_requires_and_records_proofs ... ok
+test session::tests::secrets_are_redacted_in_reads ... ok
+test session::tests::successful_publication_retains_durable_intent_and_exact_before_bytes ... ok
+test tests::glob_matches_ignore_patterns ... ok
+test tests::identifiers_follow_the_contract ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.27s
+
+   Doc-tests af_sandbox
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

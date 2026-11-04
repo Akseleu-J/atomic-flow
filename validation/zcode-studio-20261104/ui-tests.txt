@@ -1,0 +1,16 @@
+✔ complete fragmented Unicode SSE has one terminal outcome without verified claims (26.1899ms)
+✔ missing or partial final never becomes a successful response (2.1905ms)
+✔ unknown, refusal and partial are distinct terminal states (0.2643ms)
+✔ unbounded frames and output are refused and reader cancelled (14.2865ms)
+✔ duplicate terminal and post-terminal deltas are rejected (1.0586ms)
+✔ malformed and unknown SSE frames cannot silently qualify (1.1435ms)
+✔ invalid receipts cannot be dropped to fabricate all-passed verification (0.8961ms)
+✔ dashboard is self-contained, safe-text rendered and nonce-CSP compatible (3.6879ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 261.8815

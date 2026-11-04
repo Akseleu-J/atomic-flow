@@ -1,0 +1,70 @@
+name: Studio native HTTP and safety acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: ['codex/studio-*']
+permissions:
+  contents: read
+concurrency:
+  group: studio-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  studio:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    env:
+      CARGO_BUILD_JOBS: '1'
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_DEV_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          profile: minimal
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@6044e13b5db4789a24ef6e0b3ec1826e84042607
+        with:
+          node-version: '22'
+      - name: Record exact source and toolchains
+        shell: bash
+        run: |
+          mkdir -p validation/studio-ci
+          git rev-parse HEAD > validation/studio-ci/commit.txt
+          rustc --version --verbose > validation/studio-ci/rustc.txt
+          cargo --version > validation/studio-ci/cargo.txt
+          python -c "import pathlib,hashlib,json; r=pathlib.Path('.'); fs=[p for p in (r/'rust').rglob('*') if p.is_file() and ('target' not in p.parts) and (p.suffix in ('.rs','.html','.toml') or p.name=='Cargo.lock')]; pathlib.Path('validation/studio-ci/source.json').write_text(json.dumps({p.as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in fs},sort_keys=True))"
+      - name: Native kernel regressions
+        shell: bash
+        working-directory: rust
+        run: |
+          set -o pipefail
+          cargo test --workspace --locked -- --test-threads=1 2>&1 | tee ../validation/studio-ci/tests.txt
+      - name: Build native application
+        shell: bash
+        working-directory: rust
+        run: cargo build -p af-cli --locked
+      - name: Native HTTP lifecycle in isolated state
+        shell: bash
+        run: |
+          python validation/zcode-studio-20261104/http_smoke.py
+          cp validation/zcode-studio-20261104/http-smoke-result.json validation/studio-ci/http-smoke-result.json
+      - name: UI stream and rendering contract
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test validation/zcode-studio-20261104/ui-tests.mjs 2>&1 | tee validation/studio-ci/ui-tests.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: studio-${{ matrix.os }}-${{ github.sha }}
+          path: validation/studio-ci/
+          retention-days: 14
+          if-no-files-found: error

@@ -6,6 +6,7 @@
 mod dashboard;
 mod doctor;
 mod server;
+mod trusted_provider;
 
 use clap::{Parser, Subcommand};
 use serde_json::{json, Value};
@@ -31,6 +32,9 @@ enum Command {
         bind: String,
         #[arg(long)]
         token: Option<String>,
+        /// Read the server token from this process environment variable.
+        #[arg(long, conflicts_with = "token")]
+        token_env: Option<String>,
     },
     /// MCP stdio server: line-delimited JSON-RPC over stdin/stdout.
     Mcp,
@@ -234,7 +238,28 @@ enum BackendCommand {
 
 fn main() {
     let cli = Cli::parse();
-    if let Command::Serve { bind, token } = cli.command {
+    if let Command::Serve {
+        bind,
+        token,
+        token_env,
+    } = cli.command
+    {
+        let token = match token_env {
+            Some(name) => match std::env::var(name) {
+                Ok(value)
+                    if !value.is_empty()
+                        && value.len() <= 512
+                        && !value.chars().any(char::is_control) =>
+                {
+                    Some(value)
+                }
+                _ => {
+                    eprintln!("af: server token environment variable is missing or invalid");
+                    std::process::exit(1);
+                }
+            },
+            None => token,
+        };
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()
@@ -598,10 +623,9 @@ pub fn edit_toolset_for<'a>(
     let document: Value = serde_json::from_slice(&af_graph::canonical::canonical_bytes(&document))
         .map_err(|e| e.to_string())?;
     let runner = af_exec::JobRunner::open(&af_sandbox::user_dir().join("jobs")).map_err(|e| e.0)?;
-    #[cfg(windows)]
-    let check_argv = vec!["cmd".to_string(), "/C".to_string(), "exit 0".to_string()];
-    #[cfg(not(windows))]
-    let check_argv = vec!["sh".to_string(), "-c".to_string(), "exit 0".to_string()];
+    // A requirement checker must be bound by the host. No placeholder exit-zero
+    // command may be displayed as evidence that source requirements passed.
+    let check_argv = Vec::new();
     af_loop::edit::EditToolset::new(registry, root_id, runner, document, check_argv, root, 4)
 }
 

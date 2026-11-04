@@ -360,6 +360,7 @@ impl<'a> SandboxSession<'a> {
             ));
         }
         let item = self.registry.get(root_id)?;
+        self.registry.require_root_effects_clear(root_id)?;
         let write_paths: BTreeSet<&str> = item["write_paths"]
             .as_array()
             .map(|items| {
@@ -497,105 +498,173 @@ impl<'a> SandboxSession<'a> {
                 "root source manifest changed after preview".into(),
             ));
         }
+        let _lease = self.registry.root_effect_lease(&root)?;
+        self.registry.require_path_effects_clear(&root)?;
+        authority()?;
+        if manifest(&root)? != preview.manifest {
+            return Err(SandboxError(
+                "source changed before publication lease".into(),
+            ));
+        }
         let changeset_id = af_entropy::token();
-        let mut applied: Vec<(String, Option<Vec<u8>>)> = Vec::new();
         let journal_dir = self.registry.directory.join("changesets");
-        let journal_path = journal_dir.join(format!("{changeset_id}.json"));
-        let journal = |status: &str,
-                       paths: Vec<String>,
-                       error: Option<String>|
-         -> SandboxResult<()> {
-            std::fs::create_dir_all(&journal_dir)
-                .map_err(|error| SandboxError(format!("changeset journal failed: {error}")))?;
-            let record = json!({
-                "changeset_id": changeset_id, "workspace_id": self.registry.id,
-                "root_id": root_id, "status": status, "paths": paths,
-                "baseline": preview.manifest, "cross_root_atomic": false,
-                "error": error,
-            });
-            let mut file = std::fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(&journal_path)
-                .map_err(|error| SandboxError(format!("changeset journal failed: {error}")))?;
-            file.write_all(&serde_json::to_vec(&record).map_err(|e| SandboxError(format!("{e}")))?)
-                .and_then(|_| file.flush())
-                .and_then(|_| file.sync_all())
-                .map_err(|error| SandboxError(format!("changeset journal failed: {error}")))?;
-            Ok(())
-        };
+        crate::registry::ensure_no_links(&journal_dir)?;
+        std::fs::create_dir_all(&journal_dir)
+            .map_err(|_| SandboxError("changeset store unavailable".into()))?;
+        let backup_dir = journal_dir.join(format!("{changeset_id}-backups"));
+        std::fs::create_dir(&backup_dir)
+            .map_err(|_| SandboxError("backup store creation failed".into()))?;
+        let mut originals = BTreeMap::<String, Option<Vec<u8>>>::new();
+        let mut backups = Vec::new();
+        for (index, (rel, change)) in preview.changes.iter().enumerate() {
+            let path = admit_rel(&root, rel)?;
+            let original = if path.exists() {
+                Some(std::fs::read(&path).map_err(|_| SandboxError("backup read failed".into()))?)
+            } else {
+                None
+            };
+            if original.as_deref().map(sha256_hex) != change.before_source_hash {
+                return Err(SandboxError("source changed before durable backup".into()));
+            }
+            let backup = format!("before-{index}");
+            if let Some(raw) = &original {
+                crate::registry::persist_new(&backup_dir.join(&backup), raw)?;
+            }
+            backups.push(json!({"path":rel,"backup":if original.is_some(){Some(backup)}else{None},
+                "before_sha256":change.before_source_hash,"after_sha256":change.after.as_deref().map(sha256_hex)}));
+            originals.insert(rel.clone(), original);
+        }
+        let intent = json!({"schema_version":1,"changeset_id":changeset_id,"workspace_id":self.registry.id,
+            "root_id":root_id,"status":"prepared","baseline":preview.manifest,"files":backups,
+            "cross_root_atomic":false});
+        let raw = serde_json::to_vec(&intent)
+            .map_err(|_| SandboxError("intent encoding failed".into()))?;
+        crate::registry::persist_new(
+            &journal_dir.join(format!("{changeset_id}-intent.json")),
+            &raw,
+        )?;
+        self.registry
+            .begin_root_effect(&root, &changeset_id, &sha256_hex(&raw))?;
+        let mut applied = Vec::<String>::new();
         let result = (|| -> SandboxResult<()> {
             for (rel, change) in &preview.changes {
                 authority()?;
                 let path = admit_rel(&root, rel)?;
-                let original = if path.exists() {
+                let observed = if path.exists() {
                     Some(
                         std::fs::read(&path)
-                            .map_err(|error| SandboxError(format!("apply read failed: {error}")))?,
+                            .map_err(|_| SandboxError("source read failed".into()))?,
                     )
                 } else {
                     None
                 };
-                if original.as_deref().map(sha256_hex) != change.before_source_hash
-                    && !(original.is_none() && change.before_source_hash.is_none())
-                {
-                    return Err(SandboxError("root source changed during staging".into()));
+                if observed != originals[rel] {
+                    return Err(SandboxError("source changed during publication".into()));
                 }
+                // Record possible mutation before invoking the filesystem effect.
+                applied.push(rel.clone());
                 match &change.after {
-                    None => {
-                        if path.exists() {
-                            std::fs::remove_file(&path).map_err(|error| {
-                                SandboxError(format!("apply delete failed: {error}"))
-                            })?;
-                        }
-                    }
                     Some(bytes) => {
                         let temp = root.join(format!("{}.atomic-tmp", af_entropy::token()));
-                        {
-                            let mut file = std::fs::OpenOptions::new()
-                                .write(true)
-                                .create_new(true)
-                                .open(&temp)
-                                .map_err(|error| {
-                                    SandboxError(format!("apply temp write failed: {error}"))
-                                })?;
-                            file.write_all(bytes)
-                                .and_then(|_| file.flush())
-                                .and_then(|_| file.sync_all())
-                                .map_err(|error| {
-                                    SandboxError(format!("apply fsync failed: {error}"))
-                                })?;
+                        crate::registry::persist_new(&temp, bytes)?;
+                        crate::registry::replace_durable(&temp, &path)?;
+                    }
+                    None => {
+                        if path.exists() {
+                            std::fs::remove_file(&path)
+                                .map_err(|_| SandboxError("source deletion failed".into()))?;
+                            crate::registry::sync_parent(&path)?;
                         }
-                        std::fs::rename(&temp, &path).map_err(|error| {
-                            SandboxError(format!("apply replace failed: {error}"))
-                        })?;
                     }
                 }
-                applied.push((rel.clone(), original));
+                let actual = if path.exists() {
+                    Some(
+                        std::fs::read(&path)
+                            .map_err(|_| SandboxError("publication recheck failed".into()))?,
+                    )
+                } else {
+                    None
+                };
+                if actual != change.after {
+                    return Err(SandboxError("published source differs".into()));
+                }
             }
+            authority()?;
             Ok(())
         })();
         if let Err(error) = result {
-            for (rel, original) in applied.iter().rev() {
-                let path = admit_rel(&root, rel)?;
-                match original {
-                    Some(bytes) => {
-                        let _ = std::fs::write(&path, bytes);
+            let mut restored = true;
+            for rel in applied.iter().rev() {
+                let restore = (|| -> SandboxResult<()> {
+                    let path = admit_rel(&root, rel)?;
+                    let current = if path.exists() {
+                        Some(
+                            std::fs::read(&path)
+                                .map_err(|_| SandboxError("rollback read failed".into()))?,
+                        )
+                    } else {
+                        None
+                    };
+                    if current != originals[rel] && current != preview.changes[rel].after {
+                        return Err(SandboxError(
+                            "rollback conflict; preserve external bytes".into(),
+                        ));
                     }
-                    None => {
-                        let _ = std::fs::remove_file(&path);
+                    if current != originals[rel] {
+                        match &originals[rel] {
+                            Some(bytes) => {
+                                let temp = root.join(format!("{}.atomic-tmp", af_entropy::token()));
+                                crate::registry::persist_new(&temp, bytes)?;
+                                crate::registry::replace_durable(&temp, &path)?;
+                            }
+                            None => {
+                                std::fs::remove_file(&path)
+                                    .map_err(|_| SandboxError("rollback delete failed".into()))?;
+                                crate::registry::sync_parent(&path)?;
+                            }
+                        }
                     }
-                }
+                    let final_bytes = if path.exists() {
+                        Some(
+                            std::fs::read(&path)
+                                .map_err(|_| SandboxError("rollback recheck failed".into()))?,
+                        )
+                    } else {
+                        None
+                    };
+                    if final_bytes != originals[rel] {
+                        return Err(SandboxError("rollback not verified".into()));
+                    }
+                    Ok(())
+                })();
+                restored &= restore.is_ok();
             }
-            journal(
-                "aborted",
-                preview.changes.keys().cloned().collect(),
-                Some(error.0.clone()),
+            let status = if restored {
+                "aborted_restored"
+            } else {
+                "rollback_unknown"
+            };
+            let terminal=serde_json::to_vec(&json!({"changeset_id":changeset_id,"root_id":root_id,"status":status,
+                "paths":preview.changes.keys().collect::<Vec<_>>(),"error":"publication failed; inspect retained intent and backups"}))
+                .map_err(|_| SandboxError("terminal encoding failed".into()))?;
+            crate::registry::persist_new(
+                &journal_dir.join(format!("{changeset_id}.json")),
+                &terminal,
             )?;
-            return Err(error);
+            // Even a restored failure requires explicit inspection. Never silently
+            // remove the cross-session hold after a possible write error.
+            return Err(SandboxError(format!(
+                "{}; durable publication hold retained ({status})",
+                error.0
+            )));
         }
-        authority()?;
-        journal("succeeded", preview.changes.keys().cloned().collect(), None)?;
+        let terminal = serde_json::to_vec(
+            &json!({"changeset_id":changeset_id,"root_id":root_id,"status":"succeeded",
+            "paths":preview.changes.keys().collect::<Vec<_>>(),"cross_root_atomic":false}),
+        )
+        .map_err(|_| SandboxError("terminal encoding failed".into()))?;
+        crate::registry::persist_new(&journal_dir.join(format!("{changeset_id}.json")), &terminal)?;
+        self.registry.finish_root_effect(&root, &changeset_id)?;
         Ok(json!({
             "workspace_id": self.registry.id, "root_id": root_id,
             "changeset_id": changeset_id, "status": "succeeded",
@@ -604,8 +673,6 @@ impl<'a> SandboxSession<'a> {
         }))
     }
 }
-
-use std::io::Write;
 
 #[cfg(test)]
 mod tests {
@@ -669,6 +736,127 @@ mod tests {
         let full = session.read("main", "src/lib.py", 0, 12000, true).unwrap();
         assert_eq!(full["read_complete"], json!(true));
         assert!(session.preview("main", &changes).is_ok());
+    }
+
+    #[test]
+    fn failed_intent_storage_prevents_all_source_writes() {
+        let (pair, registry) = setup();
+        let original = std::fs::read(pair.root.join("src/lib.py")).unwrap();
+        let mut session = SandboxSession::new(&registry).unwrap();
+        session.read("main", "src/lib.py", 0, 12000, true).unwrap();
+        let preview = session
+            .preview(
+                "main",
+                &BTreeMap::from([("src/lib.py".into(), Some("VALUE = 2\n".into()))]),
+            )
+            .unwrap();
+        std::fs::write(
+            registry.directory.join("changesets"),
+            b"block directory creation",
+        )
+        .unwrap();
+        assert!(session
+            .apply(preview["preview_token"].as_str().unwrap(), true)
+            .is_err());
+        assert_eq!(
+            std::fs::read(pair.root.join("src/lib.py")).unwrap(),
+            original
+        );
+    }
+
+    #[test]
+    fn publication_hold_blocks_another_session_and_preserves_backups() {
+        let (pair, registry) = setup();
+        let mut session = SandboxSession::new(&registry).unwrap();
+        session.read("main", "src/lib.py", 0, 12000, true).unwrap();
+        let preview = session
+            .preview(
+                "main",
+                &BTreeMap::from([("src/lib.py".into(), Some("VALUE = 2\n".into()))]),
+            )
+            .unwrap();
+        let canonical = PathBuf::from(registry.get("main").unwrap()["path"].as_str().unwrap());
+        {
+            let _lease = registry.root_effect_lease(&canonical).unwrap();
+            registry
+                .begin_root_effect(&canonical, "interrupted-change", &"a".repeat(64))
+                .unwrap();
+        }
+        assert!(registry.require_root_effects_clear("main").is_err());
+        assert!(session
+            .apply(preview["preview_token"].as_str().unwrap(), true)
+            .is_err());
+        assert!(std::fs::read_to_string(pair.root.join("src/lib.py"))
+            .unwrap()
+            .contains("return 1"));
+        let second = SandboxRegistry::with_home("second", pair._home.clone()).unwrap();
+        second
+            .grant("other", &pair.root, &["src/lib.py".into()], true)
+            .unwrap();
+        assert!(second.require_root_effects_clear("other").is_err());
+    }
+
+    #[test]
+    fn successful_publication_retains_durable_intent_and_exact_before_bytes() {
+        let (pair, registry) = setup();
+        let before = std::fs::read(pair.root.join("src/lib.py")).unwrap();
+        let mut session = SandboxSession::new(&registry).unwrap();
+        session.read("main", "src/lib.py", 0, 12000, true).unwrap();
+        let preview = session
+            .preview(
+                "main",
+                &BTreeMap::from([("src/lib.py".into(), Some("VALUE = 2\n".into()))]),
+            )
+            .unwrap();
+        let report = session
+            .apply(preview["preview_token"].as_str().unwrap(), true)
+            .unwrap();
+        let id = report["changeset_id"].as_str().unwrap();
+        let directory = registry.directory.join("changesets");
+        let intent: Value = serde_json::from_slice(
+            &std::fs::read(directory.join(format!("{id}-intent.json"))).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(intent["status"], "prepared");
+        assert_eq!(
+            std::fs::read(directory.join(format!("{id}-backups/before-0"))).unwrap(),
+            before
+        );
+        assert!(registry.require_root_effects_clear("main").is_ok());
+    }
+
+    #[test]
+    fn partial_publication_restores_bytes_and_keeps_cross_session_hold() {
+        let (pair, registry) = setup();
+        registry
+            .grant(
+                "main",
+                &pair.root,
+                &["src/lib.py".into(), "zz-missing/new.py".into()],
+                true,
+            )
+            .unwrap();
+        let before = std::fs::read(pair.root.join("src/lib.py")).unwrap();
+        let mut session = SandboxSession::new(&registry).unwrap();
+        for path in ["src/lib.py", "zz-missing/new.py"] {
+            session.read("main", path, 0, 12000, true).unwrap();
+        }
+        let preview = session
+            .preview(
+                "main",
+                &BTreeMap::from([
+                    ("src/lib.py".into(), Some("VALUE = 2\n".into())),
+                    ("zz-missing/new.py".into(), Some("VALUE = 3\n".into())),
+                ]),
+            )
+            .unwrap();
+        let error = session
+            .apply(preview["preview_token"].as_str().unwrap(), true)
+            .unwrap_err();
+        assert!(error.0.contains("hold retained"));
+        assert_eq!(std::fs::read(pair.root.join("src/lib.py")).unwrap(), before);
+        assert!(!pair.root.join("zz-missing/new.py").exists());
+        assert!(registry.require_root_effects_clear("main").is_err());
     }
 
     #[test]

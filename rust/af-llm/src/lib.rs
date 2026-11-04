@@ -5,6 +5,7 @@
 //! route and is never retried or failed over.
 
 use serde_json::{json, Value};
+use std::io::Read;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -88,11 +89,19 @@ pub struct ToolCall {
 }
 
 #[derive(Debug, Clone)]
+pub struct HostAttempt {
+    pub session_id: String,
+    pub call_id: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct ChatRequest {
     pub model: String,
     pub messages: Vec<ChatMessage>,
     pub max_output_tokens: Option<u64>,
     pub tools: Option<Vec<ToolSpec>>,
+    /// Host-only durable journal identity; deliberately absent from wire payload.
+    pub host_attempt: Option<HostAttempt>,
 }
 
 impl ChatRequest {
@@ -102,6 +111,7 @@ impl ChatRequest {
             messages,
             max_output_tokens: None,
             tools: None,
+            host_attempt: None,
         }
     }
 }
@@ -424,6 +434,29 @@ pub fn drain_tool_calls(partial: &mut PartialToolCalls) -> Vec<ToolCall> {
     partial.drain()
 }
 
+/// Provider response metadata only, never model text or a price estimate.
+/// Missing, contradictory or malformed reported cost remains unknown.
+pub fn provider_reported_cost(usage: &Value) -> Option<f64> {
+    let value = match (usage.get("cost_usd"), usage.get("cost")) {
+        (Some(a), Some(b)) if a != b => return None,
+        (Some(a), _) | (_, Some(a)) => a,
+        _ => return None,
+    }
+    .as_f64()?;
+    (value.is_finite() && value >= 0.0).then_some(value)
+}
+
+fn bounded_response(reader: impl Read) -> std::io::Result<String> {
+    let mut raw = Vec::new();
+    reader.take(256 * 1024 + 1).read_to_end(&mut raw)?;
+    if raw.len() > 256 * 1024 {
+        return Err(std::io::Error::other(
+            "provider response exceeded byte limit",
+        ));
+    }
+    String::from_utf8(raw).map_err(|_| std::io::Error::other("provider response is not UTF-8"))
+}
+
 impl ChatBackend for OpenAiBackend {
     fn name(&self) -> &str {
         &self.name
@@ -448,6 +481,8 @@ impl ChatBackend for OpenAiBackend {
         };
         let agent = match ureq::AgentBuilder::new()
             .timeout_connect(std::time::Duration::from_secs(15))
+            .timeout_read(std::time::Duration::from_secs(15))
+            .redirects(0)
             .build()
         {
             agent => agent,
@@ -456,11 +491,11 @@ impl ChatBackend for OpenAiBackend {
             .post(&format!("{}/chat/completions", self.base_url))
             .set("Authorization", &format!("Bearer {api_key}"))
             .set("Content-Type", "application/json")
-            .timeout(std::time::Duration::from_secs(600))
+            .timeout(std::time::Duration::from_secs(120))
             .send_json(self.payload(request));
         let latency_ms = Some(started.elapsed().as_millis() as u64);
         match response {
-            Ok(body) => match body.into_string() {
+            Ok(body) => match bounded_response(body.into_reader()) {
                 Ok(text) => {
                     let parsed: Result<Value, _> = serde_json::from_str(&text);
                     match parsed {
@@ -487,7 +522,7 @@ impl ChatBackend for OpenAiBackend {
                                 tokens_out: document
                                     .pointer("/usage/completion_tokens")
                                     .and_then(Value::as_u64),
-                                cost_usd: None, // tariff table is a later, separately accepted change
+                                cost_usd: provider_reported_cost(&document["usage"]),
                                 latency_ms,
                             };
                             BackendOutcome::Completed(ChatResult {
@@ -574,12 +609,14 @@ impl OpenAiBackend {
         };
         let agent = ureq::AgentBuilder::new()
             .timeout_connect(std::time::Duration::from_secs(15))
+            .timeout_read(std::time::Duration::from_secs(15))
+            .redirects(0)
             .build();
         let response = agent
             .post(&format!("{}/chat/completions", self.base_url))
             .set("Authorization", &format!("Bearer {api_key}"))
             .set("Content-Type", "application/json")
-            .timeout(std::time::Duration::from_secs(600))
+            .timeout(std::time::Duration::from_secs(120))
             .send_json(self.stream_payload(request));
         let latency_ms = Some(started.elapsed().as_millis() as u64);
         let mut reader = match response {
@@ -612,6 +649,7 @@ impl OpenAiBackend {
         let mut finish: Option<String> = None;
         let mut usage: Option<Usage> = None;
         let mut partial_tool_calls = PartialToolCalls::default();
+        let mut wire_bytes = 0usize;
         let mut stream = std::io::BufReader::new(&mut reader);
         use std::io::BufRead as _;
         loop {
@@ -622,7 +660,10 @@ impl OpenAiBackend {
                 };
             }
             let mut line = Vec::new();
-            match stream.read_until(b'\n', &mut line) {
+            match (&mut stream)
+                .take(16 * 1024 + 1)
+                .read_until(b'\n', &mut line)
+            {
                 Ok(0) => break,
                 Ok(_) => {}
                 Err(error) => {
@@ -632,7 +673,21 @@ impl OpenAiBackend {
                     };
                 }
             }
-            let Some(chunk) = parse_sse_line(&String::from_utf8_lossy(&line)) else {
+            wire_bytes = wire_bytes.saturating_add(line.len());
+            if line.len() > 16 * 1024 || wire_bytes > 512 * 1024 {
+                return BackendOutcome::Unknown {
+                    sent: true,
+                    detail: "provider stream exceeded byte limit".into(),
+                };
+            }
+            let line = String::from_utf8_lossy(&line);
+            let Some(chunk) = parse_sse_line(&line) else {
+                if line.starts_with("data:") && !line.trim_end().ends_with("[DONE]") {
+                    return BackendOutcome::Unknown {
+                        sent: true,
+                        detail: "malformed provider stream frame".into(),
+                    };
+                }
                 continue;
             };
             let before = content.len();
@@ -648,11 +703,11 @@ impl OpenAiBackend {
             {
                 finish = Some(reason);
             }
-            if let Some(usage_value) = chunk.get("usage") {
+            if let Some(usage_value) = chunk.get("usage").filter(|u| u.is_object()) {
                 usage = Some(Usage {
                     tokens_in: usage_value.get("prompt_tokens").and_then(Value::as_u64),
                     tokens_out: usage_value.get("completion_tokens").and_then(Value::as_u64),
-                    cost_usd: None,
+                    cost_usd: provider_reported_cost(usage_value),
                     latency_ms,
                 });
             }
@@ -792,12 +847,46 @@ impl Router {
 mod tests {
     use super::*;
 
+    #[test]
+    fn cost_is_only_provider_metadata_and_host_identity_never_goes_on_wire() {
+        assert_eq!(provider_reported_cost(&json!({"cost":0.001})), Some(0.001));
+        for value in [
+            json!({}),
+            json!({"cost":-1}),
+            json!({"cost":"0.01"}),
+            json!({"cost":0.1,"cost_usd":0.2}),
+        ] {
+            assert_eq!(provider_reported_cost(&value), None);
+        }
+        let mut request = ChatRequest::new("test", vec![ChatMessage::new("user", "hello")]);
+        request.host_attempt = Some(HostAttempt {
+            session_id: "private-session".into(),
+            call_id: "private-call".into(),
+        });
+        let payload = OpenAiBackend::new("test", "https://example.com/v1", "TEST_KEY")
+            .payload(&request)
+            .to_string();
+        assert!(
+            !payload.contains("private-session")
+                && !payload.contains("private-call")
+                && !payload.contains("host_attempt")
+        );
+    }
+
+    #[test]
+    fn oversized_provider_body_is_never_a_completed_response() {
+        assert!(bounded_response(std::io::Cursor::new(vec![b'x'; 256 * 1024 + 1])).is_err());
+        assert!(bounded_response(std::io::Cursor::new(vec![0xff])).is_err());
+        assert_eq!(bounded_response(std::io::Cursor::new(b"{}")).unwrap(), "{}");
+    }
+
     fn request() -> ChatRequest {
         ChatRequest {
             model: "test-model".into(),
             messages: vec![ChatMessage::new("user", "hello")],
             max_output_tokens: Some(16),
             tools: None,
+            host_attempt: None,
         }
     }
 

@@ -1,0 +1,154 @@
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+   Compiling af-llm v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-llm)
+   Compiling af-loop v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-loop)
+   Compiling af-agent v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-agent)
+   Compiling af-program v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-program)
+   Compiling af-cli v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 25s
+     Running unittests src\lib.rs (target\debug\deps\af_agent-7ee30488f9297955.exe)
+
+running 13 tests
+test swarm::tests::aggregation_holds_pending_and_unknown_costs ... ok
+test swarm::tests::execute_sweep_claims_resolves_and_aggregates ... ok
+test swarm::tests::fully_resolved_sweep_is_complete ... ok
+test swarm::tests::sweep_admits_bounded_items_through_the_fenced_queue ... ok
+test swarm::tests::unknown_outcome_reclaims_as_new_claim_under_new_epoch ... ok
+test tests::broken_python_is_refused_at_preview_not_applied ... ok
+test tests::full_journey_records_local_integrity_without_claiming_requirement_success ... ok
+test tests::identical_replacement_refuses ... ok
+test tests::invalid_rust_syntax_is_refused_before_publication ... ok
+test tests::journal_failure_before_apply_preserves_original_source ... ok
+test tests::journey_without_replacement_refuses ... ok
+test tests::typescript_bytes_can_be_applied_without_claiming_python_or_requirement_verification ... ok
+test tests::zero_edit_budget_refuses ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.38s
+
+     Running unittests src\main.rs (target\debug\deps\af-f4d4363624ad9527.exe)
+
+running 22 tests
+test server::http_safety::tests::authenticated_remote_ip_still_requires_its_exact_origin_and_port ... ok
+test server::http_safety::tests::only_exact_local_authority_and_same_origin_are_admitted ... ok
+test server::studio_data::tests::credential_hidden_and_generated_paths_are_not_browser_sources ... ok
+test server::studio_data::tests::history_pages_are_bounded_and_do_not_make_replay_authority ... ok
+test server::tests::bind_policy_requires_token_off_loopback ... ok
+test server::tests::body_and_prompt_limits_refuse_before_backend_work ... ok
+test server::tests::browser_cannot_choose_credential_env_or_provider_destination ... ok
+test server::tests::browser_cannot_forge_kernel_terminal_history ... ok
+test server::tests::dashboard_is_served ... ok
+test server::tests::disconnected_stream_cancels_the_actual_worker_and_releases_capacity ... ok
+test server::tests::graph_and_job_queries_never_grant_arbitrary_host_paths ... ok
+test server::tests::health_is_open_loopback_style_without_token ... ok
+test server::tests::hostile_origin_is_denied_even_with_an_operator_bearer ... ok
+test server::tests::oversized_terminal_content_is_never_reported_as_a_complete_answer ... ok
+test server::tests::session_endpoints_roundtrip ... ok
+test server::tests::settled_chat_is_durable_and_an_existing_unknown_is_never_replayed ... ok
+test server::tests::sse_stream_via_scripted_backend ... ok
+test server::tests::static_authentication_ui_has_nonce_csp_but_api_remains_private ... ok
+test server::tests::token_is_enforced_with_constant_time_path ... ok
+test trusted_provider::tests::cancelled_and_wrong_model_calls_never_create_a_send ... ok
+test trusted_provider::tests::host_configuration_rejects_credential_urls_and_plaintext_remote_transport ... ok
+test trusted_provider::tests::provider_send_is_durably_settled_and_missing_cost_latches_hold ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+
+     Running unittests src\lib.rs (target\debug\deps\af_llm-540723565f059edb.exe)
+
+running 15 tests
+test tests::cancel_before_send_is_a_free_refusal ... ok
+test tests::cost_is_only_provider_metadata_and_host_identity_never_goes_on_wire ... ok
+test tests::missing_api_key_is_a_pre_send_refusal ... ok
+test tests::openai_payload_shape ... ok
+test tests::oversized_provider_body_is_never_a_completed_response ... ok
+test tests::post_send_refusal_also_holds ... ok
+test tests::pre_send_refusal_fails_over_exhausted_route_is_reported ... ok
+test tests::scripted_backend_echoes_with_settled_usage ... ok
+test tests::sse_parsing_and_accumulation ... ok
+test tests::stream_missing_key_is_pre_send_refusal ... ok
+test tests::stream_payload_carries_stream_flags ... ok
+test tests::tool_call_fragments_accumulate_across_chunks ... ok
+test tests::two_parallel_tool_calls_keep_separate_slots ... ok
+test tests::unknown_after_send_holds_and_never_fails_over ... ok
+test tests::unknown_transport_without_send_allows_failover ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\af_loop-ba69a89201303b38.exe)
+
+running 37 tests
+test compact::tests::drops_middle_messages_when_markers_are_not_enough ... ok
+test compact::tests::never_compacts_below_two_messages ... ok
+test compact::tests::old_tool_results_become_id_carrying_markers ... ok
+test compact::tests::under_budget_is_untouched ... ok
+test edit::tests::an_unbound_toolset_is_read_only_even_with_a_write_grant ... ok
+test edit::tests::check_workspace_must_match_the_granted_root ... ok
+test edit::tests::edit_budget_refuses_second_edit ... ok
+test edit::tests::edited_source_remains_unverified_without_a_requirement_checker ... ok
+test edit::tests::exact_scope_cannot_be_widened_by_model_arguments_or_a_root_grant ... ok
+test edit::tests::final_gate_fails_when_check_fails ... ok
+test edit::tests::host_approval_is_explicit ... ok
+test edit::tests::missing_durable_journal_refuses_before_any_edit ... ok
+test edit::tests::model_cannot_replace_different_bytes_than_the_reviewed_http_change ... ok
+test edit::tests::no_edits_is_answer_only_not_verified ... ok
+test edit::tests::stale_read_proof_never_overwrites_the_newer_source ... ok
+test edit::tests::zero_exit_source_mutation_invalidates_the_diagnostic_source_binding ... ok
+test edit::tests::zero_exit_with_no_tests_does_not_verify_or_commit_an_edit ... ok
+test schedule::tests::daily_schedule_fires_once_per_day ... ok
+test schedule::tests::event_triggers_match_exact_key_values ... ok
+test schedule::tests::interval_schedule_fires_repeatedly_not_stacked ... ok
+test schedule::tests::pause_and_persistence ... ok
+test schedule::tests::tick_dispatches_due_schedules_once_and_marks_runs ... ok
+test steer::tests::fork_copies_by_reference_not_replay ... ok
+test steer::tests::pause_resume_cycle_is_journaled ... ok
+test steer::tests::resume_requires_a_journaled_pause_and_clean_holds ... ok
+test tests::hold_stops_the_loop_with_unresolved_journal_evidence ... ok
+test tests::host_unknown_tool_effect_stops_same_turn_and_preserves_durable_hold ... ok
+test tests::interrupted_journal_prevents_even_first_effect ... ok
+test tests::invalid_model_arguments_never_execute_the_host_tool ... ok
+test tests::parsed_tool_calls_shape_roundtrip ... ok
+test tests::run_streaming_surfaces_deltas_and_final_answer ... ok
+test tests::streaming_hold_stops_the_loop_with_journaled_unknown ... ok
+test tests::tool_effect_completion_write_failure_stops_followups_and_retains_hold ... ok
+test tests::tool_request_then_final_answer ... ok
+test tests::tool_result_feeds_back_into_the_conversation ... ok
+test tests::turn_budget_exhausts_and_preserves_counts ... ok
+test tests::unknown_tool_is_reported_to_the_model_not_a_crash ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.43s
+
+     Running unittests src\lib.rs (target\debug\deps\af_sandbox-8822bc28c013ea61.exe)
+
+running 17 tests
+test admission::tests::admits_plain_relative_paths ... ok
+test redact::tests::masks_known_token_shapes ... ok
+test redact::tests::masks_literal_key_value_assignments ... ok
+test redact::tests::masks_private_keys_preserving_line_count ... ok
+test session::tests::apply_refuses_when_source_changed_after_preview ... ok
+test session::tests::apply_requires_approval_and_publishes ... ok
+test session::tests::broken_python_replacement_refused ... ok
+test session::tests::failed_intent_storage_prevents_all_source_writes ... ok
+test session::tests::list_files_is_bounded_and_suffix_filtered ... ok
+test session::tests::partial_publication_restores_bytes_and_keeps_cross_session_hold ... ok
+test session::tests::preview_outside_write_scope_refused ... ok
+test session::tests::publication_hold_blocks_another_session_and_preserves_backups ... FAILED
+test session::tests::read_requires_and_records_proofs ... ok
+test session::tests::secrets_are_redacted_in_reads ... ok
+test session::tests::successful_publication_retains_durable_intent_and_exact_before_bytes ... ok
+test tests::glob_matches_ignore_patterns ... ok
+test tests::identifiers_follow_the_contract ... ok
+
+failures:
+
+---- session::tests::publication_hold_blocks_another_session_and_preserves_backups stdout ----
+
+thread 'session::tests::publication_hold_blocks_another_session_and_preserves_backups' (10368) panicked at af-sandbox\src\session.rs:781:14:
+called `Result::unwrap()` on an `Err` value: SandboxError("durable record creation failed")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    session::tests::publication_hold_blocks_another_session_and_preserves_backups
+
+test result: FAILED. 16 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.26s
+
+error: test failed, to rerun pass `-p af-sandbox --lib`

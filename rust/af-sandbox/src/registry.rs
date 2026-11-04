@@ -52,7 +52,14 @@ pub fn ensure_no_links(path: &Path) -> SandboxResult<()> {
     while let Some(item) = current {
         match std::fs::symlink_metadata(item) {
             Ok(meta) => {
-                if meta.file_type().is_symlink() {
+                #[cfg(windows)]
+                let reparse = {
+                    use std::os::windows::fs::MetadataExt;
+                    meta.file_attributes() & 0x400 != 0
+                };
+                #[cfg(not(windows))]
+                let reparse = false;
+                if meta.file_type().is_symlink() || reparse {
                     return Err(SandboxError(
                         "workspace paths may not contain links or junctions".into(),
                     ));
@@ -102,6 +109,63 @@ pub fn root_identity(path: &Path) -> SandboxResult<[u64; 2]> {
 /// Exclusive lease on a marker lock file (persistent, never unlinked) — the
 /// `locking.py::exclusive_file` contract, provided by af-entropy.
 pub use af_entropy::FileLease as Lease;
+
+/// Write-through on Windows and parent-directory fsync on Unix. Windows does
+/// not pretend to provide Unix directory fsync: committed renames use the
+/// platform write-through flag instead, and uncleared holds remain conservative.
+pub(crate) fn sync_parent(path: &Path) -> SandboxResult<()> {
+    #[cfg(unix)]
+    if let Some(parent) = path.parent() {
+        std::fs::File::open(parent)
+            .and_then(|directory| directory.sync_all())
+            .map_err(|_| SandboxError("directory persistence acknowledgement failed".into()))?;
+    }
+    #[cfg(not(unix))]
+    let _ = path;
+    Ok(())
+}
+
+pub(crate) fn persist_new(path: &Path, bytes: &[u8]) -> SandboxResult<()> {
+    ensure_no_links(path)?;
+    let mut options = std::fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::OpenOptionsExt;
+        options.custom_flags(0x80000000); // FILE_FLAG_WRITE_THROUGH
+    }
+    let mut file = options
+        .open(path)
+        .map_err(|_| SandboxError("durable record creation failed".into()))?;
+    file.write_all(bytes)
+        .and_then(|_| file.flush())
+        .and_then(|_| file.sync_all())
+        .map_err(|_| SandboxError("durable record persistence failed".into()))?;
+    sync_parent(path)
+}
+
+pub(crate) fn replace_durable(from: &Path, to: &Path) -> SandboxResult<()> {
+    ensure_no_links(from)?;
+    ensure_no_links(to)?;
+    #[cfg(windows)]
+    {
+        use std::os::windows::ffi::OsStrExt;
+        #[link(name = "kernel32")]
+        extern "system" {
+            fn MoveFileExW(existing: *const u16, new: *const u16, flags: u32) -> i32;
+        }
+        let from: Vec<u16> = from.as_os_str().encode_wide().chain(Some(0)).collect();
+        let to: Vec<u16> = to.as_os_str().encode_wide().chain(Some(0)).collect();
+        // REPLACE_EXISTING | WRITE_THROUGH; no cross-volume copy fallback.
+        if unsafe { MoveFileExW(from.as_ptr(), to.as_ptr(), 0x1 | 0x8) } == 0 {
+            return Err(SandboxError("atomic source replacement failed".into()));
+        }
+    }
+    #[cfg(not(windows))]
+    std::fs::rename(from, to)
+        .map_err(|_| SandboxError("atomic source replacement failed".into()))?;
+    sync_parent(to)
+}
 
 pub struct RootRecord {
     pub root_id: String,
@@ -193,6 +257,11 @@ impl SandboxRegistry {
             .map_err(|error| SandboxError(format!("root is unavailable: {error}")))?;
         if !canonical.is_dir() {
             return Err(SandboxError("root must be a directory".into()));
+        }
+        if canonical.to_str().is_none() {
+            return Err(SandboxError(
+                "source roots must have lossless UTF-8 paths".into(),
+            ));
         }
         let home = std::fs::canonicalize(home).unwrap_or_else(|_| home.to_path_buf());
         if canonical.starts_with(&home) || home.starts_with(&canonical) {
@@ -435,6 +504,90 @@ impl SandboxRegistry {
             .get(root_id)
             .cloned()
             .ok_or_else(|| SandboxError("root access is not granted".into()))
+    }
+
+    fn effect_path(&self, root: &Path) -> PathBuf {
+        let key = root.to_string_lossy().to_string();
+        #[cfg(windows)]
+        let key = key.to_lowercase();
+        self.home
+            .join("root-effects")
+            .join(format!("{}.json", crate::sha256_hex(key.as_bytes())))
+    }
+
+    pub(crate) fn root_effect_lease(&self, root: &Path) -> SandboxResult<Lease> {
+        let path = self.effect_path(root);
+        ensure_no_links(&path)?;
+        std::fs::create_dir_all(path.parent().expect("root effect parent"))
+            .map_err(|_| SandboxError("root effect store is unavailable".into()))?;
+        ensure_no_links(&path)?;
+        Lease::acquire(
+            &path.with_extension("lock"),
+            true,
+            "another publication owns this root",
+        )
+        .map_err(SandboxError)
+    }
+
+    pub(crate) fn require_path_effects_clear(&self, root: &Path) -> SandboxResult<()> {
+        let path = self.effect_path(root);
+        ensure_no_links(&path)?;
+        match std::fs::symlink_metadata(path) {
+            Err(error) if error.kind()==std::io::ErrorKind::NotFound => Ok(()),
+            _ => Err(SandboxError("root publication has an unresolved durable hold; inspect and reconcile, never replay".into())),
+        }
+    }
+
+    /// Shared across sessions, root IDs and workspaces in the same state home.
+    /// Re-registering a root never clears an interrupted publication.
+    pub fn require_root_effects_clear(&self, root_id: &str) -> SandboxResult<()> {
+        let item = self.get(root_id)?;
+        self.require_path_effects_clear(Path::new(
+            item["path"]
+                .as_str()
+                .ok_or_else(|| SandboxError("invalid root path".into()))?,
+        ))
+    }
+
+    pub(crate) fn begin_root_effect(
+        &self,
+        root: &Path,
+        changeset: &str,
+        intent_sha256: &str,
+    ) -> SandboxResult<()> {
+        self.require_path_effects_clear(root)?;
+        let payload = serde_json::to_vec(&json!({"schema_version":1,"workspace_id":self.id,
+            "changeset_id":changeset,"intent_sha256":intent_sha256}))
+        .map_err(|_| SandboxError("root effect encoding failed".into()))?;
+        persist_new(&self.effect_path(root), &payload)
+    }
+
+    pub(crate) fn finish_root_effect(&self, root: &Path, changeset: &str) -> SandboxResult<()> {
+        use std::io::Read;
+        let path = self.effect_path(root);
+        ensure_no_links(&path)?;
+        let mut bytes = Vec::new();
+        std::fs::File::open(&path)
+            .and_then(|file| file.take(4097).read_to_end(&mut bytes))
+            .map_err(|_| SandboxError("root publication hold is unavailable".into()))?;
+        if bytes.len() > 4096 {
+            return Err(SandboxError(
+                "root publication hold exceeds its bound".into(),
+            ));
+        }
+        let saved: Value = serde_json::from_slice(&bytes)
+            .map_err(|_| SandboxError("root publication hold is corrupt".into()))?;
+        if saved["changeset_id"] != json!(changeset)
+            || saved["workspace_id"] != json!(self.id)
+            || saved["schema_version"] != json!(1)
+        {
+            return Err(SandboxError(
+                "root publication hold identity differs".into(),
+            ));
+        }
+        std::fs::remove_file(&path)
+            .map_err(|_| SandboxError("root publication hold removal failed".into()))?;
+        sync_parent(&path)
     }
 }
 

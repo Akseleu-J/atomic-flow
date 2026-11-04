@@ -1,10 +1,11 @@
 //! af-agent: the bounded agent loop on the kernel (host mechanics slice of
 //! P04–P06). The loop is: observe (full read proof + structural facts) →
 //! execute the *exact reviewed* replacement (no model text, no replan) →
-//! verify (Python syntax + post-apply content hash + graph parity) → record
+//! observe local integrity (supported source parser + post-apply content hash) → record
 //! evidence in the append-only journal. Without a reviewed replacement the
 //! journey refuses; without full read proofs the sandbox already refuses.
-//! Live-model planning is the P07 layer above this machinery.
+//! Live-model planning is the P07 layer above this machinery. These local
+//! integrity observations never establish completed requirement verification.
 
 use rustpython_parser::Parse;
 use serde_json::{json, Value};
@@ -49,6 +50,8 @@ pub struct JourneyReport {
     pub goal: String,
     pub steps: Vec<Value>,
     pub verified: bool,
+    /// Local CAS/syntax observations are distinct from requirement success.
+    pub verification: &'static str,
     pub refusal: Option<String>,
 }
 
@@ -77,6 +80,9 @@ impl Journey<'_> {
     /// One bounded journey. Every phase is journaled; any refusal stops the
     /// journey with evidence, never with a silent fallback.
     pub fn run(&mut self, plan: &JourneyPlan) -> AgentResult<JourneyReport> {
+        self.registry
+            .require_root_effects_clear(&plan.root_id)
+            .map_err(|error| AgentError(error.0))?;
         self.journal.require_effects_clear().map_err(|_| {
             AgentError("unresolved journal effects block journey; never replay".into())
         })?;
@@ -97,22 +103,24 @@ impl Journey<'_> {
             let refusal = "journey requires the complete current source; increase the read window"
                 .to_string();
             self.record("failed", json!({"phase": "observe", "refusal": refusal}))?;
-            return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
+            return Ok(make_report(false, &plan.goal, &steps, Some(refusal)));
         }
         let before_hash = page["content_hash"]
             .as_str()
             .unwrap_or_default()
             .to_string();
         let before_source = page["source"].as_str().unwrap_or_default().to_string();
-        let symbols = af_graph::adapter_ast::adapt_file(&plan.file, before_source.as_bytes());
-        let symbol_count = symbols["nodes"]
-            .as_array()
-            .map(|nodes| nodes.len() - 1)
+        let symbols =
+            af_graph::adapter_resource::adapt_source(&plan.file, before_source.as_bytes()).ok();
+        let symbol_count = symbols
+            .as_ref()
+            .and_then(|facts| facts["nodes"].as_array())
+            .map(|nodes| nodes.len().saturating_sub(1))
             .unwrap_or(0);
         steps.push(json!({
             "phase": "observe", "ok": true, "content_hash": before_hash,
             "symbols": symbol_count,
-            "parse_ok": symbols.pointer("/nodes/0/facts/parse_ok"),
+            "parse_ok": symbols.as_ref().and_then(|facts| facts.pointer("/nodes/0/facts/parse_ok")),
         }));
         self.record(
             "tool_result",
@@ -124,17 +132,23 @@ impl Journey<'_> {
             let refusal =
                 "journey needs an exact reviewed replacement; no model text is trusted".to_string();
             self.record("failed", json!({"phase": "plan", "refusal": refusal}))?;
-            return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
+            return Ok(make_report(false, &plan.goal, &steps, Some(refusal)));
         };
         if replacement == &before_source {
             let refusal = "replacement equals the current source; nothing to apply".to_string();
             self.record("failed", json!({"phase": "plan", "refusal": refusal}))?;
-            return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
+            return Ok(make_report(false, &plan.goal, &steps, Some(refusal)));
         }
         if self.limits.max_edits == 0 {
             let refusal = "journey edit budget is zero".to_string();
             self.record("failed", json!({"phase": "plan", "refusal": refusal}))?;
-            return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
+            return Ok(make_report(false, &plan.goal, &steps, Some(refusal)));
+        }
+        if source_syntax(&plan.file, replacement) == Some(false) {
+            let refusal =
+                "preview refused: replacement has invalid supported-language syntax".to_string();
+            self.record("failed", json!({"phase":"act", "refusal":refusal}))?;
+            return Ok(make_report(false, &plan.goal, &steps, Some(refusal)));
         }
         steps.push(json!({"phase": "plan", "ok": true, "replacement_bytes": replacement.len()}));
 
@@ -146,7 +160,7 @@ impl Journey<'_> {
             Err(error) => {
                 let refusal = format!("preview refused: {}", error.0);
                 self.record("failed", json!({"phase": "act", "refusal": refusal}))?;
-                return Ok(make_report(false, &plan.goal, &steps, false, Some(refusal)));
+                return Ok(make_report(false, &plan.goal, &steps, Some(refusal)));
             }
         };
         let token = preview["preview_token"]
@@ -208,29 +222,54 @@ impl Journey<'_> {
             .to_string();
         let expected_hash = sha_hex(replacement.as_bytes());
         let content_verified = after_hash == expected_hash && after_hash != before_hash;
-        let syntax_verified =
-            rustpython_parser::ast::Suite::parse(replacement, "<journey>").is_ok();
-        let verified = content_verified && syntax_verified;
+        let syntax_verified = source_syntax(&plan.file, replacement);
+        let local_integrity = content_verified && syntax_verified != Some(false);
         steps.push(json!({
-            "phase": "verify", "ok": verified,
+            "phase": "verify", "ok": local_integrity,
             "content_verified": content_verified, "syntax_verified": syntax_verified,
-            "after_hash": after_hash,
+            "syntax_status":match syntax_verified {Some(true)=>"passed",Some(false)=>"failed",None=>"not_assessed"},
+            "syntax_check": if plan.file.ends_with(".py") || plan.file.ends_with(".pyi") {"python_source_parser"}
+                else if plan.file.ends_with(".rs") {"rust_source_parser"}
+                else if plan.file.ends_with(".json") {"json_parser"} else {"not_assessed"},
+            "after_hash": after_hash, "requirement_verification":"not_assessed",
         }));
         self.record(
-            if verified { "completed" } else { "failed" },
-            json!({"phase": "verify", "verified": verified, "after_hash": after_hash}),
+            if local_integrity {
+                "completed"
+            } else {
+                "failed"
+            },
+            json!({"phase": "verify", "verified": false, "local_integrity":local_integrity,
+                "requirement_verification":"not_assessed", "after_hash": after_hash}),
         )?;
         Ok(make_report(
-            verified,
+            local_integrity,
             &plan.goal,
             &steps,
-            verified,
-            if verified {
+            if local_integrity {
                 None
             } else {
                 Some("post-apply verification failed".into())
             },
         ))
+    }
+}
+
+fn source_syntax(path: &str, source: &str) -> Option<bool> {
+    if path.ends_with(".py") || path.ends_with(".pyi") {
+        Some(rustpython_parser::ast::Suite::parse(source, "<journey>").is_ok())
+    } else if path.ends_with(".rs") {
+        af_graph::adapter_rust::adapt_file(path, source.as_bytes())
+            .ok()
+            .and_then(|facts| {
+                facts
+                    .pointer("/nodes/0/facts/parse_ok")
+                    .and_then(Value::as_bool)
+            })
+    } else if path.ends_with(".json") {
+        Some(serde_json::from_str::<Value>(source).is_ok())
+    } else {
+        None
     }
 }
 
@@ -240,18 +279,13 @@ fn sha_hex(bytes: &[u8]) -> String {
     format!("{:x}", hasher.finalize())
 }
 
-fn make_report(
-    ok: bool,
-    goal: &str,
-    steps: &[Value],
-    verified: bool,
-    refusal: Option<String>,
-) -> JourneyReport {
+fn make_report(ok: bool, goal: &str, steps: &[Value], refusal: Option<String>) -> JourneyReport {
     JourneyReport {
         ok,
         goal: goal.to_string(),
         steps: steps.to_vec(),
-        verified,
+        verified: false,
+        verification: "not_assessed",
         refusal,
     }
 }
@@ -306,7 +340,7 @@ mod tests {
     }
 
     #[test]
-    fn full_journey_verifies_and_journals() {
+    fn full_journey_records_local_integrity_without_claiming_requirement_success() {
         let (pair, registry) = setup();
         let mut journal = journal(&pair.home);
         let mut journey = Journey::new(&registry, &mut journal, JourneyLimits::default());
@@ -318,7 +352,13 @@ mod tests {
         };
         let report = journey.run(&plan).unwrap();
         assert!(report.ok, "{report:?}");
-        assert!(report.verified);
+        assert!(!report.verified);
+        assert_eq!(report.verification, "not_assessed");
+        assert_eq!(
+            report.steps.last().unwrap()["content_verified"],
+            json!(true)
+        );
+        assert_eq!(report.steps.last().unwrap()["syntax_verified"], json!(true));
         let phases: Vec<&str> = report
             .steps
             .iter()
@@ -453,5 +493,65 @@ mod tests {
             .iter()
             .any(|event| event["event_type"] == json!("failed")
                 && event.pointer("/payload/phase").and_then(Value::as_str) == Some("act")));
+    }
+
+    #[test]
+    fn typescript_bytes_can_be_applied_without_claiming_python_or_requirement_verification() {
+        let (pair, registry) = setup();
+        registry
+            .grant("main", &pair.root, &["src/value.ts".into()], true)
+            .unwrap();
+        std::fs::write(
+            pair.root.join("src/value.ts"),
+            b"export const value: number = 1;\n",
+        )
+        .unwrap();
+        let mut journal = journal(&pair.home);
+        let mut journey = Journey::new(&registry, &mut journal, JourneyLimits::default());
+        let plan = JourneyPlan {
+            root_id: "main".into(),
+            file: "src/value.ts".into(),
+            replacement: Some("export const value: number = 2;\n".into()),
+            goal: "reviewed TS edit".into(),
+        };
+        let report = journey.run(&plan).unwrap();
+        assert!(report.ok);
+        assert!(!report.verified);
+        let observation = report.steps.last().unwrap();
+        assert_eq!(observation["syntax_verified"], Value::Null);
+        assert_eq!(observation["syntax_status"], json!("not_assessed"));
+        assert_eq!(
+            observation["requirement_verification"],
+            json!("not_assessed")
+        );
+        assert_eq!(
+            std::fs::read(pair.root.join("src/value.ts")).unwrap(),
+            b"export const value: number = 2;\n"
+        );
+    }
+
+    #[test]
+    fn invalid_rust_syntax_is_refused_before_publication() {
+        let (pair, registry) = setup();
+        registry
+            .grant("main", &pair.root, &["src/value.rs".into()], true)
+            .unwrap();
+        let before = b"pub fn value() -> u32 { 1 }\n";
+        std::fs::write(pair.root.join("src/value.rs"), before).unwrap();
+        let mut journal = journal(&pair.home);
+        let mut journey = Journey::new(&registry, &mut journal, JourneyLimits::default());
+        let plan = JourneyPlan {
+            root_id: "main".into(),
+            file: "src/value.rs".into(),
+            replacement: Some("pub fn broken(\n".into()),
+            goal: "reject invalid Rust".into(),
+        };
+        let report = journey.run(&plan).unwrap();
+        assert!(!report.ok);
+        assert!(!report.verified);
+        assert_eq!(
+            std::fs::read(pair.root.join("src/value.rs")).unwrap(),
+            before
+        );
     }
 }
