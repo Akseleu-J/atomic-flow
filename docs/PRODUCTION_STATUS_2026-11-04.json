@@ -940,5 +940,16 @@
       "No durable API idempotency/outbox task acceptance",
       "No full corporate identity/resource isolation or release acceptance"
     ]
+  },
+  "latest_continuation": {
+    "date": "2026-11-05",
+    "base_commit": "7bf0661c973e46a80275c7755161286f449e037d",
+    "report": "docs/PRODUCTION_CONTINUATION_2026-11-05.md",
+    "chapter_status_changed": false,
+    "scope": [
+      "N01 strict nullable parity",
+      "N02 trusted-host queue idempotency and reservation ownership",
+      "N03 requirement receipt freshness"
+    ]
   }
 }

@@ -139,6 +139,7 @@ version = "0.1.0"
 dependencies = [
  "af-context",
  "af-entropy",
+ "af-evidence",
  "af-exec",
  "af-graph",
  "af-journal",

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { AfClient, AfHttpError, AfProtocolError, AfTransportError, parseVerificationReport } from '../dist/index.js';
+import { AfClient, AfHttpError, AfProtocolError, AfTransportError, WireError, parseVerificationReport } from '../dist/index.js';
 
 const vectors = JSON.parse(await readFile(new URL('../../../rust/af-evidence/fixtures/wire-v1.json', import.meta.url), 'utf8'));
 const baseline = JSON.parse(vectors.cases.find(c => c.name === 'empty_not_assessed').json);
@@ -63,6 +63,23 @@ test('session requests use root ID; snapshots require actual root/hold fields', 
   assert.equal((await sdk.createSession('s1', 'r1')).session_id, 's1');
   assert.deepEqual(request.body, { id: 's1', root_id: 'r1' });
   const snapshot = await sdk.readSession('s1'); assert.equal(snapshot.root_id, 'r1'); assert.deepEqual(snapshot.unresolved_call_ids, ['c2']);
+});
+test('sessions list, budget snapshot and graph read are validated field-by-field', async () => {
+  const sdk = client(async url => {
+    if (url.endsWith('/v1/sessions')) return json({ ok: true, sessions: [{ session_id: 's1', created_at: null, project: null }, { id: 's2' }] });
+    if (url.endsWith('/v1/budget')) return json({ state: 'hold', committed_usd: 'unknown', committed_basis: 'known_spend_plus_reservations', spent_usd_known: null, reserved_usd: '0.01', unknown_cost_present: true, available_usd: null, cap_usd: '1', calls: 3, send_hold: true, enforced: true, provider_mode: 'host_configured_or_scripted' });
+    return json({ ok: true, root_id: 'main', files: [{ path: 'src/main.py', layer: 'entry', symbols: ['main', ''] }], nodes: 4, edges: 2 });
+  });
+  const sessions = await sdk.listSessions();
+  assert.deepEqual(sessions.sessions, [{ session_id: 's1', created_at: null, project: null }, { session_id: 's2', created_at: null, project: null }]);
+  const budget = await sdk.readBudget();
+  assert.equal(budget.state, 'hold'); assert.equal(budget.committed_usd, 'unknown'); assert.equal(budget.calls, 3);
+  const graph = await sdk.readGraph('main');
+  assert.deepEqual(graph.files, [{ path: 'src/main.py', layer: 'entry', symbols: ['main', ''] }]); assert.equal(graph.unresolved, null);
+  await assert.rejects(client(async () => json({ ok: true, sessions: [{}] })).listSessions(), WireError);
+  await assert.rejects(client(async () => json({ ok: true, sessions: [{ session_id: 's1', extra: 1 }] })).listSessions(), WireError);
+  await assert.rejects(client(async () => json({ state: 'ok', committed_usd: '1', cap_usd: '2', calls: 0, send_hold: false })).readBudget(), WireError);
+  await assert.rejects(client(async () => json({ ok: true, root_id: 'r', files: [], nodes: 0, edges: 0, store: '/host/graph.json' })).readGraph('r'), WireError);
 });
 test('user input cannot request terminal events or arbitrary job-store paths', async () => {
   const requests = [];

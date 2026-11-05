@@ -17,6 +17,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 mod docker;
 pub mod driver;
+pub mod durable_queue;
 pub mod git;
 mod process;
 pub mod queue;

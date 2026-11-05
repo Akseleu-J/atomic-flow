@@ -14,6 +14,8 @@ use std::path::PathBuf;
 
 /// Kernel tools for one editing task inside a sandboxed root.
 pub struct EditToolset<'a> {
+    registry: &'a af_sandbox::SandboxRegistry,
+    root_grant: Value,
     session: RefCell<af_sandbox::SandboxSession<'a>>,
     runner: RefCell<af_exec::JobRunner>,
     store_document: Value,
@@ -51,6 +53,8 @@ impl<'a> EditToolset<'a> {
             return Err("check workspace must equal the granted task root".into());
         }
         Ok(EditToolset {
+            registry,
+            root_grant: root,
             session: RefCell::new(af_sandbox::SandboxSession::new(registry).map_err(|e| e.0)?),
             runner: RefCell::new(runner),
             store_document,
@@ -161,6 +165,50 @@ impl<'a> EditToolset<'a> {
     /// Paths actually changed by this toolset (for the git auto-commit).
     pub fn changed_paths(&self) -> Vec<String> {
         self.changed.borrow().clone()
+    }
+
+    fn require_current_root(&self) -> Result<(), String> {
+        if self.registry.get(&self.root_id).map_err(|error| error.0)? != self.root_grant {
+            return Err("task root grant changed; requirement evidence is stale".into());
+        }
+        af_sandbox::registry::ensure_no_links(&self.check_cwd).map_err(|error| error.0)?;
+        // Registry identities use canonical paths; the Windows fallback also
+        // hashes those path bytes (including the canonical extended prefix).
+        let canonical = std::fs::canonicalize(&self.check_cwd)
+            .map_err(|_| "task root is unavailable during requirement audit")?;
+        let identity = af_sandbox::registry::root_identity(&canonical).map_err(|error| error.0)?;
+        if json!(identity) != self.root_grant["root_identity"] {
+            return Err("task root identity changed; requirement evidence is stale".into());
+        }
+        self.registry
+            .require_root_effects_clear(&self.root_id)
+            .map_err(|error| error.0)
+    }
+
+    /// Keep the full filtered source inventory, plus exact edited bytes even
+    /// for paths excluded by the snapshot filters. This is a freshness check
+    /// for cooperating hosts, not isolation from arbitrary filesystem writers.
+    fn requirement_inventory(&self) -> Result<Value, String> {
+        use std::io::Read;
+        self.require_current_root()?;
+        let manifest = af_sandbox::manifest(&self.check_cwd).map_err(|error| error.0)?;
+        let mut changed = BTreeMap::new();
+        for path in self.changed_paths() {
+            let resolved = af_sandbox::admission::admit_rel(&self.check_cwd, &path)
+                .map_err(|error| error.0)?;
+            let mut bytes = Vec::new();
+            std::fs::File::open(resolved)
+                .map_err(|_| "edited source unavailable during requirement audit")?
+                .take(1_000_001)
+                .read_to_end(&mut bytes)
+                .map_err(|_| "edited source unreadable during requirement audit")?;
+            if bytes.len() > 1_000_000 {
+                return Err("edited source exceeds requirement audit byte cap".into());
+            }
+            changed.insert(path, af_sandbox::sha256_hex(&bytes));
+        }
+        self.require_current_root()?;
+        Ok(json!({"manifest":manifest,"exact_changed_paths":changed}))
     }
 }
 
@@ -294,6 +342,51 @@ pub enum EditOutcome {
     },
 }
 
+/// Host-declared requirement verification bound to this edit task. The
+/// checker is a trusted in-process adapter (af-evidence contract); digests
+/// are host config, never model text. When supplied and the diagnostic
+/// passed, the final gate mints a `HostRequirementReceipt` against the
+/// post-edit source inventory and the outcome becomes `Completed`.
+pub struct EditRequirement<'a> {
+    pub checker: &'a mut dyn af_evidence::HostRequirementChecker,
+    pub requirement_id: String,
+    pub requirement_contract_sha256: String,
+    pub check_inventory_sha256: String,
+    pub workspace_id: String,
+    pub revision: String,
+}
+
+fn hold_stale_requirement(
+    toolset: &EditToolset<'_>,
+    journal: &mut af_journal::SessionJournal,
+    edits: usize,
+) -> Result<EditOutcome, String> {
+    *toolset.effects_unknown.borrow_mut() = true;
+    let effect = af_entropy::token();
+    journal
+        .begin_effect(
+            "tool_request",
+            &effect,
+            &json!({"name":"requirement_receipt_freshness"}),
+        )
+        .map_err(|_| "requirement freshness checkpoint failed; completion refused")?;
+    journal
+        .finish_effect(
+            "tool_effect_unknown",
+            &effect,
+            &json!({"reason":"source or root authority changed before receipt use; reconcile"}),
+            "unknown",
+        )
+        .map_err(|_| "requirement freshness failure persistence failed; durable hold retained")?;
+    Ok(EditOutcome::Interrupted {
+        edits,
+        loop_outcome: LoopOutcome::Hold {
+            backend: "host-check".into(),
+            detail: "requirement receipt became stale; reconcile before continuation".into(),
+        },
+    })
+}
+
 /// Run one guided editing task: TurnLoop over the edit toolset, then the
 /// host final gate. `host_approved` is an explicit operator decision bound
 /// to this task (sandbox apply authority), never inferred from model text.
@@ -308,6 +401,7 @@ pub fn run_edit_task(
     host_approved: bool,
     limits: LoopLimits,
     git: Option<&af_exec::git::GitWorkflow>,
+    requirement: Option<&mut EditRequirement<'_>>,
 ) -> Result<EditOutcome, String> {
     if !host_approved {
         return Err("edit tasks require explicit host approval for sandbox apply".into());
@@ -405,20 +499,137 @@ pub fn run_edit_task(
                 .map_err(|_| {
                     "final diagnostic completion persistence failed; durable hold retained"
                 })?;
-            let git_record = json!({"committed":false, "workflow_supplied":git.is_some(),
-                "reason":"no completed requirement checker; diagnostic exit-zero cannot authorize auto-commit"});
+            // Requirement verification (N03): only a supplied in-process host
+            // checker against the post-edit inventory can mint a receipt.
+            let mut requirement_check = json!({"status":"not_assessed",
+                "reason":"no host-bound completed requirement checker was supplied"});
+            let mut receipt_ok = false;
+            let mut checked_inventory = None;
+            if diagnostic_passed {
+                if let Some(req) = requirement {
+                    let manifest = toolset
+                        .requirement_inventory()
+                        .map_err(|error| format!("post-edit source audit failed: {error}"))?;
+                    let inventory = af_sandbox::sha256_hex(&af_graph::canonical::canonical_bytes(
+                        &json!(manifest),
+                    ));
+                    let scope = af_evidence::RequirementScope {
+                        task_id: journal.session_id.clone(),
+                        requirement_id: req.requirement_id.clone(),
+                        requirement_contract_sha256: req.requirement_contract_sha256.clone(),
+                        checker_id: "host-edit-gate".into(),
+                        binding: af_evidence::SourceBinding {
+                            workspace_id: req.workspace_id.clone(),
+                            source_revision: req.revision.clone(),
+                            inventory_sha256: inventory,
+                            runtime_id: "af-loop-edit-gate".into(),
+                        },
+                        check_inventory_sha256: req.check_inventory_sha256.clone(),
+                        expected_checks: 1,
+                    };
+                    let requirement_effect = af_entropy::token();
+                    journal.begin_effect("tool_request", &requirement_effect,
+                        &json!({"name":"host_requirement_check", "inventory_sha256":scope.binding.inventory_sha256}))
+                        .map_err(|_| "requirement checkpoint failed; checker was not authorized")?;
+                    let receipt = af_evidence::run_requirement_check(&scope, req.checker);
+                    // A callback may execute code. Its result cannot authorize
+                    // completion using an inventory captured before execution.
+                    let fresh = toolset.requirement_inventory();
+                    if fresh.as_ref().ok() != Some(&manifest) {
+                        *toolset.effects_unknown.borrow_mut() = true;
+                        journal.finish_effect("tool_effect_unknown", &requirement_effect,
+                            &json!({"reason":"requirement checker changed source, root authority, or unresolved effects; reconcile before continuation"}), "unknown")
+                            .map_err(|_| "requirement freshness failure persistence failed; durable hold retained")?;
+                        return Ok(EditOutcome::Interrupted { edits, loop_outcome: LoopOutcome::Hold {
+                            backend: "host-check".into(),
+                            detail: "requirement checker freshness audit failed; reconcile before continuation".into(),
+                        }});
+                    }
+                    match receipt {
+                        Ok(receipt) => {
+                            requirement_check = json!({"status":"verified",
+                                "requirement_id": req.requirement_id,
+                                "evidence_sha256": receipt.evidence_sha256()});
+                            receipt_ok = true;
+                            checked_inventory = Some(manifest);
+                        }
+                        Err(error) => {
+                            requirement_check = json!({"status":"refused",
+                                "reason": error.to_string()});
+                        }
+                    }
+                    journal
+                        .finish_effect(
+                            "tool_result",
+                            &requirement_effect,
+                            &json!({"phase":"requirement_check", "status":requirement_check}),
+                            if receipt_ok { "success" } else { "error" },
+                        )
+                        .map_err(|_| {
+                            "requirement receipt persistence failed; durable hold retained"
+                        })?;
+                }
+            }
+            if receipt_ok && toolset.requirement_inventory().ok() != checked_inventory {
+                return hold_stale_requirement(toolset, journal, edits);
+            }
+            let git_record = if receipt_ok {
+                match git {
+                    Some(workflow) => {
+                        let changed = toolset.changed_paths();
+                        let changed_refs: Vec<&str> = changed.iter().map(String::as_str).collect();
+                        match workflow.auto_commit(
+                            &changed_refs,
+                            &format!("af: {task} (requirement verified)"),
+                        ) {
+                            Ok(head) => json!({"committed": true, "head": head}),
+                            Err(error) => json!({"committed":false, "error": error.to_string(),
+                                "reason":"auto-commit failed; recorded honestly, verdict unchanged"}),
+                        }
+                    }
+                    None => json!({"committed":false, "workflow_supplied":false,
+                        "reason":"requirement verified; no git workflow supplied"}),
+                }
+            } else {
+                json!({"committed":false, "workflow_supplied":git.is_some(),
+                    "reason":"no completed requirement receipt; diagnostic exit-zero cannot authorize auto-commit"})
+            };
+            if receipt_ok && toolset.requirement_inventory().ok() != checked_inventory {
+                return hold_stale_requirement(toolset, journal, edits);
+            }
             if diagnostic_passed || not_configured {
-                Ok(EditOutcome::Unverified {
-                    content,
-                    edits,
-                    check,
-                    git: git_record,
-                })
+                if receipt_ok {
+                    Ok(EditOutcome::Completed {
+                        content,
+                        edits,
+                        check: {
+                            let mut c = check;
+                            c["requirement_check"] = requirement_check;
+                            c
+                        },
+                        git: git_record,
+                    })
+                } else {
+                    Ok(EditOutcome::Unverified {
+                        content,
+                        edits,
+                        check: {
+                            let mut c = check;
+                            c["requirement_check"] = requirement_check;
+                            c
+                        },
+                        git: git_record,
+                    })
+                }
             } else {
                 Ok(EditOutcome::CheckFailed {
                     content,
                     edits,
-                    check,
+                    check: {
+                        let mut c = check;
+                        c["requirement_check"] = requirement_check;
+                        c
+                    },
                     git: git_record,
                 })
             }
@@ -495,6 +706,7 @@ mod tests {
         home: std::path::PathBuf,
         root: std::path::PathBuf,
         store: std::path::PathBuf,
+        _env: std::sync::MutexGuard<'static, ()>,
     }
 
     impl Drop for Temp {
@@ -507,7 +719,9 @@ mod tests {
 
     fn setup() -> (Temp, af_sandbox::SandboxRegistry) {
         static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-        let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        // Held for the entire test via Temp: sibling tests run in parallel and
+        // ATOMIC_FLOW_HOME is process-wide.
+        let env_guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
         let home = std::env::temp_dir().join(format!("af-edit-home-{}", af_entropy::token()));
         let root = std::env::temp_dir().join(format!("af-edit-root-{}", af_entropy::token()));
@@ -539,7 +753,15 @@ mod tests {
             Some(value) => std::env::set_var("ATOMIC_FLOW_HOME", value),
             None => std::env::remove_var("ATOMIC_FLOW_HOME"),
         }
-        (Temp { home, root, store }, registry)
+        (
+            Temp {
+                home,
+                root,
+                store,
+                _env: env_guard,
+            },
+            registry,
+        )
     }
 
     fn unbound_toolset<'a>(
@@ -637,6 +859,7 @@ mod tests {
             true,
             LoopLimits::default(),
             None,
+            None,
         )
         .unwrap();
         match outcome {
@@ -695,9 +918,277 @@ mod tests {
             true,
             LoopLimits::default(),
             None,
+            None,
         )
         .unwrap();
         assert!(matches!(outcome, EditOutcome::Unverified { edits: 1, .. }));
+    }
+
+    /// A trusted host test adapter: echoes the exact scope as an observed,
+    /// completed independent-behavioral execution. Test fixture only — real
+    /// checkers pin their own oracle/inventory.
+    struct EchoingChecker;
+    impl af_evidence::HostRequirementChecker for EchoingChecker {
+        fn execute(
+            &mut self,
+            scope: &af_evidence::RequirementScope,
+        ) -> std::result::Result<af_evidence::CheckExecution, af_evidence::EvidenceError> {
+            Ok(af_evidence::CheckExecution {
+                task_id: scope.task_id.clone(),
+                requirement_contract_sha256: scope.requirement_contract_sha256.clone(),
+                checker_id: scope.checker_id.clone(),
+                binding: scope.binding.clone(),
+                requirement_id: scope.requirement_id.clone(),
+                check_inventory_sha256: scope.check_inventory_sha256.clone(),
+                kind: af_evidence::CheckKind::IndependentBehavioral,
+                completed: true,
+                checked: scope.expected_checks,
+                passed: scope.expected_checks,
+                failed: 0,
+                skipped: 0,
+                evidence_sha256: af_evidence::sha256(b"observed requirement checks"),
+            })
+        }
+    }
+
+    #[test]
+    fn a_verified_requirement_receipt_completes_the_task() {
+        let (temp, registry) = setup();
+        let toolset = toolset(&temp, &registry, 0, 4);
+        let backend = ScriptedBackend::new(
+            "scripted",
+            vec![
+                completed(
+                    "",
+                    vec![call("c1", r#"{"op":"read_file","path":"lib.py"}"#)],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "c2",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 1  # verified\n"}"#,
+                    )],
+                ),
+                completed("done", vec![]),
+            ],
+        );
+        let router = Router::new(vec![Box::new(backend)]);
+        let mut journal = edit_journal(&temp);
+        let mut checker = EchoingChecker;
+        let mut requirement = EditRequirement {
+            checker: &mut checker,
+            requirement_id: "tests-pass".into(),
+            requirement_contract_sha256: af_evidence::sha256(b"tests must pass"),
+            check_inventory_sha256: af_evidence::sha256(b"pytest -q"),
+            workspace_id: "default".into(),
+            revision: "staged".into(),
+        };
+        let outcome = run_edit_task(
+            &router,
+            &toolset,
+            Some(&mut journal),
+            "m",
+            "verified repair",
+            true,
+            LoopLimits::default(),
+            None,
+            Some(&mut requirement),
+        )
+        .unwrap();
+        match outcome {
+            EditOutcome::Completed { check, git, .. } => {
+                assert_eq!(check["requirement_check"]["status"], json!("verified"));
+                assert_eq!(
+                    check["requirement_check"]["requirement_id"],
+                    json!("tests-pass")
+                );
+                assert!(git["workflow_supplied"] == json!(false));
+            }
+            other => panic!("expected a completed verified task, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn a_refusing_checker_keeps_the_task_unverified() {
+        let (temp, registry) = setup();
+        let toolset = toolset(&temp, &registry, 0, 4);
+        let backend = ScriptedBackend::new(
+            "scripted",
+            vec![
+                completed(
+                    "",
+                    vec![call("c1", r#"{"op":"read_file","path":"lib.py"}"#)],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "c2",
+                        r#"{"op":"apply_edit","path":"lib.py","replacement":"def helper():\n    return 1  # refused\n"}"#,
+                    )],
+                ),
+                completed("done", vec![]),
+            ],
+        );
+        let router = Router::new(vec![Box::new(backend)]);
+        let mut journal = edit_journal(&temp);
+        let mut checker = af_evidence::UnavailableChecker;
+        let mut requirement = EditRequirement {
+            checker: &mut checker,
+            requirement_id: "tests-pass".into(),
+            requirement_contract_sha256: af_evidence::sha256(b"tests must pass"),
+            check_inventory_sha256: af_evidence::sha256(b"pytest -q"),
+            workspace_id: "default".into(),
+            revision: "staged".into(),
+        };
+        let outcome = run_edit_task(
+            &router,
+            &toolset,
+            Some(&mut journal),
+            "m",
+            "refused repair",
+            true,
+            LoopLimits::default(),
+            None,
+            Some(&mut requirement),
+        )
+        .unwrap();
+        match outcome {
+            EditOutcome::Unverified { check, git, .. } => {
+                assert_eq!(check["requirement_check"]["status"], json!("refused"));
+                assert!(git["committed"] == json!(false));
+            }
+            other => panic!("expected an unverified outcome, got {other:?}"),
+        }
+    }
+
+    struct MutatingChecker<F: FnMut()>(F);
+    impl<F: FnMut()> af_evidence::HostRequirementChecker for MutatingChecker<F> {
+        fn execute(
+            &mut self,
+            scope: &af_evidence::RequirementScope,
+        ) -> std::result::Result<af_evidence::CheckExecution, af_evidence::EvidenceError> {
+            (self.0)();
+            af_evidence::HostRequirementChecker::execute(&mut EchoingChecker, scope)
+        }
+    }
+
+    fn assert_checker_mutation_is_held(
+        edited_path: &str,
+        mut mutate: impl FnMut(&Temp, &af_sandbox::SandboxRegistry),
+    ) {
+        let (temp, registry) = setup();
+        std::fs::write(temp.root.join(edited_path), b"value = 1\n").unwrap();
+        registry
+            .grant("main", &temp.root, &[edited_path.into()], true)
+            .unwrap();
+        let toolset = unbound_toolset(&temp, &registry, 0, 4)
+            .with_write_scope(&[edited_path.into()])
+            .unwrap();
+        let backend = ScriptedBackend::new(
+            "scripted",
+            vec![
+                completed(
+                    "",
+                    vec![call(
+                        "read",
+                        &json!({"op":"read_file","path":edited_path}).to_string(),
+                    )],
+                ),
+                completed(
+                    "",
+                    vec![call(
+                        "edit",
+                        &json!({"op":"apply_edit","path":edited_path,"replacement":"value = 2\n"})
+                            .to_string(),
+                    )],
+                ),
+                completed("done", vec![]),
+            ],
+        );
+        let router = Router::new(vec![Box::new(backend)]);
+        let mut journal = edit_journal(&temp);
+        let mut checker = MutatingChecker(|| mutate(&temp, &registry));
+        let mut requirement = EditRequirement {
+            checker: &mut checker,
+            requirement_id: "tests-pass".into(),
+            requirement_contract_sha256: af_evidence::sha256(b"tests must pass"),
+            check_inventory_sha256: af_evidence::sha256(b"independent checks"),
+            workspace_id: "default".into(),
+            revision: "staged".into(),
+        };
+        let outcome = run_edit_task(
+            &router,
+            &toolset,
+            Some(&mut journal),
+            "m",
+            "repair",
+            true,
+            LoopLimits::default(),
+            None,
+            Some(&mut requirement),
+        )
+        .unwrap();
+        assert!(
+            matches!(
+                outcome,
+                EditOutcome::Interrupted {
+                    edits: 1,
+                    loop_outcome: LoopOutcome::Hold { .. }
+                }
+            ),
+            "mutated evidence must not complete: {outcome:?}"
+        );
+        assert!(toolset.effects_unknown());
+        assert!(!journal.read().unwrap().unresolved_call_ids().is_empty());
+    }
+
+    #[test]
+    fn requirement_checker_editing_checked_source_retains_a_durable_hold() {
+        assert_checker_mutation_is_held("lib.py", |temp, _| {
+            std::fs::write(temp.root.join("lib.py"), b"value = 3\n").unwrap();
+        });
+    }
+
+    #[test]
+    fn requirement_checker_editing_other_source_invalidates_the_full_inventory() {
+        assert_checker_mutation_is_held("lib.py", |temp, _| {
+            std::fs::write(temp.root.join("other.py"), b"unexpected = True\n").unwrap();
+        });
+    }
+
+    #[test]
+    fn requirement_checker_editing_a_filtered_changed_path_is_still_detected() {
+        assert_checker_mutation_is_held(".hidden.py", |temp, _| {
+            assert!(!af_sandbox::manifest(&temp.root)
+                .unwrap()
+                .contains_key(".hidden.py"));
+            std::fs::write(temp.root.join(".hidden.py"), b"value = 3\n").unwrap();
+        });
+    }
+
+    #[test]
+    fn requirement_checker_editing_an_ignored_changed_path_is_still_detected() {
+        assert_checker_mutation_is_held("bundle.min.js", |temp, _| {
+            assert!(!af_sandbox::manifest(&temp.root)
+                .unwrap()
+                .contains_key("bundle.min.js"));
+            std::fs::write(temp.root.join("bundle.min.js"), b"value = 3\n").unwrap();
+        });
+    }
+
+    #[test]
+    fn requirement_checker_revoking_the_grant_cannot_complete() {
+        assert_checker_mutation_is_held("lib.py", |_, registry| {
+            registry.revoke("main", true).unwrap();
+        });
+    }
+
+    #[test]
+    fn requirement_checker_leaving_a_root_effect_hold_cannot_complete() {
+        assert_checker_mutation_is_held("lib.py", |temp, _| {
+            std::fs::create_dir_all(temp.home.join("root-effects")).unwrap();
+            std::fs::write(temp.home.join("root-effects/unfinished.json"), b"{}").unwrap();
+        });
     }
 
     #[test]
@@ -738,6 +1229,7 @@ mod tests {
             "two edits",
             true,
             LoopLimits::default(),
+            None,
             None,
         )
         .unwrap();
@@ -782,6 +1274,7 @@ mod tests {
             true,
             LoopLimits::default(),
             None,
+            None,
         )
         .unwrap();
         match outcome {
@@ -808,6 +1301,7 @@ mod tests {
             false,
             LoopLimits::default(),
             None,
+            None,
         )
         .unwrap_err();
         assert!(error.contains("explicit host approval"));
@@ -827,6 +1321,7 @@ mod tests {
             "answer",
             true,
             LoopLimits::default(),
+            None,
             None,
         )
         .unwrap();
@@ -869,6 +1364,7 @@ mod tests {
             "edit",
             true,
             LoopLimits::default(),
+            None,
             None,
         )
         .unwrap_err();

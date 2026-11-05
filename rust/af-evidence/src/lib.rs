@@ -213,8 +213,20 @@ pub struct Claim {
     pub citation_indices: Vec<u32>,
     pub entailment: Entailment,
     /// Data-only record of an independent scoped checker, never authority.
+    #[serde(deserialize_with = "required_nullable_string")]
     pub independent_checker: Option<String>,
 }
+// Explicit null is part of the wire contract. Normal Option deserialization
+// also accepts a missing field, which would diverge from the strict TS DTO.
+fn required_nullable_string<'de, D>(
+    deserializer: D,
+) -> std::result::Result<Option<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Option::<String>::deserialize(deserializer)
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Publication {

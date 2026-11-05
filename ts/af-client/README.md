@@ -36,6 +36,15 @@ with WebCrypto; it follows the Rust `af-evidence` frozen wire vectors. Reports
 are **data only**. Even a valid `passed` or `published` label supplies no grants,
 execution receipt, semantic truth or new authority.
 
+Session listing (`listSessions()`), budget snapshots (`readBudget()`) and
+structural graph reads (`readGraph(rootId)`) run through named wire validators
+alongside `health()` and `readSession()`. Field-set violations raise `WireError`
+(a subclass of `AfProtocolError`) naming the offending fields; value violations
+stay `AfProtocolError`. Budget amounts are exact nanodollar strings from
+af-budget — never floats — and `hold`/unknown charges stay explicit. Session
+call identifiers are strings on the host journal wire. Graph reads carry
+per-file layers and symbols: structural data only, never a read proof.
+
 HTTP is permitted only on loopback; other endpoints require HTTPS. URL userinfo,
 queries and fragments are refused and redirects use `error`. Responses are read
 incrementally with byte limits, including missing/false Content-Length. A chat

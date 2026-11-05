@@ -1,13 +1,17 @@
 /** Browser-safe native single-owner API client. Reports are data, never grants. */
-import { AfProtocolError, byteLength, ensure, exact, list, oneOf, parseJson, record, sha256Label, strings, text, uint } from "./wire.js";
+import { AfProtocolError, bool, byteLength, ensure, exact, list, literal, oneOf, parseJson, record, sha256Label, strings, text, uint, validateBudgetSnapshot, validateGraphRead, validateHealth, validateSessionList, validateSessionSummary } from "./wire.js";
+import type { BudgetSnapshotDto, GraphReadDto, HealthDto, SessionListDto, SessionSummaryDto } from "./wire.js";
 import { validateVerificationReport, type VerificationReport } from "./evidence.js";
 export { AfProtocolError } from "./wire.js";
+export { WireError, validateBudgetSnapshot, validateGraphRead, validateHealth, validateSessionList, validateSessionSummary } from "./wire.js";
 export { parseVerificationReport } from "./evidence.js";
+export type { BudgetSnapshotDto, GraphFileDto, GraphLayer, GraphReadDto, HealthDto, SessionListDto, SessionListItem, SessionSummaryDto } from "./wire.js";
 export type { VerificationReport, SourceBinding, CheckSummary, Assessment, Citation, Claim, Omission, OmissionReason } from "./evidence.js";
 
 export interface AfClientOptions { baseUrl: string; token?: string; fetchImpl?: typeof fetch; maxResponseBytes?: number; timeoutMs?: number }
 export interface SessionCreated { ok: true; session_id: string; path: string }
-export interface SessionSnapshot { ok: true; session_id: string; events: number; incomplete_tail: boolean; pending_call_ids: string[]; unresolved_call_ids: string[]; root_id: string | null }
+/** Historical name kept: a validated session summary DTO. */
+export type SessionSnapshot = SessionSummaryDto;
 export interface Capabilities { schema_version: 1; verification_schema_version: 1; authority: "single_owner"; requirement_checker: "unavailable"; verification_report_authorizes_execution: false; publication_recovery: "host_cli_preview_digest"; unknown_replay: false }
 export interface BackendSelection { provider_id: string; model: string }
 export interface EditJourneyInput { backend: BackendSelection; root_id: string; file: string; replacement: string; goal: string; session_id?: string; host_approved: true }
@@ -29,10 +33,7 @@ export class AfTransportError extends Error {
   readonly retryAllowed = false;
   constructor(message = "transport outcome unknown; inspect host state before continuing") { super(message); this.name = "AfTransportError"; }
 }
-function bool(value: unknown): boolean { ensure(typeof value === "boolean", "expected boolean"); return value; }
-function literal<T extends string | boolean | number>(value: unknown, expected: T): T { ensure(value === expected, "unexpected protocol value"); return expected; }
 function bodyText(value: unknown, max: number): string { ensure(typeof value === "string" && byteLength(value) <= max, "text byte limit"); return value; }
-function nullableText(value: unknown): string | null { return value === null ? null : text(value); }
 function selection(value: unknown): BackendSelection {
   const b = exact(value, ["provider_id", "model"]);
   return { provider_id: text(b.provider_id, 128), model: text(b.model, 128) };
@@ -111,9 +112,7 @@ export class AfClient {
     try { return parseJson(await boundedBody(response, this.maxResponseBytes), this.maxResponseBytes); }
     catch (error) { if (error instanceof AfProtocolError) throw error; throw new AfTransportError(); }
   }
-  async health(): Promise<void> {
-    const r = exact(await this.json("/health"), ["ok", "version", "kernel"]); literal(r.ok, true); text(r.version); literal(r.kernel, "atomic-flow-rust");
-  }
+  async health(): Promise<HealthDto> { return validateHealth(await this.json("/health")); }
   async capabilities(): Promise<Capabilities> {
     const r = exact(await this.json("/v1/capabilities"), ["schema_version", "verification_schema_version", "authority", "requirement_checker", "verification_report_authorizes_execution", "publication_recovery", "unknown_replay"]);
     return { schema_version: literal(r.schema_version, 1), verification_schema_version: literal(r.verification_schema_version, 1), authority: literal(r.authority, "single_owner"), requirement_checker: literal(r.requirement_checker, "unavailable"), verification_report_authorizes_execution: literal(r.verification_report_authorizes_execution, false), publication_recovery: literal(r.publication_recovery, "host_cli_preview_digest"), unknown_replay: literal(r.unknown_replay, false) };
@@ -124,9 +123,10 @@ export class AfClient {
     return { ok: literal(r.ok, true), session_id: text(r.session_id), path: text(r.path, 4096) };
   }
   async readSession(sessionId: string): Promise<SessionSnapshot> {
-    const r = exact(await this.json(`/v1/sessions/${identifier(sessionId)}`), ["ok", "session_id", "events", "incomplete_tail", "pending_call_ids", "unresolved_call_ids", "root_id"]);
-    return { ok: literal(r.ok, true), session_id: text(r.session_id), events: uint(r.events, Number.MAX_SAFE_INTEGER), incomplete_tail: bool(r.incomplete_tail), pending_call_ids: strings(r.pending_call_ids), unresolved_call_ids: strings(r.unresolved_call_ids), root_id: nullableText(r.root_id) };
+    return validateSessionSummary(await this.json(`/v1/sessions/${identifier(sessionId)}`));
   }
+  /** Durable host journal list; entries are metadata without authority. */
+  async listSessions(): Promise<SessionListDto> { return validateSessionList(await this.json("/v1/sessions")); }
   /** Browser-authored history is advisory user_input only. No terminal/approval events. */
   async appendUserInput(sessionId: string, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
     record(payload); const body = JSON.stringify({ event_type: "user_input", payload });
@@ -147,6 +147,10 @@ export class AfClient {
     const r = exact(await this.json("/v1/jobs"), ["ok", "jobs", "unresolved_unknown_ids"]);
     return { ok: literal(r.ok, true), jobs: list(r.jobs, 10000).map(record), unresolved_unknown_ids: strings(r.unresolved_unknown_ids, 10000) };
   }
+  /** af-budget snapshot. Holds, reservations and unknown charges stay explicit. */
+  async readBudget(): Promise<BudgetSnapshotDto> { return validateBudgetSnapshot(await this.json("/v1/budget")); }
+  /** Structural graph for a granted root: layers and symbols, never a read proof. */
+  async readGraph(rootId: string): Promise<GraphReadDto> { return validateGraphRead(await this.json(`/v1/graph/${identifier(rootId)}`)); }
   /** Single bounded stream. Disconnect/abort never auto-resubmits a model call. */
   async *chat(input: ChatInput, options: { signal?: AbortSignal } = {}): AsyncGenerator<ChatEvent> {
     const body = record(input); ensure(Object.keys(body).every(key => ["backend", "prompt", "session_id", "root_id"].includes(key)), "unknown chat request field");

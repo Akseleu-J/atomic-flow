@@ -814,3 +814,13 @@ well-formed JSON nor a byte restoration is a requirement-check verdict. Read
 [PRODUCTION_INCREMENT_2026-11-04.md](PRODUCTION_INCREMENT_2026-11-04.md) for
 validation and remaining limits. Original P07 research/paid UNKNOWN evidence
 is preserved; recovery does not reconcile model, budget or job UNKNOWNs.
+
+
+## Production continuation — 5 November 2026
+
+The owner requested continuation in the updated zcode checkout, currently local
+branch `experimental` from `7bf0661`. Preserve its separate pending React Studio
+surface. Read [PRODUCTION_CONTINUATION_2026-11-05.md](PRODUCTION_CONTINUATION_2026-11-05.md)
+for the native queue ownership/idempotency and requirement-freshness increment.
+This entry supersedes the active-branch pointer in the historical 4 November
+entry; chapter acceptance and old provider UNKNOWNs do not change implicitly.

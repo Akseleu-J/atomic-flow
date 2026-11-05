@@ -1,0 +1,115 @@
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling ureq v2.12.1
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+   Compiling af-llm v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-llm)
+   Compiling af-evidence v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-evidence)
+   Compiling af-exec v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-exec)
+   Compiling af-loop v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-loop)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 02s
+     Running unittests src\lib.rs (rust\target\debug\deps\af_loop-58e7380cf753636e.exe)
+
+running 45 tests
+test compact::tests::drops_middle_messages_when_markers_are_not_enough ... ok
+test compact::tests::never_compacts_below_two_messages ... ok
+test compact::tests::old_tool_results_become_id_carrying_markers ... ok
+test compact::tests::under_budget_is_untouched ... ok
+test edit::tests::a_refusing_checker_keeps_the_task_unverified ... FAILED
+test edit::tests::a_verified_requirement_receipt_completes_the_task ... FAILED
+test edit::tests::an_unbound_toolset_is_read_only_even_with_a_write_grant ... ok
+test edit::tests::check_workspace_must_match_the_granted_root ... ok
+test edit::tests::edit_budget_refuses_second_edit ... ok
+test edit::tests::edited_source_remains_unverified_without_a_requirement_checker ... ok
+test edit::tests::exact_scope_cannot_be_widened_by_model_arguments_or_a_root_grant ... ok
+test edit::tests::final_gate_fails_when_check_fails ... ok
+test edit::tests::host_approval_is_explicit ... ok
+test edit::tests::missing_durable_journal_refuses_before_any_edit ... ok
+test edit::tests::model_cannot_replace_different_bytes_than_the_reviewed_http_change ... ok
+test edit::tests::no_edits_is_answer_only_not_verified ... ok
+test edit::tests::requirement_checker_editing_a_filtered_changed_path_is_still_detected ... FAILED
+test edit::tests::requirement_checker_editing_an_ignored_changed_path_is_still_detected ... FAILED
+test edit::tests::requirement_checker_editing_checked_source_retains_a_durable_hold ... FAILED
+test edit::tests::requirement_checker_editing_other_source_invalidates_the_full_inventory ... FAILED
+test edit::tests::requirement_checker_leaving_a_root_effect_hold_cannot_complete ... FAILED
+test edit::tests::requirement_checker_revoking_the_grant_cannot_complete ... FAILED
+test edit::tests::stale_read_proof_never_overwrites_the_newer_source ... ok
+test edit::tests::zero_exit_source_mutation_invalidates_the_diagnostic_source_binding ... ok
+test edit::tests::zero_exit_with_no_tests_does_not_verify_or_commit_an_edit ... ok
+test schedule::tests::daily_schedule_fires_once_per_day ... ok
+test schedule::tests::event_triggers_match_exact_key_values ... ok
+test schedule::tests::interval_schedule_fires_repeatedly_not_stacked ... ok
+test schedule::tests::pause_and_persistence ... ok
+test schedule::tests::tick_dispatches_due_schedules_once_and_marks_runs ... ok
+test steer::tests::fork_copies_by_reference_not_replay ... ok
+test steer::tests::pause_resume_cycle_is_journaled ... ok
+test steer::tests::resume_requires_a_journaled_pause_and_clean_holds ... ok
+test tests::hold_stops_the_loop_with_unresolved_journal_evidence ... ok
+test tests::host_unknown_tool_effect_stops_same_turn_and_preserves_durable_hold ... ok
+test tests::interrupted_journal_prevents_even_first_effect ... ok
+test tests::invalid_model_arguments_never_execute_the_host_tool ... ok
+test tests::parsed_tool_calls_shape_roundtrip ... ok
+test tests::run_streaming_surfaces_deltas_and_final_answer ... ok
+test tests::streaming_hold_stops_the_loop_with_journaled_unknown ... ok
+test tests::tool_effect_completion_write_failure_stops_followups_and_retains_hold ... ok
+test tests::tool_request_then_final_answer ... ok
+test tests::tool_result_feeds_back_into_the_conversation ... ok
+test tests::turn_budget_exhausts_and_preserves_counts ... ok
+test tests::unknown_tool_is_reported_to_the_model_not_a_crash ... ok
+
+failures:
+
+---- edit::tests::a_refusing_checker_keeps_the_task_unverified stdout ----
+
+thread 'edit::tests::a_refusing_checker_keeps_the_task_unverified' (14748) panicked at af-loop\src\edit.rs:1051:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- edit::tests::a_verified_requirement_receipt_completes_the_task stdout ----
+
+thread 'edit::tests::a_verified_requirement_receipt_completes_the_task' (3208) panicked at af-loop\src\edit.rs:994:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+
+---- edit::tests::requirement_checker_editing_a_filtered_changed_path_is_still_detected stdout ----
+
+thread 'edit::tests::requirement_checker_editing_a_filtered_changed_path_is_still_detected' (6676) panicked at af-loop\src\edit.rs:1127:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+
+---- edit::tests::requirement_checker_editing_an_ignored_changed_path_is_still_detected stdout ----
+
+thread 'edit::tests::requirement_checker_editing_an_ignored_changed_path_is_still_detected' (25612) panicked at af-loop\src\edit.rs:1127:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+
+---- edit::tests::requirement_checker_editing_checked_source_retains_a_durable_hold stdout ----
+
+thread 'edit::tests::requirement_checker_editing_checked_source_retains_a_durable_hold' (30920) panicked at af-loop\src\edit.rs:1127:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+
+---- edit::tests::requirement_checker_editing_other_source_invalidates_the_full_inventory stdout ----
+
+thread 'edit::tests::requirement_checker_editing_other_source_invalidates_the_full_inventory' (6952) panicked at af-loop\src\edit.rs:1127:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+
+---- edit::tests::requirement_checker_leaving_a_root_effect_hold_cannot_complete stdout ----
+
+thread 'edit::tests::requirement_checker_leaving_a_root_effect_hold_cannot_complete' (32428) panicked at af-loop\src\edit.rs:1127:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+
+---- edit::tests::requirement_checker_revoking_the_grant_cannot_complete stdout ----
+
+thread 'edit::tests::requirement_checker_revoking_the_grant_cannot_complete' (14876) panicked at af-loop\src\edit.rs:1127:10:
+called `Result::unwrap()` on an `Err` value: "post-edit source audit failed: task root identity changed; requirement evidence is stale"
+
+
+failures:
+    edit::tests::a_refusing_checker_keeps_the_task_unverified
+    edit::tests::a_verified_requirement_receipt_completes_the_task
+    edit::tests::requirement_checker_editing_a_filtered_changed_path_is_still_detected
+    edit::tests::requirement_checker_editing_an_ignored_changed_path_is_still_detected
+    edit::tests::requirement_checker_editing_checked_source_retains_a_durable_hold
+    edit::tests::requirement_checker_editing_other_source_invalidates_the_full_inventory
+    edit::tests::requirement_checker_leaving_a_root_effect_hold_cannot_complete
+    edit::tests::requirement_checker_revoking_the_grant_cannot_complete
+
+test result: FAILED. 37 passed; 8 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.48s
+
+error: test failed, to rerun pass `-p af-loop --lib`

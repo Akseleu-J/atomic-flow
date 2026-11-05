@@ -139,3 +139,5 @@ Calibrated pairs/replacement holdout/ablations under frozen caps with independen
 Read-only source/retained evidence audit; no heavy tests, runtime edits, provider calls, commit or push. Rust/TS/workflow source at reviewed HEAD had no diff from accepted native CI source. Concurrent claims/recovery work is deliberately not accepted by this snapshot and requires fresh source-bound evidence. Historical archives and rejected attempts remain intact.
 
 Source plans: [P00–P14](PRODUCTION_ROADMAP.md), [E00–E08](ENTERPRISE_CORE_PLAN.md), [W1–W9](PRODUCTION_PLAN.md), [Rust/TS reconstruction](POLYGLOT_RECONSTRUCTION_PLAN_2026-11-03.md).
+
+Continuation: [5 November native integration and validation](PRODUCTION_CONTINUATION_2026-11-05.md). Historical snapshot findings above retain their original source scope.
