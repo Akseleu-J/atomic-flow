@@ -73,9 +73,7 @@ pub fn check_repair_budget(
     reservation: f64,
     known_prices: bool,
 ) -> Result<(), String> {
-    if let Err(error) = validate_repair(task.repair_budget) {
-        return Err(error);
-    }
+    validate_repair(task.repair_budget)?;
     if task.repair_budget.as_object().is_none_or(|o| o.is_empty()) {
         return Ok(());
     }

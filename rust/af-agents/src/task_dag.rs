@@ -160,7 +160,7 @@ impl TaskDag {
             .iter()
             .map(|(id, step)| (id.clone(), step.state))
             .collect();
-        for (_id, step) in self.steps.iter_mut() {
+        for step in self.steps.values_mut() {
             if step.state != "pending" {
                 continue;
             }

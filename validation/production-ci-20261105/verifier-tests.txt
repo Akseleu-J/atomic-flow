@@ -1,0 +1,14 @@
+test_cleanup_or_absence_uncertainty_is_refused (test_surfaces_evidence.ReceiptVerifierTests.test_cleanup_or_absence_uncertainty_is_refused) ... ok
+test_host_command_failure_is_not_container_absence (test_surfaces_evidence.ReceiptVerifierTests.test_host_command_failure_is_not_container_absence) ... ok
+test_host_still_lists_container (test_surfaces_evidence.ReceiptVerifierTests.test_host_still_lists_container) ... ok
+test_missing_live_target_witness_is_refused (test_surfaces_evidence.ReceiptVerifierTests.test_missing_live_target_witness_is_refused) ... ok
+test_missing_or_duplicate_receipt_is_refused (test_surfaces_evidence.ReceiptVerifierTests.test_missing_or_duplicate_receipt_is_refused) ... ok
+test_other_boundary_or_image_cannot_be_accepted (test_surfaces_evidence.ReceiptVerifierTests.test_other_boundary_or_image_cannot_be_accepted) ... ok
+test_semantic_verification_cannot_be_invented (test_surfaces_evidence.ReceiptVerifierTests.test_semantic_verification_cannot_be_invented) ... ok
+test_valid_protocol_fixture_retains_not_assessed (test_surfaces_evidence.ReceiptVerifierTests.test_valid_protocol_fixture_retains_not_assessed) ... ok
+test_zero_executed_or_failed_or_ignored_test_is_refused (test_surfaces_evidence.ReceiptVerifierTests.test_zero_executed_or_failed_or_ignored_test_is_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.230s
+
+OK

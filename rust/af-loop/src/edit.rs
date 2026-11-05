@@ -392,6 +392,8 @@ fn hold_stale_requirement(
 /// to this task (sandbox apply authority), never inferred from model text.
 /// `git` is retained for compatibility. Without a bound completed requirement
 /// checker this path never auto-commits, even when a diagnostic exits zero.
+// Preserve the existing API with explicit host authority and requirement-checker inputs.
+#[allow(clippy::too_many_arguments)]
 pub fn run_edit_task(
     router: &Router,
     toolset: &EditToolset,
@@ -409,22 +411,23 @@ pub fn run_edit_task(
     let journal =
         journal.ok_or("edit tasks require a durable journal before model or mutation effects")?;
     let tools: Vec<Box<dyn KernelTool + '_>> = vec![Box::new(RefCellTool(toolset))];
-    let mut loop_ = TurnLoop::new(router, &tools, Some(&mut *journal), limits);
-    let outcome = loop_
-        .run(
-            model,
-            vec![ChatMessage::new(
-                "user",
-                &format!(
-                    "Task: {task}\nTools: context (repo map), read_file, apply_edit, run_check.\n\
-                 Rules: read the complete file before apply_edit; run_check after edits;\n\
-                 finish with a final answer only when the check passes."
-                ),
-            )],
-            &Cancel::new(),
-        )
-        .map_err(|error| error.0)?;
-    drop(loop_);
+    let outcome = {
+        let mut loop_ = TurnLoop::new(router, &tools, Some(&mut *journal), limits);
+        loop_
+            .run(
+                model,
+                vec![ChatMessage::new(
+                    "user",
+                    &format!(
+                        "Task: {task}\nTools: context (repo map), read_file, apply_edit, run_check.\n\
+                     Rules: read the complete file before apply_edit; run_check after edits;\n\
+                     finish with a final answer only when the check passes."
+                    ),
+                )],
+                &Cancel::new(),
+            )
+            .map_err(|error| error.0)?
+    };
     let edits = toolset.edits_used();
     match outcome {
         LoopOutcome::Final { content, .. } => {

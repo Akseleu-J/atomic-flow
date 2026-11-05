@@ -1,0 +1,36 @@
+{
+  "command": "cargo clippy --workspace --all-targets --locked --offline -j1 --manifest-path rust/Cargo.toml -- -D warnings",
+  "target": "Windows host; Linux CI remains separate and unverified locally",
+  "exit_code": 0,
+  "output_origin": "Exact final terminal output concatenated from exec session 81338 chunks 250cb7 and 46a101; no second run",
+  "initial_failures_preserved_as_history": [
+    "af-entropy Windows redundant pointer casts/private acronym",
+    "af-graph private slice helper/ASCII comparison",
+    "af-sandbox tuple complexity/bool comparison/Option map",
+    "af-llm single-binding match",
+    "af-agents char pattern/lifetime/question-mark/map values",
+    "af-exec needless borrow/collapsible-if/redundant closure/test tuple alias",
+    "af-program ineffective usize max/new_without_default",
+    "af-budget exhaustive Option match instead of checked unwrap",
+    "af-cli cloned singleton scope/bool comparison/redundant Ok and ?/async test HOME_LOCK",
+    "af-memory new_without_default",
+    "test helpers PathBuf reference/literal format"
+  ],
+  "arity_exceptions": [
+    {
+      "function": "af_loop::edit::run_edit_task",
+      "reason": "Preserve existing public API and explicit host authority/requirement-checker arguments",
+      "lint": "clippy::too_many_arguments",
+      "scope": "one function"
+    },
+    {
+      "function": "af_cli::server::spawn_chat_stream",
+      "reason": "Keep existing stream, journal and budget authority inputs explicit",
+      "lint": "clippy::too_many_arguments",
+      "scope": "one function"
+    }
+  ],
+  "behavior_changes": "No intended production behavior change; test HOME_LOCK is now async-aware with same two whole-test critical sections; Default implementations forward to existing new().",
+  "tests_run_by_this_agent": false,
+  "ci_gate": "Linux workspace all-targets Clippy -D warnings retained, --locked -j1 added. Linux Wayland development dependency added from studio workflow; workspace tests serialized with pipefail."
+}

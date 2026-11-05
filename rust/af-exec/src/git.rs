@@ -72,7 +72,7 @@ impl GitWorkflow<'_> {
         let (code, stdout, stderr) = self
             .runner
             .run(&owned, self.repo_root, extra_env)
-            .map_err(|error| GitError(error))?;
+            .map_err(GitError)?;
         if code != 0 {
             return Err(GitError(format!(
                 "git {} failed ({code}): {}",
@@ -163,8 +163,10 @@ mod tests {
     use std::collections::BTreeMap;
     use std::path::Path;
 
+    type RecordedCall = (Vec<String>, BTreeMap<String, String>);
+
     struct FakeRunner {
-        calls: RefCell<Vec<(Vec<String>, BTreeMap<String, String>)>>,
+        calls: RefCell<Vec<RecordedCall>>,
         fail_on: RefCell<BTreeMap<String, i32>>,
     }
 

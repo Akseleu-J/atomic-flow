@@ -728,7 +728,7 @@ fn run_edit_journey(
         .map_err(|_| StatusCode::CONFLICT)?;
     let toolset = crate::edit_toolset_for(&registry, &body.root_id)
         .map_err(|_| StatusCode::BAD_REQUEST)?
-        .with_write_scope(&[body.file.clone()])
+        .with_write_scope(std::slice::from_ref(&body.file))
         .map_err(|_| StatusCode::BAD_REQUEST)?
         .with_reviewed_replacement(&body.file, &body.replacement)
         .map_err(|_| StatusCode::BAD_REQUEST)?;
@@ -801,6 +801,8 @@ use std::path::PathBuf;
 /// Used by the SSE endpoint and directly testable with the scripted backend.
 /// `budget` is the optional af-budget authority: reserve → durable send
 /// checkpoint → settle/unknown/not_sent around the single provider call.
+// Keep stream, journal, and budget authority inputs explicit at the host boundary.
+#[allow(clippy::too_many_arguments)]
 fn spawn_chat_stream(
     backend: Box<dyn af_llm::ChatBackend>,
     model: String,
@@ -1157,7 +1159,7 @@ mod tests {
     /// ATOMIC_FLOW_HOME is process-wide: every test that redirects it must
     /// hold this lock for its whole body, or a concurrently running test
     /// reads/writes another test's state home (observed as a 404 mid-test).
-    static HOME_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    static HOME_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
     #[tokio::test]
     async fn health_is_open_loopback_style_without_token() {
@@ -1219,7 +1221,7 @@ mod tests {
 
     #[tokio::test]
     async fn session_endpoints_roundtrip() {
-        let _home_guard = HOME_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        let _home_guard = HOME_LOCK.lock().await;
         let home = std::env::temp_dir().join(format!("af-serve-{}", af_entropy::token()));
         std::fs::create_dir_all(&home).unwrap();
         let previous = std::env::var("ATOMIC_FLOW_HOME").ok();
@@ -1688,7 +1690,7 @@ mod tests {
 
     #[tokio::test]
     async fn settled_chat_is_durable_and_an_existing_unknown_is_never_replayed() {
-        let _home_guard = HOME_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+        let _home_guard = HOME_LOCK.lock().await;
         struct IsolatedHome {
             path: PathBuf,
             previous: Option<std::ffi::OsString>,

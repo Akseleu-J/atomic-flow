@@ -20,7 +20,7 @@ pub fn resource_kind(path: &str) -> Option<&'static str> {
     ) {
         return Some("config");
     }
-    if dot.to_ascii_lowercase() == ".md" {
+    if dot.eq_ignore_ascii_case(".md") {
         return Some("document");
     }
     let _ = suffix;

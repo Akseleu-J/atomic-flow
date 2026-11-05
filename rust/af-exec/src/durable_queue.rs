@@ -288,12 +288,10 @@ fn validate_op(op: &Value) -> Result<()> {
             return Err(DurableQueueError(format!("invalid {field} digest")));
         }
     }
-    if kind == "submit" {
-        if op["priority"].as_i64().is_none() {
-            return Err(DurableQueueError(
-                "priority must be a signed integer".into(),
-            ));
-        }
+    if kind == "submit" && op["priority"].as_i64().is_none() {
+        return Err(DurableQueueError(
+            "priority must be a signed integer".into(),
+        ));
     }
     if matches!(kind, "complete" | "fail")
         && op["reservation_fence"]

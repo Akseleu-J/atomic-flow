@@ -26,7 +26,7 @@ impl SampleStats {
         sorted.sort_by(|a, b| a.partial_cmp(b).expect("finite samples"));
         let pick = |fraction: f64| -> f64 {
             let index = ((sorted.len() as f64) * fraction).ceil() as usize;
-            sorted[(index.min(sorted.len()) - 1).max(0)]
+            sorted[index.min(sorted.len()) - 1]
         };
         Some(SampleStats {
             n: sorted.len(),

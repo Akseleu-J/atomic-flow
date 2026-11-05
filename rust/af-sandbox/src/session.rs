@@ -23,6 +23,8 @@ const MAX_PREVIEWS: usize = 16;
 const MAX_PREVIEW_PATHS: usize = 32;
 const MAX_PREVIEW_TOTAL: usize = 1_000_000;
 
+type SourceSnapshot = (Value, PathBuf, Option<Vec<u8>>, Option<String>);
+
 pub struct SandboxSession<'a> {
     registry: &'a SandboxRegistry,
     reads: BTreeMap<String, Vec<(usize, usize)>>,
@@ -188,11 +190,7 @@ impl<'a> SandboxSession<'a> {
         })
     }
 
-    fn source(
-        &self,
-        root_id: &str,
-        rel: &str,
-    ) -> SandboxResult<(Value, PathBuf, Option<Vec<u8>>, Option<String>)> {
+    fn source(&self, root_id: &str, rel: &str) -> SandboxResult<SourceSnapshot> {
         let item = self.registry.get(root_id)?;
         let root = PathBuf::from(item["path"].as_str().unwrap_or_default());
         let path = admit_rel(&root, rel)?;
@@ -397,10 +395,7 @@ impl<'a> SandboxSession<'a> {
                     "read the complete current root-qualified source before preview".into(),
                 ));
             }
-            let after: Option<Vec<u8>> = match text {
-                Some(text) => Some(text.as_bytes().to_vec()),
-                None => None,
-            };
+            let after: Option<Vec<u8>> = text.as_ref().map(|text| text.as_bytes().to_vec());
             if let Some(bytes) = &after {
                 total += bytes.len();
                 if total > MAX_PREVIEW_TOTAL {
@@ -465,7 +460,7 @@ impl<'a> SandboxSession<'a> {
     /// decision bound to this token. On any failure, already-applied files are
     /// restored from backups and the journal records the abort.
     pub fn apply(&mut self, preview_token: &str, approved: bool) -> SandboxResult<Value> {
-        if approved != true {
+        if !approved {
             return Err(SandboxError(
                 "publication needs explicit host approval of the preview".into(),
             ));

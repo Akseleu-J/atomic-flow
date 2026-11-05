@@ -147,7 +147,7 @@ pub fn select(
     if !provider.models.iter().any(|m| m == model) {
         return Err("model is not approved for this provider".into());
     }
-    if std::env::var(&provider.api_key_env).is_ok_and(|v| !v.is_empty()) == false {
+    if !std::env::var(&provider.api_key_env).is_ok_and(|v| !v.is_empty()) {
         return Err("provider credential is unavailable on host".into());
     }
     let amount = af_budget::Money::from_usd_str(&provider.reservation_usd)

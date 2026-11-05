@@ -44,6 +44,12 @@ pub struct BlockMemory {
     blocks: Vec<MemoryBlock>,
 }
 
+impl Default for BlockMemory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BlockMemory {
     pub fn new() -> BlockMemory {
         BlockMemory { blocks: Vec::new() }

@@ -11,7 +11,7 @@ from atomic_flow.evaluation import calibrate
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--manifest", type=Path, default=Path("benchmarks/pilot/tasks.json"))
+    parser.add_argument("--manifest", type=Path, default=Path("benchmarks/pilot/tasks-calibration-20261105.json"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--execution", choices=("docker", "local"), default="docker",
                         help="local is only for these trusted historical revisions, without sandbox isolation")

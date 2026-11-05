@@ -58,7 +58,7 @@ pub trait SandboxDriver {
     /// Honest availability: the binary must exist on PATH; platforms that
     /// cannot host the runtime (e.g. Firecracker on Windows) refuse here.
     fn available(&self) -> bool {
-        which(&self.probe().binary)
+        which(self.probe().binary)
     }
 }
 
@@ -387,6 +387,7 @@ mod tests {
         assert_eq!(status["verification"], json!("not_assessed"));
         assert_eq!(jobs[&spec.job_id]["sandbox"], status["sandbox"]);
         assert!(status["sandbox"]["container_id"].as_str().unwrap().len() == 64);
+        println!("AF_DOCKER_RECEIPT={status}");
         let _ = std::fs::remove_dir_all(&store);
     }
 }

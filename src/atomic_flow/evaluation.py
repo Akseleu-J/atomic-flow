@@ -23,6 +23,18 @@ def load_suite(path: Path) -> dict:
     for key in ("base_commit", "gold_commit"):
         if not re.fullmatch(r"[0-9a-f]{40}", suite.get(key, "")):
             raise ValueError(f"{key} must be a pinned full Git SHA")
+    provenance = suite.get("revision_provenance")
+    if "revision_provenance" in suite:
+        if not isinstance(provenance, dict) or set(provenance) != {"base", "gold"}:
+            raise ValueError("revision_provenance requires base and gold records")
+        for label, record in provenance.items():
+            if not isinstance(record, dict) or set(record) != {"historical_commit", "export_commit", "tree"}:
+                raise ValueError("Revision provenance requires historical_commit, export_commit and tree")
+            if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value)
+                   for value in record.values()):
+                raise ValueError("Revision provenance values must be pinned full Git SHAs")
+            if record["export_commit"] != suite[f"{label}_commit"]:
+                raise ValueError("Revision provenance export_commit must match the suite revision")
     ids = set()
     for case in suite["cases"]:
         if not re.fullmatch(r"[a-z0-9-]+", case.get("id", "")) or case["id"] in ids:
@@ -108,6 +120,18 @@ def check_snapshot(workspace: Path, checker_source: str, check_id: str, executio
 def calibrate(repository: Path, manifest: Path, *, execution: ExecutionConfig | None = None) -> dict:
     execution = execution or ExecutionConfig(mode="docker")
     suite = load_suite(manifest)
+    # Historical objects need not survive an author-only rewrite. The versioned
+    # manifest pins the previously compared tree, and every exported revision must
+    # still match it. Never substitute an arbitrary available revision.
+    provenance = suite.get("revision_provenance")
+    if provenance is not None:
+        for label, record in provenance.items():
+            actual_tree = subprocess.run(
+                ["git", "rev-parse", "--verify", f"{record['export_commit']}^{{tree}}"],
+                cwd=repository, check=True, capture_output=True, text=True, timeout=60,
+            ).stdout.strip()
+            if actual_tree != record["tree"]:
+                raise ValueError(f"{label} revision does not match its pinned historical tree")
     checker_path = manifest.with_name("checks.py")
     checker_bytes = checker_path.read_bytes()
     checker_source = checker_bytes.decode("utf-8")
@@ -127,4 +151,5 @@ def calibrate(repository: Path, manifest: Path, *, execution: ExecutionConfig | 
             "checker_sha256": hashlib.sha256(checker_bytes).hexdigest(),
             "wordings": len(suite["cases"]), "independent_changes": len(checks),
             "calibrated": all(row["status"] == ("fail" if row["revision"] == "base" else "pass") for row in rows),
-            "model_calls": 0, "disclosure": suite["disclosure"], "results": rows}
+            "model_calls": 0, "disclosure": suite["disclosure"], "results": rows,
+            **({"revision_provenance": provenance} if provenance is not None else {})}

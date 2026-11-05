@@ -140,10 +140,10 @@ fn try_lock(file: &File) -> Result<(), std::io::Error> {
     #[cfg(windows)]
     {
         use std::os::windows::io::AsRawHandle;
-        let handle = file.as_raw_handle() as *mut std::ffi::c_void;
+        let handle = file.as_raw_handle();
         // LOCKFILE_EXCLUSIVE_LOCK = 2, LOCKFILE_FAIL_IMMEDIATELY = 1
         let flags = 2 | 1;
-        let mut overlapped = OVERLAPPED {
+        let mut overlapped = Overlapped {
             internal: 0,
             internal_high: 0,
             u: OverlappedUnion {
@@ -177,8 +177,8 @@ fn unlock(file: &File) -> Result<(), std::io::Error> {
     #[cfg(windows)]
     {
         use std::os::windows::io::AsRawHandle;
-        let handle = file.as_raw_handle() as *mut std::ffi::c_void;
-        let mut overlapped = OVERLAPPED {
+        let handle = file.as_raw_handle();
+        let mut overlapped = Overlapped {
             internal: 0,
             internal_high: 0,
             u: OverlappedUnion {
@@ -211,7 +211,7 @@ fn unlock(file: &File) -> Result<(), std::io::Error> {
 #[cfg(windows)]
 #[allow(non_snake_case)]
 #[repr(C)]
-struct OVERLAPPED {
+struct Overlapped {
     internal: usize,
     internal_high: usize,
     u: OverlappedUnion,
@@ -235,14 +235,14 @@ extern "system" {
         dw_reserved: u32,
         n_number_of_bytes_to_lock_low: u32,
         n_number_of_bytes_to_lock_high: u32,
-        lp_overlapped: *mut OVERLAPPED,
+        lp_overlapped: *mut Overlapped,
     ) -> i32;
     fn UnlockFileEx(
         h_file: *mut std::ffi::c_void,
         dw_reserved: u32,
         n_number_of_bytes_to_unlock_low: u32,
         n_number_of_bytes_to_unlock_high: u32,
-        lp_overlapped: *mut OVERLAPPED,
+        lp_overlapped: *mut Overlapped,
     ) -> i32;
 }
 

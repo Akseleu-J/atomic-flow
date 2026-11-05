@@ -77,8 +77,14 @@ in this native acceptance or represented as a deployable release.
   the owned server was terminated/reaped. Binary SHA256 is recorded in
   `validation/production-20261105/http-smoke-result.json`.
 - Eight UI protocol/rendering tests passed; browser visual QA was not assessed.
-- Fresh remote Linux/Windows CI remains a separate gate. No success is inferred
-  from a queued run or the author-only history rewrite.
+- Exact-source native CI42027392401 on `dc89e2a` passed Linux 346 / Windows 343
+  Rust tests, 36 SDK tests and 8 UI protocol tests per platform, plus installed
+  HTTP/SDK smoke. Each platform retained one ignored real-Docker test. Both ZIP
+  digests were verified and all 115 recorded source hashes per platform matched
+  Git-object bytes. See `ci-dc89e2a/*.audit.json` for the retained audits.
+- Legacy/general workflow failures remain distinct; their repair is tracked in
+  [PRODUCTION_CI_REPAIR_2026-11-05.md](PRODUCTION_CI_REPAIR_2026-11-05.md).
+  No real isolation or behavioral/model quality follows from native CI.
 
 The owner's [Git policy](GIT_OWNER_POLICY_2026-11-05.md) now requires the existing
 `experimental` branch and owner identity. All Codex branches were removed and

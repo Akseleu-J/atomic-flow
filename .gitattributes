@@ -5,3 +5,5 @@ rust/** text eol=lf
 ts/af-client/** text eol=lf
 .github/workflows/studio.yml text eol=lf
 docs/PRODUCTION_STATUS_2026-11-04.json text eol=lf
+.github/workflows/rust.yml text eol=lf
+.github/workflows/surfaces.yml text eol=lf

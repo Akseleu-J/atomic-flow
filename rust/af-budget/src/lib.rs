@@ -421,28 +421,30 @@ impl Ledger {
             {
                 return Err(BudgetError("budget schema, owner or bounds changed"));
             }
-            if state.is_none() {
-                if row.sequence != 1 || !matches!(row.operation, Operation::Created) {
-                    return Err(BudgetError("missing budget creation"));
+            match state.as_mut() {
+                None => {
+                    if row.sequence != 1 || !matches!(row.operation, Operation::Created) {
+                        return Err(BudgetError("missing budget creation"));
+                    }
+                    state = Some(Snapshot {
+                        owner: row.owner,
+                        cap: row.cap,
+                        max_calls: row.max_calls,
+                        calls: BTreeMap::new(),
+                        sequence: 1,
+                        send_checkpoint: false,
+                    });
                 }
-                state = Some(Snapshot {
-                    owner: row.owner,
-                    cap: row.cap,
-                    max_calls: row.max_calls,
-                    calls: BTreeMap::new(),
-                    sequence: 1,
-                    send_checkpoint: false,
-                });
-            } else {
-                let saved = state.as_mut().unwrap();
-                if row.sequence != saved.sequence + 1
-                    || row.cap != saved.cap
-                    || row.max_calls != saved.max_calls
-                {
-                    return Err(BudgetError("budget sequence or immutable limits changed"));
+                Some(saved) => {
+                    if row.sequence != saved.sequence + 1
+                        || row.cap != saved.cap
+                        || row.max_calls != saved.max_calls
+                    {
+                        return Err(BudgetError("budget sequence or immutable limits changed"));
+                    }
+                    apply(saved, &row.operation)?;
+                    saved.sequence = row.sequence;
                 }
-                apply(saved, &row.operation)?;
-                saved.sequence = row.sequence;
             }
         }
         let mut state = state.ok_or(BudgetError("empty budget file"))?;

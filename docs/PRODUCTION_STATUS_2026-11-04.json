@@ -97,6 +97,35 @@
       "path": "docs/P00_P06_MARATHON_2026-10-25.md",
       "status": "scoped_code_acceptance_only",
       "review": "Retained source context; not re-executed here."
+    },
+    "native-studio-ci-20261105": {
+      "kind": "exact_source_native_ci_audited",
+      "tested_commit": "dc89e2af562a66c21c3d2c5ef7db640f0124b282",
+      "run_id": 42027392401,
+      "paths": [
+        "validation/production-20261105/ci-dc89e2a/linux.audit.json",
+        "validation/production-20261105/ci-dc89e2a/windows.audit.json"
+      ],
+      "linux": {
+        "pass": 346,
+        "ignored": 1,
+        "artifact_id": 13415030595,
+        "archive_sha256": "141a035a6cfd858a7e06cb77d00f125bd18753eec4730881abec9a9937e4f164"
+      },
+      "windows": {
+        "pass": 343,
+        "ignored": 1,
+        "artifact_id": 13414253586,
+        "archive_sha256": "d23bd7f7df850e14663331e4171c4f4f6da97f681bbdfb4ccae549b0a91d9b60"
+      },
+      "source_hashes_each": 115,
+      "sdk_tests_each": 36,
+      "ui_protocol_tests_each": 8,
+      "native_http_installed_sdk_smoke": "passed_each",
+      "provider_calls": 0,
+      "semantic_quality": "not_assessed",
+      "real_docker": "ignored_in_this_run",
+      "chapter_acceptance": false
     }
   },
   "chapters": [

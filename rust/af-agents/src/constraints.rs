@@ -35,7 +35,7 @@ fn goal_metadata(goal: &Value) -> Value {
     metadata
 }
 
-fn active_steps<'a>(steps: &'a [Value]) -> Vec<&'a Value> {
+fn active_steps(steps: &[Value]) -> Vec<&Value> {
     steps
         .iter()
         .filter(|step| {

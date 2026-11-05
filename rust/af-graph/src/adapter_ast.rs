@@ -100,7 +100,7 @@ pub fn adapt_file(path: &str, source: &[u8]) -> Value {
     json!({"nodes": nodes, "edges": edges})
 }
 
-fn parse_failure(file_node: &mut Value, message: &str, nodes: &mut Vec<Value>) -> Value {
+fn parse_failure(file_node: &mut Value, message: &str, nodes: &mut [Value]) -> Value {
     let facts = file_node["facts"]
         .as_object_mut()
         .expect("file facts object");
@@ -108,7 +108,7 @@ fn parse_failure(file_node: &mut Value, message: &str, nodes: &mut Vec<Value>) -
     facts.insert("parse_error".into(), json!(message));
     file_node["fact_status"] = json!(all_fresh(facts));
     nodes[0] = file_node.clone();
-    json!({"nodes": nodes.clone(), "edges": Value::Array(Vec::new())})
+    json!({"nodes": nodes.to_owned(), "edges": Value::Array(Vec::new())})
 }
 
 struct Collector {

@@ -26,6 +26,12 @@ pub struct PublicationBuilder {
     evidence: Option<String>,
 }
 
+impl Default for PublicationBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PublicationBuilder {
     pub fn new() -> PublicationBuilder {
         PublicationBuilder {

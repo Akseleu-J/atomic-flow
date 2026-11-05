@@ -356,7 +356,7 @@ fn valid_image(value: &str) -> bool {
     segments.split('/').all(|segment| {
         !segment.is_empty()
             && segment
-                .replace(|c: char| c == '.' || c == '_' || c == '-', "")
+                .replace(['.', '_', '-'], "")
                 .chars()
                 .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
     })

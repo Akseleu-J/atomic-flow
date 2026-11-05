@@ -704,7 +704,7 @@ fn sandbox_read(
     let page = session
         .read(&root_id, &path, offset, limit, false)
         .map_err(|e| e.0)?;
-    Ok(serde_json::to_string(&page).map_err(|e| e.to_string())?)
+    serde_json::to_string(&page).map_err(|e| e.to_string())
 }
 
 fn session_create(id: Option<String>, project: PathBuf) -> Result<String, String> {
@@ -732,7 +732,7 @@ fn session_append(
             None,
         )
         .map_err(|e| e.0)?;
-    Ok(serde_json::to_string(&event).map_err(|e| e.to_string())?)
+    serde_json::to_string(&event).map_err(|e| e.to_string())
 }
 
 fn session_read(id: String) -> Result<String, String> {
@@ -766,7 +766,7 @@ fn job_run(
     let runner = af_exec::JobRunner::open(&store).map_err(|e| e.0)?;
     let spec = af_exec::JobSpec::new(argv, cwd, timeout_secs).map_err(|e| e.0)?;
     let status = runner.run(&spec).map_err(|e| e.0)?;
-    Ok(serde_json::to_string(&status).map_err(|e| e.to_string())?)
+    serde_json::to_string(&status).map_err(|e| e.to_string())
 }
 
 fn job_status(store: PathBuf) -> Result<String, String> {
@@ -798,7 +798,7 @@ fn job_reconcile(
             &json!({"via": "af cli", "evidence": af_entropy::token64()}),
         )
         .map_err(|e| e.0)?;
-    Ok(serde_json::to_string(&reconciled).map_err(|e| e.to_string())?)
+    serde_json::to_string(&reconciled).map_err(|e| e.to_string())
 }
 
 fn backend_ping() -> Result<String, String> {

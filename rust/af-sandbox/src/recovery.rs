@@ -160,10 +160,12 @@ fn strict_json(bytes: &[u8]) -> SandboxResult<Value> {
     walk(bytes, &mut 0, 0)?;
     Ok(value)
 }
+type RecoveryFile = (String, Option<Vec<u8>>, Option<Vec<u8>>);
+
 struct Recovery {
     root: PathBuf,
     directory: PathBuf,
-    files: Vec<(String, Option<Vec<u8>>, Option<Vec<u8>>)>,
+    files: Vec<RecoveryFile>,
     report: Value,
 }
 impl SandboxRegistry {
@@ -245,7 +247,7 @@ impl SandboxRegistry {
         if entries.is_empty() || entries.len() > 32 {
             return Err(fail("intent file count refused"));
         }
-        let mut files: Vec<(String, Option<Vec<u8>>, Option<Vec<u8>>)> = Vec::new();
+        let mut files: Vec<RecoveryFile> = Vec::new();
         let mut seen = BTreeSet::new();
         let mut states = Vec::new();
         let mut total = 0;

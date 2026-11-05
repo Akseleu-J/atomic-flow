@@ -297,11 +297,11 @@ mod tests {
         assert_eq!(moves.len(), 1);
         assert_eq!(moves[0]["method"], json!("unique_content_relocation"));
         assert_eq!(
-            report["identity_mapping"][format!("file:old.py")],
+            report["identity_mapping"]["file:old.py"],
             json!("file:new.py")
         );
         assert_eq!(
-            report["identity_mapping"][format!("sym:old.py::run")],
+            report["identity_mapping"]["sym:old.py::run"],
             json!("sym:new.py::run")
         );
         assert!(report["ambiguous_moves"].as_array().unwrap().is_empty());

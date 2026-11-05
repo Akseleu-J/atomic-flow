@@ -404,7 +404,7 @@ impl SandboxRegistry {
         write_paths: &[String],
         approved: bool,
     ) -> SandboxResult<Value> {
-        if approved != true {
+        if !approved {
             return Err(SandboxError(
                 "root access needs explicit host approval".into(),
             ));
@@ -467,7 +467,7 @@ impl SandboxRegistry {
     }
 
     pub fn revoke(&self, root_id: &str, approved: bool) -> SandboxResult<Value> {
-        if approved != true {
+        if !approved {
             return Err(SandboxError(
                 "revocation needs explicit host approval".into(),
             ));

@@ -1042,7 +1042,7 @@ mod tests {
         result
     }
 
-    fn make_journal(home: &PathBuf, id: &str) -> SessionJournal {
+    fn make_journal(home: &std::path::Path, id: &str) -> SessionJournal {
         let project = home.join("proj");
         std::fs::create_dir_all(&project).unwrap();
         SessionJournal::create(&project, Some(id), None).unwrap()

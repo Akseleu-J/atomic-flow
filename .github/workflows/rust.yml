@@ -5,6 +5,9 @@ on:
     branches: [main, experimental]
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
   group: rust-${{ github.ref }}
   cancel-in-progress: true
@@ -22,29 +25,42 @@ jobs:
         os: [ubuntu-24.04, windows-2022]
     name: cargo test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
         with:
           profile: minimal
+      - name: Linux native folder-picker build dependency
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwayland-dev pkg-config
       - name: Record tested source
         shell: bash
         run: |
           mkdir -p validation/rust
           git rev-parse HEAD > validation/rust/commit.txt
+          rustc --version --verbose > validation/rust/rustc.txt
+          cargo --version > validation/rust/cargo.txt
+          python validation/production-20261104/capture_source.py validation/rust/source.json
       - name: cargo test (single job, no incremental; 3.4 GiB-host parity flags)
         shell: bash
         working-directory: rust
         env:
           CARGO_BUILD_JOBS: "1"
-        run: cargo test --workspace --locked 2>&1 | tee ../validation/rust/cargo-test-${{ matrix.os }}.log
+        run: |
+          set -o pipefail
+          cargo test --workspace --locked -- --test-threads=1 2>&1 | tee ../validation/rust/cargo-test-${{ matrix.os }}.log
       - name: cargo fmt/clippy gate
         shell: bash
         working-directory: rust
         if: matrix.os == 'ubuntu-24.04'
         run: |
           cargo fmt --all -- --check
-          cargo clippy --workspace --all-targets -- -D warnings
+          cargo clippy --workspace --all-targets --locked -j1 -- -D warnings
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

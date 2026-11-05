@@ -1,6 +1,22 @@
 # Atomic Flow Studio — working native surface and safety boundaries
 
-**Native acceptance current: CI41842587975 SUCCESS on7279e23 (both platforms).**
+**Latest native engineering checkpoint: CI42027392401 SUCCESS on dc89e2a.**
+Linux 346 PASS / 1 IGNORED; Windows 343 PASS / 1 IGNORED. Each platform passed
+36 SDK tests, the installed native HTTP/SDK lifecycle smoke, and 8 UI protocol
+checks. Both archives were downloaded and all 115 recorded source hashes per
+platform matched exact Git-object bytes. `provider_calls=0`. The ignored test
+remains real Docker acceptance; this checkpoint does not admit isolation,
+behavioral quality, corporate deployment or all production chapters.
+
+- Linux artifact 13415030595: SHA256 `141a035a6cfd858a7e06cb77d00f125bd18753eec4730881abec9a9937e4f164`.
+- Windows artifact 13414253586: SHA256 `d23bd7f7df850e14663331e4171c4f4f6da97f681bbdfb4ccae549b0a91d9b60`.
+- Exact audits/archives: `validation/production-20261105/ci-dc89e2a/`.
+- Separate legacy workflow failures and their repairs are recorded in
+  `docs/PRODUCTION_CI_REPAIR_2026-11-05.md`; native success does not hide them.
+
+## Previous native checkpoint
+
+**CI41842587975 SUCCESS on7279e23 (both platforms).**
 Linux292PASS/1IGNORED; Windows290PASS/1IGNORED. Each platform also passed the
 real native HTTP lifecycle smoke and8UI protocol/rendering tests. Both archives
 were downloaded and each of84source hashes matched exact Git blobs after LF

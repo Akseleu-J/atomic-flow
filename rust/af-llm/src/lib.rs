@@ -479,14 +479,11 @@ impl ChatBackend for OpenAiBackend {
                 ),
             };
         };
-        let agent = match ureq::AgentBuilder::new()
+        let agent = ureq::AgentBuilder::new()
             .timeout_connect(std::time::Duration::from_secs(15))
             .timeout_read(std::time::Duration::from_secs(15))
             .redirects(0)
-            .build()
-        {
-            agent => agent,
-        };
+            .build();
         let response = agent
             .post(&format!("{}/chat/completions", self.base_url))
             .set("Authorization", &format!("Bearer {api_key}"))
