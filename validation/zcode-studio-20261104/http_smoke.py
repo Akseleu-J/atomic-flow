@@ -137,8 +137,8 @@ def run():
             token = None
         report = {"status":"passed", "binary_sha256":hashlib.sha256(BINARY.read_bytes()).hexdigest(),
             "scenarios":results, "provider_calls":0, "transport":"native HTTP + scripted backend",
-            "owned_server_cleanup":process.poll() is not None, "browser_visual_qa":"blocked_by_computer_use_url_guard"}
-        (Path(__file__).parent / "http-smoke-result.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
+            "owned_server_cleanup":process.poll() is not None, "browser_visual_qa":"not_assessed"}
+        Path(os.environ.get("AF_HTTP_SMOKE_RESULT", str(Path(__file__).parent / "http-smoke-result.json"))).write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
         print(json.dumps(report, indent=2))
 
 

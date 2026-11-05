@@ -3,3 +3,5 @@ validation/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 benchmarks/pilot/** -text
 rust/** text eol=lf
 ts/af-client/** text eol=lf
+.github/workflows/studio.yml text eol=lf
+docs/PRODUCTION_STATUS_2026-11-04.json text eol=lf

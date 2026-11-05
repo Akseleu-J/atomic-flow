@@ -1,0 +1,2 @@
+   Compiling af-cli v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 51.95s

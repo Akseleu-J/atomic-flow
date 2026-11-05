@@ -65,7 +65,26 @@ in this native acceptance or represented as a deployable release.
 - Initial eight freshness test failures exposed noncanonical Windows path identity;
   canonicalization fixed the implementation, without weakening its checks. The
   failed and successful logs are preserved in `validation/production-20261105/`.
-- Combined workspace, installed native HTTP/SDK smoke and remote CI: pending.
+- Combined local workspace: **343 passed, 0 failed, 1 ignored**. The ignored
+  test is real Docker acceptance, not a passed isolation gate.
+- Clean/delta parity: both paths now use independent stores at matching generation
+  and compare complete canonical exports. The initial relink-count expectation
+  omitted the changed file; the next comparison exposed raw adapter traversal
+  order versus store ID order. Neither failure justified omitting graph fields.
+  Both final parity cases pass, including unchanged bytes on stale-generation
+  rejection. Initial failed workspace log and final results are retained.
+- Native CLI build and installed-copy HTTP/SDK smoke: passed all six scenarios;
+  the owned server was terminated/reaped. Binary SHA256 is recorded in
+  `validation/production-20261105/http-smoke-result.json`.
+- Eight UI protocol/rendering tests passed; browser visual QA was not assessed.
+- Fresh remote Linux/Windows CI remains a separate gate. No success is inferred
+  from a queued run or the author-only history rewrite.
+
+The owner's [Git policy](GIT_OWNER_POLICY_2026-11-05.md) now requires the existing
+`experimental` branch and owner identity. All Codex branches were removed and
+historical Codex identities rewritten with identical trees/messages/dates. The
+old `6a3262e` candidate maps to `41a569a`; those historical SHA labels are not
+new runtime acceptance. Future work must not create replacement Codex branches.
 
 The [24-chapter registry](PRODUCTION_STATUS_2026-11-04.md) remains `not_ready`.
 Next gates: independent behavioral checker adapter and reviewed apply, actual

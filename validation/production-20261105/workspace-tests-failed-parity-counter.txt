@@ -1,0 +1,293 @@
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+   Compiling af-llm v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-llm)
+   Compiling af-exec v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-exec)
+   Compiling af-evidence v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-evidence)
+   Compiling af-loop v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-loop)
+   Compiling af-agent v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-agent)
+   Compiling af-program v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-program)
+   Compiling af-memory v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-memory)
+   Compiling af-cli v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-cli)
+   Compiling af-graph v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-graph)
+   Compiling af-context v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-context)
+   Compiling af-journal v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-journal)
+   Compiling af-budget v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-budget)
+   Compiling af-agents v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-agents)
+   Compiling af-entropy v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-entropy)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6m 15s
+     Running unittests src\lib.rs (target\debug\deps\af_agent-7ee30488f9297955.exe)
+
+running 13 tests
+test swarm::tests::aggregation_holds_pending_and_unknown_costs ... ok
+test swarm::tests::execute_sweep_claims_resolves_and_aggregates ... ok
+test swarm::tests::fully_resolved_sweep_is_complete ... ok
+test swarm::tests::sweep_admits_bounded_items_through_the_fenced_queue ... ok
+test swarm::tests::unknown_outcome_reclaims_as_new_claim_under_new_epoch ... ok
+test tests::broken_python_is_refused_at_preview_not_applied ... ok
+test tests::full_journey_records_local_integrity_without_claiming_requirement_success ... ok
+test tests::identical_replacement_refuses ... ok
+test tests::invalid_rust_syntax_is_refused_before_publication ... ok
+test tests::journal_failure_before_apply_preserves_original_source ... ok
+test tests::journey_without_replacement_refuses ... ok
+test tests::typescript_bytes_can_be_applied_without_claiming_python_or_requirement_verification ... ok
+test tests::zero_edit_budget_refuses ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.66s
+
+     Running unittests src\lib.rs (target\debug\deps\af_agents-b0178b26632a688d.exe)
+
+running 38 tests
+test check_spec::tests::canonical_digest_is_stable_and_field_order_independent ... ok
+test check_spec::tests::image_requires_digest_and_lowercase ... ok
+test check_spec::tests::private_pytest_identity_binds_task_runtime_and_paths ... ok
+test check_spec::tests::private_runtime_binding_is_exact ... ok
+test check_spec::tests::pytest_self_runner_and_profile ... ok
+test check_spec::tests::sympy_native_binds_to_sympy_paths_and_identity ... ok
+test check_spec::tests::test_paths_are_confined_and_unique ... ok
+test check_spec::tests::unreviewed_runners_interpreters_and_roots_refuse ... ok
+test check_spec::tests::valid_spec_and_exact_argv ... ok
+test constraints::tests::changed_metadata_or_new_identity_refuses ... ok
+test constraints::tests::exact_goal_identity_rebinds_lineage ... ok
+test constraints::tests::flat_replacement_needs_unambiguous_parent ... ok
+test constraints::tests::lost_linked_obligations_refuse ... ok
+test constraints::tests::scope_widening_refuses ... ok
+test failure_evidence::tests::deterministic_failures_classify_to_bounded_repair ... ok
+test failure_evidence::tests::mismatches_and_other_kinds_stop ... ok
+test failure_evidence::tests::v1_and_v2_shapes_validate ... ok
+test failure_evidence::tests::v2_requires_completed_and_matching_revisions ... ok
+test repair::tests::attribution_and_settlement_are_enforced ... ok
+test repair::tests::begin_repair_never_refreshes_existing_episode ... ok
+test repair::tests::moved_backwards_accounting_and_unknown_prices_refuse ... ok
+test repair::tests::spend_up_to_cap_passes_then_refuses ... ok
+test repair::tests::validation_is_strict ... ok
+test task_dag::tests::cycles_and_unknown_dependencies_are_refused ... ok
+test task_dag::tests::failure_blocks_descendants_until_invalidation ... ok
+test task_dag::tests::frontier_and_lifecycle ... ok
+test task_dag::tests::invalidation_requires_terminal_state ... ok
+test task_dag::tests::step_limit_enforced ... ok
+test tests::budget_cap_stops_replan ... ok
+test tests::dropping_obligations_is_refused ... ok
+test tests::empty_replan_refused ... ok
+test tests::envelope_validation_is_strict ... ok
+test tests::failure_signature_first_line_bounded ... ok
+test tests::legacy_approval_fails_closed ... ok
+test tests::no_progress_guard_requires_review ... ok
+test tests::tool_widening_is_refused ... ok
+test tests::valid_in_envelope_repair_is_preserved ... ok
+test tests::verify_weakening_is_refused ... ok
+
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src\lib.rs (target\debug\deps\af_budget-f2c4dad16c03d8bc.exe)
+
+running 8 tests
+test tests::after_send_crash_is_durable_and_never_replayed_or_released ... ok
+test tests::cooperating_owners_of_same_ledger_cannot_oversubscribe_stale_state ... ok
+test tests::currency_input_refuses_floats_and_storage_has_no_prompt_or_credentials_schema ... ok
+test tests::exact_cap_checked_integer_money_and_owner_are_enforced ... ok
+test tests::known_actual_over_estimate_is_retained_and_cap_overrun_holds ... ok
+test tests::partial_line_and_unknown_fields_block_reopen_without_truncation ... ok
+test tests::settlement_exact_identity_and_pre_send_release_do_not_refresh_call_cap ... ok
+test tests::uncertain_terminal_append_cannot_remove_the_send_checkpoint ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+
+     Running unittests src\main.rs (target\debug\deps\af-8f0cbaddbb22174a.exe)
+
+running 24 tests
+test server::evidence_adapter_tests::delivered_context_is_bound_without_inventing_requirement_success ... ok
+test server::http_safety::tests::authenticated_remote_ip_still_requires_its_exact_origin_and_port ... ok
+test server::http_safety::tests::only_exact_local_authority_and_same_origin_are_admitted ... ok
+test server::studio_data::tests::credential_hidden_and_generated_paths_are_not_browser_sources ... ok
+test server::studio_data::tests::history_pages_are_bounded_and_do_not_make_replay_authority ... ok
+test server::tests::bind_policy_requires_token_off_loopback ... ok
+test server::tests::body_and_prompt_limits_refuse_before_backend_work ... ok
+test server::tests::browser_cannot_choose_credential_env_or_provider_destination ... ok
+test server::tests::browser_cannot_forge_kernel_terminal_history ... ok
+test server::tests::budget_gates_the_stream_and_settles_by_outcome ... ok
+test server::tests::dashboard_is_served ... ok
+test server::tests::disconnected_stream_cancels_the_actual_worker_and_releases_capacity ... ok
+test server::tests::graph_and_job_queries_never_grant_arbitrary_host_paths ... ok
+test server::tests::health_is_open_loopback_style_without_token ... ok
+test server::tests::hostile_origin_is_denied_even_with_an_operator_bearer ... ok
+test server::tests::oversized_terminal_content_is_never_reported_as_a_complete_answer ... ok
+test server::tests::session_endpoints_roundtrip ... ok
+test server::tests::settled_chat_is_durable_and_an_existing_unknown_is_never_replayed ... ok
+test server::tests::sse_stream_via_scripted_backend ... ok
+test server::tests::static_authentication_ui_has_nonce_csp_but_api_remains_private ... ok
+test server::tests::token_is_enforced_with_constant_time_path ... ok
+test trusted_provider::tests::cancelled_and_wrong_model_calls_never_create_a_send ... ok
+test trusted_provider::tests::host_configuration_rejects_credential_urls_and_plaintext_remote_transport ... ok
+test trusted_provider::tests::provider_send_is_durably_settled_and_missing_cost_latches_hold ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.41s
+
+     Running unittests src\lib.rs (target\debug\deps\af_context-b28713fd66037337.exe)
+
+running 7 tests
+test tests::bound_pack_keeps_root_revision_and_refuses_stale_hashes ... ok
+test tests::context_pack_respects_byte_budget_with_reasons ... ok
+test tests::identifiers_split_and_stem ... ok
+test tests::no_match_is_weak_and_explicit ... ok
+test tests::pagerank_ranks_referenced_files ... ok
+test tests::ranking_prefers_symbol_and_penalizes_tests ... ok
+test tests::spreading_lifts_connected_neighbors ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src\lib.rs (target\debug\deps\af_entropy-9504062e38757080.exe)
+
+running 2 tests
+test tests::lease_is_exclusive_and_reusable ... ok
+test tests::tokens_are_random_and_hex ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\af_evidence-eb2f18a2b23ac41f.exe)
+
+running 13 tests
+test tests::confused_checker_scope_outputs_do_not_mint_receipts ... ok
+test tests::duplicate_omission_claim_and_requirement_ids_are_rejected ... ok
+test tests::empty_is_not_assessed_never_perfect ... ok
+test tests::exact_quote_checks_delivery_and_fresh_source ... ok
+test tests::forged_passed_wire_is_data_only_and_cannot_complete ... ok
+test tests::frozen_vectors_match_exporter_and_validator ... ok
+test tests::integer_bounds_and_overflow_are_rejected ... ok
+test tests::known_names_wrong_logic_and_irrelevant_quotes_have_no_entailment ... ok
+test tests::malformed_wire_rejected_directly_not_via_value ... ok
+test tests::mixed_completion_snapshots_and_tasks_fail_closed ... ok
+test tests::no_adapter_zero_checks_syntax_model_or_generic_exit_cannot_complete ... ok
+test tests::omissions_cannot_be_hidden_as_complete_delivery ... ok
+test tests::receipts_are_current_requirement_runtime_and_inventory_bound ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\af_exec-f2dddd1e5604ce8c.exe)
+
+running 46 tests
+test docker::tests::fixed_profile_refuses_each_missing_control_and_host_mount ... ok
+test docker::tests::mutable_docker_tag_is_refused_before_any_effect ... ok
+test driver::tests::docker_argv_carries_the_control_matrix ... ok
+test driver::tests::firecracker_is_unavailable_off_linux ... ok
+test driver::tests::gvisor_and_firecracker_build_their_runtimes ... ok
+test driver::tests::local_trusted_is_named_honestly ... ok
+test driver::tests::real_docker_acceptance_through_run_with_driver ... ignored, requires a Linux host with docker; run in CI via --ignored
+test driver::tests::selection_prefers_the_strongest_available_boundary ... ok
+test durable_queue::tests::checked_counters_refuse_overflow_without_mutating_state ... ok
+test durable_queue::tests::concurrent_identical_submissions_both_return_the_original ... ok
+test durable_queue::tests::conflicting_submissions_leave_original_bytes_unchanged ... ok
+test durable_queue::tests::cooperating_writers_cannot_oversubscribe_the_same_entry ... ok
+test durable_queue::tests::corrupt_schema_rows_are_refused_without_rewriting_evidence ... ok
+test durable_queue::tests::duplicate_idempotency_key_and_entry_never_create_a_second_entry ... ok
+test durable_queue::tests::extra_fields_in_operations_are_refused ... ok
+test durable_queue::tests::fence_must_advance_by_exactly_one ... ok
+test durable_queue::tests::lifecycle_and_priority_ordering ... ok
+test durable_queue::tests::malformed_priority_and_epoch_are_refused_before_append ... ok
+test durable_queue::tests::replay_rejects_forged_terminal_owner ... ok
+test durable_queue::tests::reservation_worker_and_epoch_survive_reopen_and_reject_forgery ... ok
+test durable_queue::tests::strict_json_allows_independent_keys_and_escaped_string_content ... ok
+test durable_queue::tests::torn_tail_blocks_reopen_without_truncation ... ok
+test durable_queue::tests::total_byte_limit_refuses_append_without_stranding_the_ledger ... ok
+test durable_queue::tests::wrong_state_transitions_are_refused ... ok
+test git::tests::auto_commit_stages_exact_paths_and_never_add_dot ... ok
+test git::tests::branch_per_task_creates_then_reuses ... ok
+test git::tests::commit_message_is_evidence_first ... ok
+test git::tests::failing_git_is_an_error_with_stderr ... ok
+test git::tests::publish_requires_exported_credential_and_never_inlines_it ... ok
+test git::tests::real_runner_refuses_implicit_credentials_without_spawning_git ... ok
+test process::tests::failed_spawn_checkpoint_stops_the_owned_tree ... ok
+test process::tests::inherited_provider_environment_never_reaches_child ... ok
+test process::tests::output_overflow_is_bounded_and_stops_owned_processes ... ok
+test process::tests::parent_exit_does_not_leave_a_descendant_running ... ok
+test queue::tests::backpressure_refuses_at_capacity ... ok
+test queue::tests::cancel_works_only_before_claim ... ok
+test queue::tests::double_claim_is_impossible ... ok
+test queue::tests::fifo_claims_in_submission_order ... ok
+test queue::tests::stale_fences_cannot_resolve_after_epoch_bump ... ok
+test tests::alive_running_job_holds_admission_without_guessing_completion ... ok
+test tests::dead_running_job_becomes_unknown_and_latches_the_runner ... ok
+test tests::duplicate_and_malformed_jobs_refused ... ok
+test tests::failing_exit_is_witnessed_failure_not_unknown ... ok
+test tests::spawn_failure_is_recorded_failed ... ok
+test tests::successful_job_reaches_succeeded ... ok
+test tests::timeout_kill_is_a_witnessed_failure ... ok
+
+test result: ok. 45 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 20.94s
+
+     Running unittests src\lib.rs (target\debug\deps\af_graph-ce85ccbf265123d7.exe)
+
+running 49 tests
+test adapter_ast::tests::async_and_nested_defs ... ok
+test adapter_ast::tests::duplicate_names_get_disambiguator ... ok
+test adapter_ast::tests::extracts_symbols_lines_and_contains_edges ... ok
+test adapter_ast::tests::facts_collect_sorted_deduped_imports_and_calls ... ok
+test adapter_ast::tests::syntax_error_is_reported_not_raised ... ok
+test adapter_resource::tests::classification_is_path_based ... ok
+test adapter_resource::tests::json_parse_ok_is_a_fact_not_an_error ... ok
+test adapter_resource::tests::nul_bytes_and_oversize_refused ... ok
+test adapter_resource::tests::python_dispatches_to_ast_and_unknown_refused ... ok
+test adapter_resource::tests::resource_emits_file_and_kind_symbol ... ok
+test adapter_rust::tests::extracts_syntax_without_claiming_macro_or_type_resolution ... ok
+test adapter_rust::tests::invalid_source_retains_hash_and_explicit_failure ... ok
+test canonical::tests::matches_python_json_dumps_shape ... ok
+test canonical::tests::unicode_stays_raw_and_control_escaped ... ok
+test delta::tests::body_edit_deltas_to_equal_clean_build ... ok
+test delta::tests::content_cas_refuses_stale_digest ... ok
+test delta::tests::delete_and_readd_updates_unresolved_consumer ... ok
+test delta::tests::generation_binding_rejects_moved_store ... ok
+test identity::tests::components_are_validated ... ok
+test identity::tests::namespace_is_stable_and_field_order_independent ... ok
+test identity::tests::read_context_requires_identity_and_grant ... ok
+test project::tests::clean_build_resolves_import_and_unique_call ... ok
+test project::tests::reverse_index_names_mentioning_files ... ok
+test project::tests::rust_collection_keeps_nested_platform_paths_and_explicit_language_scope ... ok
+test relocation::tests::ambiguous_identity_is_reported_never_merged ... ok
+test relocation::tests::owned_move_hints_compose_observed_moves_only ... ok
+test relocation::tests::provided_hint_must_match_identities ... ok
+test relocation::tests::unique_content_relocation_maps_file_and_symbols ... ok
+test resolve::tests::call_requires_imported_leaf_name ... ok
+test resolve::tests::packages_map_to_init ... ok
+test resolve::tests::self_import_and_unresolvable_are_reported_not_guessed ... ok
+test resolve::tests::unique_export_binds_call_ambiguity_reported ... ok
+test schema::tests::edge_validation_rejects_self_and_foreign_id ... ok
+test schema::tests::file_node_validates_and_rejects_bad_kind ... ok
+test schema::tests::ids_derive_from_identity ... ok
+test schema::tests::symbol_node_requires_derived_id_and_lines ... ok
+test schema::tests::unknown_fact_status_and_class_are_refused ... ok
+test semantic::tests::annotate_touches_file_nodes_only ... ok
+test semantic::tests::entry_points_from_paths_and_main_calls ... ok
+test semantic::tests::file_summary_is_deterministic_facts ... ok
+test semantic::tests::layers_follow_path_rules ... ok
+test source_analysis::tests::binds_bytes_and_revision_with_no_verification_upgrade ... ok
+test source_analysis::tests::no_platform_path_reinterpretation ... ok
+test store::tests::canonical_export_is_stable ... ok
+test store::tests::commit_advances_generation_and_persists ... ok
+test store::tests::concurrent_writer_hits_conflict_not_corruption ... ok
+test store::tests::dangling_active_edge_refused ... ok
+test store::tests::dropping_node_drops_its_edges ... ok
+test store::tests::stale_base_generation_is_refused ... ok
+
+test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.82s
+
+     Running tests\delta_parity.rs (target\debug\deps\delta_parity-f9fd7e1f386c4807.exe)
+
+running 2 tests
+test delete_delta_matches_a_clean_rebuild_without_the_file ... ok
+test one_file_delta_matches_a_clean_rebuild_byte_for_byte ... FAILED
+
+failures:
+
+---- one_file_delta_matches_a_clean_rebuild_byte_for_byte stdout ----
+
+thread 'one_file_delta_matches_a_clean_rebuild_byte_for_byte' (14936) panicked at af-graph\tests\delta_parity.rs:68:5:
+assertion `left == right` failed: b.py must relink
+  left: Number(2)
+ right: Number(1)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    one_file_delta_matches_a_clean_rebuild_byte_for_byte
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+error: test failed, to rerun pass `-p af-graph --test delta_parity`
