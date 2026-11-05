@@ -28,7 +28,11 @@ def run():
         (project / "src/refund.rs").write_bytes(raw)
         token = secrets.token_hex(24)
         env = {k: os.environ[k] for k in ("PATH", "SYSTEMROOT", "USERPROFILE", "TEMP", "TMP") if k in os.environ}
-        env.update(ATOMIC_FLOW_HOME=str(state), STUDIO_TEST_TOKEN=token)
+        env.update(ATOMIC_FLOW_HOME=str(state), STUDIO_TEST_TOKEN=token, AF_SMOKE_DUMMY_KEY="fixture")
+        (state / "providers.json").write_text(json.dumps({"schema_version": 1, "providers": [{
+            "id": "fixture", "label": "Host fixture", "base_url": BASE,
+            "api_key_env": "AF_SMOKE_DUMMY_KEY", "models": ["fixture"], "reservation_usd": "0.5",
+        }]}), encoding="utf-8")
         log = open(directory / "server.txt", "wb")
         process = subprocess.Popen([str(BINARY), "serve", "--bind", "127.0.0.1:18789", "--token-env", "STUDIO_TEST_TOKEN"],
             cwd=project, env=env, stdout=log, stderr=log, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
@@ -87,6 +91,13 @@ def run():
             request("/v1/roots/pilot/file?path=..%2Foutside.rs", expected=400)
             results.append("registered Rust project graph and hash-bound source preview")
             session = json.loads(request("/v1/sessions", {"id":"pilot-session","root_id":"pilot"})[0])["session_id"]
+            budget_probe = {"prompt": "refund policy", "session_id": session, "root_id": "pilot",
+                "backend": {"provider_id": "scripted", "model": "scripted"}}
+            history_path = f"/v1/sessions/{session}/history?after=0&limit=100"
+            before_budget = json.loads(request(history_path)[0])
+            request("/v1/chat/stream", {**budget_probe, "reserve_usd": "0.1"}, expected=409)
+            request("/v1/chat/stream", {**budget_probe, "reserve_usd": "invalid"}, expected=400)
+            assert json.loads(request(history_path)[0]) == before_budget
             stream, _ = request("/v1/chat/stream", {"prompt":"refund policy", "session_id":session, "root_id":"pilot",
                 "backend":{"provider_id":"scripted","model":"scripted"}})
             events = [json.loads(line[5:].strip()) for line in stream.decode().splitlines() if line.startswith("data:")]
@@ -112,6 +123,20 @@ def run():
             budget = json.loads(request("/v1/budget")[0])
             assert budget["cap_usd"] == "1.5" and budget["enforced"] and budget["available_usd"] == "1.5"
             results.append("immutable journal snapshot exact SHA256 and durable budget projection")
+            before_ceiling = json.loads(request(history_path)[0])
+            request("/v1/chat/stream", {**budget_probe, "reserve_usd": "0.4",
+                "backend": {"provider_id": "fixture", "model": "fixture"}}, expected=403)
+            assert json.loads(request(history_path)[0]) == before_ceiling
+            assert json.loads(request("/v1/budget")[0]) == budget
+            denied, _ = request("/v1/chat/stream", {**budget_probe, "reserve_usd": "2"})
+            refused = [json.loads(line[5:].strip()) for line in denied.decode().splitlines() if line.startswith("data:")]
+            assert len(refused) == 1 and refused[0]["sent"] is False and refused[0]["unknown"] is False
+            after_refusal = json.loads(request(history_path)[0])
+            assert after_refusal["effect_admission_clear"] and not after_refusal["pending_call_ids"]
+            assert after_refusal["events"][-1]["outcome"] == "not_sent"
+            resumed, _ = request("/v1/chat/stream", budget_probe)
+            assert any(json.loads(line[5:].strip())["type"] == "final" for line in resumed.decode().splitlines() if line.startswith("data:"))
+            results.append("budget refusal records not_sent and permits a fresh request")
             # A separate consumer resolves only an installed dist/package copy.
             package = directory / "consumer/node_modules/@atomic-flow/af-client"
             package.mkdir(parents=True)

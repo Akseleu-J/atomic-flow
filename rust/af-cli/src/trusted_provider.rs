@@ -128,6 +128,7 @@ pub fn select(
     base_url: &str,
     browser_env: &str,
     model: &str,
+    reservation_ceiling: Option<af_budget::Money>,
 ) -> Result<Box<dyn ChatBackend>, String> {
     if (id == Some("scripted") || id.is_none() && base_url == "scripted://local")
         && browser_env.is_empty()
@@ -152,6 +153,9 @@ pub fn select(
     }
     let amount = af_budget::Money::from_usd_str(&provider.reservation_usd)
         .map_err(|_| "invalid host reservation")?;
+    if reservation_ceiling.is_some_and(|ceiling| amount.0 > ceiling.0) {
+        return Err("host reservation exceeds the request ceiling".into());
+    }
     let path = ledger_path();
     let state = af_budget::Ledger::open(&path, OWNER)
         .and_then(|l| l.snapshot())

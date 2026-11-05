@@ -112,3 +112,19 @@ an incomplete Git effect after a successful checker fixture.
 The HTTP route still has no independent checker adapter or Git publisher.
 Production TaskRunner cutover and its mixed-language behavioral evidence remain
 open. The local Git operation assumes a trusted, cooperating checkout.
+
+
+## Studio budget refusal and session continuity
+
+Studio validates the optional reservation amount and ledger before creating a
+model effect checkpoint. A refused test reservation closes an existing checkpoint
+as `not_sent`. A failure to persist that terminal record retains the hold.
+The native HTTP regression covers missing budget, malformed amount, cap refusal
+and a fresh request in the same session after refusal.
+
+Configured providers own their single reservation. The dashboard field sets an
+optional ceiling on that host-configured amount. The scripted path uses the
+field as a test reservation. The ceiling constrains the reservation estimate.
+
+All five push workflows passed on the preceding publication-boundary commit
+`2228f6b`. The budget change requires its own CI run.

@@ -825,8 +825,19 @@ fn spawn_chat_stream(
             .unwrap_or_else(|| "serve".to_string());
         if let Some((ledger, amount)) = budget.as_mut() {
             if let Err(error) = ledger.reserve(&call_id, &task_id, *amount) {
-                let _ = tx.blocking_send(json!({"type": "error", "unknown": false,
-                    "error": format!("budget reserve refused; nothing was sent ({})", error.0)}));
+                let recorded = journal.as_mut().is_none_or(|journal| {
+                    journal
+                        .finish_effect(
+                            "model_failed",
+                            &call_id,
+                            &json!({"sent":false,"phase":"budget_reserve"}),
+                            "not_sent",
+                        )
+                        .is_ok()
+                });
+                let _ = tx.blocking_send(json!({"type": "error", "sent":false, "unknown": !recorded,
+                    "error": if recorded { format!("budget reserve refused; nothing was sent ({})", error.0) }
+                        else { "request was not sent; inspect the unresolved journal checkpoint".into() }}));
                 return;
             }
             if let Err(error) = ledger.begin_send(&call_id, &task_id) {
@@ -951,11 +962,19 @@ fn backend_from_config(config: &BackendConfig) -> Result<Box<dyn af_llm::ChatBac
     // A browser cannot choose a host environment variable and an exfiltration
     // URL. Real providers require a separately admitted host configuration and
     // the durable budget gate. The local scripted path sends nothing externally.
+    select_backend(config, None)
+}
+
+fn select_backend(
+    config: &BackendConfig,
+    reservation_ceiling: Option<af_budget::Money>,
+) -> Result<Box<dyn af_llm::ChatBackend>, StatusCode> {
     crate::trusted_provider::select(
         config.provider_id.as_deref(),
         &config.base_url,
         &config.api_key_env,
         &config.model,
+        reservation_ceiling,
     )
     .map_err(|_| StatusCode::FORBIDDEN)
 }
@@ -1026,7 +1045,29 @@ async fn chat_stream_sse(
     {
         return Err(StatusCode::BAD_REQUEST);
     }
-    let backend = backend_from_config(&body.backend)?;
+    let reservation = body
+        .reserve_usd
+        .as_deref()
+        .map(af_budget::Money::from_usd_str)
+        .transpose()
+        .map_err(|_| StatusCode::BAD_REQUEST)?;
+    let scripted = body.backend.provider_id.as_deref() == Some("scripted")
+        || body.backend.provider_id.is_none() && body.backend.base_url == "scripted://local";
+    // Host-configured providers reserve the call themselves. The request
+    // amount bounds their configured reservation rather than reserving twice.
+    let backend = select_backend(&body.backend, if scripted { None } else { reservation })?;
+    let budget = if let Some(amount) = reservation.filter(|_| scripted) {
+        let path = budget_ledger_path();
+        if !path.is_file() {
+            return Err(StatusCode::CONFLICT);
+        }
+        Some((
+            af_budget::Ledger::open(&path, BUDGET_OWNER).map_err(|_| StatusCode::CONFLICT)?,
+            amount,
+        ))
+    } else {
+        None
+    };
     let (augmented_prompt, sources) =
         studio_data::context_for(body.root_id.as_deref(), &body.prompt)
             .map_err(|_| StatusCode::BAD_REQUEST)?;
@@ -1056,24 +1097,6 @@ async fn chat_stream_sse(
         Some(journal)
     } else {
         None
-    };
-    // Operator-requested budget enforcement: the ledger must already exist
-    // (Settings → Бюджет). A missing ledger is a conflict, not a silent
-    // unaccounted send.
-    let budget = match body.reserve_usd.as_deref() {
-        Some(amount_text) => {
-            let ledger_path = budget_ledger_path();
-            if !ledger_path.exists() {
-                return Err(StatusCode::CONFLICT);
-            }
-            let amount =
-                af_budget::Money::from_usd_str(amount_text).map_err(|_| StatusCode::BAD_REQUEST)?;
-            match af_budget::Ledger::open(&ledger_path, BUDGET_OWNER) {
-                Ok(ledger) => Some((ledger, amount)),
-                Err(_) => return Err(StatusCode::CONFLICT),
-            }
-        }
-        None => None,
     };
     let (rx, cancel) = spawn_chat_stream(
         backend,
