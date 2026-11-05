@@ -1,0 +1,20 @@
+{
+  "id": 13415614525,
+  "node_id": "MDg6QXJ0aWZhY3QxMzQxNTYxNDUyNQ==",
+  "name": "docker-driver-aa575ddf91cbc34e2ad12f8b65d9d517faa5bec8",
+  "size_in_bytes": 16185,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/13415614525",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/13415614525/zip",
+  "expired": false,
+  "digest": "sha256:fef14a17ce47f6df4b9008cd72449e527c2f378427dbd57e263c4bdc78902d13",
+  "created_at": "2026-11-05T13:00:11Z",
+  "updated_at": "2026-11-05T13:00:11Z",
+  "expires_at": "2027-02-03T12:59:49Z",
+  "workflow_run": {
+    "id": 42031833362,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "aa575ddf91cbc34e2ad12f8b65d9d517faa5bec8"
+  }
+}

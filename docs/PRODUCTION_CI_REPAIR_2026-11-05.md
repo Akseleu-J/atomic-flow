@@ -77,8 +77,21 @@ six known historical changes, not a holdout or twelve independent tasks.
   `cargo fmt --check` and the fresh workspace suite passed **343 tests / 0 failed /
   1 ignored real-Docker test**. The mechanical/check history is retained under
   `validation/production-ci-20261105/`.
-- Repaired remote workflows and actual Docker receipt acceptance: pending.
-  Failed attempts are preserved, not renamed PASS.
+- All five push workflows succeeded on `aa575ddf91cbc34e2ad12f8b65d9d517faa5bec8`.
+  Runs 42031833371 (Rust), 42031833362 (Surfaces), 42031833346 (Project and
+  container), 42031833476 (interoperability), and 42031839997 (Studio).
+- Downloaded four archives and verified their SHA256 against GitHub metadata.
+  Both Studio archives and the native Docker archive each matched 124 recorded
+  source files against Git objects. Studio passed 346 Linux and 343 Windows Rust
+  tests, 36 SDK and 8 UI protocol tests per OS, plus HTTP smoke and server cleanup.
+- The separate native Docker test executed once using the provisioned image ID.
+  Its receipt and host observation confirmed the network-disabled, read-only
+  boundary, live target and container removal. Firecracker was unassessed.
+- Docker calibration recorded six base failures and six gold passes with zero
+  model calls. Manifest and grader hashes match the tested commit. These cases
+  measure historical grader calibration only.
+- Archive metadata, receipts and audit are retained in
+  `validation/production-ci-20261105/ci-aa575dd/`.
 
 P00–P14/E00–E08 full chapter statuses remain open as recorded in the
 [production registry](PRODUCTION_STATUS_2026-11-04.md).
