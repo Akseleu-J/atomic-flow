@@ -26,3 +26,13 @@ Package 16 (docs/IMPLEMENTATION_STEP_16.md) adds read-only worker context/tool i
 Package 17 excludes credential-shaped execution inputs, runs model checks in private snapshots, redacts decoded outputs/artifacts, imports installed quality checkers with isolated bootstrap, and rejects zero-test pytest success. Unknown tool effects latch host state and stop model follow-ups/task replan/publication; minimal safety observations persist even when normal artifacts are off. Do not clear uncertainty from model text or plan approval. Workflows retain completed effects separately; scheduler replans failed work after independent steps drain. Evaluation accepts only finite calibrated fixture answer forms automatically; other wording needs independent review. Evaluation attempt sidecars persist before/after provider calls, failed parsing retains usage, and unknown usage is never a known-zero total. Never overwrite historical pilot/repro evidence or claim this finite grader is general semantic verification. G01/G02/G03 remain open.
 
 24 October import review: see docs/IMPORT_REVIEW_2026-10-24.md and docs/IMPORT_RUNTIME_REVIEW.md, IMPORT_EXECUTION_REVIEW.md, IMPORT_ROUTING_REVIEW.md. Selected external packages 18–21 from c8820ff were imported, corrected and committed in 5be5d81 and subsequent fixes; consult current PROJECT_CONTEXT and docs/PRODUCTION_PLAN.md for latest acceptance evidence. Do not reuse the external 850-pass claim for corrected sources. Source locks protect cooperating writers, not arbitrary external editors; Job Objects prove owned process lifetime, not filesystem/network isolation. Host reconciliation preserves original call/day identity and remains unknown until artifacts settle. A routed physical attempt may send once; unknown outcomes do not authorize fallback. free_only rejects nonzero/unknown actual cost while retaining accounting. Preserve import failure/recheck evidence and distinguish installed-wheel source isolation with reused dependencies from clean dependency/remote CI acceptance. Do not run full local suites without a new reason.
+
+
+## Owner Git policy — 5 November 2026
+
+Continue all work on the existing `experimental` branch used by Zcode. Do not
+create `codex` branches or use Codex/OpenAI author or committer identities.
+Use `Omirbay Akseleu <omirbajakseleu5@gmail.com>` for new commits and the owner's
+process-only GitHub token from the project access protocol. Never persist or
+print credentials. Historical source SHA references remain provenance records;
+author-only history rewrites have a private old-to-new commit map and bundle.

@@ -2,7 +2,7 @@ name: Studio native HTTP and safety acceptance
 on:
   workflow_dispatch:
   push:
-    branches: ['codex/studio-*']
+    branches: ['experimental']
 permissions:
   contents: read
 concurrency:
