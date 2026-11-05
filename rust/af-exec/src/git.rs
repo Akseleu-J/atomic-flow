@@ -118,10 +118,17 @@ impl GitWorkflow<'_> {
         if message.trim().is_empty() {
             return Err(GitError("auto-commit requires a non-empty message".into()));
         }
+        let literal_paths: Vec<String> = paths
+            .iter()
+            .map(|path| format!(":(literal){path}"))
+            .collect();
         let mut add = vec!["add", "--"];
-        add.extend(paths);
+        add.extend(literal_paths.iter().map(String::as_str));
         self.git(&add, &[])?;
-        self.git(&["commit", "-m", message], &[])?;
+        // --only leaves other staged paths out of this commit.
+        let mut commit = vec!["commit", "--only", "-m", message, "--"];
+        commit.extend(literal_paths.iter().map(String::as_str));
+        self.git(&commit, &[])?;
         let head = self.git(&["rev-parse", "--short", "HEAD"], &[])?;
         Ok(head.trim().to_string())
     }
@@ -247,10 +254,73 @@ mod tests {
             .all(|(argv, _)| !argv.contains(&".".to_string())
                 || argv[0] != "git"
                 || argv[1] != "add"));
-        assert_eq!(calls[1].0, vec!["git", "commit", "-m", "af: bump helper"]);
+        assert_eq!(
+            calls[1].0,
+            vec![
+                "git",
+                "commit",
+                "--only",
+                "-m",
+                "af: bump helper",
+                "--",
+                ":(literal)src/lib.py",
+                ":(literal)src/app.py"
+            ]
+        );
         assert_eq!(calls[2].0, vec!["git", "rev-parse", "--short", "HEAD"]);
         assert!(git.auto_commit(&[], "x").is_err());
         assert!(git.auto_commit(&["a.py"], "  ").is_err());
+    }
+
+    #[test]
+    fn real_commit_preserves_unrelated_index_entries() {
+        let root = std::env::temp_dir().join(format!("af-git-scope-{}", af_entropy::token()));
+        std::fs::create_dir(&root).unwrap();
+        struct Temp(std::path::PathBuf);
+        impl Drop for Temp {
+            fn drop(&mut self) {
+                let _ = std::fs::remove_dir_all(&self.0);
+            }
+        }
+        let _temp = Temp(root.clone());
+        let git = GitWorkflow {
+            repo_root: &root,
+            runner: &ProcessRunner,
+        };
+        git.git(&["init", "--quiet"], &[]).unwrap();
+        for (key, value) in [
+            ("user.name", "Fixture"),
+            ("user.email", "fixture@example.invalid"),
+            ("commit.gpgsign", "false"),
+        ] {
+            git.git(&["config", "--local", key, value], &[]).unwrap();
+        }
+        for path in ["change[1].txt", "change1.txt", "unrelated.txt"] {
+            std::fs::write(root.join(path), "before\n").unwrap();
+        }
+        git.git(&["add", "--all"], &[]).unwrap();
+        git.git(&["commit", "-m", "baseline"], &[]).unwrap();
+        for path in ["change[1].txt", "change1.txt", "unrelated.txt"] {
+            std::fs::write(root.join(path), "after\n").unwrap();
+        }
+        git.git(&["add", "--", "unrelated.txt"], &[]).unwrap();
+        git.auto_commit(&["change[1].txt"], "reviewed change")
+            .unwrap();
+        assert_eq!(
+            git.git(
+                &["diff-tree", "--no-commit-id", "--name-only", "-r", "HEAD"],
+                &[]
+            )
+            .unwrap()
+            .trim(),
+            "change[1].txt"
+        );
+        assert_eq!(
+            git.git(&["diff", "--cached", "--name-only"], &[])
+                .unwrap()
+                .trim(),
+            "unrelated.txt"
+        );
     }
 
     #[test]

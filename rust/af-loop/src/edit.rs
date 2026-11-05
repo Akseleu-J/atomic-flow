@@ -581,13 +581,58 @@ pub fn run_edit_task(
                     Some(workflow) => {
                         let changed = toolset.changed_paths();
                         let changed_refs: Vec<&str> = changed.iter().map(String::as_str).collect();
-                        match workflow.auto_commit(
+                        if workflow.repo_root.canonicalize().ok()
+                            != Some(
+                                toolset
+                                    .check_cwd
+                                    .canonicalize()
+                                    .map_err(|_| "checked root unavailable")?,
+                            )
+                        {
+                            return Err("Git workflow root differs from checked root".into());
+                        }
+                        let effect = af_entropy::token();
+                        journal
+                            .begin_effect(
+                                "tool_request",
+                                &effect,
+                                &json!({"name":"verified_local_commit", "paths": changed}),
+                            )
+                            .map_err(|_| {
+                                "Git effect checkpoint failed; commit was not authorized"
+                            })?;
+                        let result = workflow.auto_commit(
                             &changed_refs,
                             &format!("af: {task} (requirement verified)"),
-                        ) {
-                            Ok(head) => json!({"committed": true, "head": head}),
-                            Err(error) => json!({"committed":false, "error": error.to_string(),
-                                "reason":"auto-commit failed; recorded honestly, verdict unchanged"}),
+                        );
+                        match result {
+                            Ok(head) => {
+                                journal
+                                    .finish_effect(
+                                        "tool_result",
+                                        &effect,
+                                        &json!({"committed":true, "head":head}),
+                                        "success",
+                                    )
+                                    .map_err(|_| {
+                                        "Git completion persistence failed; durable hold retained"
+                                    })?;
+                                json!({"committed": true, "head": head})
+                            }
+                            Err(_) => {
+                                *toolset.effects_unknown.borrow_mut() = true;
+                                journal.finish_effect("tool_effect_unknown", &effect,
+                                    &json!({"reason":"Git operation failed; inspect index and HEAD before continuing"}), "unknown")
+                                    .map_err(|_| "Git failure persistence failed; durable hold retained")?;
+                                return Ok(EditOutcome::Interrupted {
+                                    edits,
+                                    loop_outcome: LoopOutcome::Hold {
+                                        backend: "host-git".into(),
+                                        detail: "Git publication outcome needs reconciliation"
+                                            .into(),
+                                    },
+                                });
+                            }
                         }
                     }
                     None => json!({"committed":false, "workflow_supplied":false,
@@ -954,8 +999,31 @@ mod tests {
         }
     }
 
+    struct FailingGit;
+
+    impl af_exec::git::CommandRunner for FailingGit {
+        fn run(
+            &self,
+            argv: &[String],
+            _: &std::path::Path,
+            _: &[(&str, &str)],
+        ) -> Result<(i32, String, String), String> {
+            assert_eq!(argv[1], "add");
+            Err("simulated incomplete Git operation".into())
+        }
+    }
+
     #[test]
     fn a_verified_requirement_receipt_completes_the_task() {
+        run_verified_receipt_fixture(false);
+    }
+
+    #[test]
+    fn a_failed_git_effect_holds_even_after_a_verified_requirement() {
+        run_verified_receipt_fixture(true);
+    }
+
+    fn run_verified_receipt_fixture(fail_git: bool) {
         let (temp, registry) = setup();
         let toolset = toolset(&temp, &registry, 0, 4);
         let backend = ScriptedBackend::new(
@@ -986,6 +1054,10 @@ mod tests {
             workspace_id: "default".into(),
             revision: "staged".into(),
         };
+        let workflow = af_exec::git::GitWorkflow {
+            repo_root: &temp.root,
+            runner: &FailingGit,
+        };
         let outcome = run_edit_task(
             &router,
             &toolset,
@@ -994,10 +1066,22 @@ mod tests {
             "verified repair",
             true,
             LoopLimits::default(),
-            None,
+            fail_git.then_some(&workflow),
             Some(&mut requirement),
         )
         .unwrap();
+        if fail_git {
+            assert!(matches!(
+                outcome,
+                EditOutcome::Interrupted {
+                    loop_outcome: LoopOutcome::Hold { .. },
+                    ..
+                }
+            ));
+            assert!(toolset.effects_unknown());
+            assert_eq!(journal.read().unwrap().unresolved_call_ids().len(), 1);
+            return;
+        }
         match outcome {
             EditOutcome::Completed { check, git, .. } => {
                 assert_eq!(check["requirement_check"]["status"], json!("verified"));

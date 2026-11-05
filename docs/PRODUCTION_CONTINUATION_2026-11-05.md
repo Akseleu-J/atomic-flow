@@ -97,3 +97,18 @@ Next gates: independent behavioral checker adapter and reviewed apply, actual
 API idempotency/outbox/recovery integration, native TaskRunner cutover and its
 mixed-language negative/repair/final-check evidence. Corporate identity, worker
 isolation, utility/holdout, operations and release acceptance stay separate.
+
+
+## Local publication boundary
+
+After an admitted requirement receipt, the edit loop checks that the Git workflow
+uses the checked root and journals the Git effect before invoking it. The commit
+uses literal paths and `git commit --only`, which excludes unrelated staged
+changes. An incomplete Git outcome leaves a durable hold for inspection of the
+index and HEAD. A real temporary Git repository exercises staged-file isolation
+and a literal filename containing brackets. The edit-loop regression exercises
+an incomplete Git effect after a successful checker fixture.
+
+The HTTP route still has no independent checker adapter or Git publisher.
+Production TaskRunner cutover and its mixed-language behavioral evidence remain
+open. The local Git operation assumes a trusted, cooperating checkout.
