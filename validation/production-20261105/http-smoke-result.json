@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "binary_sha256": "4feef8c808ecaef6a8cb480754c1fcdd082bb12719fe3b38a6b57b389b342567",
+  "scenarios": [
+    "static UI nonce CSP and token-only APIs",
+    "hostile origin, DNS-rebinding Host and browser credential routing refused",
+    "registered Rust project graph and hash-bound source preview",
+    "actual native scripted chat, source context, durable history and forged terminal refusal",
+    "immutable journal snapshot exact SHA256 and durable budget projection",
+    "installed SDK copy outside checkout against actual native API"
+  ],
+  "provider_calls": 0,
+  "transport": "native HTTP + scripted backend",
+  "owned_server_cleanup": true,
+  "browser_visual_qa": "not_assessed"
+}

@@ -1,0 +1,22 @@
+.........................F........                                       [100%]
+================================== FAILURES ===================================
+__________________ test_cli_task_bootstraps_persisted_index ___________________
+tests\test_task_execution.py:105: in test_cli_task_bootstraps_persisted_index
+    assert load_tree(tmp_path)["files"] == 1
+E   assert 3 == 1
+---------------------------- Captured stdout call -----------------------------
+planning: explain sample
+
+plan (1 steps):
+  1. Report sample  [none]
+
+
+task:   task_11ba3afade9f
+query:  explain sample
+status: done
+budget: $0.0030
+steps:
+  [✓] 1. Report sample  -- completed (verification not requested)
+=========================== short test summary info ===========================
+FAILED tests/test_task_execution.py::test_cli_task_bootstraps_persisted_index
+1 failed, 33 passed in 3.86s

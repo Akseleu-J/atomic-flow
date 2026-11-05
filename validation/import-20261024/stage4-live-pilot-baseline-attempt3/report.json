@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "instance_id": "sympy__sympy-21614",
+  "arm": "baseline",
+  "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "provider": "host_model_proxy",
+  "limits": {
+    "max_calls": 4,
+    "max_output_tokens": 2048,
+    "max_input_tokens": 60000,
+    "max_wall_seconds": 600.0,
+    "max_reported_cost_usd": 0.05
+  },
+  "status": "finished",
+  "calls": 1,
+  "tokens_in": 5273,
+  "tokens_out": 165,
+  "cost_usd": 0.00156575,
+  "cost_complete": true,
+  "human_interventions": 0,
+  "model_quality_measured": false,
+  "experiment": "exposed_public_development_pilot_not_formal_matched_comparison",
+  "money_admission": "declared_estimate_not_billing_guarantee",
+  "quota_admission": "authorized_host_responsibility",
+  "wall_enforcement": "cooperative_deadline_and_bounded_transport_not_os_hard_kill",
+  "generation_kind": "one_direct_completion",
+  "task_status": "finished",
+  "patch_sha256": "54c5e29844729c2ecca2a1c45ab8b57bfa71595db59dfc0654207a59626c22cc",
+  "wall_seconds": 11.327999999979511,
+  "known_cost_lower_bound_usd": 0.00156575
+}

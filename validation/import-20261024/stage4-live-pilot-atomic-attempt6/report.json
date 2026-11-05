@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "instance_id": "sympy__sympy-21614",
+  "arm": "atomic",
+  "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "provider": "host_model_proxy",
+  "limits": {
+    "max_calls": 6,
+    "max_output_tokens": 2048,
+    "max_input_tokens": 240000,
+    "max_wall_seconds": 600.0,
+    "max_reported_cost_usd": 0.05
+  },
+  "status": "failed",
+  "calls": 6,
+  "tokens_in": 80301,
+  "tokens_out": 2100,
+  "cost_usd": 0.010813575,
+  "cost_complete": true,
+  "human_interventions": 0,
+  "model_quality_measured": false,
+  "experiment": "exposed_public_development_pilot_not_formal_matched_comparison",
+  "money_admission": "declared_estimate_not_billing_guarantee",
+  "quota_admission": "authorized_host_responsibility",
+  "wall_enforcement": "cooperative_deadline_and_bounded_transport_not_os_hard_kill",
+  "task_status": "paused",
+  "task_id": "task_1cdc3cfb1028",
+  "generation_kind": "TaskRunner",
+  "model_planning": true,
+  "reviewed_paths": [
+    "sympy/core/function.py"
+  ],
+  "completion_report": {},
+  "wall_seconds": 701.4060000001919,
+  "known_cost_lower_bound_usd": 0.010813575
+}

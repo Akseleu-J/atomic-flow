@@ -1,0 +1,49 @@
+   Compiling syn v3.0.9
+   Compiling synstructure v0.14.0
+   Compiling zerofrom-derive v0.1.8
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling yoke v0.8.4
+   Compiling zerovec-derive v0.11.7
+   Compiling zerovec v0.11.9
+   Compiling displaydoc v0.2.7
+   Compiling tinystr v0.8.5
+   Compiling icu_locale_core v2.4.0
+   Compiling zerotrie v0.2.5
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.4.0
+   Compiling icu_provider v2.4.0
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling icu_normalizer v2.4.0
+   Compiling icu_properties v2.4.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling af-graph v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-graph)
+   Compiling url v2.5.8
+   Compiling ureq v2.12.1
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+warning: unused import: `std::io::Write`
+   --> af-sandbox\src\session.rs:676:5
+    |
+676 | use std::io::Write;
+    |     ^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `af-sandbox` (lib) generated 1 warning (run `cargo fix --lib -p af-sandbox` to apply 1 suggestion)
+   Compiling af-journal v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-journal)
+   Compiling af-exec v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-exec)
+   Compiling tokio-macros v2.7.2
+   Compiling tokio v1.54.1
+   Compiling af-llm v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-llm)
+   Compiling windows_x86_64_gnu v0.52.6
+   Compiling af-agents v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-agents)
+   Compiling af-context v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-context)
+   Compiling hyper v1.12.0
+   Compiling windows-targets v0.52.6
+   Compiling rfd v0.15.4
+   Compiling windows-sys v0.59.0
+   Compiling hyper-util v0.1.21
+   Compiling tower v0.5.3
+   Compiling af-loop v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-loop)

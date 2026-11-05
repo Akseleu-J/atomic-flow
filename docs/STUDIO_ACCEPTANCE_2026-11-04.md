@@ -1,0 +1,167 @@
+# Atomic Flow Studio — working native surface and safety boundaries
+
+**Latest native engineering checkpoint: CI42027392401 SUCCESS on dc89e2a.**
+Linux 346 PASS / 1 IGNORED; Windows 343 PASS / 1 IGNORED. Each platform passed
+36 SDK tests, the installed native HTTP/SDK lifecycle smoke, and 8 UI protocol
+checks. Both archives were downloaded and all 115 recorded source hashes per
+platform matched exact Git-object bytes. `provider_calls=0`. The ignored test
+remains real Docker acceptance; this checkpoint does not admit isolation,
+behavioral quality, corporate deployment or all production chapters.
+
+- Linux artifact 13415030595: SHA256 `141a035a6cfd858a7e06cb77d00f125bd18753eec4730881abec9a9937e4f164`.
+- Windows artifact 13414253586: SHA256 `d23bd7f7df850e14663331e4171c4f4f6da97f681bbdfb4ccae549b0a91d9b60`.
+- Exact audits/archives: `validation/production-20261105/ci-dc89e2a/`.
+- Separate legacy workflow failures and their repairs are recorded in
+  `docs/PRODUCTION_CI_REPAIR_2026-11-05.md`; native success does not hide them.
+
+## Previous native checkpoint
+
+**CI41842587975 SUCCESS on7279e23 (both platforms).**
+Linux292PASS/1IGNORED; Windows290PASS/1IGNORED. Each platform also passed the
+real native HTTP lifecycle smoke and8UI protocol/rendering tests. Both archives
+were downloaded and each of84source hashes matched exact Git blobs after LF
+was made an explicit checkout policy. The ignored test is real Docker acceptance,
+not a passed isolation test. provider_calls=0.
+
+- Linux artifact13329652887 SHA2568f5f838d5bb424894235893c6ff19805c19b86b3aab38d2c0fe53bba2f63575b.
+- Windows artifact13330156903 SHA2565626732c8324cbd805722c73f71ea4d47f9014340bfa809a504c63e6648e1eaf.
+- General CI41842587866 and external interoperability41842588641 also SUCCESS.
+
+The final follow-up commits only evidence/docs/inventory for this accepted
+runtime; they do not change its Rust, HTML or toolchain source. Browser visual
+QA and strict Clippy remain separate unaccepted checks as explained below.
+Persistent background startup was rejected by automatic permission review
+without a specific reason; no alternative launch was attempted. The native
+binary itself was started, exercised and cleaned up by the accepted smoke.
+
+The 4 November work continues the updated zcode checkout from `09d06c5`.
+It preserves the Rust/TypeScript reconstruction and improves the existing
+native Studio surface. This is a functional engineering increment, not full
+production acceptance or a claim that every Python capability has migrated.
+
+## Run
+
+From this checkout's `rust/` directory:
+
+```powershell
+cargo run -p af-cli --locked --offline -- serve --bind 127.0.0.1:8787
+```
+
+Then open `http://127.0.0.1:8787/dashboard`. The built Windows executable is
+`rust/target/debug/af.exe`. The default local test provider is deterministic;
+it checks the connection and journal, and does not generate a model answer.
+Existing project roots and historical paid holds are never imported/reset by
+this increment. Use an isolated `ATOMIC_FLOW_HOME` for disposable testing.
+
+For authenticated access, inject a process-only `AF_STUDIO_TOKEN` and run
+`af serve --token-env AF_STUDIO_TOKEN`. Enter that existing token into Studio's
+authorization dialog; it is retained only in the current browser tab's memory.
+No credential is placed in a URL, saved to localStorage or sent in provider
+configuration responses. Non-loopback binding still requires a server token;
+plain HTTP remote deployment is not a supported secure deployment recipe.
+
+## What now works
+
+- Three zones with responsive panels, persisted panel widths, keyboard command
+  palette, accessible controls, readable empty/error states and no external fonts.
+- Explicit folder selection, project registration/revocation, structural graph
+  building, redacted source preview with SHA256 and stale-source warnings.
+- Bounded chat streams with stop/disconnect cancellation and mandatory terminal
+  outcome; session/root switching invalidates stale UI state and evidence.
+- Real journal history with bounded cursor pages and immutable journal snapshots.
+  A journal snapshot is inspection data, not a backup of project source or replay.
+- Source context is discovered in the graph, re-read from the current root grant,
+  hash-checked and bounded before being sent to a provider. The source list means
+  “context supplied,” not “every answer claim was independently verified.”
+- Host-selected providers and durable per-attempt budget admission. Journal and
+  ledger use the same host session/call identity. Missing/unknown actual cost or
+  failed settlement retains HOLD; there is no automatic replay or hold reset.
+- Browser-controlled URLs, credential environment names, hostile origins/Host
+  values, forged model terminal events and arbitrary job-store paths are refused.
+
+The native editing entry point binds exact reviewed paths and replacement bytes.
+Generic exit-zero commands and no-edit answers remain `not_assessed`; they cannot
+grant Verified or automatic Git publication. The UI keeps unsupported task/apply
+workflows disabled until an admitted requirement checker and review/publication
+contract are wired. This limitation is deliberate and visible.
+
+Publication now persists exact before-byte backups and an immutable intent before
+any source write, fsyncs the records, verifies replacements/rollback and retains
+a durable root hold after an uncertain mutation. A fresh session or another ID for
+the same root cannot clear that hold. This is cooperating-writer protection on a
+trusted host, not protection against an adversary modifying the host filesystem.
+
+## Configure a real provider on the host
+
+`ATOMIC_FLOW_HOME/providers.json` (or the explicit process path
+`AF_STUDIO_PROVIDER_CONFIG`) is a host-owned file, never a browser-write endpoint.
+It contains configuration and the name of a process variable, not the API key:
+
+```json
+{
+  "schema_version": 1,
+  "providers": [{
+    "id": "primary",
+    "label": "My provider",
+    "base_url": "https://provider.example/v1",
+    "api_key_env": "ATOMIC_FLOW_API_KEY",
+    "models": ["approved-model-id"],
+    "reservation_usd": "0.05"
+  }]
+}
+```
+
+Choose the provider/model in Settings and create a durable budget before sending.
+The reservation is an admission estimate, not a guaranteed provider billing cap.
+Only finite nonnegative provider-reported `usage.cost`/`usage.cost_usd` settles
+actual cost. A provider that omits cost leaves a HOLD after its response, even if
+token usage is present. No tariff is invented and no unknown cost becomes zero.
+Provider redirects are disabled; response/stream bytes and network waits are bounded.
+
+## Validation and remaining gates
+
+Local Windows targeted suites: af-agent 13, af-cli 22, af-llm 15, af-loop 37,
+af-sandbox 17: **104 PASS**. The sandbox fixture initially omitted its required
+lease; its failed run is retained and the corrected final sandbox run is separate.
+The earlier HTTP fixture incorrectly expected scripted echo to repeat the prompt;
+it now checks the actual scripted response. UI protocol/security tests: **8 PASS**.
+
+The actual built native binary passed five end-to-end HTTP scenarios in isolated
+state: authentication/CSP, hostile request refusal, Rust graph/source preview,
+durable scripted chat/history/context, journal snapshot/hash and budget projection.
+Owned server cleanup was confirmed. Evidence is in
+`validation/zcode-studio-20261104/`; provider_calls=0 throughout.
+
+Final native build completed without compiler warnings. A separate strict
+Windows Clippy attempt stopped in unchanged `af-entropy` code on two redundant
+Win32 pointer casts and the `OVERLAPPED` FFI type name; Clippy is not marked
+passed. The first PowerShell-hosted build was interrupted by a shell stack
+overflow; the retained non-login-shell continuation completed and was tested.
+
+Browser visual QA is **not completed**: the in-app browser is disabled and Windows
+Computer Use stopped because it could not determine Chrome's current URL safely.
+No browser protection was bypassed. Full native Linux Docker acceptance, full
+capability cutover, independent answer grading and real-provider quality are
+separate gates. Historical research pairs/holdout/ablations remain unfinished.
+
+First remote CI41841153725 on a98d4a2 stopped before build: the pre-existing
+zcode workflow's setup-node pin could not be resolved. The Studio workflow
+now uses official setup-node v4 commit49933ea5288caeca8642d1e84afbd3f7d6820020,
+verified through the upstream Git ref. This setup refusal is retained separately
+from application test outcomes. The inventory generator now writes explicit LF
+to keep its one-line JSON free of Windows CR whitespace issues.
+
+CI41841470828 then compiled on Linux but refused the native picker dependency:
+`wayland-client.pc` was missing. Artifact13328159865 SHA256
+46affecc1bfa82e2032020c7871a6a98c89fd7cb43f431bdff47e5603e6dcc8c was downloaded;
+84 Rust/source/config hashes matched653163f. No application test outcome is
+claimed for that Linux attempt. The workflow now provisions `libwayland-dev`
+and `pkg-config`; the Windows job was still running when this was recorded.
+
+Windows job126613871213 subsequently completed SUCCESS on653163f: full workspace
+290PASS/1IGNORED, native HTTP smoke PASS, 8 UI tests PASS. Downloaded artifact
+13330160802 SHA256448547bac18e2cbe4c107337c678c765ac9c6c01f638965a56f3db01d06c9764
+was audited. One source hash matched the exact Git blob; the other83 matched
+the exact Git blob after the recorded Windows LF→CRLF checkout conversion.
+This is explicit content equivalence with newline differences, not84 identical
+Git-byte hashes. `rust/** text eol=lf` now standardizes future checkouts.

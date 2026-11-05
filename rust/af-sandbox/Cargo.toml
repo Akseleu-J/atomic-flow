@@ -1,0 +1,15 @@
+[package]
+name = "af-sandbox"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Host-approved sandboxed workspaces: root registry, read proofs, bounded preview/apply (workspace.py port)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+sha1.workspace = true
+regex.workspace = true
+af-entropy.workspace = true
+rustpython-parser = "0.4"

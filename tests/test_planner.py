@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from atomic_flow.agents.planner import Plan, PlanStep, plan_task
+from atomic_flow.agents.planner import PlanStep, plan_task
 from atomic_flow.backends.base import ChatResult
 
 
@@ -43,8 +43,11 @@ def test_plan_retries_on_malformed():
 
 
 def test_plan_rejects_empty_steps():
-    backend = FakeBackend(['{"steps": [], "rationale": ""}'])
-    with pytest.raises(Exception):
+    from atomic_flow.errors import ResponseFormatError
+
+    # Two identical answers: plan_task retries once before surfacing the parse error.
+    backend = FakeBackend(['{"steps": [], "rationale": ""}', '{"steps": [], "rationale": ""}'])
+    with pytest.raises(ResponseFormatError, match="Plan validation failed"):
         plan_task("x", project_root=Path("."), backend=backend, candidates=[], n_files=1)
 
 

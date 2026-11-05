@@ -1,0 +1,25 @@
+.....F..                                                                 [100%]
+================================== FAILURES ===================================
+____________________________ test_Derivative_kind _____________________________
+
+    def test_Derivative_kind():
+        A = MatrixSymbol('A', 2,2)
+        assert Derivative(comm_x, comm_x).kind is NumberKind
+>       assert Derivative(A, comm_x).kind is MatrixKind(NumberKind)
+E       assert NumberKind is MatrixKind(NumberKind)
+E        +  where NumberKind = Derivative(A, x).kind
+E        +    where Derivative(A, x) = Derivative(A, x)
+E        +  and   MatrixKind(NumberKind) = MatrixKind(NumberKind)
+
+sympy\core\tests\test_kind.py:46: AssertionError
+============================== warnings summary ===============================
+..\..\..\..\..\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.local-tools\stage4-env\Lib\site-packages\_pytest\config\__init__.py:1474
+  C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.local-tools\stage4-env\Lib\site-packages\_pytest\config\__init__.py:1474: PytestConfigWarning: Unknown config option: doctestplus
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+                               DO *NOT* COMMIT!                               
+=========================== short test summary info ===========================
+FAILED sympy/core/tests/test_kind.py::test_Derivative_kind - assert NumberKin...
+1 failed, 7 passed, 1 warning in 4.73s

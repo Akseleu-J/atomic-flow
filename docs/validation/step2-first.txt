@@ -1,0 +1,12 @@
+......s.............................F...                                 [100%]
+================================== FAILURES ===================================
+______________ test_task_runner_resume_continues_from_checkpoint ______________
+tests\test_task.py:139: in test_task_runner_resume_continues_from_checkpoint
+    assert result.status == "done"
+E   AssertionError: assert 'failed' == 'done'
+E
+E     - done
+E     + failed
+=========================== short test summary info ===========================
+FAILED tests/test_task.py::test_task_runner_resume_continues_from_checkpoint
+1 failed, 38 passed, 1 skipped in 6.66s

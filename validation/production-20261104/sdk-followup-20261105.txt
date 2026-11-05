@@ -1,0 +1,44 @@
+✔ Rust frozen verification vector: empty_not_assessed (17.3645ms)
+✔ Rust frozen verification vector: duplicate_version (2.4095ms)
+✔ Rust frozen verification vector: unknown_field (1.2903ms)
+✔ Rust frozen verification vector: boolean_integer (1.8384ms)
+✔ Rust frozen verification vector: fractional_integer (0.8232ms)
+✔ Rust frozen verification vector: nonfinite (0.7039ms)
+✔ Rust frozen verification vector: integer_overflow (1.645ms)
+✔ Rust frozen verification vector: zero_passed (0.8812ms)
+✔ Rust frozen verification vector: unsupported_version (1.1803ms)
+✔ Rust frozen verification vector: nested_duplicate (1.0358ms)
+✔ Rust frozen verification vector: nonzero_test_scope_only (1.2574ms)
+✔ Rust frozen verification vector: partial_with_explicit_omissions (1.417ms)
+✔ Rust frozen verification vector: quote_provenance_without_entailment (47.9149ms)
+✔ Rust frozen verification vector: forged_quote_digest (2.6203ms)
+✔ Rust frozen verification vector: citation_exceeds_supported_source (1.1674ms)
+✔ Rust frozen verification vector: unsupported_entailment_no_checker (3.105ms)
+✔ Rust frozen verification vector: duplicate_claim_identity (2.3682ms)
+✔ Rust frozen verification vector: duplicate_omission_identity (0.9313ms)
+✔ Rust frozen verification vector: missing_explicit_nullable_checker (0.6401ms)
+✔ reports reject noncanonical integers and nested escaped duplicate names (2.806ms)
+✔ UTF8 byte limits, controls, invalid scalar and huge wire are refused (4.6776ms)
+✔ only HTTPS or loopback HTTP with no URL credentials/query/fragment (1.6217ms)
+✔ bearer is header-only; redirects disabled; response checked at runtime (105.6224ms)
+✔ capabilities preserve unavailable checker and nonauthority semantics (2.2605ms)
+✔ session requests use root ID; snapshots require actual root/hold fields (2.8561ms)
+✔ sessions list, budget snapshot and graph read are validated field-by-field (6.2765ms)
+✔ user input cannot request terminal events or arbitrary job-store paths (3.2396ms)
+✔ edit request uses host provider and can never return verified success (4.5638ms)
+✔ JSON body limits apply without or with a false Content-Length and cancel reader (2.8201ms)
+✔ invalid UTF8, wrong content type and duplicate JSON keys refused (1.5258ms)
+✔ HTTP rejection is typed and transport unknown is never retried (0.9791ms)
+✔ stream projects deltas and data-only report with explicit selected coverage (4.2321ms)
+✔ unknown/cancelled stream never reconnects or turns missing usage into zero (4.9109ms)
+✔ stream rejects old credential request before send and forged final DTO (1.7126ms)
+✔ closing stream aborts actual fetch and cancels receiver without another send (1.0084ms)
+✔ stream total/event bounds and nested integer lexical rules are enforced (1.5355ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 595.8262

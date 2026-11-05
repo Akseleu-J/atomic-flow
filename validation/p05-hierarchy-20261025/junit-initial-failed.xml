@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="105" time="105.451" timestamp="2026-10-25T08:36:07.162594+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_goal_hierarchy" name="test_roundtrip_preserves_stable_goal_ids_and_ancestor_requirements" time="0.161" /><testcase classname="tests.test_goal_hierarchy" name="test_goal_and_step_requirement_changes_stale_approval[goal_criterion]" time="0.398" /><testcase classname="tests.test_goal_hierarchy" name="test_goal_and_step_requirement_changes_stale_approval[step_criterion]" time="0.172" /><testcase classname="tests.test_goal_hierarchy" name="test_goal_and_step_requirement_changes_stale_approval[parent]" time="0.114" /><testcase classname="tests.test_goal_hierarchy" name="test_legacy_canonical_plan_is_byte_compatible_and_migration_grants_nothing" time="0.064" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[cycle]" time="0.023" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[missing_parent]" time="0.005" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[uncovered]" time="0.006" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[depth]" time="0.067" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[count]" time="0.015" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[duplicate]" time="0.012" /><testcase classname="tests.test_goal_hierarchy" name="test_invalid_decomposition_is_rejected[criteria]" time="0.011" /><testcase classname="tests.test_goal_hierarchy" name="test_persisted_goal_validation_rejects_cross_generation_and_unknown_fields" time="0.126" /><testcase classname="tests.test_goal_hierarchy" name="test_revise_after_completed_work_keeps_history_and_namespaces_new_goals" time="0.156" /><testcase classname="tests.test_goal_hierarchy" name="test_hierarchical_internal_replan_cannot_drop_original_requirements" time="2.188" /><testcase classname="tests.test_goal_hierarchy" name="test_task_goal_history_is_bounded" time="0.023" /><testcase classname="tests.test_goal_hierarchy" name="test_requirements_reach_step_context_without_claiming_semantic_acceptance" time="4.011" /><testcase classname="tests.test_goal_hierarchy" name="test_replan_requirement_context_refuses_overflow_instead_of_truncating" time="0.081" /><testcase classname="tests.test_planner" name="test_plan_parses_valid" time="0.174" /><testcase classname="tests.test_planner" name="test_plan_retries_on_malformed" time="0.032" /><testcase classname="tests.test_planner" name="test_plan_rejects_empty_steps" time="0.110" /><testcase classname="tests.test_planner" name="test_plan_step_defaults" time="0.014" /><testcase classname="tests.test_task_frontier" name="test_frontier_drains_independent_work_and_links_existing_ledgers" time="0.028" /><testcase classname="tests.test_task_frontier" name="test_invalidation_recomputes_frontier_without_replaying_done_steps" time="0.229" /><testcase classname="tests.test_task_frontier" name="test_resume_explanation_is_read_only_and_project_bound" time="0.061" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[0]" time="0.158" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[4]" time="0.617" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[True]" time="0.007" /><testcase classname="tests.test_task_frontier" name="test_horizon_rejects_invalid_bounds[1.5]" time="0.006" /><testcase classname="tests.test_task_frontier" name="test_horizon_and_context_stay_bounded_with_valid_json" time="0.021" /><testcase classname="tests.test_task_frontier" name="test_invalid_dag_never_produces_a_frontier[steps0-cyclic]" time="0.034" /><testcase classname="tests.test_task_frontier" name="test_invalid_dag_never_produces_a_frontier[steps1-missing]" time="0.070" /><testcase classname="tests.test_task_frontier" name="test_running_requires_reconciliation_superseded_does_not_satisfy_dependency" time="0.122" /><testcase classname="tests.test_task_frontier" name="test_scheduler_does_not_drain_ready_work_while_running_step_is_unresolved" time="0.423" /><testcase classname="tests.test_plan_review_dependencies" name="test_unapproved_legacy_task_cannot_execute" time="0.231" /><testcase classname="tests.test_plan_review_dependencies" name="test_legacy_migration_cannot_carry_approval_and_preserves_sequential_dependencies[0]" time="0.118" /><testcase classname="tests.test_plan_review_dependencies" name="test_legacy_migration_cannot_carry_approval_and_preserves_sequential_dependencies[1]" time="0.082" /><testcase classname="tests.test_plan_review_dependencies" name="test_review_and_approval_bind_plan_source_and_new_path_scope" time="0.536" /><testcase classname="tests.test_plan_review_dependencies" name="test_revision_invalidates_approval_without_model_call" time="0.379" /><testcase classname="tests.test_plan_review_dependencies" name="test_review_rejects_directory_traversal_and_wildcards" time="0.156" /><testcase classname="tests.test_plan_review_dependencies" name="test_invalid_dependency_graphs_rejected[dependencies0]" time="0.016" /><testcase classname="tests.test_plan_review_dependencies" name="test_invalid_dependency_graphs_rejected[dependencies1]" time="0.006" /><testcase classname="tests.test_plan_review_dependencies" name="test_invalid_dependency_graphs_rejected[dependencies2]" time="0.007" /><testcase classname="tests.test_plan_review_dependencies" name="test_independent_work_finishes_before_failed_dependency_is_replanned" time="1.040" /><testcase classname="tests.test_plan_review_dependencies" name="test_replanned_work_pauses_before_any_new_execution" time="1.702" /><testcase classname="tests.test_plan_review_dependencies" name="test_plan_tampering_after_approval_does_not_execute" time="0.388" /><testcase classname="tests.test_plan_review_dependencies" name="test_revision_refuses_interrupted_step" time="0.107" /><testcase classname="tests.test_plan_review_dependencies" name="test_final_scope_catches_out_of_scope_mutations_from_host_backend" time="3.392" /><testcase classname="tests.test_plan_review_dependencies" name="test_explicit_host_scope_can_authorize_new_path" time="2.371" /><testcase classname="tests.test_plan_review_dependencies" name="test_host_integrity_failure_never_calls_replanner" time="2.792"><failure message="AssertionError: assert 'source changed' in 'workspace rollback failed: '&#10; +  where 'workspace rollback failed: ' = Task(id='task_d9556b2f6535', query='change source', project='C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-fl...}, 'workspace_manifest': None, 'digest': '8c3084ea9cfef4198792cfd4b3f0cbc0bd7aaa98ab44173bb3422f8689e90193'}, goals=[]).error">tmp_path = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-hierarchy-final-20261025/test_host_integrity_failure_ne0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001A981AC18E0&gt;
+
+    def test_host_integrity_failure_never_calls_replanner(tmp_path, monkeypatch):
+        task, runner = staged(tmp_path)
+        def execute(task, step):
+            raise ChangeSetConflict("source changed after authorization")
+        monkeypatch.setattr(runner, "_execute_step", execute)
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", lambda *a, **kw: pytest.fail("integrity failure replanned"))
+        task = runner.approve(task, runner.review(task)["digest"])
+        result = runner.resume(task)
+        assert result.status == "failed" and not result.replan_count
+&gt;       assert "source changed" in result.error
+E       AssertionError: assert 'source changed' in 'workspace rollback failed: '
+E        +  where 'workspace rollback failed: ' = Task(id='task_d9556b2f6535', query='change source', project='C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-fl...}, 'workspace_manifest': None, 'digest': '8c3084ea9cfef4198792cfd4b3f0cbc0bd7aaa98ab44173bb3422f8689e90193'}, goals=[]).error
+
+tests\test_plan_review_dependencies.py:179: AssertionError</failure></testcase><testcase classname="tests.test_plan_review_dependencies" name="test_revise_preserves_done_work_and_remaps_new_dependencies" time="0.417" /><testcase classname="tests.test_internal_replan" name="test_internal_replan_is_explicit_and_bound_to_review_digest" time="0.722" /><testcase classname="tests.test_internal_replan" name="test_authorized_repair_continues_in_same_resume_and_preserves_scope" time="4.821" /><testcase classname="tests.test_internal_replan" name="test_legacy_approval_still_pauses_before_replanned_execution" time="1.640"><failure message="AssertionError: assert ('failed' == 'paused'&#10;  &#10;  - paused&#10;  + failed)">tmp_path = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-hierarchy-final-20261025/test_legacy_approval_still_pau0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001A981C4C320&gt;
+
+    def test_legacy_approval_still_pauses_before_replanned_execution(tmp_path, monkeypatch):
+        task, runner = staged(tmp_path)
+        seen = []
+    
+        def execute(task, step):
+            seen.append(step.index)
+            raise StepFailure(step.index, "first approach failed")
+    
+        monkeypatch.setattr(runner, "_execute_step", execute)
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", repaired_plan)
+        result = runner.resume(authorize(runner, task, internal=False))
+&gt;       assert result.status == "paused" and seen == [0]
+E       AssertionError: assert ('failed' == 'paused'
+E         
+E         - paused
+E         + failed)
+
+tests\test_internal_replan.py:84: AssertionError</failure></testcase><testcase classname="tests.test_internal_replan" name="test_replan_cannot_drop_pytest_obligation_from_mixed_plan" time="2.848"><failure message="AssertionError: workspace rollback failed: &#10;assert 'failed' == 'paused'&#10;  &#10;  - paused&#10;  + failed">tmp_path = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-hierarchy-final-20261025/test_replan_cannot_drop_pytest0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001A9818C2840&gt;
+
+    def test_replan_cannot_drop_pytest_obligation_from_mixed_plan(tmp_path, monkeypatch):
+        plan = Plan(steps=[
+            PlanStep(description="Verify behavior with tests", tools_needed=["run_command"], verify_with="pytest", depends_on=[]),
+            PlanStep(description="Read the source independently", tools_needed=["read_file"], verify_with="none", depends_on=[]),
+        ])
+        task, runner = staged(tmp_path, plan)
+        seen = []
+    
+        def execute(task, step):
+            seen.append(step.index)
+            if step.index == 0:
+                raise StepFailure(step.index, "pytest requirement failed")
+    
+        monkeypatch.setattr(runner, "_execute_step", execute)
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", repaired_plan)
+        result = runner.resume(authorize(runner, task))
+&gt;       assert result.status == "paused", result.error
+E       AssertionError: workspace rollback failed: 
+E       assert 'failed' == 'paused'
+E         
+E         - paused
+E         + failed
+
+tests\test_internal_replan.py:105: AssertionError</failure></testcase><testcase classname="tests.test_internal_replan" name="test_replan_cannot_introduce_new_execution_tool" time="1.993"><failure message="AssertionError: assert ('failed' == 'paused'&#10;  &#10;  - paused&#10;  + failed)">tmp_path = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-hierarchy-final-20261025/test_replan_cannot_introduce_n0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001A981ADD6D0&gt;
+
+    def test_replan_cannot_introduce_new_execution_tool(tmp_path, monkeypatch):
+        task, runner = staged(tmp_path)
+        seen = []
+    
+        def execute(task, step):
+            seen.append(step.index)
+            raise StepFailure(step.index, "read failed")
+    
+        monkeypatch.setattr(runner, "_execute_step", execute)
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", lambda *a, **kw: Plan(steps=[
+            PlanStep(description="Execute a different approach", tools_needed=["run_command"], verify_with="none")]))
+        result = runner.resume(authorize(runner, task))
+&gt;       assert result.status == "paused" and seen == [0]
+E       AssertionError: assert ('failed' == 'paused'
+E         
+E         - paused
+E         + failed)
+
+tests\test_internal_replan.py:123: AssertionError</failure></testcase><testcase classname="tests.test_internal_replan" name="test_runtime_change_after_opt_in_pauses_before_any_step" time="0.943" /><testcase classname="tests.test_internal_replan" name="test_actual_backend_change_with_same_runner_config_pauses_before_inference[model-other-model]" time="0.457" /><testcase classname="tests.test_internal_replan" name="test_actual_backend_change_with_same_runner_config_pauses_before_inference[base_url-https://other.invalid/v1]" time="0.705" /><testcase classname="tests.test_internal_replan" name="test_backend_added_after_approval_requires_fresh_review" time="0.601" /><testcase classname="tests.test_internal_replan" name="test_repeated_failure_pauses_before_global_replan_cap" time="5.171"><failure message="AssertionError: workspace rollback failed: &#10;assert 'failed' == 'paused'&#10;  &#10;  - paused&#10;  + failed">tmp_path = WindowsPath('C:/Users/omirb/OneDrive/Документы/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-hierarchy-final-20261025/test_repeated_failure_pauses_b0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001A981AC2DE0&gt;
+
+    def test_repeated_failure_pauses_before_global_replan_cap(tmp_path, monkeypatch):
+        task, runner = staged(tmp_path)
+        runner.config.task.max_replans = 5
+        seen = []
+    
+        def execute(task, step):
+            seen.append(step.index)
+            raise StepFailure(step.index, "the same failing precondition")
+    
+        monkeypatch.setattr(runner, "_execute_step", execute)
+        monkeypatch.setattr("atomic_flow.agents.task_loop.replan_task", repaired_plan)
+        result = runner.resume(authorize(runner, task))
+&gt;       assert result.status == "paused", result.error
+E       AssertionError: workspace rollback failed: 
+E       assert 'failed' == 'paused'
+E         
+E         - paused
+E         + failed
+
+tests\test_internal_replan.py:177: AssertionError</failure></testcase><testcase classname="tests.test_internal_replan" name="test_opt_in_enforces_effective_tool_allowlist_in_orchestrator" time="3.445" /><testcase classname="tests.test_internal_replan" name="test_real_dispatcher_denies_undeclared_execution_before_tool_implementation" time="9.225" /><testcase classname="tests.test_internal_replan" name="test_opt_in_requires_enforceable_finite_task_limits[unlimited_budget]" time="0.131" /><testcase classname="tests.test_internal_replan" name="test_opt_in_requires_enforceable_finite_task_limits[disabled_budget_guard]" time="0.085" /><testcase classname="tests.test_internal_replan" name="test_opt_in_requires_enforceable_finite_task_limits[no_replans]" time="0.101" /><testcase classname="tests.test_envelope" name="test_in_scope_replan_is_preserved" time="0.015" /><testcase classname="tests.test_envelope" name="test_widening_is_refused_with_reasons" time="0.035" /><testcase classname="tests.test_envelope" name="test_mutating_tool_introduction_is_refused" time="0.025" /><testcase classname="tests.test_envelope" name="test_new_verify_kind_is_refused" time="0.016" /><testcase classname="tests.test_envelope" name="test_budget_cap_blocks_replan_continuation" time="0.009" /><testcase classname="tests.test_envelope" name="test_no_progress_guard_trips_on_recurring_signature" time="0.027" /><testcase classname="tests.test_envelope" name="test_legacy_missing_envelope_and_nonfinite_accounting_fail_closed" time="0.018" /><testcase classname="tests.test_envelope" name="test_whitespace_failure_is_not_a_crash" time="0.014" /><testcase classname="tests.test_envelope" name="test_replan_cannot_discard_edit_or_execution_obligations" time="0.019" /><testcase classname="tests.test_task_read_plan" name="test_step_query_includes_read_plan_with_reasons" time="2.071" /><testcase classname="tests.test_task_read_plan" name="test_read_plan_degrades_explicitly_when_graph_fails" time="0.033" /><testcase classname="tests.test_completion_diagnostics" name="test_syntax_diagnostic_is_revision_bound_and_compile_does_not_execute" time="0.113" /><testcase classname="tests.test_completion_diagnostics" name="test_quality_diagnostics_exclude_outside_private_and_stale_locations" time="0.029" /><testcase classname="tests.test_completion_diagnostics" name="test_run_command_exposes_typed_diagnostics_even_on_failure" time="0.172" /><testcase classname="tests.test_completion_diagnostics" name="test_completion_rejects_empty_and_unfinished_task" time="0.086" /><testcase classname="tests.test_completion_diagnostics" name="test_completion_rechecks_approved_final_syntax_and_original_freshness" time="0.402" /><testcase classname="tests.test_completion_diagnostics" name="test_final_pytest_failure_is_not_published_and_report_survives_reload" time="1.286" /><testcase classname="tests.test_completion_diagnostics" name="test_completion_detects_test_process_changes_after_its_success" time="0.494" /><testcase classname="tests.test_completion_diagnostics" name="test_unavailable_final_executor_cannot_pass_and_cancellation_propagates" time="0.098" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_cascades_to_dependents_and_records_reason" time="0.087" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_spares_independent_done_steps" time="0.067" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_refusals" time="0.149" /><testcase classname="tests.test_step_invalidation" name="test_invalidated_done_step_is_rerunnable_state" time="0.070" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_cannot_requeue_a_different_project" time="0.047" /><testcase classname="tests.test_step_invalidation" name="test_invalidation_reason_in_persisted_state_must_be_text" time="0.026" /><testcase classname="tests.test_task_changeset" name="test_multistep_task_publishes_all_or_none[True]" time="17.032" /><testcase classname="tests.test_task_changeset" name="test_multistep_task_publishes_all_or_none[False]" time="13.179" /><testcase classname="tests.test_task_changeset" name="test_resume_conflict_sends_no_model_request" time="0.443" /><testcase classname="tests.test_task_changeset" name="test_legacy_checkpoint_is_not_silently_replayed" time="0.077" /><testcase classname="tests.test_task_changeset" name="test_interrupted_step_requires_review" time="0.169" /><testcase classname="tests.test_task_changeset" name="test_offline_cli_recovery_never_constructs_backend" time="0.648" /><testcase classname="tests.test_task_changeset" name="test_completed_publish_is_not_replayed_after_crash" time="0.259" /><testcase classname="tests.test_task_changeset" name="test_task_ids_cannot_escape_storage[../outside]" time="0.014" /><testcase classname="tests.test_task_changeset" name="test_task_ids_cannot_escape_storage[x/y]" time="0.011" /><testcase classname="tests.test_task_changeset" name="test_task_ids_cannot_escape_storage[task_not-an-id]" time="0.007" /><testcase classname="tests.test_replan_cli" name="test_cli_review_and_approve_bind_internal_replan_option" time="0.504" /><testcase classname="tests.test_replan_cli" name="test_cli_refuses_ambiguous_operations_before_loading_or_execution[operation0]" time="0.085" /><testcase classname="tests.test_replan_cli" name="test_cli_refuses_ambiguous_operations_before_loading_or_execution[operation1]" time="0.102" /><testcase classname="tests.test_replan_cli" name="test_cli_refuses_ambiguous_operations_before_loading_or_execution[operation2]" time="0.132" /></testsuite></testsuites>

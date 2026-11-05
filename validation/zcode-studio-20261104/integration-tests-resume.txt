@@ -1,0 +1,75 @@
+   Compiling af-sandbox v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-sandbox)
+   Compiling af-loop v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-loop)
+   Compiling af-agent v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-agent)
+   Compiling serde_urlencoded v0.7.1
+   Compiling clap_derive v4.6.7
+   Compiling raw-window-handle v0.6.2
+   Compiling axum v0.8.9
+   Compiling rfd v0.15.4
+   Compiling clap v4.6.7
+   Compiling af-program v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-program)
+   Compiling tokio-stream v0.1.19
+   Compiling af-budget v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-budget)
+   Compiling af-cli v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-cli)
+   Compiling af-llm v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-llm)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 43s
+     Running unittests src\lib.rs (target\debug\deps\af_agent-7ee30488f9297955.exe)
+
+running 13 tests
+test swarm::tests::aggregation_holds_pending_and_unknown_costs ... ok
+test swarm::tests::execute_sweep_claims_resolves_and_aggregates ... ok
+test swarm::tests::fully_resolved_sweep_is_complete ... ok
+test swarm::tests::sweep_admits_bounded_items_through_the_fenced_queue ... ok
+test swarm::tests::unknown_outcome_reclaims_as_new_claim_under_new_epoch ... ok
+test tests::broken_python_is_refused_at_preview_not_applied ... ok
+test tests::full_journey_records_local_integrity_without_claiming_requirement_success ... ok
+test tests::identical_replacement_refuses ... ok
+test tests::invalid_rust_syntax_is_refused_before_publication ... ok
+test tests::journal_failure_before_apply_preserves_original_source ... ok
+test tests::journey_without_replacement_refuses ... ok
+test tests::typescript_bytes_can_be_applied_without_claiming_python_or_requirement_verification ... ok
+test tests::zero_edit_budget_refuses ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.03s
+
+     Running unittests src\main.rs (target\debug\deps\af-f4d4363624ad9527.exe)
+
+running 22 tests
+test server::http_safety::tests::authenticated_remote_ip_still_requires_its_exact_origin_and_port ... ok
+test server::http_safety::tests::only_exact_local_authority_and_same_origin_are_admitted ... ok
+test server::studio_data::tests::credential_hidden_and_generated_paths_are_not_browser_sources ... ok
+test server::studio_data::tests::history_pages_are_bounded_and_do_not_make_replay_authority ... ok
+test server::tests::bind_policy_requires_token_off_loopback ... ok
+test server::tests::body_and_prompt_limits_refuse_before_backend_work ... ok
+test server::tests::browser_cannot_choose_credential_env_or_provider_destination ... ok
+test server::tests::browser_cannot_forge_kernel_terminal_history ... ok
+test server::tests::dashboard_is_served ... ok
+test server::tests::disconnected_stream_cancels_the_actual_worker_and_releases_capacity ... ok
+test server::tests::graph_and_job_queries_never_grant_arbitrary_host_paths ... ok
+test server::tests::health_is_open_loopback_style_without_token ... ok
+test server::tests::hostile_origin_is_denied_even_with_an_operator_bearer ... ok
+test server::tests::oversized_terminal_content_is_never_reported_as_a_complete_answer ... ok
+test server::tests::session_endpoints_roundtrip ... ok
+test server::tests::settled_chat_is_durable_and_an_existing_unknown_is_never_replayed ... FAILED
+test server::tests::sse_stream_via_scripted_backend ... ok
+test server::tests::static_authentication_ui_has_nonce_csp_but_api_remains_private ... ok
+test server::tests::token_is_enforced_with_constant_time_path ... ok
+test trusted_provider::tests::cancelled_and_wrong_model_calls_never_create_a_send ... ok
+test trusted_provider::tests::host_configuration_rejects_credential_urls_and_plaintext_remote_transport ... ok
+test trusted_provider::tests::provider_send_is_durably_settled_and_missing_cost_latches_hold ... ok
+
+failures:
+
+---- server::tests::settled_chat_is_durable_and_an_existing_unknown_is_never_replayed stdout ----
+
+thread 'server::tests::settled_chat_is_durable_and_an_existing_unknown_is_never_replayed' (22204) panicked at af-cli\src\server.rs:1508:9:
+assertion failed: snapshot.events.last().unwrap()["payload"]["content"].as_str().unwrap().contains("ping")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    server::tests::settled_chat_is_durable_and_an_existing_unknown_is_never_replayed
+
+test result: FAILED. 21 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+
+error: test failed, to rerun pass `-p af-cli --bin af`

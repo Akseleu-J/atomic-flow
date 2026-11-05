@@ -1,0 +1,36 @@
+[package]
+name = "af-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "The atomic-flow product binary: graph, sandbox, sessions, jobs and backend plane in one native executable"
+
+[[bin]]
+name = "af"
+path = "src/main.rs"
+
+[dependencies]
+af-evidence.workspace = true
+af-graph.workspace = true
+af-sandbox.workspace = true
+af-journal.workspace = true
+af-agents.workspace = true
+af-exec.workspace = true
+af-llm.workspace = true
+af-agent.workspace = true
+af-loop.workspace = true
+af-program.workspace = true
+af-entropy.workspace = true
+af-budget.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+clap = { version = "4", features = ["derive"] }
+axum = "0.8"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net"] }
+tokio-stream = "0.1"
+serde = { version = "1", features = ["derive"] }
+rfd = "0.15"
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"

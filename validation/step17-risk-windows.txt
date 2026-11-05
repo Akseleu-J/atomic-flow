@@ -1,0 +1,71 @@
+.................s...................................................... [ 20%]
+........................................................................ [ 40%]
+........................FFF............................................. [ 61%]
+................s.......s...s.........ssssss......s..................... [ 81%]
+..............................................................s.         [100%]
+================================== FAILURES ===================================
+__________ test_uncertain_charge_is_held_and_not_replayed[response0] __________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/af17risk06/test_uncertain_charge_is_held_0')
+response = ChatResult(content='{"steps": [{"description": "Report sample", "verify_with": "none"}]}', tokens_in=100, tokens_out=5...tency_ms=0, truncated=False, cache_read_tokens=None, cache_write_tokens=None, cost_source='unspecified', tool_calls=[])
+
+    @pytest.mark.parametrize("response", [reply(cost=None), reply(cost=float("nan")), RuntimeError("network lost")])
+    def test_uncertain_charge_is_held_and_not_replayed(tmp_path, response):
+        backend = Responses(response)
+        runner = TaskRunner(AtomicConfig(), tmp_path, backend)
+        task = runner.prepare("report sample", candidates=[], n_files=0)
+        assert task.status == "paused" and task.budget_events[0]["status"] == "unknown"
+        assert SpendLedger(10).today_total() > 0
+        task = runner.resume(task)
+>       assert "unresolved model call" in task.error and len(backend.calls) == 1
+E       AssertionError: assert ('unresolved model call' in 'task has unresolved calls or effects; inspect external state before resuming')
+E        +  where 'task has unresolved calls or effects; inspect external state before resuming' = Task(id='task_5971a8e5abec', query='report sample', project='C:\\Users\\omirb\\AppData\\Local\\Temp\\af17risk06\\test_... 4096, 'price_in_per_mtok': 1.0, 'price_out_per_mtok': 1.0}], schema_version=2, completion_report={}, plan_approval={}).error
+
+tests\test_task_budget.py:105: AssertionError
+__________ test_uncertain_charge_is_held_and_not_replayed[response1] __________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/af17risk06/test_uncertain_charge_is_held_1')
+response = ChatResult(content='{"steps": [{"description": "Report sample", "verify_with": "none"}]}', tokens_in=100, tokens_out=5...tency_ms=0, truncated=False, cache_read_tokens=None, cache_write_tokens=None, cost_source='unspecified', tool_calls=[])
+
+    @pytest.mark.parametrize("response", [reply(cost=None), reply(cost=float("nan")), RuntimeError("network lost")])
+    def test_uncertain_charge_is_held_and_not_replayed(tmp_path, response):
+        backend = Responses(response)
+        runner = TaskRunner(AtomicConfig(), tmp_path, backend)
+        task = runner.prepare("report sample", candidates=[], n_files=0)
+        assert task.status == "paused" and task.budget_events[0]["status"] == "unknown"
+        assert SpendLedger(10).today_total() > 0
+        task = runner.resume(task)
+>       assert "unresolved model call" in task.error and len(backend.calls) == 1
+E       AssertionError: assert ('unresolved model call' in 'task has unresolved calls or effects; inspect external state before resuming')
+E        +  where 'task has unresolved calls or effects; inspect external state before resuming' = Task(id='task_8396fff4a0ab', query='report sample', project='C:\\Users\\omirb\\AppData\\Local\\Temp\\af17risk06\\test_... 4096, 'price_in_per_mtok': 1.0, 'price_out_per_mtok': 1.0}], schema_version=2, completion_report={}, plan_approval={}).error
+
+tests\test_task_budget.py:105: AssertionError
+__________ test_uncertain_charge_is_held_and_not_replayed[response2] __________
+
+tmp_path = WindowsPath('C:/Users/omirb/AppData/Local/Temp/af17risk06/test_uncertain_charge_is_held_2')
+response = RuntimeError('network lost')
+
+    @pytest.mark.parametrize("response", [reply(cost=None), reply(cost=float("nan")), RuntimeError("network lost")])
+    def test_uncertain_charge_is_held_and_not_replayed(tmp_path, response):
+        backend = Responses(response)
+        runner = TaskRunner(AtomicConfig(), tmp_path, backend)
+        task = runner.prepare("report sample", candidates=[], n_files=0)
+        assert task.status == "paused" and task.budget_events[0]["status"] == "unknown"
+        assert SpendLedger(10).today_total() > 0
+        task = runner.resume(task)
+>       assert "unresolved model call" in task.error and len(backend.calls) == 1
+E       AssertionError: assert ('unresolved model call' in 'task has unresolved calls or effects; inspect external state before resuming')
+E        +  where 'task has unresolved calls or effects; inspect external state before resuming' = Task(id='task_dcd3594ba3e7', query='report sample', project='C:\\Users\\omirb\\AppData\\Local\\Temp\\af17risk06\\test_...0, 'price_out_per_mtok': 1.0, 'error_type': 'RuntimeError'}], schema_version=2, completion_report={}, plan_approval={}).error
+
+tests\test_task_budget.py:105: AssertionError
+============================== warnings summary ===============================
+tests/test_run_control.py::test_api_run_stream_auth_result_version_and_root
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_task_budget.py::test_uncertain_charge_is_held_and_not_replayed[response0]
+FAILED tests/test_task_budget.py::test_uncertain_charge_is_held_and_not_replayed[response1]
+FAILED tests/test_task_budget.py::test_uncertain_charge_is_held_and_not_replayed[response2]
+3 failed, 337 passed, 12 skipped, 1 warning in 135.87s (0:02:15)

@@ -1,0 +1,69 @@
+{
+  "run_id": "rust-live-20261026-01",
+  "kind": "LIVE_API_RESPONSE (transport smoke of the Rust OpenAI-compatible backend)",
+  "credential_label": "Kaggle3_TOKEN",
+  "owner_authorized": true,
+  "authorized_by": "owner granted Kaggle3_TOKEN for one bounded transport smoke (26.10.2026)",
+  "utc_start": "2026-10-29T16:47:49.564805+00:00",
+  "caps": {
+    "max_physical_calls": 1,
+    "max_output_tokens": 256,
+    "timeout_seconds": 600,
+    "max_retries": 0,
+    "min_quota_reserve": 1,
+    "prompt_transfer": "no repository content; synthetic one-line prompt only"
+  },
+  "physical_attempts": [
+    {
+      "attempt": 1,
+      "command": [
+        "C:\\Users\\omirb\\.zcode\\workspace\\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\\atomic-flow-dev\\rust\\target\\release\\af.exe",
+        "backend",
+        "call",
+        "--base-url",
+        "https://mp-staging.kaggle.net/models/openapi",
+        "--api-key-env",
+        "MODEL_PROXY_API_KEY",
+        "--model",
+        "google/gemini-3.1-flash-lite-preview",
+        "--prompt",
+        "Reply with exactly one line: RUST-LIVE-OK"
+      ],
+      "note": "MODEL_PROXY_API_KEY value is in child env only; never in argv or logs",
+      "exit_code": 0,
+      "stdout_tail": "{\"backend\":\"openai\",\"content_chars\":12,\"ok\":true,\"tokens_in\":13,\"tokens_out\":6,\"truncated\":false}\n",
+      "stderr_tail": "",
+      "outcome": "success"
+    }
+  ],
+  "model_calls": 1,
+  "quota_before": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 0.0,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 3.330001749999994,
+      "allowed": 100
+    }
+  ],
+  "model_allowlist": "",
+  "model_choice": "account 3 has no LLM_DEFAULT/LLMS_AVAILABLE; using the model the owner approved for all previous live pilots (see .local-tools/live-request.json p05-diagnostic)",
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "status": "LIVE_API_RESPONSE",
+  "quota_after": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 1.224999999926979e-05,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 3.3300140000000056,
+      "allowed": 100
+    }
+  ],
+  "utc_end": "2026-10-29T16:47:55.077388+00:00"
+}

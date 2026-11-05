@@ -13,6 +13,7 @@ from atomic_flow.tree.builder import build_tree, save_tree
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
+    monkeypatch.setenv("ATOMIC_FLOW_EXECUTION_MODE", "local")
     monkeypatch.setenv("ATOMIC_FLOW_HOME", str(tmp_path / "home"))
     for var in ("ATOMIC_FLOW_BASE_URL", "ATOMIC_FLOW_API_KEY", "ATOMIC_FLOW_MODEL", "ATOMIC_FLOW_SERVER_API_KEY",
                 "ATOMIC_FLOW_PROJECT_ROOT", "ATOMIC_FLOW_REQUIRE_API_KEY"):
@@ -40,7 +41,7 @@ class ScriptedBackend:
 
     def __init__(self, handlers: dict):
         self.handlers = {k: (list(v) if isinstance(v, list) else v) for k, v in handlers.items()}
-        self.config = BackendConfig(model="fake-model")
+        self.config = BackendConfig(model="fake-model", price_in_per_mtok=1, price_out_per_mtok=1)
         self.calls: list[tuple[str, list[dict]]] = []
 
     def chat(self, messages, *, json_mode=False, model=None) -> ChatResult:

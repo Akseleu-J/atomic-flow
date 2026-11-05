@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\tools\integration_acceptance.py", line 151, in <module>
+    main()
+  File "C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\tools\integration_acceptance.py", line 144, in main
+    result = run(args)
+             ^^^^^^^^^
+  File "C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\tools\integration_acceptance.py", line 122, in run
+    assert task.status == "done", f"{task.status}: {task.error} {task.steps[0].result_summary}"
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError: failed: StepFailure: (0, 'external_probe: LSPError: noncanonical document URI') StepFailure: (0, 'external_probe: LSPError: noncanonical document URI')

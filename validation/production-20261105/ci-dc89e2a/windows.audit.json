@@ -1,0 +1,31 @@
+{
+  "tested_commit": "dc89e2af562a66c21c3d2c5ef7db640f0124b282",
+  "archive_sha256": "d23bd7f7df850e14663331e4171c4f4f6da97f681bbdfb4ccae549b0a91d9b60",
+  "source_files_exact_git_bytes": 115,
+  "rust_pass": 343,
+  "rust_ignored": 1,
+  "sdk_test_summary": [
+    "# tests 36",
+    "# pass 36",
+    "# fail 0",
+    "# skipped 0"
+  ],
+  "native_http_smoke": {
+    "status": "passed",
+    "binary_sha256": "43df30392cf8b10ad96bdfeb1c0e68471aee35f4c2ad6974f230642ba189220a",
+    "scenarios": [
+      "static UI nonce CSP and token-only APIs",
+      "hostile origin, DNS-rebinding Host and browser credential routing refused",
+      "registered Rust project graph and hash-bound source preview",
+      "actual native scripted chat, source context, durable history and forged terminal refusal",
+      "immutable journal snapshot exact SHA256 and durable budget projection",
+      "installed SDK copy outside checkout against actual native API"
+    ],
+    "provider_calls": 0,
+    "transport": "native HTTP + scripted backend",
+    "owned_server_cleanup": true,
+    "browser_visual_qa": "not_assessed"
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1",
+  "scope": "CI engineering and installed-copy SDK integration; not production or live model acceptance"
+}

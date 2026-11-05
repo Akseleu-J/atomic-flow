@@ -1,0 +1,13 @@
+{
+  "task_type": "modify",
+  "target_scope": [
+    "sympy/core/function.py"
+  ],
+  "focus_terms": [
+    "Derivative",
+    "kind",
+    "expression",
+    "differentiated"
+  ],
+  "answer_format": "code_patch"
+}

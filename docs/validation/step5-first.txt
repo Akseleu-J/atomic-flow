@@ -1,0 +1,36 @@
+............................sssss........s.........s.................... [ 40%]
+s..........................s......F...............................F..... [ 80%]
+...................................                                      [100%]
+================================== FAILURES ===================================
+____________________ test_task_runner_stops_on_failed_edit ____________________
+tests\test_task.py:100: in test_task_runner_stops_on_failed_edit
+    assert task.status == "failed"
+E   AssertionError: assert 'paused' == 'failed'
+E
+E     - failed
+E     + paused
+__________________ test_cli_task_bootstraps_persisted_index ___________________
+tests\test_task_execution.py:130: in test_cli_task_bootstraps_persisted_index
+    assert cli.main(["task", "explain sample", "--project", str(project), "--yes"]) == 0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = <function main at 0x0000023FC2374EA0>(['task', 'explain sample', '--project', 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.analysis-budget-first\\test_cli_task_bootstraps_persi0\\project', '--yes'])
+E    +    where <function main at 0x0000023FC2374EA0> = <module 'atomic_flow.cli' from 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\src\\atomic_flow\\cli.py'>.main
+---------------------------- Captured stdout call -----------------------------
+planning: explain sample
+
+task:   task_86a4a43ca8b8
+query:  explain sample
+status: paused
+budget: $0.0000
+steps:
+error: model response has no valid cost; review usage before continuing
+============================== warnings summary ===============================
+tests/test_config_backends_api.py::test_server_auth_chat_hard_and_validation
+  C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_task.py::test_task_runner_stops_on_failed_edit - AssertionE...
+FAILED tests/test_task_execution.py::test_cli_task_bootstraps_persisted_index
+2 failed, 168 passed, 9 skipped, 1 warning in 38.86s

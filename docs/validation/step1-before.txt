@@ -1,0 +1,202 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFF                                               [100%]
+================================== FAILURES ===================================
+__________________ test_role_denial_is_enforced_and_recorded __________________
+tests\test_tool_execution.py:44: in test_role_denial_is_enforced_and_recorded
+    result, record = invoke(tool, tmp_path, allowed=("read_node",))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+________ test_every_execution_outcome_is_audited[result0-False-error] _________
+tests\test_tool_execution.py:60: in test_every_execution_outcome_is_audited
+    payload, record = invoke(ProbeTool(result, raises), tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+________ test_every_execution_outcome_is_audited[result1-False-error] _________
+tests\test_tool_execution.py:60: in test_every_execution_outcome_is_audited
+    payload, record = invoke(ProbeTool(result, raises), tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+________ test_every_execution_outcome_is_audited[result2-False-error] _________
+tests\test_tool_execution.py:60: in test_every_execution_outcome_is_audited
+    payload, record = invoke(ProbeTool(result, raises), tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+________ test_every_execution_outcome_is_audited[result3-False-error] _________
+tests\test_tool_execution.py:60: in test_every_execution_outcome_is_audited
+    payload, record = invoke(ProbeTool(result, raises), tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+_______ test_every_execution_outcome_is_audited[result4-False-success] ________
+tests\test_tool_execution.py:60: in test_every_execution_outcome_is_audited
+    payload, record = invoke(ProbeTool(result, raises), tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+__________ test_every_execution_outcome_is_audited[None-True-error] ___________
+tests\test_tool_execution.py:60: in test_every_execution_outcome_is_audited
+    payload, record = invoke(ProbeTool(result, raises), tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+________ test_every_execution_outcome_is_audited[result6-False-error] _________
+tests\test_tool_execution.py:60: in test_every_execution_outcome_is_audited
+    payload, record = invoke(ProbeTool(result, raises), tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+___________________ test_policy_denial_has_a_result_summary ___________________
+tests\test_tool_execution.py:68: in test_policy_denial_has_a_result_summary
+    result, record = invoke(tool, tmp_path, policy=PolicyEngine([Rule("probe", "forbid")]))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+______________ test_edit_capability_cannot_be_granted_by_policy _______________
+tests\test_tool_execution.py:75: in test_edit_capability_cannot_be_granted_by_policy
+    result, record = execute_tool(
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+______________ test_invalid_arguments_do_not_prompt_for_approval ______________
+tests\test_tool_execution.py:87: in test_invalid_arguments_do_not_prompt_for_approval
+    result, record = execute_tool({"tool": "edit_node", "args": {}}, default_registry(), ctx,
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+________________________ test_unknown_tool_is_recorded ________________________
+tests\test_tool_execution.py:94: in test_unknown_tool_is_recorded
+    result, record = execute_tool({"tool": "unknown", "args": {}}, default_registry(),
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+______________ test_summary_drops_source_but_keeps_verification _______________
+tests\test_tool_execution.py:100: in test_summary_drops_source_but_keeps_verification
+    result, record = invoke(ProbeTool({"status": "applied", "checks": ["syntax"], "source": "large"}), tmp_path)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_tool_execution.py:39: in invoke
+    return execute_tool({"tool": "probe", "args": {}}, registry, ctx, allowed_tools=allowed, role="refiner")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: execute_tool() got an unexpected keyword argument 'allowed_tools'
+______ test_incomplete_or_failed_evidence_cannot_pass[calls0-py_compile] ______
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+______ test_incomplete_or_failed_evidence_cannot_pass[calls1-py_compile] ______
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+______ test_incomplete_or_failed_evidence_cannot_pass[calls2-py_compile] ______
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+______ test_incomplete_or_failed_evidence_cannot_pass[calls3-py_compile] ______
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+________ test_incomplete_or_failed_evidence_cannot_pass[calls4-pytest] ________
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+________ test_incomplete_or_failed_evidence_cannot_pass[calls5-pytest] ________
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+_________ test_incomplete_or_failed_evidence_cannot_pass[calls6-none] _________
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+____ test_incomplete_or_failed_evidence_cannot_pass[calls7-unknown-method] ____
+tests\test_task_execution.py:32: in test_incomplete_or_failed_evidence_cannot_pass
+    with pytest.raises(StepFailure):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+____________ test_declared_edit_requires_an_edit_even_with_pytest _____________
+tests\test_task_execution.py:39: in test_declared_edit_requires_an_edit_even_with_pytest
+    with pytest.raises(StepFailure, match="edit"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StepFailure
+____________________ test_pytest_before_last_edit_is_rerun ____________________
+tests\test_task_execution.py:54: in test_pytest_before_last_edit_is_rerun
+    assert len(invoked) == 1
+E   assert 0 == 1
+E    +  where 0 = len([])
+_________ test_task_uses_real_orchestrator_and_approval_channel[True] _________
+tests\test_task_execution.py:81: in test_task_uses_real_orchestrator_and_approval_channel
+    assert approvals and approvals[0][0] == "edit_node"
+E   assert ([])
+________ test_task_uses_real_orchestrator_and_approval_channel[False] _________
+tests\test_task_execution.py:81: in test_task_uses_real_orchestrator_and_approval_channel
+    assert approvals and approvals[0][0] == "edit_node"
+E   assert ([])
+__________________ test_cli_task_bootstraps_persisted_index ___________________
+tests\test_task_execution.py:104: in test_cli_task_bootstraps_persisted_index
+    assert cli.main(["task", "explain sample", "--project", str(tmp_path), "--yes"]) == 0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = <function main at 0x000001D2ECECC860>(['task', 'explain sample', '--project', 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\.analysis-step1-red\\test_cli_task_bootstraps_persi0', '--yes'])
+E    +    where <function main at 0x000001D2ECECC860> = <module 'atomic_flow.cli' from 'C:\\Users\\omirb\\OneDrive\\Документы\\ChatGPT\\atomic-flow 2\\atomic-flow\\src\\atomic_flow\\cli.py'>.main
+---------------------------- Captured stdout call -----------------------------
+planning: explain sample
+
+plan (1 steps):
+  1. Report sample  [none]
+
+
+task:   task_7109cc5fef4d
+query:  explain sample
+status: failed
+budget: $0.0000
+steps:
+  [✗] 1. Report sample  -- TreeError: No project tree found at C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.analysis-step1-
+  [✗] 2. Report sample  -- TreeError: No project tree found at C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.analysis-step1-
+  [✗] 3. Report sample  -- TreeError: No project tree found at C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.analysis-step1-
+error: TreeError: No project tree found at C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.analysis-step1-red\test_cli_task_bootstraps_persi0\.atomic_flow\tree.json. Run `atomic tree build` first.
+=========================== short test summary info ===========================
+FAILED tests/test_tool_execution.py::test_role_denial_is_enforced_and_recorded
+FAILED tests/test_tool_execution.py::test_every_execution_outcome_is_audited[result0-False-error]
+FAILED tests/test_tool_execution.py::test_every_execution_outcome_is_audited[result1-False-error]
+FAILED tests/test_tool_execution.py::test_every_execution_outcome_is_audited[result2-False-error]
+FAILED tests/test_tool_execution.py::test_every_execution_outcome_is_audited[result3-False-error]
+FAILED tests/test_tool_execution.py::test_every_execution_outcome_is_audited[result4-False-success]
+FAILED tests/test_tool_execution.py::test_every_execution_outcome_is_audited[None-True-error]
+FAILED tests/test_tool_execution.py::test_every_execution_outcome_is_audited[result6-False-error]
+FAILED tests/test_tool_execution.py::test_policy_denial_has_a_result_summary
+FAILED tests/test_tool_execution.py::test_edit_capability_cannot_be_granted_by_policy
+FAILED tests/test_tool_execution.py::test_invalid_arguments_do_not_prompt_for_approval
+FAILED tests/test_tool_execution.py::test_unknown_tool_is_recorded - TypeErro...
+FAILED tests/test_tool_execution.py::test_summary_drops_source_but_keeps_verification
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls0-py_compile]
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls1-py_compile]
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls2-py_compile]
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls3-py_compile]
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls4-pytest]
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls5-pytest]
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls6-none]
+FAILED tests/test_task_execution.py::test_incomplete_or_failed_evidence_cannot_pass[calls7-unknown-method]
+FAILED tests/test_task_execution.py::test_declared_edit_requires_an_edit_even_with_pytest
+FAILED tests/test_task_execution.py::test_pytest_before_last_edit_is_rerun - ...
+FAILED tests/test_task_execution.py::test_task_uses_real_orchestrator_and_approval_channel[True]
+FAILED tests/test_task_execution.py::test_task_uses_real_orchestrator_and_approval_channel[False]
+FAILED tests/test_task_execution.py::test_cli_task_bootstraps_persisted_index
+26 failed in 0.91s

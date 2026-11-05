@@ -1,0 +1,57 @@
+...........s..s.........sF.F.F.F.....                                    [100%]
+================================== FAILURES ===================================
+_______ test_actual_stdio_server_tools_resources_and_clean_environment ________
+tests\test_mcp_integration.py:30: in test_actual_stdio_server_tools_resources_and_clean_environment
+    with MCPClient(project, [sys.executable, str(FIXTURE.resolve()), str(project), str(capture)], approved=True,
+src\atomic_flow\integrations\mcp.py:277: in __exit__
+    self.close()
+src\atomic_flow\integrations\mcp.py:261: in close
+    _kill_tree(self._proc)
+src\atomic_flow\agents\execution.py:228: in _kill_tree
+    raise ExecutionUnavailable("Windows process-tree cleanup could not be confirmed; effects remain unknown") from None
+E   atomic_flow.agents.execution.ExecutionUnavailable: Windows process-tree cleanup could not be confirmed; effects remain unknown
+_________ test_remote_schema_drift_and_operation_approval_fail_closed _________
+tests\test_mcp_integration.py:52: in test_remote_schema_drift_and_operation_approval_fail_closed
+    with client(tmp_path, allowed_tools={"source_tree": "0" * 64}, approval=lambda *_: True) as remote:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\atomic_flow\integrations\mcp.py:277: in __exit__
+    self.close()
+src\atomic_flow\integrations\mcp.py:261: in close
+    _kill_tree(self._proc)
+src\atomic_flow\agents\execution.py:228: in _kill_tree
+    raise ExecutionUnavailable("Windows process-tree cleanup could not be confirmed; effects remain unknown") from None
+E   atomic_flow.agents.execution.ExecutionUnavailable: Windows process-tree cleanup could not be confirmed; effects remain unknown
+___________ test_bad_or_nonresponding_stdio_server_is_bounded[hang] ___________
+tests\test_mcp_integration.py:85: in test_bad_or_nonresponding_stdio_server_is_bounded
+    with remote:
+         ^^^^^^
+src\atomic_flow\integrations\mcp.py:274: in __enter__
+    return self.start()
+           ^^^^^^^^^^^^
+src\atomic_flow\integrations\mcp.py:114: in start
+    result = self._request("initialize", {"protocolVersion": PROTOCOL_VERSION, "capabilities": {},
+src\atomic_flow\integrations\mcp.py:212: in _request
+    self.close()
+src\atomic_flow\integrations\mcp.py:261: in close
+    _kill_tree(self._proc)
+src\atomic_flow\agents\execution.py:228: in _kill_tree
+    raise ExecutionUnavailable("Windows process-tree cleanup could not be confirmed; effects remain unknown") from None
+E   atomic_flow.agents.execution.ExecutionUnavailable: Windows process-tree cleanup could not be confirmed; effects remain unknown
+_________ test_cancellation_closes_owned_server_without_replay[hang] __________
+tests\test_mcp_integration.py:94: in test_cancellation_closes_owned_server_without_replay
+    remote.start()
+src\atomic_flow\integrations\mcp.py:114: in start
+    result = self._request("initialize", {"protocolVersion": PROTOCOL_VERSION, "capabilities": {},
+src\atomic_flow\integrations\mcp.py:212: in _request
+    self.close()
+src\atomic_flow\integrations\mcp.py:261: in close
+    _kill_tree(self._proc)
+src\atomic_flow\agents\execution.py:228: in _kill_tree
+    raise ExecutionUnavailable("Windows process-tree cleanup could not be confirmed; effects remain unknown") from None
+E   atomic_flow.agents.execution.ExecutionUnavailable: Windows process-tree cleanup could not be confirmed; effects remain unknown
+=========================== short test summary info ===========================
+FAILED tests/test_mcp_integration.py::test_actual_stdio_server_tools_resources_and_clean_environment
+FAILED tests/test_mcp_integration.py::test_remote_schema_drift_and_operation_approval_fail_closed
+FAILED tests/test_mcp_integration.py::test_bad_or_nonresponding_stdio_server_is_bounded[hang]
+FAILED tests/test_mcp_integration.py::test_cancellation_closes_owned_server_without_replay[hang]
+4 failed, 30 passed, 3 skipped in 108.77s (0:01:48)

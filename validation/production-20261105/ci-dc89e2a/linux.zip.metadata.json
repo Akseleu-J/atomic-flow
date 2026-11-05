@@ -1,0 +1,20 @@
+{
+  "id": 13415030595,
+  "node_id": "MDg6QXJ0aWZhY3QxMzQxNTAzMDU5NQ==",
+  "name": "studio-ubuntu-24.04-dc89e2af562a66c21c3d2c5ef7db640f0124b282",
+  "size_in_bytes": 33340,
+  "url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/13415030595",
+  "archive_download_url": "https://api.github.com/repos/Akseleu-J/atomic-flow/actions/artifacts/13415030595/zip",
+  "expired": false,
+  "digest": "sha256:141a035a6cfd858a7e06cb77d00f125bd18753eec4730881abec9a9937e4f164",
+  "created_at": "2026-11-05T12:30:41Z",
+  "updated_at": "2026-11-05T12:30:41Z",
+  "expires_at": "2026-11-19T12:30:41Z",
+  "workflow_run": {
+    "id": 42027392401,
+    "repository_id": 1373027250,
+    "head_repository_id": 1373027250,
+    "head_branch": "experimental",
+    "head_sha": "dc89e2af562a66c21c3d2c5ef7db640f0124b282"
+  }
+}

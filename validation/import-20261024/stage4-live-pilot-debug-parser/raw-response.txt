@@ -1,0 +1,3 @@
+```json
+{"patch": "--- a/sympy/core/function.py\n+++ b/sympy/core/function.py\n@@ -1265,6 +1265,13 @@\n \n     is_Derivative = True\n \n+    @property\n+    def kind(self):\n+        from sympy.core.kind import DerivativeKind\n+        # The kind of a derivative is the kind of the expression being\n+        # differentiated.\n+        return self.expr.kind\n+\n     @property\n     def _diff_wrt(self):\n         \"\"\"An expression may be differentiated wrt a Derivative if"}
+```

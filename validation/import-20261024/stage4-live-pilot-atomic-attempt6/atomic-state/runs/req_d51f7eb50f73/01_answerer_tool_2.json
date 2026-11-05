@@ -1,0 +1,72 @@
+{
+  "call": {
+    "tool": "read_node",
+    "args": {
+      "node_id": "n38206",
+      "zoom": 2,
+      "offset": 0,
+      "limit": 6000
+    },
+    "role": "answerer",
+    "contract": {
+      "effects": [
+        "read"
+      ],
+      "timeout_seconds": 120,
+      "max_output_bytes": 262144,
+      "interaction": false,
+      "idempotent": true,
+      "retryable": false,
+      "cancellation": "cooperative"
+    },
+    "policy_action": "auto",
+    "policy_source": "default",
+    "policy_reason": "default: matched docs_fetch|docs_search|find_callers|find_files|lsp_definition|lsp_diagnostics|lsp_references|notebook_read|read_file|read_many|read_node|read_result|search_text|search_tree|tool_catalog|workspace_read -> auto",
+    "output_bytes": 6542,
+    "result_summary": {
+      "node_id": "n38206",
+      "path": "sympy/core/function.py",
+      "symbol": "Derivative",
+      "content_hash": "2c56b38f173e4f81e6bcc801e8f2329401a3ade0",
+      "next_offset": 6000,
+      "read_complete": false,
+      "source_complete": true,
+      "outcome": "success",
+      "verification": {},
+      "provenance": {
+        "origin": "tool_result",
+        "tool": "read_node",
+        "role": "answerer",
+        "trust": "data_only",
+        "index_revision": 0
+      }
+    }
+  },
+  "result": {
+    "node_id": "n38206",
+    "path": "sympy/core/function.py",
+    "symbol": "Derivative",
+    "kind": "class",
+    "lines": "1053-1936",
+    "zoom": 2,
+    "source": "1053| class Derivative(Expr):\n1054|     \"\"\"\n1055|     Carries out differentiation of the given expression with respect to symbols.\n1056| \n1057|     Examples\n1058|     ========\n1059| \n1060|     >>> from sympy import Derivative, Function, symbols, Subs\n1061|     >>> from sympy.abc import x, y\n1062|     >>> f, g = symbols('f g', cls=Function)\n1063| \n1064|     >>> Derivative(x**2, x, evaluate=True)\n1065|     2*x\n1066| \n1067|     Denesting of derivatives retains the ordering of variables:\n1068| \n1069|         >>> Derivative(Derivative(f(x, y), y), x)\n1070|         Derivative(f(x, y), y, x)\n1071| \n1072|     Contiguously identical symbols are merged into a tuple giving\n1073|     the symbol and the count:\n1074| \n1075|         >>> Derivative(f(x), x, x, y, x)\n1076|         Derivative(f(x), (x, 2), y, x)\n1077| \n1078|     If the derivative cannot be performed, and evaluate is True, the\n1079|     order of the variables of differentiation will be made canonical:\n1080| \n1081|         >>> Derivative(f(x, y), y, x, evaluate=True)\n1082|         Derivative(f(x, y), x, y)\n1083| \n1084|     Derivatives with respect to undefined functions can be calculated:\n1085| \n1086|         >>> Derivative(f(x)**2, f(x), evaluate=True)\n1087|         2*f(x)\n1088| \n1089|     Such derivatives will show up when the chain rule is used to\n1090|     evalulate a derivative:\n1091| \n1092|         >>> f(g(x)).diff(x)\n1093|         Derivative(f(g(x)), g(x))*Derivative(g(x), x)\n1094| \n1095|     Substitution is used to represent derivatives of functions with\n1096|     arguments that are not symbols or functions:\n1097| \n1098|         >>> f(2*x + 3).diff(x) == 2*Subs(f(y).diff(y), y, 2*x + 3)\n1099|         True\n1100| \n1101|     Notes\n1102|     =====\n1103| \n1104|     Simplification of high-order derivatives:\n1105| \n1106|     Because there can be a significant amount of simplification that can be\n1107|     done when multiple differentiations are performed, results will be\n1108|     automatically simplified in a fairly conservative fashion unless the\n1109|     keyword ``simplify`` is set to False.\n1110| \n1111|         >>> from sympy import sqrt, diff, Function, symbols\n1112|         >>> from sympy.abc import x, y, z\n1113|         >>> f, g = symbols('f,g', cls=Function)\n1114| \n1115|         >>> e = sqrt((x + 1)**2 + x)\n1116|         >>> diff(e, (x, 5), simplify=False).count_ops()\n1117|         136\n1118|         >>> diff(e, (x, 5)).count_ops()\n1119|         30\n1120| \n1121|     Ordering of variables:\n1122| \n1123|     If evaluate is set to True and the expression cannot be evaluated, the\n1124|     list of differentiation symbols will be sorted, that is, the expression is\n1125|     assumed to have continuous derivatives up to the order asked.\n1126| \n1127|     Derivative wrt non-Symbols:\n1128| \n1129|     For the most part, one may not differentiate wrt non-symbols.\n1130|     For example, we do not allow differentiation wrt `x*y` because\n1131|     there are multiple ways of structurally defining where x*y appears\n1132|     in an expression: a very strict definition would make\n1133|     (x*y*z).diff(x*y) == 0. Derivatives wrt defined functions (like\n1134|     cos(x)) are not allowed, either:\n1135| \n1136|         >>> (x*y*z).diff(x*y)\n1137|         Traceback (most recent call last):\n1138|         ...\n1139|         ValueError: Can't calculate derivative wrt x*y.\n1140| \n1141|     To make it easier to work with variational calculus, however,\n1142|     derivatives wrt AppliedUndef and Derivatives are allowed.\n1143|     For example, in the Euler-Lagrange method one may write\n1144|     F(t, u, v) where u = f(t) and v = f'(t). These variables can be\n1145|     written explicitly as functions of time::\n1146| \n1147|         >>> from sympy.abc import t\n1148|         >>> F = Function('F')\n1149|         >>> U = f(t)\n1150|         >>> V = U.diff(t)\n1151| \n1152|     The derivative wrt f(t) can be obtained directly:\n1153| \n1154|         >>> direct = F(t, U, V).diff(U)\n1155| \n1156|     When differentiation wrt a non-Symbol is attempted, the non-Symbol\n1157|     is temporarily converted to a Symbol while the differentiation\n1158|     is performed and the same answer is obtained:\n1159| \n1160|         >>> indirect = F(t, U, V).subs(U, x).diff(x).subs(x, U)\n1161|         >>> assert direct == indirect\n1162| \n1163|     The implication of this non-symbol replacement is that all\n1164|     functions are treated as independent of other functions and the\n1165|     symbols are independent of the functions that contain them::\n1166| \n1167|         >>> x.diff(f(x))\n1168|         0\n1169|         >>> g(x).diff(f(x))\n1170|         0\n1171| \n1172|     It also means that derivatives are assumed to depend only\n1173|     on the variables of differentiation, not on anything contained\n1174|     within the expression being differentiated::\n1175| \n1176|         >>> F = f(x)\n1177|         >>> Fx = F.diff(x)\n1178|         >>> Fx.diff(F)  # derivative depends on x, not F\n1179|         0\n1180|         >>> Fxx = Fx.diff(x)\n1181|         >>> Fxx.diff(Fx)  # derivative depends on x, not Fx\n1182|         0\n1183| \n1184|     The last example can be made explicit by showing the replacement\n1185|     of Fx in Fxx with y:\n1186| \n1187|         >>> Fxx.subs(Fx, y)\n1188|         Derivative(y, x)\n1189| \n1190|         Since that in itself will evaluate to zero, differentiating\n1191|         wrt Fx will also be zero:\n1192| \n1193|         >>> _.doit()\n1194|         0\n1195| \n1196|     Replacing undefined functions with concrete expressions\n1197| \n1198|     One must be careful to replace undefined functions with expressions\n1199|     that contain variables consistent with the function definition and\n1200|     the variables of differentiation or else insconsistent result will\n1201|     be obtained. Consider the following example:\n1202| \n1203|     >>> eq = f(x)*g(y)\n1204|     >>> eq.subs(f(x), x*y).diff(x, y).doit()\n1205|     y*Derivative(g(y), y) + g(y)\n1206|     >>> eq.diff(x, y).subs(f(x), x*y).doit()\n1207|     y*",
+    "offset": 0,
+    "next_offset": 6000,
+    "truncated": true,
+    "content_hash": "2c56b38f173e4f81e6bcc801e8f2329401a3ade0",
+    "source_complete": true,
+    "read_complete": false,
+    "rendered_complete": false,
+    "total_chars": 39104,
+    "representation": "redacted",
+    "outcome": "success",
+    "verification": {},
+    "provenance": {
+      "origin": "tool_result",
+      "tool": "read_node",
+      "role": "answerer",
+      "trust": "data_only",
+      "index_revision": 0
+    }
+  }
+}

@@ -1,0 +1,17 @@
+--- a/sympy/core/function.py
++++ b/sympy/core/function.py
+@@ -1265,6 +1265,14 @@
+ 
+     is_Derivative = True
+ 
++    @property
++    def kind(self):
++        from sympy.core.kind import Kind
++        k = self.expr.kind
++        for v, _ in self.variable_count:
++            k = k / v.kind
++        return k
++
+     @property
+     def _diff_wrt(self):
+         """An expression may be differentiated wrt a Derivative if

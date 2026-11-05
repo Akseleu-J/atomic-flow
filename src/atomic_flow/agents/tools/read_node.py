@@ -5,8 +5,10 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from atomic_flow.activation.redact import redact
 from atomic_flow.agents.base import Tool
 from atomic_flow.agents.context import ToolContext
+from atomic_flow.agents.tools.file_paths import admitted_path
 from atomic_flow.tree.node import TreeNode
 
 
@@ -14,6 +16,8 @@ class ReadNodeArgs(BaseModel):
     node_id: str = Field(description="Short node id like 'n42', or full 'path::symbol'.")
     zoom: int = Field(default=2, ge=0, le=3,
                       description="0=signature, 1=+docstring, 2=full body, 3=+related nodes.")
+    offset: int = Field(default=0, ge=0, description="Character offset into rendered source; follow next_offset for long nodes.")
+    limit: int = Field(default=6000, ge=256, le=12000, description="Maximum source characters per page.")
 
 
 def _split_lines(text: str) -> list[str]:
@@ -24,8 +28,8 @@ class ReadNodeTool(Tool):
     name = "read_node"
     description = (
         "Read the source of a project node at a given zoom. "
-        "zoom=0 signature only, zoom=1 adds docstring, zoom=2 full body, "
-        "zoom=3 additionally lists callers/callees/references."
+        "zoom=0 signature only, zoom=1 adds docstring, zoom=2 body, "
+        "zoom=3 additionally lists callers/callees/references. Follow next_offset to read remaining pages."
     )
     args_schema = ReadNodeArgs
 
@@ -36,16 +40,24 @@ class ReadNodeTool(Tool):
             return {"error": f"unknown node_id: {args.node_id}",
                     "hint": "use search_tree to find valid ids"}
 
-        lines = ctx.sources.get(node.path)
-        if lines is None:
-            try:
-                text = (ctx.project_root / node.path).read_text(encoding="utf-8-sig", errors="replace")
-                lines = _split_lines(text)
-                ctx.sources[node.path] = lines
-            except OSError as exc:
-                ctx.sources[node.path] = None
-                return {"error": f"cannot read {node.path}: {exc}"}
-
+        try:
+            ctx.cancel_check()
+            admitted_path(ctx, node.path, existing=True)
+            text = ctx.read_source(node.path).decode("utf-8-sig")
+        except (OSError, UnicodeError) as exc:
+            return {"error": f"cannot read {node.path}: {exc}"}
+        lines = _split_lines(redact(text))
+        source = self._render(node, lines, args.zoom, ctx)
+        offset = min(args.offset, len(source))
+        page = source[offset:offset + args.limit]
+        next_offset = offset + len(page) if offset + len(page) < len(source) else None
+        ctx.cancel_check()
+        source_complete = args.zoom >= 2
+        coverage = ctx.record_read(node.path, ctx.file_hashes[node.path], f"node_zoom_{args.zoom}",
+                                   offset, offset + len(page), len(source),
+                                   node_id=None if node.kind == "file" else node.node_id,
+                                   source_complete=source_complete)
+        ctx.evidence[node.node_id] = (ctx.evidence.get(node.node_id, "") + "\n" + page).strip()
         return {
             "node_id": ctx.aliases.get(node.node_id, node.node_id),
             "path": node.path,
@@ -53,13 +65,18 @@ class ReadNodeTool(Tool):
             "kind": node.kind,
             "lines": f"{node.start_line}-{node.end_line}",
             "zoom": args.zoom,
-            "source": self._render(node, lines, args.zoom, ctx),
+            "source": page,
+            "offset": offset, "next_offset": next_offset, "truncated": next_offset is not None,
+            "content_hash": ctx.file_hashes[node.path],
+            "source_complete": source_complete, "read_complete": coverage["read_complete"] and source_complete,
+            "rendered_complete": coverage["read_complete"], "total_chars": len(source),
+            "representation": "redacted",
         }
 
     @staticmethod
     def _render(node: TreeNode, lines: list[str], zoom: int, ctx: ToolContext) -> str:
         if node.kind == "file":
-            limit = {0: 5, 1: 20, 2: 60, 3: 200}.get(zoom, 60)
+            limit = {0: 5, 1: 20}.get(zoom, len(lines))
             body = lines[:limit]
             head = f"# {node.path} (showing {len(body)} of {len(lines)} lines)\n"
             return head + "\n".join(body)
@@ -70,8 +87,6 @@ class ReadNodeTool(Tool):
         start, end = node.start_line, node.end_line
         if zoom == 1:
             end = min(end, start + 14)
-        elif zoom == 2:
-            end = min(end, start + 80)
 
         body_lines = lines[start - 1:end]
         numbered = "\n".join(f"{start + i:>4}| {line}" for i, line in enumerate(body_lines))

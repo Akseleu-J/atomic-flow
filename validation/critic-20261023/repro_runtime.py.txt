@@ -1,0 +1,123 @@
+"""Offline audit reproduction. No models, subprocesses, credentials or source edits."""
+import json
+import os
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+from atomic_flow.agents import task_loop
+from atomic_flow.agents.planner import Plan, PlanStep
+from atomic_flow.agents.task import Step, Task
+from atomic_flow.config import AtomicConfig
+from atomic_flow.config import BackendConfig
+from atomic_flow.agents.base import Tool, ToolContract, ToolRegistry
+from atomic_flow.agents.context import ToolContext
+from atomic_flow.agents.policy import PolicyEngine, Rule
+from atomic_flow.backends.base import ChatResult
+from atomic_flow.llm.orchestrator import _Run
+from atomic_flow.llm.prompts import PromptRegistry
+from atomic_flow.llm.schemas import Answer
+from pydantic import BaseModel
+from atomic_flow.workflows import Workflow, run_workflow
+from atomic_flow.agents.execution import TaskCancelled
+
+
+def scheduler_case(project, independent):
+    config = AtomicConfig()
+    config.artifacts.save = False
+    task = Task.new("audit", project, [Step(index=0, description="failure", verify_with="none")]
+                    + ([Step(index=1, description="independent", verify_with="none", depends_on=[])] if independent else []))
+    runner = task_loop.TaskRunner(config, project, SimpleNamespace(chat=lambda *_: None))
+    calls = []
+
+    class FakeChangeSet:
+        workspace = project
+        def checkpoint(self):
+            return {}
+        def restore_checkpoint(self, _):
+            pass
+
+    runner.changeset = FakeChangeSet()
+    def execute(_task, step):
+        calls.append(step.description)
+        if step.index == 0:
+            raise ValueError("scripted step failure")
+    runner._execute_step = execute
+    replans = []
+    def replan(*args, **kwargs):
+        replans.append(kwargs["failed_description"])
+        return Plan(steps=[PlanStep(description="repair", verify_with="none")])
+    with patch.object(task_loop, "save", lambda _: None), patch.object(task_loop, "require_scope", lambda *_: None), \
+         patch.object(task_loop, "save_tree", lambda *_: None), patch.object(task_loop, "build_tree", lambda *_, **__: {}), \
+         patch.object(task_loop, "replan_task", replan):
+        result = runner._resume_steps(task)
+    return {"independent_step": independent, "executed": calls, "replanner_calls": len(replans),
+            "status": result.status, "error": result.error, "step_statuses": [s.status for s in result.steps]}
+
+
+def uncertain_effect_case(project):
+    invocations = []
+    class Args(BaseModel):
+        pass
+    class ExternalEffect(Tool):
+        name = "external_effect"
+        description = "Scripted non-idempotent external effect"
+        args_schema = Args
+        contract = ToolContract(effects=("execute",), idempotent=False)
+        def run(self, args, ctx):
+            invocations.append("external effect may have completed")
+            return {"error": "response lost after effect", "side_effects_may_have_occurred": True}
+    registry = ToolRegistry()
+    registry.register(ExternalEffect())
+    ctx = ToolContext(project, {}, policy=PolicyEngine(host_rules=[Rule(ExternalEffect.name, "auto")]))
+    backend = SimpleNamespace(config=BackendConfig(max_output_tokens=4096))
+    run = _Run(backend, PromptRegistry(project), SimpleNamespace(check=lambda: None), "perform operation", None,
+               tool_registry=registry, tool_ctx=ctx)
+    messages = iter([{"tool": "external_effect", "args": {}}, {"tool": "external_effect", "args": {}}, {"text": "stopped"}])
+    run.chat = lambda *_: ChatResult(content=json.dumps(next(messages)))
+    answer = run._invoke_with_tools("answerer", Answer, {}, None, [ExternalEffect.name])
+    return {"non_idempotent": True, "real_effects_simulated": True, "tool_invocations": len(invocations),
+            "recorded_uncertain_calls": sum(bool(c["result_summary"].get("side_effects_may_have_occurred")) for c in run.tool_calls),
+            "final_answer": answer.text}
+
+
+def workflow_effect_case(project):
+    invocations = []
+    class Args(BaseModel):
+        pass
+    class SuccessfulWrite(Tool):
+        name = "successful_write"
+        description = "Simulated successful source write"
+        args_schema = Args
+        contract = ToolContract(effects=("write",), idempotent=False)
+        def run(self, args, ctx):
+            invocations.append("successful write")
+            return {"status": "applied", "checks": ["syntax"]}
+    class CancelledRead(Tool):
+        name = "cancelled_read"
+        description = "Simulated cancellation in next read"
+        args_schema = Args
+        contract = ToolContract(effects=("read",))
+        def run(self, args, ctx):
+            raise TaskCancelled("scripted cancellation")
+    registry = ToolRegistry()
+    registry.register(SuccessfulWrite())
+    registry.register(CancelledRead())
+    names = [SuccessfulWrite.name, CancelledRead.name]
+    ctx = ToolContext(project, {}, edits_enabled=True, policy=PolicyEngine(host_rules=[Rule(name, "auto") for name in names]))
+    workflow = Workflow.model_validate({"name": "audit", "steps": [
+        {"id": "write", "tool": names[0]}, {"id": "read", "tool": names[1], "depends_on": ["write"]}]})
+    try:
+        run_workflow(workflow, registry, ctx, allowed_tools=names, expected_digest=workflow.digest(), approved=True)
+    except TaskCancelled as exc:
+        return {"successful_write_invocations": len(invocations), "report": exc.workflow_report}
+    raise AssertionError("expected scripted cancellation")
+
+
+folder = Path(__file__).parent / "audit-runtime-state"
+project = folder / "project"
+project.mkdir(parents=True, exist_ok=True)
+os.environ["ATOMIC_FLOW_HOME"] = str((folder / "home").resolve())
+results = {"scheduler": [scheduler_case(project, False), scheduler_case(project, True)],
+           "uncertain_effect_retry": uncertain_effect_case(project), "workflow_effect_tracking": workflow_effect_case(project)}
+print(json.dumps(results, indent=2))

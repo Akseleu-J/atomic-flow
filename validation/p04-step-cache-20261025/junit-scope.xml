@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="1.406" timestamp="2026-10-25T07:50:14.751360+03:00" hostname="DESKTOP-LLOHV5V"><testcase classname="tests.test_read_plan_live_cache" name="test_cache_is_rebound_to_task_and_exact_approved_scope" time="0.896" /></testsuite></testsuites>

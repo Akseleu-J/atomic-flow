@@ -1,0 +1,3 @@
+{"case": "source-secret-via-check-output", "source_read_denied": true, "ignored_credential_copied": true, "raw_fake_credential_in_tool_result": true, "redactor_would_have_masked": true, "command_exit_code": 1}
+{"case": "fixed-quality-tool-shadowing", "command_exit_code": 0, "verification": {"pytest": "passed"}, "shadowed_module_ran": true}
+{"case": "host-completion-shadowing", "ready_to_publish": true, "tests": "passed", "test_exit_code": 0, "shadowed_module_ran": true}

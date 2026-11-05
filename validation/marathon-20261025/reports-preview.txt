@@ -1,0 +1,91 @@
+SOURCE_KEYS ['schema_version', 'tested_commit', 'runtime_worktree_dirty', 'python', 'platform', 'provider_calls', 'status', 'testcases', 'failures', 'skipped', 'source_sha256', 'source_normalized_sha256', 'junit_sha256', 'additional_junit_sha256', 'limits']
+SOURCE_SAMPLE {'schema_version': 1, 'tested_commit': 'a8a76f86f2a6a60f9e02bee0db0294270970608a', 'runtime_worktree_dirty': False, 'python': '3.12.15', 'platform': 'Linux', 'provider_calls': 0, 'status': 'passed', 'testcases': 1274, 'failures': 0, 'skipped': 14, 'source_sha256': {'src/atomic_flow/__init__.py': 'd500be7ca3defbb2f39cae842c3cbf9d90154c5231b1b027912f343d69076b5c', 'src/atomic_flow/activation/__init__.py': '7d52d84296610c802d9b3741c546a2ae0dc320967a0bfc5d50e74f71333bc11c', 'src/atomic_flow/activation/activate.py': '80d3ba9924be14e9e82660a9075fb57ddd5a2fc01ef529439894bb77f76a67b2', 'src/atomic_flow/activation/redact.py': '2a6cef3c0c44425c542328e8cbb3f09c782323f220aac287ab578fceb8fa53ef', 'src/atomic_flow/activation/text.py': 'ded7e4b50b9b2a7bf4e198525686ce132914a85bdc8444be503e36c00cf69b93', 'src/atomic_flow/agents/__init__.py': '69ad1150b40900bf8e6eb4a3983930ba668d648b16fbf68a5c1e939ebc8c111c', 'src/atomic_flow/agents/base.py': '183b02907003ba0bdae6337ce8c099e0bef99c4288ff213c93c2e474beb45746', 'src/atomic_flow/agents/changeset.py': '04e81d1c39642dbb3c4391c30492df2f06a71c85775b83ace4fc83cc52dc1aef', 'src/atomic_flow/agents/completion.py': '730fd3feb76e59c222d3bf910abda6cc8d80db073ae05
+DOCKER {
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+  "gpu_requested": false,
+  "model_calls": 0,
+  "container": "PASS",
+  "tests_exit": 0,
+  "extra_tests_exit": 0,
+  "compile_exit": 0,
+  "image_id": "sha256:35b08188a25f3de5b94c5b0b59fc48b19e534d59b60428ba7d28934461d10778"
+}
+
+COMPOSITION {
+  "schema_version": 2,
+  "status": "passed",
+  "paid_calls": 0,
+  "scenarios": [
+    {
+      "name": "publish",
+      "status": "passed",
+      "schema_version": 2,
+      "external_services": "real local processes",
+      "model": "scripted; no model quality claim",
+      "paid_calls": 0,
+      "observations": [
+        {
+          "phase": "before",
+          "workspace": "staged",
+          "version": 1,
+          "hash": "a66948897ff1355c03922828f3f42685766d5bd3",
+          "definitions": 1
+        },
+        {
+          "phase": "after",
+          "workspace": "staged",
+          "version": 2,
+          "hash": "33968aa35ff8d2090345df0af46b4c7b25ab9ba5",
+          "definitions": 1
+        }
+      ],
+      "review": {
+        "unapproved_resume_blocked": true,
+        "allowed_paths": [
+          "book.ipynb",
+          "sample.py"
+        ],
+        "approval_digest": "9fbabfd0f19f8bde1ef7f4f2e7413a6e6219dd9771de4d1057a9585ad7ec0014",
+        "planning_calls": 1
+      },
+      "factory_bindings": 2,
+      "task_status": "done",
+      "task_error": "",
+      "notebook": {
+        "source_changed": true,
+        "stable_ids": true,
+        "outputs_cleared": true,
+        "trust_cleared": true,
+        "notebook_execution": "not_run"
+      },
+      "recovery": {
+        "published_journal_unsaved_completion": "verified",
+        "new_model_calls": 0,
+        "recreated_capabilities": 0,
+        "source_bytes_verified": true,
+        "fault_method": "host durable-state injection; not process-kill coverage"
+      },
+      "changeset_status": "published",
+      "scripted_calls": 14,
+      "budget_events": 14,
+      "accounting_fixture_spend_usd": 0.014000000000000005,
+      "published_sha256": "ab9a9e7571dc3df2baf1975f0f70fa139251fdb0ff7f44c65f91f53154e42d1f",
+      "completion": {
+        "schema_version": 1,
+        "ready_to_publish": true,
+        "checked_at": 1792946478.977498,
+        "checks": [
+          {
+            "name": "completed_steps",
+            "status": "passed",
+            "superseded_by_replanning": []
+          },
+          {
+            "name": "approved_diff_and_freshness",
+            "status": "passed"
+          },
+          {
+    
+
+EXIT_CODE=0

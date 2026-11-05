@@ -1,0 +1,100 @@
+name: Surfaces acceptance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, experimental]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: surfaces-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ts-client:
+    name: TypeScript client (typecheck + Node tests)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Record tested source
+        run: |
+          mkdir -p validation/ts
+          git rev-parse HEAD > validation/ts/commit.txt
+      - name: Install dependencies
+        working-directory: ts/af-client
+        run: npm ci --ignore-scripts --no-fund --no-audit
+      - name: Typecheck (strict)
+        working-directory: ts/af-client
+        run: npm run typecheck
+      - name: Unit tests
+        working-directory: ts/af-client
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test 2>&1 | tee ../../validation/ts/node-tests.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: ts-client-${{ github.sha }}
+          path: validation/ts/
+
+  docker-driver:
+    name: Real Docker acceptance (SandboxDriver)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CARGO_BUILD_JOBS: "2"
+      CARGO_INCREMENTAL: "0"
+      CARGO_PROFILE_DEV_DEBUG: "0"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          profile: minimal
+      - name: Record tested source
+        run: |
+          mkdir -p validation/docker
+          git rev-parse HEAD > validation/docker/commit.txt
+          rustc --version --verbose > validation/docker/rustc.txt
+          cargo --version > validation/docker/cargo.txt
+          docker version > validation/docker/docker-version.txt
+          python3 validation/production-20261104/capture_source.py validation/docker/source.json
+      - name: Check Docker evidence refusal cases without Docker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s validation/production-ci-20261105 -p test_surfaces_evidence.py -v 2>&1 | tee validation/docker/verifier-unit-tests.log
+      - name: Provision host image and record immutable identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull alpine:3.22 2>&1 | tee validation/docker/image-pull.log
+          python3 validation/production-ci-20261105/surfaces_evidence.py provision validation/docker alpine:3.22
+      - name: Build af kernel tests
+        working-directory: rust
+        run: cargo build --locked --release -p af-exec --tests
+      - name: Real Docker acceptance through run_with_driver (alpine, network none, read-only)
+        working-directory: rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${AF_EXEC_TEST_IMAGE:?host image provisioning is required}"
+          cargo test --locked -p af-exec --release real_docker_acceptance -- --ignored --nocapture --test-threads=1 2>&1 | tee ../validation/docker/acceptance.log
+      - name: Verify actual Docker receipt and observed container absence
+        run: python3 validation/production-ci-20261105/surfaces_evidence.py verify validation/docker
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: docker-driver-${{ github.sha }}
+          path: validation/docker/

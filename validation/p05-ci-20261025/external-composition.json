@@ -1,0 +1,212 @@
+{
+  "schema_version": 2,
+  "status": "passed",
+  "paid_calls": 0,
+  "scenarios": [
+    {
+      "name": "publish",
+      "status": "passed",
+      "schema_version": 2,
+      "external_services": "real local processes",
+      "model": "scripted; no model quality claim",
+      "paid_calls": 0,
+      "observations": [
+        {
+          "phase": "before",
+          "workspace": "staged",
+          "version": 1,
+          "hash": "a66948897ff1355c03922828f3f42685766d5bd3",
+          "definitions": 1
+        },
+        {
+          "phase": "after",
+          "workspace": "staged",
+          "version": 2,
+          "hash": "33968aa35ff8d2090345df0af46b4c7b25ab9ba5",
+          "definitions": 1
+        }
+      ],
+      "review": {
+        "unapproved_resume_blocked": true,
+        "allowed_paths": [
+          "book.ipynb",
+          "sample.py"
+        ],
+        "approval_digest": "e79001df7c05514dd2b629cf798e1aa8f379d4a225b9a19e0fc26bb0ab63fc52",
+        "planning_calls": 1
+      },
+      "factory_bindings": 2,
+      "task_status": "done",
+      "task_error": "",
+      "notebook": {
+        "source_changed": true,
+        "stable_ids": true,
+        "outputs_cleared": true,
+        "trust_cleared": true,
+        "notebook_execution": "not_run"
+      },
+      "recovery": {
+        "published_journal_unsaved_completion": "verified",
+        "new_model_calls": 0,
+        "recreated_capabilities": 0,
+        "source_bytes_verified": true,
+        "fault_method": "host durable-state injection; not process-kill coverage"
+      },
+      "changeset_status": "published",
+      "scripted_calls": 14,
+      "budget_events": 14,
+      "accounting_fixture_spend_usd": 0.014000000000000005,
+      "published_sha256": "ab9a9e7571dc3df2baf1975f0f70fa139251fdb0ff7f44c65f91f53154e42d1f",
+      "completion": {
+        "schema_version": 1,
+        "ready_to_publish": true,
+        "checked_at": 1792915623.0978105,
+        "checks": [
+          {
+            "name": "completed_steps",
+            "status": "passed",
+            "superseded_by_replanning": []
+          },
+          {
+            "name": "approved_diff_and_freshness",
+            "status": "passed"
+          },
+          {
+            "name": "notebook_structure",
+            "status": "passed",
+            "path": "book.ipynb",
+            "execution": "not_run"
+          },
+          {
+            "name": "final_python_syntax",
+            "status": "passed",
+            "scope": "Changed surviving Python files only"
+          }
+        ],
+        "diagnostics": [],
+        "tests": "passed",
+        "model_calls": 0,
+        "step_observations": [
+          {
+            "index": 0,
+            "receipt": "148ca738fff55a764079fc79bddab8701354522bf6c615cbda0b50b224cd651f",
+            "current": false,
+            "legacy_missing": false
+          },
+          {
+            "index": 1,
+            "receipt": "1d2827c1e146fc08e930395deb8abcd75c87494349450198265adab0cc4e2204",
+            "current": true,
+            "legacy_missing": false
+          }
+        ],
+        "changed_paths": [
+          {
+            "path": "book.ipynb",
+            "before_hash": "2e08b92ce026b7a3ab8ed46b19abede7176026d8",
+            "after_hash": "561d40e10feb2fad2bcdb5602bba9285bda57a2c"
+          },
+          {
+            "path": "sample.py",
+            "before_hash": "a66948897ff1355c03922828f3f42685766d5bd3",
+            "after_hash": "33968aa35ff8d2090345df0af46b4c7b25ab9ba5"
+          }
+        ],
+        "workspace_manifest_sha256": "6cfd48762d8b294522cc09a37dca37ca49da1d622d07f3822631d1590fdc2860",
+        "test_exit_code": 0,
+        "test_timed_out": false,
+        "test_output_tail": ".                                                                        [100%]\n1 passed in 0.00s\n",
+        "limits": "Host gates confirm declared checks and approved bytes, not semantic fulfillment of every user requirement."
+      }
+    },
+    {
+      "name": "cancel",
+      "status": "passed",
+      "schema_version": 2,
+      "external_services": "real local processes",
+      "model": "scripted; no model quality claim",
+      "paid_calls": 0,
+      "observations": [
+        {
+          "phase": "before",
+          "workspace": "staged",
+          "version": 1,
+          "hash": "a66948897ff1355c03922828f3f42685766d5bd3",
+          "definitions": 1
+        },
+        {
+          "phase": "after",
+          "workspace": "staged",
+          "version": 2,
+          "hash": "33968aa35ff8d2090345df0af46b4c7b25ab9ba5",
+          "definitions": 1
+        }
+      ],
+      "review": {
+        "unapproved_resume_blocked": true,
+        "allowed_paths": [
+          "book.ipynb",
+          "sample.py"
+        ],
+        "approval_digest": "e8ca7c0282ba22908938be9273d484681221467deb6c9d91becb15ca9adff7e5",
+        "planning_calls": 1
+      },
+      "factory_bindings": 1,
+      "host_fault": "cancel after staged edit and completed read-only external probes",
+      "task_status": "cancelled",
+      "task_error": "cancelled by user",
+      "source_preserved": true,
+      "changeset_status": "aborted",
+      "scripted_calls": 6,
+      "budget_events": 6,
+      "accounting_fixture_spend_usd": 0.006,
+      "published_sha256": null,
+      "completion": {}
+    },
+    {
+      "name": "source_conflict",
+      "status": "passed",
+      "schema_version": 2,
+      "external_services": "real local processes",
+      "model": "scripted; no model quality claim",
+      "paid_calls": 0,
+      "observations": [
+        {
+          "phase": "before",
+          "workspace": "staged",
+          "version": 1,
+          "hash": "a66948897ff1355c03922828f3f42685766d5bd3",
+          "definitions": 1
+        },
+        {
+          "phase": "after",
+          "workspace": "staged",
+          "version": 2,
+          "hash": "33968aa35ff8d2090345df0af46b4c7b25ab9ba5",
+          "definitions": 1
+        }
+      ],
+      "review": {
+        "unapproved_resume_blocked": true,
+        "allowed_paths": [
+          "book.ipynb",
+          "sample.py"
+        ],
+        "approval_digest": "b29aebfcf554ae0d3b88028905182b8405fe49c15f3341903e811e93e2b574a0",
+        "planning_calls": 1
+      },
+      "factory_bindings": 1,
+      "host_fault": "external source editor changed original after staged edit",
+      "task_status": "failed",
+      "task_error": "ChangeSetConflict: plan approval is stale; project source changed",
+      "external_source_preserved": true,
+      "changeset_status": "aborted",
+      "scripted_calls": 8,
+      "budget_events": 8,
+      "accounting_fixture_spend_usd": 0.008,
+      "published_sha256": null,
+      "completion": {}
+    }
+  ],
+  "script_sha256": "271e9ff39147ba1d0242c321b0d6cf7e3e231db5f33f0a93bffbe7201797ffb1"
+}

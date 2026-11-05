@@ -1,0 +1,16 @@
+[package]
+name = "af-memory"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Hybrid agent memory: self-editing blocks with provenance over the journal (Letta-style) plus file-system-as-memory (Manus-style)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+af-entropy.workspace = true
+af-journal.workspace = true
+
+[dev-dependencies]
+af-entropy.workspace = true

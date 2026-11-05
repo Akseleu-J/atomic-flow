@@ -1,0 +1,8 @@
+[package]
+name = "af-entropy"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "OS randomness (BCryptGenRandom / /dev/urandom) and portable file leases (LockFileEx/flock) for atomic-flow crates"
+
+[dependencies]

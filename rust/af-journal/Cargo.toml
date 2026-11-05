@@ -1,0 +1,13 @@
+[package]
+name = "af-journal"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Bounded append-only session journal with redaction and unknown-outcome holds (sessions.py port)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+regex.workspace = true
+af-entropy.workspace = true

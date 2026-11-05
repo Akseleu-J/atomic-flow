@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2020",
+    "module": "commonjs",
+    "rootDir": ".",
+    "noEmitOnError": true,
+    "skipLibCheck": false,
+    "types": []
+  },
+  "include": ["src/budget.ts", "tests/budget.ts"]
+}

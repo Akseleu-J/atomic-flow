@@ -1,0 +1,18 @@
+[package]
+name = "af-agent"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Bounded agent journey on the kernel: observe -> reviewed plan -> sandbox apply -> verify -> evidence (host mechanics without a live model)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+rustpython-parser = "0.4"
+af-entropy.workspace = true
+af-graph.workspace = true
+af-sandbox.workspace = true
+af-journal.workspace = true
+af-agents.workspace = true
+af-exec.workspace = true

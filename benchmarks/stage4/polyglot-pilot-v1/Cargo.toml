@@ -1,0 +1,16 @@
+[package]
+name = "atomic-budget-pilot"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/budget.rs"
+
+[profile.dev]
+debug = 0
+incremental = false
+
+[profile.test]
+debug = 0
+incremental = false

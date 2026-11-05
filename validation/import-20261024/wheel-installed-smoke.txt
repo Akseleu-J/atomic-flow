@@ -1,0 +1,13 @@
+Processing .\.local-tools\import-release-20261024\dist\atomic_flow-0.2.0-py3-none-any.whl
+Installing collected packages: atomic-flow
+Successfully installed atomic-flow-0.2.0
+DEPENDENCY SCOPE: existing validated dependencies reused; fresh dependency resolution is a CI gate.
+import location: C:\Users\omirb\AppData\Local\Temp\atomic-installed-import-20261024\Lib\site-packages\atomic_flow\__init__.py
+packaged fixtures: cases.json (7137 bytes)
+tree build/save/load: ok
+sdk import: ok
+C:\Users\omirb\OneDrive\Документы\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+api health/ready: ok
+cli --help: ok
+wheel smoke: PASS

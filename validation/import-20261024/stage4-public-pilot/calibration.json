@@ -1,0 +1,92 @@
+{
+  "instance_id": "sympy__sympy-21614",
+  "calibrated": false,
+  "rows": [
+    {
+      "instance_id": "sympy__sympy-21614",
+      "label": "base",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "execution": {
+        "status": "finished",
+        "exit_code": 4,
+        "wall_seconds": 5.280999999959022,
+        "log_sha256": "9c60e40c120b6e2a585e7b0f6548e0990e2d8b94d0d73d9b65799979d6bdfc8f",
+        "log_bytes": 855,
+        "log_prefix": "ImportError while loading conftest 'C:\\Users\\omirb\\AppData\\Local\\Temp\\stage4-6d1zjktj\\repo\\conftest.py'.\r\nconftest.py:11: in <module>\r\n    from sympy.testing.runtests import setup_pprint, _get_doctest_blacklist\r\nsympy\\__init__.py:51: in <module>\r\n    from .core import (sympify, SympifyError, cacheit, Basic, Atom,\r\nsympy\\core\\__init__.py:4: in <module>\r\n    from .sympify import sympify, SympifyError\r\nsympy\\core\\sympify.py:9: in <module>\r\n    from .compatibility import iterable\r\nsympy\\core\\compatibility.py:11: in <module>\r\n    from sympy.external.gmpy import SYMPY_INTS, HAS_GMPY, GROUND_TYPES, gmpy\r\nsympy\\external\\__init__.py:18: in <module>\r\n    from sympy.external.importtools import import_module\r\nsympy\\external\\importtools.py:4: in <module>\r\n    from distutils.version import LooseVersion\r\nE   ModuleNotFoundError: No module named 'distutils'\r\n"
+      },
+      "oracle_sha256": "d94f7d2f0f632c698c668e9c65712728646d4822a3c9ef9de2c9c5b8f6533549",
+      "tests": {
+        "test_Add_kind": "error",
+        "test_Derivative_kind": "error",
+        "test_Integral_kind": "error",
+        "test_Matrix_kind": "error",
+        "test_NumberKind": "error",
+        "test_Symbol_kind": "error",
+        "test_mul_kind": "error"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-21614",
+      "label": "gold",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "patch_sha256": "5a20f33fdb0a731064a81dc26e925e91557900bb7edbfce84463de6280e8e3cd",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "execution": {
+        "status": "finished",
+        "exit_code": 4,
+        "wall_seconds": 1.8900000001303852,
+        "log_sha256": "5dc8551b7a125622729ba8041fcb66742514a421f5a63f4a8ad810b9edfa2801",
+        "log_bytes": 855,
+        "log_prefix": "ImportError while loading conftest 'C:\\Users\\omirb\\AppData\\Local\\Temp\\stage4-dq3rqf54\\repo\\conftest.py'.\r\nconftest.py:11: in <module>\r\n    from sympy.testing.runtests import setup_pprint, _get_doctest_blacklist\r\nsympy\\__init__.py:51: in <module>\r\n    from .core import (sympify, SympifyError, cacheit, Basic, Atom,\r\nsympy\\core\\__init__.py:4: in <module>\r\n    from .sympify import sympify, SympifyError\r\nsympy\\core\\sympify.py:9: in <module>\r\n    from .compatibility import iterable\r\nsympy\\core\\compatibility.py:11: in <module>\r\n    from sympy.external.gmpy import SYMPY_INTS, HAS_GMPY, GROUND_TYPES, gmpy\r\nsympy\\external\\__init__.py:18: in <module>\r\n    from sympy.external.importtools import import_module\r\nsympy\\external\\importtools.py:4: in <module>\r\n    from distutils.version import LooseVersion\r\nE   ModuleNotFoundError: No module named 'distutils'\r\n"
+      },
+      "oracle_sha256": "d94f7d2f0f632c698c668e9c65712728646d4822a3c9ef9de2c9c5b8f6533549",
+      "tests": {
+        "test_Add_kind": "error",
+        "test_Derivative_kind": "error",
+        "test_Integral_kind": "error",
+        "test_Matrix_kind": "error",
+        "test_NumberKind": "error",
+        "test_Symbol_kind": "error",
+        "test_mul_kind": "error"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-21614",
+      "label": "wrong",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "patch_sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "execution": {
+        "status": "finished",
+        "exit_code": 4,
+        "wall_seconds": 2.577999999979511,
+        "log_sha256": "44e10e81a57b5f2094c58c805732b709263ce95c6fd838e69b09939ac2f039c9",
+        "log_bytes": 855,
+        "log_prefix": "ImportError while loading conftest 'C:\\Users\\omirb\\AppData\\Local\\Temp\\stage4-rytqim_4\\repo\\conftest.py'.\r\nconftest.py:11: in <module>\r\n    from sympy.testing.runtests import setup_pprint, _get_doctest_blacklist\r\nsympy\\__init__.py:51: in <module>\r\n    from .core import (sympify, SympifyError, cacheit, Basic, Atom,\r\nsympy\\core\\__init__.py:4: in <module>\r\n    from .sympify import sympify, SympifyError\r\nsympy\\core\\sympify.py:9: in <module>\r\n    from .compatibility import iterable\r\nsympy\\core\\compatibility.py:11: in <module>\r\n    from sympy.external.gmpy import SYMPY_INTS, HAS_GMPY, GROUND_TYPES, gmpy\r\nsympy\\external\\__init__.py:18: in <module>\r\n    from sympy.external.importtools import import_module\r\nsympy\\external\\importtools.py:4: in <module>\r\n    from distutils.version import LooseVersion\r\nE   ModuleNotFoundError: No module named 'distutils'\r\n"
+      },
+      "oracle_sha256": "d94f7d2f0f632c698c668e9c65712728646d4822a3c9ef9de2c9c5b8f6533549",
+      "tests": {
+        "test_Add_kind": "error",
+        "test_Derivative_kind": "error",
+        "test_Integral_kind": "error",
+        "test_Matrix_kind": "error",
+        "test_NumberKind": "error",
+        "test_Symbol_kind": "error",
+        "test_mul_kind": "error"
+      }
+    }
+  ],
+  "wrong_patch_sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+  "model_quality_measured": false,
+  "environment_identity": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]\npytest 8.4.2\nmpmath 1.2.1\n",
+  "interpreter_sha256": "47b0553a0a11b62c53d0d0eca35f06c08b95eca70c717ff93fc1852a8d49cf44",
+  "oracle_adapter_sha256": "026ccab468e0d7e7c7f096089a5516380914d4c5a86405a93cc9b3aa5b64b5e7",
+  "task_exposure": "public_known_gold_development_pilot",
+  "model_calls": 0,
+  "provider_calls": 0
+}

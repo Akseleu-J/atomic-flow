@@ -1,0 +1,116 @@
+{
+  "instance_id": "sympy__sympy-21614",
+  "calibrated": true,
+  "rows": [
+    {
+      "instance_id": "sympy__sympy-21614",
+      "label": "base",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "execution": {
+        "status": "finished",
+        "exit_code": 1,
+        "wall_seconds": 25.67200000002049,
+        "log_sha256": "ab933738144f10f6a31263881ae496bcfe87e7a9eb3648d1702c90e3d6725e36",
+        "log_bytes": 1443,
+        "log_prefix": ".....F..                                                                 [100%]\r\n================================== FAILURES ===================================\r\n____________________________ test_Derivative_kind _____________________________\r\n\r\n    def test_Derivative_kind():\r\n        A = MatrixSymbol('A', 2,2)\r\n>       assert Derivative(comm_x, comm_x).kind is NumberKind\r\nE       assert UndefinedKind is NumberKind\r\nE        +  where UndefinedKind = Derivative(x, x).kind\r\nE        +    where Derivative(x, x) = Derivative(x, x)\r\n\r\nsympy\\core\\tests\\test_kind.py:45: AssertionError\r\n============================== warnings summary ===============================\r\n..\\..\\..\\..\\..\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474\r\n  C:\\Users\\omirb\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474: PytestConfigWarning: Unknown config option: doctestplus\r\n  \r\n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\r\n\r\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\r\n                               DO *NOT* COMMIT!                               \r\n=========================== short test summary info ===========================\r\nFAILED sympy/core/tests/test_kind.py::test_Derivative_kind - assert Undefined...\r\n1 failed, 7 passed, 1 warning in 2.36s\r\n"
+      },
+      "oracle_sha256": "0247c32e398975d3ca7decf7da3c8149cc9de8c5aba807c259fd112f4ae01397",
+      "tests": {
+        "sympy/core/tests/test_kind.py::test_Add_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_Derivative_kind": "fail",
+        "sympy/core/tests/test_kind.py::test_Integral_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_MatMul_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_Matrix_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_NumberKind": "pass",
+        "sympy/core/tests/test_kind.py::test_Symbol_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_mul_kind": "pass",
+        "test_Add_kind": "pass",
+        "test_Derivative_kind": "fail",
+        "test_Integral_kind": "pass",
+        "test_Matrix_kind": "pass",
+        "test_NumberKind": "pass",
+        "test_Symbol_kind": "pass",
+        "test_mul_kind": "pass"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-21614",
+      "label": "gold",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "patch_sha256": "5a20f33fdb0a731064a81dc26e925e91557900bb7edbfce84463de6280e8e3cd",
+      "status": "verified_success",
+      "verified_success": true,
+      "execution": {
+        "status": "finished",
+        "exit_code": 0,
+        "wall_seconds": 21.82799999997951,
+        "log_sha256": "1afb9e2d7d6b996ba243bb8b065bce2d4745d54598950aecd8d682f92f9820ea",
+        "log_bytes": 685,
+        "log_prefix": "........                                                                 [100%]\r\n============================== warnings summary ===============================\r\n..\\..\\..\\..\\..\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474\r\n  C:\\Users\\omirb\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474: PytestConfigWarning: Unknown config option: doctestplus\r\n  \r\n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\r\n\r\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\r\n8 passed, 1 warning in 1.85s\r\n"
+      },
+      "oracle_sha256": "02c4c150deecf9ac1a31a1a304d03e93f481399a8993f6976bb60617d01781c7",
+      "tests": {
+        "sympy/core/tests/test_kind.py::test_Add_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_Derivative_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_Integral_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_MatMul_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_Matrix_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_NumberKind": "pass",
+        "sympy/core/tests/test_kind.py::test_Symbol_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_mul_kind": "pass",
+        "test_Add_kind": "pass",
+        "test_Derivative_kind": "pass",
+        "test_Integral_kind": "pass",
+        "test_Matrix_kind": "pass",
+        "test_NumberKind": "pass",
+        "test_Symbol_kind": "pass",
+        "test_mul_kind": "pass"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-21614",
+      "label": "wrong",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "patch_sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+      "status": "requirement_failed",
+      "verified_success": false,
+      "execution": {
+        "status": "finished",
+        "exit_code": 1,
+        "wall_seconds": 24.719000000040978,
+        "log_sha256": "f0de1a5dddb9348ad4b5dfd724ff9c54d047fb62c977446b7e2b1b48e88e0235",
+        "log_bytes": 1585,
+        "log_prefix": ".....F..                                                                 [100%]\r\n================================== FAILURES ===================================\r\n____________________________ test_Derivative_kind _____________________________\r\n\r\n    def test_Derivative_kind():\r\n        A = MatrixSymbol('A', 2,2)\r\n        assert Derivative(comm_x, comm_x).kind is NumberKind\r\n>       assert Derivative(A, comm_x).kind is MatrixKind(NumberKind)\r\nE       assert NumberKind is MatrixKind(NumberKind)\r\nE        +  where NumberKind = Derivative(A, x).kind\r\nE        +    where Derivative(A, x) = Derivative(A, x)\r\nE        +  and   MatrixKind(NumberKind) = MatrixKind(NumberKind)\r\n\r\nsympy\\core\\tests\\test_kind.py:46: AssertionError\r\n============================== warnings summary ===============================\r\n..\\..\\..\\..\\..\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474\r\n  C:\\Users\\omirb\\OneDrive\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\stage4-env\\Lib\\site-packages\\_pytest\\config\\__init__.py:1474: PytestConfigWarning: Unknown config option: doctestplus\r\n  \r\n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\r\n\r\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\r\n                               DO *NOT* COMMIT!                               \r\n=========================== short test summary info ===========================\r\nFAILED sympy/core/tests/test_kind.py::test_Derivative_kind - assert NumberKin...\r\n1 failed, 7 passed, 1 warning in 4.73s\r\n"
+      },
+      "oracle_sha256": "0247c32e398975d3ca7decf7da3c8149cc9de8c5aba807c259fd112f4ae01397",
+      "tests": {
+        "sympy/core/tests/test_kind.py::test_Add_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_Derivative_kind": "fail",
+        "sympy/core/tests/test_kind.py::test_Integral_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_MatMul_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_Matrix_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_NumberKind": "pass",
+        "sympy/core/tests/test_kind.py::test_Symbol_kind": "pass",
+        "sympy/core/tests/test_kind.py::test_mul_kind": "pass",
+        "test_Add_kind": "pass",
+        "test_Derivative_kind": "fail",
+        "test_Integral_kind": "pass",
+        "test_Matrix_kind": "pass",
+        "test_NumberKind": "pass",
+        "test_Symbol_kind": "pass",
+        "test_mul_kind": "pass"
+      }
+    }
+  ],
+  "wrong_patch_sha256": "7dfc0e3f04d2380182dcfa6d8cd01172173120d8788df7352239e51f3223cc15",
+  "model_quality_measured": false,
+  "environment_identity": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]\npytest 8.4.2\nmpmath 1.2.1\n",
+  "interpreter_sha256": "47b0553a0a11b62c53d0d0eca35f06c08b95eca70c717ff93fc1852a8d49cf44",
+  "oracle_adapter_sha256": "d53ec7c3092675d98fd46745b99968100f34e99f999c8e9cc7cd01f6236f8e31",
+  "task_exposure": "public_known_gold_development_pilot",
+  "model_calls": 0,
+  "provider_calls": 0
+}

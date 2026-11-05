@@ -1,0 +1,94 @@
+{
+  "scheduler": [
+    {
+      "independent_step": false,
+      "executed": [
+        "failure"
+      ],
+      "replanner_calls": 1,
+      "status": "paused",
+      "error": "replanned work requires fresh plan review and approval",
+      "step_statuses": [
+        "superseded",
+        "pending"
+      ]
+    },
+    {
+      "independent_step": true,
+      "executed": [
+        "failure",
+        "independent"
+      ],
+      "replanner_calls": 0,
+      "status": "paused",
+      "error": "blocked work remains; review prerequisites or revise the plan",
+      "step_statuses": [
+        "failed",
+        "done"
+      ]
+    }
+  ],
+  "uncertain_effect_retry": {
+    "non_idempotent": true,
+    "real_effects_simulated": true,
+    "tool_invocations": 2,
+    "recorded_uncertain_calls": 2,
+    "final_answer": "stopped"
+  },
+  "workflow_effect_tracking": {
+    "successful_write_invocations": 1,
+    "report": {
+      "name": "audit",
+      "digest": "df757d4dbdea2cd892516149c03a8b729eb06edc1182c441d177a4a4cb0e62a5",
+      "status": "interrupted",
+      "steps": [
+        {
+          "step": "write",
+          "tool": "successful_write",
+          "result": {
+            "status": "applied",
+            "checks": [
+              "syntax"
+            ],
+            "provenance": {
+              "origin": "tool_result",
+              "tool": "successful_write",
+              "role": "",
+              "trust": "data_only",
+              "index_revision": 0
+            },
+            "outcome": "success",
+            "verification": {
+              "syntax": "passed",
+              "pytest": "not_run"
+            }
+          },
+          "audit": {
+            "tool": "successful_write",
+            "role": "",
+            "contract": {
+              "effects": [
+                "write"
+              ],
+              "timeout_seconds": 120,
+              "max_output_bytes": 262144,
+              "interaction": false,
+              "idempotent": false,
+              "retryable": false,
+              "cancellation": "cooperative"
+            },
+            "policy_action": "auto",
+            "policy_source": "host",
+            "policy_reason": "host: matched successful_write -> auto",
+            "output_bytes": 43,
+            "args_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          }
+        }
+      ],
+      "pending_step": "read",
+      "pending_call_id": "workflow_339605dfd3e546b08a2491a978b3bda7",
+      "side_effects_may_have_occurred": false,
+      "replay_performed": false
+    }
+  }
+}

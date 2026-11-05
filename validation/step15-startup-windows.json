@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "scope": "Fresh interpreter SDK/catalog imports and explicit symbol loading; no service startup or inference",
+  "model_calls": 0,
+  "measurements": {
+    "catalog": {
+      "samples": [
+        {
+          "seconds": 0.8637904999777675,
+          "peak_rss_bytes": 31047680,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": []
+        },
+        {
+          "seconds": 0.7007843999890611,
+          "peak_rss_bytes": 30466048,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": []
+        },
+        {
+          "seconds": 0.637223600060679,
+          "peak_rss_bytes": 30781440,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": []
+        }
+      ],
+      "median_seconds": 0.7007843999890611,
+      "median_peak_rss_bytes": 30781440
+    },
+    "lsp": {
+      "samples": [
+        {
+          "seconds": 1.3859590999782085,
+          "peak_rss_bytes": 33132544,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": [
+            "lsp"
+          ]
+        },
+        {
+          "seconds": 1.3663759999908507,
+          "peak_rss_bytes": 34017280,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": [
+            "lsp"
+          ]
+        },
+        {
+          "seconds": 0.8031266999896616,
+          "peak_rss_bytes": 33820672,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": [
+            "lsp"
+          ]
+        }
+      ],
+      "median_seconds": 1.3663759999908507,
+      "median_peak_rss_bytes": 33820672
+    },
+    "mcp": {
+      "samples": [
+        {
+          "seconds": 0.8807842000387609,
+          "peak_rss_bytes": 31502336,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": [
+            "mcp"
+          ]
+        },
+        {
+          "seconds": 1.0488108000718057,
+          "peak_rss_bytes": 30973952,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": [
+            "mcp"
+          ]
+        },
+        {
+          "seconds": 1.23485350003466,
+          "peak_rss_bytes": 32206848,
+          "before_optional_load": {
+            "fastapi": false,
+            "torch": false,
+            "transformers": false,
+            "kaggle": false,
+            "atomic_flow.integrations.mcp": false,
+            "atomic_flow.lsp": false
+          },
+          "loaded_components": [
+            "mcp"
+          ]
+        }
+      ],
+      "median_seconds": 1.0488108000718057,
+      "median_peak_rss_bytes": 31502336
+    }
+  }
+}

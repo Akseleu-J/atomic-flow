@@ -1,0 +1,62 @@
+    Checking once_cell v1.21.4
+    Checking cfg-if v1.0.5
+    Checking itoa v1.0.18
+    Checking memchr v2.8.3
+   Compiling getrandom v0.2.17
+    Checking serde_core v1.0.229
+   Compiling zerocopy v0.8.63
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_core v0.6.4
+    Checking zerofrom v0.1.8
+   Compiling rand_chacha v0.3.1
+   Compiling siphasher v1.0.4
+    Checking stable_deref_trait v1.2.1
+    Checking log v0.4.34
+    Checking yoke v0.8.4
+   Compiling phf_shared v0.11.3
+   Compiling rand v0.8.8
+    Checking zmij v1.0.23
+    Checking ryu v1.0.23
+    Checking ahash v0.8.12
+    Checking serde_json v1.0.154
+   Compiling phf_generator v0.11.3
+    Checking typenum v1.20.1
+    Checking either v1.19.0
+    Checking itertools v0.11.0
+    Checking generic-array v0.14.7
+    Checking zerovec v0.11.9
+   Compiling phf_codegen v0.11.3
+    Checking hashbrown v0.14.5
+    Checking libm v0.2.16
+    Checking thiserror v1.0.69
+    Checking malachite-base v0.4.22
+    Checking af-entropy v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-entropy)
+error: casting raw pointers to the same type and constness is unnecessary (`*mut std::ffi::c_void` -> `*mut std::ffi::c_void`)
+   --> af-entropy\src\lib.rs:143:22
+    |
+143 |         let handle = file.as_raw_handle() as *mut std::ffi::c_void;
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `file.as_raw_handle()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+    = note: `-D clippy::unnecessary-cast` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::unnecessary_cast)]`
+
+error: casting raw pointers to the same type and constness is unnecessary (`*mut std::ffi::c_void` -> `*mut std::ffi::c_void`)
+   --> af-entropy\src\lib.rs:180:22
+    |
+180 |         let handle = file.as_raw_handle() as *mut std::ffi::c_void;
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `file.as_raw_handle()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+error: name `OVERLAPPED` contains a capitalized acronym
+   --> af-entropy\src\lib.rs:214:8
+    |
+214 | struct OVERLAPPED {
+    |        ^^^^^^^^^^ help: consider making the acronym lowercase, except the initial letter: `Overlapped`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#upper_case_acronyms
+    = note: `-D clippy::upper-case-acronyms` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::upper_case_acronyms)]`
+
+error: could not compile `af-entropy` (lib) due to 3 previous errors

@@ -1,0 +1,10 @@
+   Compiling af-graph v0.1.0 (C:\Users\omirb\.zcode\workspace\7a9e7cc1-327f-4133-a7af-0ccfe5ee24e8\atomic-flow-dev\rust\af-graph)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.60s
+     Running tests\delta_parity.rs (target\debug\deps\delta_parity-d3ce96a0f92b58a9.exe)
+
+running 2 tests
+test delete_delta_matches_a_clean_rebuild_without_the_file ... ok
+test one_file_delta_matches_a_clean_rebuild_byte_for_byte ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+

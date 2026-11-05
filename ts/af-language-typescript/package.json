@@ -1,0 +1,14 @@
+{
+  "name": "@atomic-flow/af-language-typescript",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "bin": {"af-language-typescript": "./bin/analyze.mjs"},
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {"typescript": "5.8.3"}
+}

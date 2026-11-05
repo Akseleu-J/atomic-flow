@@ -1,0 +1,80 @@
+{
+  "tested_commit": "aa575ddf91cbc34e2ad12f8b65d9d517faa5bec8",
+  "artifacts": {
+    "calibration.zip": {
+      "artifact_id": 13416252990,
+      "run_id": 42031833346,
+      "sha256": "83f9ebd816652dab4553b47f044b5cf7802f3e0c0f076a81313d330188e4a1a9",
+      "zip_members": 12,
+      "calibration": {
+        "base_fail": 6,
+        "gold_pass": 6,
+        "model_calls": 0
+      }
+    },
+    "docker-driver.zip": {
+      "artifact_id": 13415614525,
+      "run_id": 42031833362,
+      "sha256": "fef14a17ce47f6df4b9008cd72449e527c2f378427dbd57e263c4bdc78902d13",
+      "zip_members": 13,
+      "source_files_exact_git_bytes": 124,
+      "docker_receipt": {
+        "receipt_valid": true,
+        "container_id": "fe7c5330366b40347c2beb3963011b7899221953de4fb86a68c248337c9ebb22",
+        "image_id": "sha256:24ab38714e948bd49d24d566e97c1c104b63f85c2e642685e72393b37cfb9862",
+        "host_container_absence_confirmed": true,
+        "verification": "not_assessed"
+      }
+    },
+    "studio-ubuntu-24.04.zip": {
+      "artifact_id": 13417275126,
+      "run_id": 42031839997,
+      "sha256": "68fcefb717943f76cac3e9f575871502de1c80858bcfee6d540858f3d40267be",
+      "zip_members": 9,
+      "source_files_exact_git_bytes": 124,
+      "rust_pass": 346,
+      "rust_ignored": 1,
+      "smoke": {
+        "status": "passed",
+        "binary_sha256": "ef3902cf83a6005e5e5ce37827a849f6a9e68089c297d3a48f216154344296ee",
+        "scenarios": [
+          "static UI nonce CSP and token-only APIs",
+          "hostile origin, DNS-rebinding Host and browser credential routing refused",
+          "registered Rust project graph and hash-bound source preview",
+          "actual native scripted chat, source context, durable history and forged terminal refusal",
+          "immutable journal snapshot exact SHA256 and durable budget projection",
+          "installed SDK copy outside checkout against actual native API"
+        ],
+        "provider_calls": 0,
+        "transport": "native HTTP + scripted backend",
+        "owned_server_cleanup": true,
+        "browser_visual_qa": "not_assessed"
+      }
+    },
+    "studio-windows-2022.zip": {
+      "artifact_id": 13416732521,
+      "run_id": 42031839997,
+      "sha256": "7e60a6a523fa6d015eac26d6fc9088d106442c26d53146b8990ff583f46cbeef",
+      "zip_members": 9,
+      "source_files_exact_git_bytes": 124,
+      "rust_pass": 343,
+      "rust_ignored": 1,
+      "smoke": {
+        "status": "passed",
+        "binary_sha256": "e62b01546f8922d17d373c6c2fcb36898e5026f4479af9f34c918303eac629c4",
+        "scenarios": [
+          "static UI nonce CSP and token-only APIs",
+          "hostile origin, DNS-rebinding Host and browser credential routing refused",
+          "registered Rust project graph and hash-bound source preview",
+          "actual native scripted chat, source context, durable history and forged terminal refusal",
+          "immutable journal snapshot exact SHA256 and durable budget projection",
+          "installed SDK copy outside checkout against actual native API"
+        ],
+        "provider_calls": 0,
+        "transport": "native HTTP + scripted backend",
+        "owned_server_cleanup": true,
+        "browser_visual_qa": "not_assessed"
+      }
+    }
+  }
+}

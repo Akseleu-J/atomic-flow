@@ -1,0 +1,44 @@
+{
+  "status": "verified",
+  "published_head": "91d22e2d1ed3e4d415bbb72076503cc4c6bf2fe3",
+  "tested_merge": "be9fb63a075274bdbf7dd8e40671053f01daf34a",
+  "same_tree": "c95e2dbdd4dfb90098a6e7f1601e8b64c1d1978a",
+  "tree_verified_by": "git fetch refs/pull/2/merge and rev-parse of published head/merge tree",
+  "runs": [
+    40175334384,
+    40175334261
+  ],
+  "archive_sha256": {
+    "host-py311.zip": "ef5ee8892b849d5d454ad060a32b61e42ed82127910a654864bbd54a07113a50",
+    "host-py312.zip": "60a2ab6725d5ccba5cd556a211d745ca820b8e0acbd11983927a6b6385141928",
+    "external-composition.zip": "53c3e190caff26e6084f9a6a4b2f38121930d067514c57635044fdfc920e869e"
+  },
+  "reports": [
+    {
+      "archive": "host-py311.zip",
+      "passed": 1197,
+      "skipped": 14,
+      "source_files_matched": 255,
+      "junit_sha256": "5f1161456bd1d9938e02d44f45a689876d341376b1543dda1bcf8016cce2e626"
+    },
+    {
+      "archive": "host-py312.zip",
+      "passed": 1197,
+      "skipped": 14,
+      "source_files_matched": 255,
+      "junit_sha256": "b97e71e16b7367d2ce3ccf9d9fb7f7cbefbad5feded36879e80c3c225a04c74d"
+    },
+    {
+      "archive": "external-composition.zip",
+      "scenarios": [
+        "publish",
+        "cancel",
+        "source_conflict"
+      ],
+      "status": "passed",
+      "script_sha256": "271e9ff39147ba1d0242c321b0d6cf7e3e231db5f33f0a93bffbe7201797ffb1"
+    }
+  ],
+  "installed_matrix": "12 jobs passed; individual installed wheel archives not downloaded in this package",
+  "scope": "P05 host core acceptance, not production readiness or model utility"
+}

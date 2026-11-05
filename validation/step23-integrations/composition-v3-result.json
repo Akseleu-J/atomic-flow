@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "status": "failed",
+  "paid_calls": 0,
+  "scenarios": [
+    {
+      "name": "publish",
+      "status": "failed",
+      "schema_version": 2,
+      "external_services": "real local processes",
+      "model": "scripted; no model quality claim",
+      "paid_calls": 0,
+      "observations": [],
+      "review": {
+        "unapproved_resume_blocked": true,
+        "allowed_paths": [
+          "book.ipynb",
+          "sample.py"
+        ],
+        "approval_digest": "4a02b278ddef70380ac233ff3412bbe3e2f0fcfed49ec9a57ababdeda32621d9",
+        "planning_calls": 1
+      },
+      "error_type": "AssertionError",
+      "error": "missing completed external probes: LSPError: LSP request timed out"
+    }
+  ],
+  "script_sha256": "1992abfb3a98a7af802c2100a1cbc660a1b0ab7ba853ac18e227661f16fd63ef",
+  "error_type": "AssertionError",
+  "error": "missing completed external probes: LSPError: LSP request timed out"
+}

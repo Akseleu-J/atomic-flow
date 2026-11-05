@@ -1,0 +1,11 @@
+[package]
+name = "af-context"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Retrieval and context for the model plane: tokenization, inverted index with field weights, PageRank blend, byte-budgeted context pack (activation/ port, the repo-map layer)"
+
+[dependencies]
+serde_json.workspace = true
+thiserror.workspace = true
+af-graph.workspace = true

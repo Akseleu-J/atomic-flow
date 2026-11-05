@@ -1,0 +1,9 @@
+{
+  "schema_version": 2,
+  "status": "failed",
+  "paid_calls": 0,
+  "scenarios": [],
+  "script_sha256": "4f36bf3b2156b8d49aef57e55dbf993dde663da7404c432320157497665e0ac8",
+  "error_type": "AssertionError",
+  "error": "failed: ResponseFormatError: answerer: tool loop exceeded 6 turns ResponseFormatError: answerer: tool loop exceeded 6 turns"
+}

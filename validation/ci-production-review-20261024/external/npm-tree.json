@@ -1,0 +1,91 @@
+{
+  "name": "external-tools",
+  "dependencies": {
+    "@modelcontextprotocol/server-filesystem": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/@modelcontextprotocol/server-filesystem/-/server-filesystem-2.0.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@modelcontextprotocol/server": {
+          "version": "2.4.0",
+          "resolved": "https://registry.npmjs.org/@modelcontextprotocol/server/-/server-2.4.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@modelcontextprotocol/core": {
+              "version": "2.4.0",
+              "resolved": "https://registry.npmjs.org/@modelcontextprotocol/core/-/core-2.4.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "zod": {
+                  "version": "4.6.7"
+                }
+              }
+            },
+            "zod": {
+              "version": "4.6.7"
+            }
+          }
+        },
+        "diff": {
+          "version": "8.0.4",
+          "resolved": "https://registry.npmjs.org/diff/-/diff-8.0.4.tgz",
+          "overridden": false
+        },
+        "glob": {
+          "version": "13.0.6",
+          "resolved": "https://registry.npmjs.org/glob/-/glob-13.0.6.tgz",
+          "overridden": false,
+          "dependencies": {
+            "minimatch": {
+              "version": "10.2.6"
+            },
+            "minipass": {
+              "version": "7.1.3",
+              "resolved": "https://registry.npmjs.org/minipass/-/minipass-7.1.3.tgz",
+              "overridden": false
+            },
+            "path-scurry": {
+              "version": "2.0.2",
+              "resolved": "https://registry.npmjs.org/path-scurry/-/path-scurry-2.0.2.tgz",
+              "overridden": false,
+              "dependencies": {
+                "lru-cache": {
+                  "version": "11.5.3",
+                  "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-11.5.3.tgz",
+                  "overridden": false
+                },
+                "minipass": {
+                  "version": "7.1.3"
+                }
+              }
+            }
+          }
+        },
+        "minimatch": {
+          "version": "10.2.6",
+          "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-10.2.6.tgz",
+          "overridden": false,
+          "dependencies": {
+            "brace-expansion": {
+              "version": "5.0.12",
+              "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.12.tgz",
+              "overridden": false,
+              "dependencies": {
+                "balanced-match": {
+                  "version": "4.0.4",
+                  "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.4.tgz",
+                  "overridden": false
+                }
+              }
+            }
+          }
+        },
+        "zod": {
+          "version": "4.6.7",
+          "resolved": "https://registry.npmjs.org/zod/-/zod-4.6.7.tgz",
+          "overridden": false
+        }
+      }
+    }
+  }
+}

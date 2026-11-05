@@ -1,0 +1,251 @@
+..................................................F..................... [ 37%]
+........................................................................ [ 74%]
+................................................F.                       [100%]
+================================== FAILURES ===================================
+_________ test_empty_goal_scope_denies_writes_and_is_bound_to_review __________
+
+tmp_path = WindowsPath('C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_empty_goal_scope_denies_w0')
+
+    def test_empty_goal_scope_denies_writes_and_is_bound_to_review(tmp_path):
+        task = job(tmp_path)
+        task.goals[0].scope_paths = []
+>       save(task)
+
+tests\test_p05_acceptance.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\atomic_flow\agents\task.py:106: in save
+    tmp.replace(target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_empty_goal_scope_denies_w0/home/tasks/task_6e82431de4e7.json.0avnqnug.tmp')
+target = WindowsPath('C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_empty_goal_scope_denies_w0/home/tasks/task_6e82431de4e7.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] �������� � �������: 'C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\p05-closure-final\\test_empty_goal_scope_denies_w0\\home\\tasks\\task_6e82431de4e7.json.0avnqnug.tmp' -> 'C:\\Users\\omirb\\OneDrive\\���������\\ChatGPT\\atomic-flow 2\\atomic-flow\\.local-tools\\p05-closure-final\\test_empty_goal_scope_denies_w0\\home\\tasks\\task_6e82431de4e7.json'
+
+C:\Users\omirb\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py:1376: PermissionError
+__________ test_public_review_edit_check_and_fault_journeys[cancel] ___________
+
+tmp_path = WindowsPath('C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_public_review_edit_check_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002442ADF7E30>
+mode = 'cancel'
+
+    @pytest.mark.parametrize("mode", ["publish", "cancel", "source_conflict"])
+    def test_public_review_edit_check_and_fault_journeys(tmp_path, monkeypatch, mode):
+        # Only public dependency constructors are replaced. TaskRunner, notebook
+        # operations, dispatcher, ledger, checks and publication remain real. These
+        # fakes cannot establish external LSP/MCP interoperability.
+        clients = []
+    
+        class LSP:
+            def __init__(self, root, command, **kwargs):
+                assert kwargs["approved"] and kwargs["private_workspace"]
+                self.root, self.revisions, self.closed = root, {}, False
+                clients.append(self)
+    
+            def __enter__(self):
+                return self
+    
+            def __exit__(self, *args):
+                self.closed = True
+    
+            def read_document(self, path):
+                text = (self.root / path).read_text(encoding="utf-8")
+                old, version = self.revisions.get(path, (None, 0))
+                version += old != text
+                self.revisions[path] = text, version
+                return {"text": text, "version": version, "content_hash": hashlib.sha1(text.encode()).hexdigest()}
+    
+            def definition(self, path, line, column):
+                return [{"path": path}]
+    
+        class MCP:
+            def __init__(self, root, command, **kwargs):
+                assert kwargs["approved"]
+                self.allowed_tools, self.closed = {}, False
+                clients.append(self)
+    
+            def __enter__(self):
+                return self
+    
+            def __exit__(self, *args):
+                self.closed = True
+    
+            def list_tools(self):
+                return [{"name": "read_text_file", "inputSchema": {"type": "object"}}]
+    
+            def call_tool(self, name, params):
+                assert name in self.allowed_tools
+                return {"remote_result": {"content": [{"text": Path(params["path"]).read_text(encoding="utf-8")}]}}
+    
+        monkeypatch.setattr(acceptance, "LSPClient", LSP)
+        monkeypatch.setattr(acceptance, "MCPClient", MCP)
+        args = SimpleNamespace(pylsp=tmp_path / "host-pylsp", pylsp_python=False,
+                               node=tmp_path / "host-node", mcp_server=tmp_path / "host-mcp.js")
+>       result = acceptance.run_single(args, mode)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_composition_acceptance.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = namespace(pylsp=WindowsPath('C:/Users/omirb/OneDrive/���������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-clos...�������/ChatGPT/atomic-flow 2/atomic-flow/.local-tools/p05-closure-final/test_public_review_edit_check_1/host-mcp.js'))
+mode = 'cancel'
+evidence = {'schema_version': 2, 'name': 'cancel', 'status': 'running', 'external_services': 'real local processes', ...}
+
+    def run_single(args, mode="publish", evidence=None):
+        if evidence is None:
+            evidence = {}
+        evidence.update(schema_version=2, name=mode, status="running", external_services="real local processes",
+                        model="scripted; no model quality claim", paid_calls=0, observations=[])
+        print(f"acceptance scenario={mode} start", flush=True)
+        with tempfile.TemporaryDirectory(prefix="atomic-external-acceptance-") as tmp, ExitStack() as clients:
+            root = Path(tmp)
+            project = root / "project"
+            project.mkdir()
+            (project / "sample.py").write_bytes(BEFORE.encode("utf-8"))
+            (project / "book.ipynb").write_bytes(notebook_bytes())
+            test_bytes = b"from sample import answer\n\ndef test_answer():\n    assert answer() == 2\n"
+            (project / "test_sample.py").write_bytes(test_bytes)
+            os.environ["ATOMIC_FLOW_HOME"] = str(root / "host-state")
+            os.environ["ATOMIC_FLOW_EXECUTION_MODE"] = "local"
+            save_tree(project, build_tree(project))
+            backend = ScriptedBackend()
+    
+            class Probe(Tool):
+                name, description = "external_probe", "Read source through real host-approved LSP and MCP clients"
+                contract = ToolContract(effects=("read",), timeout_seconds=90)
+    
+                class Args(BaseModel):
+                    phase: str
+    
+                args_schema = Args
+    
+                def run(self, params, ctx):
+                    assert params.phase in {"before", "after"}
+                    expected = BEFORE if params.phase == "before" else AFTER
+                    assert ctx.project_root != project
+                    assert (project / "sample.py").read_text(encoding="utf-8") == BEFORE
+                    doc = lsp.read_document("sample.py")
+                    definitions = lsp.definition("sample.py", 3, 10)
+                    assert doc["text"] == expected, "LSP document bytes differ from expected revision"
+                    assert definitions and definitions[0]["path"] == "sample.py", f"unexpected definitions: {definitions}"
+                    result = mcp.call_tool("read_text_file", {"path": str(ctx.project_root / "sample.py")})
+                    text = "\n".join(block.get("text", "") for block in result["remote_result"]["content"])
+                    assert expected.strip() in text, "MCP source response differs from staged revision"
+                    evidence["observations"].append({"phase": params.phase, "workspace": "staged", "version": doc["version"],
+                                                       "hash": doc["content_hash"], "definitions": len(definitions)})
+                    if params.phase == "after" and mode == "cancel":
+                        request_cancel(task.id)
+                        evidence["host_fault"] = "cancel after staged edit and completed read-only external probes"
+                    elif params.phase == "after" and mode == "source_conflict":
+                        (project / "sample.py").write_bytes(EXTERNAL.encode())
+                        evidence["host_fault"] = "external source editor changed original after staged edit"
+                    return {"phase": params.phase, "data_only": True, "definition_count": len(definitions)}
+    
+            def factory(context):
+                nonlocal lsp, mcp
+                assert context.workspace != context.project
+                evidence["factory_bindings"] = evidence.get("factory_bindings", 0) + 1
+                lsp_command = [str(args.pylsp)] + (["-m", "pylsp"] if args.pylsp_python else [])
+                lsp = clients.enter_context(LSPClient(context.workspace, lsp_command, approved=True, timeout=45, private_workspace=True))
+                mcp = clients.enter_context(MCPClient(context.workspace, [str(args.node), str(args.mcp_server), str(context.workspace)],
+                                                      approved=True, timeout=45, approval=lambda method, params: method == "tools/call"))
+                tools = mcp.list_tools()
+                descriptor = next(t for t in tools if t["name"] == "read_text_file")
+                mcp.allowed_tools["read_text_file"] = schema_hash(descriptor)
+                registry = default_registry()
+                registry.register(Probe())
+                return TaskCapabilities(lsp_client=lsp, tool_registry=registry,
+                                        role_tools={"answerer": ["external_probe", "read_file", "patch_file",
+                                                                  "notebook_read", "notebook_edit"]})
+    
+            lsp = mcp = None
+            config = AtomicConfig()
+            config.task.max_replans = 0
+            config.task.max_model_calls = 16
+            config.task.final_check = "pytest"
+            runner = TaskRunner(config, project, backend, approval_callback=lambda *a: True, capability_factory=factory)
+            task = runner.prepare("Change sample and notebook source to two and verify through external source tools",
+                                  candidates=["sample.py::answer"], n_files=3)
+            assert task.status == "paused" and task.plan_ready and len(backend.calls) == 1
+            assert not task.plan_approval and not task.changeset_id
+            task = runner.resume(task)
+            assert task.status == "paused" and "plan approval required" in task.error
+            assert not task.changeset_id and len(backend.calls) == 1
+            review = runner.review(task, allowed_paths=["sample.py", "book.ipynb"])
+            task = runner.approve(task, review["digest"], allowed_paths=["sample.py", "book.ipynb"])
+            assert task.plan_approval["digest"] == review["digest"]
+            assert not task.changeset_id and len(backend.calls) == 1
+            evidence["review"] = {"unapproved_resume_blocked": True, "allowed_paths": review["allowed_paths"],
+                                  "approval_digest": review["digest"], "planning_calls": 1}
+            task = runner.resume(task)
+            print(f"acceptance scenario={mode} task_status={task.status}", flush=True)
+            assert len(evidence["observations"]) == 2, f"missing completed external probes: {task.error}"
+            assert evidence["observations"][1]["version"] > evidence["observations"][0]["version"]
+            assert abs(SpendLedger(10).today_total() - task.budget_spent) < 1e-8
+            assert all(event["status"] == "completed" for event in task.budget_events)
+            assert len(task.budget_events) == len(backend.calls)
+            evidence.update(task_status=task.status, task_error=task.error)
+            if mode == "publish":
+                assert task.status == "done", f"{task.status}: {task.error} {task.steps[0].result_summary}"
+                assert len(backend.calls) == 14 and evidence["factory_bindings"] == 2
+                assert (project / "sample.py").read_bytes() == AFTER.encode()
+                assert (project / "test_sample.py").read_bytes() == test_bytes
+                assert task.completion_report["ready_to_publish"] and task.completion_report["tests"] == "passed"
+                book = json.loads((project / "book.ipynb").read_text(encoding="utf-8"))
+                cell = book["cells"][0]
+                assert cell["id"] == "cell-one" and "".join(cell["source"]) == "value = 2\n"
+                assert cell["outputs"] == [] and cell["execution_count"] is None
+                assert "trusted" not in cell["metadata"] and "signature" not in book["metadata"]
+                assert any(c["name"] == "notebook_structure" and c["status"] == "passed" and c["execution"] == "not_run"
+                           for c in task.completion_report["checks"])
+                evidence["notebook"] = {"source_changed": True, "stable_ids": True, "outputs_cleared": True,
+                                        "trust_cleared": True, "notebook_execution": "not_run"}
+                # Exact crash boundary: publication journal is saved but task's final
+                # completion save was lost. This is durable-state injection, not an
+                # actual OS process-kill test, and never patches a private method.
+                task.status, task.finished_at, task.error = "paused", None, "fault: completion save interrupted after publication"
+                save(task)
+                calls_before_recovery = len(backend.calls)
+    
+                def no_rebind(context):
+                    raise AssertionError("published recovery must not recreate execution capabilities")
+    
+                recovered = TaskRunner(config, project, backend, capability_factory=no_rebind).resume(task)
+                assert recovered.status == "done" and not recovered.error
+                assert len(backend.calls) == calls_before_recovery
+                assert (project / "sample.py").read_bytes() == AFTER.encode()
+                evidence["recovery"] = {"published_journal_unsaved_completion": "verified", "new_model_calls": 0,
+                                        "recreated_capabilities": 0, "source_bytes_verified": True,
+                                        "fault_method": "host durable-state injection; not process-kill coverage"}
+            elif mode == "cancel":
+>               assert task.status == "failed" and task.error == "cancelled by user", task.error
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: cancelled by user
+
+tools\integration_acceptance.py:234: AssertionError
+---------------------------- Captured stdout call -----------------------------
+acceptance scenario=cancel start
+acceptance scenario=cancel task_status=cancelled
+============================== warnings summary ===============================
+tests/test_rolling_plan.py::test_more_than_three_children_and_goal_rewrite_are_rejected
+  C:\Users\omirb\OneDrive\���������\ChatGPT\atomic-flow 2\atomic-flow\.venv\Lib\site-packages\pydantic\main.py:520: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `PlanGoal` - serialized value may not be as expected [field_name='goals', input_value={'id': 'other'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p05_acceptance.py::test_empty_goal_scope_denies_writes_and_is_bound_to_review
+FAILED tests/test_composition_acceptance.py::test_public_review_edit_check_and_fault_journeys[cancel]
+2 failed, 192 passed, 1 warning in 138.15s (0:02:18)
+

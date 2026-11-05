@@ -1,0 +1,68 @@
+{
+  "status": "verified",
+  "published_head": "395b8accfb8b5aa61a4270543c42185dde596db1",
+  "tested_merge": "a8a76f86f2a6a60f9e02bee0db0294270970608a",
+  "tree": "ecdd45b385090c85a6d5d1831339b7af12511c88",
+  "runs": [
+    40212848955,
+    40212848950
+  ],
+  "reports": [
+    {
+      "artifact_id": 12606635488,
+      "archive_sha256": "01e03a389a52b3036bb4678bed569b6d1766d397401151ad85c3b835c622a658",
+      "name": "host-tests-3.11-a8a76f86f2a6a60f9e02bee0db0294270970608a",
+      "cases": 1274,
+      "passed": 1260,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 271,
+      "python": "3.11.17"
+    },
+    {
+      "artifact_id": 12606368992,
+      "archive_sha256": "4f6b44999c27bd9be5e137b9c8d9783adb1968cbd0cb0c9f7e43639b9c7d7f3c",
+      "name": "validation-a8a76f86f2a6a60f9e02bee0db0294270970608a",
+      "docker": {
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15 (main, Oct  1 2026, 02:35:59) [GCC 13.3.0]",
+        "gpu_requested": false,
+        "model_calls": 0,
+        "container": "PASS",
+        "tests_exit": 0,
+        "extra_tests_exit": 0,
+        "compile_exit": 0,
+        "image_id": "sha256:35b08188a25f3de5b94c5b0b59fc48b19e534d59b60428ba7d28934461d10778"
+      }
+    },
+    {
+      "artifact_id": 12605259143,
+      "archive_sha256": "292eb7a880f24916ecf6bdd29af142ee7f856b8e4b3bd39a7fe06978916d21c9",
+      "name": "host-tests-3.12-a8a76f86f2a6a60f9e02bee0db0294270970608a",
+      "cases": 1274,
+      "passed": 1260,
+      "failed": 0,
+      "skipped": 14,
+      "source_files_matched": 271,
+      "python": "3.12.15"
+    },
+    {
+      "artifact_id": 12606485660,
+      "archive_sha256": "241ada49dcdf05b6bc97287bda6e7ea8445a50a52808d6e39dee226b4b9b1686",
+      "name": "external-interoperability-a8a76f86f2a6a60f9e02bee0db0294270970608a",
+      "composition_scenarios": [
+        "publish",
+        "cancel",
+        "source_conflict"
+      ]
+    }
+  ],
+  "local_unique_union": {
+    "cases": 168,
+    "passed": 165,
+    "failed": 0,
+    "skipped": 3
+  },
+  "new_provider_calls": 0,
+  "limits": "Wheel matrix job status recorded separately; its 12 archives were not downloaded. No live utility, independent review, worker deployment or production acceptance claim."
+}

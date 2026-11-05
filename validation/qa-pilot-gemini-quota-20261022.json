@@ -1,0 +1,26 @@
+{
+  "before": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 4.000000000559112e-06,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 7.906456399999996,
+      "allowed": 100
+    }
+  ],
+  "after": [
+    {
+      "period": "ModelProxyQuotaRefillPeriod.DAILY",
+      "used": 0.07988507499999997,
+      "allowed": 10
+    },
+    {
+      "period": "ModelProxyQuotaRefillPeriod.MONTHLY",
+      "used": 7.986337474999999,
+      "allowed": 100
+    }
+  ]
+}

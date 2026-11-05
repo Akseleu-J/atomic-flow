@@ -4,16 +4,17 @@ from __future__ import annotations
 
 import time
 
-from atomic_flow.backends.base import ChatResult, estimate_cost
-from atomic_flow.backends.http import post_json
+from atomic_flow.backends.base import ChatResult, ResponseShapeError
+from atomic_flow.backends.http import TransportError, post_json
+from atomic_flow.backends.usage import AnthropicCachePrices, anthropic_usage
 from atomic_flow.config import BackendConfig
-from atomic_flow.errors import BackendError
 
 
 class AnthropicBackend:
-    def __init__(self, config: BackendConfig, *, backend_name: str = "anthropic"):
+    def __init__(self, config: BackendConfig, *, backend_name: str = "anthropic", cache_prices: AnthropicCachePrices | None = None):
         self.config = config
         self.name = backend_name
+        self.cache_prices = cache_prices
 
     def chat(self, messages: list[dict[str, str]], *, json_mode: bool = False, model: str | None = None) -> ChatResult:
         started = time.monotonic()
@@ -31,13 +32,35 @@ class AnthropicBackend:
         headers = {"Content-Type": "application/json", "anthropic-version": "2023-06-01", "User-Agent": "atomic-flow/0.2"}
         if key:
             headers["x-api-key"] = key
-        payload = post_json(endpoint, body, headers, timeout=self.config.timeout_seconds,
+        remaining = min(self.config.timeout_seconds, getattr(self, "route_deadline", float("inf")) - time.monotonic())
+        if remaining <= 0:
+            raise TransportError("provider routing deadline exceeded; request not sent", outcome="not_sent")
+        payload = post_json(endpoint, body, headers, timeout=remaining,
                             retries=self.config.max_retries, secrets=(key,))
+        tokens_in, tokens_out, cost, source, cache_read, cache_write = anthropic_usage(
+            payload, self.config, self.cache_prices, model=model)
+        result = ChatResult("", tokens_in, tokens_out, cost,
+                          int((time.monotonic() - started) * 1000), truncated=payload.get("stop_reason") == "max_tokens",
+                          cache_read_tokens=cache_read, cache_write_tokens=cache_write,
+                          cost_source=source, resolved_backend=self.name, resolved_model=model or self.config.model)
         try:
-            content = "".join(b.get("text", "") for b in payload.get("content", []) if b.get("type") == "text")
-            usage = payload.get("usage", {})
-            tokens_in, tokens_out = int(usage.get("input_tokens", 0)), int(usage.get("output_tokens", 0))
-        except (AttributeError, TypeError, ValueError) as exc:
-            raise BackendError("Unexpected Anthropic response shape.") from exc
-        return ChatResult(content, tokens_in, tokens_out, estimate_cost(self.config, tokens_in, tokens_out),
-                          int((time.monotonic() - started) * 1000), truncated=payload.get("stop_reason") == "max_tokens")
+            blocks = payload["content"]
+            if not isinstance(blocks, list) or not blocks:
+                raise ValueError("missing content blocks")
+            texts = []
+            for block in blocks:
+                if not isinstance(block, dict) or not isinstance(block.get("type"), str):
+                    raise ValueError("invalid content block")
+                if block["type"] == "text":
+                    if not isinstance(block.get("text"), str):
+                        raise ValueError("invalid text block")
+                    texts.append(block["text"])
+                elif block["type"] not in {"thinking", "redacted_thinking"}:
+                    # Native/server tools are not declared by this text adapter.
+                    raise ValueError("unsupported content block")
+            if not texts:
+                raise ValueError("no text content")
+            result.content = "".join(texts)
+            return result
+        except (KeyError, ValueError, TypeError) as exc:
+            raise ResponseShapeError("Unexpected Anthropic response content; received usage retained.", result) from exc
